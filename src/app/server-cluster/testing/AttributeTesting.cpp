@@ -51,7 +51,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
     {
         ChipLogError(Test, "Sets of different sizes.");
 
-        for (const auto it : entriesA)
+        for (const auto & it : entriesA)
         {
             if (entriesB.find(it.first) == entriesB.end())
             {
@@ -59,7 +59,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
             }
         }
 
-        for (const auto it : entriesB)
+        for (const auto & it : entriesB)
         {
             if (entriesA.find(it.first) == entriesA.end())
             {
@@ -70,7 +70,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
         return false;
     }
 
-    for (const auto it : entriesA)
+    for (const auto & it : entriesA)
     {
         const auto other = entriesB.find(it.first);
         if (other == entriesB.end())
@@ -120,7 +120,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
     {
         ChipLogError(Test, "Sets of different sizes.");
 
-        for (const auto it : entriesA)
+        for (const auto & it : entriesA)
         {
             if (entriesB.find(it.first) == entriesB.end())
             {
@@ -128,7 +128,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
             }
         }
 
-        for (const auto it : entriesB)
+        for (const auto & it : entriesB)
         {
             if (entriesA.find(it.first) == entriesA.end())
             {
@@ -139,7 +139,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
         return false;
     }
 
-    for (const auto it : entriesA)
+    for (const auto & it : entriesA)
     {
         const auto other = entriesB.find(it.first);
         if (other == entriesB.end())

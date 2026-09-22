@@ -32,6 +32,8 @@ public:
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
+    std::optional<CHIP_ERROR> HandleSetAttribute(ByteSpan tlvData) const;
+
     Clusters::BooleanStateCluster & mCluster;
     EndpointId mEndpointId;
 };

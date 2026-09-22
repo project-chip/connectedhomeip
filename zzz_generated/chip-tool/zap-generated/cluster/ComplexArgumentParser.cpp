@@ -3084,39 +3084,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::St
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("GroupcastAdoptionStruct.groupcastAdopted", "groupcastAdopted",
-                                                                  value.isMember("groupcastAdopted")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupcastAdopted");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupcastAdopted, value["groupcastAdopted"]));
-    valueCopy.removeMember("groupcastAdopted");
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.groupcastAdopted);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request,
                                         Json::Value & value)
 {

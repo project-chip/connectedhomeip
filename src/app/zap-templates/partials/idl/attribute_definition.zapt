@@ -24,6 +24,9 @@
   {{~/if~}}
   {{~#if isNullable~}}
     nullable {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
+  {{~#if isFabricSensitive~}}
+    fabric_sensitive {{!marker to place a space even with whitespace removal~}}
   {{~/if~}} {{type}}
   {{~#unless isArray~}}
     {{~#if (isString type)~}}

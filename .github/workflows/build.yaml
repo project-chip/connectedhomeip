@@ -76,6 +76,11 @@ jobs:
               with:
                   languages: "cpp"
                   queries: security-extended, security-and-quality
+                  # TRAP caching only pays off when a run can restore extraction
+                  # output from a closely-related earlier run (PR vs. its base).
+                  # codeql.yml runs nightly on master only, so re-enable this if
+                  # the push/pull_request triggers are ever restored.
+                  trap-caching: false
             - name: Setup Build
               if: github.event.pull_request.number == null
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
