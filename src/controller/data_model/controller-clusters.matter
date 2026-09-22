@@ -12134,7 +12134,7 @@ cluster WebRTCTransportProvider = 1363 {
     kMetadata = 0x1;
   }
 
-  readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
+  readonly attribute access(read: manage) fabric_sensitive WebRTCSessionStruct currentSessions[] = 0;
   provisional readonly attribute int16u supportedSFrameCipherSuites[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
