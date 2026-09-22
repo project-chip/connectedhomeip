@@ -838,10 +838,6 @@ jobs:
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
                 use-cache-volume: 'true'
-                # TEST SCAFFOLDING - REMOVE BEFORE MERGE. Lets this branch write the
-                # volume so the restore path can be exercised before the change lands;
-                # the merged default is master-writes-only.
-                volume-allow-write: 'true'
 
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'

@@ -56,14 +56,21 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        runs-on: namespace-profile-4x16
+        # Shares the ccache volume with the tests.yaml REPL build job, which builds
+        # the same variant. The tag also keeps that cache off the profile's default
+        # volume, where instances running other workflows would drop it.
+        runs-on: namespace-profile-4x16;overrides.cache-tag=chip-ccache-linux
 
         container:
             image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
+                # The runner's cache volume is not visible inside a container job
+                # unless it is mounted and NSC_CACHE_PATH is forwarded.
+                - /cache:/cache
             env:
                 NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NSC_CACHE_PATH: ${{ env.NSC_CACHE_PATH }}
                 NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
                 NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
                 NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
@@ -92,6 +99,7 @@ jobs:
                 build-variant: ${{ matrix.build_variant }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+                use-cache-volume: 'true'
 
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
@@ -198,13 +206,13 @@ jobs:
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
               run: ccache --evict-older-than 1d || true
             - name: Delete existing ccache before save
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               uses: ./.github/actions/delete-cache
               with:
                   cache-key: ${{ env.CCACHE_KEY }}
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true' && steps.ccache.outputs.using-volume != 'true'
               uses: actions/cache/save@v6
               with:
                   path: .ccache
