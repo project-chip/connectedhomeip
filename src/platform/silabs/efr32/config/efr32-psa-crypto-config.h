@@ -18,6 +18,20 @@
 
 #pragma once
 
+// Ensure device feature macros (e.g. SEMAILBOX_PRESENT) are available before
+// any Silabs security headers that key off them. TF-PSA build_info pulls this
+// file in very early — before em_device.h would otherwise be reached.
+#include "em_device.h"
+
+// mbedTLS 4 includes tf-psa-crypto/build_info.h before MBEDTLS_CONFIG_FILE.
+// The Silabs autogen that enables MBEDTLS_PSA_CRYPTO_C (and related symbols)
+// must be visible during that first TF-PSA finalize pass.
+#include "sli_mbedtls_config_autogen.h"
+
+// Allow use of legacy mbedtls_* crypto primitives that moved under private/
+// headers in mbedTLS 4 / TF-PSA-Crypto (e.g. Spake2p).
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+
 // MATTER AWS Specific Configurations
 #ifdef SL_MATTER_ENABLE_AWS
 #define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY

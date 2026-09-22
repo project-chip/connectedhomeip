@@ -16,9 +16,16 @@
  *    limitations under the License.
  */
 
-#include "OtaTlvEncryptionKey.h"
+#include <mbedtls/version.h>
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+// Must be set before OtaTlvEncryptionKey.h (pulls psa/crypto.h -> private/aes.h).
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+#include <mbedtls/private/aes.h>
+#else
+#include <mbedtls/aes.h>
+#endif
 
-#include "mbedtls/aes.h"
+#include "OtaTlvEncryptionKey.h"
 
 #include <string.h>
 

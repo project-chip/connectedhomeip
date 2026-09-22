@@ -190,8 +190,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/bgapi_protocol/protocol/inc",
       "${efr32_sdk_root}/cmsis/Core/Include",
       "${efr32_sdk_root}/cmsis/RTOS2/Include",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/include",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/src/include",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/include",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/src/include",
       "${efr32_sdk_root}/platform_core/platform/driver/debug/inc",
       "${efr32_sdk_root}/platform_core/platform/driver/gpio/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/common/inc",
@@ -217,18 +217,19 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_crypto/inc",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_psec_osal/inc",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_psec_common/inc",
+      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/dispatch/include",
       "${efr32_sdk_root}/platform_core/platform/driver/dma_channel/inc",
       "${efr32_sdk_root}/platform_core/platform/common/inc/",
       "${efr32_sdk_root}/platform_core/platform/service/clock_manager/inc",
+      "${efr32_sdk_root}/platform_core/platform/service/clock_manager/config",
       "${efr32_sdk_root}/platform_core/platform/service/device_manager/inc",
       "${efr32_sdk_root}/platform_core/platform/service/interrupt_manager/inc",
       "${efr32_sdk_root}/platform_core/platform/service/interrupt_manager/inc/arm",
       "${efr32_sdk_root}/platform_core/platform/service/interrupt_manager/src",
+      "${efr32_sdk_root}/platform_core/platform/service/interrupt_manager/config",
       "${efr32_sdk_root}/platform_core/platform/service/iostream/inc",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/src",
-      "${efr32_sdk_root}/platform_core/platform/service/memory_manager/profiler/inc",
-      "${efr32_sdk_root}/platform_core/platform/service/memory_manager/profiler/config",
       "${efr32_sdk_root}/platform_core/platform/service/mpu/inc",
       "${efr32_sdk_root}/platform_core/platform/service/power_manager/inc/",
       "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/common/",
@@ -255,20 +256,30 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/memory_manager",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/queue",
-      "${efr32_sdk_root}/mbedtls/include/",
-      "${efr32_sdk_root}/mbedtls/include/mbedtls",
-      "${efr32_sdk_root}/mbedtls/include/psa",
-      "${efr32_sdk_root}/mbedtls/library",
+      # mbedTLS 4.x + TF-PSA-Crypto layout (SISDK 2026.12+)
+      "${efr32_sdk_root}/mbedtls/mbedtls/include",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/include",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/dispatch",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/include",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/platform",
+      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/dispatch",
+      "${efr32_sdk_root}/platform_core/platform/service/sl_log/inc",
+      "${efr32_sdk_root}/platform_core/platform/service/sl_log/config",
       "${efr32_sdk_root}/freertos/cmsis/Include",
       "${efr32_sdk_root}/freertos/kernel/include",
       "${silabs_gen_folder}/config",
       "${silabs_gen_folder}/autogen",
       "${sl_ot_platform_abstraction}/rtos",
-      "${efr32_sdk_root}/openthread/include",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/include",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/src/include/common",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/src/core",
-      "${efr32_sdk_root}/openthread_stack/util/third_party/openthread/examples/platforms",
+      "${efr32_sdk_root}/thread/include",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/include",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/src/include/common",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/src/core",
+      "${efr32_sdk_root}/openthread_forks/util/third_party/openthread/examples/platforms",
       "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
 
       # Headers needed for Init no function will be called if OT is not used
@@ -323,7 +334,7 @@ template("efr32_sdk") {
     }
 
     if (is_series_2 || is_series_3) {
-      libs += [ "${efr32_sdk_root}/openthread/libs/build/${compiler}/cortex-m33/sl-openthread-library/Release/libsl_openthread.a" ]
+      libs += [ "${efr32_sdk_root}/thread/libs/build/${compiler}/cortex-m33/sl-openthread-library/Release/libsl_openthread.a" ]
 
       if (!sl_matter_enable_siwx_ble) {
         libs += [
@@ -332,6 +343,7 @@ template("efr32_sdk") {
           "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/protocol/command/release/libbgapi_command.a",
           "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/protocol/device/release/libbgapi_device.a",
           "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/protocol/event/release/libbgapi_event.a",
+          "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/protocol/task/release/libbgapi_task.a",
           "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/protocol/release/libbgapi_protocol.a",
           "${efr32_sdk_root}/bgapi_protocol/build/${compiler}/cortex-m33/bgapi_trace/release/libbgapi_trace_stub.a",
           "${efr32_sdk_root}/bluetooth_le_host/build/${compiler}/cortex-m33/accept_list/release/libble_host_accept_list_stub.a",
@@ -547,17 +559,19 @@ template("efr32_sdk") {
       ]
     }
 
-    # Note that we're setting the mbedTLS and PSA configuration files through a
-    # define. This means the build system by default does not pick up changes in
-    # the content of these, only when changing the filename itself.
+    # Note that we're setting the mbedTLS and TF-PSA-Crypto configuration files
+    # through a define. This means the build system by default does not pick up
+    # changes in the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in efr32_mbedtls_config further down this file.
-    # Include path required so bare MBEDTLS_*_CONFIG_FILE filenames resolve after
-    # the headers were moved under src/platform/silabs/efr32/config/.
+    # Include path required so bare MBEDTLS_* / TF_PSA_* CONFIG_FILE filenames
+    # resolve after the headers were moved under src/platform/silabs/efr32/config/.
     _include_dirs += [ "${chip_root}/src/platform/silabs/efr32/config" ]
     defines += [
       "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",
-      "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"efr32-psa-crypto-config.h\"",
+      "TF_PSA_CRYPTO_CONFIG_FILE=\"efr32-psa-crypto-config.h\"",
+      # OpenThread MAC key-policy header (thread package ot_packet_utils).
+      "SL_OT_MAC_KEY_POLICY_CONFIG_HEADER=\"mac/mac-config-key-policy.hpp\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
@@ -565,6 +579,7 @@ template("efr32_sdk") {
       "NVM3_DEFAULT_NVM_SIZE=${sl_nvm3_nvm_size}",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=${sl_nvm3_max_object_size}",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
+      "SL_MATTER_DEFERRED_ATTRIBUTE_STORE_DELAY_MS=${sl_deferred_attribute_store_delay_ms}",
       "CORTEXM3=1",
       "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
       "PLAT=EMBER_PLATFORM_CORTEXM3",
@@ -785,6 +800,9 @@ template("efr32_sdk") {
       # which is not supported by the EFR32 thus resulting on linking failing on
       # undefined __aeabi_read_tp symbol
       cflags += [ "-femulated-tls" ]
+
+      # mbedTLS 4 x509_crt.c trips -Wuninitialized-const-pointer under -Werror.
+      cflags += [ "-Wno-uninitialized-const-pointer" ]
     }
 
     if (defined(invoker.defines)) {
@@ -823,59 +841,60 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/freertos/kernel/timers.c",
-      "${efr32_sdk_root}/mbedtls/include/mbedtls/platform.h",
-      "${efr32_sdk_root}/mbedtls/library/aes.c",
-      "${efr32_sdk_root}/mbedtls/library/asn1parse.c",
-      "${efr32_sdk_root}/mbedtls/library/asn1write.c",
-      "${efr32_sdk_root}/mbedtls/library/base64.c",
-      "${efr32_sdk_root}/mbedtls/library/bignum.c",
-      "${efr32_sdk_root}/mbedtls/library/bignum_core.c",
-      "${efr32_sdk_root}/mbedtls/library/block_cipher.c",
-      "${efr32_sdk_root}/mbedtls/library/ccm.c",
-      "${efr32_sdk_root}/mbedtls/library/cipher.c",
-      "${efr32_sdk_root}/mbedtls/library/cipher_wrap.c",
-      "${efr32_sdk_root}/mbedtls/library/cmac.c",
-      "${efr32_sdk_root}/mbedtls/library/constant_time.c",
-      "${efr32_sdk_root}/mbedtls/library/ecdh.c",
-      "${efr32_sdk_root}/mbedtls/library/ecdsa.c",
-      "${efr32_sdk_root}/mbedtls/library/ecjpake.c",
-      "${efr32_sdk_root}/mbedtls/library/ecp.c",
-      "${efr32_sdk_root}/mbedtls/library/ecp_curves.c",
-      "${efr32_sdk_root}/mbedtls/library/hkdf.c",
-      "${efr32_sdk_root}/mbedtls/library/hmac_drbg.c",
-      "${efr32_sdk_root}/mbedtls/library/md.c",
-      "${efr32_sdk_root}/mbedtls/library/oid.c",
-      "${efr32_sdk_root}/mbedtls/library/pem.c",
-      "${efr32_sdk_root}/mbedtls/library/pk.c",
-      "${efr32_sdk_root}/mbedtls/library/pk_ecc.c",
-      "${efr32_sdk_root}/mbedtls/library/pk_wrap.c",
-      "${efr32_sdk_root}/mbedtls/library/pkcs5.c",
-      "${efr32_sdk_root}/mbedtls/library/pkparse.c",
-      "${efr32_sdk_root}/mbedtls/library/pkwrite.c",
-      "${efr32_sdk_root}/mbedtls/library/platform.c",
-      "${efr32_sdk_root}/mbedtls/library/platform_util.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_aead.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_cipher.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_client.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_driver_wrappers_no_static.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_ecp.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_hash.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_mac.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_rsa.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_se.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_slot_management.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_crypto_storage.c",
-      "${efr32_sdk_root}/mbedtls/library/psa_util.c",
-      "${efr32_sdk_root}/mbedtls/library/sha256.c",
-      "${efr32_sdk_root}/mbedtls/library/threading.c",
-      "${efr32_sdk_root}/mbedtls/library/x509.c",
-      "${efr32_sdk_root}/mbedtls/library/x509_create.c",
-      "${efr32_sdk_root}/mbedtls/library/x509_crl.c",
-      "${efr32_sdk_root}/mbedtls/library/x509_crt.c",
-      "${efr32_sdk_root}/mbedtls/library/x509_csr.c",
-      "${efr32_sdk_root}/mbedtls/library/x509write_crt.c",
-      "${efr32_sdk_root}/mbedtls/library/x509write_csr.c",
+      # mbedTLS 4.x / TF-PSA-Crypto sources
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/include/mbedtls/platform.h",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/asn1parse.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/asn1write.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/base64.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/constant_time.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/oid.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/pem.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/utilities/pkcs5.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/platform/platform.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/platform/platform_util.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/platform/threading.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/md.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/pk.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/pk_ecc.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/pk_wrap.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/pkparse.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/extras/pkwrite.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_crypto.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_crypto_client.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_crypto_random.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_crypto_slot_management.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_crypto_storage.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/core/psa_util.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/aes.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/bignum.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/bignum_core.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/block_cipher.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ccm.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/cipher.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/cipher_wrap.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/cmac.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ecdsa.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ecjpake.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ecp.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ecp_curves.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/hmac_drbg.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_aead.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_cipher.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_ecp.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_hash.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_mac.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_rsa.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_util_internal.c",
+      "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/sha256.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509_create.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509_crl.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509_crt.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509_csr.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509_oid.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509write_crt.c",
+      "${efr32_sdk_root}/mbedtls/mbedtls/library/x509write_csr.c",
+      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/dispatch/psa_crypto_driver_wrappers_no_static.c",
       "${efr32_sdk_root}/platform_core/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform_core/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform_core/platform/common/src/sl_string.c",
@@ -898,14 +917,11 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_sysrtc_subsystem.c",
       "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_system.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/error.c",
-      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c",
-      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c",
-      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ecdsa_ecdh.c",
-      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_sha.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sl_entropy_hardware.c",
-      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
+      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sli_mbedtls.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
+      "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/version_features.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c",
       "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_init.c",
@@ -923,7 +939,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/service/interrupt_manager/src/sl_interrupt_manager_cortexm.c",
       "${efr32_sdk_root}/platform_core/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform_core/platform/service/iostream/src/sl_iostream_rtt.c",
-      "${efr32_sdk_root}/platform_core/platform/service/memory_manager/profiler/src/sli_memory_profiler_stubs.c",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/src/sl_memory_manager.c",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/src/sl_memory_manager_cpp.cpp",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/src/sl_memory_manager_dynamic_reservation.c",
@@ -966,11 +981,10 @@ template("efr32_sdk") {
     if (enable_matter_aws) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
-        "${efr32_sdk_root}/mbedtls/library/ctr_drbg.c",
-        "${efr32_sdk_root}/mbedtls/library/entropy.c",
-        "${efr32_sdk_root}/mbedtls/library/entropy_poll.c",
-        "${efr32_sdk_root}/mbedtls/library/rsa.c",
-        "${efr32_sdk_root}/mbedtls/library/rsa_alt_helpers.c",
+        "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/ctr_drbg.c",
+        "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/entropy.c",
+        "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/rsa.c",
+        "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/rsa_alt_helpers.c",
       ]
     }
 
@@ -1052,9 +1066,6 @@ template("efr32_sdk") {
     # COS and SWO sources files for when we use generate with slc
     if (slc_generate || slc_reuse_files) {
       sources += [
-        "${efr32_sdk_root}/mbedtls/library/block_cipher.c",
-        "${efr32_sdk_root}/mbedtls/library/hmac_drbg.c",
-        "${efr32_sdk_root}/mbedtls/library/psa_crypto_ecp.c",
         "${efr32_sdk_root}/platform_core/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform_core/platform/driver/debug/src/sl_debug_swo.c",
       ]
@@ -1106,15 +1117,15 @@ template("efr32_sdk") {
 
     if (use_thread_coap_lib) {
       sources += [
-        "${efr32_sdk_root}/mbedtls/library/psa_crypto_driver_wrappers.h",
-        "${efr32_sdk_root}/mbedtls/library/psa_crypto_pake.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_ciphersuites.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_client.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_cookie.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_msg.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_tls.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_tls12_client.c",
-        "${efr32_sdk_root}/mbedtls/library/ssl_tls12_server.c",
+        "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/dispatch/psa_crypto_driver_wrappers.h",
+        "${efr32_sdk_root}/mbedtls/tf-psa-crypto/drivers/builtin/src/psa_crypto_pake.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_ciphersuites.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_client.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_cookie.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_msg.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_tls.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_tls12_client.c",
+        "${efr32_sdk_root}/mbedtls/mbedtls/library/ssl_tls12_server.c",
       ]
     }
     if (silabs_family == "efr32mg24") {
@@ -1176,7 +1187,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/se_manager/src/sli_se_manager_mailbox.c",
-        "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_aead.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_cipher.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c",
@@ -1219,7 +1229,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform_core/platform/emlib/src/em_timer.c",
         "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_emu.c",
         "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_usart.c",
-        "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_radioaes.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
         "${efr32_sdk_root}/platform_core/platform/security/sl_component/sli_crypto/src/sl_crypto_s2.c",
