@@ -16,10 +16,10 @@
  */
 #pragma once
 
+#include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
+#include <app/clusters/thermostat-server/ThermostatDelegate.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 #include <device/types/water-heater/WaterHeater.h>
-#include <device/types/water-heater/impl/ThermostatDelegate.h>
-#include <device/types/water-heater/impl/ThermostatSetpointsDelegate.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
@@ -27,23 +27,17 @@ namespace chip::app {
 constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
 constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
 
-struct SimulatedWaterHeaterDelegates
-{
-    explicit SimulatedWaterHeaterDelegates(FabricTable & fabricTable) : thermostatDelegate(fabricTable) {}
-
-    ThermostatDelegate thermostatDelegate;
-    ThermostatSetpointsDelegate thermostatSetpointsDelegate;
-};
-
-class SimulatedWaterHeater : private SimulatedWaterHeaterDelegates,
-                             public WaterHeater<ThermostatDelegate, ThermostatSetpointsDelegate>,
-                             public Clusters::WaterHeaterManagement::Delegate,
-                             public TimerContext,
-                             public Clusters::ModeBase::AppDelegate
+class SimulatedWaterHeater
+    : public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>,
+      public Clusters::WaterHeaterManagement::Delegate,
+      public Clusters::Thermostat::Delegate,
+      public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
+      public TimerContext,
+      public Clusters::ModeBase::AppDelegate
 {
 public:
     explicit SimulatedWaterHeater(const Config & config);
-    ~SimulatedWaterHeater();
+    ~SimulatedWaterHeater() override;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
@@ -64,6 +58,33 @@ public:
     Percent GetTankPercentage() override;
     Clusters::WaterHeaterManagement::BoostStateEnum GetBoostState() override;
 
+    // Clusters::Thermostat::Delegate
+    FabricTable & GetFabricTable() const override;
+    Clusters::Thermostat::SystemModeEnum GetSystemMode() const override;
+    Protocols::InteractionModel::Status SetSystemMode(Clusters::Thermostat::SystemModeEnum systemMode, bool & changed) override;
+    Protocols::InteractionModel::Status
+    GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & runningMode) const override;
+    Protocols::InteractionModel::Status SetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum runningMode,
+                                                       bool & changed) override;
+    Protocols::InteractionModel::Status
+    GetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> & runningState) const override;
+    Protocols::InteractionModel::Status SetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> runningState,
+                                                        bool & changed) override;
+    Clusters::Thermostat::ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(Clusters::Thermostat::ControlSequenceOfOperationEnum seq,
+                                                                      bool & changed) override;
+    DataModel::Nullable<Clusters::Thermostat::temperature> GetLocalTemperature() const override;
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<Clusters::Thermostat::temperature> temp,
+                                                            bool & changed) override;
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<Clusters::Thermostat::RemoteSensingBitmap> sensing,
+                                                         bool & changed) override;
+
+    // Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate
+    Protocols::InteractionModel::Status
+    GetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature & occupiedHeatingSetpoint) const override;
+    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature occupiedHeatingSetpoint,
+                                                                   bool & changed) override;
+
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
@@ -76,12 +97,6 @@ private:
     void EndBoost();
     void NotifyHeatDemandAndBoostStateChanged();
 
-    template <typename DelegateType>
-    DelegateType & GetDelegate()
-    {
-        return std::get<std::add_lvalue_reference_t<DelegateType>>(mThermostatDelegates);
-    }
-
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
         Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
     };
@@ -90,6 +105,13 @@ private:
     uint32_t mBoostRemainingTime                                = 0;
     Clusters::Thermostat::temperature mTemperature              = kInitialTemperature;
     bool mHeatingEnabled                                        = false;
+
+    // Thermostat attributes
+    Clusters::Thermostat::ControlSequenceOfOperationEnum mControlSequenceOfOperation =
+        Clusters::Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating;
+    Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;
+    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+    Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = 2000;
 };
 
 } // namespace chip::app

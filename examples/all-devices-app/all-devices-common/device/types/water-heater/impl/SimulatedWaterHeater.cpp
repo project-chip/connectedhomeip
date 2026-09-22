@@ -53,8 +53,9 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 } // namespace
 
 SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) :
-    SimulatedWaterHeaterDelegates(config.fabricTable),
-    WaterHeater(config, *this, *this, thermostatDelegate, thermostatSetpointsDelegate)
+    WaterHeater(config, static_cast<Clusters::WaterHeaterManagement::Delegate &>(*this),
+                static_cast<Clusters::ModeBase::AppDelegate &>(*this), static_cast<Clusters::Thermostat::Delegate &>(*this),
+                static_cast<Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate &>(*this))
 {}
 
 SimulatedWaterHeater::~SimulatedWaterHeater()
@@ -77,7 +78,7 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
-    GetDelegate<ThermostatSetpointsDelegate>().SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
+    SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
 
     ReturnErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
     return CHIP_NO_ERROR;
@@ -221,6 +222,117 @@ void SimulatedWaterHeater::NotifyHeatDemandAndBoostStateChanged()
                                       DataModel::AttributeChangeType::kReportable);
 }
 
+// Clusters::Thermostat::Delegate
+FabricTable & SimulatedWaterHeater::GetFabricTable() const
+{
+    return mConfig.fabricTable;
+}
+
+SystemModeEnum SimulatedWaterHeater::GetSystemMode() const
+{
+    return mSystemMode;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemModeEnum systemMode, bool & changed)
+{
+    changed = false;
+    if (mSystemMode == systemMode)
+    {
+        return Status::Success;
+    }
+
+    mSystemMode = systemMode;
+    changed     = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::GetRunningMode(ThermostatRunningModeEnum & runningMode) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::GetRunningState(BitMask<RelayStateBitmap> & runningState) const
+{
+    return Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+ControlSequenceOfOperationEnum SimulatedWaterHeater::GetControlSequenceOfOperation() const
+{
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
+                                                                                        bool & changed)
+{
+    changed = false;
+    if (mControlSequenceOfOperation == seq)
+    {
+        return Status::Success;
+    }
+
+    mControlSequenceOfOperation = seq;
+    changed                     = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<temperature> SimulatedWaterHeater::GetLocalTemperature() const
+{
+    return mLocalTemperature;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
+{
+    changed = false;
+    if (mLocalTemperature == temp)
+    {
+        return Status::Success;
+    }
+    mLocalTemperature = temp;
+    if (!temp.IsNull())
+    {
+        mTemperature = temp.Value();
+    }
+    changed = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
+{
+    return Status::UnsupportedAttribute;
+}
+
+// Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate
+Protocols::InteractionModel::Status SimulatedWaterHeater::GetOccupiedHeatingSetpoint(temperature & occupiedHeatingSetpoint) const
+{
+    occupiedHeatingSetpoint = mOccupiedHeatingSetpoint;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetpoint(temperature occupiedHeatingSetpoint,
+                                                                                     bool & changed)
+{
+    changed = false;
+    if (mOccupiedHeatingSetpoint == occupiedHeatingSetpoint)
+    {
+        return Status::Success;
+    }
+
+    mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
+    changed                  = true;
+    return Status::Success;
+}
+
+// Clusters::ModeBase::AppDelegate
 CHIP_ERROR SimulatedWaterHeater::Init()
 {
     return CHIP_NO_ERROR;
