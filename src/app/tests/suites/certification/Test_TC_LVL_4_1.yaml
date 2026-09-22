@@ -271,49 +271,46 @@ tests:
               type: int8u
               maxValue: 254
 
+    #MinLevel is optional before cluster revision 7. When it is not
+    #implemented, TH assumes the spec fallback value: 1 with the Lighting
+    #feature, 0 without it.
     - label:
-          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
-          (MinLevel implemented)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.A0002
+          "Step 4f: MinLevel not implemented, TH assumes the fallback value
+          (Lighting)"
+      PICS: "!LVL.S.A0002 && LVL.S.F01"
+      cluster: "ValueCommands"
+      command: "UnsignedNumberValue"
+      arguments:
+          values:
+              - name: "Value"
+                value: 1
+      response:
+          - values:
+                - name: "Value"
+                  saveAs: MinLevelValue
+
+    - label:
+          "Step 4f: MinLevel not implemented, TH assumes the fallback value (no
+          Lighting)"
+      PICS: "!LVL.S.A0002 && !LVL.S.F01"
+      cluster: "ValueCommands"
+      command: "UnsignedNumberValue"
+      arguments:
+          values:
+              - name: "Value"
+                value: 0
+      response:
+          - values:
+                - name: "Value"
+                  saveAs: MinLevelValue
+
+    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:
               - name: "Level"
                 value: MinLevelValue
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    #Using hard coded fallback value when MinLevel is not implemented (it is
-    #optional before cluster revision 7): 1 with Lighting, 0 without it
-    - label:
-          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
-          (MinLevel not implemented, Lighting)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "Level"
-                value: 1
-              - name: "TransitionTime"
-                value: 0
-              - name: "OptionsMask"
-                value: 0
-              - name: "OptionsOverride"
-                value: 0
-
-    - label:
-          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel
-          (MinLevel not implemented, no Lighting)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "Level"
-                value: 0
               - name: "TransitionTime"
                 value: 0
               - name: "OptionsMask"
@@ -349,33 +346,12 @@ tests:
 
     - label:
           "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level. (MinLevel implemented)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.A0002
+          from DUT, expects mininum level."
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
       response:
           value: MinLevelValue
-
-    #Using hard coded fallback value when MinLevel is not implemented (it is
-    #optional before cluster revision 7): 1 with Lighting, 0 without it
-    - label:
-          "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level. (MinLevel not implemented, Lighting)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.F01
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: 1
-
-    - label:
-          "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
-          from DUT, expects mininum level. (MinLevel not implemented, no
-          Lighting)"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && !LVL.S.A0002 && !LVL.S.F01
-      command: "readAttribute"
-      attribute: "CurrentLevel"
-      response:
-          value: 0
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"
