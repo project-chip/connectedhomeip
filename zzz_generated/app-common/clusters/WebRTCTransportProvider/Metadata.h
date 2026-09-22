@@ -24,8 +24,7 @@ namespace Attributes {
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CurrentSessions::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
-                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kManage, std::nullopt);
 } // namespace CurrentSessions
 namespace SupportedSFrameCipherSuites {
