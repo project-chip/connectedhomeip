@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
@@ -26,48 +27,14 @@
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/TimerDelegate.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
 
-class ThreadBorderRouter : public SingleEndpoint, public Clusters::ThreadBorderRouterManagementDelegate
+class ThreadBorderRouter : public SingleEndpoint
 {
 public:
-    ThreadBorderRouter(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                       DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext);
-    ~ThreadBorderRouter() override;
-
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    // ThreadBorderRouterManagementDelegate
-    CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override;
-    bool GetPanChangeSupported() override;
-    void GetBorderRouterName(MutableCharSpan & borderRouterName) override;
-    CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
-    uint16_t GetThreadVersion() override;
-    bool GetInterfaceEnabled() override;
-    CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
-    CHIP_ERROR CommitActiveDataset() override;
-    CHIP_ERROR RevertActiveDataset() override;
-    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
-
-    Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
-    {
-        return mThreadBorderRouterManagementCluster.Cluster();
-    }
-    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
-    Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
-    {
-        return mThreadNetworkDiagnosticsCluster.Cluster();
-    }
-
-protected:
     class LocalBreadCrumbTracker : public Clusters::BreadCrumbTracker
     {
     public:
@@ -78,51 +45,48 @@ protected:
         uint64_t mBreadCrumb = 0;
     };
 
-    LocalBreadCrumbTracker mBreadCrumbTracker;
+    struct Context
+    {
+        Clusters::ThreadBorderRouterManagementDelegate & delegate;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        PersistentStorageDelegate & storage;
+        Clusters::BreadCrumbTracker * breadcrumbTracker = nullptr;
+    };
+
+    explicit ThreadBorderRouter(const Context & context);
+    ~ThreadBorderRouter() override = default;
+
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // Public getters for programmatic control
+    Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
+    {
+        return mThreadBorderRouterManagementCluster.Cluster();
+    }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
+    Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
+    {
+        return mThreadNetworkDiagnosticsCluster.Cluster();
+    }
+    Clusters::BreadCrumbTracker & GetBreadCrumbTracker() { return mBreadCrumbTracker; }
+
+protected:
+    Clusters::ThreadBorderRouterManagementDelegate & mDelegate;
+    FailSafeContext & mFailSafeContext;
+    DeviceLayer::PlatformManager & mPlatformManager;
+
+    LocalBreadCrumbTracker mDefaultBreadCrumbTracker;
+    Clusters::BreadCrumbTracker & mBreadCrumbTracker;
+
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
     Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
-
-private:
-    class ActiveDatasetTimerContext : public TimerContext
-    {
-    public:
-        ActiveDatasetTimerContext(ThreadBorderRouter & router) : mRouter(router) {}
-        void TimerFired() override { mRouter.OnActiveDatasetTimerFired(); }
-
-    private:
-        ThreadBorderRouter & mRouter;
-    };
-
-    class PendingDatasetTimerContext : public TimerContext
-    {
-    public:
-        PendingDatasetTimerContext(ThreadBorderRouter & router) : mRouter(router) {}
-        void TimerFired() override { mRouter.OnPendingDatasetTimerFired(); }
-
-    private:
-        ThreadBorderRouter & mRouter;
-    };
-
-    void OnActiveDatasetTimerFired();
-    void OnPendingDatasetTimerFired();
-
-    TimerDelegate & mTimerDelegate;
-    DeviceLayer::PlatformManager & mPlatformManager;
-    FailSafeContext & mFailSafeContext;
-
-    ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };
-    PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };
-
-    AttributeChangeCallback * mAttributeChangeCallback = nullptr;
-    Thread::OperationalDataset mActiveDataset;
-    Thread::OperationalDataset mPendingDataset;
-
-    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
-    uint32_t mActivateDatasetSequence;
 };
 
 } // namespace app

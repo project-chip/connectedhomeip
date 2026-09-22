@@ -20,6 +20,8 @@ source_set("network-infrastructure-manager") {
   sources = [
     "NetworkInfrastructureManager.cpp",
     "NetworkInfrastructureManager.h",
+    "impl/SimulatedNetworkInfrastructureManager.cpp",
+    "impl/SimulatedNetworkInfrastructureManager.h",
   ]
 
   public_deps = [

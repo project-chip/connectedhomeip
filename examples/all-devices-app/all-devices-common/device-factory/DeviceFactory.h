@@ -49,7 +49,7 @@
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
-#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
@@ -65,7 +65,7 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
-#include <device/types/thread-border-router/ThreadBorderRouter.h>
+#include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -490,8 +490,8 @@ private:
         {
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                mContext->platformManager, mContext->failSafeContext);
+                return MakeDevice<SimulatedNetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
+                                                                        mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -606,8 +606,8 @@ private:
         {
             RegisterCreator("thread-border-router", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ThreadBorderRouter>(mContext->timerDelegate, mContext->storageDelegate, mContext->platformManager,
-                                                      mContext->failSafeContext);
+                return MakeDevice<SimulatedThreadBorderRouter>(mContext->timerDelegate, mContext->storageDelegate,
+                                                              mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)

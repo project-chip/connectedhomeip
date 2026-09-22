@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
@@ -27,46 +28,39 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/TimerDelegate.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
 
-class SimpleBreadCrumbTracker : public Clusters::BreadCrumbTracker
+class NetworkInfrastructureManager : public SingleEndpoint
 {
 public:
-    void SetBreadCrumb(uint64_t value) override { mBreadCrumb = value; }
-    uint64_t GetBreadCrumb() const { return mBreadCrumb; }
+    class LocalBreadCrumbTracker : public Clusters::BreadCrumbTracker
+    {
+    public:
+        void SetBreadCrumb(uint64_t value) override { mBreadCrumb = value; }
+        uint64_t GetBreadCrumb() const { return mBreadCrumb; }
 
-private:
-    uint64_t mBreadCrumb = 0;
-};
+    private:
+        uint64_t mBreadCrumb = 0;
+    };
 
-class NetworkInfrastructureManager : public SingleEndpoint, public Clusters::ThreadBorderRouterManagementDelegate
-{
-public:
-    NetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                 DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext);
-    ~NetworkInfrastructureManager() override;
+    struct Context
+    {
+        Clusters::ThreadBorderRouterManagementDelegate & delegate;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        PersistentStorageDelegate & storage;
+        Clusters::BreadCrumbTracker * breadcrumbTracker = nullptr;
+    };
+
+    explicit NetworkInfrastructureManager(const Context & context);
+    ~NetworkInfrastructureManager() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-    // ThreadBorderRouterManagementDelegate
-    CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override;
-    bool GetPanChangeSupported() override;
-    void GetBorderRouterName(MutableCharSpan & borderRouterName) override;
-    CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
-    uint16_t GetThreadVersion() override;
-    bool GetInterfaceEnabled() override;
-    CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
-    CHIP_ERROR CommitActiveDataset() override;
-    CHIP_ERROR RevertActiveDataset() override;
-    CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     // Public getters for programmatic control
     Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
@@ -79,9 +73,16 @@ public:
     {
         return mThreadNetworkDiagnosticsCluster.Cluster();
     }
+    Clusters::BreadCrumbTracker & GetBreadCrumbTracker() { return mBreadCrumbTracker; }
 
 protected:
-    SimpleBreadCrumbTracker mBreadCrumbTracker;
+    Clusters::ThreadBorderRouterManagementDelegate & mDelegate;
+    FailSafeContext & mFailSafeContext;
+    DeviceLayer::PlatformManager & mPlatformManager;
+
+    LocalBreadCrumbTracker mDefaultBreadCrumbTracker;
+    Clusters::BreadCrumbTracker & mBreadCrumbTracker;
+
     DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
     Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
 
@@ -89,44 +90,6 @@ protected:
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
-
-private:
-    class ActiveDatasetTimerContext : public TimerContext
-    {
-    public:
-        ActiveDatasetTimerContext(NetworkInfrastructureManager & manager) : mManager(manager) {}
-        void TimerFired() override { mManager.OnActiveDatasetTimerFired(); }
-
-    private:
-        NetworkInfrastructureManager & mManager;
-    };
-
-    class PendingDatasetTimerContext : public TimerContext
-    {
-    public:
-        PendingDatasetTimerContext(NetworkInfrastructureManager & manager) : mManager(manager) {}
-        void TimerFired() override { mManager.OnPendingDatasetTimerFired(); }
-
-    private:
-        NetworkInfrastructureManager & mManager;
-    };
-
-    void OnActiveDatasetTimerFired();
-    void OnPendingDatasetTimerFired();
-
-    TimerDelegate & mTimerDelegate;
-    DeviceLayer::PlatformManager & mPlatformManager;
-    FailSafeContext & mFailSafeContext;
-
-    ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };
-    PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };
-
-    AttributeChangeCallback * mAttributeChangeCallback = nullptr;
-    Thread::OperationalDataset mActiveDataset;
-    Thread::OperationalDataset mPendingDataset;
-
-    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
-    uint32_t mActivateDatasetSequence;
 };
 
 } // namespace app

@@ -20,6 +20,8 @@ source_set("thread-border-router") {
   sources = [
     "ThreadBorderRouter.cpp",
     "ThreadBorderRouter.h",
+    "impl/SimulatedThreadBorderRouter.cpp",
+    "impl/SimulatedThreadBorderRouter.h",
   ]
 
   public_deps = [
