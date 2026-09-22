@@ -75,11 +75,23 @@ void LoggingRoomAirConditioner::OnIdentifyStop(Clusters::IdentifyCluster & clust
 void LoggingRoomAirConditioner::OnOffStartup(bool on)
 {
     ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
+    ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
+                                               : DataModel::NullNullable);
+    if (!on && mSystemMode != SystemModeEnum::kOff)
+    {
+        (void) ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
+    }
 }
 
 void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
 {
     ChipLogProgress(AppServer, "RoomAirConditioner: turned %s", on ? "on" : "off");
+    ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
+                                               : DataModel::NullNullable);
+    if (!on && mSystemMode != SystemModeEnum::kOff)
+    {
+        (void) ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
+    }
 }
 
 Status LoggingRoomAirConditioner::SetLocalTemperature(DataModel::Nullable<int16_t> value, bool & changed)

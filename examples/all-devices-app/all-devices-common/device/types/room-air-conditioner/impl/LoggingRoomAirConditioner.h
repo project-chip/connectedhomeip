@@ -84,9 +84,11 @@ public:
     void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
 private:
+    static constexpr int16_t kDefaultLocalTemperatureCentiCelsius = 2500;
+
     FabricTable & mFabricTable;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
-    DataModel::Nullable<int16_t> mLocalTemperatureCentiCelsius{ 2500 }; // Simulated room temperature: 25 degrees Celsius.
+    DataModel::Nullable<int16_t> mLocalTemperatureCentiCelsius{ kDefaultLocalTemperatureCentiCelsius };
     Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
     int16_t mCoolingSetpoint                         = Clusters::Thermostat::kDefaultCoolingSetpoint;
 };
