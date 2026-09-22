@@ -204,13 +204,13 @@ chip-tool-x86-64 thermostat read active-preset-handle <nodeID> 1 | grep TOO
 
 ### SetpointChange Tracking
 
-`SetpointChangeSource`, `SetpointChangeAmount` and `SetpointChangeSourceTimestamp`
-are updated whenever one of the operational setpoints (`OccupiedCoolingSetpoint`,
-`OccupiedHeatingSetpoint`, `UnoccupiedCoolingSetpoint`,
-`UnoccupiedHeatingSetpoint`) changes value. Writes to the absolute/user setpoint
-limits do not update these attributes. This example app's delegate doesn't
-override `GetSetpointChangeSource()`, so `SetpointChangeSource` always reads
-back `Manual` (0).
+`SetpointChangeSource`, `SetpointChangeAmount` and
+`SetpointChangeSourceTimestamp` are updated whenever one of the operational
+setpoints (`OccupiedCoolingSetpoint`, `OccupiedHeatingSetpoint`,
+`UnoccupiedCoolingSetpoint`, `UnoccupiedHeatingSetpoint`) changes value. Writes
+to the absolute/user setpoint limits do not update these attributes. This
+example app's delegate doesn't override `GetSetpointChangeSource()`, so
+`SetpointChangeSource` always reads back `Manual` (0).
 
 #### Write a setpoint to trigger a tracked change
 
