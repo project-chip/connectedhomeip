@@ -91,15 +91,15 @@ runs:
       uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
       with:
         path: ${{ github.workspace }}/.ccache
-    # A cache volume is shared across refs and has no save step to gate, unlike the
-    # actions/cache entry it replaces. Keep the same write policy: master writes,
-    # everything else reads. This is defence in depth only: the binding control is
-    # the runner profile's Protected branches setting, which a pull request cannot
-    # alter because it does not live in this file.
-    - name: Restrict volume-backed ccache to reads off master
-      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' && github.ref != 'refs/heads/master' }}
-      shell: bash
-      run: echo "CCACHE_READONLY=1" >> $GITHUB_ENV
+    # There is deliberately no write gate here. The volume is mounted copy-on-write:
+    # a run writes to its own fork, and that fork is committed back only on the refs
+    # listed in the runner profile's Protected branches setting. So a run gets a
+    # writable cache for its own duration -- which is what lets the ~20 build targets
+    # reuse each other's objects -- while nothing it writes persists unless the ref
+    # is allowed to commit. Setting CCACHE_READONLY would suppress that per-run reuse
+    # too: measured at 0% hits and 45 min against an empty volume, versus 61% and
+    # 38 min with it left alone. It would also add nothing, since the commit is
+    # refused by the profile, which this file cannot change.
     # Without this the failure is silent: the actions/cache restore below is gated
     # off, so an unmounted volume means every build is cold with job duration as the
     # only symptom. Checking that the directory or /cache merely exists proves
