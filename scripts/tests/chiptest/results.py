@@ -456,3 +456,4 @@ class ResultProcessingThread(TerminableThread):
             if not self.resource_thread_join():
                 raise RuntimeError(
                     "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
+            raise
