@@ -49,7 +49,7 @@ import re
 import tempfile
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from sys import stderr, stdout
 from tempfile import NamedTemporaryFile
 from typing import BinaryIO
@@ -278,9 +278,10 @@ class THServerInstance:
     # The SessionID from this instance's most recent successful StartRangingResponse,
     # tracked per instance so the increment check is per instance, not global.
     prev_session_id: int | None = None
-    # Active session IDs observed before the current start step, so the just-assigned
-    # SessionID can be recovered as the newly added entry (manual path).
-    _baseline_sessions: set = field(default_factory=set)
+    # Output length captured just before the current pass's StartRangingRequest, so the
+    # just-assigned SessionID can be recovered from the PrepareSession log line that follows
+    # (manual path) without racing the active-initiator instant self-termination.
+    start_output_mark: int = 0
 
 
 def is_session_id_increment(prev: int | None, current: int) -> bool:
@@ -405,11 +406,6 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         read = await self.th_controller.ReadAttribute(
             instance.node_id, [(instance.endpoint, attribute)])
         return read[instance.endpoint][Clusters.ProximityRanging][attribute]
-
-    async def active_session_ids(self, instance: THServerInstance) -> set:
-        """Returns the set of active SessionIDs the TH server currently reports."""
-        session_ids = await self.read_th_attribute(instance, Clusters.ProximityRanging.Attributes.SessionIDList)
-        return set(session_ids)
 
     async def send_client_command(self, instance: THServerInstance, cmd):
         """Sends a Proximity Ranging client command to a TH server over the harness fabric.
@@ -544,9 +540,26 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                                   read_step, start_step, response_step, final_step) -> None:
         """Runs one technology pass of the DUT-as-client procedure across its four steps."""
         peer_for_i, peer_for_r = await self._run_read_step(spec, read_step)
-        await self._run_start_step(spec, start_step, peer_for_i, peer_for_r, periodic=periodic)
-        await self._run_response_step(spec, response_step)
-        await self._run_final_step(spec, final_step, periodic=periodic)
+        # For the instant case, subscribe to TH_I's RangingResult BEFORE the StartRangingRequest is
+        # triggered: TH_I is the active initiator, so its instant session self-terminates right after
+        # its single measurement (~3 s, ProximityRangingDriver.cpp:388-392), emitting that one result
+        # then. A subscription created only in the final step would miss it under human pacing, so it
+        # is opened here and captures the event live regardless of how long the operator takes. The
+        # periodic case does not need this -- its session is not instant, so it lives until EndTime
+        # and keeps emitting -- and starting early would defeat its live inter-arrival cadence timing;
+        # it subscribes in its own final step.
+        result_handler = None
+        if not periodic:
+            result_handler = EventSubscriptionHandler(expected_cluster=_PR)
+            await result_handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
+                                       min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
+        try:
+            await self._run_start_step(spec, start_step, peer_for_i, peer_for_r, periodic=periodic)
+            await self._run_response_step(spec, response_step)
+            await self._run_final_step(spec, final_step, periodic=periodic, result_handler=result_handler)
+        finally:
+            if result_handler is not None:
+                result_handler.cancel()
 
     async def _run_read_step(self, spec: TechSpec, read_step) -> tuple:
         self.step(read_step)
@@ -580,12 +593,12 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 self._ci_response_r, _PR.Commands.StartRangingResponse,
                 "TH_R did not answer the StartRangingRequest with a StartRangingResponse.")
         else:
-            # Record the baseline so the just-assigned SessionID is recoverable, and arm the
-            # arrival match on BOTH servers before prompting: the operator triggers both commands
-            # while the prompt is up, so a match armed only afterwards would miss a line that has
-            # already been forwarded.
-            self.th_i._baseline_sessions = await self.active_session_ids(self.th_i)
-            self.th_r._baseline_sessions = await self.active_session_ids(self.th_r)
+            # Mark each server's output position so this pass's PrepareSession line (which carries
+            # the just-assigned SessionID) can be found afterwards, and arm the arrival match on
+            # BOTH servers before prompting: the operator triggers both commands while the prompt is
+            # up, so a match armed only afterwards would miss a line that has already been forwarded.
+            self.th_i.start_output_mark = self.th_i.subprocess.output_len()
+            self.th_r.start_output_mark = self.th_r.subprocess.output_len()
             arrival_i = self.arm_command_arrival(self.th_i, spec.log_tag)
             arrival_r = self.arm_command_arrival(self.th_r, spec.log_tag)
             self.wait_for_user_input(
@@ -600,14 +613,25 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             self.assert_logged(self.th_i, arrival_i)
             self.assert_logged(self.th_r, arrival_r)
 
-    async def _new_session_id(self, instance: THServerInstance) -> int:
-        after = await self.active_session_ids(instance)
-        added = after - instance._baseline_sessions
+    def _session_id_from_prepare_log(self, instance: THServerInstance, spec: TechSpec) -> int:
+        """Recovers the SessionID the TH server just assigned, from its PrepareSession log line.
+
+        Reading SessionIDList (as an earlier version did) races the active-initiator instant
+        self-termination: TH_I terminates its instant session ~3 s after StartSession
+        (ProximityRangingDriver.cpp:388-392), so a human-paced response step could read an empty
+        list and fail. The adapter logs ``[LoggingRangingAdapter:<tag>] PrepareSession id=<n>`` when
+        the StartRangingRequest is processed -- before any termination -- and the server subprocess
+        retains it, so scanning the output from this pass's start mark recovers the id race-free.
+        The pass's log tag scopes the search to this technology, and the newest match is this pass's.
+        """
+        pattern = re.compile(
+            re.escape(f"[LoggingRangingAdapter:{spec.log_tag}] PrepareSession id=".encode()) + rb"(\d+)")
+        ids = pattern.findall(instance.subprocess.output_snapshot(instance.start_output_mark))
         asserts.assert_true(
-            len(added) >= 1,
-            f"{instance.name} gained no active session after the StartRangingRequest, so no SessionID was assigned.")
-        # SessionIDs increase monotonically per instance, so the newest is the just-assigned one.
-        return max(added)
+            len(ids) >= 1,
+            f"{instance.name} logged no PrepareSession for the {spec.name} pass, so no SessionID was assigned "
+            "(or the StartRangingRequest never reached it).")
+        return int(ids[-1])
 
     async def _run_response_step(self, spec: TechSpec, response_step) -> None:
         self.step(response_step)
@@ -615,8 +639,8 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             session_id_i = self._ci_response_i.sessionID
             session_id_r = self._ci_response_r.sessionID
         else:
-            session_id_i = await self._new_session_id(self.th_i)
-            session_id_r = await self._new_session_id(self.th_r)
+            session_id_i = self._session_id_from_prepare_log(self.th_i, spec)
+            session_id_r = self._session_id_from_prepare_log(self.th_r, spec)
         self.assert_session_id(self.th_i, session_id_i)
         self.assert_session_id(self.th_r, session_id_r)
         # Retained for the final step: TH_I's SessionID scopes the RangingResult events (prior
@@ -646,12 +670,12 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 continue
             return event.Data
 
-    async def _run_final_step(self, spec: TechSpec, final_step, *, periodic: bool) -> None:
+    async def _run_final_step(self, spec: TechSpec, final_step, *, periodic: bool, result_handler) -> None:
         self.step(final_step)
         if periodic:
             await self._verify_periodic_cadence(spec)
         else:
-            await self._verify_instant_result_and_stop(spec)
+            await self._verify_instant_result_and_stop(spec, result_handler)
 
     async def _verify_periodic_cadence(self, spec: TechSpec) -> None:
         """Verifies TH_I emits a RangingResult roughly once per interval.
@@ -692,17 +716,16 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 f"RangingResult events on TH_I arrived {gap:.3f} s apart, outside the interval "
                 f"({RANGING_INSTANCE_INTERVAL_SECONDS} s) plus the plan's +/- 3 s deviation.")
 
-    async def _verify_instant_result_and_stop(self, spec: TechSpec) -> None:
-        """Verifies a RangingResult is obtained from TH_I, then a StopRangingRequest to TH_R."""
-        handler = EventSubscriptionHandler(expected_cluster=_PR)
-        await handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
-                            min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
-        try:
-            result = self._wait_for_ranging_result(handler, self._session_id_i, timeout_sec=30)
-            asserts.assert_not_equal(
-                result.sessionID, INVALID_SESSION_ID, "TH_I emitted a RangingResult with SessionID 0.")
-        finally:
-            handler.cancel()
+    async def _verify_instant_result_and_stop(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
+        """Verifies a RangingResult is obtained from TH_I, then a StopRangingRequest to TH_R.
+
+        ``result_handler`` was subscribed to TH_I's RangingResult BEFORE the StartRangingRequest (see
+        run_technology_pass), so TH_I's single instant result -- emitted as its session self-terminates
+        ~3 s after StartSession -- is already captured and survives a human-paced operator.
+        """
+        result = self._wait_for_ranging_result(result_handler, self._session_id_i, timeout_sec=30)
+        asserts.assert_not_equal(
+            result.sessionID, INVALID_SESSION_ID, "TH_I emitted a RangingResult with SessionID 0.")
 
         # Mark TH_R's output position, then trigger the Stop. _assert_client_stop then requires -- in
         # the output produced after this mark -- a StopRangingRequest command receipt followed by
