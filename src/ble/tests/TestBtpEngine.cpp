@@ -569,13 +569,18 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
 
     auto packet0 = System::PacketBufferHandle::New(packetLength);
     ASSERT_FALSE(packet0.IsNull());
-    packet0->SetDataLength(packetLength);
-    if (packet0->DataLength() < packetLength)
+
+    // Fixed-size buffer pools (e.g. CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL) allocate a
+    // fixed kMaxSizeWithoutReserve block regardless of the requested size, so MaxDataLength()
+    // may still be smaller than packetLength even when kMaxAllocSize is large.
+    if (packet0->MaxDataLength() < packetLength)
     {
-        ChipLogProgress(Test, "Skipping IsValidAckOnSequenceWraparound: PacketBuffer DataLength (%u) < required packetLength (%u)",
-                        static_cast<unsigned>(packet0->DataLength()), static_cast<unsigned>(packetLength));
+        ChipLogProgress(Test,
+                        "Skipping IsValidAckOnSequenceWraparound: PacketBuffer MaxDataLength (%u) < required packetLength (%u)",
+                        static_cast<unsigned>(packet0->MaxDataLength()), static_cast<unsigned>(packetLength));
         return;
     }
+    packet0->SetDataLength(packetLength);
 
     // Send the first packet to start transmission.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
