@@ -58,11 +58,17 @@ public:
     // Public getters for programmatic control
     Clusters::ThreadBorderRouterManagementCluster & ThreadBorderRouterManagementCluster()
     {
+        VerifyOrDie(mThreadBorderRouterManagementCluster.IsConstructed());
         return mThreadBorderRouterManagementCluster.Cluster();
     }
-    Clusters::WiFiNetworkManagementCluster & WiFiNetworkManagementCluster() { return mWiFiNetworkManagementCluster.Cluster(); }
+    Clusters::WiFiNetworkManagementCluster & WiFiNetworkManagementCluster()
+    {
+        VerifyOrDie(mWiFiNetworkManagementCluster.IsConstructed());
+        return mWiFiNetworkManagementCluster.Cluster();
+    }
     Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
     {
+        VerifyOrDie(mThreadNetworkDiagnosticsCluster.IsConstructed());
         return mThreadNetworkDiagnosticsCluster.Cluster();
     }
     Clusters::BreadCrumbTracker & GetBreadCrumbTracker() { return mBreadCrumbTracker; }

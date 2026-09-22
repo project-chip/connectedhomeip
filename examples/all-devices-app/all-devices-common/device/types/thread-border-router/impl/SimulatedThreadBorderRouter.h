@@ -42,12 +42,10 @@ public:
         PersistentStorageDelegate & storage;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        std::string nodeLabel;
     };
 
-    SimulatedThreadBorderRouter(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext,
-                                std::string nodeLabel = "");
-    explicit SimulatedThreadBorderRouter(const Context & context, std::string nodeLabel = "");
+    explicit SimulatedThreadBorderRouter(const Context & context);
     ~SimulatedThreadBorderRouter() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;

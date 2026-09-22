@@ -42,12 +42,10 @@ public:
         PersistentStorageDelegate & storage;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        std::string nodeLabel;
     };
 
-    SimulatedNetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
-                                          DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext,
-                                          std::string nodeLabel = "");
-    explicit SimulatedNetworkInfrastructureManager(const Context & context, std::string nodeLabel = "");
+    explicit SimulatedNetworkInfrastructureManager(const Context & context);
     ~SimulatedNetworkInfrastructureManager() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -66,7 +64,7 @@ public:
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
-    // Access to optional Thread Network Directory cluster
+    // Access to Thread Network Directory cluster
     Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
 
 protected:

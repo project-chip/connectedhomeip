@@ -30,24 +30,15 @@ namespace {
 constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 } // namespace
 
-SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(TimerDelegate & timerDelegate,
-                                                                             PersistentStorageDelegate & storage,
-                                                                             DeviceLayer::PlatformManager & platformManager,
-                                                                             FailSafeContext & failSafeContext,
-                                                                             std::string nodeLabel) :
+SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(const Context & context) :
     NetworkInfrastructureManager(NetworkInfrastructureManager::Context{
         .delegate            = *this,
-        .failSafeContext     = failSafeContext,
-        .platformManager     = platformManager,
+        .failSafeContext     = context.failSafeContext,
+        .platformManager     = context.platformManager,
         .breadcrumbTracker   = *this,
         .diagnosticsProvider = *this,
     }),
-    mTimerDelegate(timerDelegate), mThreadNetworkDirectoryStorage(storage), mBorderRouterName(std::move(nodeLabel))
-{}
-
-SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(const Context & context, std::string nodeLabel) :
-    SimulatedNetworkInfrastructureManager(context.timerDelegate, context.storage, context.platformManager, context.failSafeContext,
-                                          std::move(nodeLabel))
+    mTimerDelegate(context.timerDelegate), mThreadNetworkDirectoryStorage(context.storage), mBorderRouterName(context.nodeLabel)
 {}
 
 SimulatedNetworkInfrastructureManager::~SimulatedNetworkInfrastructureManager()
@@ -65,6 +56,7 @@ void SimulatedNetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvid
         mActivateDatasetCallback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_ERROR_CANCELLED);
     }
     mActivateDatasetCallback = nullptr;
+    mAttributeChangeCallback = nullptr;
     mStagedActiveDataset.Clear();
     mActiveDataset.Clear();
     mPendingDataset.Clear();
@@ -201,10 +193,13 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::RevertActiveDataset()
 {
     ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::RevertActiveDataset called");
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    if (mActivateDatasetCallback != nullptr)
+    {
+        mActivateDatasetCallback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_ERROR_CANCELLED);
+    }
     mActivateDatasetCallback = nullptr;
     mStagedActiveDataset.Clear();
     mActiveDataset.Clear();
-
     if (mAttributeChangeCallback != nullptr)
     {
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
@@ -262,9 +257,10 @@ void SimulatedNetworkInfrastructureManager::OnActiveDatasetTimerFired()
 
 void SimulatedNetworkInfrastructureManager::OnPendingDatasetTimerFired()
 {
-    TEMPORARY_RETURN_IGNORED mActiveDataset.Init(mPendingDataset.AsByteSpan());
+    CHIP_ERROR err = mActiveDataset.Init(mPendingDataset.AsByteSpan());
+    LogErrorOnFailure(err);
     mPendingDataset.Clear();
-    if (mAttributeChangeCallback != nullptr)
+    if (err == CHIP_NO_ERROR && mAttributeChangeCallback != nullptr)
     {
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
