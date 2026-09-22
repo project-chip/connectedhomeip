@@ -38,8 +38,6 @@ public:
     DeviceTypeParser()  = default;
     ~DeviceTypeParser() = default;
 
-    static DeviceTypeParser & GetInstance();
-
     // Disable copy and assignment to be safe, though not strictly necessary if only one instance is used.
     DeviceTypeParser(const DeviceTypeParser &)             = delete;
     DeviceTypeParser & operator=(const DeviceTypeParser &) = delete;
@@ -52,8 +50,6 @@ public:
      * @return CHIP_NO_ERROR on success, or a CHIP_ERROR on failure.
      */
     CHIP_ERROR ParseSingleDeviceString(const char * value);
-
-    void AddDeviceTypeEntry(Entry entry) { mDeviceTypeEntries.push_back(std::move(entry)); }
 
     /**
      * Expands any wildcard "*" entries in the parsed list into the given list of device types,
