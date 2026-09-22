@@ -9,19 +9,20 @@ for architecture and device class implementation.
 
 ## 1. CMake Build Deltas ([`esp32/main/CMakeLists.txt`](../esp32/main/CMakeLists.txt))
 
--   **Delete from `esp32/main/CMakeLists.txt`**:
-    -   `include("${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake")`
-    -   `${ALL_DEVICES_EXTRA_INCLUDE_DIRS}`, `${ALL_DEVICES_DEVICE_SOURCES}`,
-        and `${ALL_DEVICES_CLUSTER_SOURCES}`
--   **Delete simulator files from `esp32/main/`** (since
-    `idf_component_register` compiles all `.cpp` files in
-    `SRC_DIRS "${CMAKE_CURRENT_LIST_DIR}"`):
-    -   `DeviceFactoryPlatformOverride.cpp`, `DeviceFactoryPlatformOverride.h`,
-        `DeviceShellCommands.cpp`, `DeviceShellCommands.h`,
-        `DeviceTypeSelection.h`, and `AppDeviceFactory.h`
--   **Append required base and device sources to `APP_TOPLEVEL_EXTRA_SRCS`**
-    (note that `config/esp32/components/chip` already compiles the SDK cluster
-    servers into `libCHIP.a`):
+-   **Remove Simulator & Example Scaffolding**:
+    -   Delete
+        `include("${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake")`
+        and remove `${ALL_DEVICES_EXTRA_INCLUDE_DIRS}`,
+        `${ALL_DEVICES_DEVICE_SOURCES}`, and `${ALL_DEVICES_CLUSTER_SOURCES}`.
+    -   Remove simulator device-factory, shell device-switching, and example
+        peripheral directories/files (such as `display/` and `devices/chime/`)
+        from `esp32/main/` and `CMakeLists.txt`.
+-   **Append Base & Product Device Sources**:
+    -   Keep `APP_TOPLEVEL_EXTRA_SRCS` (which selects `ThreadFeature.cpp` or
+        `WifiFeature.cpp` based on `CONFIG_ENABLE_MATTER_OVER_THREAD`) and
+        append the `device/api/*` base sources, `RootNode.cpp`, and the single
+        base device `.cpp` (note that `config/esp32/components/chip` already
+        compiles the SDK cluster servers into `libCHIP.a`):
 
 ```cmake
 list(APPEND APP_TOPLEVEL_EXTRA_SRCS
@@ -37,22 +38,17 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
 ## 2. Entrypoint Deltas ([`esp32/main/main.cpp`](../esp32/main/main.cpp))
 
 -   **Keep**:
-    -   Persistence initialization, `dataModelProvider` setup, and `gRootNode`
-        (`WifiRootNode`) registration on `kRootEndpointId` (`0`) in
-        `PopulateCodeDrivenDataModelProvider()`.
--   **Delete**:
-    -   `#include "AppDeviceFactory.h"`, `#include "DeviceTypeSelection.h"`,
-        `#include "DeviceFactoryPlatformOverride.h"`, and
-        `#include <DeviceShellCommands.h>`
-    -   `AppDeviceFactory::GetInstance()` and
-        `RegisterDeviceFactoryOverrides(...)` in `InitServer()`, and
-        `chip::Shell::DeviceCommands::GetInstance().Register()` in `app_main()`
-    -   `gConstructedDevices` (replace with
-        `std::unique_ptr<MyProductSpeaker> gProductDevice;`)
+    -   Platform initialization, persistence setup, `dataModelProvider`
+        creation, and `gRootNode` (`WifiRootNode`) registration on
+        `kRootEndpointId` (`0`) in `PopulateCodeDrivenDataModelProvider()`.
+-   **Remove**:
+    -   All `AppDeviceFactory` registration, NVS `dev-type` device-selection
+        state, shell device-switching commands, and sample display UI hooks in
+        `main.cpp`.
 -   **Replace**:
-    -   Replace the `AppDeviceFactory::GetInstance()` block after
-        `gRootNode->Register(...)` in `PopulateCodeDrivenDataModelProvider()`
-        with direct registration on `EndpointId(1)`:
+    -   Immediately after `gRootNode->Register(...)` in
+        `PopulateCodeDrivenDataModelProvider()`, instantiate and register the
+        product device on `EndpointId(1)`:
 
 ```cpp
     if (gRootNode->Register(rootAllocator, dataModelProvider) != CHIP_NO_ERROR)

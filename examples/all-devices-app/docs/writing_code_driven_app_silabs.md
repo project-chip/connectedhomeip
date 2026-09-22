@@ -9,21 +9,17 @@ for architecture and device class implementation.
 
 ## 1. GN Build Deltas ([`silabs/BUILD.gn`](../silabs/BUILD.gn))
 
--   **Delete**:
-    -   `import(".../device-factory/enabled_devices.gni")`
-    -   `"${chip_root}/examples/all-devices-app/all-devices-common/device-factory"`
-        and unused `all-devices-common/device/types/*` entries from `deps`
-    -   `include/AppKeys.h`, `include/DeviceShellCommands.h`, and
-        `src/DeviceShellCommands.cpp` from `sources`
--   **Keep**:
-    -   `root-node:wifi`, `root-node:thread`, and `root-node:ota` conditional
-        blocks
-    -   Device info provider targets (`all-devices-example-device-info-provider`
-        and `all-devices-example-device-instance-info-provider`, or replace with
-        production factory providers)
--   **Add**:
-    -   Product device source files and the single base device target (e.g.,
-        `device/types/speaker`):
+-   **Remove Simulator Scaffolding**:
+    -   Remove the `enabled_devices.gni` import,
+        `all-devices-common/device-factory`, unused
+        `all-devices-common/device/types/*` targets, and the shell/KVS
+        device-selection files (`DeviceShellCommands.*`, `AppKeys.h`).
+-   **Keep Platform & Root Node Dependencies**:
+    -   Keep the `root-node:wifi`, `root-node:thread`, and `root-node:ota`
+        conditional blocks, along with the device info provider targets.
+-   **Link the Product Device**:
+    -   Add your product device sources and depend on the single base device
+        target (e.g., `device/types/speaker`):
 
 ```text
   sources += [
@@ -47,21 +43,18 @@ for architecture and device class implementation.
 ## 2. Entrypoint Deltas ([`silabs/src/AppTask.cpp`](../silabs/src/AppTask.cpp))
 
 -   **Keep**:
-    -   Persistence initialization, `sDataModelProvider` creation, and
-        `sRootNode` (`RootNodeWith<...>`) construction and registration on
-        `kRootEndpointId` (`0`) in `AppTask::InitCodeDrivenDataModel()`.
--   **Delete**:
-    -   `#include "AppKeys.h"`, `#include <DeviceShellCommands.h>`,
-        `#include <app_config/enabled_devices.h>`, and
-        `#include <device-factory/DeviceFactory.h>`
-    -   `chip::Shell::DeviceCommands::GetInstance().Register()` in
-        `AppTask::AppInit()`
-    -   `kMaxConstructedDevices` / `sConstructedDevices` (replace with
-        `std::unique_ptr<chip::app::MyProductSpeaker> sProductDevice;`)
+    -   Platform initialization, persistence setup, `sDataModelProvider`
+        creation, and `sRootNode` (`RootNodeWith<...>`) construction and
+        registration on `kRootEndpointId` (`0`) in
+        `AppTask::InitCodeDrivenDataModel()`.
+-   **Remove**:
+    -   All `DeviceFactory` (`NoHooksDeviceFactory`), build-time device list
+        (`enabled_devices.h`), KVS device-type selection, and shell
+        device-switching code.
 -   **Replace**:
-    -   Replace the `NoHooksDeviceFactory::GetInstance().Init(...)` and KVS
-        lookup block after `sRootNode->Register(...)` with direct registration
-        on `kDeviceEndpointId` (`EndpointId(1)`):
+    -   Immediately after `sRootNode->Register(...)` in
+        `AppTask::InitCodeDrivenDataModel()`, instantiate and register the
+        product device on `kDeviceEndpointId` (`EndpointId(1)`):
 
 ```cpp
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));

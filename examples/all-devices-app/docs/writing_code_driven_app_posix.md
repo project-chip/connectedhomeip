@@ -9,25 +9,19 @@ for architecture and device class implementation.
 
 ## 1. GN Build Deltas ([`posix/BUILD.gn`](../posix/BUILD.gn), [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn), [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn))
 
--   **Delete from `posix/BUILD.gn`**:
-    -   `OOBAccessorHook.h`, `named_pipe/Hook.h`, and
-        `include/DeviceFactoryPlatformOverride.h` from `sources`
-    -   `all-devices-common/device-factory`, `oob-accessors:oob-accessors`,
-        `posix/named_pipe`, unused `device/types/*` targets, and all `:posix`
-        sub-targets (`device/types/<device>:posix`, which compile
-        `impl/Logging*` classes) from `deps`
--   **Delete from [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn) and
-    [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn)**:
-    -   `"../include/DeviceFactoryPlatformOverride.h"` from `sources`
-    -   `"${chip_root}/examples/all-devices-app/all-devices-common/device-factory"`
-        from `deps`
--   **Keep in `posix/BUILD.gn`**:
-    -   `posix/app_options:app-options` (used by `Initialize()` /
-        `RunApplication()` for `--discriminator`, `--passcode`, `--kvs`,
-        `--wifi`, and `--dac-provider`)
-    -   `device/types/root-node`, `device/types/root-node:posix`,
-        `device/types/root-node:wifi`, and the single base device target (e.g.,
-        `device/types/speaker`):
+-   **Remove Simulator & Example Scaffolding**:
+    -   Remove `all-devices-common/device-factory` and
+        `DeviceFactoryPlatformOverride.h` from `posix/BUILD.gn`,
+        [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn), and
+        [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn).
+    -   Remove `oob-accessors`, `posix/named_pipe`, sample peripheral sources
+        (`PosixAudioManager.cpp`, `PosixChime.cpp`, `PosixSpeaker.cpp`), unused
+        `device/types/*` targets, and all `:posix` sub-targets
+        (`device/types/<device>:posix`, which compile `impl/Logging*` classes).
+-   **Keep Platform & Root Node Dependencies**:
+    -   Keep `posix/app_options:app-options`, `device/types/root-node`
+        (including `:posix` and `:wifi`), and the single base device target
+        (e.g., `device/types/speaker`):
 
 ```text
   sources = [
@@ -52,21 +46,17 @@ for architecture and device class implementation.
 ## 2. Entrypoint Deltas ([`posix/main.cpp`](../posix/main.cpp))
 
 -   **Keep**:
-    -   `mAttributePersistence`, `mDataModelProvider`, and `mRootNode`
-        (`AppRootNode`) construction in `CodeDrivenDataModelDevices`.
--   **Delete**:
-    -   `#include <PosixAudioManager.h>` and `gAudioManager`
-    -   `PosixDeviceFactory`, `RegisterDeviceFactoryOverrides(...)`,
-        `SetupNamedPipe(...)`, and `AppOptions::GetDeviceTypeEntries()`
-        (`--device`) handling in `CodeDrivenDataModelDevices::Startup()` and
-        `RunApplication()`.
+    -   Platform initialization, `mAttributePersistence`, `mDataModelProvider`,
+        and `mRootNode` (`AppRootNode`) construction in
+        `CodeDrivenDataModelDevices`.
+-   **Remove**:
+    -   All `PosixDeviceFactory` registration, CLI `--device` topology loops,
+        named pipe setup, and sample audio manager hooks (including the
+        audio-only `ApplicationShutdown()` helper).
 -   **Replace**:
-    -   Replace
-        `std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices` in
-        `CodeDrivenDataModelDevices` with a member instance
-        `MyProductSpeaker mProductDevice` (initialized with
-        `mProductDevice(mContext.timerDelegate)` in the constructor initializer
-        list) and register it in `Startup()` alongside `mRootNode.RootDevice()`:
+    -   Own a member instance `MyProductSpeaker mProductDevice` in
+        `CodeDrivenDataModelDevices` and register/unregister it in `Startup()`
+        and `Shutdown()` alongside `mRootNode.RootDevice()`:
 
 ```cpp
     CHIP_ERROR Startup()
