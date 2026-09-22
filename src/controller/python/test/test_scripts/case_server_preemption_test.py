@@ -26,7 +26,7 @@ import hmac
 import logging
 from optparse import OptionParser
 import os
-import random
+import secrets
 import socket
 import struct
 import sys
@@ -446,7 +446,7 @@ class SimulatedCASEServerPR74109:
       expected_ms = 2000
     elapsed = max(0, now_ms - self.state_entered_ms)
     remaining = max(250, expected_ms - elapsed)
-    jitter = 50 + (random.randint(0, 65535) % 200)
+    jitter = 50 + secrets.randbelow(200)
     return min(65535, remaining + jitter)
 
   def on_sigma1_received(

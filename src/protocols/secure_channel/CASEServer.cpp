@@ -261,6 +261,7 @@ CHIP_ERROR CASEServer::PeekSigma1Params(const System::PacketBufferHandle & paylo
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(1)));
     ByteSpan randomSpan;
     ReturnErrorOnFailure(reader.GetByteView(randomSpan));
+    VerifyOrReturnError(randomSpan.size() == kSigmaParamRandomNumberSize, CHIP_ERROR_INVALID_CASE_PARAMETER);
     VerifyOrReturnError(randomSpan.size() <= outInitiatorRandom.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(outInitiatorRandom.data(), randomSpan.data(), randomSpan.size());
     outInitiatorRandom.reduce_size(randomSpan.size());
@@ -274,6 +275,7 @@ CHIP_ERROR CASEServer::PeekSigma1Params(const System::PacketBufferHandle & paylo
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(3)));
     ByteSpan destIdSpan;
     ReturnErrorOnFailure(reader.GetByteView(destIdSpan));
+    VerifyOrReturnError(destIdSpan.size() == Crypto::kSHA256_Hash_Length, CHIP_ERROR_INVALID_CASE_PARAMETER);
     VerifyOrReturnError(destIdSpan.size() <= outDestinationId.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(outDestinationId.data(), destIdSpan.data(), destIdSpan.size());
     outDestinationId.reduce_size(destIdSpan.size());
@@ -378,13 +380,13 @@ void CASEServer::PreemptExistingSession()
 System::Clock::Milliseconds16 CASEServer::ComputeDynamicBusyDelay()
 {
     System::Clock::Timeout expectedDuration = System::Clock::kZero;
-    if (GetSession().GetState() == CASESession::State::kSentSigma2)
-    {
-        expectedDuration = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
-    }
-    else if (GetSession().IsCryptoOperationInProgress())
+    if (GetSession().IsCryptoOperationInProgress())
     {
         expectedDuration = System::Clock::Milliseconds16(250);
+    }
+    else if (GetSession().GetState() == CASESession::State::kSentSigma2)
+    {
+        expectedDuration = CASESession::ComputeSigma2ResponseTimeout(GetSession().GetRemoteMRPConfig());
     }
     else
     {
