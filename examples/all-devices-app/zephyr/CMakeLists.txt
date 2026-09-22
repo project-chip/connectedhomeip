@@ -126,8 +126,10 @@ target_sources(app PRIVATE
     include/AppTaskBase.ipp
     include/AppTask.h
     include/Buttons.h
+    include/ZephyrIdentifyDelegate.h
     src/Buttons.cpp
     src/main.cpp
+    src/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
     ${ALL_DEVICES_DEVICE_SOURCES}
