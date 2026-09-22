@@ -57,8 +57,8 @@ tests:
 
     - label:
           "Use the assigned value directly as a command argument, without
-          needing an arithmetic expression to coerce its type. This also
-          covers a falsy assigned value, unlike the previous step."
+          needing an arithmetic expression to coerce its type. This also covers
+          a falsy assigned value, unlike the previous step."
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
