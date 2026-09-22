@@ -29,6 +29,8 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <lib/support/BitMask.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -50,9 +52,16 @@ public:
      *            SetpointRaiseLower command targeting) one of the four operational setpoints, as opposed to a
      *            setpoint limit write that incidentally clamped an operational setpoint via Setpoints::Fix().
      *            Only changes with this set to true are reported through the SetpointChange* tracking attributes.
+     * @param[in] initiatingAttributeId The specific operational setpoint attribute that was directly written (or
+     *            targeted by a single-mode SetpointRaiseLower command), if any. Used to disambiguate which
+     *            setpoint's delta to report when the operation also cascades into a second operational setpoint
+     *            via Setpoints::Fix() (e.g. an auto-mode deadband adjustment). Left as std::nullopt when more than
+     *            one operational setpoint is intentionally targeted by the same operation (SetpointRaiseLower with
+     *            mode kBoth), in which case an explicit fixed-order policy is used instead.
      */
     virtual Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes,
-                                                              bool initiatedByOperationalSetpointWrite) = 0;
+                                                              bool initiatedByOperationalSetpointWrite,
+                                                              std::optional<AttributeId> initiatingAttributeId) = 0;
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp) const;
     void NotifyAttributesChanged(const SetpointAttributes & changedAttributes);
 
@@ -74,9 +83,11 @@ protected:
      * @param[in] changedAttributes The set of setpoint attributes that were changed by this operation.
      * @param[in] initiatedByOperationalSetpointWrite See SaveSetpoints(). A limit write that merely clamps an
      *            operational setpoint via Setpoints::Fix() must not be reported as a setpoint change.
+     * @param[in] initiatingAttributeId See SaveSetpoints().
      */
     void UpdateSetpointChangeAttributes(const Setpoints & oldSetpoints, const Setpoints & newSetpoints,
-                                        const SetpointAttributes & changedAttributes, bool initiatedByOperationalSetpointWrite);
+                                        const SetpointAttributes & changedAttributes, bool initiatedByOperationalSetpointWrite,
+                                        std::optional<AttributeId> initiatingAttributeId);
 
     /**
      * @brief True if attributeId is one of the four operational setpoints (Occupied/UnoccupiedHeating/CoolingSetpoint),

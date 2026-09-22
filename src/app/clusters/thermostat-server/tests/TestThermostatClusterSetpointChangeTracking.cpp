@@ -224,6 +224,33 @@ TEST_F(ThermostatTestFixture, TestIndependentOptionalAttributeGating)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestDirectWriteCascadeReportsInitiatingSetpointDelta)
+{
+    EnableAllSetpointChangeAttributes(mOptionalAttributes);
+
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kAutoMode);
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mAutoDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Default OccupiedHeatingSetpoint (2000) and OccupiedCoolingSetpoint (2600) start further apart than the 2.0C
+    // deadband. Writing OccupiedCoolingSetpoint down to 2050 leaves only 0.5C between them, so Setpoints::Fix()
+    // also pulls OccupiedHeatingSetpoint down to 1850 to restore the deadband. Both attributes end up in
+    // changedAttributes, but only OccupiedCoolingSetpoint was directly written; its delta - not the cascaded
+    // heating delta - must be the one reported.
+    EXPECT_EQ(tester.WriteAttribute(OccupiedCoolingSetpoint::Id, static_cast<temperature>(2050)), Status::Success);
+    EXPECT_EQ(mHeatingDelegate.mOccupiedHeatingSetpoint, 1850);
+
+    DataModel::Nullable<int16_t> amount;
+    EXPECT_EQ(tester.ReadAttribute(SetpointChangeAmount::Id, amount), Status::Success);
+    ASSERT_FALSE(amount.IsNull());
+    EXPECT_EQ(amount.Value(), -550);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerCommandReportsFirstChangedSetpointDelta)
 {
     EnableAllSetpointChangeAttributes(mOptionalAttributes);
