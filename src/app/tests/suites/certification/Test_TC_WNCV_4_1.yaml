@@ -17,6 +17,8 @@ name:
     Verification [DUT as Server]
 
 CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
     - name: "Test against all-devices/window-covering"
       app: all-devices
       args:

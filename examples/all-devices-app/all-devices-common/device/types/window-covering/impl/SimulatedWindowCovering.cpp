@@ -16,7 +16,6 @@
  */
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <inttypes.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters::WindowCovering;
@@ -28,7 +27,9 @@ namespace {
 
 constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(500);
 constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(30000);
-constexpr Percent100ths kPositionStep                        = 500; // 5% step
+// Delay before deciding whether the device still needs its initial calibration; see Register().
+constexpr System::Clock::Milliseconds32 kInitialCalibrationCheckDelay = System::Clock::Milliseconds32(250);
+constexpr Percent100ths kPositionStep                                 = 500; // 5% step
 
 // Returns the next position, moved at most kPositionStep towards target.
 Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
@@ -75,16 +76,20 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
 {
     ReturnErrorOnFailure(WindowCovering::Register(endpoint, provider, composition));
 
-    // The device boots without a known position; enter calibration mode itself immediately
-    // rather than waiting for a client to request it, so it resolves to a known position
-    // shortly after startup on its own (see OnModeChanged()/TimerFired()).
-    if (WindowCoveringCluster().GetCurrentPositionLiftPercent100ths().IsNull() ||
-        WindowCoveringCluster().GetCurrentPositionTiltPercent100ths().IsNull())
-    {
-        WindowCoveringCluster().SetMode(chip::BitMask<Mode>(Mode::kCalibrationMode));
-    }
-
-    return CHIP_NO_ERROR;
+    // This simulated device starts uncalibrated: both current positions are null (targets stay
+    // null until a client commands a movement) until a calibration completes. Device registration
+    // happens before the cluster's Startup(), which only then loads any persisted positions from
+    // NVS on later boots, so whether an initial calibration is still needed can only be decided
+    // after that load - hence the deferred check below rather than a check at register time.
+    //
+    // If the positions are still unknown once Startup() is done (fresh install, nothing
+    // persisted), the device enters calibration mode by itself instead of waiting for a client to
+    // request it, and resolves to a known position shortly after startup on its own (see
+    // TimerFired()). A client can also enter calibration mode at any time by writing
+    // Mode.CalibrationMode. No movement commands are accepted by the cluster while calibrating
+    // (GetMotionLockStatus()), and any movement or calibration transition cancels this pending
+    // check timer, so the two paths cannot interfere.
+    return mContext.timerDelegate.StartTimer(this, kInitialCalibrationCheckDelay);
 }
 
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
@@ -158,14 +163,19 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     auto currentTilt               = cluster.GetCurrentPositionTiltPercent100ths();
     [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
 
-    // Longest content is "65535\0" (max uint16_t), so 6 bytes covers either that or "NULL\0".
-    StringBuilder<6> liftStr;
-    currentLift.IsNull() ? liftStr.Add("NULL") : liftStr.AddFormat("%u", currentLift.Value());
-    StringBuilder<6> tiltStr;
-    currentTilt.IsNull() ? tiltStr.Add("NULL") : tiltStr.AddFormat("%u", currentTilt.Value());
-
-    ChipLogProgress(DeviceLayer, "WindowCovering: Halted. Frozen State -> Lift: %s, Tilt: %s | OpStatus raw=0x%02X",
-                    liftStr.c_str(), tiltStr.c_str(), opStatus.Raw());
+    // Positions may be null while the device is uncalibrated (a fresh install before its initial
+    // calibration completes), so only log the values when they are known.
+    if (currentLift.IsNull() || currentTilt.IsNull())
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: Halted while uncalibrated, positions unknown | OpStatus raw=0x%02X",
+                        opStatus.Raw());
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer,
+                        "WindowCovering: Halted. Frozen State -> Lift: %" PRIu16 ", Tilt: %" PRIu16 " | OpStatus raw=0x%02X",
+                        currentLift.Value(), currentTilt.Value(), opStatus.Raw());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -205,7 +215,11 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
     }
 
     ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%" PRIu32 " ms)", kCalibrationDuration.count());
-    mCalibrating   = true;
+    mCalibrating = true;
+    // No movement can be in progress while calibrating (motion is locked), so drop any stale
+    // moving flags; a client must send a fresh movement command after calibration completes.
+    mMovingLift    = false;
+    mMovingTilt    = false;
     auto & cluster = WindowCoveringCluster();
     cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
     cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
@@ -216,6 +230,21 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
 void SimulatedWindowCovering::TimerFired()
 {
     auto & cluster = WindowCoveringCluster();
+
+    // The deferred initial-calibration check from Register(): if there is still no known position
+    // once Startup() has loaded persisted state (fresh install), run the initial calibration by
+    // entering calibration mode; OnModeChanged() takes it from here. Any client-initiated
+    // calibration or movement would have cancelled this timer before it could fire, so this cannot
+    // interrupt a transition already in progress.
+    if (!mCalibrating && !mMovingLift && !mMovingTilt &&
+        (cluster.GetCurrentPositionLiftPercent100ths().IsNull() || cluster.GetCurrentPositionTiltPercent100ths().IsNull()))
+    {
+        ChipLogProgress(DeviceLayer, "WindowCovering: No known position after startup, starting initial calibration");
+        chip::BitMask<Mode> mode = cluster.GetMode();
+        mode.Set(Mode::kCalibrationMode);
+        cluster.SetMode(mode);
+        return;
+    }
 
     if (mCalibrating)
     {
@@ -243,7 +272,10 @@ void SimulatedWindowCovering::TimerFired()
 
     if (mMovingLift)
     {
-        Percent100ths currentVal = cluster.GetCurrentPositionLiftPercent100ths().ValueOr(0);
+        // Current positions are always non-null while moving (calibration locks motion), so read
+        // them directly; the target is null unless a client commanded a movement, in which case it
+        // equals the position we are stepping towards.
+        Percent100ths currentVal = cluster.GetCurrentPositionLiftPercent100ths().Value();
         Percent100ths targetVal  = cluster.GetTargetPositionLiftPercent100ths().ValueOr(currentVal);
         Percent100ths nextVal    = ComputeStepToTarget(currentVal, targetVal);
 
@@ -260,7 +292,7 @@ void SimulatedWindowCovering::TimerFired()
 
     if (mMovingTilt)
     {
-        Percent100ths currentVal = cluster.GetCurrentPositionTiltPercent100ths().ValueOr(0);
+        Percent100ths currentVal = cluster.GetCurrentPositionTiltPercent100ths().Value();
         Percent100ths targetVal  = cluster.GetTargetPositionTiltPercent100ths().ValueOr(currentVal);
         Percent100ths nextVal    = ComputeStepToTarget(currentVal, targetVal);
 

@@ -278,7 +278,9 @@ TEST_F(TestWindowCoveringCluster, ReadMandatoryDefaults)
 
     chip::BitMask<ConfigStatus> configStatus{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::ConfigStatus::Id, configStatus), CHIP_NO_ERROR);
-    EXPECT_EQ(configStatus.Raw(), 0);
+    // ConfigStatus is derived from Mode (0 -> operational) and the feature map (no PA features
+    // here) at construction, then refreshed on Startup, so a fresh cluster reports kOperational.
+    EXPECT_EQ(configStatus.Raw(), 0x1);
 
     chip::BitMask<OperationalStatus> opStatus{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::OperationalStatus::Id, opStatus), CHIP_NO_ERROR);
@@ -293,6 +295,61 @@ TEST_F(TestWindowCoveringCluster, ReadMandatoryDefaults)
     EXPECT_TRUE(featureMap.HasAll(Feature::kLift, Feature::kTilt));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// ConfigStatus is derived, not independent state: the PositionAware bits mirror the feature map
+// (spec 9.3.6.13) and the Operational/MovementReversed bits follow Mode, so the bitmap is already
+// coherent at construction and stays coherent after Startup loads persisted state.
+TEST_F(TestWindowCoveringCluster, StartupDerivesConfigStatus)
+{
+    MockWindowCoveringDelegate delegate;
+    TestableWindowCoveringCluster cluster(
+        kTestEndpointId,
+        WindowCoveringCluster::Config(delegate).WithFeatures(
+            BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift, Feature::kTilt, Feature::kPositionAwareTilt }));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    chip::BitMask<ConfigStatus> configStatus{};
+    ASSERT_EQ(tester.ReadAttribute(Attributes::ConfigStatus::Id, configStatus), CHIP_NO_ERROR);
+    EXPECT_EQ(configStatus.Raw(),
+              static_cast<uint8_t>(ConfigStatus::kOperational) | static_cast<uint8_t>(ConfigStatus::kLiftPositionAware) |
+                  static_cast<uint8_t>(ConfigStatus::kTiltPositionAware));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A persisted non-operational Mode stays non-operational after reboot: the derivation follows the
+// loaded Mode, it does not reset it.
+TEST_F(TestWindowCoveringCluster, StartupDerivationFollowsPersistedMode)
+{
+    TestServerClusterContext sharedContext;
+    MockWindowCoveringDelegate delegate;
+
+    // First boot: leave the cluster in maintenance mode (clears Operational).
+    {
+        TestableWindowCoveringCluster cluster(
+            kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+        ASSERT_EQ(cluster.Startup(sharedContext.Get()), CHIP_NO_ERROR);
+
+        chip::BitMask<Mode> maintenance;
+        maintenance.Set(Mode::kMaintenanceMode);
+        cluster.SetMode(maintenance);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Second boot: ConfigStatus is re-derived from the persisted Mode.
+    {
+        TestableWindowCoveringCluster cluster(
+            kTestEndpointId, WindowCoveringCluster::Config(delegate).WithFeatures(BitFlags<Feature>{ Feature::kLift }));
+        ASSERT_EQ(cluster.Startup(sharedContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_EQ(cluster.GetMode().Raw(), static_cast<uint8_t>(Mode::kMaintenanceMode));
+        EXPECT_EQ(cluster.GetConfigStatus().Raw(), 0);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }
 
 TEST_F(TestWindowCoveringCluster, ReadEnabledOptionalDefaults)
@@ -396,8 +453,11 @@ TEST_F(TestWindowCoveringCluster, WriteMode_DirtyAndNoOp)
 
     auto & dirtyList = tester.GetDirtyList();
 
+    // Maintenance mode clears the Operational bit of ConfigStatus, so both Mode and the derived
+    // ConfigStatus change on this write (a mode write that leaves the derived bits untouched, e.g.
+    // toggling only kLedFeedback, marks Mode alone as dirty).
     chip::BitMask<Mode> mode;
-    mode.Set(Mode::kLedFeedback);
+    mode.Set(Mode::kMaintenanceMode);
     ASSERT_EQ(tester.WriteAttribute(Attributes::Mode::Id, mode), CHIP_NO_ERROR);
 
     EXPECT_TRUE(tester.IsAttributeDirty(Attributes::Mode::Id));

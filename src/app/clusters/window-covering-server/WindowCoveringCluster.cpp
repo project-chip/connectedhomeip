@@ -81,6 +81,25 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
         VerifyOrDieWithMsg(mType == Type::kShutter || mType == Type::kTiltBlindTiltOnly || mType == Type::kUnknown, AppServer,
                            "Validation failed: Type is not valid when only Tilt is enabled.");
     }
+
+    // The PositionAware bits of ConfigStatus mirror the immutable feature map (spec 9.3.6.13), so
+    // they are established here, where the features from the Config are set; with Mode still 0 the
+    // cluster starts operational. Startup() refreshes the whole bitmap after loading persisted
+    // state, since the Mode-derived bits can change across boots.
+    mConfigStatus = DeriveConfigStatus();
+}
+
+chip::BitMask<ConfigStatus> WindowCoveringCluster::DeriveConfigStatus() const
+{
+    // Starts from the current value: only the four spec-derived bits are refreshed here (the
+    // PositionAware pair mirrors the feature map, Operational/LiftMovementReversed follow Mode);
+    // the remaining bits (OnlineReserved, encoder-controlled) are independent state.
+    chip::BitMask<ConfigStatus> status = mConfigStatus;
+    status.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    status.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
+    status.Set(ConfigStatus::kLiftPositionAware, mFeatureMap.Has(Feature::kPositionAwareLift));
+    status.Set(ConfigStatus::kTiltPositionAware, mFeatureMap.Has(Feature::kPositionAwareTilt));
+    return status;
 }
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
@@ -112,6 +131,12 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id), rawConfigStatus,
         rawConfigStatus);
     mConfigStatus = chip::BitMask<ConfigStatus>(rawConfigStatus);
+
+    // Refresh the derived bits after loading persisted state: the Mode-derived bits (Operational,
+    // LiftMovementReversed) can change across boots, and a persisted ConfigStatus must not shadow
+    // the feature-mirroring PositionAware bits. Applied directly, with no change notification or
+    // delegate callback: this is initialization from persisted state, not a state change.
+    mConfigStatus = DeriveConfigStatus();
 
     return CHIP_NO_ERROR;
 }
@@ -280,10 +305,7 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
             ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id), rawMode));
     }
 
-    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
-    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
-    SetConfigStatus(newStatus);
+    SetConfigStatus(DeriveConfigStatus());
 }
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
