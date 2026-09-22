@@ -58,6 +58,7 @@ public:
     CHIP_ERROR AddRemoteCandidate(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId,
                                   const std::string & aCandidate) override;
     std::vector<LocalICECandidate> TakeLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    std::vector<ConnectedStream> ConnectedStreams() const override;
 
 private:
     // The camera and the id it assigned: ids are unique only within a camera, so both identify a session
@@ -73,6 +74,9 @@ private:
         bool gatheringComplete = false;
         // The camera's answer was applied: the camera is ready for our candidates
         bool answerApplied = false;
+        // Set once the connection reaches Connected
+        bool connected              = false;
+        uint64_t connectedAtEpochUs = 0;
     };
 
     // The assigned session a given connection belongs to
