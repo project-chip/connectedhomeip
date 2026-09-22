@@ -44,7 +44,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
     FabricTable & GetFabricTable() const override { return mFabricTable; }
-    DataModel::Nullable<int16_t> GetLocalTemperature() const override { return mLocalTemperature; }
+    DataModel::Nullable<int16_t> GetLocalTemperature() const override { return mLocalTemperatureCentiCelsius; }
     Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<int16_t> value, bool & changed) override;
     Clusters::Thermostat::SystemModeEnum GetSystemMode() const override { return mSystemMode; }
     Protocols::InteractionModel::Status SetSystemMode(Clusters::Thermostat::SystemModeEnum value, bool & changed) override;
@@ -86,7 +86,7 @@ public:
 private:
     FabricTable & mFabricTable;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
-    DataModel::Nullable<int16_t> mLocalTemperature{ 2500 }; // Simulated room temperature: 25 degrees Celsius.
+    DataModel::Nullable<int16_t> mLocalTemperatureCentiCelsius{ 2500 }; // Simulated room temperature: 25 degrees Celsius.
     Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
     int16_t mCoolingSetpoint                         = Clusters::Thermostat::kDefaultCoolingSetpoint;
 };

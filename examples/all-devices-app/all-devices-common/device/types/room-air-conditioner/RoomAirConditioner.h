@@ -30,10 +30,17 @@ public:
     using CoolingThermostat = Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::Delegate,
                                                                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate>;
 
-    RoomAirConditioner(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                       Clusters::OnOffDelegate & onOffDelegate, Clusters::Thermostat::Delegate & thermostatDelegate,
-                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-                       Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate);
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
+        Clusters::OnOffDelegate & onOffDelegate;
+        Clusters::Thermostat::Delegate & thermostatDelegate;
+        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate;
+        Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate;
+    };
+
+    explicit RoomAirConditioner(const Context & context);
     ~RoomAirConditioner() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

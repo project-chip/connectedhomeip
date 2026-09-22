@@ -25,7 +25,15 @@ using namespace Clusters::Thermostat;
 using Protocols::InteractionModel::Status;
 
 LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable) :
-    RoomAirConditioner(timerDelegate, *this, *this, *this, *this, *this), mFabricTable(fabricTable)
+    RoomAirConditioner(RoomAirConditioner::Context{
+        .timerDelegate         = timerDelegate,
+        .identifyDelegate      = *this,
+        .onOffDelegate         = *this,
+        .thermostatDelegate    = *this,
+        .coolingDelegate       = *this,
+        .userInterfaceDelegate = *this,
+    }),
+    mFabricTable(fabricTable)
 {}
 
 CHIP_ERROR LoggingRoomAirConditioner::Startup(ServerClusterContext & context)
@@ -76,8 +84,8 @@ void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
 
 Status LoggingRoomAirConditioner::SetLocalTemperature(DataModel::Nullable<int16_t> value, bool & changed)
 {
-    changed           = mLocalTemperature != value;
-    mLocalTemperature = value;
+    changed                        = mLocalTemperatureCentiCelsius != value;
+    mLocalTemperatureCentiCelsius = value;
     return Status::Success;
 }
 

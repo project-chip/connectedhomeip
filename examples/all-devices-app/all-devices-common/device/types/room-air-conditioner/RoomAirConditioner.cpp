@@ -19,13 +19,11 @@
 
 namespace chip::app {
 
-RoomAirConditioner::RoomAirConditioner(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                                       Clusters::OnOffDelegate & onOffDelegate, Clusters::Thermostat::Delegate & thermostatDelegate,
-                                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-                                       Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate) :
+RoomAirConditioner::RoomAirConditioner(const Context & context) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoomAirConditioner, 1)),
-    mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate), mOnOffDelegate(onOffDelegate),
-    mThermostatDelegate(thermostatDelegate), mCoolingDelegate(coolingDelegate), mUserInterfaceDelegate(userInterfaceDelegate)
+    mTimerDelegate(context.timerDelegate), mIdentifyDelegate(context.identifyDelegate), mOnOffDelegate(context.onOffDelegate),
+    mThermostatDelegate(context.thermostatDelegate), mCoolingDelegate(context.coolingDelegate),
+    mUserInterfaceDelegate(context.userInterfaceDelegate)
 {}
 
 CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
