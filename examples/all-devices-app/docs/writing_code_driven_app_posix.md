@@ -1,43 +1,49 @@
 # Writing a Code-Driven Application: POSIX (GN)
 
-This guide accompanies
-[Writing a Code-Driven Application](writing_code_driven_app.md) and describes
-the specific changes required in [`examples/all-devices-app/posix/`](../posix/)
-to convert the multi-device simulator into a single-device application.
+Build and entrypoint deltas for converting
+[`examples/all-devices-app/posix/`](../posix/) into a single-device product
+application. See [Writing a Code-Driven Application](writing_code_driven_app.md)
+for architecture and device class implementation.
 
 ---
 
-## 1. GN Build Deltas ([`posix/BUILD.gn`](../posix/BUILD.gn))
+## 1. GN Build Deltas ([`posix/BUILD.gn`](../posix/BUILD.gn), [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn), [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn))
 
-Use [`posix/BUILD.gn`](../posix/BUILD.gn) as the starting template and apply the
-following changes:
-
-1. **Remove Simulator Infrastructure & Logging Targets**:
-    - Remove `OOBAccessorHook.h`, `named_pipe/Hook.h`, and
-      `DeviceFactoryPlatformOverride.h` from `sources`.
-    - Remove `all-devices-common/device-factory`, `oob-accessors`,
-      `posix/app_options:app-options`, `posix/named_pipe`, and all `:posix`
-      sub-targets (`device/types/<device>:posix`, which compile the
-      `impl/Logging*` classes) from `deps`.
-2. **Keep Only Target Device & Root Node Dependencies**:
-    - Keep `all-devices-common/device/types/root-node` (and `:wifi` if Wi-Fi
-      commissioning is used) and the single base device target for your product
-      (e.g., `all-devices-common/device/types/dimmable-light`):
+-   **Delete from `posix/BUILD.gn`**:
+    -   `OOBAccessorHook.h`, `named_pipe/Hook.h`, and
+        `include/DeviceFactoryPlatformOverride.h` from `sources`
+    -   `all-devices-common/device-factory`, `oob-accessors:oob-accessors`,
+        `posix/named_pipe`, unused `device/types/*` targets, and all `:posix`
+        sub-targets (`device/types/<device>:posix`, which compile
+        `impl/Logging*` classes) from `deps`
+-   **Delete from [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn) and
+    [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn)**:
+    -   `"../include/DeviceFactoryPlatformOverride.h"` from `sources`
+    -   `"${chip_root}/examples/all-devices-app/all-devices-common/device-factory"`
+        from `deps`
+-   **Keep in `posix/BUILD.gn`**:
+    -   `posix/app_options:app-options` (used by `Initialize()` /
+        `RunApplication()` for `--discriminator`, `--passcode`, `--kvs`,
+        `--wifi`, and `--dac-provider`)
+    -   `device/types/root-node`, `device/types/root-node:posix`,
+        `device/types/root-node:wifi`, and the single base device target (e.g.,
+        `device/types/speaker`):
 
 ```gn
   sources = [
-    "MyProductDimmableLight.cpp",
-    "MyProductDimmableLight.h",
+    "MyProductSpeaker.cpp",
+    "MyProductSpeaker.h",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/identify:LoggingIdentifyDelegate",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
-    # ... keep existing platform/linux and codedriven persistence deps ...
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    # ... keep existing platform/linux, providers, and codedriven persistence deps ...
   ]
 ```
 
@@ -45,30 +51,25 @@ following changes:
 
 ## 2. Entrypoint Deltas ([`posix/main.cpp`](../posix/main.cpp))
 
-In [`posix/main.cpp`](../posix/main.cpp), `CodeDrivenDataModelDevices` already
-owns `mAttributePersistence`, `mDataModelProvider`, and `mRootNode`, and
-registers `mRootNode` on `kRootEndpointId` (0) inside `Init()`. It then uses
-`PosixDeviceFactory` (`DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`) to
-instantiate a `std::vector<std::unique_ptr<DeviceInterface>> mDevices` parsed
-from CLI `--device` flags.
-
-### What to Change
-
-In `CodeDrivenDataModelDevices` ([`posix/main.cpp`](../posix/main.cpp)):
-
-1. **Keep `mAttributePersistence`, `mDataModelProvider`, and `mRootNode`
-   initialization unchanged**.
-2. **Replace `std::vector<std::unique_ptr<DeviceInterface>> mDevices` and
-   `PosixDeviceFactory`** with a direct member instance of your product device
-   class (`MyProductDimmableLight mProductDevice`):
+-   **Keep**:
+    -   `mAttributePersistence`, `mDataModelProvider`, and `mRootNode`
+        (`AppRootNode`) construction in `CodeDrivenDataModelDevices`.
+-   **Delete**:
+    -   `PosixDeviceFactory`, `RegisterDeviceFactoryOverrides(...)`,
+        `SetupNamedPipe(...)`, and the `AppOptions::GetDevices()` `--device`
+        loop in `RunApplication()`.
+-   **Replace**:
+    -   Replace
+        `std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices` in
+        `CodeDrivenDataModelDevices` with a member instance
+        `MyProductSpeaker mProductDevice` and register it in `Startup()`
+        alongside `mRootNode.RootDevice()`:
 
 ```cpp
-    CHIP_ERROR Init()
+    CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider));
-
-        // Replace PosixDeviceFactory and CLI --device loop with fixed registration:
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider));
         ReturnErrorOnFailure(mProductDevice.Register(EndpointId(1), mDataModelProvider));
         return CHIP_NO_ERROR;
     }
@@ -76,6 +77,6 @@ In `CodeDrivenDataModelDevices` ([`posix/main.cpp`](../posix/main.cpp)):
     void Shutdown()
     {
         mProductDevice.Unregister(mDataModelProvider);
-        mRootNode.Unregister(mDataModelProvider);
+        mRootNode.RootDevice().Unregister(mDataModelProvider);
     }
 ```
