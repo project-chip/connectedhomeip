@@ -48,7 +48,7 @@ updated to match, and the unit tests in
 src/python_testing/test_testing/test_pqc_support.py check both implementations against the
 shared certificate vectors in src/crypto/tests/MlDsaAttestationChain_test_vectors.h.
 
-Requires a `cryptography` build providing `hazmat.primitives.asymmetric.mldsa` (46.0.0 or newer,
+Requires a `cryptography` build providing `hazmat.primitives.asymmetric.mldsa` (47.0.0 or newer,
 linked against OpenSSL 3.5 or newer) to validate ML-DSA chains. ECDSA-only chains work with any
 supported version.
 """
