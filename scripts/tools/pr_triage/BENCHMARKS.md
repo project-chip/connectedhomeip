@@ -21,7 +21,7 @@ How both runs were set up, so they can be repeated or argued with:
 
 |                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository                       | `project-chip/connectedhomeip`, base branch `upstream/master` at `99a81bd32`. One agent in run 2 fetched part-way through, moving the branch name to `954268d5`, sixteen commits on; none of those touch any of the 143 files the 24 pull requests target, so no verdict could have changed, and `JUDGE.md` now tells agents to read the recorded commit rather than the branch name.                                                                                                                                                                                        |
+| Repository                       | `project-chip/connectedhomeip`, base branch `upstream/master` at `99a81bd32`. One agent in run 2 fetched part-way through, moving the branch name to `954268d5`, sixteen commits on; none of those touch any of the 143 files the 24 pull requests target, so no verdict could have changed, and the skill now tells agents to read the recorded commit rather than the branch name.                                                                                                                                                                                         |
 | Selection                        | 24 open pull requests, `--older-than 290d` on the default activity date field, so last activity before 2025-12-02. Identical set in both runs.                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Shared input                     | Gathering ran once per run. Every agent got the same `selection.json`, the same 24 dossiers and the same `SKILL.md` (then named JUDGE.md) Step 3 instructions, with nothing else in its context.                                                                                                                                                                                                                                                                                                                                                                             |
 | Tools                            | Read access to the checkout and to `gh`, so any agent could open the base branch or a diff. None could write.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -255,8 +255,8 @@ The facts are cached, so re-judging costs only the judging. To run it on another
 model or another agent:
 
 1. `select --older-than 290d --include-triaged --name <label>` from the
-   checkout, then `collect` and `signals` on the run it writes. Confirm the
-   selection matches the 24 above.
+   checkout, or with `--repo owner/name`, then `collect` and `signals` on the
+   run it writes. Confirm the selection matches the 24 above.
 2. Give the judging agent Step 3 of `.agents/skills/matter-pr-triage/SKILL.md`
    and only that, with read access to the checkout and `gh` and no way to write.
    Tell it to read the base branch at the commit in the run's `manifest.json`,
@@ -316,5 +316,5 @@ write good descriptions, so the population is friendlier than the not-linked
 case the tier exists for. The remaining misses are semantic, an issue described
 only by symptoms and log links whose fix touched something else, and are out of
 reach for lexical scoring. Repeat with
-`matter_pr_triage_issues.py benchmark --sample 80 --seed 3` from a clone with a
-synced corpus; a fresh seed draws a fresh sample.
+`matter_pr_triage_issues.py benchmark --sample 80 --seed 3` after `sync`, from a
+clone or with `--repo owner/name`; a fresh seed draws a fresh sample.

@@ -65,7 +65,7 @@ The report has these sections.
   RELATED BUT NOT RESOLVED BY THE PR  for a safe-to-close pull request: related, but what they ask for isn't resolved by it
   ALREADY CLOSED                      linked, and closed already
   COULD NOT DETERMINE                 the check a person would do next
-  REFERENCED ELSEWHERE                issues and pull requests in other repositories the PR cites; context, not judged
+  REFERENCED ELSEWHERE                issues and pull requests in other repositories the PR cites or that match it by content; context, not judged
 Safe to close appears for a pull request the triage found safe to close, Related for any other; the rest only when they have entries.
 
 An agent without slash commands, Codex included, is handed this file and the same words.
@@ -144,9 +144,10 @@ issues that need a verdict now; follow its `next` line before running `report`.
 `gather` writes the dossier, `issues/pr-<n>.json` under the cache root, and
 prints: the pull request's triage verdict, the issue numbers in each tier, where
 the inferred tier came from (`corpus` or `search`), the size of the skim list,
-related pull requests it mentions, cross-repository references, anything skipped
-and why, and `issues_to_judge`. Say the counts in one line and go on to judge. A
-pull request that was never triaged is reported as such in that output.
+related pull requests it mentions, cross-repository references, matches in
+sibling repositories, anything skipped and why, and `issues_to_judge`. Say the
+counts in one line and go on to judge. A pull request that was never triaged is
+reported as such in that output.
 
 The inferred tier works from a corpus of the repository's issues kept in the
 cache, no clone involved: every open one and the recently closed ones, scored on
@@ -168,8 +169,8 @@ often lives.
 ## Step 3 - Judge
 
 Read the dossier. Everything you need is in it: the pull request, its triage
-verdict with the reason that proves coverage, and every issue with its ask, its
-state, its labels, and the pull requests attached to it.
+verdict with its reason, and every issue with its ask, its state, its labels,
+and the pull requests attached to it.
 
 **Skim first.** `longlist` holds up to sixty issues the corpus scored, each with
 a `score` and a `why` naming the signals that fired; `inferred` is the read list

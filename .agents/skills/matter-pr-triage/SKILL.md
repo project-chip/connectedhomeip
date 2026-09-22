@@ -20,7 +20,7 @@ Script: `scripts/tools/pr_triage/matter_pr_triage.py` in this repository. Every
 `scripts/tools/pr_triage/matter_pr_triage.py <command>` from the repository
 root, or with `python3` in front of it. It needs only Python 3.8 or newer and an
 authenticated `gh`; no build environment. Run every command from a checkout of
-the repository being triaged.
+the repository being triaged, or add `--repo owner/name`.
 
 ## Step 0 - Help
 

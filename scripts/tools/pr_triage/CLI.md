@@ -137,7 +137,7 @@ above, and most take `--pr`.
     Inferred from the clone, or from a pull request URL given to `--pr`, when
     omitted.
 -   `--pr N` - the pull request: `40191`, `#40191` or its URL. One per
-    invocation. Taken by `gather`, `report` and `forget`.
+    invocation. Taken by `gather`, `report`, `cost` and `forget`.
 
 ## gather
 
@@ -145,8 +145,8 @@ above, and most take `--pr`.
     Default 8; each one costs the judge a read.
 -   `--refetch` - ignore the per-issue cache, which is otherwise trusted for an
     hour, and fetch every issue again.
--   `--no-search` - skip the inferred tier, so only issues linked, referencing
-    or mentioned are gathered.
+-   `--no-search` - skip the inferred tier and the sibling matches, so only
+    issues linked, referencing or mentioned are gathered.
 -   `--read ISSUE` - an issue to read in full as an inferred candidate, the
     judge's pick from the skim list. Repeatable.
 
@@ -194,5 +194,6 @@ above, and most take `--pr`.
 
 ## forget
 
--   `--yes` - actually remove the pull request's dossier and judgment. Without
-    it, `forget` only reports what would go. The per-issue cache is kept.
+-   `--yes` - actually remove the pull request's dossier, judgment and report.
+    Without it, `forget` only reports what would go. The per-issue cache is
+    kept.
