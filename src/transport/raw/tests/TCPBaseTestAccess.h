@@ -40,7 +40,23 @@ public:
 
     public:
         operator bool() const { return !mHolder.IsNull(); }
+        const ActiveTCPConnectionHandle & Handle() const { return mHolder; }
     };
+
+    /**
+     * A connection slot for an endpoint that was never connected, so tests that only care
+     * about connection handoff need no socket.  TCPBase leaves mConnectionState unset.
+     */
+    static Connection AllocateConnection(TCPImpl & tcp, const Inet::TCPEndPointHandle & endPoint,
+                                         const Transport::PeerAddress & peerAddress, TCPState connectionState)
+    {
+        Connection result;
+        ActiveTCPConnectionState * allocated = tcp.AllocateConnection(endPoint, peerAddress);
+        VerifyOrReturnValue(allocated != nullptr, result);
+        allocated->mConnectionState = connectionState;
+        result.mHolder              = tcp.FindInUseConnection(peerAddress);
+        return result;
+    }
 
     static Connection FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & peerAddress)
     {

@@ -40,5 +40,10 @@ chip_test_suite("tests") {
     "${chip_root}/src/messaging/tests:helpers",
   ]
 
+  if (chip_enable_icd_checkin) {
+    test_sources += [ "TestICDCheckInSender.cpp" ]
+    public_deps += [ "${chip_root}/src/app/icd/server:sender" ]
+  }
+
   cflags = [ "-Wconversion" ]
 }

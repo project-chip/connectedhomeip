@@ -61,21 +61,7 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
 void PairingSession::Finish()
 {
-    Transport::PeerAddress address = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (address.GetTransportType() == Transport::Type::kTcp)
-    {
-        // Fetch the connection for the unauthenticated session used to set up
-        // the secure session.
-        auto conn = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
-
-        // Associate the connection with the secure session being activated.
-        mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
-    }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
-    DiscardExchange();
+    Transport::PeerAddress address = mPeerAddress;
 
     CHIP_ERROR err = ActivateSecureSession(address);
     if (err == CHIP_NO_ERROR)
@@ -104,18 +90,28 @@ void PairingSession::Finish()
     }
 }
 
-void PairingSession::DiscardExchange()
+void PairingSession::AdoptExchange(Messaging::ExchangeContext & exchange)
 {
-    if (mExchangeCtxt.HasValue())
-    {
-        // Make sure the exchange doesn't try to notify us when it closes,
-        // since we might be dead by then.
-        mExchangeCtxt.Value()->SetDelegate(nullptr);
+    mExchangeCtxt.Grab(&exchange);
+    CaptureSessionDetails();
+}
 
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
-        // exchange will handle that.
-        mExchangeCtxt.ClearValue();
+void PairingSession::CaptureSessionDetails()
+{
+    VerifyOrReturn(mExchangeCtxt);
+
+    const SessionHandle & session = mExchangeCtxt->GetSessionHandle();
+    VerifyOrReturn(session->IsUnauthenticatedSession());
+
+    Transport::UnauthenticatedSession * unauthenticated = session->AsUnauthenticatedSession();
+    mPeerAddress                                        = unauthenticated->GetPeerAddress();
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (mPeerAddress.GetTransportType() == Transport::Type::kTcp && mSecureSessionHolder)
+    {
+        mSecureSessionHolder->AsSecureSession()->SetTCPConnection(unauthenticated->GetTCPConnection());
     }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams,
@@ -291,15 +287,8 @@ void PairingSession::Clear()
     // Clear acts like the destructor of PairingSession. If it is called during
     // the middle of pairing, that means we should terminate the exchange. For the
     // normal path, the exchange should already be discarded before calling Clear.
-    if (mExchangeCtxt.HasValue())
-    {
-        // The only time we reach this is when we are getting destroyed in the
-        // middle of our handshake. In that case, there is no point in trying to
-        // do MRP resends of the last message we sent. So, abort the exchange
-        // instead of just closing it.
-        mExchangeCtxt.Value()->Abort();
-        mExchangeCtxt.ClearValue();
-    }
+    mExchangeCtxt.Release();
+    mPeerAddress = Transport::PeerAddress();
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
