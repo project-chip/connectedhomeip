@@ -203,7 +203,7 @@ public:
         PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
         ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
-            std::make_unique<AddBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager, *mEndpointIdAllocator)));
+            std::make_unique<AddBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
         ReturnErrorOnFailure(
             OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
 
@@ -241,7 +241,7 @@ public:
 
     chip::app::DeviceManager<PosixDeviceFactory> & GetDeviceManager() { return mDeviceManager; }
 
-    auto GetConstructedDevices() const { return mDeviceManager.GetAllDevices(); }
+    auto GetConstructedDevices() { return mDeviceManager.GetAllDevices(); }
 
 private:
     Context mContext;

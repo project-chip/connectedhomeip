@@ -109,9 +109,10 @@ public:
         }
         return std::nullopt;
     };
-    std::vector<DeviceRef> GetAllDevices() const
+    std::vector<DeviceRef> GetAllDevices()
     {
-        std::vector<DeviceRef> allDevices(mDevices.size());
+        std::vector<DeviceRef> allDevices;
+        allDevices.reserve(mDevices.size());
         for (auto & device : mDevices)
         {
             allDevices.push_back(device.GetDeviceRef());

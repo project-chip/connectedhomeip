@@ -21,9 +21,7 @@ namespace chip::app::NamedPipe {
 CHIP_ERROR RemoveBridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
                                                                OOBAccessorRegistry & registry) const
 {
-    auto deviceId = ExtractUInt<uint16_t>(json, "deviceId");
-    VerifyOrReturnError(deviceId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId, *deviceId);
+    return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId);
 }
 
 } // namespace chip::app::NamedPipe

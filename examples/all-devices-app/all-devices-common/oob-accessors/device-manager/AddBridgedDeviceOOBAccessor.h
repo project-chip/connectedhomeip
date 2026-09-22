@@ -126,8 +126,9 @@ public:
         if (!device.has_value() || (device->name != "bridged-node" && device->name != "aggregator"))
         {
             // Need to create aggregator
-            device = mDeviceManager.AddDevice("aggregator", EndpointComposition::WithParent(parentEndpointId));
-            ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(device, "aggregator", parentEndpointId));
+            auto aggregatorDevice = mDeviceManager.AddDevice("aggregator", "", EndpointComposition::WithParent(parentEndpointId));
+            ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(aggregatorDevice, "aggregator", parentEndpointId));
+            device.emplace(*aggregatorDevice);
             parentEndpointId = device->device.GetEndpointId();
         }
 
@@ -136,13 +137,14 @@ public:
         if (device->name != "bridged-node")
         {
             // Need to create bridged-node
-            device = mDeviceManager.AddDevice("bridged-node", EndpointComposition::WithParent(parentEndpointId));
-            ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(device, "bridged-node", parentEndpointId));
+            auto bridgedNodeDevice = mDeviceManager.AddDevice("bridged-node", "", EndpointComposition::WithParent(parentEndpointId));
+            ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(bridgedNodeDevice, "bridged-node", parentEndpointId));
+            device.emplace(*bridgedNodeDevice);
             parentEndpointId = device->device.GetEndpointId();
         }
 
-        device = mDeviceManager.AddDevice(deviceType, EndpointComposition::WithParent(parentEndpointId));
-        ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(device, deviceType, parentEndpointId));
+        auto finalDevice = mDeviceManager.AddDevice(deviceType, "", EndpointComposition::WithParent(parentEndpointId));
+        ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(finalDevice, deviceType, parentEndpointId));
 
         return CHIP_NO_ERROR;
     }
