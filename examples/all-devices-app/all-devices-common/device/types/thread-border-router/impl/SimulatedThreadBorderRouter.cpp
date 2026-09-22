@@ -32,21 +32,20 @@ constexpr uint16_t kThreadVersionForThread_1_3_1 = 5;
 
 SimulatedThreadBorderRouter::SimulatedThreadBorderRouter(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
                                                          DeviceLayer::PlatformManager & platformManager,
-                                                         FailSafeContext & failSafeContext,
-                                                         Clusters::BreadCrumbTracker * breadcrumbTracker) :
+                                                         FailSafeContext & failSafeContext, std::string nodeLabel) :
     ThreadBorderRouter(ThreadBorderRouter::Context{
-        .delegate          = *this,
-        .failSafeContext   = failSafeContext,
-        .platformManager   = platformManager,
-        .storage           = storage,
-        .breadcrumbTracker = breadcrumbTracker,
+        .delegate            = *this,
+        .failSafeContext     = failSafeContext,
+        .platformManager     = platformManager,
+        .breadcrumbTracker   = *this,
+        .diagnosticsProvider = *this,
     }),
-    mTimerDelegate(timerDelegate)
+    mTimerDelegate(timerDelegate), mThreadNetworkDirectoryStorage(storage), mBorderRouterName(std::move(nodeLabel))
 {}
 
-SimulatedThreadBorderRouter::SimulatedThreadBorderRouter(const Context & context) :
+SimulatedThreadBorderRouter::SimulatedThreadBorderRouter(const Context & context, std::string nodeLabel) :
     SimulatedThreadBorderRouter(context.timerDelegate, context.storage, context.platformManager, context.failSafeContext,
-                                context.breadcrumbTracker)
+                                std::move(nodeLabel))
 {}
 
 SimulatedThreadBorderRouter::~SimulatedThreadBorderRouter()
@@ -59,10 +58,22 @@ void SimulatedThreadBorderRouter::Unregister(CodeDrivenDataModelProvider & provi
 {
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
-    mActivateDatasetCallback = nullptr;
-    mAttributeChangeCallback = nullptr;
-
     ThreadBorderRouter::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedThreadBorderRouter::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
+    return provider.AddCluster(mThreadNetworkDirectoryCluster.Registration());
+}
+
+void SimulatedThreadBorderRouter::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mThreadNetworkDirectoryCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
+        mThreadNetworkDirectoryCluster.Destroy();
+    }
 }
 
 CHIP_ERROR SimulatedThreadBorderRouter::Init(AttributeChangeCallback * attributeChangeCallback)
@@ -81,7 +92,14 @@ bool SimulatedThreadBorderRouter::GetPanChangeSupported()
 void SimulatedThreadBorderRouter::GetBorderRouterName(MutableCharSpan & borderRouterName)
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::GetBorderRouterName called");
-    CopyCharSpanToMutableCharSpanWithTruncation("all-devices-tbr"_span, borderRouterName);
+    if (!mBorderRouterName.empty())
+    {
+        CopyCharSpanToMutableCharSpanWithTruncation(CharSpan::fromCharString(mBorderRouterName.c_str()), borderRouterName);
+    }
+    else
+    {
+        CopyCharSpanToMutableCharSpanWithTruncation("all-devices-tbr"_span, borderRouterName);
+    }
 }
 
 CHIP_ERROR SimulatedThreadBorderRouter::GetBorderAgentId(MutableByteSpan & borderAgentId)
@@ -173,7 +191,8 @@ CHIP_ERROR SimulatedThreadBorderRouter::RevertActiveDataset()
 
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
     return CHIP_NO_ERROR;
@@ -188,12 +207,24 @@ CHIP_ERROR SimulatedThreadBorderRouter::SetPendingDataset(const Thread::Operatio
     ReturnErrorOnFailure(tempDataset.GetDelayTimer(delayTimerMillis));
 
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
-    ReturnErrorOnFailure(mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis)));
+    CHIP_ERROR err =
+        mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis));
+    if (err != CHIP_NO_ERROR)
+    {
+        mPendingDataset.Clear();
+        if (mAttributeChangeCallback != nullptr)
+        {
+            mAttributeChangeCallback->ReportAttributeChanged(
+                ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        }
+        return err;
+    }
 
     mPendingDataset = tempDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -207,7 +238,8 @@ void SimulatedThreadBorderRouter::OnActiveDatasetTimerFired()
     mActiveDataset = mStagedActiveDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 
@@ -223,8 +255,10 @@ void SimulatedThreadBorderRouter::OnPendingDatasetTimerFired()
     mPendingDataset.Clear();
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 }

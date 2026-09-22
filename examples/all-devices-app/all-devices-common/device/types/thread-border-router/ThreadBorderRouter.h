@@ -21,12 +21,9 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementCluster.h>
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
-#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
-#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
-#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 #include <device/api/SingleEndpoint.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -35,23 +32,13 @@ namespace app {
 class ThreadBorderRouter : public SingleEndpoint
 {
 public:
-    class LocalBreadCrumbTracker : public Clusters::BreadCrumbTracker
-    {
-    public:
-        void SetBreadCrumb(uint64_t value) override { mBreadCrumb = value; }
-        uint64_t GetBreadCrumb() const { return mBreadCrumb; }
-
-    private:
-        uint64_t mBreadCrumb = 0;
-    };
-
     struct Context
     {
         Clusters::ThreadBorderRouterManagementDelegate & delegate;
         FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
-        PersistentStorageDelegate & storage;
-        Clusters::BreadCrumbTracker * breadcrumbTracker = nullptr;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
+        Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & diagnosticsProvider;
     };
 
     explicit ThreadBorderRouter(const Context & context);
@@ -66,7 +53,6 @@ public:
     {
         return mThreadBorderRouterManagementCluster.Cluster();
     }
-    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
     Clusters::ThreadNetworkDiagnosticsCluster & ThreadNetworkDiagnosticsCluster()
     {
         return mThreadNetworkDiagnosticsCluster.Cluster();
@@ -74,18 +60,19 @@ public:
     Clusters::BreadCrumbTracker & GetBreadCrumbTracker() { return mBreadCrumbTracker; }
 
 protected:
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
+
     Clusters::ThreadBorderRouterManagementDelegate & mDelegate;
     FailSafeContext & mFailSafeContext;
     DeviceLayer::PlatformManager & mPlatformManager;
-
-    LocalBreadCrumbTracker mDefaultBreadCrumbTracker;
     Clusters::BreadCrumbTracker & mBreadCrumbTracker;
-
-    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
-    Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider mThreadDiagnosticsProvider;
+    Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mDiagnosticsProvider;
 
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
-    LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
 };
 

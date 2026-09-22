@@ -34,20 +34,20 @@ SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(Tim
                                                                              PersistentStorageDelegate & storage,
                                                                              DeviceLayer::PlatformManager & platformManager,
                                                                              FailSafeContext & failSafeContext,
-                                                                             Clusters::BreadCrumbTracker * breadcrumbTracker) :
+                                                                             std::string nodeLabel) :
     NetworkInfrastructureManager(NetworkInfrastructureManager::Context{
-        .delegate          = *this,
-        .failSafeContext   = failSafeContext,
-        .platformManager   = platformManager,
-        .storage           = storage,
-        .breadcrumbTracker = breadcrumbTracker,
+        .delegate            = *this,
+        .failSafeContext     = failSafeContext,
+        .platformManager     = platformManager,
+        .breadcrumbTracker   = *this,
+        .diagnosticsProvider = *this,
     }),
-    mTimerDelegate(timerDelegate)
+    mTimerDelegate(timerDelegate), mThreadNetworkDirectoryStorage(storage), mBorderRouterName(std::move(nodeLabel))
 {}
 
-SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(const Context & context) :
-    SimulatedNetworkInfrastructureManager(context.timerDelegate, context.storage, context.platformManager, context.failSafeContext,
-                                          context.breadcrumbTracker)
+SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(const Context & context, std::string nodeLabel) :
+    SimulatedNetworkInfrastructureManager(context.timerDelegate, context.storage, context.platformManager,
+                                          context.failSafeContext, std::move(nodeLabel))
 {}
 
 SimulatedNetworkInfrastructureManager::~SimulatedNetworkInfrastructureManager()
@@ -61,6 +61,27 @@ void SimulatedNetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvid
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
     NetworkInfrastructureManager::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedNetworkInfrastructureManager::RegisterOptionalClusters(EndpointId endpoint,
+                                                                           CodeDrivenDataModelProvider & provider)
+{
+    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
+    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
+
+    ReturnErrorOnFailure(SetWiFiNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span),
+                                                   ByteSpan::fromCharSpan("Setec Astronomy"_span)));
+
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedNetworkInfrastructureManager::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mThreadNetworkDirectoryCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
+        mThreadNetworkDirectoryCluster.Destroy();
+    }
 }
 
 CHIP_ERROR SimulatedNetworkInfrastructureManager::Init(AttributeChangeCallback * attributeChangeCallback)
@@ -79,7 +100,14 @@ bool SimulatedNetworkInfrastructureManager::GetPanChangeSupported()
 void SimulatedNetworkInfrastructureManager::GetBorderRouterName(MutableCharSpan & borderRouterName)
 {
     ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::GetBorderRouterName called");
-    CopyCharSpanToMutableCharSpanWithTruncation("all-devices-br"_span, borderRouterName);
+    if (!mBorderRouterName.empty())
+    {
+        CopyCharSpanToMutableCharSpanWithTruncation(CharSpan::fromCharString(mBorderRouterName.c_str()), borderRouterName);
+    }
+    else
+    {
+        CopyCharSpanToMutableCharSpanWithTruncation("all-devices-br"_span, borderRouterName);
+    }
 }
 
 CHIP_ERROR SimulatedNetworkInfrastructureManager::GetBorderAgentId(MutableByteSpan & borderAgentId)
@@ -123,8 +151,8 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::GetDataset(Thread::Operational
     return dataset.Init(source->AsByteSpan());
 }
 
-void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                             ActivateDatasetCallback * callback)
+void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+                                                             uint32_t sequenceNum, ActivateDatasetCallback * callback)
 {
     ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
     if (mActivateDatasetCallback != nullptr)
@@ -171,7 +199,8 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::RevertActiveDataset()
 
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
     return CHIP_NO_ERROR;
@@ -186,12 +215,24 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::SetPendingDataset(const Thread
     ReturnErrorOnFailure(tempDataset.GetDelayTimer(delayTimerMillis));
 
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
-    ReturnErrorOnFailure(mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis)));
+    CHIP_ERROR err =
+        mTimerDelegate.StartTimer(&mPendingDatasetTimerContext, System::Clock::Milliseconds32(delayTimerMillis));
+    if (err != CHIP_NO_ERROR)
+    {
+        mPendingDataset.Clear();
+        if (mAttributeChangeCallback != nullptr)
+        {
+            mAttributeChangeCallback->ReportAttributeChanged(
+                ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        }
+        return err;
+    }
 
     mPendingDataset = tempDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -205,7 +246,8 @@ void SimulatedNetworkInfrastructureManager::OnActiveDatasetTimerFired()
     mActiveDataset = mStagedActiveDataset;
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 
@@ -221,8 +263,10 @@ void SimulatedNetworkInfrastructureManager::OnPendingDatasetTimerFired()
     mPendingDataset.Clear();
     if (mAttributeChangeCallback != nullptr)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        mAttributeChangeCallback->ReportAttributeChanged(
+            ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
         mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
 }

@@ -17,14 +17,23 @@
 
 #pragma once
 
+#include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
+#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
+#include <device/capabilities/breadcrumb/SimpleBreadCrumbTracker.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
+
+#include <string>
 
 namespace chip {
 namespace app {
 
-class SimulatedNetworkInfrastructureManager : public NetworkInfrastructureManager,
-                                              public Clusters::ThreadBorderRouterManagementDelegate
+class SimulatedNetworkInfrastructureManager : public Clusters::ThreadBorderRouterManagementDelegate,
+                                              public SimpleBreadCrumbTracker,
+                                              public Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider,
+                                              public NetworkInfrastructureManager
 {
 public:
     struct Context
@@ -33,13 +42,12 @@ public:
         PersistentStorageDelegate & storage;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
-        Clusters::BreadCrumbTracker * breadcrumbTracker = nullptr;
     };
 
     SimulatedNetworkInfrastructureManager(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage,
                                           DeviceLayer::PlatformManager & platformManager, FailSafeContext & failSafeContext,
-                                          Clusters::BreadCrumbTracker * breadcrumbTracker = nullptr);
-    explicit SimulatedNetworkInfrastructureManager(const Context & context);
+                                          std::string nodeLabel = "");
+    explicit SimulatedNetworkInfrastructureManager(const Context & context, std::string nodeLabel = "");
     ~SimulatedNetworkInfrastructureManager() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -57,6 +65,16 @@ public:
     CHIP_ERROR CommitActiveDataset() override;
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
+
+    // Access to optional Thread Network Directory cluster
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster()
+    {
+        return mThreadNetworkDirectoryCluster.Cluster();
+    }
+
+protected:
+    CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
     class ActiveDatasetTimerContext : public TimerContext
@@ -83,6 +101,9 @@ private:
     void OnPendingDatasetTimerFired();
 
     TimerDelegate & mTimerDelegate;
+    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
+    LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
+    std::string mBorderRouterName;
 
     ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };
     PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };

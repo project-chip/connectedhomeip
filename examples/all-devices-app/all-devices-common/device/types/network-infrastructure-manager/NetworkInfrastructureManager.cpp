@@ -17,8 +17,6 @@
 
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <device/api/Interface.h>
 #include <devices/Types.h>
 #include <lib/support/Span.h>
@@ -32,8 +30,7 @@ namespace app {
 NetworkInfrastructureManager::NetworkInfrastructureManager(const Context & context) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
     mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
-    mBreadCrumbTracker(context.breadcrumbTracker != nullptr ? *context.breadcrumbTracker : mDefaultBreadCrumbTracker),
-    mThreadNetworkDirectoryStorage(context.storage)
+    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider)
 {}
 
 CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -44,25 +41,22 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    // 1. Thread Border Router Management
+    // 1. Thread Border Router Management (mandatory)
     ThreadBorderRouterManagementCluster::Config tbrConfig(mDelegate, mFailSafeContext, mBreadCrumbTracker, mPlatformManager);
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
-    // 2. WiFi Network Management
+    // 2. WiFi Network Management (mandatory)
     mWiFiNetworkManagementCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mWiFiNetworkManagementCluster.Registration()));
-    ReturnErrorOnFailure(mWiFiNetworkManagementCluster.Cluster().SetNetworkCredentials(
-        ByteSpan::fromCharSpan("MatterAP"_span), ByteSpan::fromCharSpan("Setec Astronomy"_span)));
 
-    // 3. Thread Network Directory
-    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
-    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
-
-    // 4. Thread Network Diagnostics
+    // 3. Thread Network Diagnostics (mandatory)
     mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                            mThreadDiagnosticsProvider);
+                                            mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
+
+    // 4. Optional clusters (e.g. Thread Network Directory)
+    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -73,15 +67,12 @@ void NetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvider & prov
 {
     UnregisterDescriptor(provider);
 
+    UnregisterOptionalClusters(provider);
+
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDiagnosticsCluster.Cluster()));
         mThreadNetworkDiagnosticsCluster.Destroy();
-    }
-    if (mThreadNetworkDirectoryCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
-        mThreadNetworkDirectoryCluster.Destroy();
     }
     if (mWiFiNetworkManagementCluster.IsConstructed())
     {

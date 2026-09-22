@@ -17,8 +17,6 @@
 
 #include <device/types/thread-border-router/ThreadBorderRouter.h>
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <device/api/Interface.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -29,10 +27,9 @@ namespace chip {
 namespace app {
 
 ThreadBorderRouter::ThreadBorderRouter(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)), mDelegate(context.delegate),
-    mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
-    mBreadCrumbTracker(context.breadcrumbTracker != nullptr ? *context.breadcrumbTracker : mDefaultBreadCrumbTracker),
-    mThreadNetworkDirectoryStorage(context.storage)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)),
+    mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
+    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider)
 {}
 
 CHIP_ERROR ThreadBorderRouter::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -43,19 +40,18 @@ CHIP_ERROR ThreadBorderRouter::Register(chip::EndpointId endpoint, CodeDrivenDat
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    // 1. Thread Border Router Management
+    // 1. Thread Border Router Management (mandatory)
     ThreadBorderRouterManagementCluster::Config tbrConfig(mDelegate, mFailSafeContext, mBreadCrumbTracker, mPlatformManager);
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
-    // 2. Thread Network Directory (optional on device type; included for cluster testing)
-    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
-    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
-
-    // 3. Thread Network Diagnostics
+    // 2. Thread Network Diagnostics (mandatory)
     mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull,
-                                            mThreadDiagnosticsProvider);
+                                            mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
+
+    // 3. Optional clusters (e.g. Thread Network Directory)
+    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -66,15 +62,12 @@ void ThreadBorderRouter::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
 
+    UnregisterOptionalClusters(provider);
+
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDiagnosticsCluster.Cluster()));
         mThreadNetworkDiagnosticsCluster.Destroy();
-    }
-    if (mThreadNetworkDirectoryCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
-        mThreadNetworkDirectoryCluster.Destroy();
     }
     if (mThreadBorderRouterManagementCluster.IsConstructed())
     {

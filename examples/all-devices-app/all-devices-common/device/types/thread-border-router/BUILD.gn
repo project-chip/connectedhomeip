@@ -20,18 +20,28 @@ source_set("thread-border-router") {
   sources = [
     "ThreadBorderRouter.cpp",
     "ThreadBorderRouter.h",
-    "impl/SimulatedThreadBorderRouter.cpp",
-    "impl/SimulatedThreadBorderRouter.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/thread-border-router-management-server",
     "${chip_root}/src/app/clusters/thread-network-diagnostics-server",
-    "${chip_root}/src/app/clusters/thread-network-directory-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
+
+source_set("simulated") {
+  sources = [
+    "impl/SimulatedThreadBorderRouter.cpp",
+    "impl/SimulatedThreadBorderRouter.h",
+  ]
+
+  public_deps = [
+    ":thread-border-router",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/breadcrumb",
+    "${chip_root}/src/app/clusters/thread-network-directory-server",
   ]
 }

@@ -8,7 +8,6 @@
 To update or validate this list manually, follow these steps:
 
 1. **Verify Implemented Device Types**:
-
     - Inspect
       `examples/all-devices-app/all-devices-common/device-factory/DeviceFactory.h`.
     - Look at the `DeviceFactory` constructor. Every
@@ -25,7 +24,6 @@ To update or validate this list manually, follow these steps:
       `examples/all-devices-app/all-devices-common/device/types/root-node/`.
 
 2. **Verify Server Clusters per Device Type**:
-
     - Locate the device type definition in the Matter Specification (e.g. under
       `device_library/` in the spec repository, or locally generated markdown
       files).
@@ -98,7 +96,7 @@ To update or validate this list manually, follow these steps:
 | 43  | Speaker                        | 34 (0x0022)   |                                                                                                                               |                             |
 | 44  | Temperature Controlled Cabinet | 113 (0x0071)  | Refrigerator And Temperature Controlled Cabinet Mode [O], Oven Mode [O], Temperature Alarm [O]                                | Part of Refrigerator / Oven |
 | 45  | Temperature Sensor             | 770 (0x0302)  |                                                                                                                               |                             |
-| 46  | Thread Border Router           | 145 (0x0091)  | Thread Border Router Diagnostics [O]                                                                                          |                             |
+| 46  | Thread Border Router           | 145 (0x0091)  | Thread Border Router Diagnostics [O]                                                                                          | Minimally Ready             |
 | 47  | Water Freeze Detector          | 65 (0x0041)   |                                                                                                                               |                             |
 | 48  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                               |                             |
 | 49  | Water Valve                    | 66 (0x0042)   |                                                                                                                               |                             |
