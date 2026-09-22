@@ -29,8 +29,8 @@ namespace chip {
 namespace app {
 
 ThreadBorderRouter::ThreadBorderRouter(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)),
-    mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)), mDelegate(context.delegate),
+    mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
     mBreadCrumbTracker(context.breadcrumbTracker != nullptr ? *context.breadcrumbTracker : mDefaultBreadCrumbTracker),
     mThreadNetworkDirectoryStorage(context.storage)
 {}

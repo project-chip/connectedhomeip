@@ -491,7 +491,7 @@ private:
             RegisterCreator("network-infrastructure-manager", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                        mContext->platformManager, mContext->failSafeContext);
+                                                                         mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -607,7 +607,7 @@ private:
             RegisterCreator("thread-border-router", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(mContext->timerDelegate, mContext->storageDelegate,
-                                                              mContext->platformManager, mContext->failSafeContext);
+                                                               mContext->platformManager, mContext->failSafeContext);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
