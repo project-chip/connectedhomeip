@@ -236,8 +236,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::IcdFeature, chip::app::OtaFeature>;
-    sRootNode          = std::make_unique<RootNodeType>(
-        rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext, otaContext);
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
+                                               icdContext, otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
     sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
@@ -270,8 +270,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::IcdFeature>;
-    sRootNode          = std::make_unique<RootNodeType>(
-        rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext);
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
+                                               icdContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
     sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver });
