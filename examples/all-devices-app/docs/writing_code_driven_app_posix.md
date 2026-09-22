@@ -55,15 +55,18 @@ for architecture and device class implementation.
     -   `mAttributePersistence`, `mDataModelProvider`, and `mRootNode`
         (`AppRootNode`) construction in `CodeDrivenDataModelDevices`.
 -   **Delete**:
+    -   `#include <PosixAudioManager.h>` and `gAudioManager`
     -   `PosixDeviceFactory`, `RegisterDeviceFactoryOverrides(...)`,
-        `SetupNamedPipe(...)`, and the `AppOptions::GetDevices()` `--device`
-        loop in `RunApplication()`.
+        `SetupNamedPipe(...)`, and `AppOptions::GetDeviceTypeEntries()`
+        (`--device`) handling in `CodeDrivenDataModelDevices::Startup()` and
+        `RunApplication()`.
 -   **Replace**:
     -   Replace
         `std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices` in
         `CodeDrivenDataModelDevices` with a member instance
-        `MyProductSpeaker mProductDevice` and register it in `Startup()`
-        alongside `mRootNode.RootDevice()`:
+        `MyProductSpeaker mProductDevice` (initialized with
+        `mProductDevice(mContext.timerDelegate)` in the constructor initializer
+        list) and register it in `Startup()` alongside `mRootNode.RootDevice()`:
 
 ```cpp
     CHIP_ERROR Startup()

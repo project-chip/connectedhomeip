@@ -41,10 +41,12 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
         (`WifiRootNode`) registration on `kRootEndpointId` (`0`) in
         `PopulateCodeDrivenDataModelProvider()`.
 -   **Delete**:
-    -   `#include "AppDeviceFactory.h"`, `#include "DeviceTypeSelection.h"`, and
-        `#include "DeviceFactoryPlatformOverride.h"`
+    -   `#include "AppDeviceFactory.h"`, `#include "DeviceTypeSelection.h"`,
+        `#include "DeviceFactoryPlatformOverride.h"`, and
+        `#include <DeviceShellCommands.h>`
     -   `AppDeviceFactory::GetInstance()` and
-        `RegisterDeviceFactoryOverrides(...)` in `InitServer()`
+        `RegisterDeviceFactoryOverrides(...)` in `InitServer()`, and
+        `chip::Shell::DeviceCommands::GetInstance().Register()` in `app_main()`
     -   `gConstructedDevices` (replace with
         `std::unique_ptr<MyProductSpeaker> gProductDevice;`)
 -   **Replace**:

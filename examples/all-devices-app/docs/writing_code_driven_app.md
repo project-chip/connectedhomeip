@@ -46,7 +46,7 @@ device base class (`device/types/<device>/<Device>.h`) and implement its cluster
     Inherit `private` `Delegate` interfaces **before** `public <BaseDevice>` so
     delegate vtables initialize before `*this` is passed to `<BaseDevice>`.
 -   **Hardware Peripheral Reference**: See
-    [`PosixSpeaker.h`](../posix/PosixSpeaker.h) or
+    [`PosixSpeaker.h`](../posix/include/PosixSpeaker.h) or
     [`ESP32DimmableLight.h`](../esp32/main/ESP32DimmableLight.h) for compiled
     subclasses driving platform hardware.
 
@@ -61,9 +61,9 @@ public:
     {}
 
 protected:
-    // Optional (if applicable on the base device class): attach extra spec-optional clusters
-    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
-    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
+    // Optional (when declared virtual by the base device class): attach extra spec-optional clusters
+    // CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    // void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
     // Override virtual methods from LevelControlDelegate and OnOffDelegate with hardware TODOs
