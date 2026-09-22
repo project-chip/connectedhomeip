@@ -522,7 +522,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 {
     auto discriminator = config.discriminator.value_or(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR));
 
-    const auto setupPasscode             = MakeOptional(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
+    const auto setupPasscode =
+        MakeOptional(config.passcode.value_or(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE)));
     const uint32_t spake2pIterationCount = Crypto::kSpake2p_Min_PBKDF_Iterations;
 
     Optional<std::vector<uint8_t>> serializedSpake2pVerifier = NullOptional;
@@ -571,6 +572,15 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // Non-concurrent builds are excluded: they must not run Wi-Fi alongside BLE, so
+    // BLEManagerImpl starts management itself once the BLE connection closes.
+    if (config.enableWiFi)
+    {
+        LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
+    }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     ConfigureWiFiPaf(config.wifipafFreqList);

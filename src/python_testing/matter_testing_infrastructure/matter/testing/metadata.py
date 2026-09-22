@@ -85,15 +85,6 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
     return runs_arg_lines
 
 
-def declares_executor(py_script_path: str) -> bool:
-    """Whether the test names a dedicated runner in its CI arguments block.
-
-    Such a test needs a topology `run_python_test.py` does not model, so the
-    sweeps that run every test leave it out unless they are asked for it.
-    """
-    return any(run.get("executor") for run in extract_runs_args(py_script_path).values())
-
-
 class MetadataReader:
     """
     A class to parse run arguments from the test scripts and

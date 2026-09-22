@@ -46,9 +46,10 @@ arguments itself. Each test names this script in its block's `executor`, so
 these tests like any other.
 
 Must run as root, so that the namespaces and the mock D-Bus bus can be created.
-When invoked as a normal user it re-executes itself under `unshare
---map-root-user`; where a host forbids that (`kernel.apparmor_restrict_
-unprivileged_userns=1`), run it in a privileged container as CI does.
+Re-executing under `unshare --map-root-user` as an ordinary user is not enough:
+`ip netns add` sets the network namespace back to the one it started in, which
+the mapped root does not own, and fails with EPERM. Use sudo, or a privileged
+container as CI does.
 
 Example:
 
@@ -74,8 +75,9 @@ import chiptest.linux
 import click
 from chiptest.log_config import LogConfig
 
+from matter.testing.apps import AppServerSubprocess
 from matter.testing.metadata import extract_runs_args
-from matter.testing.tasks import Subprocess, terminate_process_group
+from matter.testing.tasks import terminate_process_group
 
 log = logging.getLogger(__name__)
 
@@ -106,9 +108,7 @@ BLE_CONTROLLER_PROXY = 1
 # would default the controller to adapter 0 and have it share the end device's.
 BLE_CONTROLLER_TOOL_ABSENT = 9
 
-# all-devices-app has no --passcode option, so the proxy always comes up on the
-# built-in test passcode and the test script has to be given the same value.
-PROXY_PASSCODE = 20202021
+DEFAULT_PROXY_PASSCODE = 20202021
 
 # Logged by every example application once it is up and commissionable
 APP_READY_PATTERN = "APP STATUS: Starting event loop"
@@ -144,20 +144,10 @@ class MockRecordsOnly(logging.Filter):
         return record.name.startswith(self.MOCK_LOGGER) and record.levelno >= self.mock_level
 
 
-class ProxyAppSubprocess(Subprocess):
-    """The proxy application, tagged as [PROXY].
-
-    all-devices-app parses its own options rather than the shared
-    LinuxDeviceOptions, so AppServerSubprocess cannot launch it: that class always
-    passes --secured-device-port, which all-devices-app rejects in favour of
-    --port, and there is no --passcode.
-    """
+class ProxyAppSubprocess(AppServerSubprocess):
+    """The proxy application, tagged so its output is distinguishable from the end device's."""
 
     PREFIX = b"[PROXY]"
-
-    def __init__(self, app: str, kvs_path: str, discriminator: int, extra_args: list[str], wrapper: list[str]):
-        super().__init__(*wrapper, app, *extra_args, "--KVS", kvs_path, "--discriminator", str(discriminator),
-                         output_cb=lambda line, is_stderr: self.PREFIX + line)
 
 
 class Transport(enum.StrEnum):
@@ -370,8 +360,7 @@ def ed_app_args(transport: str) -> str:
 @click.option('--discriminator', default=None, type=int,
               help='Discriminator of the proxy. Defaults to the value the test declares.')
 @click.option('--passcode', default=None, type=int,
-              help='Passcode of the proxy. all-devices-app cannot be given one, so this only tells '
-                   'the test script which passcode to use and must match the built-in default.')
+              help='Passcode of the proxy. Defaults to the value the test declares.')
 @click.option('--ed-discriminator', default=None, type=int,
               help='Discriminator of the end device. Defaults to the value the test declares.')
 @click.option('--ed-passcode', default=None, type=int,
@@ -417,16 +406,11 @@ def main(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, scrip
 
     endpoint = resolve(endpoint, "endpoint", DEFAULT_CP_ENDPOINT)
     discriminator = resolve(discriminator, "discriminator", DEFAULT_PROXY_DISCRIMINATOR)
-    passcode = resolve(passcode, "passcode", PROXY_PASSCODE)
+    passcode = resolve(passcode, "passcode", DEFAULT_PROXY_PASSCODE)
     ed_discriminator = resolve(ed_discriminator, "ed_discriminator", DEFAULT_ED_DISCRIMINATOR)
     ed_passcode = resolve(ed_passcode, "ed_passcode", DEFAULT_ED_PASSCODE)
     log.info("Proxy discriminator %d passcode %d on endpoint %d; end device discriminator %d passcode %d",
              discriminator, passcode, endpoint, ed_discriminator, ed_passcode)
-
-    if passcode != PROXY_PASSCODE:
-        raise click.BadOptionUsage(
-            "passcode", f"The proxy application has no --passcode option, so its passcode is always "
-            f"{PROXY_PASSCODE}; --passcode and the test's CI arguments block cannot change it.")
 
     transport, proxy_ble = resolve_transport(proxy_app, transport, proxy_ble)
 
@@ -475,8 +459,10 @@ def run(proxy_app: str, proxy_args: str, ed_app: str | None, script: str, script
 
         proxy = ProxyAppSubprocess(
             proxy_app,
+            storage_dir=storage_dir,
             kvs_path=os.path.join(storage_dir, "kvs-proxy"),
             discriminator=discriminator,
+            passcode=passcode,
             extra_args=proxy_app_args(transport, endpoint, proxy_ble) + shlex.split(proxy_args),
             wrapper=net_ns.proxy_ns.netns_cmd_wrapper)
         proxy.start(expected_output=APP_READY_PATTERN, timeout=APP_READY_TIMEOUT_S)

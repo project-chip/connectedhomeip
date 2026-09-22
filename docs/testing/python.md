@@ -958,17 +958,18 @@ for that run, e.g.:
     everything it starts. `app`, `app-args` and `factory-reset` are then the
     runner's to interpret or ignore.
 
-    Tests declaring an executor are excluded from the sweeps that run every
-    test, because they generally need privileges or binaries an ordinary run
-    does not have. Pass `--with-executor` to `execute_python_tests.py run` or to
-    `local.py python-tests` to include them.
+    CI runs these like any other test, in a job of their own so that the
+    applications and privileges they need are set up once.
+    `local.py python-tests` skips them and names each one it skipped, because a
+    developer sweep has neither. List each such test under `dedicated_runner` in
+    `src/python_testing/test_metadata.yaml`.
 
     -   Example: `scripts/tests/run_compro_test.py`
 
 -   `executor-args`: Arguments appended to the `executor` invocation. Supports
     the same `${...}` environment substitutions as `app` and `script-args`.
 
-    -   Example: `--proxy-app ${ALL_DEVICES_APP} --ed-app ${ALL_CLUSTERS_APP}`
+    -   Example: `--proxy-app ${ALL_DEVICES_BLE_WIFI_APP}`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

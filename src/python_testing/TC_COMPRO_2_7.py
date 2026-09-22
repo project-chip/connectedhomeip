@@ -17,7 +17,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_DEVICES_APP}
+#     app: ${ALL_DEVICES_BLE_WIFI_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -30,8 +30,8 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     executor: scripts/tests/run_compro_test.py
 #     executor-args: >
-#       --proxy-app ${ALL_DEVICES_APP}
-#       --ed-app ${ALL_CLUSTERS_APP}
+#       --proxy-app ${ALL_DEVICES_BLE_WIFI_APP}
+#       --ed-app ${ALL_DEVICES_BLE_WIFI_APP}
 #       --proxy-transport auto
 #     factory-reset: true
 #     timeout: 100

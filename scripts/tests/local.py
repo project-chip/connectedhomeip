@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import declares_executor, extract_runs_args
+    from matter.testing.metadata import extract_runs_args
     from matter.testing.tasks import SubprocessKind
 
 
@@ -937,14 +937,6 @@ def gen_coverage(flat):
     show_default=True,
     help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
 )
-@click.option(
-    "--with-executor",
-    default=False,
-    is_flag=True,
-    show_default=True,
-    help="Include tests that name a dedicated runner in their CI arguments block. These need a "
-         "topology run_python_test.py does not model, so they are excluded by default.",
-)
 def python_tests(
     test_filter,
     skip,
@@ -959,7 +951,6 @@ def python_tests(
     override_binary_path,
     app_filter,
     include_nightly,
-    with_executor,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -1046,6 +1037,7 @@ def python_tests(
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
+    dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
@@ -1056,16 +1048,21 @@ def python_tests(
         raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
+    skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
             continue
         if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
-        if not with_executor and declares_executor(file):
+        if os.path.basename(file) in dedicated_runner_tests:
+            skipped_dedicated_runner.append(os.path.basename(file))
             continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
+
+    for name in sorted(skipped_dedicated_runner):
+        log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
 
     execution_times = []
     failed_tests = []

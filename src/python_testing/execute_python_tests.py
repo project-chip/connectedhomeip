@@ -36,7 +36,6 @@ import click
 import coloredlogs
 import yaml
 
-from matter.testing.metadata import declares_executor
 
 log = logging.getLogger(__name__)
 
@@ -282,13 +281,6 @@ def main():
     help="If set only run tests under the nightly section.",
 )
 @click.option(
-    "--with-executor",
-    is_flag=True,
-    help="Also run tests that name a dedicated runner in their CI arguments block. "
-         "These need a topology run_python_test.py does not model, so they are left "
-         "out by default.",
-)
-@click.option(
     "--summary-file",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
@@ -307,7 +299,7 @@ def main():
     help="Name for the JUnit XML test suite (default: execute_python_tests script).",
 )
 def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool,
-            with_executor: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
+            summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -348,9 +340,6 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             if os.path.basename(file) not in excluded_patterns
             and os.path.basename(file) not in nightly_tests
         ]
-
-    if not with_executor:
-        python_files = [file for file in python_files if not declares_executor(file)]
 
     if len(python_files) == 0:
         # No files match

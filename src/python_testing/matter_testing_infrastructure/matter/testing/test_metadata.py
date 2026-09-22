@@ -16,7 +16,7 @@ import os
 import tempfile
 import unittest
 
-from metadata import Metadata, MetadataReader, declares_executor
+from metadata import Metadata, MetadataReader
 
 
 class TestMetadataReader(unittest.TestCase):
@@ -99,7 +99,6 @@ class TestMetadataReader(unittest.TestCase):
                 "--proxy-app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/"
                 "chip-all-clusters-app --proxy-transport auto")
             self.assertEqual(metadata.timeout, 100)
-            self.assertTrue(declares_executor(test_file))
 
     def test_no_executor_declared(self):
         """A test without the key reports neither an executor nor its args."""
@@ -110,7 +109,6 @@ class TestMetadataReader(unittest.TestCase):
             metadata = MetadataReader(env_file).parse_script(test_file)[0]
             self.assertIsNone(metadata.executor)
             self.assertIsNone(metadata.executor_args)
-            self.assertFalse(declares_executor(test_file))
 
 
 if __name__ == "__main__":

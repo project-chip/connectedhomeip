@@ -284,6 +284,49 @@ not_automated:
           CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
 
+# Tests whose CI arguments block names an `executor`: a dedicated runner takes
+# over the whole run, because the test needs a topology run_python_test.py does
+# not model. CI runs these in a job of their own. The developer sweeps
+# (`local.py python-tests`) skip them and name each one they skipped, because
+# they need root and applications built with BLE and Wi-Fi.
+dedicated_runner:
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Needs a mocked BLE and Wi-Fi topology. Run it with
+          scripts/tests/run_compro_test.py.
+
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive
