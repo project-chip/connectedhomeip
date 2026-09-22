@@ -237,7 +237,9 @@ public:
         }
         if (status == Protocols::InteractionModel::Status::Success)
         {
-            return SaveSetpoints(setpoints, changedAttributes, IsOperationalSetpointAttribute(request.path.mAttributeId));
+            bool isOperationalSetpointWrite = IsOperationalSetpointAttribute(request.path.mAttributeId);
+            return SaveSetpoints(setpoints, changedAttributes, isOperationalSetpointWrite,
+                                 isOperationalSetpointWrite ? std::make_optional(request.path.mAttributeId) : std::nullopt);
         }
         return status;
     }
@@ -288,7 +290,8 @@ public:
     }
 
     Protocols::InteractionModel::Status SaveSetpoints(const Setpoints & setpoints, SetpointAttributes changedAttributes,
-                                                      bool initiatedByOperationalSetpointWrite) override
+                                                      bool initiatedByOperationalSetpointWrite,
+                                                      std::optional<AttributeId> initiatingAttributeId) override
     {
         Setpoints currentSetpoints = GetSetpoints();
         if constexpr (kHasCooling)
@@ -307,7 +310,8 @@ public:
                 return status.GetStatusCode().GetStatus();
             }
         }
-        UpdateSetpointChangeAttributes(currentSetpoints, setpoints, changedAttributes, initiatedByOperationalSetpointWrite);
+        UpdateSetpointChangeAttributes(currentSetpoints, setpoints, changedAttributes, initiatedByOperationalSetpointWrite,
+                                       initiatingAttributeId);
         NotifyAttributesChanged(changedAttributes);
         return Protocols::InteractionModel::Status::Success;
     }
