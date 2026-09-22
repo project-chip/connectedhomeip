@@ -20,7 +20,6 @@
 
 namespace chip::app::NamedPipe {
 
-
 /**
  * Named pipe usage (json):
  * {
@@ -31,20 +30,16 @@ namespace chip::app::NamedPipe {
  *        If the device is `Bridged Node`, the new device will be added as a child of that device.
  *            `Bridged Node` at parentEndpointId
  *                    └── the new device
- *        If the device is `Aggregator`, a `Bridged Node` will be created as child, and the new device will be added as a child of the latter device.
- *            `Aggregator` at parentEndpontId
- *                    └── a new `Bridged Node`
- *                            └── the new device
- *        If not a `Bridged Node` or `Aggregator`, following layout will be created
- *            Some device at parentEndpointId
- *                    └── a new `Aggregator`
- *                            └── a new `Bridged Node`
+ *        If the device is `Aggregator`, a `Bridged Node` will be created as child, and the new device will be added as a child of
+ * the latter device. `Aggregator` at parentEndpontId └── a new `Bridged Node` └── the new device If not a `Bridged Node` or
+ * `Aggregator`, following layout will be created Some device at parentEndpointId └── a new `Aggregator` └── a new `Bridged Node`
  *                                    └── the new device
  *        If not present, will be same as if `kRootEndpointId` was specified.
  *        If there is no device interface under the specified endpoint, the command will fail.
  *
  *    "Device": String
- *        The device type name, e.g. "electrical-sensor". See `examples/all-devices-app/README.md` for the list of supported device types.
+ *        The device type name, e.g. "electrical-sensor". See `examples/all-devices-app/README.md` for the list of supported device
+ * types.
  * }
  *
  * Example: echo '{"Name": "AddBridgedDevice", "ParentEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
@@ -59,8 +54,7 @@ public:
         return Span<const CharSpan>(kNames);
     }
 
-    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                   OOBAccessorRegistry & registry) const override;
+    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
 };
 
 } // namespace chip::app::NamedPipe

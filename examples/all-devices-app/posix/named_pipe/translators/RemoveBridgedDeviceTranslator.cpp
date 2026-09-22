@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR RemoveBridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                               OOBAccessorRegistry & registry) const
+                                                              OOBAccessorRegistry & registry) const
 {
     return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId);
 }

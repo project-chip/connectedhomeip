@@ -174,7 +174,8 @@ public:
                 features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::GetConfig().enableWiFi);
 #endif
                 return features;
-            }()), mDeviceManager(PosixDeviceFactory::GetInstance(), mDataModelProvider)
+            }()),
+        mDeviceManager(PosixDeviceFactory::GetInstance(), mDataModelProvider)
     {}
 
     std::set<EndpointId> GetReservedEndpointIds() const
@@ -204,8 +205,8 @@ public:
 
         ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
             std::make_unique<AddBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
-        ReturnErrorOnFailure(
-            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
+        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(
+            std::make_unique<RemoveBridgedDeviceOOBAccessor<PosixDeviceFactory>>(mDeviceManager)));
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -215,12 +216,11 @@ public:
             }
             ChipLogProgress(AppServer, "Adding device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
                             entry.parentId);
-            auto device = mDeviceManager.AddDevice(entry.type, entry.label,
-                                                                   EndpointComposition::WithParent(entry.parentId));
+            auto device = mDeviceManager.AddDevice(entry.type, entry.label, EndpointComposition::WithParent(entry.parentId));
             if (!device.has_value())
             {
-                ChipLogError(AppServer, "Failed to add device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
-                             entry.parentId);
+                ChipLogError(AppServer, "Failed to add device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
+                             entry.endpoint, entry.parentId);
                 return CHIP_ERROR_INCORRECT_STATE;
             }
         }

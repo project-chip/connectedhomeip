@@ -35,29 +35,23 @@ namespace chip::app {
  *        If the device is `Bridged Node`, the new device will be added as a child of that device.
  *            `Bridged Node` at parentEndpointId
  *                    └── the new device
- *        If the device is `Aggregator`, a `Bridged Node` will be created as child, and the new device will be added as a child of the latter device.
- *            `Aggregator` at parentEndpontId
- *                    └── a new `Bridged Node`
- *                            └── the new device
- *        If not a `Bridged Node` or `Aggregator`, following layout will be created
- *            Some device at parentEndpointId
- *                    └── a new `Aggregator`
- *                            └── a new `Bridged Node`
+ *        If the device is `Aggregator`, a `Bridged Node` will be created as child, and the new device will be added as a child of
+ * the latter device. `Aggregator` at parentEndpontId └── a new `Bridged Node` └── the new device If not a `Bridged Node` or
+ * `Aggregator`, following layout will be created Some device at parentEndpointId └── a new `Aggregator` └── a new `Bridged Node`
  *                                    └── the new device
  *        If not present, will be same as if `kRootEndpointId` was specified.
  *        Otherwise the command will fail.
  *
  *    Tag(2): String device
- *        The device type name, e.g. "electrical-sensor". See `examples/all-devices-app/README.md` for the list of supported device types.
+ *        The device type name, e.g. "electrical-sensor". See `examples/all-devices-app/README.md` for the list of supported device
+ * types.
  */
 
 template <typename DeviceFactoryT>
 class AddBridgedDeviceOOBAccessor : public OOBAccessor
 {
 public:
-    AddBridgedDeviceOOBAccessor(DeviceManager<DeviceFactoryT> & deviceManager) :
-        mDeviceManager(deviceManager)
-    {}
+    AddBridgedDeviceOOBAccessor(DeviceManager<DeviceFactoryT> & deviceManager) : mDeviceManager(deviceManager) {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override
     {
@@ -74,9 +68,9 @@ public:
         ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
         EndpointId parentEndpointId = kRootEndpointId;
-        char deviceType[256]      = {};
-        bool hasDeviceType    = false;
-        CHIP_ERROR err        = CHIP_NO_ERROR;
+        char deviceType[256]        = {};
+        bool hasDeviceType          = false;
+        CHIP_ERROR err              = CHIP_NO_ERROR;
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             TLV::Tag tag = reader.GetTag();
@@ -101,7 +95,8 @@ public:
         ReturnErrorOnFailure(reader.ExitContainer(outerType));
         VerifyOrReturnError(hasDeviceType, CHIP_ERROR_INVALID_ARGUMENT);
 
-        auto VerifyDeviceWasAddedSuccessfully = [](const auto& device, const char* deviceType, EndpointId parentEndpointId = kInvalidEndpointId) -> CHIP_ERROR {
+        auto VerifyDeviceWasAddedSuccessfully = [](const auto & device, const char * deviceType,
+                                                   EndpointId parentEndpointId = kInvalidEndpointId) -> CHIP_ERROR {
             if (!device.has_value())
             {
                 ChipLogError(AppServer, "Failed to add device %s", deviceType);
@@ -112,7 +107,8 @@ public:
                 ChipLogError(AppServer, "Possibly failed to register the device %s", deviceType);
                 return CHIP_ERROR_INCORRECT_STATE;
             }
-            ChipLogProgress(AppServer, "Device %s added successfully, endpoint: 0x%04X, parent: 0x%04X", deviceType, device->device.GetEndpointId(), parentEndpointId);
+            ChipLogProgress(AppServer, "Device %s added successfully, endpoint: 0x%04X, parent: 0x%04X", deviceType,
+                            device->device.GetEndpointId(), parentEndpointId);
             return CHIP_NO_ERROR;
         };
 
@@ -137,7 +133,8 @@ public:
         if (device->name != "bridged-node")
         {
             // Need to create bridged-node
-            auto bridgedNodeDevice = mDeviceManager.AddDevice("bridged-node", "", EndpointComposition::WithParent(parentEndpointId));
+            auto bridgedNodeDevice =
+                mDeviceManager.AddDevice("bridged-node", "", EndpointComposition::WithParent(parentEndpointId));
             ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(bridgedNodeDevice, "bridged-node", parentEndpointId));
             device.emplace(*bridgedNodeDevice);
             parentEndpointId = device->device.GetEndpointId();

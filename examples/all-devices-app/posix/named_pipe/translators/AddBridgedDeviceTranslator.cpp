@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR AddBridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                            OOBAccessorRegistry & registry) const
+                                                           OOBAccessorRegistry & registry) const
 {
     if (!json.isMember("Device") || !json["Device"].isString())
     {
@@ -29,8 +29,7 @@ CHIP_ERROR AddBridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId
     endpointId = ExtractUInt<EndpointId>(json, "ParentEndpointId").value_or(endpointId);
 
     const std::string device = json["Device"].asString();
-    return DispatchStringAction(registry, "AddBridgedDevice"_span, endpointId,
-                                CharSpan(device.data(), device.size()));
+    return DispatchStringAction(registry, "AddBridgedDevice"_span, endpointId, CharSpan(device.data(), device.size()));
 }
 
 } // namespace chip::app::NamedPipe

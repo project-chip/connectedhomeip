@@ -50,8 +50,8 @@ public:
         ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
         EndpointId endpointId = kInvalidEndpointId;
-        bool hasEndpointId = false;
-        CHIP_ERROR err     = CHIP_NO_ERROR;
+        bool hasEndpointId    = false;
+        CHIP_ERROR err        = CHIP_NO_ERROR;
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             TLV::Tag tag = reader.GetTag();
@@ -83,7 +83,8 @@ public:
         }
         const std::string deviceName = device->name;
         mDeviceManager.RemoveDevice(endpointId);
-        ChipLogProgress(AppServer, "RemoveBridgedDevice succeeded: name='%s' was removed from endpoint %u", deviceName.c_str(), endpointId);
+        ChipLogProgress(AppServer, "RemoveBridgedDevice succeeded: name='%s' was removed from endpoint %u", deviceName.c_str(),
+                        endpointId);
         return CHIP_NO_ERROR;
     }
 
