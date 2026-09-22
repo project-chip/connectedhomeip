@@ -112,9 +112,9 @@ is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
 is_series_3 = silabs_family == "simg301"
 
 declare_args() {
-  sl_ot_libs_path = "${efr32_sdk_root}/openthread"
+  sl_ot_libs_path = "${efr32_sdk_root}/thread"
   sl_ot_platform_abstraction =
-      "${efr32_sdk_root}/openthread/platform-abstraction"
+      "${efr32_sdk_root}/thread/platform-abstraction"
 
   # board related pre-generated files path (default)
   sl_pre_gen_path = "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/"
@@ -231,6 +231,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform_core/platform/service/memory_manager/src",
       "${efr32_sdk_root}/platform_core/platform/service/mpu/inc",
+      "${efr32_sdk_root}/platform_core/platform/service/power_manager/config/",
       "${efr32_sdk_root}/platform_core/platform/service/power_manager/inc/",
       "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/common/",
       "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/sleep_loop/",
@@ -579,7 +580,6 @@ template("efr32_sdk") {
       "NVM3_DEFAULT_NVM_SIZE=${sl_nvm3_nvm_size}",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=${sl_nvm3_max_object_size}",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
-      "SL_MATTER_DEFERRED_ATTRIBUTE_STORE_DELAY_MS=${sl_deferred_attribute_store_delay_ms}",
       "CORTEXM3=1",
       "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
       "PLAT=EMBER_PLATFORM_CORTEXM3",
