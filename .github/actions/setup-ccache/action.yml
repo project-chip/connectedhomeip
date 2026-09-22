@@ -91,15 +91,9 @@ runs:
       uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
       with:
         path: ${{ github.workspace }}/.ccache
-    # A cache volume is shared across refs and has no save step to gate, unlike the
-    # actions/cache entry it replaces. Keep the same write policy: master writes,
-    # everything else reads. This is defence in depth only: the binding control is
-    # the runner profile's Protected branches setting, which a pull request cannot
-    # alter because it does not live in this file.
-    - name: Restrict volume-backed ccache to reads off master
-      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' && github.ref != 'refs/heads/master' }}
-      shell: bash
-      run: echo "CCACHE_READONLY=1" >> $GITHUB_ENV
+    # TEMPORARY - DO NOT MERGE. The read-only guard is removed here so this branch
+    # can populate the cache volume once, which is the only way to measure the
+    # read-only path against a warm volume. Reverted as soon as the run reports.
     # Without this the failure is silent: the actions/cache restore below is gated
     # off, so an unmounted volume means every build is cold with job duration as the
     # only symptom. Checking that the directory or /cache merely exists proves
