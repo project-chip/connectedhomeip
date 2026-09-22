@@ -149,7 +149,7 @@ endif()
 if(CONFIG_OPENTHREAD)
     target_sources(app PRIVATE
         ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.h
-        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/ThreadFeature.cpp
     )
 endif()
 
