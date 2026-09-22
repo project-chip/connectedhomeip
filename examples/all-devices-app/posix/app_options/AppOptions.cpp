@@ -218,7 +218,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         // Rejects zero, anything above 99999998 and the trivial codes such as
         // 11111111 and 12345678.
-        if (*endptr != '\0' || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(val)))
+        if (*endptr != '\0' || val > UINT32_MAX || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(val)))
         {
             ChipLogError(Support, "Invalid passcode: %s", value);
             return false;
