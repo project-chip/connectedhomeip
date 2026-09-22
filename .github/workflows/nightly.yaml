@@ -98,7 +98,7 @@ jobs:
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                build-variant: ${{ matrix.build_variant }}
+                build-variant: ${{ env.BUILD_VARIANT }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
                 use-cache-volume: 'true'
