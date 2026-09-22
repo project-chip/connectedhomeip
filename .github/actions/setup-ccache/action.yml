@@ -89,10 +89,11 @@ runs:
       uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
       with:
         path: ${{ github.workspace }}/.ccache
-    # No write gate here on purpose: the mount is copy-on-write, so a run's writes
-    # stay in its own fork unless the profile's Protected branches setting lists the
-    # ref. CCACHE_READONLY would only cost the ~20 targets their reuse of each
-    # other's objects -- 0% hits against an empty volume, versus 61%.
+    # The actions/cache path below gates its save step to master; that gate does not
+    # port here. The mount is copy-on-write, so nothing a run writes persists unless
+    # the profile's Protected branches setting lists its ref, and CCACHE_READONLY
+    # would only stop this job's two dozen apps reusing each other's compiles --
+    # 61% hits on an empty volume rather than 0%.
     # The directory always exists -- mkdir above, and Docker creates a missing
     # bind-mount source -- so check the bind, not the path. Otherwise an unmounted
     # volume is silent: the build is simply cold.
