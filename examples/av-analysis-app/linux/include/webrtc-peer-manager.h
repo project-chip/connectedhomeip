@@ -69,6 +69,10 @@ private:
         std::shared_ptr<rtc::Track> videoTrack;
         // Gathered local candidates, buffered until they are taken for sending to the camera
         std::vector<LocalICECandidate> localCandidates;
+        // libdatachannel reported the end of ICE gathering: localCandidates is complete
+        bool gatheringComplete = false;
+        // The camera's answer was applied: the camera is ready for our candidates
+        bool answerApplied = false;
     };
 
     // The assigned session a given connection belongs to
@@ -78,6 +82,10 @@ private:
     // A connection's state change, on the Matter thread
     void OnPeerConnectionStateChanged(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection,
                                       rtc::PeerConnection::State aState);
+    // The end of a connection's ICE gathering, on the Matter thread
+    void OnGatheringComplete(const std::shared_ptr<rtc::PeerConnection> & aPeerConnection);
+    // Gathering is complete and the answer applied: the session's candidates can be sent
+    static bool LocalCandidatesReady(const PeerSession & aSession) { return aSession.gatheringComplete && aSession.answerApplied; }
 
     // A pending session always has a connection
     bool HasPendingSession() const { return mPendingSession.peerConnection != nullptr; }

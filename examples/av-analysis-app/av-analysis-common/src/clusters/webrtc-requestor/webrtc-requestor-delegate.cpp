@@ -40,20 +40,21 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const Clusters::WebRTCTransport
 
     ChipLogProgress(AppServer, "AvAnalysisNode: Answer received for WebRTC session %u", aSession.id);
 
-    const ScopedNodeId cameraNode = CameraOf(aSession);
-    ReturnErrorOnFailure(mPeerController->ApplyAnswer(cameraNode, aSession.id, aSdpAnswer));
+    // Our candidates follow through OnLocalCandidatesReady, once the peer connection has gathered them all
+    return mPeerController->ApplyAnswer(CameraOf(aSession), aSession.id, aSdpAnswer);
+}
 
-    // Our candidates go out on the next event-loop turn, so this command's status response reaches
-    // the camera before the ProvideICECandidates that follows it
-    const uint16_t sessionId = aSession.id;
-    CHIP_ERROR err =
-        DeviceLayer::SystemLayer().ScheduleLambda([this, cameraNode, sessionId]() { SendLocalCandidates(cameraNode, sessionId); });
+void WebRTCRequestorDelegate::OnLocalCandidatesReady(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
+{
+    // Sent on the next event-loop turn: when this is reported from within HandleAnswer, the Answer's
+    // status response then reaches the camera before the ProvideICECandidates that follows it
+    CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda(
+        [this, aCameraNode, aWebRTCSessionId]() { SendLocalCandidates(aCameraNode, aWebRTCSessionId); });
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "AvAnalysisNode: ICE candidate send not scheduled for WebRTC session %u: %" CHIP_ERROR_FORMAT,
-                     sessionId, err.Format());
+                     aWebRTCSessionId, err.Format());
     }
-    return CHIP_NO_ERROR;
 }
 
 void WebRTCRequestorDelegate::SendLocalCandidates(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
