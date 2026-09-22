@@ -50,9 +50,8 @@ namespace app {
 LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
                                Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                std::vector<PanelList> panels, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(CConfig, Tdelegate, Idelegate, *this),
-    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(panels)),
-    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(CConfig, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
+    mPanelList(std::move(panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 LoggingClosure::~LoggingClosure()
@@ -69,9 +68,9 @@ Protocols::InteractionModel::Status
 LoggingClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::TargetPositionEnum> & position,
                                     const Optional<bool> & latch, const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::HandleMoveToCommand() -> position=%hhu latch=%d speed=%u",
-                    position.ValueOr(Clusters::ClosureControl::TargetPositionEnum::kUnknownEnumValue), latch.ValueOr(false),
-                    to_underlying(speed.ValueOr(Clusters::Globals::ThreeLevelAutoEnum::kAuto)));
+    ChipLogProgress(DeviceLayer, "LoggingClosure::HandleMoveToCommand() -> position=%u latch=%d speed=%u",
+                    to_underlying(position.ValueOr(Clusters::ClosureControl::TargetPositionEnum::kUnknownEnumValue)),
+                    latch.ValueOr(false), to_underlying(speed.ValueOr(Clusters::Globals::ThreeLevelAutoEnum::kAuto)));
     DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> overallCurrentState =
         ClosureControlCluster().GetOverallCurrentState();
     Clusters::ClosureControl::GenericOverallCurrentState fallback =
@@ -146,7 +145,8 @@ void LoggingClosure::TimerFired()
     ChipLogProgress(DeviceLayer, "LoggingClosure::TimerFired()");
     if (mPendingCurrentState.has_value())
     {
-        LogErrorOnFailure(ClosureControlCluster().SetOverallCurrentState(DataModel::MakeNullable(*mPendingCurrentState)));
+        Clusters::ClosureControl::GenericOverallCurrentState pendingState = *mPendingCurrentState;
+        LogErrorOnFailure(ClosureControlCluster().SetOverallCurrentState(DataModel::MakeNullable(pendingState)));
         mPendingCurrentState.reset();
     }
     LogErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
