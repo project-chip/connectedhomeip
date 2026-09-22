@@ -1601,7 +1601,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Mobly documents _teardown_test as the proxy that guarantees the base implementation
         of teardown_test is called, so this is the intended hook; mobly still records an
         error raised by an override against the test. Note that the underscore makes it a
-        private API of a dependency we don't pin, so check the pairing on a mobly upgrade.
+        private API, so check the pairing whenever the mobly pin moves.
         """
         try:
             super()._teardown_test(test_name)
