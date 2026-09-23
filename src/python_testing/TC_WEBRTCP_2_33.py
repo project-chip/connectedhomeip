@@ -93,6 +93,10 @@ class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
                 streamUsage=Clusters.Objects.Globals.Enums.StreamUsageEnum.kLiveView,
                 videoStreamID=video_stream_id,
                 audioStreamID=audio_stream_id,
+                # originatingEndpointID is the Requestor (TH) endpoint hosting the WebRTCTransportRequestor
+                # server cluster (hardcoded as kWebRTCRequesterDynamicEndpointId = 1 in
+                # WebRTCTransportRequestorManager.h) where the DUT sends Answer/ICECandidates callbacks,
+                # whereas `endpoint` below is the destination endpoint on the DUT.
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
