@@ -24,6 +24,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -33,9 +34,6 @@
 #endif
 
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_DECLARE(app, LOG_LEVEL_INF);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -57,14 +55,20 @@ void AppTask::SetOnOffLED(bool on)
 {
     if (!gpio_is_ready_dt(&sLightLed))
     {
+        ChipLogError(AppServer, "led0 not ready, light state %s not applied", on ? "on" : "off");
         return;
     }
-    gpio_pin_set_dt(&sLightLed, on ? 1 : 0);
+
+    int rc = gpio_pin_set_dt(&sLightLed, on ? 1 : 0);
+    if (rc != 0)
+    {
+        ChipLogError(AppServer, "Failed to drive led0 %s: %d", on ? "on" : "off", rc);
+    }
 }
 
 CHIP_ERROR AppTask::Init()
 {
-    LOG_INF("Bringing up Matter stack for ESP32-C6 (Zephyr)");
+    ChipLogProgress(AppServer, "Bringing up Matter stack for %s (Zephyr)", CONFIG_BOARD_TARGET);
 
     ReturnErrorOnFailure(Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -79,7 +83,7 @@ CHIP_ERROR AppTask::Init()
     }
     else
     {
-        LOG_WRN("led0 not ready, light state will not be shown on a GPIO");
+        ChipLogError(AppServer, "led0 not ready, light state will not be shown on a GPIO");
     }
 
     // Example (test) DAC/PAI/CD. No factory-data partition. Not for production.
@@ -95,6 +99,8 @@ CHIP_ERROR AppTask::Init()
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 
     // The rendezvous flag must match the radios actually compiled in.
+    // TODO: advertise Wi-Fi PAF and commissioning over Thread once those transports
+    // are supported by this example.
     ConfigurationMgr().LogDeviceConfig();
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
@@ -105,7 +111,7 @@ CHIP_ERROR AppTask::Init()
     // Everything above must be done before the CHIP thread starts.
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
-    LOG_INF("Matter stack initialized");
+    ChipLogProgress(AppServer, "Matter stack initialized");
     return CHIP_NO_ERROR;
 }
 

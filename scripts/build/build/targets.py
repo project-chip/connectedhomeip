@@ -345,8 +345,8 @@ def BuildEsp32Target():
     return target
 
 
-def BuildEsp32ZephyrTarget():
-    # ESP32 examples built on Zephyr instead of ESP-IDF (examples/<app>/esp32/zephyr).
+def BuildEsp32ZephyrTarget() -> BuildTarget:
+    """Create the ESP32 Zephyr build target."""
     target = BuildTarget('esp32', Esp32ZephyrBuilder)
 
     target.AppendFixedTargets([
