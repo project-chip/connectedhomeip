@@ -459,7 +459,7 @@ def main() -> int:
         target_devices = (
             _REDUCED_LINUX_CI_DEVICES
             if options.ci_linux_reduced
-            else [d for d in _DEVICE_LIST if d not in _EXCLUDE_DEVICE_FROM_LINUX_CI]
+            else list(set(_DEVICE_LIST) - set(_EXCLUDE_DEVICE_FROM_LINUX_CI))
         )
         for device_name in target_devices:
             if device_name not in _DEVICE_LIST:
