@@ -131,6 +131,22 @@ class ChangedAttribute:
     new_value: Any
 
 
+@dataclass(frozen=True)
+class EventRequestPaths:
+    """The six endpoint/cluster/event combinations an event request path can take.
+
+    Each field is an events argument in the form ReadEvent accepts, ordered from most
+    to least specific. Event subscribe test cases cover the same six shapes, so they
+    can reuse these by passing them to ReadEvent with a reportInterval.
+    """
+    specific_endpoint_specific_event: list
+    specific_endpoint_all_cluster_events: list
+    specific_endpoint_all_events: list
+    all_endpoints_specific_event: list
+    all_endpoints_all_cluster_events: list
+    all_endpoints_all_events: list
+
+
 # Clusters whose commands must never be auto-invoked by IDM constraint fuzzing.
 # Violation payloads are expected to be rejected with CONSTRAINT_ERROR before any
 # execution, but a DUT that fails to enforce a constraint would *execute* the
@@ -287,6 +303,20 @@ def client_cmd(cmd_class):
     return None
 
 
+def _describe_event_result(result: EventReadResult) -> str:
+    """Render one read result as a single line for an assertion failure message."""
+    if result.Header is None:
+        return f"<no header> status {result.Status}"
+
+    path = (f"EP{result.Header.EndpointId} cluster 0x{result.Header.ClusterId:04X} "
+            f"event 0x{result.Header.EventId:02X}")
+    if isinstance(result.Data, ValueDecodeFailure):
+        return f"{path} reported but undecodable: {result.Data.Reason}"
+    if result.Data is None:
+        return f"{path} status {result.Status}"
+    return f"{path} {type(result.Data).__name__} EventNumber {result.Header.EventNumber}"
+
+
 # ============================================================================
 # IDMBaseTest - Main Base Class
 # ============================================================================
@@ -426,29 +456,25 @@ class IDMBaseTest(BasicCompositionTests):
 
     @staticmethod
     def wildcard_event_paths(endpoint: int, cluster: type[ClusterObjects.Cluster],
-                             event: type[ClusterObjects.ClusterEvent]) -> list[tuple[str, list]]:
+                             event: type[ClusterObjects.ClusterEvent]) -> EventRequestPaths:
         """Build the six endpoint/cluster/event combinations an event request path can take.
 
         Only the events argument is built here; the caller decides whether to issue a read
-        or a subscription with it. Event subscribe test cases cover the same six path shapes,
-        so they can reuse these paths by passing them to ReadEvent with a reportInterval.
+        or a subscription with it.
 
         Args:
             endpoint: Endpoint to use for the concrete-endpoint paths
             cluster: Cluster to use for the concrete-cluster paths
             event: Event to use for the concrete-event paths
-
-        Returns:
-            List of (description, events argument) tuples, ordered from most to least specific
         """
-        return [
-            ("Node = Specific, Endpoint = Specific, Cluster = Specific, Event = Specific", [(endpoint, event)]),
-            ("Node = Specific, Endpoint = Specific, Cluster = Specific, Event = Wildcard", [(endpoint, cluster)]),
-            ("Node = Specific, Endpoint = Specific, Cluster = Wildcard, Event = Wildcard", [endpoint]),
-            ("Node = Specific, Endpoint = Wildcard, Cluster = Specific, Event = Specific", [event]),
-            ("Node = Specific, Endpoint = Wildcard, Cluster = Specific, Event = Wildcard", [cluster]),
-            ("Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event = Wildcard", ['*']),
-        ]
+        return EventRequestPaths(
+            specific_endpoint_specific_event=[(endpoint, event)],
+            specific_endpoint_all_cluster_events=[(endpoint, cluster)],
+            specific_endpoint_all_events=[endpoint],
+            all_endpoints_specific_event=[event],
+            all_endpoints_all_cluster_events=[cluster],
+            all_endpoints_all_events=['*'],
+        )
 
     async def read_events(self, ctrl: ChipDeviceCtrl, events: list, event_number_filter: int | None = None,
                           fabric_filtered: bool = False) -> list[EventReadResult]:
@@ -501,17 +527,23 @@ class IDMBaseTest(BasicCompositionTests):
             endpoint: Endpoint the event must come from, or None to accept any endpoint,
                 as the wildcard-endpoint paths require
         """
-        asserts.assert_true(
-            any(
-                e.Header is not None
-                and (endpoint is None or e.Header.EndpointId == endpoint)
-                and e.Header.ClusterId == cluster.id
-                and isinstance(e.Data, event)
-                for e in events
-            ),
-            f"Report data must contain event {event.__name__} from cluster {cluster.__name__}"
-            f"{'' if endpoint is None else f' on endpoint {endpoint}'}"
-        )
+        for result in events:
+            if result.Header is None:
+                continue
+            if endpoint is not None and result.Header.EndpointId != endpoint:
+                continue
+            if result.Header.ClusterId != cluster.id:
+                continue
+            if isinstance(result.Data, event):
+                return
+
+        # Every result is listed, since a miss is usually the event arriving on another endpoint
+        # or carrying a status or undecodable payload instead of data.
+        expected = f"{cluster.__name__}.{event.__name__}"
+        if endpoint is not None:
+            expected = f"{expected} on endpoint {endpoint}"
+        reported = "\n  ".join(_describe_event_result(e) for e in events) if events else "<empty report>"
+        asserts.fail(f"Report data must contain event {expected}, got {len(events)} result(s):\n  {reported}")
 
     @staticmethod
     def assert_events_reported(events: list[EventReadResult]):
@@ -554,10 +586,12 @@ class IDMBaseTest(BasicCompositionTests):
             cluster: Cluster expected to be absent from the report data
         """
         reported = [e for e in events if e.Header is not None and e.Header.ClusterId == cluster.id]
-        asserts.assert_equal(
-            len(reported), 0,
-            f"Report data must not contain any entry for cluster {cluster.__name__}, got {len(reported)}"
-        )
+        if not reported:
+            return
+
+        entries = "\n  ".join(_describe_event_result(e) for e in reported)
+        asserts.fail(f"Report data must not contain any entry for cluster {cluster.__name__}, "
+                     f"got {len(reported)}:\n  {entries}")
 
     @staticmethod
     def assert_event_numbers_at_least(events: list[EventReadResult], minimum: int):

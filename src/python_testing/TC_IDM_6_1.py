@@ -35,8 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 from mobly import asserts
 from support_modules.idm_support import IDMBaseTest
 
@@ -44,8 +42,6 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.runner import default_matter_test_main
-
-log = logging.getLogger(__name__)
 
 # Events are read back from AccessControl rather than from a cluster only test applications
 # implement, so this test stays runnable against any DUT. AccessControlEntryChanged is
@@ -77,46 +73,40 @@ class TC_IDM_6_1(IDMBaseTest):
         await self.emit_access_control_entry_changed(ctrl=self.default_controller)
 
         paths = self.wildcard_event_paths(endpoint=endpoint, cluster=EVENT_CLUSTER, event=EVENT)
-        specific_endpoint_specific_event = paths[0][1]
-        specific_endpoint_wildcard_event = paths[1][1]
-        specific_endpoint_wildcard_cluster = paths[2][1]
-        wildcard_endpoint_specific_event = paths[3][1]
-        wildcard_endpoint_wildcard_event = paths[4][1]
-        all_wildcard = paths[5][1]
 
         self.step(1, "TH sends Read Request Message to DUT with EventRequests set to a specific event from a specific "
                      "cluster on a specific endpoint on a specific node that is, [Node = Specific, Endpoint = Specific, "
                      "Cluster = Specific, Event = Specific].",
                   expectation="Verify TH receives Report Data Message with the data for specific event in Read Request Message.")
-        events = await self.read_events(ctrl=self.default_controller, events=specific_endpoint_specific_event)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.specific_endpoint_specific_event)
         self.assert_event_reported(events=events, cluster=EVENT_CLUSTER, event=EVENT, endpoint=endpoint)
 
         self.step(2, "TH sends Read Request Message to DUT with EventRequests set to all events from a specific cluster "
                      "on a specific endpoint on a specific node that is, [Node = Specific, Endpoint = Specific, "
                      "Cluster = Specific, Event = Wildcard].",
                   expectation="Verify TH receives Report Data Message with the data for events in Read Request Message.")
-        events = await self.read_events(ctrl=self.default_controller, events=specific_endpoint_wildcard_event)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.specific_endpoint_all_cluster_events)
         self.assert_event_reported(events=events, cluster=EVENT_CLUSTER, event=EVENT, endpoint=endpoint)
 
         self.step(3, "TH sends Read Request Message to DUT with EventRequests set to all events from all clusters on a "
                      "specific endpoint on a specific node that is, [Node = Specific, Endpoint = Specific, "
                      "Cluster = Wildcard, Event = Wildcard].",
                   expectation="Verify TH receives Report Data Message with the data for events in Read Request Message.")
-        events = await self.read_events(ctrl=self.default_controller, events=specific_endpoint_wildcard_cluster)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.specific_endpoint_all_events)
         self.assert_event_reported(events=events, cluster=EVENT_CLUSTER, event=EVENT, endpoint=endpoint)
 
         self.step(4, "TH sends Read Request Message to DUT with EventRequests set to a specific event from a specific "
                      "cluster on all endpoints on a specific node that is, [Node = Specific, Endpoint = Wildcard, "
                      "Cluster = Specific, Event = Specific].",
                   expectation="Verify TH receives Report Data Message with the data for specific event in Read Request Message.")
-        events = await self.read_events(ctrl=self.default_controller, events=wildcard_endpoint_specific_event)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_specific_event)
         self.assert_event_reported(events=events, cluster=EVENT_CLUSTER, event=EVENT)
 
         self.step(5, "TH sends Read Request Message to DUT with EventRequests set to all events from a specific cluster "
                      "on all endpoints on a specific node that is, [Node = Specific, Endpoint = Wildcard, "
                      "Cluster = Specific, Event = Wildcard].",
                   expectation="Verify TH receives Report Data Message with the data for events in Read Request Message.")
-        events = await self.read_events(ctrl=self.default_controller, events=wildcard_endpoint_wildcard_event)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_cluster_events)
         self.assert_event_reported(events=events, cluster=EVENT_CLUSTER, event=EVENT)
 
         self.step(6, "TH sends Read Request Message to DUT with EventRequests set to all events from all clusters on "
@@ -124,7 +114,7 @@ class TC_IDM_6_1(IDMBaseTest):
                      "Cluster = Wildcard, Event = Wildcard].",
                   expectation="Verify TH receives Report Data Message with the data for events in Read Request Message.")
         # The path names nothing to check a reported event against, so any event satisfies it.
-        events = await self.read_events(ctrl=self.default_controller, events=all_wildcard)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_events)
         self.assert_events_reported(events=events)
 
         self.step(7, "TH sends Read Request Message to DUT with EventRequests set to path which indicates a cluster "
@@ -146,7 +136,7 @@ class TC_IDM_6_1(IDMBaseTest):
                                                         privilege=view_privilege) as restricted_ctrl:
             # The restricted controller holds view on BasicInformation only, so a concrete path
             # naming an AccessControl event, which requires administer, is refused by name.
-            events = await self.read_events(ctrl=restricted_ctrl, events=specific_endpoint_specific_event)
+            events = await self.read_events(ctrl=restricted_ctrl, events=paths.specific_endpoint_specific_event)
             self.assert_event_status_count(events=events, status=Status.UnsupportedAccess, expected_count=1)
 
             self.step(9, "TH sends Read Request Message to DUT with EventRequests set to Wildcard path where reading an "
@@ -154,8 +144,9 @@ class TC_IDM_6_1(IDMBaseTest):
                       expectation="Verify TH receives Report Data Message with no entry for that event in EventReports list.")
             # The same denial expands differently under a wildcard: the path the controller may
             # not read is skipped outright rather than reported with a status.
-            events = await self.read_events(ctrl=restricted_ctrl, events=all_wildcard)
+            events = await self.read_events(ctrl=restricted_ctrl, events=paths.all_endpoints_all_events)
             self.assert_cluster_events_absent(events=events, cluster=EVENT_CLUSTER)
+            self.assert_event_status_count(events=events, status=Status.UnsupportedAccess, expected_count=0)
 
         self.step(10, "TH sends a Read Request Message to the DUT to read back events. Note down the largest event "
                       "number received in the report data message sent back from the DUT. TH sends Read Request Message "
@@ -165,11 +156,13 @@ class TC_IDM_6_1(IDMBaseTest):
         # A second event guarantees two distinct event numbers, so an EventMin strictly below the
         # largest one still selects a non-empty set.
         await self.emit_access_control_entry_changed(ctrl=self.default_controller)
-        latest_event_number = await self.read_latest_event_number(ctrl=self.default_controller, events=all_wildcard)
+        latest_event_number = await self.read_latest_event_number(ctrl=self.default_controller,
+                                                                 events=paths.all_endpoints_all_events)
         asserts.assert_is_not_none(latest_event_number, "DUT reported no events to derive an EventMin from")
         asserts.assert_greater(latest_event_number, 0, "DUT must report an event number above zero to test EventMin below it")
         event_min = latest_event_number - 1
-        events = await self.read_events(ctrl=self.default_controller, events=all_wildcard, event_number_filter=event_min)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_events,
+                                       event_number_filter=event_min)
         self.assert_events_reported(events=events)
         self.assert_event_numbers_at_least(events=events, minimum=event_min)
 
@@ -180,7 +173,8 @@ class TC_IDM_6_1(IDMBaseTest):
                   expectation="Verify TH receives Report Data Message with empty EventReports, or if Events are present, "
                               "then verify that it contains EventReports with event numbers bigger than the one provided.")
         event_min = latest_event_number + EVENT_MIN_BEYOND_LATEST
-        events = await self.read_events(ctrl=self.default_controller, events=all_wildcard, event_number_filter=event_min)
+        events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_events,
+                                       event_number_filter=event_min)
         self.assert_event_numbers_at_least(events=events, minimum=event_min)
 
         self.step(12, "[Testing Chunked Event Data] TH sends Read Request Message to DUT with EventRequests set to all "
