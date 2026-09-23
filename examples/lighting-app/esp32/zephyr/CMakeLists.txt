@@ -24,7 +24,7 @@ list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-esp32c6-zephyr-lighting-app)
+project(chip-esp32-zephyr-lighting-app)
 
 include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
