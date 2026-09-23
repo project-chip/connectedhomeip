@@ -1084,7 +1084,7 @@ jobs:
             fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split of ~30 minutes each.
-                filter: ["", "TC_A", "TC_[B-C]", "TC_COMPRO", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
+                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
@@ -1092,11 +1092,6 @@ jobs:
                       junitxml: out/junit-results/TC_A-results.xml
                     - filter: "TC_[B-C]"
                       junitxml: out/junit-results/TC_B-C-results.xml
-                      # TC_COMPRO runs in a split of its own, so that its
-                      # timeout-bound tests do not lengthen this one.
-                      exclude_filter: "TC_COMPRO"
-                    - filter: "TC_COMPRO"
-                      junitxml: out/junit-results/TC_COMPRO-results.xml
                     - filter: "TC_[D-F]"
                       junitxml: out/junit-results/TC_D-F-results.xml
                     - filter: "TC_[G-M]"
@@ -1263,16 +1258,11 @@ jobs:
               if: ${{matrix.filter != ''}}
               env:
                   KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
-                  EXCLUDE_FILTER: ${{ matrix.exclude_filter }}
               run: |
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  EXCLUDE_ARG=""
-                  if [ -n "$EXCLUDE_FILTER" ]; then
-                      EXCLUDE_ARG="--regex !$EXCLUDE_FILTER"
-                  fi
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING $EXCLUDE_ARG --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
