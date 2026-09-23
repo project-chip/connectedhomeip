@@ -16,7 +16,6 @@
 
 #include "LoggingClosurePanel.h"
 
-#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;

@@ -15,7 +15,6 @@
  */
 
 #include "ClosurePanel.h"
-#include <device/types/closure-panel/ClosureSematicTags.h>
 #include <devices/Types.h>
 
 namespace {
@@ -25,8 +24,8 @@ CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointCompo
     size_t panelTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::app::kClosureNamespaceId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::app::kClosurePanelNamespaceId)
+        VerifyOrReturnError(tag.namespaceID != chip::app::CommonNamespace::kClosureId, CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::app::CommonNamespace::kClosurePanelId)
         {
             ++panelTagCount;
         }
@@ -38,6 +37,30 @@ CHIP_ERROR ValidateClosurePanelTagList(chip::Span<const chip::app::EndpointCompo
 } // namespace
 
 namespace chip::app {
+namespace {
+
+// A panel starts out fully closed.
+constexpr Percent100ths kFullyClosedPosition = 10000;
+
+/// The state a closed, unlatched panel starts in. Members are only populated for the features the
+/// panel actually has: SetCurrentState rejects a member whose feature is unsupported.
+Clusters::ClosureDimension::GenericDimensionStateStruct DefaultCurrentState(BitFlags<Clusters::ClosureDimension::Feature> features)
+{
+    using Clusters::ClosureDimension::Feature;
+
+    Optional<DataModel::Nullable<Percent100ths>> position = features.Has(Feature::kPositioning)
+        ? MakeOptional(DataModel::MakeNullable<Percent100ths>(kFullyClosedPosition))
+        : NullOptional;
+    // Unlatched: a latched panel rejects any SetTarget that moves the position without also unlatching.
+    Optional<DataModel::Nullable<bool>> latch =
+        features.Has(Feature::kMotionLatching) ? MakeOptional(DataModel::MakeNullable(false)) : NullOptional;
+    Optional<Clusters::Globals::ThreeLevelAutoEnum> speed =
+        features.Has(Feature::kSpeed) ? MakeOptional(Clusters::Globals::ThreeLevelAutoEnum::kAuto) : NullOptional;
+
+    return Clusters::ClosureDimension::GenericDimensionStateStruct(position, latch, speed);
+}
+
+} // namespace
 
 ClosurePanel::ClosurePanel(Clusters::ClosureDimension::ClosureDimensionClusterDelegate & dimensionDelegate, Config config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosurePanel, 1)), mConfig(config),
@@ -48,9 +71,10 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
 {
     ReturnErrorOnFailure(ValidateClosurePanelTagList(composition.tagList));
 
-    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-
     VerifyOrReturnError(mConfig.positioning.has_value() || mConfig.motionLatching.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    DeviceRegistrationTransaction transaction(*this, provider);
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     Clusters::ClosureDimension::ClosureDimensionCluster::Config dimensionConfig(endpoint, mDimensionDelegate);
     if (mConfig.withAccess)
@@ -90,8 +114,15 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
     }
 
     mClosureDimensionCluster.Create(dimensionConfig);
+
+    // SetTarget and Step are rejected with InvalidInState while CurrentState is null, so a panel has
+    // to start from a known state.
+    Clusters::ClosureDimension::ClosureDimensionCluster & cluster = mClosureDimensionCluster.Cluster();
+    ReturnErrorOnFailure(cluster.SetCurrentState(DataModel::MakeNullable(DefaultCurrentState(cluster.GetFeatureMap()))));
+
     ReturnErrorOnFailure(provider.AddCluster(mClosureDimensionCluster.Registration()));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 

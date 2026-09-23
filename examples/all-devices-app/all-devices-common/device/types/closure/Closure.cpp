@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #include "Closure.h"
+#include <clusters/shared/Enums.h>
 #include <devices/Types.h>
 
 namespace {
@@ -23,8 +24,8 @@ CHIP_ERROR ValidateClosureTagList(chip::Span<const chip::app::EndpointCompositio
     size_t closureTagCount = 0;
     for (auto & tag : tags)
     {
-        VerifyOrReturnError(tag.namespaceID != chip::app::kClosurePanelNamespaceId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (tag.namespaceID == chip::app::kClosureNamespaceId)
+        VerifyOrReturnError(tag.namespaceID != chip::app::CommonNamespace::kClosurePanelId, CHIP_ERROR_INVALID_ARGUMENT);
+        if (tag.namespaceID == chip::app::CommonNamespace::kClosureId)
         {
             ++closureTagCount;
         }
@@ -39,12 +40,13 @@ namespace chip {
 namespace app {
 
 using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
+using Clusters::Globals::ClosureTag;
 
-bool IsAccsess(Span<const SemanticTag> tags)
+bool IsAccess(Span<const SemanticTag> tags)
 {
     for (const auto & tag : tags)
     {
-        if (tag.namespaceID == chip::app::kClosureNamespaceId &&
+        if (tag.namespaceID == chip::app::CommonNamespace::kClosureId &&
             (to_underlying(ClosureTag::kWindow) == tag.tag || to_underlying(ClosureTag::kDoor) == tag.tag ||
              to_underlying(ClosureTag::kBarrier) == tag.tag || to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
              to_underlying(ClosureTag::kGate) == tag.tag))
@@ -57,25 +59,26 @@ bool IsAccsess(Span<const SemanticTag> tags)
 
 Closure::Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
                  Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)),
-    mConfig(config), mTimerDelegate(Tdelegate), mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)), mConfig(config), mTimerDelegate(Tdelegate),
+    mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
 {}
 
 CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                              EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     Span<const EndpointComposition::SemanticTag> tags = composition.tagList.empty() ? mConfig.tags : composition.tagList;
     composition.tagList                               = tags;
     ReturnErrorOnFailure(ValidateClosureTagList(tags));
     DeviceRegistrationTransaction transaction(*this, provider);
-    EndpointId endpointId = allocator.Allocate();
-    ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
+    mEndpointId = allocator.Allocate();
+    ReturnErrorOnFailure(RegisterDescriptor(mEndpointId, provider, composition));
 
-    Clusters::ClosureControl::ClosureControlCluster::Config CCconfig(endpointId, mClosureControlClusterDelegate, mTimerDelegate);
+    Clusters::ClosureControl::ClosureControlCluster::Config CCconfig(mEndpointId, mClosureControlClusterDelegate, mTimerDelegate);
 
     CCconfig.WithInitialOverallCurrentState(mConfig.initialOverallCurrentState);
 
-    if (mConfig.withAccess || IsAccsess(tags) || RegistersAccessDevicePanel())
+    if (mConfig.withAccess || IsAccess(tags) || RegistersAccessDevicePanel())
     {
         CCconfig.WithAccess();
     }
@@ -107,13 +110,16 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
     {
         CCconfig.WithPositioning();
     }
+    if (mConfig.withProtection)
+    {
+        CCconfig.WithProtection();
+    }
 
     mClosureControlCluster.Create(CCconfig);
 
     ReturnErrorOnFailure(provider.AddCluster(mClosureControlCluster.Registration()));
 
-    Clusters::IdentifyCluster::Config Iconfig(endpointId, mTimerDelegate);
-    // shall we skip the delegate ???
+    Clusters::IdentifyCluster::Config Iconfig(mEndpointId, mTimerDelegate);
     Iconfig.WithDelegate(&mIdentifyDelegate);
     mIdentifyCluster.Create(Iconfig);
 
@@ -129,7 +135,8 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
 void Closure::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterParts(provider);
-    UnregisterDescriptor(GetEndpointId(), provider);
+    UnregisterDescriptor(mEndpointId, provider);
+    mEndpointId = kInvalidEndpointId;
 
     if (mIdentifyCluster.IsConstructed())
     {

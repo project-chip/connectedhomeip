@@ -18,7 +18,6 @@
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/api/Interface.h>
-#include <device/types/closure-panel/ClosureSematicTags.h>
 
 namespace chip {
 namespace app {
@@ -36,6 +35,7 @@ public:
         bool withPedestrian       = false;
         bool withCalibration      = false;
         bool withManuallyOperable = false;
+        bool withProtection       = false;
         bool withAccess           = false;
         DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
     };
@@ -56,7 +56,7 @@ public:
         return mClosureControlCluster.Cluster();
     }
 
-    EndpointId GetEndpointId() { return mEndpointRegistration.endpointEntry.id; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
 private:
     virtual bool RegistersAccessDevicePanel() const                      = 0;
@@ -64,6 +64,7 @@ private:
                                      EndpointComposition composition)    = 0;
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
 
+    EndpointId mEndpointId = kInvalidEndpointId;
     const Config mConfig;
     TimerDelegate & mTimerDelegate;
     Clusters::IdentifyDelegate & mIdentifyDelegate;

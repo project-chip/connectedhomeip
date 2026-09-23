@@ -20,7 +20,7 @@
 
 namespace chip::app {
 
-class LoggingClosurePanel : public ClosurePanel, public Clusters::ClosureDimension::ClosureDimensionClusterDelegate
+class LoggingClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate, public ClosurePanel
 {
 public:
     explicit LoggingClosurePanel(Config config);
