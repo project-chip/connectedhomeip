@@ -214,6 +214,42 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 }
 
+// Without a Rate and without DefaultMoveRate the move is immediate, so MoveWithOnOff Down has to reach
+// MinLevel and turn the device off within the invocation, with no transition left running.
+TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownNullRateTurnsOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // DefaultMoveRate is not configured, so a null Rate leaves no rate at all.
+    Commands::MoveWithOnOff::Type data;
+    data.moveMode = MoveModeEnum::kDown;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+}
+
 TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
