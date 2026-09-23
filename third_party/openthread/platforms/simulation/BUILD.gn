@@ -24,6 +24,11 @@ static_library("simulation") {
     # "tmp" and the working directory the app runs from is not guaranteed to
     # be writable (it is not in CI), which makes otPlatFlashInit() exit the
     # app at startup. Use an absolute path so any working directory works.
+    #
+    # /tmp is isolated per test run: the test harness remounts it to a
+    # per-worker directory inside each worker's mount namespace and clears it
+    # between runs (scripts/tests/chiptest/linux.py), and the file names below
+    # it are per (PORT_OFFSET, node id).
     "OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH=\"/tmp/openthread-simulation\"",
   ]
 
