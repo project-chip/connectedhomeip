@@ -134,7 +134,7 @@ public:
         {
             // Need to create bridged-node
             auto bridgedNodeDevice =
-                mDeviceManager.AddDevice("bridged-node", "", EndpointComposition::WithParent(parentEndpointId));
+                mDeviceManager.AddDevice("bridged-node", "", EndpointComposition(parentEndpointId, DataModel::EndpointCompositionPattern::kFullFamily));
             ReturnErrorOnFailure(VerifyDeviceWasAddedSuccessfully(bridgedNodeDevice, "bridged-node", parentEndpointId));
             device.emplace(*bridgedNodeDevice);
             parentEndpointId = device->device.GetEndpointId();

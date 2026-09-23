@@ -21,12 +21,14 @@
 #include <device/api/allocator/EndpointIdAllocator.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 #include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
 #include <vector>
+#include <algorithm>
 namespace chip::app {
 
 template <typename DeviceFactoryT>
@@ -67,16 +69,16 @@ public:
     std::optional<DeviceRef> AddDevice(const std::string & deviceName, const std::string & nodeLabel = "",
                                        EndpointComposition composition = {})
     {
+        if (mEndpointIdAllocator == nullptr)
+        {
+            ChipLogError(AppServer, "EndpointIdAllocator is not set. Cannot add a device");
+            return std::nullopt;
+        }
+
         auto device = mDeviceFactory.Create(deviceName, nodeLabel);
         if (device.device == nullptr)
         {
             ChipLogError(AppServer, "Failed to create device %s", deviceName.c_str());
-            return std::nullopt;
-        }
-
-        if (mEndpointIdAllocator == nullptr)
-        {
-            ChipLogError(AppServer, "EndpointIdAllocator is not set. Cannot register device %s", deviceName.c_str());
             return std::nullopt;
         }
 
@@ -125,6 +127,19 @@ public:
     {
         auto it = GetDeviceStorageIterator(endpointId);
         VerifyOrReturn(it != mDevices.end());
+        // Find and remove children first
+        ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
+        ReturnOnFailure(mProvider.Endpoints(endpointsList));
+
+        auto endpoints = endpointsList.TakeBuffer();
+        for (const auto & ep : endpoints)
+        {
+            // Second checks if there is a device interface associated with this endpoint in the manager
+            if (ep.parentId == endpointId && GetDevice(ep.id).has_value())
+            {
+                RemoveDevice(ep.id);
+            }
+        }
         it->device.device->Unregister(mProvider);
         mDevices.erase(it);
     }
@@ -140,7 +155,7 @@ public:
 private:
     auto GetDeviceStorageIterator(EndpointId endpointId)
     {
-        return find_if(mDevices.begin(), mDevices.end(),
+        return std::find_if(mDevices.begin(), mDevices.end(),
                        [endpointId](const auto & device) { return device.device.device->GetEndpointId() == endpointId; });
     };
 
