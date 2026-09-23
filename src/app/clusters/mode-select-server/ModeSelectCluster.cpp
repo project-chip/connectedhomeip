@@ -50,8 +50,7 @@ std::optional<uint8_t> ClosestSupportedMode(Span<const ModeSelect::Structs::Mode
     for (const auto & option : supportedModes)
     {
         const int distance = std::abs(static_cast<int>(option.mode) - static_cast<int>(requestedMode));
-        if (!closest.has_value() || distance < closestDistance ||
-            (distance == closestDistance && option.mode < *closest))
+        if (!closest.has_value() || distance < closestDistance || (distance == closestDistance && option.mode < *closest))
         {
             closest         = option.mode;
             closestDistance = distance;
