@@ -29,7 +29,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
-#include <device/types/closure/impl/LoggingClosure.h>
+#include <device/types/closure/impl/SampleClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -366,72 +366,9 @@ private:
         {
             RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
-                ClosurePanel::Config c1{
-                    .withAccess = true,
-                    .positioning =
-                        ClosurePanel::PositioningParams{
-                            .resolution = 1,
-                            .stepValue  = 1,
-                            .motion =
-                                ClosurePanel::TranslationParams{ Clusters::ClosureDimension::TranslationDirectionEnum::kBackward },
-                        },
-                };
-                ClosurePanel::Config c2{
-                    .withAccess = false,
-                    .positioning =
-                        ClosurePanel::PositioningParams{
-                            .resolution = 1,
-                            .stepValue  = 1,
-                            .motion =
-                                ClosurePanel::ModulationParams{ Clusters::ClosureDimension::ModulationTypeEnum::kSlatsOpenwork },
-                        },
-                };
-                ClosurePanel::Config c3{
-                    .withAccess     = true,
-                    .motionLatching = BitFlags<Clusters::ClosureDimension::LatchControlModesBitmap>(
-                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
-                        Clusters::ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
-                    .positioning =
-                        ClosurePanel::PositioningParams{
-                            .resolution = 1,
-                            .stepValue  = 1,
-                            .motion     = ClosurePanel::RotationParams{ Clusters::ClosureDimension::RotationAxisEnum::kLeft,
-                                                                    Clusters::ClosureDimension::OverflowEnum::kTopInside },
-                        },
-                };
-
-                static EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = kClosurePanelNamespaceId,
-                                                                           .tag         = to_underlying(ClosurePanelTag::kLift) } };
-                static EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID = kClosurePanelNamespaceId,
-                                                                           .tag = to_underlying(ClosurePanelTag::kRotate) } };
-                static EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID = kClosurePanelNamespaceId,
-                                                                           .tag = to_underlying(ClosurePanelTag::kSliding) } };
-                static EndpointComposition::SemanticTag kDoorTag[]   = { { .namespaceID = kClosureNamespaceId,
-                                                                           .tag         = to_underlying(ClosureTag::kDoor) } };
-
-                std::vector<PanelList> panels = { PanelList{ c1, Span<EndpointComposition::SemanticTag>(kLiftTag) },
-                                                  PanelList{ c2, Span<EndpointComposition::SemanticTag>(kRotateTag) },
-                                                  PanelList{ c3, Span<EndpointComposition::SemanticTag>(kSlideTag) } };
-                Closure::Config CCconfig{
-                    .tags            = Span<EndpointComposition::SemanticTag>(kDoorTag),
-                    .withPositioning = true,
-                    .motionLatching  = BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>(
-                        Clusters::ClosureControl::LatchControlModesBitmap::kRemoteLatching,
-                        Clusters::ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
-                    .withInstantaneous          = false, // mutually exclusive with Speed below
-                    .withSpeed                  = true,
-                    .withPedestrian             = true,
-                    .withCalibration            = true,
-                    .withManuallyOperable       = true,
-                    .withAccess                 = true,
-                    .initialOverallCurrentState = DataModel::MakeNullable(Clusters::ClosureControl::GenericOverallCurrentState(
-                        MakeOptional(DataModel::MakeNullable(Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed)),
-                        MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Clusters::Globals::ThreeLevelAutoEnum::kAuto))),
-
-                };
-
-                return MakeDevice<LoggingClosure>(mContext->timerDelegate, mContext->identifyDelegate, CCconfig,
-                                                  mContext->groupDataProvider, mContext->fabricTable, std::move(panels),
+                SampleClosure sample = MakeSampleClosure();
+                return MakeDevice<LoggingClosure>(mContext->timerDelegate, mContext->identifyDelegate, sample.closure,
+                                                  mContext->groupDataProvider, mContext->fabricTable, std::move(sample.panels),
                                                   mContext->testEventTriggerDelegate);
             });
         }

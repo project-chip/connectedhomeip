@@ -21,7 +21,6 @@ source_set("closure-panel") {
   sources = [
     "ClosurePanel.cpp",
     "ClosurePanel.h",
-    "ClosureSematicTags.h",
   ]
 
   public_deps = [
