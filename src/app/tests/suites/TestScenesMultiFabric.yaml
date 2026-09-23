@@ -807,7 +807,8 @@ tests:
               ]
 
     - label:
-          "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
+          "TH1 confirms its FabricSceneInfo's deprecated CurrentScene, CurrentGroup and SceneValid
+          fields remain fixed at 0xFF, 0x00 and false (Scenes Management Revision 2)"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:

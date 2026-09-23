@@ -25,10 +25,13 @@ static_library("simulation") {
     # be writable (it is not in CI), which makes otPlatFlashInit() exit the
     # app at startup. Use an absolute path so any working directory works.
     #
-    # /tmp is isolated per test run: the test harness remounts it to a
-    # per-worker directory inside each worker's mount namespace and clears it
-    # between runs (scripts/tests/chiptest/linux.py), and the file names below
-    # it are per (PORT_OFFSET, node id).
+    # In the CI test harness, /tmp is private to each worker process: it is
+    # bind-mounted to a per-worker directory when the worker process starts
+    # (scripts/tests/chiptest/linux.py). The file names below it include the
+    # PORT_OFFSET and node id, so app instances running concurrently within a
+    # test do not collide. Note that the simulated flash files persist across
+    # tests within a worker (otPlatFlashInit() only erases a newly created
+    # file).
     "OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH=\"/tmp/openthread-simulation\"",
   ]
 

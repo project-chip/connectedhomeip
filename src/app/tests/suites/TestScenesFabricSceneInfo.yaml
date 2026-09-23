@@ -293,17 +293,22 @@ tests:
                                     },
                                     {
                                         AttributeID: 0x4001,
-                                        ValueUnsigned8: 0x01,
+                                        ValueUnsigned8: 0x64,
                                     },
                                     {
                                         AttributeID: 0x4002,
-                                        ValueUnsigned8: 0x00,
+                                        ValueUnsigned8: 0x64,
                                     },
                                     {
                                         AttributeID: 0x4003,
-                                        ValueUnsigned8: 0x00,
+                                        ValueUnsigned8: 0x64,
                                     },
                                 ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
       response:
@@ -389,17 +394,22 @@ tests:
                                     },
                                     {
                                         AttributeID: 0x4001,
-                                        ValueUnsigned8: 0x01,
+                                        ValueUnsigned8: 0x64,
                                     },
                                     {
                                         AttributeID: 0x4002,
-                                        ValueUnsigned8: 0x00,
+                                        ValueUnsigned8: 0x64,
                                     },
                                     {
                                         AttributeID: 0x4003,
-                                        ValueUnsigned8: 0x00,
+                                        ValueUnsigned8: 0x64,
                                     },
                                 ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
 
@@ -546,7 +556,9 @@ tests:
               ]
 
     - label:
-          "Configures the DUT to a different state, should invalidate the scene"
+          "Configures the DUT to a different state; with the deprecated
+          CurrentScene/CurrentGroup/SceneValid fields fixed at 0xFF/0x00/false
+          (Scenes Management Revision 2), this verifies they remain so"
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
