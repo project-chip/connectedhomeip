@@ -189,6 +189,10 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
+        if (!onLevel.IsNull())
+        {
+            VerifyOrReturnError(IsValidLevel(onLevel.Value()), Status::ConstraintError);
+        }
         SetOnLevel(onLevel);
         return Status::Success;
     }
@@ -322,7 +326,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {

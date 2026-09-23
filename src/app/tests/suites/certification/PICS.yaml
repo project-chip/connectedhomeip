@@ -8813,6 +8813,80 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
 
+    # Smoke Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a server?"
+      id: SMOKECONC.S
+
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a client?"
+      id: SMOKECONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: SMOKECONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: SMOKECONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: SMOKECONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: SMOKECONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: SMOKECONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: SMOKECONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: SMOKECONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: SMOKECONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: SMOKECONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: SMOKECONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: SMOKECONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: SMOKECONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: SMOKECONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: SMOKECONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: SMOKECONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: SMOKECONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: SMOKECONC.S.A000a
+
     ##  Fan control
 
     # Features
@@ -10793,3 +10867,66 @@ PICS:
 
     - label: "Does the device implement the End command?"
       id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Proximity Ranging Cluster
+    #
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a server?"
+      id: PROXR.S
+
+    # Features
+    - label: "Does the device support the Wi-Fi USD Proximity Ranging feature?"
+      id: PROXR.S.F00
+
+    - label: "Does the device support the Bluetooth Channel Sounding feature?"
+      id: PROXR.S.F01
+
+    - label: "Does the device support the BLE Beacon RSSI feature?"
+      id: PROXR.S.F02
+
+    - label: "Does the device support the UWB Ranging feature?"
+      id: PROXR.S.F03
+
+    # Server attributes
+    - label: "Does the device implement the RangingCapabilities attribute?"
+      id: PROXR.S.A0000
+
+    - label: "Does the device implement the WiFiDevIK attribute?"
+      id: PROXR.S.A0001
+
+    - label: "Does the device implement the BLEDeviceID attribute?"
+      id: PROXR.S.A0002
+
+    - label: "Does the device implement the BLTDevIK attribute?"
+      id: PROXR.S.A0003
+
+    - label: "Does the device implement the BLTCSSecurityLevel attribute?"
+      id: PROXR.S.A0004
+
+    - label: "Does the device implement the BLTCSModeCapability attribute?"
+      id: PROXR.S.A0005
+
+    - label: "Does the device implement the SessionIDList attribute?"
+      id: PROXR.S.A0006
+
+    - label: "Does the device implement the RangingConstraints attribute?"
+      id: PROXR.S.A0007
+
+    # Commands received
+    - label: "Does the device implement the StartRangingRequest command?"
+      id: PROXR.S.C00.Rsp
+
+    - label: "Does the device implement the StopRangingRequest command?"
+      id: PROXR.S.C02.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the StartRangingResponse command?"
+      id: PROXR.S.C01.Tx
+
+    # Events
+    - label: "Does the device implement the RangingResult event?"
+      id: PROXR.S.E00
+
+    - label: "Does the device implement the RangingSessionStatus event?"
+      id: PROXR.S.E01
