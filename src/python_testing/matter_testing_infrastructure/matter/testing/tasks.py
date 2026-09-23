@@ -28,6 +28,7 @@ from matter.testing.defaults import TestingDefaults
 
 LOGGER = logging.getLogger(__name__)
 
+
 def forward_f(f_in: BinaryIO, f_out: BinaryIO, cb: Callable[[bytes, bool], bytes] | None = None, is_stderr: bool = False) -> None:
     """Forward f_in to f_out.
 

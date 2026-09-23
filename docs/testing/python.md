@@ -950,9 +950,9 @@ for that run, e.g.:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
 -   A test whose topology `run_python_test.py` does not model, such as one with
-    more than one application or a mocked transport, names a script as its
-    `app` that brings that topology up and logs a line for `app-ready-pattern`.
-    The test script then runs against it like any other. `local.py python-tests`
+    more than one application or a mocked transport, names a script as its `app`
+    that brings that topology up and logs a line for `app-ready-pattern`. The
+    test script then runs against it like any other. `local.py python-tests`
     skips such tests and names each one it skipped, since they need root and
     applications an ordinary sweep does not build. List each under
     `dedicated_runner` in `src/python_testing/test_metadata.yaml`.
