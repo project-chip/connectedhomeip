@@ -27,73 +27,9 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    unit_tests:
-        name: Unit / Integration Tests
-        if: github.actor != 'restyled-io[bot]'
-
-        strategy:
-            matrix:
-                type: [main, mbedtls, all_features]
-        env:
-            BUILD_TYPE: ${{ matrix.type }}
-
-        runs-on: ubuntu-latest
-
-        container:
-            image: ghcr.io/project-chip/chip-build:211
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v7
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux unit_tests
-                bootstrap-log-name: bootstrap-logs-unittest-${{ matrix.type }}
-            - name: Artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Setup Build
-              # all_features bundles ICD, ARL and rotating-device-id (with clang/asan/boringssl) into one matrix row
-              run: |
-                  case $BUILD_TYPE in
-                     "main") GN_ARGS='chip_build_all_platform_tests=true';;
-                     "mbedtls") GN_ARGS='chip_crypto="mbedtls" chip_build_all_platform_tests=true';;
-                     "all_features") GN_ARGS='is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true';;
-                     *) ;;
-                  esac
-
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
-            - name: Run Build
-              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
-            - name: Run Tests
-              run: scripts/tests/gn_tests.sh
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Notify Slack on Failure
-              if: failure()
-              uses: ./.github/actions/notify-slack-failure
-              with:
-                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
-
-    # Builds and runs the host unit-test suite with the PSA crypto backend.
-    psa_crypto_unit_tests:
-        name: PSA Crypto Unit Tests
+    # Builds and runs the host unit-test suite with the PSA and mbedTLS crypto backends.
+    crypto_backend_unit_tests:
+        name: Crypto Backend Unit Tests (PSA, mbedTLS)
         if: github.actor != 'restyled-io[bot]'
 
         runs-on: ubuntu-latest
@@ -108,32 +44,42 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux unit_tests
-                bootstrap-log-name: bootstrap-logs-unittest-psa
+            # Runs before bootstrap so PRs that match neither filter skip the whole job body.
             - name: Detect changed paths
               uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
               id: changed_paths
               with:
                   filters: |
-                      credentials:
-                        - 'src/credentials/**'
+                      # PSA on Linux is provided by the mbedTLS library, so both backends share one filter.
                       crypto:
+                        - 'src/credentials/**'
                         - 'src/crypto/**'
-                      pigweed:
                         - 'src/pw_backends/**'
                         - 'third_party/pigweed/**'
+                        - 'third_party/mbedtls/**'
+                        - '.github/workflows/unit_integration_test.yaml'
+            - name: Checkout submodules & Bootstrap
+              id: bootstrap
+              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux unit_tests
+                bootstrap-log-name: bootstrap-logs-unittest-crypto-backends
             - name: Build and run PSA unit tests (ASan)
-              if: >
-                github.event_name == 'push' ||
-                steps.changed_paths.outputs.credentials == 'true' ||
-                steps.changed_paths.outputs.crypto == 'true' ||
-                steps.changed_paths.outputs.pigweed == 'true' 
+              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build"
+                    "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build" \
+                    && rm -rf out/linux-x64-tests-psa-asan-clang
+            - name: Build and run mbedTLS unit tests (ASan)
+              # Runs even if the PSA step failed, but not if bootstrap failed.
+              if: >
+                !cancelled() && steps.bootstrap.outcome == 'success' &&
+                (github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true')
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
+                    && rm -rf out/linux-x64-tests-mbedtls-asan-clang
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

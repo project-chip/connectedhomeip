@@ -454,3 +454,42 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    nightly_unit_tests_various_features:
+        name: Nightly Unit Tests - Linux (various features)
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 120
+
+        runs-on: ubuntu-latest
+
+        env:
+            BUILD_TYPE: various_features
+
+        container:
+            image: ghcr.io/project-chip/chip-build:211
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux unit_tests
+                  bootstrap-log-name: bootstrap-logs-unittest-various-features
+            - name: Setup Build
+              # Bundles ICD, ARL and rotating-device-id (with clang/asan/boringssl) into one build
+              run: |
+                  scripts/build/gn_gen.sh --args='is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true'
+            - name: Run Build
+              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
+            - name: Run Tests
+              run: scripts/tests/gn_tests.sh
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

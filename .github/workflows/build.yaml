@@ -83,7 +83,7 @@ jobs:
                   trap-caching: false
             - name: Setup Build
               if: github.event.pull_request.number == null
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_build_all_platform_tests=true"
             - name: Run Build
               if: github.event.pull_request.number == null
               run: scripts/run_in_build_env.sh "ninja -C ./out"
@@ -124,10 +124,13 @@ jobs:
               run: rm -rf ./out
             - name: Set up Build Without Logging
               if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_logging=false"
+              run: scripts/build/gn_gen.sh --args="chip_logging=false chip_build_all_platform_tests=true"
             - name: Run Build Without Logging
               if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Run Tests Without Logging
+              if: inputs.run-codeql != true
+              run: scripts/tests/gn_tests.sh
             - name: Uploading core files
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
               if: ${{ failure() && !env.ACT }}
