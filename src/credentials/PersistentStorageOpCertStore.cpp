@@ -541,7 +541,9 @@ bool PersistentStorageOpCertStore::HasAnyCertificateForFabric(FabricIndex fabric
     bool rcacMissing = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kRcac);
     bool icacMissing = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kIcac);
     bool nocMissing  = !StorageHasCertificate(mStorage, fabricIndex, CertChainElement::kNoc);
-    bool anyPending  = (fabricIndex == mPendingFabricIndex) &&
+    // Pending VID verification elements need no term here: they are only staged while
+    // mPendingFabricIndex is set, which in turn only happens alongside a pending RCAC or NOC.
+    bool anyPending = (fabricIndex == mPendingFabricIndex) &&
         ((mPendingRcac.Get() != nullptr) || (mPendingIcac.Get() != nullptr) || (mPendingNoc.Get() != nullptr));
 
     if (rcacMissing && icacMissing && nocMissing && !anyPending)
