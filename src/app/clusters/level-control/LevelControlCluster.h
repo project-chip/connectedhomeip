@@ -66,11 +66,19 @@ public:
         Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
+        /// Declares that the On/Off cluster is present on this endpoint without advertising the
+        /// OO feature. Spec 1.6.6.9 keys the command dependency on the On/Off cluster existing on
+        /// the same endpoint, and 1.6.4.1.3 states that this holds "Even if the On/Off (OO)
+        /// feature set bit is set to zero".
+        Config & WithOnOffDependency(OnOffCluster & onOffCluster)
+        {
+            mOnOffCluster = &onOffCluster;
+            return *this;
+        }
         Config & WithOnOff(OnOffCluster & onOffCluster)
         {
             mFeatureMap.Set(LevelControl::Feature::kOnOff);
-            mOnOffCluster = &onOffCluster;
-            return *this;
+            return WithOnOffDependency(onOffCluster);
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
         {

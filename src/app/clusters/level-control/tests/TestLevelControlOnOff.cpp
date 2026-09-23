@@ -105,6 +105,44 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff_OverrideOff)
     EXPECT_EQ(readLevel.Value(), 10u); // Should remain 10
 }
 
+// Spec 1.6.6.9 keys the gate on "The On/Off cluster exists on the same endpoint as this cluster",
+// and 1.6.4.1.3 adds that this holds "Even if the On/Off (OO) feature set bit is set to zero".
+TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffDependency(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(cluster.GetFeatureMap().Has(Feature::kOnOff));
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 20;
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    // The command is suppressed even though the OO feature bit is clear.
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 10u);
+}
+
 TEST_F(TestLevelControlOnOff, TestWriteOnLevel)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
