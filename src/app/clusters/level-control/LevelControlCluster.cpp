@@ -345,12 +345,14 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
 
     mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
+    const bool coupleColorTemp = ShouldCoupleColorTempToLevel(optionsMask, optionsOverride);
+
     if (mCurrentLevel.value().IsNull())
     {
         // If the current level is undefined (null), we cannot calculate a transition duration
         // because we don't know the starting point. The spec says "move from its current level".
         // In this case, we treat it as an immediate transition to the target level.
-        CHIP_ERROR status = SetCurrentLevel(level, ReportingMode::kForceReport);
+        CHIP_ERROR status = SetCurrentLevel(level, ReportingMode::kForceReport, coupleColorTemp);
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && level == mMinLevel)
         {
             ReturnErrorOnFailure(SetOnOff(false));
@@ -375,12 +377,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
     if (tickDurationMs > 0)
     {
         // We are doing a timed transition, start it.
-        mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
+        mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs, coupleColorTemp);
         return Status::Success;
     }
 
     // Immediate move
-    ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+    ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport, coupleColorTemp));
 
     if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && targetLevel == mMinLevel)
     {
@@ -393,7 +395,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         // "On" command (which might not specify a level) restores the brightness the user expects.
         if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
         {
-            ReturnErrorOnFailure(SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport));
+            ReturnErrorOnFailure(SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport, coupleColorTemp));
         }
     }
     return Status::Success;
@@ -422,6 +424,8 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     }
 
     mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
+
+    const bool coupleColorTemp = ShouldCoupleColorTempToLevel(optionsMask, optionsOverride);
 
     // Determine Direction first
     bool increasing = (moveMode == MoveModeEnum::kUp);
@@ -454,7 +458,8 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
         tickDurationMs = 1;
     }
 
-    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, difference * tickDurationMs, tickDurationMs);
+    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, difference * tickDurationMs, tickDurationMs,
+                                       coupleColorTemp);
     return Status::Success;
 }
 
@@ -485,6 +490,8 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 
     mTransitionHandler.StopTransition();
 
+    const bool coupleColorTemp = ShouldCoupleColorTempToLevel(optionsMask, optionsOverride);
+
     bool increasing      = (stepMode == StepModeEnum::kUp);
     uint8_t currentLevel = mCurrentLevel.value().Value();
     uint8_t targetLevel;
@@ -511,7 +518,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
     // Check if immediate transition is needed (0 time or 0 duration calculated)
     if (transitionTimeMs == 0 || totalSteps == 0 || (transitionTimeMs / totalSteps) == 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(targetLevel, ReportingMode::kForceReport);
+        CHIP_ERROR status = SetCurrentLevel(targetLevel, ReportingMode::kForceReport, coupleColorTemp);
 
         // Spec: "If any command that has the effect of setting the CurrentLevel attribute to the minimum level...
         // the OnOff attribute... SHALL be set to FALSE"
@@ -523,7 +530,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
     }
 
     uint32_t tickDurationMs = transitionTimeMs / totalSteps;
-    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
+    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs, coupleColorTemp);
     return Status::Success;
 }
 
@@ -564,7 +571,7 @@ CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode reportingMode)
+CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode reportingMode, bool coupleColorTemp)
 {
     VerifyOrReturnError(IsValidLevel(level), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mCurrentLevel.value().IsNull() || mCurrentLevel.value().Value() != level, CHIP_NO_ERROR); // No change
@@ -589,11 +596,12 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode rep
     StoreCurrentLevel(mCurrentLevel.value());
     mDelegate.OnLevelChanged(level);
 
-    // Spec 1.6.6.5 (CoupleColorTempToLevel Bit): "If this bit is set, changes to the CurrentLevel
-    // attribute SHALL be coupled with the color temperature set in the Color Control cluster."
-    // Every change is forwarded, including the intermediate steps of a transition, so the color
-    // temperature tracks the ramp rather than jumping at the end.
-    if (mColorControl != nullptr && mOptions.Has(OptionsBitmap::kCoupleColorTempToLevel))
+    // Spec 1.6.6.9.2 (CoupleColorTempToLevel Bit): "If this bit is set, changes to the CurrentLevel
+    // attribute SHALL be coupled with the color temperature set in the Color Control cluster. When
+    // not supporting the Lighting feature, this bit SHALL be zero and ignored."
+    // `coupleColorTemp` is the effective bit from ShouldCoupleColorTempToLevel (accounting for the
+    // Lighting feature and any command-level OptionsMask / OptionsOverride).
+    if (coupleColorTemp)
     {
         mColorControl->CoupleColorTempToLevel(level);
     }
@@ -709,7 +717,8 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
 }
 
 void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel,
-                                                             uint32_t transitionTimeMs, uint32_t stepDurationMs)
+                                                             uint32_t transitionTimeMs, uint32_t stepDurationMs,
+                                                             bool coupleColorTemp)
 {
     mCurrentCommandId = commandId;
     mInitialLevel     = initialLevel;
@@ -717,6 +726,7 @@ void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId
     mTransitionTimeMs = transitionTimeMs;
     mTickDurationMs   = stepDurationMs;
     mElapsedTimeMs    = 0;
+    mCoupleColorTemp  = coupleColorTemp;
 
     mTransitionStartTimeMs = System::SystemClock().GetMonotonicMilliseconds64().count();
 
@@ -786,7 +796,8 @@ void LevelControlCluster::TransitionHandler::TimerFired()
     if (currentLevel == mTargetLevel || mElapsedTimeMs >= mTransitionTimeMs)
     {
         // Safe to ignore error: mTargetLevel was validated when starting the transition.
-        RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mTargetLevel, LevelControlCluster::ReportingMode::kForceReport);
+        RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mTargetLevel, LevelControlCluster::ReportingMode::kForceReport,
+                                                       mCoupleColorTemp);
 
         mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport); // Transition complete
 
@@ -803,14 +814,15 @@ void LevelControlCluster::TransitionHandler::TimerFired()
             if (mCluster.mOnLevel.IsNull() && !mCluster.mLevelBeforeTurnedOff.IsNull())
             {
                 RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mCluster.mLevelBeforeTurnedOff.Value(),
-                                                               LevelControlCluster::ReportingMode::kForceReport);
+                                                               LevelControlCluster::ReportingMode::kForceReport, mCoupleColorTemp);
             }
         }
         return;
     }
 
     // Intermediate tick
-    RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(currentLevel, LevelControlCluster::ReportingMode::kQuietReport);
+    RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(currentLevel, LevelControlCluster::ReportingMode::kQuietReport,
+                                                   mCoupleColorTemp);
 
     // StartTimer is safe here because this method is called when the timer has already fired (and thus is not active),
     // and if we are here it means we are continuing the same transition. If a new transition starts via StartTransition,
@@ -894,6 +906,24 @@ bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask,
         return optionsOverride.Has(OptionsBitmap::kExecuteIfOff);
     }
     return mOptions.Has(OptionsBitmap::kExecuteIfOff);
+}
+
+bool LevelControlCluster::ShouldCoupleColorTempToLevel(BitMask<OptionsBitmap> optionsMask,
+                                                       BitMask<OptionsBitmap> optionsOverride) const
+{
+    // Spec 1.6.6.9.2: "If this bit is set, changes to the CurrentLevel attribute SHALL be coupled
+    // with the color temperature set in the Color Control cluster. When not supporting the Lighting
+    // feature, this bit SHALL be zero and ignored."
+    if (mColorControl == nullptr || !mFeatureMap.Has(Feature::kLighting))
+    {
+        return false;
+    }
+
+    if (optionsMask.Has(OptionsBitmap::kCoupleColorTempToLevel))
+    {
+        return optionsOverride.Has(OptionsBitmap::kCoupleColorTempToLevel);
+    }
+    return mOptions.Has(OptionsBitmap::kCoupleColorTempToLevel);
 }
 
 bool LevelControlCluster::SupportsCluster(EndpointId endpoint, ClusterId cluster)

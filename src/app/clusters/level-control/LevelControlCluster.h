@@ -237,7 +237,11 @@ private:
         kQuietReport
     };
 
-    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode);
+    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode)
+    {
+        return SetCurrentLevel(level, reportingMode, ShouldCoupleColorTempToLevel({}, {}));
+    }
+    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode, bool coupleColorTemp);
 
     // Attributes
     app::QuieterReportingAttribute<uint8_t> mCurrentLevel;
@@ -272,7 +276,7 @@ private:
         ~TransitionHandler();
 
         void StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel, uint32_t transitionTimeMs,
-                             uint32_t stepDurationMs);
+                             uint32_t stepDurationMs, bool coupleColorTemp);
         void StopTransition();
 
         uint32_t GetTransitionTimeMs() const { return mTransitionTimeMs; }
@@ -291,6 +295,7 @@ private:
         uint32_t mTickDurationMs        = 0;
         uint64_t mTransitionStartTimeMs = 0;
         CommandId mCurrentCommandId     = kInvalidCommandId;
+        bool mCoupleColorTemp           = false;
     };
 
     TransitionHandler mTransitionHandler;
@@ -306,6 +311,8 @@ private:
     CHIP_ERROR SetOnOff(bool on);
     bool GetOnOff();
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    bool ShouldCoupleColorTempToLevel(BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                      BitMask<LevelControl::OptionsBitmap> optionsOverride) const;
 
     // Helper to write CurrentLevel to NVM.
     void StoreCurrentLevel(DataModel::Nullable<uint8_t> value);

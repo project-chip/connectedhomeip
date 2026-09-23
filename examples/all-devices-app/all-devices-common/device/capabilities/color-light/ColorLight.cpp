@@ -229,12 +229,6 @@ void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
         mDynamicLightingCluster.Destroy();
     }
 
-    if (mColorControlCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mColorControlCluster.Cluster()));
-        mColorControlCluster.Destroy();
-    }
-
     if (mGroupsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
@@ -245,6 +239,12 @@ void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mLevelControlCluster.Cluster()));
         mLevelControlCluster.Destroy();
+    }
+
+    if (mColorControlCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mColorControlCluster.Cluster()));
+        mColorControlCluster.Destroy();
     }
 
     if (mOnOffCluster.IsConstructed())

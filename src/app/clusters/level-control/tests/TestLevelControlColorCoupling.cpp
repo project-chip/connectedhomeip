@@ -60,7 +60,9 @@ struct TestLevelControlColorCoupling : public LevelControlTestBase
 TEST_F(TestLevelControlColorCoupling, TestNoCouplingWhileOptionBitClear)
 {
     LevelControlCluster cluster{ kTestEndpointId,
-                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithColorControl(mockColorControl) };
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -78,7 +80,9 @@ TEST_F(TestLevelControlColorCoupling, TestNoCouplingWhileOptionBitClear)
 TEST_F(TestLevelControlColorCoupling, TestCouplesOnLevelChange)
 {
     LevelControlCluster cluster{ kTestEndpointId,
-                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithColorControl(mockColorControl) };
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EnableCoupling(tester);
@@ -100,7 +104,10 @@ TEST_F(TestLevelControlColorCoupling, TestCouplesOnEveryTransitionStep)
 {
     LevelControlCluster cluster{
         kTestEndpointId,
-        LevelControlCluster::Config(mockTimer, mockDelegate).WithColorControl(mockColorControl).WithInitialCurrentLevel(10)
+        LevelControlCluster::Config(mockTimer, mockDelegate)
+            .WithLighting(DataModel::NullNullable)
+            .WithColorControl(mockColorControl)
+            .WithInitialCurrentLevel(10)
     };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -148,7 +155,10 @@ TEST_F(TestLevelControlColorCoupling, TestNoCouplingDuringStartup)
 {
     LevelControlCluster cluster{
         kTestEndpointId,
-        LevelControlCluster::Config(mockTimer, mockDelegate).WithColorControl(mockColorControl).WithInitialCurrentLevel(42)
+        LevelControlCluster::Config(mockTimer, mockDelegate)
+            .WithLighting(DataModel::NullNullable)
+            .WithColorControl(mockColorControl)
+            .WithInitialCurrentLevel(42)
     };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -158,6 +168,74 @@ TEST_F(TestLevelControlColorCoupling, TestNoCouplingDuringStartup)
     BitMask<OptionsBitmap> options;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::Options::Id, options).IsSuccess());
     EXPECT_FALSE(options.Has(OptionsBitmap::kCoupleColorTempToLevel));
+}
+
+// Command-level OptionsMask / OptionsOverride can temporarily enable coupling even when Options bit is clear.
+TEST_F(TestLevelControlColorCoupling, TestCommandOptionsOverrideEnablesCoupling)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 100;
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.Set(OptionsBitmap::kCoupleColorTempToLevel);
+    data.optionsOverride.Set(OptionsBitmap::kCoupleColorTempToLevel);
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    ASSERT_EQ(mockColorControl.mCoupledLevels.size(), 1u);
+    EXPECT_EQ(mockColorControl.mCoupledLevels.back(), 100u);
+}
+
+// Command-level OptionsMask / OptionsOverride can temporarily suppress coupling across a timed transition
+// even when Options bit is set.
+TEST_F(TestLevelControlColorCoupling, TestCommandOptionsOverrideSuppressesCoupling)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl)
+                                     .WithInitialCurrentLevel(10) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EnableCoupling(tester);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 15;
+    data.transitionTime.SetNonNull(10);
+    data.optionsMask.Set(OptionsBitmap::kCoupleColorTempToLevel);
+    data.optionsOverride.ClearAll();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    while (mockTimer.IsTimerActive(nullptr))
+    {
+        AdvanceClock(System::Clock::Milliseconds64(100));
+    }
+
+    EXPECT_TRUE(mockColorControl.mCoupledLevels.empty());
+}
+
+// Spec 1.6.6.9.2: When not supporting the Lighting feature, CoupleColorTempToLevel SHALL be ignored.
+TEST_F(TestLevelControlColorCoupling, TestIgnoredWithoutLightingFeature)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithColorControl(mockColorControl) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EnableCoupling(tester);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 100;
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    EXPECT_TRUE(mockColorControl.mCoupledLevels.empty());
 }
 
 } // namespace
