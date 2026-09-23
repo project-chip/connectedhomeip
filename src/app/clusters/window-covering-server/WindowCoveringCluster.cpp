@@ -367,6 +367,8 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
         ReturnErrorOnFailure(decoder.Decode(mode));
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
         // TODO: Spec 5.3.6.14.2: "In a write interaction, setting this bit to 0, while the device
+        // spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/13478
+        // SDK issue: https://github.com/project-chip/connectedhomeip/issues/72853
         // Disabled because Test_TC_WNCV_2_3 Step 2d writes Mode=0x00 to exit calibration,
         // which contradicts the spec. Needs test update
         // VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);
