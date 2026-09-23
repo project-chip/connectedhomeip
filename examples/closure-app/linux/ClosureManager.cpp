@@ -83,8 +83,8 @@ void ClosureManager::Init()
     VerifyOrDie(mClosureEndpoint1.Init() == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Control Endpoint initialized successfully");
 
-    ClosureDimension::ClusterConformance conformance2;
-    conformance2.FeatureMap()
+    ClosureDimension::ClusterConformance conformanceEndpoint2;
+    conformanceEndpoint2.FeatureMap()
         .Set(ClosureDimension::Feature::kPositioning)
         .Set(ClosureDimension::Feature::kMotionLatching)
         .Set(ClosureDimension::Feature::kUnit)
@@ -92,21 +92,21 @@ void ClosureManager::Init()
         .Set(ClosureDimension::Feature::kSpeed)
         .Set(ClosureDimension::Feature::kTranslation);
 
-    ClosureDimension::ClusterInitParameters clusterInitParameters2;
-    clusterInitParameters2.resolution           = 100;
-    clusterInitParameters2.stepValue            = 1000;
-    clusterInitParameters2.unit                 = ClosureUnitEnum::kMillimeter;
-    clusterInitParameters2.translationDirection = TranslationDirectionEnum::kDownward;
-    clusterInitParameters2.overflow             = OverflowEnum::kTopInside;
-    clusterInitParameters2.modulationType       = ModulationTypeEnum::kVentilation;
-    clusterInitParameters2.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint2;
+    clusterInitParametersEndpoint2.resolution           = 100;
+    clusterInitParametersEndpoint2.stepValue            = 1000;
+    clusterInitParametersEndpoint2.unit                 = ClosureUnitEnum::kMillimeter;
+    clusterInitParametersEndpoint2.translationDirection = TranslationDirectionEnum::kDownward;
+    clusterInitParametersEndpoint2.overflow             = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint2.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint2.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
         .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
 
-    VerifyOrDie(mClosurePanelEndpoint2.Init(conformance2, clusterInitParameters2) == CHIP_NO_ERROR);
+    VerifyOrDie(mClosurePanelEndpoint2.Init(conformanceEndpoint2, clusterInitParametersEndpoint2) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Panel Endpoint 2 initialized successfully");
 
-    ClosureDimension::ClusterConformance conformance3;
-    conformance3.FeatureMap()
+    ClosureDimension::ClusterConformance conformanceEndpoint3;
+    conformanceEndpoint3.FeatureMap()
         .Set(ClosureDimension::Feature::kPositioning)
         .Set(ClosureDimension::Feature::kMotionLatching)
         .Set(ClosureDimension::Feature::kUnit)
@@ -114,17 +114,17 @@ void ClosureManager::Init()
         .Set(ClosureDimension::Feature::kSpeed)
         .Set(ClosureDimension::Feature::kRotation);
 
-    ClosureDimension::ClusterInitParameters clusterInitParameters3;
-    clusterInitParameters3.resolution     = 100;
-    clusterInitParameters3.stepValue      = 1000;
-    clusterInitParameters3.unit           = ClosureUnitEnum::kDegree;
-    clusterInitParameters3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
-    clusterInitParameters3.overflow       = OverflowEnum::kTopInside;
-    clusterInitParameters3.modulationType = ModulationTypeEnum::kVentilation;
-    clusterInitParameters3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint3;
+    clusterInitParametersEndpoint3.resolution     = 100;
+    clusterInitParametersEndpoint3.stepValue      = 1000;
+    clusterInitParametersEndpoint3.unit           = ClosureUnitEnum::kDegree;
+    clusterInitParametersEndpoint3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
+    clusterInitParametersEndpoint3.overflow       = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint3.modulationType = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
         .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
 
-    VerifyOrDie(mClosurePanelEndpoint3.Init(conformance3, clusterInitParameters3) == CHIP_NO_ERROR);
+    VerifyOrDie(mClosurePanelEndpoint3.Init(conformanceEndpoint3, clusterInitParametersEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Panel Endpoint 3 initialized successfully");
 
     // Set Taglist for Closure endpoints
