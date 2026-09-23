@@ -26,7 +26,7 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(500);
-constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(30000);
+constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(3000);
 // Delay before deciding whether the device still needs its initial calibration; see Register().
 constexpr System::Clock::Milliseconds32 kInitialCalibrationCheckDelay = System::Clock::Milliseconds32(250);
 constexpr Percent100ths kPositionStep                                 = 500; // 5% step
