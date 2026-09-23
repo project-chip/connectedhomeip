@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Chef CI
+name: Chef CI (Reduced)
 
 on:
     push:
@@ -30,11 +30,11 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
-    chef_linux_all_devices:
-        name: Chef - Linux CI Examples (All chef devices)
-        timeout-minutes: 120
+    chef_linux_reduced:
+        name: Chef - Linux CI Examples (Reduced chef devices)
+        timeout-minutes: 60
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'push'
 
         container:
             image: ghcr.io/project-chip/chip-build:211
@@ -49,10 +49,10 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: CI Examples Linux
+            - name: CI Examples Linux (Reduced)
               shell: bash
               run: |
-                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux_reduced"
 
             - name: Notify Slack on Failure
               if: failure()
