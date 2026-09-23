@@ -59,8 +59,8 @@ CHIP_ERROR SilabsTemperatureSensor::Register(EndpointIdAllocator & allocator, Co
     // Si70xx reports temperature in centi-degrees Celsius; widen the cluster range from
     // the base simulation's [-10, 50] to the sensor's rated [-40 C, 125 C] so real readings
     // are not rejected as ConstraintError by SetMeasuredValue.
-    ReturnErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValueRange(
-        DataModel::MakeNullable<int16_t>(-4000), DataModel::MakeNullable<int16_t>(12500)));
+    ReturnErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValueRange(DataModel::MakeNullable<int16_t>(-4000),
+                                                                                        DataModel::MakeNullable<int16_t>(12500)));
 #endif
 
 #if SL_MATTER_DISPLAY_ENABLED

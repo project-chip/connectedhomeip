@@ -20,8 +20,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if SL_MATTER_DISPLAY_ENABLED
 #include <cstdio>
@@ -148,7 +148,7 @@ SilabsDimmableLight::SilabsDimmableLight(const Context & context, const Config &
 #endif // SL_MATTER_DISPLAY_ENABLED
 
 CHIP_ERROR SilabsDimmableLight::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                        EndpointComposition composition)
+                                         EndpointComposition composition)
 {
     ReturnErrorOnFailure(SingleEndpoint::Register(allocator, provider, composition));
 
@@ -211,8 +211,7 @@ void SilabsDimmableLight::OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel)
 
 void SilabsDimmableLight::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate)
 {
-    ChipLogProgress(DeviceLayer, "SilabsDimmableLight: OnDefaultMoveRateChanged -> %s",
-                    defaultMoveRate.IsNull() ? "NULL" : "set");
+    ChipLogProgress(DeviceLayer, "SilabsDimmableLight: OnDefaultMoveRateChanged -> %s", defaultMoveRate.IsNull() ? "NULL" : "set");
 }
 
 #if SL_MATTER_DISPLAY_ENABLED
@@ -232,8 +231,7 @@ void SilabsDimmableLight::DrawDevicePage(GLIB_Context_t * context, EndpointId en
     if (self != nullptr)
     {
         char stateLine[24];
-        std::snprintf(stateLine, sizeof(stateLine), "%s  Lvl %u", self->mOn ? "ON " : "OFF",
-                      static_cast<unsigned>(self->mLevel));
+        std::snprintf(stateLine, sizeof(stateLine), "%s  Lvl %u", self->mOn ? "ON " : "OFF", static_cast<unsigned>(self->mLevel));
         GLIB_drawStringOnLine(context, stateLine, kStateLine, GLIB_ALIGN_CENTER, 0, 0, true);
         GLIB_drawBitmap(context, x, y, kBitmapWidth, kBitmapHeight, self->mOn ? kLightbulbBitmapOn : kLightbulbBitmapOff);
     }
