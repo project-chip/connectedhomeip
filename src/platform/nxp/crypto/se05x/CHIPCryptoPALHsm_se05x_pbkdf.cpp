@@ -64,7 +64,7 @@ CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t p
     policy_for_hmac_key.policies[0] = &hmac_withPol;
     policy_for_hmac_key.policies[1] = &commonPol;
 
-    sss_object_t hmacKeyObj = {
+    se_sss_object_t hmacKeyObj = {
         0,
     };
 
@@ -74,15 +74,15 @@ CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t p
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_init(&hmacKeyObj, &gex_sss_chip_ctx.ks);
+    status = se_sss_key_object_init(&hmacKeyObj, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, sizeof(password),
-                                            kKeyObject_Mode_Transient);
+    status = se_sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC, sizeof(password),
+                                               kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &hmacKeyObj, password, plen, plen * 8, &policy_for_hmac_key,
-                                   sizeof(policy_for_hmac_key));
+    status = se_sss_key_store_set_key(&gex_sss_chip_ctx.ks, &hmacKeyObj, password, plen, plen * 8, &policy_for_hmac_key,
+                                      sizeof(policy_for_hmac_key));
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     smStatus = Se05x_API_PBKDF2_extended(
@@ -93,9 +93,9 @@ CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t p
 
     error = CHIP_NO_ERROR;
 exit:
-    if (hmacKeyObj.keyStore->session != NULL)
+    if (hmacKeyObj.keyStore != nullptr && hmacKeyObj.keyStore->session != NULL)
     {
-        sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
+        se_sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
     }
     if (se05x_close_session() != CHIP_NO_ERROR)
     {

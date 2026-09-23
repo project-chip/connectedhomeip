@@ -41,6 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -98,7 +99,7 @@ class TC_MOD_1_2(MatterBaseTest):
                                     "Element semantictag.Value is greater than 16 bits")
 
     def _log_attribute(self, name, value):
-        log.info(f"{name} attribute with value: {value} with type: {type(value)}")
+        log.info("%s attribute with value: %s with type: %s", name, value, type(value))
 
     @property
     def default_endpoint(self) -> int:
@@ -118,13 +119,13 @@ class TC_MOD_1_2(MatterBaseTest):
         # Verify if semantic tags has elements in list , and if there are values assert the values
         self.step(2)
         supported_modes = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.SupportedModes)
-        log.info(f"Supported modes {supported_modes}")
+        log.info("Supported modes %s", supported_modes)
         # List must not be empty
         asserts.assert_true(len(supported_modes) > 0, "Supported modes can not be empty.")
         supported_modes_values = []
         for supported_mode in supported_modes:
-            log.info(
-                f"Label {supported_mode} with type {type(supported_mode)} and {supported_mode.label} and {supported_mode.mode} and {supported_mode.semanticTags}")
+            log.info("Label %s with type %s and %s and %s and %s",
+                     supported_mode, type(supported_mode), supported_mode.label, supported_mode.mode, supported_mode.semanticTags)
             # Verify the struct values
             self._verify_supported_mode(supported_mode=supported_mode)
             # After verifying the struct is correct append the mode value.
@@ -132,7 +133,7 @@ class TC_MOD_1_2(MatterBaseTest):
         # Verify mode numbers are unique
         asserts.assert_equal(len(supported_modes_values), len(set(supported_modes_values)),
                              f"Duplicate value found for supported mode values :{supported_modes_values}.")
-        log.info(f"Supported modes values {supported_modes_values}")
+        log.info("Supported modes values %s", supported_modes_values)
 
         # Currentmode attribute check must be int and must be in the supported modes values.
         self.step(3)
@@ -158,9 +159,11 @@ class TC_MOD_1_2(MatterBaseTest):
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.cluster.Attributes.StartUpMode):
             startup_mode = await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=self.cluster, attribute=self.cluster.Attributes.StartUpMode)
             self._log_attribute("StartupMode", startup_mode)
-            asserts.assert_true(isinstance(startup_mode, int), "Startupmode is not int")
-            asserts.assert_in(startup_mode, supported_modes_values,
-                              f"Startupmode {startup_mode} is not in {supported_modes_values}")
+            asserts.assert_true(matter_asserts.is_valid_uint_value(startup_mode, 8) or startup_mode is NullValue,
+                                "StartupMode is not uint8 or NullValue")
+            if startup_mode is not NullValue:
+                asserts.assert_in(startup_mode, supported_modes_values,
+                                  f"StartupMode {startup_mode} is not in {supported_modes_values}")
 
         # Verify the string  is str and larger that 1 char.
         self.step(6)

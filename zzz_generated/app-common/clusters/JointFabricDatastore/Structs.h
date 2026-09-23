@@ -142,10 +142,10 @@ using DecodableType = Type;
 namespace DatastoreBindingTargetStruct {
 enum class Fields : uint8_t
 {
-    kNode     = 0,
-    kGroup    = 1,
-    kEndpoint = 2,
-    kCluster  = 3,
+    kNode     = 1,
+    kGroup    = 2,
+    kEndpoint = 3,
+    kCluster  = 4,
 };
 
 struct Type
@@ -223,10 +223,10 @@ using DecodableType = Type;
 namespace DatastoreAccessControlEntryStruct {
 enum class Fields : uint8_t
 {
-    kPrivilege = 0,
-    kAuthMode  = 1,
-    kSubjects  = 2,
-    kTargets   = 3,
+    kPrivilege = 1,
+    kAuthMode  = 2,
+    kSubjects  = 3,
+    kTargets   = 4,
 };
 
 struct Type
@@ -378,15 +378,14 @@ using DecodableType = Type;
 namespace DatastoreGroupKeySetStruct {
 enum class Fields : uint8_t
 {
-    kGroupKeySetID           = 0,
-    kGroupKeySecurityPolicy  = 1,
-    kEpochKey0               = 2,
-    kEpochStartTime0         = 3,
-    kEpochKey1               = 4,
-    kEpochStartTime1         = 5,
-    kEpochKey2               = 6,
-    kEpochStartTime2         = 7,
-    kGroupKeyMulticastPolicy = 8,
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
 };
 
 struct Type
@@ -400,7 +399,6 @@ public:
     DataModel::Nullable<uint64_t> epochStartTime1;
     DataModel::Nullable<chip::ByteSpan> epochKey2;
     DataModel::Nullable<uint64_t> epochStartTime2;
-    DatastoreGroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = static_cast<DatastoreGroupKeyMulticastPolicyEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

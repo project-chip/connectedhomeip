@@ -82,6 +82,10 @@ CHIP_ERROR Interface::Init(const ClusterConformance & conformance, const Cluster
     {
         config.WithManuallyOperable();
     }
+    if (conformance.HasFeature(Feature::kAccess))
+    {
+        config.WithAccess();
+    }
     if (conformance.OptionalAttributes().IsSet(Attributes::CountdownTime::Id))
     {
         config.WithCountdownTime();

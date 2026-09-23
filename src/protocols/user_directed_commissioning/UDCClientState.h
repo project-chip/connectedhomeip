@@ -219,20 +219,20 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
-    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
-    uint16_t mLongDiscriminator = 0;
-    uint16_t mVendorId          = 0;
-    uint16_t mProductId         = 0;
-    uint16_t mCdPort            = 0;
-    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen                                         = 0;
-    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
-    uint16_t mPairingHint                                         = 0;
+    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    char mDeviceName[Dnssd::kMaxDeviceNameLen + 1]                    = {};
+    uint16_t mLongDiscriminator                                       = 0;
+    uint16_t mVendorId                                                = 0;
+    uint16_t mProductId                                               = 0;
+    uint16_t mCdPort                                                  = 0;
+    uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen]               = {};
+    size_t mRotatingIdLen                                             = 0;
+    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1]     = {};
+    uint16_t mPairingHint                                             = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
-    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
-    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+    constexpr static size_t kMaxTargetAppInfos        = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
+    uint8_t mNumTargetAppInfos                        = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos] = {};
 
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;

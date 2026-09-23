@@ -24,6 +24,7 @@
 
 #include "WiFiPAFEndPoint.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <utility>
@@ -147,10 +148,22 @@ CHIP_ERROR WiFiPAFEndPoint::HandleConnectComplete()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mState = kState_Connected;
-    // Cancel the connect timer.
-    StopConnectTimer();
+    // Cancel connect and receive-connection timers.
+    if (mRole == kWiFiPafRole_Subscriber)
+    {
+        StopConnectTimer();
+    }
+    else
+    {
+        StopReceiveConnectionTimer();
+    }
+
+    // Arm ongoing idle session supervision to ensure upper-layer commissioning
+    // (Phase 2 PASE handshake) initiates within a reasonable deadline.
+    LogErrorOnFailure(StartAckReceivedTimer());
 
     // We've successfully completed the PAF transport protocol handshake, so let the application know we're open for business.
+
     if (mWiFiPafLayer != nullptr)
     {
         // Indicate connect complete to next-higher layer.
@@ -182,6 +195,10 @@ void WiFiPAFEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
         if (mRole == kWiFiPafRole_Subscriber)
         {
             StopConnectTimer();
+        }
+        else
+        {
+            StopReceiveConnectionTimer();
         }
 
         // Free the packets in re-order queue if ones exist
@@ -277,7 +294,9 @@ void WiFiPAFEndPoint::Free()
 
     // Cancel all timers.
     StopConnectTimer();
+    StopReceiveConnectionTimer();
     StopAckReceivedTimer();
+
     StopSendAckTimer();
     StopWaitResourceTimer();
 
@@ -693,6 +712,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle
     }
 
     // Select fragment size for connection based on MTU.
+    VerifyOrReturnError(mtu >= WiFiPAFTP::sMinFragmentSize, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
     resp.mFragmentSize = std::min(static_cast<uint16_t>(mtu), WiFiPAFTP::sMaxFragmentSize);
 
     // Select local and remote max receive window size based on local resources available for both incoming writes
@@ -752,7 +772,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
     // Decode PAFTP capabilities response.
     ReturnErrorOnFailure(PAFTransportCapabilitiesResponseMessage::Decode(data, resp));
 
-    VerifyOrReturnError(resp.mFragmentSize > 0, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
+    VerifyOrReturnError(resp.mFragmentSize >= WiFiPAFTP::sMinFragmentSize, WIFIPAF_ERROR_INVALID_FRAGMENT_SIZE);
 
     ChipLogProgress(WiFiPAF, "Publisher chose PAFTP version %d; subscriber expected between %d and %d",
                     resp.mSelectedProtocolVersion, CHIP_PAF_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION,
@@ -780,8 +800,9 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
         mState = kState_Aborting;
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize = resp.mWindowSize;
-    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", resp.mWindowSize);
+    mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize =
+        std::min(resp.mWindowSize, static_cast<uint8_t>(PAF_MAX_RECEIVE_WINDOW_SIZE));
+    ChipLogProgress(WiFiPAF, "local and remote recv window size = %u", mReceiveWindowMaxSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
     mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);
@@ -1159,6 +1180,16 @@ CHIP_ERROR WiFiPAFEndPoint::StartConnectTimer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WiFiPAFEndPoint::StartReceiveConnectionTimer()
+{
+    const CHIP_ERROR timerErr = mWiFiPafLayer->mSystemLayer->StartTimer(System::Clock::Milliseconds32(PAFTP_CONN_RSP_TIMEOUT_MS),
+                                                                        HandleReceiveConnectionTimeout, this);
+    ReturnErrorOnFailure(timerErr);
+    mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WiFiPAFEndPoint::StartAckReceivedTimer()
 {
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
@@ -1225,6 +1256,13 @@ void WiFiPAFEndPoint::StopConnectTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
 }
 
+void WiFiPAFEndPoint::StopReceiveConnectionTimer()
+{
+    // Cancel any existing receive-connection timer.
+    mWiFiPafLayer->mSystemLayer->CancelTimer(HandleReceiveConnectionTimeout, this);
+    mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+}
+
 void WiFiPAFEndPoint::StopAckReceivedTimer()
 {
     // Cancel any existing ack-received timer.
@@ -1256,6 +1294,19 @@ void WiFiPAFEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, vo
         ChipLogError(WiFiPAF, "connect handshake timed out, closing ep %p", ep);
         ep->mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
         ep->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_CONNECT_TIMED_OUT);
+    }
+}
+
+void WiFiPAFEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState)
+{
+    WiFiPAFEndPoint * ep = static_cast<WiFiPAFEndPoint *>(appState);
+
+    // Check for event-based timer race condition.
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kReceiveConnectionTimerRunning))
+    {
+        ChipLogError(WiFiPAF, "receive handshake timed out, closing ep %p", ep);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
+        ep->DoClose(kWiFiPAFCloseFlag_SuppressCallback | kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_RECEIVE_TIMED_OUT);
     }
 }
 
@@ -1313,8 +1364,37 @@ void WiFiPAFEndPoint::HandleWaitResourceTimeout(chip::System::Layer * systemLaye
 
 void WiFiPAFEndPoint::ClearAll()
 {
-    memset(reinterpret_cast<uint8_t *>(this), 0, sizeof(WiFiPAFEndPoint));
-    return;
+    // Return the end point to the free state the pool relies on (GetFree()/Find() key off
+    // mWiFiPafLayer == nullptr). The endpoint owns ref-counted PacketBufferHandles (mSendQueue,
+    // mAckToSend, ReorderQueue and buffers inside mPafTP); release those explicitly, then reset
+    // the trivially-copyable state. Any owning member added here later must be released too.
+    mSendQueue = nullptr;
+    mAckToSend = nullptr;
+    for (auto & queued : ReorderQueue)
+    {
+        queued = nullptr;
+    }
+    ItemsInReorderQueue = 0;
+    mPafTP.ClearRxPacket();
+    mPafTP.ClearTxPacket();
+
+    mWiFiPafLayer           = nullptr;
+    mOnPafSubscribeComplete = nullptr;
+    mOnPafSubscribeError    = nullptr;
+    mAppState               = nullptr;
+    OnMessageReceived       = nullptr;
+    OnConnectionClosed      = nullptr;
+
+    mState = kState_Closed;
+    mRole  = kWiFiPafRole_Publisher;
+    mRxAck = 0;
+    mConnStateFlags.ClearAll();
+    mTimerStateFlags.ClearAll();
+    mLocalReceiveWindowSize  = 0;
+    mRemoteReceiveWindowSize = 0;
+    mReceiveWindowMaxSize    = 0;
+    mResourceWaitCount       = 0;
+    mSessionInfo             = WiFiPAFSession{};
 }
 
 } /* namespace WiFiPAF */

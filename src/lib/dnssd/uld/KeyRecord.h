@@ -1,0 +1,68 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#pragma once
+
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPError.h>
+#include <lib/dnssd/uld/Constants.h>
+#include <lib/dnssd/wire/records/ResourceRecord.h>
+#include <lib/support/Span.h>
+
+namespace chip {
+namespace Dnssd {
+namespace Uld {
+
+/**
+ * @brief DNS KEY resource record (RFC 2535 / RFC 6605).
+ *
+ * RDATA: flags(2) | protocol(1) | algorithm(1) | public_key(64).
+ * @p publicKey is an uncompressed P-256 public key. The 0x04 point prefix is
+ * omitted from the encoded RDATA.
+ */
+class KeyResourceRecord : public ResourceRecord
+{
+public:
+    // DNSKEY RR flags for SRP / ULD requesters (RFC 9665): must be all zeroes.
+    static constexpr uint16_t kKeyFlags = 0x0000;
+
+    // DNSKEY RR protocol value for DNSSEC (RFC 4034).
+    static constexpr uint8_t kKeyProtocolDnssec = 3;
+
+    KeyResourceRecord(const FullQName & name, const Crypto::P256PublicKey & publicKey) :
+        ResourceRecord(QType::KEY, name), mPublicKey(publicKey)
+    {}
+
+    const Crypto::P256PublicKey & GetPublicKey() const { return mPublicKey; }
+
+    /**
+     * Parses KEY RDATA (RFC 2535 / RFC 6605) and reconstructs an uncompressed
+     * P-256 public key. Only the RDATA length, metadata, and nonzero key
+     * material are checked; the X||Y coordinates are not validated as a point
+     * on the curve.
+     */
+    static CHIP_ERROR Parse(ByteSpan rdata, Crypto::P256PublicKey & publicKey);
+
+protected:
+    bool WriteData(RecordWriter & out) const override;
+
+private:
+    Crypto::P256PublicKey mPublicKey;
+};
+
+} // namespace Uld
+} // namespace Dnssd
+} // namespace chip

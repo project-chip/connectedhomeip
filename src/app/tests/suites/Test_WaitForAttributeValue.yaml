@@ -1,0 +1,68 @@
+# Test for WaitForAttributeValue command
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Turn on the DUT"
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Set Level to 10 (initial state)"
+
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: 10
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Verify Level is 10"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 10
+
+    - label: "Move to Level 100 with 1s transition"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: 100
+              - name: "TransitionTime"
+                value: 10 # 1s (10 * 100ms)
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait for CurrentLevel to become 100"
+      cluster: "DelayCommands"
+      command: "WaitForAttributeValue"
+      arguments:
+          values:
+              - name: "attribute"
+                value: "CurrentLevel"
+              - name: "expectedValue"
+                value: 100
+              - name: "expectedDurationMs"
+                value: 1000
+              - name: "cluster"
+                value: "Level Control"
+              - name: "endpoint"
+                value: 1

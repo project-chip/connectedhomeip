@@ -156,9 +156,8 @@ CHIP_ERROR EncodeSigma1Helper(PacketBufferHandle & msg, FuzzCASESession::EncodeS
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(kInitiatorEphPubKeyTag), initiatorEphPubKey.data(), initiatorEphPubKey.size()));
 
-    VerifyOrReturnError(inputParams.initiatorMrpConfig != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag), *inputParams.initiatorMrpConfig, tlvWriter));
+    ReturnErrorOnFailure(CASESession::EncodeSessionParameters(TLV::ContextTag(kInitiatorMRPParamsTag),
+                                                              inputParams.initiatorSessionParams, tlvWriter));
 
     if (inputParams.sessionResumptionRequested)
     {
@@ -198,7 +197,7 @@ void ParseSigma1_StructuredPayload(const vector<uint8_t> & fuzzInitiatorRandom, 
         encodeParams.destinationId      = ByteSpan(fuzzDestinationID.data(), fuzzDestinationID.size());
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.initiatorMrpConfig = &LocalMRPConfig;
+        encodeParams.initiatorSessionParams.SetMRPConfig(LocalMRPConfig);
 
         if (fuzzSessionResumptionRequested)
         {
@@ -270,7 +269,7 @@ void EncodeParseSigma1RoundTrip(const vector<uint8_t> & fuzzInitiatorRandom, uin
         encodeParams.destinationId      = ByteSpan(fuzzDestinationID.data(), fuzzDestinationID.size());
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.initiatorMrpConfig = &LocalMRPConfig;
+        encodeParams.initiatorSessionParams.SetMRPConfig(LocalMRPConfig);
 
         if (fuzzSessionResumptionRequested)
         {
@@ -545,7 +544,7 @@ void EncodeParseSigma2RoundTrip(const vector<uint8_t> & fuzzResponderRandom, uin
 
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.responderMrpConfig = &LocalMRPConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(LocalMRPConfig);
 
         /********************************* Encode Sigma2 Using CASESession::EncodeSigma2 *********************************/
         PacketBufferHandle encodedSigma2;
@@ -909,7 +908,7 @@ void EncodeParseSigma2ResumeRoundTrip(const vector<uint8_t> & fuzzResumptionID, 
 
         ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                      System::Clock::Milliseconds16(4000));
-        encodeParams.responderMrpConfig = &LocalMRPConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(LocalMRPConfig);
 
         /***************** Encode Sigma2Resume Using CASESession::EncodeSigma2Resume *********************/
         PacketBufferHandle encodedSigma2Resume;

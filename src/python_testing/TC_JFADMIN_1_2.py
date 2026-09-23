@@ -83,14 +83,15 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             self.admin_passcode = random.randint(20202021, 20202099)
             self.admin_discriminator = random.randint(0, 4095)
+            rpc_port = self.get_random_port()
             # Start JF-Administrator App
             self.jf_admin = AppServerSubprocess(
                 self.jfa_server_app,
                 storage_dir=self.fabric_storage,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=self.admin_discriminator,
                 passcode=self.admin_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", str(rpc_port)])
             self.jf_admin.start(
                 expected_output="Server initialization complete",
                 timeout=10)

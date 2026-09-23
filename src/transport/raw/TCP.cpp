@@ -389,7 +389,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
             return err;
         }
         uint32_t messageSize = LittleEndian::Get32(messageSizeBuf);
-        if (messageSize >= kMaxTCPMessageSize)
+        if (messageSize > kMaxTCPMessageSize)
         {
             // Message is too big for this node to process. Disconnect from peer.
             ChipLogError(Inet, "Received TCP message of length %" PRIu32 " exceeds limit.", messageSize);
@@ -408,8 +408,10 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(const Inet::TCPEndPointHandle & endPoi
 
         if (messageSize == 0)
         {
-            // No payload but considered a valid message. Return success to keep the connection alive.
-            return CHIP_NO_ERROR;
+            // Zero-length messages are not valid Matter messages. Reject to
+            // prevent attackers from holding TCP connection slots indefinitely.
+            ChipLogError(Inet, "Received zero-length TCP message, closing connection.");
+            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
         }
 
         ReturnErrorOnFailure(ProcessSingleMessage(peerAddress, *state, messageSize));

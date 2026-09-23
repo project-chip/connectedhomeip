@@ -17,15 +17,33 @@
  */
 
 #include <app_options/AppOptions.h>
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
 using namespace chip;
 using namespace chip::ArgParser;
+
+namespace {
+
+bool IsExcludedFromWildcard(const std::string & type)
+{
+    // These device types are excluded from the wildcard (*) expansion to prevent redundant,
+    // invalid, or non-leaf endpoint structures.
+    static const std::vector<std::string> kExcludedDevices = {
+        "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
+        "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.
+    };
+    return std::any_of(kExcludedDevices.begin(), kExcludedDevices.end(),
+                       [&type](const auto & excluded) { return excluded == type; });
+}
+
+} // namespace
 
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType    = 0xffd0;
@@ -36,21 +54,122 @@ constexpr uint16_t kOptionVendorId      = 0xffd5;
 constexpr uint16_t kOptionProductId     = 0xffd6;
 constexpr uint16_t kOptionPort          = 0xffd7;
 constexpr uint16_t kOptionInterfaceId   = 0xffd8;
+constexpr uint16_t kOptionBLE           = 0xffd9;
+constexpr uint16_t kOptionGroupcast     = 0xffda;
+constexpr uint16_t kOptionAppPipe       = 0xffdb;
+constexpr uint16_t kOptionTraceTo       = 0xffdc;
+constexpr uint16_t kOptionDacProvider   = 0xffdd;
+constexpr uint16_t kOptionEnableKey     = 0xffde;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+constexpr uint16_t kOptionWiFiPAF = 0xffdf;
+#endif
+constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
+bool AppOptions::sIsConfigValidated = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+std::vector<uint16_t> AppOptions::ParseWiFiPafFreqList(const std::string & extCmds)
+{
+    static constexpr char kFreqListKey[] = "freq_list=";
+
+    std::vector<uint16_t> freqs;
+    const auto pos = extCmds.find(kFreqListKey);
+    if (pos == std::string::npos)
+    {
+        return freqs;
+    }
+
+    const char * p = extCmds.c_str() + pos + strlen(kFreqListKey);
+    while (*p != '\0' && *p != ' ')
+    {
+        char * end              = nullptr;
+        const unsigned long val = strtoul(p, &end, 10);
+        if (end == p)
+        {
+            // Stop rather than spin, but say so: silently keeping a prefix of what was
+            // asked for would leave the proxy advertising bands it was not told to use.
+            ChipLogError(AppServer, "--wifipaf freq_list: ignoring unparsable frequency at \"%s\"", p);
+            break;
+        }
+        if (val == 0 || val > UINT16_MAX)
+        {
+            ChipLogError(AppServer, "--wifipaf freq_list: ignoring out-of-range frequency %lu", val);
+        }
+        else
+        {
+            freqs.push_back(static_cast<uint16_t>(val));
+        }
+        p = end;
+        if (*p != ',')
+        {
+            break;
+        }
+        ++p;
+    }
+
+    return freqs;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
+bool AppOptions::ParsePortNumber(const char * value, uint16_t & port)
+{
+    if (value == nullptr || *value == '\0')
+    {
+        return false;
+    }
+
+    char * endptr           = nullptr;
+    const unsigned long val = strtoul(value, &endptr, 0);
+
+    // `endptr == value` catches input with no digits at all; strtoul would otherwise
+    // report success with a value of 0.
+    if (endptr == value || *endptr != '\0' || val > UINT16_MAX)
+    {
+        return false;
+    }
+
+    port = static_cast<uint16_t>(val);
+    return true;
+}
 
 const AppOptions::AppConfig & AppOptions::GetConfig()
 {
+    VerifyOrDie(sIsConfigValidated);
+    return mConfig;
+}
+
+CHIP_ERROR AppOptions::ValidateConfig()
+{
+    // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
     {
         mConfig.deviceTypeEntries.push_back({
-            .type     = chip::app::DeviceFactory::GetInstance().GetDefaultDevice(),
+            .type     = chip::app::NoHooksDeviceFactory::GetInstance().GetDefaultDevice(),
             .endpoint = 1,
             .parentId = chip::kInvalidEndpointId,
         });
     }
-    return mConfig;
+    else
+    {
+        // Expand wildcards using the supported device types from DeviceFactory
+        std::vector<std::string> supportedTypes;
+        for (const auto & deviceType : chip::app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
+        {
+            if (!IsExcludedFromWildcard(deviceType))
+            {
+                supportedTypes.push_back(deviceType);
+            }
+        }
+
+        sParser.ExpandWildcards(supportedTypes);
+        mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
+    }
+
+    ReturnErrorOnFailure(DeviceTypeParser::ValidateConfig(mConfig.deviceTypeEntries));
+    sIsConfigValidated = true;
+    return CHIP_NO_ERROR;
 }
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
@@ -59,6 +178,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
     switch (identifier)
     {
     case kOptionDeviceType: {
+        sIsConfigValidated = false;
         if (sParser.ParseSingleDeviceString(value) != CHIP_NO_ERROR)
         {
             return false;
@@ -66,6 +186,13 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.deviceTypeEntries = sParser.GetDeviceTypeEntries();
         return true;
     }
+    case kOptionBLE:
+        if (!ParseInt(value, mConfig.bleController))
+        {
+            ChipLogError(Support, "Invalid BLE controller specified: %s", value);
+            return false;
+        }
+        return true;
     case kOptionWiFi:
         mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
@@ -78,7 +205,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         unsigned long val = strtoul(value, &endptr, 0);
         if (*endptr != '\0' || val > 0xFFF)
         {
-            ChipLogError(Support, "Invalid discriminator: %s\n", value);
+            ChipLogError(Support, "Invalid discriminator: %s", value);
             return false;
         }
         mConfig.discriminator = static_cast<uint16_t>(val);
@@ -91,20 +218,72 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.productId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
         return true;
     case kOptionPort: {
-        char * endptr;
-        unsigned long val = strtoul(value, &endptr, 0);
-        if (*endptr != '\0' || val > 0xFFFF)
+        uint16_t port = 0;
+        if (!ParsePortNumber(value, port))
         {
-            ChipLogError(Support, "Invalid port: %s\n", value);
+            ChipLogError(Support, "Invalid port: %s", value);
             return false;
         }
-        mConfig.port = static_cast<uint16_t>(val);
-        ChipLogProgress(AppServer, "Port option set to %u\n", static_cast<uint16_t>(val));
+        mConfig.port = port;
+        ChipLogProgress(AppServer, "Port option set to %u", port);
+        return true;
+    }
+    case kOptionRpcServerPort: {
+        uint16_t port = 0;
+        if (!ParsePortNumber(value, port))
+        {
+            ChipLogError(Support, "Invalid RPC server port: %s", value);
+            return false;
+        }
+        // Port 0 would make the OS pick an ephemeral port. Unlike the Matter operational port,
+        // which is advertised over DNS-SD, the pw_rpc port is not discoverable and the app does
+        // not report the port it actually bound, so no client could ever reach the server.
+        if (port == 0)
+        {
+            ChipLogError(Support, "Invalid RPC server port: 0 is not a usable listen port");
+            return false;
+        }
+        mConfig.rpcServerPort = port;
+        ChipLogProgress(AppServer, "RPC server port option set to %u", port);
         return true;
     }
     case kOptionInterfaceId:
         mConfig.interfaceId = static_cast<uint32_t>(strtoul(value, nullptr, 0));
         return true;
+    case kOptionGroupcast:
+        mConfig.enableGroupcast = true;
+        ChipLogProgress(AppServer, "Groupcast usage enabled");
+        return true;
+    case kOptionAppPipe:
+        mConfig.appPipePath = value;
+        ChipLogProgress(AppServer, "App pipe path set to %s", value);
+        return true;
+    case kOptionTraceTo:
+        mConfig.traceTo.push_back(value);
+        ChipLogProgress(AppServer, "Added trace destination: %s", value);
+        return true;
+    case kOptionDacProvider:
+        mConfig.dacProvider = value;
+        ChipLogProgress(AppServer, "DAC provider file set to %s", value);
+        return true;
+    case kOptionEnableKey: {
+        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+
+        if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
+        {
+
+            ChipLogError(Support, "%s: ERROR: invalid value specified for %s\n", program, name);
+            return false;
+        }
+        ChipLogProgress(AppServer, "TestEventTrigger enable key configured");
+        return true;
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    case kOptionWiFiPAF:
+        mConfig.wifipafExtCmds  = value ? value : "";
+        mConfig.wifipafFreqList = ParseWiFiPafFreqList(mConfig.wifipafExtCmds);
+        return true;
+#endif
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -117,6 +296,9 @@ OptionSet * AppOptions::GetOptions()
 {
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        { "ble-controller", kArgumentRequired, kOptionBLE },
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
@@ -126,26 +308,95 @@ OptionSet * AppOptions::GetOptions()
         { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
         { "interface-id", kArgumentRequired, kOptionInterfaceId },
+        { "groupcast", kNoArgument, kOptionGroupcast },
+        { "app-pipe", kArgumentRequired, kOptionAppPipe },
+        { "trace-to", kArgumentRequired, kOptionTraceTo },
+        { "dac_provider", kArgumentRequired, kOptionDacProvider },
+        { "enable-key", kArgumentRequired, kOptionEnableKey },
+        { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { "wifipaf", kArgumentRequired, kOptionWiFiPAF },
+#endif
         {}, // need empty terminator
     };
 
     static const std::string gHelpText = []() {
         // Device option - this is dynamic
         std::string result = "  --device <";
-        for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
+        for (auto & name : app::NoHooksDeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             result.append(name);
             result.append("|");
         }
-        result.replace(result.length() - 1, 1, ">");
+        result.append("*");
+        result.append(">");
         result += "\n";
-        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'\n";
+        result += "       Select the device to start up. Format: 'type' or 'type:endpoint' or "
+                  "'type:endpoint,parent=parentId[,bridged]'.\n";
+        result += "       Use '*' to select all supported leaf devices (e.g. --device \"*:1\").\n";
+        result += "       Use 'bridged' to automatically create a parent bridged-node endpoint for the device.\n";
         result += "       Can be specified multiple times for multi-endpoint devices.\n";
-        result += "       Example: --device chime:1 --device speaker:2,parent=1\n\n";
+        result += "       Example: --device aggregator:1 --device \"chime:2,parent=1,bridged\"\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        result += "  --ble-controller <number>\n";
+        result += "       Select the BLE controller to use (default: 0)\n\n";
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
+#endif
+
+        result += "  --KVS <path>\n";
+#if defined(CHIP_CONFIG_KVS_PATH)
+        result += "       Path to the Key Value Store file (default: " CHIP_CONFIG_KVS_PATH ")\n\n";
+#else
+        result += "       Path to the Key Value Store file\n\n";
+#endif
+
+        result += "  --discriminator <number>\n";
+        result += "       Discriminator value for commissioning (default: 3840)\n\n";
+
+        result += "  --vendor-id <number>\n";
+        result += "       Vendor ID value for commissioning\n\n";
+
+        result += "  --product-id <number>\n";
+        result += "       Product ID value for commissioning\n\n";
+
+        result += "  --port <number>\n";
+        result += "       Listen port for secure device messages (default: 5540)\n\n";
+
+        result += "  --interface-id <number>\n";
+        result += "       Interface ID to use for multicast multicast DNS\n\n";
+
+        result += "  --groupcast\n";
+        result += "       Enable groupcast messaging support\n\n";
+
+        result += "  --app-pipe <path>\n";
+        result += "       Path to the named pipe for receiving runtime commands\n\n";
+
+        result += "  --trace-to <destination>\n";
+        result += "       Enable tracing destination (e.g., json:log, json:file_path)\n\n";
+
+        result += "  --dac_provider <path>\n";
+        result += "       Path to JSON file containing device attestation credentials\n\n";
+
+        result += "  --enable-key <key>\n";
+        result += "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of General Diagnostics cluster\n\n";
+
+        result += "  --rpc-server-port <number>\n";
+        result += "       Listen port for the Pigweed RPC server, 1-65535 (default: 33000). This is\n";
+        result += "       separate from --port, which sets the Matter operational port. Only has an\n";
+        result += "       effect in builds compiled with Pigweed RPC support (chip_enable_pw_rpc).\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        result += "  --wifipaf freq_list=<freq_1>,<freq_2>...\n";
+        result += "       Enable Wi-Fi PAF via wpa_supplicant, on these NAN frequencies in MHz.\n";
+        result += "       2437 is channel 6, the default publish channel. The list sets the\n";
+        result += "       advertised WiFiBand and the channels published on; scans and connects\n";
+        result += "       subscribe on 2437 when listed, otherwise on the first frequency given.\n";
+        result += "       Give an empty string if not setting freq_list: \"\"\n\n";
 #endif
 
         return result;

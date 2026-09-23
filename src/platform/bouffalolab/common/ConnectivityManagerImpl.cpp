@@ -39,7 +39,7 @@
 #if CHIP_DEVICE_LAYER_TARGET_BL702
 #include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif
 #endif
@@ -51,6 +51,12 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+extern "C" {
+#include <pm_manager.h>
+}
 #endif
 
 using namespace ::chip;
@@ -186,6 +192,11 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
 
 void ConnectivityManagerImpl::OnWiFiStationConnected()
 {
+#if CHIP_DEVICE_LAYER_TARGET_BFLB && defined(CONFIG_PM) && CONFIG_PM
+    ChipLogProgress(NotSpecified, "[LP] WiFi connected, enter STA PS");
+    pm_enter_lp_perparation();
+#endif
+
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
@@ -316,13 +327,13 @@ void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
-            memset(&m_ip4addr, 0, sizeof(ip4_addr_t));
+            VerifyOrDo(!haveIPv4Conn, memset(&m_ip4addr, 0, sizeof(m_ip4addr)));
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
         }
 
         if (haveIPv6Conn != hadIPv6Conn)
         {
-            memset(&m_ip6addr, 0, sizeof(ip6_addr_t) * LWIP_IPV6_NUM_ADDRESSES);
+            VerifyOrDo(!haveIPv6Conn, memset(&m_ip6addr, 0, sizeof(m_ip6addr)));
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
         }
     }

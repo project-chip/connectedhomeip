@@ -137,6 +137,7 @@ public:
 
 private:
     friend class TestWriteInteraction;
+    friend class TestSessionRelease;
     enum class State : uint8_t
     {
         Uninitialized = 0, // The handler has not been initialized

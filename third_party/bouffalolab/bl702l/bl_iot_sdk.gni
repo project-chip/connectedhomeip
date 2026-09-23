@@ -173,6 +173,9 @@ template("bl_iot_sdk") {
     ]
 
     defines = [ "BL702L_PT_ENTRY_MAX=6" ]
+    if (defined(invoker.enable_pds) && invoker.enable_pds) {
+      defines += [ "CFG_PDS_ENABLE" ]
+    }
     cflags_cc = [ "-Wno-literal-suffix" ]
   }
 
@@ -181,10 +184,6 @@ template("bl_iot_sdk") {
     if (defined(invoker.chip_config_network_layer_ble) &&
         invoker.chip_config_network_layer_ble) {
       defines += [ "CFG_BLE_ENABLE" ]
-    }
-
-    if (defined(invoker.enable_pds) && invoker.enable_pds) {
-      defines += [ "CFG_PDS_ENABLE" ]
     }
 
     if (defined(invoker.enable_debug_coredump) &&
@@ -458,7 +457,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
     ]
 
-    defines = [ "MBEDTLS_CONFIG_FILE=\"bl702l-chip-mbedtls-config.h\"" ]
+    defines = [ "MBEDTLS_CONFIG_FILE=\"mbedtls_sample_config.h\"" ]
   }
 
   source_set("${sdk_target_name}_mbedtls") {
@@ -555,6 +554,7 @@ template("bl_iot_sdk") {
     defines = [
       "CONFIG_BT_CONN=1",
       "CONFIG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BLE_USING_DYNAMIC_RAM=0",
       "CONFIG_BT_PERIPHERAL",
       "CFG_BLE_ENABLE",
       "BFLB_BLE",
@@ -585,6 +585,7 @@ template("bl_iot_sdk") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
     ]
@@ -629,13 +630,16 @@ template("bl_iot_sdk") {
     defines = [
       "OT_FREERTOS_ENABLE=1",
       "CONFIG_LMAC154_LOG=0",
+      "CONFIG_LMAC154_DBG=0",
       "NXSPI_OPENTHREAD_RADIO=0",
+      "OPENTHREAD_PLATFORM_NEXUS=0",
     ]
 
     include_dirs = [
       "${openthread_root}/src/core",
       "${openthread_root}/examples/platforms",
       "${bl_iot_sdk_root}/components/network/lmac154/lmac154/include",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702l/bl702l_std",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include",
     ]
@@ -657,10 +661,10 @@ template("bl_iot_sdk") {
     ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_alarm_bl702l.c",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_alarm.c",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_link_metric.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
-      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio_bl70xx.c",
-      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_sys.c",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_sys_iot.c",
     ]
 
     if (defined(invoker.bouffalo_sdk_component_easyflash_enabled) &&
@@ -671,10 +675,7 @@ template("bl_iot_sdk") {
       sources += [ "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings_littlefs.c" ]
     }
 
-    libs = [
-      "${bl_iot_sdk_root}/components/network/lmac154/lmac154_bl702l/lib/liblmac154_bl702l.a",
-      "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702l/lib/libopenthread_utils_bl702l.a",
-    ]
+    libs = [ "${bl_iot_sdk_root}/components/network/lmac154/lmac154_bl702l/lib/liblmac154_bl702l.a" ]
 
     configs += [
       ":${sdk_target_name}_config",
@@ -698,10 +699,9 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_factory_data") {
-    defines = [ "BL_MFD_PLAT_H=\"bl_mfd_bl702l.h\"" ]
     sources = [
-      "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd.c",
-      "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd_decrypt.c",
+      "${bl_iot_sdk_root}/components/network/matter/mfd/bflb_mfd.c",
+      "${bl_iot_sdk_root}/components/network/matter/mfd/bflb_mfd_decrypt_iot.c",
     ]
 
     configs += [

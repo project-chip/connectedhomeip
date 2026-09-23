@@ -23,6 +23,13 @@
 
 #pragma once
 
+#include <TargetConditionals.h>
+
+#if TARGET_OS_OSX
+// On macOS, use the Linux PC/SC-based implementation
+#include <platform/Linux/NFCCommissioningManagerImpl.h>
+#else
+
 #include <platform/internal/NFCCommissioningManager.h>
 #include <transport/raw/NfcApplicationDelegate.h>
 
@@ -73,3 +80,5 @@ private:
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+
+#endif // TARGET_OS_OSX

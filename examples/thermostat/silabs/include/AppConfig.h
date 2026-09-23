@@ -21,8 +21,6 @@
 
 #include "silabs_utils.h"
 
-// ---- Lighting Example App Config ----
-
 #define APP_TASK_NAME "Therm"
 
 #define BLE_DEV_NAME "SL-" APP_TASK_NAME

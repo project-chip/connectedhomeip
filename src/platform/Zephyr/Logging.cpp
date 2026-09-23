@@ -61,6 +61,9 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     // help, apparently.  Just turn off that warning around this switch.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wvla-cxx-extension"
+#endif
     switch (category)
     {
     case kLogCategory_Error:

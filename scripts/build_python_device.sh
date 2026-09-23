@@ -98,14 +98,17 @@ fi
 # Generates ninja files
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
 # Compiles python files
-ninja -v -C "$OUTPUT_ROOT" matter-clusters matter-core
+ninja -v -C "$OUTPUT_ROOT" matter-clusters.wheel matter-core.wheel
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new environment to register the python WHL
 
-WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
+WHEEL=(
+    "$OUTPUT_ROOT"/obj/src/controller/python/matter-clusters._build_wheel/*.whl
+    "$OUTPUT_ROOT"/obj/src/controller/python/matter-core._build_wheel/*.whl
+)
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade

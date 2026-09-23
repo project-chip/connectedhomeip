@@ -63,7 +63,7 @@ public:
     virtual CHIP_ERROR AppMatter_Register(void) override;
 
 private:
-    void DispatchEvent(const AppEvent & event);
+    void DispatchEvent(const AppEvent & event) override;
 };
 
 } // namespace chip::Zephyr::App

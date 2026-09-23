@@ -146,13 +146,29 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> &
 CameraAVStreamManager::GetAllocatedVideoStreams() const
 {
-    return GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+    auto * cluster = GetCameraAVStreamManagementCluster();
+    if (cluster == nullptr)
+    {
+        ChipLogError(Camera, "CameraAVStreamManagementCluster is null in GetAllocatedVideoStreams");
+        static const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> kEmptyVideoStreams;
+        return kEmptyVideoStreams;
+    }
+
+    return cluster->GetAllocatedVideoStreams();
 }
 
 const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> &
 CameraAVStreamManager::GetAllocatedAudioStreams() const
 {
-    return GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+    auto * cluster = GetCameraAVStreamManagementCluster();
+    if (cluster == nullptr)
+    {
+        ChipLogError(Camera, "CameraAVStreamManagementCluster is null in GetAllocatedAudioStreams");
+        static const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> kEmptyAudioStreams;
+        return kEmptyAudioStreams;
+    }
+
+    return cluster->GetAllocatedAudioStreams();
 }
 
 void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -161,10 +177,18 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
 {
 
     outBandwidthbps = 0;
+
+    auto * cluster = GetCameraAVStreamManagementCluster();
+    if (cluster == nullptr)
+    {
+        ChipLogError(Camera, "CameraAVStreamManagementCluster is null in GetBandwidthForStreams");
+        return;
+    }
+
     if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
     {
         uint16_t vStreamId           = videoStreamId.Value().Value();
-        auto & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+        auto & allocatedVideoStreams = cluster->GetAllocatedVideoStreams();
         for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : allocatedVideoStreams)
         {
             if (stream.videoStreamID == vStreamId)
@@ -178,7 +202,7 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
     {
         uint16_t aStreamId           = audioStreamId.Value().Value();
-        auto & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+        auto & allocatedAudioStreams = cluster->GetAllocatedAudioStreams();
         for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : allocatedAudioStreams)
         {
             if (stream.audioStreamID == aStreamId)

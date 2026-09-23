@@ -112,7 +112,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         transport_configs = await self.read_single_attribute_check_success(
@@ -131,10 +131,10 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
-        log.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        log.info("SupportedIngestMethods: %s", aSupportedIngestMethods)
 
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
-        log.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
+        log.info("SupportedContainerFormats: %s", aSupportedContainerFormats)
 
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()

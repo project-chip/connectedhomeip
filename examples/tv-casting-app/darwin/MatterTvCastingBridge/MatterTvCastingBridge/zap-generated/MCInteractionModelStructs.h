@@ -27,12 +27,26 @@
 
 @interface MCMediaPlaybackClusterTrackAttributesStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull languageCode;
+@property (nonatomic, copy) NSArray * _Nullable characteristics;
 @property (nonatomic, copy) NSString * _Nullable displayName;
 @end
 
 @interface MCMediaPlaybackClusterTrackStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull id;
 @property (nonatomic, copy) MCMediaPlaybackClusterTrackAttributesStruct * _Nullable trackAttributes;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCMediaPlaybackClusterContentInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentType;
+@property (nonatomic, copy) NSString * _Nullable title;
+@property (nonatomic, copy) NSString * _Nullable show;
+@property (nonatomic, copy) NSString * _Nullable season;
+@property (nonatomic, copy) NSString * _Nullable episode;
+@property (nonatomic, copy) NSString * _Nullable provider;
+@property (nonatomic, copy) NSString * _Nullable artist;
+@property (nonatomic, copy) NSString * _Nullable album;
+@property (nonatomic, copy) NSString * _Nullable track;
 @end
 
 @interface MCApplicationBasicClusterApplicationStruct : NSObject <NSCopying>
@@ -103,6 +117,45 @@
 @interface MCContentLauncherClusterAdditionalInfoStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSString * _Nonnull value;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterContentAppInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppVendorID;
+@property (nonatomic, copy) NSNumber * _Nonnull contentAppProductID;
+@property (nonatomic, copy) NSString * _Nonnull data;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterLaunchUrlInfo : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull url;
+@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable contentType;
+@property (nonatomic, copy) NSArray * _Nullable contentHeaders;
+@property (nonatomic, copy) NSNumber * _Nullable offsetMillisecs;
+@property (nonatomic, copy) NSNumber * _Nullable queueType;
+@property (nonatomic, copy) NSString * _Nullable nextUrl;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterReplicationInfo : NSObject <NSCopying>
+@property (nonatomic, copy) MCContentLauncherClusterLaunchUrlInfo * _Nullable launchUrlInfo;
+@property (nonatomic, copy) MCContentLauncherClusterContentAppInfo * _Nullable contentAppInfo;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCContentLauncherClusterContentPresetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull presetID;
+@property (nonatomic, copy) NSString * _Nonnull presetName;
+@end
+
+// MTR_PROVISIONALLY_AVAILABLE
+@interface MCMediaFileManagementClusterFileDescriptionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fileID;
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
 @end
 
 #endif /* MCStructsObjc_h */

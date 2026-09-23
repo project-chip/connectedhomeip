@@ -19,6 +19,7 @@
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "TargetNavigatorManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/Span.h>
 
 #include <list>
@@ -71,7 +72,13 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
         TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
-    mCurrentTarget = static_cast<uint8_t>(target);
+    bool targetChanged = (mCurrentTarget != static_cast<uint8_t>(target));
+    mCurrentTarget     = static_cast<uint8_t>(target);
+    if (targetChanged && mEndpoint != chip::kInvalidEndpointId)
+    {
+        MatterReportingAttributeChangeCallback(mEndpoint, chip::app::Clusters::TargetNavigator::Id,
+                                               chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id);
+    }
 
     response.data   = chip::MakeOptional("data response"_span);
     response.status = StatusEnum::kSuccess;

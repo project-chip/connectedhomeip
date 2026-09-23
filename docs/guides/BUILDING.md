@@ -143,7 +143,7 @@ brew install sdl2
 
 Complete the following steps:
 
-1. Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+1. Using `rpi-imager`, install the Ubuntu _24.04_ 64-bit _server_ OS for arm64
    architectures on a micro SD card.
 1. Boot the SD card.
 1. Log in with the default user account "ubuntu" and password "ubuntu"
@@ -160,9 +160,10 @@ Complete the following steps:
 #### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
-controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
-the features required by the Matter application by default. To enable these
-features, you need to enable experimental Bluetooth support in BlueZ.
+controller. The BlueZ version that comes with Ubuntu 22.04 and 24.04 does not
+support all the features required by the Matter application by default. To
+enable these features, you need to enable experimental Bluetooth support in
+BlueZ.
 
 Also disable the battery plugin from BlueZ, because iOS devices advertises a
 battery service via BLE, which requires pairing if accessed. BlueZ includes a
@@ -420,15 +421,16 @@ To compile, use:
 After which tests should be located in
 `out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
 
-#### `ossfuzz` configurations
+#### OSS-Fuzz builds (`oss_fuzz=true`)
 
-`ossfuzz` configurations are not stand-alone fuzzing and instead serve as an
-integration point with external fuzzing automated builds.
+The `oss_fuzz=true` GN build is not stand-alone fuzzing; it is the integration
+point for the external OSS-Fuzz automation, which drives it from its own
+`build.sh` and supplies environment variables such as `$CFLAGS`, `$CXXFLAGS` and
+`$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py` target.
 
-They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
-`$LIB_FUZZING_ENGINE`.
-
-You likely want `libfuzzer` + `asan` builds instead for local testing.
+For local testing you likely want `libfuzzer` + `asan` builds, or -- for the
+`pw_fuzzer` `FuzzTests` below -- the `-ossfuzz` modifier, which reproduces the
+OSS-Fuzz (libFuzzer-compatibility) build with the local toolchain.
 
 ### `pw_fuzzer` `FuzzTests`
 
@@ -452,6 +454,14 @@ executed manually.
 >     `linux-x64-tests-clang-pw-fuzztest-coverage`
 > -   Details:
 >     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
+> -   Append `-ossfuzz` to build in libFuzzer-compatibility mode (the mode
+>     OSS-Fuzz drives) instead of FuzzTest's native engine, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-ossfuzz`. Useful to reproduce the
+>     OSS-Fuzz build locally, or to use libFuzzer corpus/merge/minimize
+>     features.
+> -   Append `-ubsan` to add UndefinedBehaviorSanitizer on top of the default
+>     `asan`, e.g. `linux-x64-tests-clang-pw-fuzztest-ubsan` (can be combined
+>     with `-ossfuzz`).
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where

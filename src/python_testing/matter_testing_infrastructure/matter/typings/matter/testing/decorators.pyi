@@ -1,7 +1,8 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/decorators.pyi
 
+from collections.abc import Callable
 from enum import IntFlag
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 # Assume types from matter.clusters can be imported.
 from matter.clusters import Attribute

@@ -30,6 +30,9 @@
 #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 #include <mbedtls/private/bignum.h>
 #include <mbedtls/private/ecp.h>
+#else
+#include <mbedtls/bignum.h>
+#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #endif // !CHIP_CRYPTO_SPAKE2P_PSA
 
@@ -47,13 +50,8 @@
 
 #include <psa/crypto.h>
 
-#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
-#include <mbedtls/bignum.h>
-#include <mbedtls/ecp.h>
-#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
-
 #include <mbedtls/error.h>
-#include <mbedtls/x509_csr.h>
+#include <mbedtls/md.h>
 
 #include <string.h>
 #include <type_traits>
@@ -345,6 +343,9 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
 
     return status == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
+
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(psa_hash_operation_t),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying psa_hash_operation_t");
 
 static inline psa_hash_operation_t * toHashOperation(HashSHA256OpaqueContext * context)
 {
@@ -879,6 +880,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
+    ClearSecretData(privateKey, sizeof(privateKey));
     LogPsaError(status);
 
     return error;
@@ -928,7 +930,7 @@ void P256Keypair::Clear()
     {
         PsaP256KeypairContext & context = ToPsaContext(mKeypair);
         psa_destroy_key(context.key_id);
-        memset(&context, 0, sizeof(context));
+        ClearSecretData(reinterpret_cast<uint8_t *>(&context), sizeof(context));
         mInitialized = false;
     }
 }
@@ -1047,6 +1049,10 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    ClearSecretData(Kcab);
+    ClearSecretData(Kae);
+
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

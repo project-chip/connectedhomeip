@@ -54,6 +54,8 @@ TEST(TestDefaultSessionResumptionStorage, TestSave)
     }
 
     // Fill storage.
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     for (size_t i = 0; i < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE; ++i)
     {
         EXPECT_EQ(sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, vectors[i].sharedSecret, vectors[i].cats),
@@ -120,6 +122,8 @@ TEST(TestDefaultSessionResumptionStorage, TestInPlaceSave)
     // Construct only a few unique node identities to simulate talking to a
     // couple peers.
     chip::ScopedNodeId nodes[3];
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     static_assert(MATTER_ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
                   "must have fewer nodes than slots in session resumption storage");
     for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)

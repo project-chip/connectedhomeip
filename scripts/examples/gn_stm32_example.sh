@@ -28,7 +28,7 @@ echo_blue() {
     echo -e "\033[1;34m$*\033[0m"
 }
 
-if [[ -z "${MATTER_ROOT}" ]]; then
+if [[ -z "$MATTER_ROOT" ]]; then
     echo "Using default path for Matter root"
     CHIP_ROOT="$(dirname "$0")/../.."
 else
@@ -60,6 +60,7 @@ if [ "$#" == "0" ]; then
         Identifier of the board for which this app is built
         Currently Supported :
             STM32WB5MM-DK
+            STM32WBA651-DK1
 
     <Build options> - optional noteworthy build options for stm32
         chip_build_libshell
@@ -123,7 +124,7 @@ else
     while [ $# -gt 0 ]; do
         case $1 in
             --wifi)
-                if [ -z "$2" ]; then
+                if [ "$2" = "" ]; then
                     echo "--wifi requires mxchip"
                     exit 1
                 fi
@@ -168,22 +169,25 @@ else
         esac
     done
 
-    if [ -z "$STM32_BOARD" ]; then
+    if [ "$STM32_BOARD" = "" ]; then
         echo "STM32_BOARD not defined"
         exit 1
     fi
 
     BUILD_DIR=$OUTDIR/$STM32_BOARD
+    example_dir=$MATTER_ROOT/examples/$example_name/stm32/$STM32_BOARD
+
     echo BUILD_DIR="$BUILD_DIR"
+    echo example_dir="$example_dir"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="stm32_board=\"$STM32_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
-        if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+        if [ "$optArgs" = "" ]; then
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" --args="stm32_board=\"$STM32_BOARD\" treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$example_dir" --args="stm32_board=\"$STM32_BOARD\" $optArgs treat_warnings_as_errors=false" --ide=json "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/

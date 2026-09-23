@@ -35,6 +35,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_3_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_3_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -150,25 +165,23 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        log.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
+                             f"OperationalState({operational_state}) should be {state_enum_to_text(expected_state)}")
 
     # Sends the Pause command and checks that the returned error matches the expected_error
     async def send_pause_cmd_with_check(self, step_number, expected_error):
         self.print_step(step_number, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     # Sends the Resume command and checks that the returned error matches the expected_error
     async def send_resume_cmd_with_check(self, step_number, expected_error):
         self.print_step(step_number, "Send Pause command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     async def send_run_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -205,7 +218,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         test_step = "Manually put the device in a state where it can receive a Pause command"
         self.print_step(2, test_step)
@@ -218,19 +231,19 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         op_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                      attribute=attributes.OperationalStateList)
 
-        log.info("OperationalStateList: %s" % (op_state_list))
+        log.info("OperationalStateList: %s", op_state_list)
 
         defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                           if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
         state_ids = {s.operationalStateID for s in op_state_list}
 
-        asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
+        asserts.assert_true(all(_id in state_ids for _id in defined_states), "OperationalStateList is missing a required entry")
 
         self.print_step(4, "Read OperationalState")
         old_opstate_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                        attribute=attributes.OperationalState)
-        log.info("OperationalState: %s" % old_opstate_dut)
+        log.info("OperationalState: %s", old_opstate_dut)
 
         await self.send_pause_cmd_with_check(5, op_errors.kNoError)
 
@@ -240,22 +253,22 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(7, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.CountdownTime)
-            log.info("CountdownTime: %s" % initial_countdown_time)
+            log.info("CountdownTime: %s", initial_countdown_time)
             if initial_countdown_time is not NullValue:
                 in_range = (1 <= initial_countdown_time <= 259200)
             asserts.assert_true(initial_countdown_time is NullValue or in_range,
-                                "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
+                                f"invalid CountdownTime({initial_countdown_time}). Must be in between 1 and 259200, or null ")
 
             self.print_step(8, "Waiting for 5 seconds")
             await asyncio.sleep(5)
 
             self.print_step(9, "Read CountdownTime attribute")
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
-            log.info("CountdownTime: %s" % countdown_time)
+            log.info("CountdownTime: %s", countdown_time)
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
-                                "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
-            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) not equal to the initial CountdownTime(%s)"
-                                 % (countdown_time, initial_countdown_time))
+                                f"invalid CountdownTime({countdown_time}). Must be a non zero integer, or null")
+            asserts.assert_equal(countdown_time, initial_countdown_time,
+                                 f"CountdownTime({countdown_time}) not equal to the initial CountdownTime({initial_countdown_time})")
 
         await self.send_pause_cmd_with_check(10, op_errors.kNoError)
 
@@ -264,9 +277,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(12, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
-        log.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, old_opstate_dut,
-                             "OperationalState(%s) should be the state before pause (%s)" % (operational_state, old_opstate_dut))
+                             f"OperationalState({operational_state}) should be the state before pause ({old_opstate_dut})")
 
         await self.send_resume_cmd_with_check(13, op_errors.kNoError)
 
@@ -292,7 +305,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Stopped(0x00) operational state"
             self.print_step(24, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -306,7 +319,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Error(0x03) operational state"
             self.print_step(28, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "Stuck"})
+                self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "Stuck"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -320,10 +333,10 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Charging(0x41) operational state"
             self.print_step(32, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
                 await self.send_run_change_to_mode_cmd(1)
                 await self.send_run_change_to_mode_cmd(0)
-                self.write_to_app_pipe({"Name": "ChargerFound"})
+                self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -343,7 +356,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Docked(0x42) operational state"
             self.print_step(38, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Charged"})
+                self.write_to_app_pipe({"Name": "Charged", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -375,7 +388,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the EmptyingDustBin(0x43) operational state"
             self.print_step(46, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "EmptyingDustBin"})
+                self.write_to_app_pipe({"Name": "EmptyingDustBin", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -396,7 +409,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the CleaningMop(0x44) operational state"
             self.print_step(50, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "CleaningMop"})
+                self.write_to_app_pipe({"Name": "CleaningMop", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -417,7 +430,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the FillingWaterTank(0x45) operational state"
             self.print_step(54, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "FillingWaterTank"})
+                self.write_to_app_pipe({"Name": "FillingWaterTank", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -438,7 +451,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the UpdatingMaps(0x46) operational state"
             self.print_step(58, test_step)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "UpdatingMaps"})
+                self.write_to_app_pipe({"Name": "UpdatingMaps", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

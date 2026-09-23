@@ -35,6 +35,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <system/RAIIMockClock.h>
 
 #include <algorithm>
 #include <variant>
@@ -338,10 +339,22 @@ struct TestNetworkIdentityManagementCluster : public ::testing::Test
     void SetUp() override { ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestNetworkIdentityManagementCluster() : cluster(kTestEndpointId, storage, keystore, authenticatorDriver), tester(cluster) {}
+    TestNetworkIdentityManagementCluster() : cluster(kTestEndpointId, storage, keystore, authenticatorDriver), tester(cluster)
+    {
+        SetMockTime(kDefaultMockMatterEpochS);
+    }
 
-    static constexpr EndpointId kTestEndpointId = 1;
+    static constexpr EndpointId kTestEndpointId        = 1;
+    static constexpr uint32_t kDefaultMockMatterEpochS = 900000000; // ~year 2028, well ahead of all test timestamps
 
+    // Sets the mock clock to the given Matter epoch seconds value.
+    void SetMockTime(uint32_t matterEpochS)
+    {
+        mockClock.mRealTime = System::Clock::Microseconds64(
+            (static_cast<uint64_t>(matterEpochS) + chip::kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond);
+    }
+
+    System::Clock::Internal::RAIIMockClock mockClock;
     chip::TestPersistentStorageDelegate persistentStorage;
     DefaultNetworkIdentityStorage storage{ persistentStorage };
     TestNetworkIdentityKeystore keystore;
@@ -515,6 +528,38 @@ TEST_F(TestNetworkIdentityManagementCluster, ImportAdminSecretTimestampValidatio
     keystore.ValidateHandles(1, 2);
 }
 
+TEST_F(TestNetworkIdentityManagementCluster, ImportAdminSecretFutureTimestampRejected)
+{
+    constexpr uint32_t kNow = 10000;
+    SetMockTime(kNow);
+
+    // Timestamp within 60 seconds of "now" — should succeed
+    auto result1 = ImportNASS(kRawSecretA, System::Clock::Seconds32(kNow + 60));
+    ASSERT_TRUE(result1.IsSuccess());
+
+    // Timestamp more than 60 seconds in the future — should fail
+    auto result2 = ImportNASS(kRawSecretB, System::Clock::Seconds32(kNow + 61));
+    EXPECT_EQ(result2.GetStatusCode(), ClusterStatusCode(Status::DynamicConstraintError));
+
+    keystore.ValidateHandles(1, 1);
+}
+
+TEST_F(TestNetworkIdentityManagementCluster, ImportAdminSecretFutureTimestampSkippedWhenClockNotSynced)
+{
+    class NotSyncedClock : public System::Clock::Internal::RAIIMockClock
+    {
+        CHIP_ERROR GetClock_RealTime(System::Clock::Microseconds64 &) override { return CHIP_ERROR_REAL_TIME_NOT_SYNCED; }
+        CHIP_ERROR GetClock_RealTimeMS(System::Clock::Milliseconds64 &) override { return CHIP_ERROR_REAL_TIME_NOT_SYNCED; }
+    };
+    NotSyncedClock notSyncedClock; // temporarily overrides the fixture's mockClock
+
+    // Import with a far-future timestamp — should succeed because the clock check is skipped
+    auto result = ImportNASS(kRawSecretA, System::Clock::Seconds32(999999999));
+    ASSERT_TRUE(result.IsSuccess());
+
+    keystore.ValidateHandles(1, 1);
+}
+
 TEST_F(TestNetworkIdentityManagementCluster, ImportAdminSecretInvalidNASS)
 {
     // Import garbage bytes as NASS — should return INVALID_COMMAND
@@ -560,6 +605,7 @@ TEST_F(TestNetworkIdentityManagementCluster, ImportAdminSecretRetiringAndCapacit
                 addRequest.clientIdentity = identity.Cert();
                 auto addResult            = tester.Invoke(addRequest);
                 ASSERT_TRUE(addResult.IsSuccess());
+                ASSERT_TRUE(addResult.response.has_value());
                 clientIndices.push_back(addResult.response->clientIndex);
                 authenticatorDriver.mCallback->OnClientAuthenticated(addResult.response->clientIndex, ni.index);
                 break;
@@ -719,6 +765,33 @@ TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityClientByIdentifier)
     EXPECT_TRUE(queryResult.response->identity.data_equal(identity.Cert()));
 }
 
+TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityByClientIndex)
+{
+    auto identity = GenerateClientIdentity();
+
+    Commands::AddClient::Type addRequest;
+    addRequest.clientIdentity = identity.Cert();
+    auto addResult            = tester.Invoke(addRequest);
+    ASSERT_TRUE(addResult.IsSuccess());
+    ASSERT_TRUE(addResult.response.has_value());
+
+    // Query by client index should return the client identity
+    Commands::QueryIdentity::Type queryRequest;
+    queryRequest.clientIndex.SetValue(addResult.response->clientIndex);
+    auto queryResult = tester.Invoke(queryRequest);
+    ASSERT_TRUE(queryResult.IsSuccess());
+    ASSERT_TRUE(queryResult.response.has_value());
+    EXPECT_TRUE(queryResult.response->identity.data_equal(identity.Cert()));
+}
+
+TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityByClientIndexNotFound)
+{
+    Commands::QueryIdentity::Type queryRequest;
+    queryRequest.clientIndex.SetValue(999);
+    auto queryResult = tester.Invoke(queryRequest);
+    EXPECT_EQ(queryResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
+}
+
 TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityByNIIdentifier)
 {
     auto importResult = ImportNASS(kRawSecretA, System::Clock::Seconds32(100));
@@ -742,10 +815,11 @@ TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityByNIIdentifier)
 
 TEST_F(TestNetworkIdentityManagementCluster, QueryIdentityMultipleFieldsRejected)
 {
-    // Passing all three optional fields should return InvalidCommand
+    // Passing multiple optional fields should return InvalidCommand
     Commands::QueryIdentity::Type queryRequest;
     queryRequest.networkIdentityIndex.SetValue(1);
     queryRequest.networkIdentityType.SetValue(IdentityTypeEnum::kEcdsa);
+    queryRequest.clientIndex.SetValue(1);
     queryRequest.identifier.SetValue(ByteSpan());
     auto queryResult = tester.Invoke(queryRequest);
     EXPECT_EQ(queryResult.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
@@ -783,6 +857,7 @@ TEST_F(TestNetworkIdentityManagementCluster, AddClientBasic)
     const auto & entry = iter.GetValue();
     EXPECT_EQ(entry.clientIndex, result.response->clientIndex);
     EXPECT_TRUE(entry.clientIdentifier.data_equal(ByteSpan(identity.identifier)));
+    EXPECT_EQ(entry.clientIdentityType, IdentityTypeEnum::kEcdsa);
     EXPECT_TRUE(entry.networkIdentityIndex.IsNull());
 }
 
@@ -820,11 +895,14 @@ TEST_F(TestNetworkIdentityManagementCluster, AddMultipleClients)
     request1.clientIdentity = identity1.Cert();
     auto result1            = tester.Invoke(request1);
     ASSERT_TRUE(result1.IsSuccess());
+    ASSERT_TRUE(result1.response.has_value());
 
     Commands::AddClient::Type request2;
     request2.clientIdentity = identity2.Cert();
     auto result2            = tester.Invoke(request2);
     ASSERT_TRUE(result2.IsSuccess());
+    ASSERT_TRUE(result2.response.has_value());
+
     EXPECT_NE(result2.response->clientIndex, result1.response->clientIndex);
 
     // Verify Clients attribute has both entries
@@ -875,6 +953,7 @@ TEST_F(TestNetworkIdentityManagementCluster, RemoveClientByIndex)
     addRequest.clientIdentity = identity.Cert();
     auto addResult            = tester.Invoke(addRequest);
     ASSERT_TRUE(addResult.IsSuccess());
+    ASSERT_TRUE(addResult.response.has_value());
 
     Commands::RemoveClient::Type removeRequest;
     removeRequest.clientIndex.SetValue(addResult.response->clientIndex);
@@ -981,10 +1060,12 @@ TEST_F(TestNetworkIdentityManagementCluster, ClientNIReferenceAndNotifications)
     addRequest.clientIdentity = identityA.Cert();
     auto addResultA           = tester.Invoke(addRequest);
     ASSERT_TRUE(addResultA.IsSuccess());
+    ASSERT_TRUE(addResultA.response.has_value());
 
     addRequest.clientIdentity = identityB.Cert();
     auto addResultB           = tester.Invoke(addRequest);
     ASSERT_TRUE(addResultB.IsSuccess());
+    ASSERT_TRUE(addResultB.response.has_value());
 
     // 3. Both clients authenticate against NI1 (current).
     // NI1 is current, so RemainingClients is null — no notification expected for ActiveNetworkIdentities.
@@ -1143,6 +1224,7 @@ TEST_F(TestNetworkIdentityManagementCluster, AddClientNotifiesAD)
     request.clientIdentity = identity.Cert();
     auto result            = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
 
     ASSERT_EQ(authenticatorDriver.Count<TestAuthenticatorDriver::ClientAddedEvent>(), 1u);
     EXPECT_EQ(authenticatorDriver.Get<TestAuthenticatorDriver::ClientAddedEvent>().clientIndex, result.response->clientIndex);
@@ -1170,6 +1252,7 @@ TEST_F(TestNetworkIdentityManagementCluster, RemoveClientNotifiesAD)
     addRequest.clientIdentity = identity.Cert();
     auto addResult            = tester.Invoke(addRequest);
     ASSERT_TRUE(addResult.IsSuccess());
+    ASSERT_TRUE(addResult.response.has_value());
 
     authenticatorDriver.mEvents.clear();
     Commands::RemoveClient::Type removeRequest;
@@ -1201,10 +1284,13 @@ TEST_F(TestNetworkIdentityManagementCluster, OnClientAuthenticatedUpdatesNIRefer
     addRequest.clientIdentity = identity.Cert();
     auto addResult            = tester.Invoke(addRequest);
     ASSERT_TRUE(addResult.IsSuccess());
+    ASSERT_TRUE(addResult.response.has_value());
 
-    // Simulate authentication via the AD callback
+    // Simulate authentication via the AD callback — should NOT dirty Clients (quiet reporting)
     ASSERT_NE(authenticatorDriver.mCallback, nullptr);
+    tester.GetDirtyList().clear();
     authenticatorDriver.mCallback->OnClientAuthenticated(addResult.response->clientIndex, niIndex);
+    EXPECT_FALSE(tester.IsAttributeDirty(Clients::Id));
 
     // Verify the client now references the NI
     Clients::TypeInfo::DecodableType clients;
@@ -1236,16 +1322,19 @@ TEST_F(TestNetworkIdentityManagementCluster, OnClientAuthenticatedNonCurrentNINo
     addRequest.clientIdentity = identity.Cert();
     auto addResult            = tester.Invoke(addRequest);
     ASSERT_TRUE(addResult.IsSuccess());
+    ASSERT_TRUE(addResult.response.has_value());
 
-    // Client authenticates against non-current NI1 — should notify ActiveNetworkIdentities
+    // Client authenticates against non-current NI1 — should notify ActiveNetworkIdentities but NOT Clients
     tester.GetDirtyList().clear();
     authenticatorDriver.mCallback->OnClientAuthenticated(addResult.response->clientIndex, ni1Index);
     EXPECT_TRUE(tester.IsAttributeDirty(ActiveNetworkIdentities::Id));
+    EXPECT_FALSE(tester.IsAttributeDirty(Clients::Id));
 
     // Second auth with same NI — no change, should NOT notify
     tester.GetDirtyList().clear();
     authenticatorDriver.mCallback->OnClientAuthenticated(addResult.response->clientIndex, ni1Index);
     EXPECT_FALSE(tester.IsAttributeDirty(ActiveNetworkIdentities::Id));
+    EXPECT_FALSE(tester.IsAttributeDirty(Clients::Id));
 }
 
 TEST_F(TestNetworkIdentityManagementCluster, PrepareNetworkIdentityAdditionRejectsImport)

@@ -40,6 +40,7 @@ AES
 AFL
 AIDL
 algs
+aliased
 alloc
 allocator
 allocators
@@ -124,8 +125,10 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
+backwards
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
@@ -160,6 +163,7 @@ bluetoothd
 bluez
 Bonjour
 BOOL
+boolean
 booleans
 BooleanState
 bootable
@@ -191,6 +195,8 @@ bzip
 CACACACA
 cacerts
 CAfile
+callsite
+callsites
 cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
@@ -312,8 +318,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -400,6 +406,7 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+dep
 Depacketization
 deployable
 depottools
@@ -409,6 +416,8 @@ dereference
 dereferencing
 desc
 descheduled
+destructor
+destructors
 detokenization
 detokenizer
 dev
@@ -429,6 +438,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+devicetree
 Devkit
 DevKitC
 DevKitM
@@ -533,6 +543,7 @@ endian
 EndpointId
 eno
 entrypoint
+Entrypoints
 enum
 Enums
 env
@@ -562,6 +573,7 @@ EVKBMIMXRT
 EVSE
 exceptfds
 ExchangeContext
+Excludable
 exe
 ExecStart
 executables
@@ -584,6 +596,7 @@ FDDE
 fddead
 fde
 fdx
+featuremap
 FECA
 FecalColiformAndEColiConcentrationMeasurement
 feff
@@ -605,8 +618,10 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+FormaldehydeConcentrationMeasurement
 formatter
 formatters
+forwarding
 FOTA
 framerate
 FRDM
@@ -626,6 +641,7 @@ fvisibility
 FW
 Fxx
 gbl
+gc
 gcloud
 GDB
 gdbgui
@@ -636,6 +652,7 @@ generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
+Genericity
 GenericPlatformManagerImpl
 GenericThreadConfigurationManagerImpl
 GenericThreadStackManagerImpl
@@ -666,6 +683,7 @@ googleapis
 googlesource
 GPG
 GPIO
+GPIOs
 GPL
 GPLv
 Gradle
@@ -683,7 +701,9 @@ gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
+Hardcode
 hardcoded
+hardcodes
 hardknott
 hardwarever
 HardwareVersion
@@ -753,6 +773,9 @@ Infineon
 ini
 init
 InitArgs
+initialize
+initializer
+initializers
 inlined
 inlining
 InputLoop
@@ -762,6 +785,7 @@ integrations
 IntelliSense
 InteractionModelEngine
 InteractionModelVersion
+interop
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -802,6 +826,7 @@ jre
 js
 json
 jsoncpp
+jsontlv
 JTAG
 Jupyter
 jupyterlab
@@ -815,6 +840,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -862,11 +888,13 @@ libTransportLayer
 libudev
 libwebkitgtk
 lifecycle
+lifecycles
 lightbulb
 lightin
 LightingApp
 LightingColor
 LightingState
+linker's
 LinkSoftwareAndDocumentationPack
 linter
 linters
@@ -966,6 +994,7 @@ minLength
 MinRtrAdvInterval
 minValue
 mkdir
+mixins
 mlan
 MLD
 mmevk
@@ -1168,7 +1197,11 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+pluggable
 PluginServerCallback
+Pm10ConcentrationMeasurement
+Pm1ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 png
 Podman
 PollControl
@@ -1181,6 +1214,7 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
+ppm
 pre
 PrebuiltDataModelDirectory
 prepends
@@ -1192,6 +1226,8 @@ ProductID
 ProductLabel
 ProductName
 ProductURL
+programmatically
+proguard
 proto
 protobuf
 protos
@@ -1242,6 +1278,7 @@ QueryImageResponse
 queryImageStatus
 Quickstart
 qvCHIP
+RadonConcentrationMeasurement
 RADVD
 raspberryPi
 RasPi
@@ -1268,9 +1305,13 @@ refrigeratoralarm
 regen
 registerAttributeAccessOverride
 RegisterCommandHandler
+registration
+registrations
+registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1280,17 +1321,19 @@ repo
 repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
+resync
 retargeting
 reusability
 reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
@@ -1340,13 +1383,14 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1369,6 +1413,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1437,15 +1482,19 @@ strcpy
 struct
 structs
 su
+subclasses
 Subclassing
 subcommand
 subcommands
 subdirectories
 subdirectory
+subflag
 subfolder
+subfolders
 submodule
 submodules
 subnet
+subobject
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1455,6 +1504,7 @@ subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+superset
 suppressResponse
 svg
 SVR
@@ -1484,6 +1534,7 @@ TCP
 teardown
 Telink
 TemperatureMeasurement
+templated
 templating
 Tera
 testability
@@ -1530,6 +1581,7 @@ TKIP
 TLS
 tlsr
 TLV
+TLX
 tmp
 tngvndl
 TODO
@@ -1545,6 +1597,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
@@ -1599,9 +1652,12 @@ unlinking
 unpair
 unprovisioned
 unreferenced
+unregister
+unregisters
 unregistration
 Unsecure
 Unselect
+unsynchronized
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1653,6 +1709,7 @@ vous
 VPN
 VSC
 VSCode
+vtable
 WaitNewInputEvent
 WakeOnLan
 Walkthrough
@@ -1692,9 +1749,9 @@ xbef
 xc
 xcd
 Xcode
+Xcode's
 xcodebuild
 xcodeproj
-Xcode's
 xcworkspace
 xd
 xds

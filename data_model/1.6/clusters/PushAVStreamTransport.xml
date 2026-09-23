@@ -222,18 +222,15 @@ Davis, CA 95616, USA
       <field id="2" name="ChunkDuration" type="uint16">
         <mandatoryConform/>
         <constraint>
-          <between>
-            <from value="0"/>
-            <to>
-              <compute>
-                <operation>divide</operation>
-                <left>
-                  <field name="SegmentDuration"/>
-                </left>
-                <right value="2"/>
-              </compute>
-            </to>
-          </between>
+          <max>
+            <compute>
+              <operation>divide</operation>
+              <left>
+                <field name="SegmentDuration"/>
+              </left>
+              <right value="2"/>
+            </compute>
+          </max>
         </constraint>
       </field>
       <field id="3" name="SessionGroup" type="uint8">
@@ -252,26 +249,6 @@ Davis, CA 95616, USA
             <from value="1"/>
             <to value="16"/>
           </lengthBetween>
-        </constraint>
-      </field>
-      <field id="5" name="CENCKey" type="octstr">
-        <otherwiseConform>
-          <provisionalConform/>
-          <optionalConform/>
-        </otherwiseConform>
-        <constraint>
-          <allowed value="16"/>
-        </constraint>
-      </field>
-      <field id="6" name="CENCKeyID" type="octstr">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <field name="CENCKey"/>
-          </mandatoryConform>
-        </otherwiseConform>
-        <constraint>
-          <allowed value="16"/>
         </constraint>
       </field>
       <field id="7" name="MetadataEnabled" type="bool">

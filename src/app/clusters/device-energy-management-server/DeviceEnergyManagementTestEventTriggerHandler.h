@@ -76,6 +76,10 @@ enum class DeviceEnergyManagementTrigger : uint64_t
     kForecast = 0x0098'0000'0000'000F,
     // Clear the forecast
     kForecastClear = 0x0098'0000'0000'0010,
+    // Simulate a Power Range Adjustment Test Event
+    kPowerRangeAdjustment = 0x0098'0000'0000'0011,
+    // Clear the Power Range Adjustment Test Event
+    kPowerRangeAdjustmentClear = 0x0098'0000'0000'0012,
 };
 
 class DeviceEnergyManagementTestEventTriggerHandler : public TestEventTriggerHandler

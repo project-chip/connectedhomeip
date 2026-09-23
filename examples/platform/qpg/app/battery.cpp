@@ -125,7 +125,7 @@ BatChargeLevelEnum CalculateBatChargeLevel(uint32_t currentBatVoltage, DoubledPe
 {
     BatChargeLevelEnum value;
 
-    // Assign proper values to the power level dependant on battery'
+    // Assign proper values to the power level dependent on battery'
     if (currentBatVoltage <= APP_BATTERY_CRITICAL_THRESHOLD)
     {
         // battery voltage < critical battery level

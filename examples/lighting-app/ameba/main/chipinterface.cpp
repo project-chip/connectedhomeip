@@ -24,7 +24,6 @@
 #include <Globals.h>
 #include <LEDWidget.h>
 
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
@@ -136,12 +135,6 @@ static void InitServer(intptr_t context)
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    initParams.groupDataProvider->SetGroupcastEnabled(true);
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate sGroupAuxAccessDelegate(initParams.groupDataProvider);
-    initParams.groupAuxiliaryAccessControlDelegate = &sGroupAuxAccessDelegate;
-#endif
-
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -164,6 +157,9 @@ static void InitServer(intptr_t context)
     }
 
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
 }
 
 extern "C" void ChipTest(void)

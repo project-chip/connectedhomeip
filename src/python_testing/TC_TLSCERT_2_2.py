@@ -45,6 +45,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_TLSCERT_2_2(TC_TLSCERT_Base):
+    disable_wildcard_subscription = True
+
     def pics_TC_TLSCERT_2_2(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         # In this case - there is no feature flags needed to run this test case

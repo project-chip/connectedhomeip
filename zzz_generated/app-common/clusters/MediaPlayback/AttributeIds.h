@@ -14,7 +14,7 @@ namespace MediaPlayback {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 16;
+inline constexpr uint32_t kAttributesCount = 18;
 
 namespace CurrentState {
 inline constexpr AttributeId Id = 0x00000000;
@@ -59,6 +59,14 @@ inline constexpr AttributeId Id = 0x00000009;
 namespace AvailableTextTracks {
 inline constexpr AttributeId Id = 0x0000000A;
 } // namespace AvailableTextTracks
+
+namespace AvailableCommands {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace AvailableCommands
+
+namespace ContentInfo {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace ContentInfo
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

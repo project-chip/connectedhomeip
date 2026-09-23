@@ -24,10 +24,12 @@
 
 #include <lib/core/CHIPError.h>
 
-class SmokeCoAlarmManager
+class SmokeCoAlarmManager : public chip::app::Clusters::SmokeCoAlarmDelegate
 {
 public:
     CHIP_ERROR Init();
+
+    void OnSelfTestRequested() override;
 
     /**
      * @brief Execute the self-test process

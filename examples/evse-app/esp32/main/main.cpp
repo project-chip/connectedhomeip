@@ -122,7 +122,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kS
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
 #endif
 
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
+chip::BitMask<Feature> GetFeatureMap()
 {
     return sFeatureMap;
 }
@@ -221,5 +221,5 @@ extern "C" void app_main()
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    RETURN_SAFELY_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

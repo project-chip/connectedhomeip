@@ -194,7 +194,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC;
+    subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC_v02;
 
 #if ENABLE_REENTRANCY
     VerifyOrReturnError(spake_objects_created < LIMIT_CRYPTO_OBJECTS, CHIP_ERROR_INTERNAL);
@@ -388,8 +388,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
 #if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-    ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_v, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
-    ReturnErrorOnFailure(se05x_set_key_for_spake(Lin_id_v, Lin, Lin_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
+    ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_v, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC));
+    ReturnErrorOnFailure(se05x_set_key_for_spake(Lin_id_v, Lin, Lin_len, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC));
 #endif
 
     smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
@@ -468,8 +468,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
                                           SE05x_SPAKE2PLUS_DEVICE_TYPE_A);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR(chip::ChipError::Range::kPlatform, smstatus));
 
-    ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_p, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
-    ReturnErrorOnFailure(se05x_set_key_for_spake(w1in_id_p, w1in_mod, w1in_mod_len, kSSS_KeyPart_Default, kSSS_CipherType_HMAC));
+    ReturnErrorOnFailure(se05x_set_key_for_spake(w0in_id_p, w0in_mod, w0in_mod_len, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC));
+    ReturnErrorOnFailure(se05x_set_key_for_spake(w1in_id_p, w1in_mod, w1in_mod_len, kSSS_KeyPart_Default, kSE_SSS_CipherType_HMAC));
 
     smstatus = Se05x_API_PAKEInitDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
                                         static_cast<SE05x_CryptoObjectID_t>(hsm_pake_context.spake_objId),

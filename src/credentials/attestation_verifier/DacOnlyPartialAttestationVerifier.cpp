@@ -43,6 +43,9 @@ constexpr size_t kMaxResponseLength = 900;
 void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVerifier::AttestationInfo & info,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
+    // The exit handler below dereferences onCompletion unconditionally; reject null here.
+    VerifyOrReturn(onCompletion != nullptr);
+
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
     AttestationCertVidPid dacVidPid;
@@ -54,13 +57,25 @@ void PartialDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         .productId = info.productId,
     };
 
+    const bool supportsRequestedProfile = (info.attestationProfile == DeviceAttestationCertProfile::kEcdsaMatterLegacy) ||
+        (info.attestationProfile == DeviceAttestationCertProfile::kMlDsa44 && IsMlDsa44Supported()) ||
+        (info.attestationProfile == DeviceAttestationCertProfile::kMlDsa65 && IsMlDsa65Supported());
+
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
                      !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
-                     !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
+                     !info.attestationNonceBuffer.empty(),
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
     VerifyOrExit(info.attestationElementsBuffer.size() <= kMaxResponseLength,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
+
+    if (!supportsRequestedProfile)
+    {
+        ChipLogError(Support, "PQC device attestation verification is not implemented for requested profile %u",
+                     to_underlying(info.attestationProfile));
+        attestationError = AttestationVerificationResult::kNotImplemented;
+        ExitNow();
+    }
 
     // match DAC and PAI VIDs
     {

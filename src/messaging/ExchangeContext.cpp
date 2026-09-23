@@ -75,9 +75,11 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     SetWaitingForResponseOrAck(inResponseExpected);
 }
 
-void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+CHIP_ERROR ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
+    VerifyOrReturnError(mSession, CHIP_ERROR_MISSING_SECURE_SESSION);
     SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, !HasReceivedAtLeastOneMessage()));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
@@ -422,6 +424,11 @@ void ExchangeContext::OnSessionReleased()
     }
     else
     {
+        // The session was released while a send was pending. Call DoClose so
+        // the exchange is marked closed (kFlagClosed set) without dropping the
+        // ref.  kFlagWillSendMessage is intentionally left set so that
+        // ExchangeHolder::OnExchangeClosing keeps its raw pointer and
+        // ExchangeHolder::Release later calls Abort() to free the EC.
         DoClose(true /* clearRetransTable */);
     }
 }

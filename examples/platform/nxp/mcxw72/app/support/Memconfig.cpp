@@ -67,6 +67,47 @@ static size_t xBlockAllocatedBit = ((size_t) 1) << ((sizeof(size_t) * heapBITS_P
 
 extern "C" {
 
+extern void * __real_pvPortMalloc(size_t xWantedSize);
+extern void __real_vPortFree(void * pv);
+extern void __real_vTaskSuspendAll(void);
+extern BaseType_t __real_xTaskResumeAll(void);
+
+/* xPortMallocUsableSize relies on heap4 implementation.
+It returns the size of an allocated block and it is
+called by __wrap_realloc.
+Thus it is validated in __wrap_realloc function that the allocated size
+of the old_ptr is smaller than the allocated size of new_ptr */
+size_t xPortMallocUsableSize(void * pv)
+{
+    uint8_t * puc = (uint8_t *) pv;
+    BlockLink_t * pxLink;
+    void * voidp;
+    size_t sz = 0;
+
+    if (pv != NULL)
+    {
+        uint32_t primask = DisableGlobalIRQ();
+        {
+            /* The memory being checked will have an BlockLink_t structure immediately
+            before it. */
+            puc -= xHeapStructSize;
+
+            /* This casting is to keep the compiler from issuing warnings. */
+            voidp  = (void *) puc;
+            pxLink = (BlockLink_t *) voidp;
+
+            /* Check if the block is actually allocated. */
+            configASSERT((pxLink->xBlockSize & xBlockAllocatedBit) != 0);
+            configASSERT(pxLink->pxNextFreeBlock == NULL);
+
+            sz = (pxLink->xBlockSize & ~xBlockAllocatedBit) - xHeapStructSize;
+        }
+        EnableGlobalIRQ(primask);
+    }
+
+    return sz;
+}
+
 void * __wrap_malloc(size_t size)
 {
     return pvPortMalloc(size);
@@ -106,17 +147,28 @@ void * __wrap_realloc(void * ptr, size_t new_size)
 
     if (new_size)
     {
-        /* MML will only realloc a new pointer if the size is greater than old pointer size.*/
-        vTaskSuspendAll();
-        new_ptr = MEM_BufferRealloc(ptr, new_size);
-        xTaskResumeAll();
+        size_t old_ptr_size = xPortMallocUsableSize(ptr);
+        if (new_size <= old_ptr_size)
+        {
+            /* Return old pointer if the newly allocated size is smaller
+                    or equal to the allocated size for old_ptr */
+            return ptr;
+        }
+
+        /* if old_ptr is NULL, then old_ptr_size is zero and new_ptr will be returned */
+        new_ptr = pvPortMalloc(new_size);
 
         if (!new_ptr)
         {
             ChipLogError(DeviceLayer, "__wrap_realloc: Could not allocate memory!");
             return NULL;
         }
+
+        memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
+        memcpy(new_ptr, ptr, old_ptr_size);
     }
+
+    vPortFree(ptr);
 
     return new_ptr;
 }
@@ -141,6 +193,79 @@ void * __wrap__calloc_r(void * REENT, size_t num, size_t size)
     return __wrap_calloc(num, size);
 }
 
+/* pvPortMalloc() and pvPortFree() protect critical operations through
+ * vTaskSuspendAll() and xTaskResumeAll(). However, this is not enough
+ * as these functions may be called from interrupt context. To protect:
+ * -> pvPortMalloc -> wrap_vTaskSuspendAll -> DisableGlobalIRQ -> vTaskSuspendAll
+ * -> pvPortMalloc -> wrap_xTaskResumeAll -> EnableGlobalIRQ -> xTaskResumeAll
+ * -> vPortFree -> wrap_vTaskSuspendAll -> DisableGlobalIRQ -> vTaskSuspendAll
+ * -> vPortFree -> wrap_xTaskResumeAll -> EnableGlobalIRQ -> xTaskResumeAll
+ */
+
+static volatile uint8_t heap_operation   = 0;
+static volatile bool global_irq_disabled = false;
+static volatile uint32_t global_primask  = 0;
+
+void * __wrap_pvPortMalloc(size_t xWantedSize)
+{
+    uint32_t primask = DisableGlobalIRQ();
+    heap_operation++;
+    EnableGlobalIRQ(primask);
+
+    void * ptr = __real_pvPortMalloc(xWantedSize);
+
+    primask = DisableGlobalIRQ();
+    heap_operation--;
+    EnableGlobalIRQ(primask);
+
+    return ptr;
+}
+
+void __wrap_vPortFree(void * pv)
+{
+    uint32_t primask = DisableGlobalIRQ();
+    heap_operation++;
+    EnableGlobalIRQ(primask);
+
+    __real_vPortFree(pv);
+
+    primask = DisableGlobalIRQ();
+    heap_operation--;
+    EnableGlobalIRQ(primask);
+}
+
+void __wrap_vTaskSuspendAll(void)
+{
+    if (heap_operation > 0 && !global_irq_disabled)
+    {
+        global_primask      = DisableGlobalIRQ();
+        global_irq_disabled = true;
+    }
+
+    if (0U == __get_IPSR())
+    {
+        __real_vTaskSuspendAll();
+    }
+}
+
+BaseType_t __wrap_xTaskResumeAll(void)
+{
+    BaseType_t result = pdFALSE;
+
+    if (heap_operation > 0 && global_irq_disabled)
+    {
+        EnableGlobalIRQ(global_primask);
+        global_irq_disabled = false;
+    }
+
+    if (0U == __get_IPSR())
+    {
+        result = __real_xTaskResumeAll();
+    }
+
+    return result;
+}
+
 int __wrap_printf(const char * fmt_s, ...)
 {
     int res = 0;
@@ -153,3 +278,34 @@ int __wrap_printf(const char * fmt_s, ...)
 }
 
 } // extern "C"
+
+// C++ operators must be outside extern "C" block
+void * operator new(size_t size)
+{
+    return pvPortMalloc(size);
+}
+
+void operator delete(void * p)
+{
+    vPortFree(p);
+}
+
+void operator delete(void * p, size_t size)
+{
+    vPortFree(p);
+}
+
+void * operator new[](size_t size) noexcept
+{
+    return operator new(size);
+}
+
+void operator delete[](void * p) noexcept
+{
+    operator delete(p);
+}
+
+void operator delete[](void * p, size_t size) noexcept
+{
+    operator delete(p, size);
+}

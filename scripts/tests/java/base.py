@@ -24,7 +24,6 @@ import subprocess
 import sys
 import threading
 import time
-import typing
 
 from colorama import Fore, Style
 
@@ -51,7 +50,7 @@ def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
     return log_queue_thread
 
 
-def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
+def DumpProgramOutputToQueue(thread_list: list[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
     thread_list.append(RedirectQueueThread(process.stdout,
                                            (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), queue))
     thread_list.append(RedirectQueueThread(process.stderr,

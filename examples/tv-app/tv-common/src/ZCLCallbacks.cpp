@@ -176,6 +176,12 @@ void emberAfMessagesClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Messages::SetDefaultDelegate");
     Messages::SetDefaultDelegate(endpoint, &messagesManager);
+    messagesManager.SetEndpointId(endpoint);
+}
+
+MessagesManager * GetMessagesManager()
+{
+    return &messagesManager;
 }
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)

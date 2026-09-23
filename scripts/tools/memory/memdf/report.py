@@ -20,7 +20,8 @@ import io
 import json
 import pathlib
 import sys
-from typing import IO, Any, Callable, Dict, List, Mapping, Optional, Protocol, Sequence, Union
+from collections.abc import Callable, Mapping, Sequence
+from typing import IO, Any, Protocol, TypeAlias
 
 import cxxfilt  # type: ignore
 import memdf.df
@@ -92,7 +93,7 @@ def demangle(symbol: str):
     return symbol
 
 
-def hierify_rows(table: Sequence[Sequence[Any]]) -> List[List[Any]]:
+def hierify_rows(table: Sequence[Sequence[Any]]) -> list[list[Any]]:
     if not table:
         return table
     persist = None
@@ -155,13 +156,13 @@ def postprocess_output_metadata(config: Config, key: str,
     config.put(key, metadata)
 
 
-OutputOption = Union[IO, str, None]
+OutputOption: TypeAlias = IO | str | None
 
 
 @contextlib.contextmanager
 def open_output(config: Config,
                 output: OutputOption = None,
-                suffix: Optional[str] = None):
+                suffix: str | None = None):
     if isinstance(output, io.IOBase):
         yield output
         return
@@ -327,7 +328,7 @@ def kwgetset(k: str, *args):
     return r
 
 
-def prep(config: Config, df: pd.DataFrame, kw: Dict) -> pd.DataFrame:
+def prep(config: Config, df: pd.DataFrame, kw: dict) -> pd.DataFrame:
     """Preprocess a table for output."""
     def each_column(k: str):
         for column in set(df.attrs.get(k, set()) | kw.get(k, set())):
@@ -360,8 +361,8 @@ class Writer:
     def __init__(self,
                  group: Callable,
                  single: Callable,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         self.group = group
         self.single = single
         self.defaults = defaults or {}
@@ -386,7 +387,7 @@ class Writer:
         frames = {k: prep(config, df, args) for k, df in frames.items()}
         self.group(config, frames, output, self.single, **args)
 
-    def _args(self, kw: Mapping) -> Dict:
+    def _args(self, kw: Mapping) -> dict:
         r = self.defaults.copy()
         r.update(kw)
         r.update(self.overrides)
@@ -395,8 +396,8 @@ class Writer:
 
 class MarkdownWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_one, write_markdown, d, overrides)
@@ -404,23 +405,23 @@ class MarkdownWriter(Writer):
 
 class JsonWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         super().__init__(write_jsons, write_json, defaults, overrides)
         self.overrides['hierify'] = False
 
 
 class CsvWriter(Writer):
     def __init__(self,
-                 defaults: Optional[Dict] = None,
-                 overrides: Optional[Dict] = None):
+                 defaults: dict | None = None,
+                 overrides: dict | None = None):
         d = {'index': False}
         d.update(defaults or {})
         super().__init__(write_many, write_csv, d, overrides)
         self.overrides['hierify'] = False
 
 
-WRITERS: Dict[str, Writer] = {
+WRITERS: dict[str, Writer] = {
     'none': Writer(write_none, write_nothing),
     'text': Writer(write_one, write_text, {'titlefmt': '\n{}\n'}),
     'json_split': JsonWriter(),
@@ -488,7 +489,7 @@ OUTPUT_CONFIG: ConfigDescription = {
 def write_dfs(config: Config,
               frames: DFs,
               output: OutputOption = None,
-              method: Optional[str] = None,
+              method: str | None = None,
               **kwargs) -> None:
     """Write a group of memory usage data frames."""
     kwargs['method'] = method or config['output.format']
@@ -498,7 +499,7 @@ def write_dfs(config: Config,
 def write_df(config: Config,
              frame: DF,
              output: OutputOption = None,
-             method: Optional[str] = None,
+             method: str | None = None,
              **kwargs) -> None:
     """Write a memory usage data frame."""
     kwargs['method'] = method or config['output.format']

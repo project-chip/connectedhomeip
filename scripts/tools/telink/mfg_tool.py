@@ -141,7 +141,7 @@ def read_der_file(path: str):
     try:
         with open(path, 'rb') as f:
             return f.read()
-    except IOError as e:
+    except OSError as e:
         log.exception(e)
         raise e
 
@@ -213,7 +213,7 @@ def generate_discriminator(args, out_dirs):
     else:
         disc = random.randint(0x0000, 0x0FFF)
     # Append discriminator to each line of the passcode file
-    with open(os.sep.join([out_dirs['output'], 'pin.csv']), 'r') as fd:
+    with open(os.sep.join([out_dirs['output'], 'pin.csv'])) as fd:
         lines = fd.readlines()
 
     lines[0] = ','.join([lines[0].strip(), 'Discriminator'])
@@ -311,7 +311,7 @@ def generate_dac_cert(iteration, args, out_dirs, discriminator, passcode, ca_key
     cmd = [
         TOOLS['chip-cert'], 'gen-att-cert',
         '--type', 'd',
-        '--subject-cn', '"{} DAC {}"'.format(args.cn_prefix, iteration),
+        '--subject-cn', f'"{args.cn_prefix} DAC {iteration}"',
         '--out-key', out_key_pem,
         '--out', out_cert_pem,
     ]
@@ -440,7 +440,7 @@ def generate_onboarding_data(args, out_dirs, discriminator, passcode):
 # This function generates the DACs, picks the commissionable data from the already present csv file,
 # and generates the onboarding payloads, and writes everything to the master csv
 def write_device_unique_data(args, out_dirs, pai_cert):
-    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv']), 'r') as csvf:
+    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv'])) as csvf:
         pin_disc_dict = csv.DictReader(csvf)
         row = pin_disc_dict.__next__()
 
@@ -456,7 +456,6 @@ def write_device_unique_data(args, out_dirs, pai_cert):
             else:
                 dacs = generate_dac_cert(int(row['Index']), args, out_dirs, int(row['Discriminator']),
                                          int(row['PIN Code']), pai_cert['key_pem'], pai_cert['cert_pem'])
-
             nvs_memory_append('dac_cert', read_der_file(dacs[0]))
             nvs_memory_append('dac_key', read_key_bin_file(dacs[1]))
             nvs_memory_append('pai_cert', read_der_file(pai_cert['cert_der']))
@@ -472,12 +471,16 @@ def write_device_unique_data(args, out_dirs, pai_cert):
         return dacs
 
 
-def generate_partition(args, out_dirs):
-    log.info("Generating partition image: offset: 0x%08X size: 0x%08X", args.offset, args.size)
+def generate_partition(args, dacs_cert, out_dirs):
+    log.info(
+        "Generating partition image: offset: 0x%X size: 0x%X",
+        args.offset,
+        args.size,
+    )
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
-        raise ValueError("generated CBOR file exceeds declared maximum partition size! {} > {}".format(len(cbor_data), args.size))
+        raise ValueError(f"generated CBOR file exceeds declared maximum partition size! {len(cbor_data)} > {args.size}")
     ih = IntelHex()
     ih.putsz(args.offset, cbor_data)
     ih.write_hex_file(os.sep.join([out_dirs['output'], 'factory_data.hex']), True)
@@ -493,14 +496,14 @@ def generate_json_summary(args, out_dirs, pai_certs, dacs_cert, serial_num: str)
         if (not isinstance(nvs_value, bytes) and not isinstance(nvs_value, bytearray)):
             json_dict[key] = nvs_value
 
-    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv']), 'r') as csvf:
+    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv'])) as csvf:
         pin_disc_dict = csv.DictReader(csvf)
         row = pin_disc_dict.__next__()
         json_dict['passcode'] = row['PIN Code']
         json_dict['spake2_salt'] = row['Salt']
         json_dict['spake2_verifier'] = row['Verifier']
 
-    with open(os.sep.join([out_dirs['output'], 'onb_codes.csv']), 'r') as csvf:
+    with open(os.sep.join([out_dirs['output'], 'onb_codes.csv'])) as csvf:
         pin_disc_dict = csv.DictReader(csvf)
         row = pin_disc_dict.__next__()
         for key, value in row.items():
@@ -728,14 +731,14 @@ def main():
     out_dir_top = os.path.realpath(args.output)
     os.makedirs(out_dir_top, exist_ok=True)
 
-    with open(os.sep.join([out_dir_top, "device_sn.csv"]), "w") as f:
-        f.write(DEV_SN_CSV_HDR)
+    with open(os.sep.join([out_dir_top, "device_sn.csv"]), "w") as dev_sn_file:
+        dev_sn_file.write(DEV_SN_CSV_HDR)
 
         for i in range(args.count):
             pai_cert = {}
             serial_num_str = format(serial_num_int + i, 'x')
-            log.info("Generating for '%s'", serial_num_str)
-            f.write(serial_num_str + '\n')
+            log.info("Generating for %s", serial_num_str)
+            dev_sn_file.write(serial_num_str + '\n')
             out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
             add_additional_kv(args, serial_num_str)
             generate_passcode(args, out_dirs)
@@ -743,7 +746,7 @@ def main():
             if args.paa or args.pai:
                 pai_cert = setup_root_certificates(args, out_dirs)
             dacs_cert = write_device_unique_data(args, out_dirs, pai_cert)
-            generate_partition(args, out_dirs)
+            generate_partition(args, dacs_cert, out_dirs)
             generate_json_summary(args, out_dirs, pai_cert, dacs_cert, serial_num_str)
 
 

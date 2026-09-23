@@ -17,7 +17,7 @@
  */
 
 #include <DEMConfig.h>
-#include <DEMManufacturerDelegate.h>
+#include <ElectricalSensorManager.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/power-source-server/power-source-server.h>
@@ -122,10 +122,10 @@ void FakeReadings::FakeReadingsUpdate()
     // Update readings
     // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
     // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
-    int64_t power = (static_cast<int64_t>(rand()) % (2 * mPowerRandomness_mW)) - mPowerRandomness_mW;
+    int64_t power = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mPowerRandomness_mW))) - mPowerRandomness_mW;
     power += mPower_mW; // add in the base power
 
-    int64_t voltage = (static_cast<int64_t>(rand()) % (2 * mVoltageRandomness_mV)) - mVoltageRandomness_mV;
+    int64_t voltage = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mVoltageRandomness_mV))) - mVoltageRandomness_mV;
     voltage += mVoltage_mV; // add in the base voltage
 
     /* Note: whilst we could compute a current from the power and voltage,
@@ -135,10 +135,14 @@ void FakeReadings::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    int64_t current = (static_cast<int64_t>(rand()) % (2 * mCurrentRandomness_mA)) - mCurrentRandomness_mA;
+    int64_t current = (static_cast<int64_t>(rand()) % (2 * static_cast<int64_t>(mCurrentRandomness_mA))) - mCurrentRandomness_mA;
     current += mCurrent_mA; // add in the base current
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPowerReading(mEndpointId, power, voltage, current);
+    ElectricalSensorManager * esManager = GetESManager();
+    if (esManager != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED esManager->SendPowerReading(power, voltage, current);
+    }
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval
     if (mPower_mW > 0)
@@ -156,11 +160,14 @@ void FakeReadings::FakeReadingsUpdate()
         mTotalEnergyExported += mPeriodicEnergyExported;
     }
 
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPeriodicEnergyReading(
-        mEndpointId, mPeriodicEnergyImported, mPeriodicEnergyExported);
-
-    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->GetDEMManufacturerDelegate()->SendCumulativeEnergyReading(
-        mEndpointId, mTotalEnergyImported, mTotalEnergyExported);
+    if (esManager != nullptr)
+    {
+        esManager->SetPeriodicEnergyImported(mPeriodicEnergyImported);
+        esManager->SetPeriodicEnergyExported(mPeriodicEnergyExported);
+        esManager->SetCumulativeEnergyImported(mTotalEnergyImported);
+        esManager->SetCumulativeEnergyExported(mTotalEnergyExported);
+        esManager->GenerateEEMReport();
+    }
 
     // start/restart the timer
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(mInterval_s), FakeReadingsTimerExpiry,

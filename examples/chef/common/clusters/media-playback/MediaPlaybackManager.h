@@ -74,21 +74,29 @@ protected:
     chip::EndpointId mEndpoint;
     // NOTE: it does not make sense to have default state of playing with a speed of 0, but
     // the CI test cases expect these values, and need to be fixed.
-    PlaybackPositionType mPlaybackPosition       = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
-    TrackType mActiveAudioTrack                  = { chip::CharSpan("activeAudioTrackId_0", 20),
-                                                     chip::app::DataModel::Nullable<TrackAttributesType>(
-                                        { chip::CharSpan("languageCode1", 13),
-                                                           chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
-                                              { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) }) };
+    PlaybackPositionType mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    TrackType mActiveAudioTrack            = {
+        chip::CharSpan("activeAudioTrackId_0", 20),
+        chip::app::DataModel::Nullable<TrackAttributesType>(
+            { chip::CharSpan("languageCode1", 13),
+                         chip::Optional<chip::app::DataModel::Nullable<
+                  chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
+                         chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+                  { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) })
+    };
     std::vector<TrackType> mAvailableAudioTracks = {
         { chip::CharSpan("activeAudioTrackId_0", 20),
           chip::app::DataModel::Nullable<TrackAttributesType>(
               { chip::CharSpan("languageCode1", 13),
+                chip::Optional<chip::app::DataModel::Nullable<
+                    chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) }) },
         { chip::CharSpan("activeAudioTrackId_1", 20),
           chip::app::DataModel::Nullable<TrackAttributesType>(
               { chip::CharSpan("languageCode2", 13),
+                chip::Optional<chip::app::DataModel::Nullable<
+                    chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };
@@ -97,11 +105,15 @@ protected:
         { chip::CharSpan("activeTextTrackId_0", 19),
           chip::app::DataModel::Nullable<TrackAttributesType>(
               { chip::CharSpan("languageCode1", 13),
+                chip::Optional<chip::app::DataModel::Nullable<
+                    chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) }) },
         { chip::CharSpan("activeTextTrackId_1", 19),
           chip::app::DataModel::Nullable<TrackAttributesType>(
               { chip::CharSpan("languageCode2", 13),
+                chip::Optional<chip::app::DataModel::Nullable<
+                    chip::app::DataModel::List<const chip::app::Clusters::MediaPlayback::CharacteristicEnum>>>(),
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };

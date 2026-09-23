@@ -301,7 +301,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         printf("\nFREERTOS ASSERT ( %s )\n", #x);                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
@@ -309,7 +309,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configASSERTNULL(x)                                                                                                        \
     if ((x) == NULL)                                                                                                               \
     {                                                                                                                              \
-        taskDISABLE_INTERRUPTS();                                                                                                  \
+        portDISABLE_INTERRUPTS();                                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
     }
@@ -336,7 +336,7 @@ standard names. */
     (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS + 1)
 #endif
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__cplusplus)
 /* For the linker. */
 #define fabs __builtin_fabs
 #endif

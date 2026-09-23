@@ -51,7 +51,7 @@ auto config = ClosureControlCluster::Config(/* endpoint */ 1, gMyDelegate, gTime
                   .WithCalibration()
                   // Add other features as needed via WithSpeed(), WithVentilation(),
                   // WithPedestrian(), WithProtection(), WithManuallyOperable(),
-                  // WithInstantaneous()...
+                  // WithAccess(), WithInstantaneous()...
                   .WithMotionLatching(chip::BitFlags<LatchControlModesBitmap>()
                                           .Set(LatchControlModesBitmap::kRemoteLatching)
                                           .Set(LatchControlModesBitmap::kRemoteUnlatching))

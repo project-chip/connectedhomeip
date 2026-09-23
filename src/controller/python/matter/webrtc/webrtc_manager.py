@@ -21,7 +21,6 @@ import logging
 import threading
 from collections import defaultdict
 from ctypes import string_at
-from typing import Optional, Union
 
 from .async_websocket_client import AsyncWebSocketClient
 from .browser_peer_connection import BrowserPeerConnection
@@ -50,7 +49,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     _peerconnection_map = {}  # dict[Node-id, PeerConnection]
     _lock = threading.RLock()
 
-    def __init__(self, event_loop: Optional[asyncio.AbstractEventLoop] = None):
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
         self.init_webrtc_requestor_server()
         self.set_webrtc_requestor_delegate_callbacks()
@@ -132,8 +131,8 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
 
     @staticmethod
     def get_peer(
-        session_id: Optional[int] = None, node_id: Optional[int] = None
-    ) -> Union[LibdatachannelPeerConnection, BrowserPeerConnection, None]:
+        session_id: int | None = None, node_id: int | None = None
+    ) -> LibdatachannelPeerConnection | BrowserPeerConnection | None:
         """Retrieves the PeerConnection instance associated with the given session ID or node ID."""
         if session_id is None and node_id is None:
             raise ValueError("session_id and node_id both are None")
@@ -187,7 +186,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     @staticmethod
     def handle_offer(sessionId: int, offerSdp: bytes) -> int:
         """WebRTC Requestor `HandleOffer` delegate callback"""
-        LOGGER.debug(f"handle_offer sessionId:{sessionId}")
+        LOGGER.debug("handle_offer sessionId:%s", sessionId)
         peer = WebRTCManager.get_peer(session_id=sessionId)
         if peer is None or len(offerSdp) == 0:
             return -1
@@ -197,10 +196,10 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     @staticmethod
     def handle_answer(sessionId: int, answerSdp: bytes) -> int:
         """WebRTC Requestor `HandleAnswer` delegate callback"""
-        LOGGER.debug(f"handle_answer for sessionId:{sessionId}")
+        LOGGER.debug("handle_answer for sessionId:%s", sessionId)
         peer = WebRTCManager.get_peer(session_id=sessionId)
         if peer is None or len(answerSdp) == 0:
-            LOGGER.error(f"handle answer failed {answerSdp}")
+            LOGGER.error("handle answer failed %s", answerSdp)
             return -1
         peer.on_remote_answer(sessionId, string_at(answerSdp).decode("utf-8"))
         return 0
@@ -208,7 +207,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     @staticmethod
     def handle_ice_candidates(sessionId: int, iceCandidateList: list[IceCandidateStruct], iceCandidateSize: int) -> int:
         """WebRTC Requestor `HandleIceCandidates` delegate callback"""
-        LOGGER.debug(f"handle_ice_candidates sessionId:{sessionId}")
+        LOGGER.debug("handle_ice_candidates sessionId:%s", sessionId)
         peer = WebRTCManager.get_peer(session_id=sessionId)
         if peer is None or iceCandidateSize <= 0:
             return -1
@@ -229,7 +228,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     @staticmethod
     def handle_end(sessionId: int, reason: int):
         """WebRTC Requestor `HandleEnd` delegate callback"""
-        LOGGER.debug(f"handle_end reason:{reason}")
+        LOGGER.debug("handle_end reason:%s", reason)
         peer = WebRTCManager.get_peer(session_id=sessionId)
         if peer is None:
             return -1
@@ -240,7 +239,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
 
     def handle_ws_message(self, message):
         """Handles incoming WebSocket messages from the browser client"""
-        LOGGER.debug(f"handle_ws_message {message}")
+        LOGGER.debug("handle_ws_message %s", message)
         message = json.loads(message)
         if "sessionId" not in message:
             raise RuntimeError("sessionId missing in message")

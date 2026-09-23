@@ -20,8 +20,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -176,13 +176,13 @@ class TC_GC_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(5)
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID2,
             keySetID=keySetID1)
         )
 
         self.step(6)
-        sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID2, key_set_id=keySetID1)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
@@ -225,13 +225,13 @@ class TC_GC_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(10)
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
             keySetID=keySetID1)
         )
 
         self.step(11)
-        sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID1, key_set_id=keySetID1)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 

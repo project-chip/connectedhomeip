@@ -47,7 +47,6 @@ public:
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
     virtual void SetButtonsCb(SilabsButtonCb callback) {}
     virtual uint8_t GetButtonState(uint8_t button) { return 0; }
-    virtual void SleepButtonActionHandler(void){};
 
     // LEDS
     virtual void InitLed(void) {}
@@ -72,12 +71,6 @@ public:
      * Override in SilabsPlatform when SL_MATTER_USE_SI70XX_SENSOR; default is a no-op.
      */
     virtual sl_status_t EnableSi70xxSensorGpio() { return SL_STATUS_OK; }
-
-    // Watchdog
-    virtual void WatchdogInit(){};
-    virtual void WatchdogFeed(){};
-    virtual void WatchdogEnable(){};
-    virtual void WatchdogDisable(){};
 
     /**
      * @brief Function trigger the platform to execute a software reset.

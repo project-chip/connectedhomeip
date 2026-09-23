@@ -37,6 +37,10 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
+
 #include "bt_types.h"
 #include "gap_msg.h"
 #include "matter_ble.h"
@@ -118,14 +122,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(!mFlags.Has(Flags::kAMEBABLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mFlags.Has(Flags::kBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     matter_ble_cback_register((P_MATTER_BLE_CBACK) (ble_callback_dispatcher));
 
     // Set related flags
-    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
-    mFlags.Set(Flags::kAMEBABLEStackInitialized);
-    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? true : false);
+    mFlags.ClearAll();
+    mFlags.Set(Flags::kBLEStackInitialized);
+    mFlags.Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled);
 
     InitSubscribed();
@@ -521,6 +525,33 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_Disconnecting)
+    {
+        CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "PostCloseAllBLEConnectionsToOperationalNetworkEvent failed: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+        }
+    }
+#endif
+}
+
+void BLEManagerImpl::_Shutdown()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    BleLayer::Shutdown();
+
+    mFlags.ClearAll().Set(Flags::kBLEStackInitialized);
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+#endif
+}
+
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                           PacketBufferHandle data)
 {
@@ -703,7 +734,7 @@ void BLEManagerImpl::DriveBLEState()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(mFlags.Has(Flags::kAMEBABLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kBLEStackInitialized), /* */);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
@@ -724,6 +755,15 @@ void BLEManagerImpl::DriveBLEState()
         SuccessOrExit(err);
         ChipLogProgress(DeviceLayer, "Stopped BLE Advertising");
     }
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
+    {
+        // TODO: shut down realtek BT
+        mFlags.ClearAll();
+        ChipLogProgress(DeviceLayer, "Shut down BLE");
+    }
+#endif
 
 exit:
     if (err != CHIP_NO_ERROR)

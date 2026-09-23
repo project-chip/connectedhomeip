@@ -18,7 +18,8 @@
 
 #include "window.h"
 
-#include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
+
 #include <app/data-model/Nullable.h>
 
 #include <lib/core/DataModelTypes.h>

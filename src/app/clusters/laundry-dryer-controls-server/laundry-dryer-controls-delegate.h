@@ -18,7 +18,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/LaundryDryerControls/Enums.h>
+#include <lib/core/CHIPError.h>
+
+#include <cstddef>
 
 namespace chip {
 namespace app {

@@ -19,6 +19,10 @@
 #include "AppTask.h"
 #include "ICDUtil.h"
 
+#if CONFIG_CHIP_APP_BATTERY_MANAGER
+#include "BatteryApplicationManager.h"
+#endif
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -41,6 +45,12 @@ void ContactSensorApp::AppTask::PreInitMatterStack()
 void ContactSensorApp::AppTask::PostInitMatterStack()
 {
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&chip::NXP::App::GetICDUtil());
+
+#if CONFIG_CHIP_APP_BATTERY_MANAGER
+    /* Initialize and start the battery application manager */
+    chip::NXP::App::BatteryAppMgr().Init();
+    chip::NXP::App::BatteryAppMgr().StartPeriodicUpdate();
+#endif
 }
 
 ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()

@@ -157,7 +157,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
             endpoint
         )
 
-        log.info(f"Initial reference counts - Audio: {initial_audio_ref_count}, Video: {initial_video_ref_count}")
+        log.info("Initial reference counts - Audio: %s, Video: %s", initial_audio_ref_count, initial_video_ref_count)
 
         self.step(3)
         # Establish a WebRTC session using the allocated streams
@@ -181,7 +181,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
         )
         session_id = provide_offer_response.webRTCSessionID
         asserts.assert_true(session_id >= 0, f"Invalid session ID: {session_id}")
-        log.info(f"Valid WebRTC session ID: {session_id} is obtained")
+        log.info("Valid WebRTC session ID: %s is obtained", session_id)
 
         # Register session with WebRTC manager
         webrtc_manager.session_id_created(session_id, self.dut_node_id)
@@ -215,7 +215,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
             log.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
-        log.info(f"WebRTC session established with session ID: {session_id}")
+        log.info("WebRTC session established with session ID: %s", session_id)
 
         self.step(4)
         # Read reference counts again to verify they increased
@@ -237,11 +237,11 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
                              f"Audio reference count should have increased from {initial_audio_ref_count} to {initial_audio_ref_count + 1}")
         asserts.assert_equal(active_video_ref_count, initial_video_ref_count + 1,
                              f"Video reference count should have increased from {initial_video_ref_count} to {initial_video_ref_count + 1}")
-        log.info(f"Reference counts increased - Audio: {active_audio_ref_count}, Video: {active_video_ref_count}")
+        log.info("Reference counts increased - Audio: %s, Video: %s", active_audio_ref_count, active_video_ref_count)
 
         self.step(5)
         # Send EndSession command
-        log.info(f"Sending EndSession command for session {session_id}")
+        log.info("Sending EndSession command for session %s", session_id)
         await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=session_id,
@@ -250,7 +250,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
             endpoint=endpoint,
             payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
         )
-        log.info(f"Successfully sent EndSession command for session {session_id}")
+        log.info("Successfully sent EndSession command for session %s", session_id)
 
         self.step(6)
         # Read reference counts again to verify they decreased back to original values
@@ -272,7 +272,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
                              f"Audio reference count should have decreased back to {initial_audio_ref_count}")
         asserts.assert_equal(final_video_ref_count, initial_video_ref_count,
                              f"Video reference count should have decreased back to {initial_video_ref_count}")
-        log.info(f"Reference counts decreased - Audio: {final_audio_ref_count}, Video: {final_video_ref_count}")
+        log.info("Reference counts decreased - Audio: %s, Video: %s", final_audio_ref_count, final_video_ref_count)
 
         self.step(7)
         # Deallocate the Audio and Video streams
@@ -285,7 +285,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated audio stream {audio_stream_id}")
+        log.info("Successfully deallocated audio stream %s", audio_stream_id)
 
         # Deallocate video stream
         await self.send_single_cmd(
@@ -294,7 +294,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
             ),
             endpoint=endpoint,
         )
-        log.info(f"Successfully deallocated video stream {video_stream_id}")
+        log.info("Successfully deallocated video stream %s", video_stream_id)
 
         # Clean up
         await webrtc_manager.close_all()

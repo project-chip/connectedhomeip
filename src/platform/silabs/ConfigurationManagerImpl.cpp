@@ -299,8 +299,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    GetPlatform().WatchdogDisable();
     error = SilabsConfig::FactoryResetConfig();
     if (error != CHIP_NO_ERROR)
     {

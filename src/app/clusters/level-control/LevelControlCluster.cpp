@@ -66,8 +66,8 @@ constexpr CommandId kInternalOffTransition = 0xFFFFFFFF; // Sentinel value to id
 
 } // namespace
 
-LevelControlCluster::LevelControlCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
+LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & config) :
+    DefaultServerCluster({ endpoint, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
     mOnLevel(DataModel::Nullable<uint8_t>()),
     mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
@@ -189,6 +189,10 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
+        if (!onLevel.IsNull())
+        {
+            VerifyOrReturnError(IsValidLevel(onLevel.Value()), Status::ConstraintError);
+        }
         SetOnLevel(onLevel);
         return Status::Success;
     }
@@ -322,7 +326,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {
@@ -586,12 +595,9 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
 {
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), value));
 }
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
@@ -599,11 +605,9 @@ CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8
     VerifyOrReturnError(SetAttributeValue(mStartUpCurrentLevel, startupLevel, Attributes::StartUpCurrentLevel::Id), CHIP_NO_ERROR);
     VerifyOrReturnError(mContext != nullptr, CHIP_NO_ERROR);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(startupLevel, storageValue);
-    return mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), startupLevel);
 }
 
 void LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)

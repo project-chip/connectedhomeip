@@ -29,6 +29,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/StringBuilderAdapters.h>
 
@@ -823,6 +824,54 @@ TEST_F(TestInetAddress, TestCheckToString)
         CheckAddressString(lAddressBuffer, lCurrent->mAddr.mAddrString);
 #endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ++lCurrent;
+    }
+}
+
+/**
+ *  Test IP address conversion to a string with interface ID.
+ */
+TEST_F(TestInetAddress, TestCheckToStringWithInterface)
+{
+    InterfaceIterator iter;
+    if (iter.HasCurrent())
+    {
+        InterfaceId ifaceId = iter.GetInterfaceId();
+        char ifName[InterfaceId::kMaxIfNameLength];
+        EXPECT_EQ(ifaceId.GetInterfaceName(ifName, sizeof(ifName)), CHIP_NO_ERROR);
+
+        // 1. Test IPv6 Link-Local Address (LLA) with Interface ID
+        IPAddress llaAddress;
+        EXPECT_TRUE(IPAddress::FromString("fe80::8edc:d4ff:fe3a:ebfb", llaAddress));
+
+        char buf[IPAddress::kMaxAddressWithInterfaceLength];
+        EXPECT_NE(llaAddress.ToString(buf, sizeof(buf), ifaceId), nullptr);
+
+        char expected[IPAddress::kMaxAddressWithInterfaceLength];
+        snprintf(expected, sizeof(expected), "fe80::8edc:d4ff:fe3a:ebfb%%%s", ifName);
+        EXPECT_STREQ(buf, expected);
+
+        // 2. Test IPv6 LLA with Null Interface ID (should NOT append suffix)
+        EXPECT_NE(llaAddress.ToString(buf, sizeof(buf), InterfaceId::Null()), nullptr);
+        EXPECT_STREQ(buf, "fe80::8edc:d4ff:fe3a:ebfb");
+
+        // 3. Test Standard IPv6 Address (non-LLA) with Interface ID (should NOT append suffix)
+        IPAddress ulaAddress;
+        EXPECT_TRUE(IPAddress::FromString("fd00::1", ulaAddress));
+        EXPECT_NE(ulaAddress.ToString(buf, sizeof(buf), ifaceId), nullptr);
+        EXPECT_STREQ(buf, "fd00::1");
+
+        // 4. Test IPv4 Address with Interface ID (should NOT append suffix)
+#if INET_CONFIG_ENABLE_IPV4
+        IPAddress ipv4Address;
+        EXPECT_TRUE(IPAddress::FromString("1.2.3.4", ipv4Address));
+        EXPECT_NE(ipv4Address.ToString(buf, sizeof(buf), ifaceId), nullptr);
+        EXPECT_STREQ(buf, "1.2.3.4");
+#endif // INET_CONFIG_ENABLE_IPV4
+
+        // 5. Test Buffer Too Small
+        size_t requiredSize = strlen("fe80::8edc:d4ff:fe3a:ebfb") + 1 + strlen(ifName) + 1;
+        std::unique_ptr<char[]> smallBufAlloc(new char[requiredSize - 1]);
+        EXPECT_EQ(llaAddress.ToString(smallBufAlloc.get(), static_cast<uint32_t>(requiredSize - 1), ifaceId), nullptr);
     }
 }
 
@@ -1691,6 +1740,23 @@ TEST_F(TestInetAddress, TestCheckMakeIPv6PrefixMulticast)
             ++lCurrent;
         }
     }
+}
+
+TEST_F(TestInetAddress, TestMakeIPv6MatterIANAMulticastAddr)
+{
+    IPAddress lAddress = IPAddress::MakeIPv6MatterIANAMulticastAddr();
+
+    EXPECT_TRUE(lAddress.IsIPv6());
+    EXPECT_TRUE(lAddress.IsIPv6Multicast());
+    EXPECT_TRUE(lAddress.IsMulticast());
+    EXPECT_FALSE(lAddress.IsIPv4());
+    EXPECT_FALSE(lAddress.IsIPv4Multicast());
+    EXPECT_FALSE(lAddress.IsIPv4Broadcast());
+    EXPECT_EQ(lAddress.Type(), IPAddressType::kIPv6);
+
+    char lAddressBuffer[INET6_ADDRSTRLEN];
+    lAddress.ToString(lAddressBuffer);
+    CheckAddressString(lAddressBuffer, "ff05::fa");
 }
 
 /**

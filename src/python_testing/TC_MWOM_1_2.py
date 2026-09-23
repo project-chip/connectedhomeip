@@ -32,6 +32,23 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs2
+#       --device microwave-oven
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -110,7 +127,7 @@ class TC_MWOM_1_2(MatterBaseTest):
         except AttributeError:
             derivedTags = Clusters.MicrowaveOvenMode.Enums.ModeTag
 
-        log.info("Derived tags: %s" % derivedTags)
+        log.info("Derived tags: %s", derivedTags)
 
         for m in supported_modes:
             for t in m.modeTags:
@@ -125,7 +142,7 @@ class TC_MWOM_1_2(MatterBaseTest):
 
         self.step(3)
         current_mode = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        log.info("CurrentMode: %s" % current_mode)
+        log.info("CurrentMode: %s", current_mode)
         asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
 
 

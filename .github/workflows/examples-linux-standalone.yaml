@@ -38,22 +38,42 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:193
+            image: ghcr.io/project-chip/chip-build:211
 
         steps:
             - name: Checkout
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
 
-            - name: Build Standalone cert tool
+            - name: Build standalone tools
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
-                        build" && rm -rf out
+                        --target linux-x64-chip-tool \
+                        build"
+            - name: Strip executables
+              run: |
+                strip out/linux-x64-chip-cert/chip-cert
+                strip out/linux-x64-chip-tool/chip-tool
+            - name: Upload tools as artifact
+              if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
+              uses: actions/upload-artifact@v7
+              with:
+                name: chip-tools-linux-x64
+                retention-days: 7
+                path: |
+                  out/linux-x64-chip-cert/chip-cert
+                  out/linux-x64-chip-tool/chip-tool
+
+            - name: Test standalone cert tool
+              run: |
+                  CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
+                      python3 src/tools/chip-cert/tests/test_chip_cert.py
+
             - name: Build minmdns example with platform dns
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -93,3 +113,8 @@ jobs:
 
             - name: CCache statistics
               run: ccache --show-stats
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

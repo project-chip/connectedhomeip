@@ -139,7 +139,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         log.info("Reading FeatureMap attribute from the DUT")
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         is_cl_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
         is_lt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
@@ -163,7 +163,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("2d")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         # STEP 3a: TH reads from the DUT the MainState attribute
         self.step("3a")
@@ -172,7 +172,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         # Check if the MainState attribute has the expected values
         is_setup_required = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired
         is_stopped = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
-        log.info(f"Mainstate: {mainstate}")
+        log.info("Mainstate: %s", mainstate)
         asserts.assert_true(is_setup_required or is_stopped, "MainState is not in the expected state")
 
         # STEP 3b: TH sends command Calibrate to DUT
@@ -193,7 +193,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         # Check if the MainState attribute has the expected values
         asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
                              "MainState is not in the expected state")
-        log.info(f"Mainstate: {mainstate}")
+        log.info("Mainstate: %s", mainstate)
 
         # STEP 3d: Wait until the TH receives a subscription report for the MainState attribute
         self.step("3d")
@@ -250,7 +250,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             self.step("5b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
 
             CurrentLatch = overall_current_state.latch
 
@@ -259,7 +259,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
-                log.info(f"LatchControlModes: {LatchControlModes}")
+                log.info("LatchControlModes: %s", LatchControlModes)
 
             else:
                 asserts.assert_fail("LatchControlModes attribute is not supported.")
@@ -329,7 +329,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("5j")
 
         overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-        log.info(f"OverallCurrentState: {overall_current_state}")
+        log.info("OverallCurrentState: %s", overall_current_state)
 
         if overall_current_state is NullValue:
             asserts.assert_fail("OverallCurrentState is NullValue.")

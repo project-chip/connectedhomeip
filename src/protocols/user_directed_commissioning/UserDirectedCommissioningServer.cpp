@@ -25,6 +25,7 @@
 
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMemString.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/raw/Base.h>
 
@@ -58,10 +59,10 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
     size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
+    ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
 
     IdentificationDeclaration id;
-    TEMPORARY_RETURN_IGNORED id.ReadPayload(udcPayload, sizeof(udcPayload));
+    ReturnOnFailure(id.ReadPayload(udcPayload, udcPayloadLength));
 
     if (id.GetCancelPasscode())
     {
@@ -238,21 +239,22 @@ CHIP_ERROR UserDirectedCommissioningServer::EncodeUDCMessage(const System::Packe
 
 CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t payloadBufferSize)
 {
-    size_t i = 0;
-    while (i < std::min<size_t>(sizeof(mInstanceName), payloadBufferSize) && udcPayload[i] != '\0')
+    if (payloadBufferSize < sizeof(mInstanceName))
     {
-        mInstanceName[i] = (char) udcPayload[i];
-        i++;
+        ChipLogError(AppServer, "UDC payload too short for instance name");
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
-    mInstanceName[i] = '\0';
 
-    if (payloadBufferSize <= sizeof(mInstanceName))
+    size_t instanceNameLen = strnlen(reinterpret_cast<const char *>(udcPayload), sizeof(mInstanceName) - 1);
+    Platform::CopyString(mInstanceName, ByteSpan(udcPayload, instanceNameLen));
+
+    if (payloadBufferSize == sizeof(mInstanceName))
     {
         ChipLogProgress(AppServer, "UDC - No TLV information in Identification Declaration");
         return CHIP_NO_ERROR;
     }
     // advance i to the end of the fixed length block containing instance name
-    i = sizeof(mInstanceName);
+    size_t i = sizeof(mInstanceName);
 
     CHIP_ERROR err;
 
@@ -303,8 +305,16 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
             break;
         case kRotatingIdTag:
             // rotatingId
-            mRotatingIdLen = reader.GetLength();
-            err            = reader.GetBytes(mRotatingId, sizeof(mRotatingId));
+            if (reader.GetLength() <= sizeof(mRotatingId))
+            {
+                mRotatingIdLen = reader.GetLength();
+                err            = reader.GetBytes(mRotatingId, sizeof(mRotatingId));
+            }
+            else
+            {
+                mRotatingIdLen = 0;
+                err            = CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
             break;
         case kTargetAppListTag:
             // app vendor list
@@ -393,6 +403,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "IdentificationDeclaration::ReadPayload read error %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
 
@@ -404,6 +415,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
     else
     {
         ChipLogError(AppServer, "IdentificationDeclaration::ReadPayload exiting early error %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
     ChipLogProgress(AppServer, "UDC TLV parse complete");
