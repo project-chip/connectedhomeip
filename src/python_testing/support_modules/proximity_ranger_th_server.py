@@ -57,7 +57,6 @@ from typing import BinaryIO
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
@@ -371,13 +370,33 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         super().teardown_class()
 
     async def commission_th_servers_onto_harness(self) -> None:
-        """Commissions TH_I and TH_R onto the harness fabric so their attributes can be read."""
+        """Commissions TH_I and TH_R onto the harness fabric so their attributes can be read.
+
+        Each server is paired over its loopback address and known port rather than found by
+        commissionable-node mDNS discovery. The harness launched both servers and assigned
+        their ports, so it already knows exactly where each one is; discovery only adds a
+        dependency it does not need. That dependency is what fails in CI: each all-devices-app
+        runs its own CHIP minimal-mDNS responder contending for UDP 5353, and once the first
+        server is commissioned it stops advertising as commissionable ("Expiring all PASE
+        sessions"), so a discriminator-filtered commissionable query for the second server can
+        go unanswered and time out -- observed as TH_I commissioning, then discovery for TH_R
+        timing out with CHIP_ERROR_TIMEOUT. EstablishPASESessionIP + Commission opens the PASE
+        straight to the known address, removing that commissionable-discovery step
+        (compro_support.py's establish_pase_to_dut uses the same API for the same reason).
+
+        The Commission() state machine still resolves each node's *operational* advertisement
+        to open CASE for CommissioningComplete, so mDNS is not eliminated entirely; but the
+        operational record is a targeted, persistent advertisement (both servers keep
+        advertising _matter._tcp), not the commissionable record that the first server drops,
+        so it is not subject to the same suppression race. ipaddr is the IPv6 loopback: the
+        app binds all interfaces and the CI job explicitly brings IPv6 up, so ::1 reaches each
+        server on the port the harness itself chose.
+        """
         for instance in (self.th_i, self.th_r):
-            await self.th_controller.CommissionOnNetwork(
-                nodeId=instance.node_id,
-                setupPinCode=FIXED_PASSCODE,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=instance.discriminator)
+            await self.th_controller.EstablishPASESessionIP(
+                ipaddr="::1", setupPinCode=FIXED_PASSCODE,
+                nodeId=instance.node_id, port=instance.port)
+            await self.th_controller.Commission(instance.node_id)
             log.info("Commissioned %s onto the harness fabric as node 0x%x", instance.name, instance.node_id)
 
     async def ask_dut_to_commission_th_servers(self) -> None:
