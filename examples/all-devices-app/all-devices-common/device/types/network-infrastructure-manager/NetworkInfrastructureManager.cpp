@@ -30,7 +30,8 @@ namespace app {
 NetworkInfrastructureManager::NetworkInfrastructureManager(const Context & context) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
     mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
-    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider)
+    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider),
+    mThreadNetworkDirectoryStorage(context.storage)
 {}
 
 CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -54,8 +55,9 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull, mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
-    // 4. Optional clusters (e.g. Thread Network Directory)
-    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
+    // 4. Thread Network Directory (mandatory)
+    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
+    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -66,8 +68,11 @@ void NetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvider & prov
 {
     UnregisterDescriptor(provider);
 
-    UnregisterOptionalClusters(provider);
-
+    if (mThreadNetworkDirectoryCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
+        mThreadNetworkDirectoryCluster.Destroy();
+    }
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDiagnosticsCluster.Cluster()));

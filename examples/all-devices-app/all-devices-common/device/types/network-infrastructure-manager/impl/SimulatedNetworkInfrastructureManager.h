@@ -18,8 +18,6 @@
 #pragma once
 
 #include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
-#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
-#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <device/capabilities/breadcrumb/SimpleBreadCrumbTracker.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -30,6 +28,18 @@
 namespace chip {
 namespace app {
 
+/**
+ * Concrete simulated implementation of NetworkInfrastructureManager.
+ *
+ * Inherits from ThreadBorderRouterManagementDelegate, SimpleBreadCrumbTracker, and
+ * DirectThreadNetworkDiagnosticsProvider before NetworkInfrastructureManager so that
+ * these base subobjects are fully constructed before NetworkInfrastructureManager's constructor
+ * receives references to them.
+ *
+ * Note on BreadCrumbTracker:
+ * See SimpleBreadCrumbTracker.h for details on Matter Core Spec 14.3.6.4.2. A future refactor
+ * should route breadcrumb updates to the root node's GeneralCommissioningCluster.
+ */
 class SimulatedNetworkInfrastructureManager : public Clusters::ThreadBorderRouterManagementDelegate,
                                               public SimpleBreadCrumbTracker,
                                               public Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider,
@@ -48,6 +58,8 @@ public:
     explicit SimulatedNetworkInfrastructureManager(const Context & context);
     ~SimulatedNetworkInfrastructureManager() override;
 
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // ThreadBorderRouterManagementDelegate
@@ -63,13 +75,6 @@ public:
     CHIP_ERROR CommitActiveDataset() override;
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
-
-    // Access to Thread Network Directory cluster
-    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
-
-protected:
-    CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
-    void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
     class ActiveDatasetTimerContext : public TimerContext
@@ -96,8 +101,6 @@ private:
     void OnPendingDatasetTimerFired();
 
     TimerDelegate & mTimerDelegate;
-    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
-    LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
     std::string mBorderRouterName;
 
     ActiveDatasetTimerContext mActiveDatasetTimerContext{ *this };

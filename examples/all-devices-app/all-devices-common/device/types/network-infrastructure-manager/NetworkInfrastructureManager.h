@@ -23,8 +23,11 @@
 #include <app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
+#include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
+#include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -38,6 +41,7 @@ public:
         Clusters::ThreadBorderRouterManagementDelegate & delegate;
         FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
+        PersistentStorageDelegate & storage;
         Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & diagnosticsProvider;
     };
@@ -71,24 +75,26 @@ public:
         VerifyOrDie(mThreadNetworkDiagnosticsCluster.IsConstructed());
         return mThreadNetworkDiagnosticsCluster.Cluster();
     }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster()
+    {
+        VerifyOrDie(mThreadNetworkDirectoryCluster.IsConstructed());
+        return mThreadNetworkDirectoryCluster.Cluster();
+    }
     Clusters::BreadCrumbTracker & GetBreadCrumbTracker() { return mBreadCrumbTracker; }
 
 protected:
-    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-    {
-        return CHIP_NO_ERROR;
-    }
-    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
-
     Clusters::ThreadBorderRouterManagementDelegate & mDelegate;
     FailSafeContext & mFailSafeContext;
     DeviceLayer::PlatformManager & mPlatformManager;
     Clusters::BreadCrumbTracker & mBreadCrumbTracker;
     Clusters::ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mDiagnosticsProvider;
 
+    DefaultThreadNetworkDirectoryStorage mThreadNetworkDirectoryStorage;
+
     LazyRegisteredServerCluster<Clusters::ThreadBorderRouterManagementCluster> mThreadBorderRouterManagementCluster;
     LazyRegisteredServerCluster<Clusters::WiFiNetworkManagementCluster> mWiFiNetworkManagementCluster;
     LazyRegisteredServerCluster<Clusters::ThreadNetworkDiagnosticsCluster> mThreadNetworkDiagnosticsCluster;
+    LazyRegisteredServerCluster<Clusters::ThreadNetworkDirectoryCluster> mThreadNetworkDirectoryCluster;
 };
 
 } // namespace app

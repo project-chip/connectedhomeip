@@ -35,10 +35,11 @@ SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(con
         .delegate            = *this,
         .failSafeContext     = context.failSafeContext,
         .platformManager     = context.platformManager,
+        .storage             = context.storage,
         .breadcrumbTracker   = *this,
         .diagnosticsProvider = *this,
     }),
-    mTimerDelegate(context.timerDelegate), mThreadNetworkDirectoryStorage(context.storage), mBorderRouterName(context.nodeLabel)
+    mTimerDelegate(context.timerDelegate), mBorderRouterName(context.nodeLabel)
 {}
 
 SimulatedNetworkInfrastructureManager::~SimulatedNetworkInfrastructureManager()
@@ -63,25 +64,15 @@ void SimulatedNetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvid
     NetworkInfrastructureManager::Unregister(provider);
 }
 
-CHIP_ERROR SimulatedNetworkInfrastructureManager::RegisterOptionalClusters(EndpointId endpoint,
-                                                                           CodeDrivenDataModelProvider & provider)
+CHIP_ERROR SimulatedNetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                           EndpointComposition composition)
 {
-    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
-    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
+    ReturnErrorOnFailure(NetworkInfrastructureManager::Register(endpoint, provider, composition));
 
     ReturnErrorOnFailure(
         SetWiFiNetworkCredentials(ByteSpan::fromCharSpan("MatterAP"_span), ByteSpan::fromCharSpan("Setec Astronomy"_span)));
 
     return CHIP_NO_ERROR;
-}
-
-void SimulatedNetworkInfrastructureManager::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
-{
-    if (mThreadNetworkDirectoryCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
-        mThreadNetworkDirectoryCluster.Destroy();
-    }
 }
 
 CHIP_ERROR SimulatedNetworkInfrastructureManager::Init(AttributeChangeCallback * attributeChangeCallback)

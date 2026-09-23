@@ -22,6 +22,20 @@
 
 namespace chip::app {
 
+/**
+ * In-memory fallback implementation of BreadCrumbTracker for simulated devices.
+ *
+ * Matter Core Specification (Section 14.3.6.4.2 Breadcrumb Field):
+ * "See Breadcrumb Attribute subclause of General Commissioning Cluster in Matter Core for usage."
+ *
+ * Per specification, breadcrumb updates belong to the General Commissioning Cluster (typically on
+ * Endpoint 0 / Root Node) rather than per-device storage. In all-devices-app, dynamic endpoint
+ * devices instantiated via DeviceFactory are decoupled from the root node. This standalone tracker
+ * satisfies the BreadCrumbTracker interface required by ThreadBorderRouterManagementCluster.
+ *
+ * TODO: Plumb the root node's GeneralCommissioningCluster via DeviceFactory::Context or an endpoint-sharing
+ * mechanism so that breadcrumbs are reflected in the General Commissioning cluster attribute.
+ */
 class SimpleBreadCrumbTracker : public Clusters::BreadCrumbTracker
 {
 public:

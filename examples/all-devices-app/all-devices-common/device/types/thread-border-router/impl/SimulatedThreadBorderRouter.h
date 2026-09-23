@@ -30,6 +30,18 @@
 namespace chip {
 namespace app {
 
+/**
+ * Concrete simulated implementation of ThreadBorderRouter.
+ *
+ * Inherits from ThreadBorderRouterManagementDelegate, SimpleBreadCrumbTracker, and
+ * DirectThreadNetworkDiagnosticsProvider before ThreadBorderRouter so that these base
+ * subobjects are fully constructed before ThreadBorderRouter's constructor receives
+ * references to them.
+ *
+ * Note on BreadCrumbTracker:
+ * See SimpleBreadCrumbTracker.h for details on Matter Core Spec 14.3.6.4.2. A future refactor
+ * should route breadcrumb updates to the root node's GeneralCommissioningCluster.
+ */
 class SimulatedThreadBorderRouter : public Clusters::ThreadBorderRouterManagementDelegate,
                                     public SimpleBreadCrumbTracker,
                                     public Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider,
@@ -65,7 +77,11 @@ public:
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
 
     // Access to optional Thread Network Directory cluster
-    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster() { return mThreadNetworkDirectoryCluster.Cluster(); }
+    Clusters::ThreadNetworkDirectoryCluster & ThreadNetworkDirectoryCluster()
+    {
+        VerifyOrDie(mThreadNetworkDirectoryCluster.IsConstructed());
+        return mThreadNetworkDirectoryCluster.Cluster();
+    }
 
 protected:
     CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
