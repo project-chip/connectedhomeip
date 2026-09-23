@@ -88,7 +88,7 @@ class LabelEvaluation:
 
 
 def fetch_pull_request_data(repo: str, pr_number: int) -> dict[str, Any]:
-    """Fetches pull request details and latest reviews using the gh CLI."""
+    """Fetches pull request details and reviews using the gh CLI."""
     cmd = [
         "gh",
         "pr",
@@ -97,7 +97,7 @@ def fetch_pull_request_data(repo: str, pr_number: int) -> dict[str, Any]:
         "--repo",
         repo,
         "--json",
-        "author,title,state,labels,latestReviews",
+        "author,title,state,labels,reviews",
     ]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
@@ -123,7 +123,9 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
 
     try:
         with open(config_path, encoding="utf-8") as f:
-            content = yaml.load(f, Loader=UniqueKeySafeLoader) or {}
+            content = yaml.load(f, Loader=UniqueKeySafeLoader)
+            if content is None:
+                content = {}
     except yaml.YAMLError as e:
         raise ValueError(f"YAML syntax error in {config_path}: {e}") from e
 
@@ -185,11 +187,24 @@ def extract_approvers(pr_data: dict[str, Any]) -> set[str]:
     """Extracts lowercase usernames of approved reviewers from PR JSON data, excluding the author."""
     pr_author = pr_data.get("author", {}).get("login", "")
     author_lower = pr_author.lower() if pr_author else ""
+    raw_reviews = pr_data.get("reviews")
+    if raw_reviews is None:
+        raw_reviews = pr_data.get("latestReviews", [])
+    reviews = sorted(
+        raw_reviews,
+        key=lambda review: review.get("submittedAt") or "",
+    )
+    latest_states: dict[str, str] = {}
+    for review in reviews:
+        reviewer = review.get("author", {}).get("login", "").lower()
+        state = review.get("state")
+        if reviewer and state not in {"COMMENTED", "PENDING"}:
+            latest_states[reviewer] = state
+
     return {
-        r.get("author", {}).get("login", "").lower()
-        for r in pr_data.get("latestReviews", [])
-        if r.get("state") == "APPROVED"
-        and r.get("author", {}).get("login", "").lower() != author_lower
+        reviewer
+        for reviewer, state in latest_states.items()
+        if state == "APPROVED" and reviewer != author_lower
     }
 
 

@@ -207,6 +207,13 @@ security:
             parse_label_config(config_path)
         self.assertIn("YAML syntax error", str(ctx.exception))
 
+    def test_falsey_yaml_document_rejected(self) -> None:
+        """Verifies that a YAML document containing false fails validation."""
+        config_path = self._write_temp_config("false\n")
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("expected a YAML mapping", str(ctx.exception))
+
 
 class TestExtractApprovers(unittest.TestCase):
     """Tests extracting valid approvers from GitHub PR JSON payloads."""
@@ -232,6 +239,36 @@ class TestExtractApprovers(unittest.TestCase):
                 {"author": {"login": "charlie"}, "state": "CHANGES_REQUESTED"},
                 {"author": {"login": "david"}, "state": "COMMENTED"},
                 {"author": {"login": "eve"}, "state": "DISMISSED"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice"})
+
+    def test_approval_followed_by_comment_retains_approval(self) -> None:
+        """Verifies that a subsequent COMMENTED review does not clear an earlier approval."""
+        pr_data = {
+            "author": {"login": "author_user"},
+            "reviews": [
+                {
+                    "author": {"login": "alice"},
+                    "state": "APPROVED",
+                    "submittedAt": "2026-09-20T10:00:00Z",
+                },
+                {
+                    "author": {"login": "alice"},
+                    "state": "COMMENTED",
+                    "submittedAt": "2026-09-20T11:00:00Z",
+                },
+                {
+                    "author": {"login": "bob"},
+                    "state": "APPROVED",
+                    "submittedAt": "2026-09-20T09:00:00Z",
+                },
+                {
+                    "author": {"login": "bob"},
+                    "state": "CHANGES_REQUESTED",
+                    "submittedAt": "2026-09-20T12:00:00Z",
+                },
             ],
         }
         approvers = extract_approvers(pr_data)

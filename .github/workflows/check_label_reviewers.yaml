@@ -29,10 +29,6 @@ on:
       - ".github/label_reviewers.yaml"
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number || github.sha }}
-  cancel-in-progress: true
-
 jobs:
   check-sme-review:
     name: Check SME Approvals
@@ -40,6 +36,9 @@ jobs:
     if: |
       github.event_name != 'issue_comment' ||
       (github.event.issue.pull_request != null && startsWith(github.event.comment.body, '/check-sme'))
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number || github.sha }}
+      cancel-in-progress: true
     permissions:
       contents: read
       pull-requests: read
