@@ -248,6 +248,19 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownNullRateTurnsOff)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    // When OnOff is true and CurrentLevel is already at MinLevel, MoveWithOnOff(kDown) must still set OnOff to false.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(cluster.GetMinLevel(), DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
+                    .IsSuccess());
+    EXPECT_TRUE(onOffCluster.GetOnOff());
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
