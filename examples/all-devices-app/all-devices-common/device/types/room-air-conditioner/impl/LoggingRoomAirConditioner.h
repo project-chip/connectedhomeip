@@ -15,20 +15,23 @@
  */
 #pragma once
 
+#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/types/room-air-conditioner/RoomAirConditioner.h>
 
 namespace chip::app {
 
-class LoggingRoomAirConditioner : public RoomAirConditioner,
-                                  public Clusters::IdentifyDelegate,
+class LoggingRoomAirConditioner : public Clusters::IdentifyDelegate,
                                   public Clusters::OnOffDelegate,
                                   public Clusters::Thermostat::Delegate,
                                   public Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
-                                  public Clusters::ThermostatUserInterfaceConfiguration::Delegate
+                                  public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
+                                  public RoomAirConditioner
 {
 public:
     LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable);
     ~LoggingRoomAirConditioner() override = default;
+
+    Clusters::ThermostatUserInterfaceConfigurationCluster & UserInterfaceCluster() { return mUserInterfaceCluster.Cluster(); }
 
     // IdentifyDelegate
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
@@ -83,10 +86,15 @@ public:
     void OnTemperatureDisplayModeChanged(Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value) override;
     void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
+protected:
+    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
+
 private:
     static constexpr int16_t kDefaultLocalTemperatureCentiCelsius = 2500;
 
     FabricTable & mFabricTable;
+    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
     DataModel::Nullable<int16_t> mLocalTemperatureCentiCelsius{ kDefaultLocalTemperatureCentiCelsius };
     Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;

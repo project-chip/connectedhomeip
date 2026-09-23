@@ -18,12 +18,12 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
-#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/api/SingleEndpoint.h>
 
 namespace chip::app {
 
-/// A single-endpoint room air conditioner with cooling and local UI configuration.
+/// A single-endpoint room air conditioner with cooling.
+/// Optional clusters, including local UI configuration, belong to subclasses.
 class RoomAirConditioner : public SingleEndpoint
 {
 public:
@@ -37,7 +37,6 @@ public:
         Clusters::OnOffDelegate & onOffDelegate;
         Clusters::Thermostat::Delegate & thermostatDelegate;
         Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate;
-        Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate;
     };
 
     explicit RoomAirConditioner(const Context & context);
@@ -49,7 +48,17 @@ public:
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::OnOffCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
     CoolingThermostat & ThermostatCluster() { return mThermostatCluster.Cluster(); }
-    Clusters::ThermostatUserInterfaceConfigurationCluster & UserInterfaceCluster() { return mUserInterfaceCluster.Cluster(); }
+
+protected:
+    /// Called before the endpoint is registered, within the registration transaction.
+    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    /// Called after the endpoint is removed, including on partial registration failure.
+    /// Overrides must tolerate clusters that were not constructed or registered.
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:
     TimerDelegate & mTimerDelegate;
@@ -57,12 +66,10 @@ private:
     Clusters::OnOffDelegate & mOnOffDelegate;
     Clusters::Thermostat::Delegate & mThermostatDelegate;
     Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & mCoolingDelegate;
-    Clusters::ThermostatUserInterfaceConfiguration::Delegate & mUserInterfaceDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
     LazyRegisteredServerCluster<CoolingThermostat> mThermostatCluster;
-    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 
 } // namespace chip::app

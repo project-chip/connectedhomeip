@@ -22,8 +22,7 @@ namespace chip::app {
 RoomAirConditioner::RoomAirConditioner(const Context & context) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoomAirConditioner, 1)),
     mTimerDelegate(context.timerDelegate), mIdentifyDelegate(context.identifyDelegate), mOnOffDelegate(context.onOffDelegate),
-    mThermostatDelegate(context.thermostatDelegate), mCoolingDelegate(context.coolingDelegate),
-    mUserInterfaceDelegate(context.userInterfaceDelegate)
+    mThermostatDelegate(context.thermostatDelegate), mCoolingDelegate(context.coolingDelegate)
 {}
 
 CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -47,9 +46,7 @@ CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModel
                               CoolingThermostat::Config({}, mTimerDelegate), mThermostatDelegate, mCoolingDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
-    mUserInterfaceCluster.Create(endpoint);
-    mUserInterfaceCluster.Cluster().SetDelegate(&mUserInterfaceDelegate);
-    ReturnErrorOnFailure(provider.AddCluster(mUserInterfaceCluster.Registration()));
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -59,12 +56,7 @@ CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModel
 void RoomAirConditioner::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mUserInterfaceCluster.IsConstructed())
-    {
-        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
-        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
-        mUserInterfaceCluster.Destroy();
-    }
+    UnregisterAdditionalClusters(provider);
     if (mThermostatCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThermostatCluster.Cluster()));

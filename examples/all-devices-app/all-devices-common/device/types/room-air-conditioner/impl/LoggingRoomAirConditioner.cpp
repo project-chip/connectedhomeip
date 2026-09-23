@@ -26,15 +26,31 @@ using Protocols::InteractionModel::Status;
 
 LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable) :
     RoomAirConditioner(RoomAirConditioner::Context{
-        .timerDelegate         = timerDelegate,
-        .identifyDelegate      = *this,
-        .onOffDelegate         = *this,
-        .thermostatDelegate    = *this,
-        .coolingDelegate       = *this,
-        .userInterfaceDelegate = *this,
+        .timerDelegate      = timerDelegate,
+        .identifyDelegate   = *this,
+        .onOffDelegate      = *this,
+        .thermostatDelegate = *this,
+        .coolingDelegate    = *this,
     }),
     mFabricTable(fabricTable)
 {}
+
+CHIP_ERROR LoggingRoomAirConditioner::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    mUserInterfaceCluster.Create(endpoint);
+    mUserInterfaceCluster.Cluster().SetDelegate(this);
+    return provider.AddCluster(mUserInterfaceCluster.Registration());
+}
+
+void LoggingRoomAirConditioner::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mUserInterfaceCluster.IsConstructed())
+    {
+        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
+        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
+        mUserInterfaceCluster.Destroy();
+    }
+}
 
 CHIP_ERROR LoggingRoomAirConditioner::Startup(ServerClusterContext & context)
 {

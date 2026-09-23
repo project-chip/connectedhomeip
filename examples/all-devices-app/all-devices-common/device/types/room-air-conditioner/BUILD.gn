@@ -25,7 +25,6 @@ source_set("room-air-conditioner") {
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/clusters/thermostat-server",
-    "${chip_root}/src/app/clusters/thermostat-user-interface-configuration-server",
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 }
@@ -41,5 +40,8 @@ source_set("logging") {
     "${chip_root}/src/lib/support",
   ]
 
-  public_deps = [ ":room-air-conditioner" ]
+  public_deps = [
+    ":room-air-conditioner",
+    "${chip_root}/src/app/clusters/thermostat-user-interface-configuration-server",
+  ]
 }
