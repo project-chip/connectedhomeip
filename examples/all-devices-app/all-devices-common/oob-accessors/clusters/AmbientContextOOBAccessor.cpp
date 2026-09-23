@@ -116,6 +116,10 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleAction(CharSpan actio
     {
         return HandleSetAmbientSensingUnionName(tlvData);
     }
+    if (action.data_equal("SetAmbientSensingUnionHealth"_span))
+    {
+        return HandleSetAmbientSensingUnionHealth(tlvData);
+    }
 
     return std::nullopt;
 }
@@ -802,6 +806,56 @@ std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientSensingUnio
     }
 
     return mUnionCluster.SetUnionName(unionName);
+}
+
+std::optional<CHIP_ERROR> AmbientContextOOBAccessor::HandleSetAmbientSensingUnionHealth(ByteSpan tlvData) const
+{
+    TLV::TLVReader reader;
+    reader.Init(tlvData);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    EndpointId endpointId = kInvalidEndpointId;
+    bool hasEndpointId    = false;
+    uint8_t healthRaw     = 0;
+    bool hasHealth        = false;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(tag))
+        {
+        case 1:
+            ReturnErrorOnFailure(reader.Get(endpointId));
+            hasEndpointId = true;
+            break;
+        case 2:
+            ReturnErrorOnFailure(reader.Get(healthRaw));
+            hasHealth = true;
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+    VerifyOrReturnError(hasEndpointId && hasHealth, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (endpointId != mEndpointId)
+    {
+        return std::nullopt;
+    }
+
+    auto health = static_cast<Clusters::AmbientSensingUnion::UnionHealthEnum>(healthRaw);
+    return mUnionCluster.SetUnionHealth(health);
 }
 
 } // namespace chip::app

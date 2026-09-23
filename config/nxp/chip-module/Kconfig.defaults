@@ -47,7 +47,7 @@ config CHIP_TASK_PRIORITY
 	default 5
 
 config CHIP_TASK_STACK_SIZE
-	default 7168 if SOC_MCXW70AC
+	default 8192 if SOC_MCXW70AC
 	default 16384 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers and Zephyr
 	default 10240
 
@@ -206,6 +206,12 @@ config NET_MGMT_EVENT_STACK_SIZE
 	default 2048 if CHIP_WIFI_PAF
 	default 1024
 
+config NET_TX_STACK_SIZE
+	default 768 if SOC_MCXW70AC
+
+config NET_RX_STACK_SIZE
+	default 768 if SOC_MCXW70AC
+
 config NET_MGMT_EVENT_QUEUE_SIZE
 	default 20
 
@@ -282,8 +288,11 @@ choice OPENTHREAD_DEVICE_TYPE
 endchoice
 
 config OPENTHREAD_THREAD_STACK_SIZE
-    default 3584 if SOC_MCXW70AC
+    default 4224 if SOC_MCXW70AC
 	default 6144
+
+config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
+	default 640 if SOC_MCXW70AC
 
 # Use the platform-provided heap
 config OPENTHREAD_EXTERNAL_HEAP
@@ -428,12 +437,16 @@ config BT_BUF_ACL_TX_SIZE
 	default 251
 
 config BT_RX_STACK_SIZE
+	default 1536 if SOC_MCXW70AC
 	default 2560 if OPENTHREAD
 	default 2048 if NO_OPTIMIZATIONS && DEBUG
 	default 1700
 
+config BT_TX_PROCESSOR_STACK_SIZE
+	default 768 if SOC_MCXW70AC
+
 config BT_LONG_WQ_STACK_SIZE
-	default 3072 if SOC_MCXW70AC
+	default 3584 if SOC_MCXW70AC
 	default 2560
 
 config BT_DEVICE_NAME_GATT_WRITABLE
@@ -661,7 +674,12 @@ config MBEDTLS_HEAP_SIZE
 	default 15360
 
 config MBEDTLS_CTR_DRBG_C
+	default n if SOC_MCXW70AC
 	default y
+
+config MBEDTLS_HMAC_DRBG_C
+	default y if SOC_MCXW70AC
+	default n
 
 config MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 	default y
@@ -683,6 +701,17 @@ config MBEDTLS_PSA_CRYPTO_STORAGE_C
 
 config SECURE_STORAGE
 	default y
+
+# The SGI-PKC multi-part AEAD path has a CCM tag-verification defect, so use the
+# validated one-shot single-part API instead (mirrors the NXP FreeRTOS default).
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+	default y if PSA_CRYPTO_DRIVER_SGI_PKC
+
+# Point tf-psa-crypto at the MCXW70 accel header so the SW builtins duplicated by
+# the SGI-PKC HW driver are dropped from the image (Flash/RAM saving).
+config TF_PSA_CRYPTO_USER_CONFIG_FILE
+	default "nxp_mcxw70_psa_crypto_config.h" if PSA_CRYPTO_DRIVER_SGI_PKC
+
 
 endif # CHIP_CRYPTO_PSA
 
