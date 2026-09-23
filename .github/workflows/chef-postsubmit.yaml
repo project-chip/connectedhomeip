@@ -1,0 +1,60 @@
+# Copyright (c) 2021-2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Chef CI (All chef devices)
+
+on:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+env:
+    CHIP_LOG_TIMESTAMPS: false
+
+jobs:
+    chef_linux_all_devices:
+        name: Chef - Linux CI Examples (All chef devices)
+        timeout-minutes: 120
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:211
+            volumes:
+                - "/:/runner-root-volume"
+            options: --user root
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+            - name: CI Examples Linux (All devices)
+              shell: bash
+              run: |
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
