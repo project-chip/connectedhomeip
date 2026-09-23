@@ -102,13 +102,11 @@ TEST_F(TestLevelControlColorCoupling, TestCouplesOnLevelChange)
 // than jumping once at the end.
 TEST_F(TestLevelControlColorCoupling, TestCouplesOnEveryTransitionStep)
 {
-    LevelControlCluster cluster{
-        kTestEndpointId,
-        LevelControlCluster::Config(mockTimer, mockDelegate)
-            .WithLighting(DataModel::NullNullable)
-            .WithColorControl(mockColorControl)
-            .WithInitialCurrentLevel(10)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl)
+                                     .WithInitialCurrentLevel(10) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EnableCoupling(tester);
@@ -153,13 +151,11 @@ TEST_F(TestLevelControlColorCoupling, TestOptionBitInertWithoutColorControl)
 // this point, and Color Control may not have started yet.
 TEST_F(TestLevelControlColorCoupling, TestNoCouplingDuringStartup)
 {
-    LevelControlCluster cluster{
-        kTestEndpointId,
-        LevelControlCluster::Config(mockTimer, mockDelegate)
-            .WithLighting(DataModel::NullNullable)
-            .WithColorControl(mockColorControl)
-            .WithInitialCurrentLevel(42)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable)
+                                     .WithColorControl(mockColorControl)
+                                     .WithInitialCurrentLevel(42) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
