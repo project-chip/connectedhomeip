@@ -29,8 +29,8 @@ struct PanelList
     Span<const EndpointComposition::SemanticTag> tags;
 };
 
-class LoggingClosure : public Closure,
-                       public Clusters::ClosureControl::ClosureControlClusterDelegate,
+class LoggingClosure : public Clusters::ClosureControl::ClosureControlClusterDelegate,
+                       public Closure,
                        public TimerContext,
                        public TestEventTriggerHandler
 {
@@ -58,7 +58,7 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 private:
-    static constexpr uint32_t kTimeoutnDurationSec = 1;
+    static constexpr uint32_t kTimeoutDurationSec = 1;
     bool RegistersAccessDevicePanel() const override;
     void CancelTimer();
     LoggingOnOffLight::Context OnOffContext;
@@ -67,7 +67,12 @@ private:
     void UnregisterParts(CodeDrivenDataModelProvider & provide) override;
     // TODO add LoggingDoorLock after migration
     std::vector<std::unique_ptr<LoggingClosurePanel>> mLoggingClosurePanel;
-    std::unique_ptr<LoggingOnOffLight> mLoggingOnOffLights;
+    // Held by base-class handle: OnOffLoad hides the SingleEndpoint Register/Unregister names,
+    // while DeviceInterface declares both publicly.
+    std::unique_ptr<DeviceInterface> mLoggingOnOffLights;
+    // Non-owning view of the same object as mLoggingOnOffLights, kept as the leaf type because only
+    // SingleEndpoint exposes the endpoint id that UnregisterParts needs. Cleared alongside the owner.
+    LoggingOnOffLight * mOnOffLightPart = nullptr;
     std::vector<PanelList> mPanelList;
     TimerDelegate & mTimerDelegate;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;

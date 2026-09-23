@@ -50,9 +50,8 @@ namespace app {
 LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
                                Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                std::vector<PanelList> panels, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(CConfig, Tdelegate, Idelegate, *this),
-    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(panels)),
-    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(CConfig, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
+    mPanelList(std::move(panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 LoggingClosure::~LoggingClosure()
@@ -62,6 +61,8 @@ LoggingClosure::~LoggingClosure()
 Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::HandleStopCommand()");
+    CancelTimer();
+    mPendingCurrentState.reset();
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -96,8 +97,11 @@ LoggingClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::Tar
 
     mPendingCurrentState = Clusters::ClosureControl::GenericOverallCurrentState(
         newPosition, newLatch, speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed, DataModel::MakeNullable(isSecure));
-
-    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutnDurationSec)));
+    CancelTimer();
+    VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutDurationSec)).Handle([](CHIP_ERROR err) {
+        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+    }),
+                        Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -105,7 +109,11 @@ Protocols::InteractionModel::Status LoggingClosure::HandleCalibrateCommand()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::HandleCalibrateCommand()");
     mPendingCurrentState.reset();
-    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutnDurationSec)));
+    CancelTimer();
+    VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutDurationSec)).Handle([](CHIP_ERROR err) {
+        ChipLogError(DeviceLayer, "LoggingClosure: failed to start Calibrate timer : %" CHIP_ERROR_FORMAT, err.Format());
+    }),
+                        Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -126,7 +134,7 @@ ElapsedS LoggingClosure::GetMovingCountdownTime()
 }
 ElapsedS LoggingClosure::GetWaitingForMotionCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::GetMovingCountdownTime()");
+    ChipLogProgress(DeviceLayer, "LoggingClosure::GetWaitingForMotionCountdownTime()");
     return 0u;
 }
 bool LoggingClosure::RegistersAccessDevicePanel() const
@@ -198,9 +206,10 @@ CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDr
         mLoggingClosurePanel.push_back(std::move(ClosurePanel));
     }
 
-    mLoggingOnOffLights = std::make_unique<LoggingOnOffLight>(OnOffContext);
-    ReturnErrorOnFailure(
-        mLoggingOnOffLights->Register(allocator.Allocate(), provider, EndpointComposition::WithParent(GetEndpointId())));
+    auto onOffLights    = std::make_unique<LoggingOnOffLight>(OnOffContext);
+    mOnOffLightPart     = onOffLights.get();
+    mLoggingOnOffLights = std::move(onOffLights);
+    ReturnErrorOnFailure(mLoggingOnOffLights->Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId())));
 
     ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
     return CHIP_NO_ERROR;
@@ -210,14 +219,23 @@ void LoggingClosure::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
     mTestEventTriggerDelegate.RemoveHandler(this);
 
+    // Parts whose registration was rolled back already have an invalid endpoint id: skip them,
+    // unregistering them a second time would fail in RemoveEndpoint().
     for (size_t i = 0; i < mLoggingClosurePanel.size(); i++)
     {
-        mLoggingClosurePanel[i]->Unregister(provider);
+        if (mLoggingClosurePanel[i]->GetEndpointId() != kInvalidEndpointId)
+        {
+            mLoggingClosurePanel[i]->Unregister(provider);
+        }
     }
-    if (mLoggingOnOffLights)
+    mLoggingClosurePanel.clear();
+
+    if (mOnOffLightPart != nullptr && mOnOffLightPart->GetEndpointId() != kInvalidEndpointId)
     {
         mLoggingOnOffLights->Unregister(provider);
     }
+    mLoggingOnOffLights.reset();
+    mOnOffLightPart = nullptr;
 }
 
 } // namespace app
