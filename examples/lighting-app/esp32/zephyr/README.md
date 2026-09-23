@@ -101,10 +101,13 @@ source "$WS/.venv/bin/activate"
 source "$WS/zephyr/zephyr-env.sh"
 ```
 
-`scripts/activate.sh` is not needed. The Matter build finds `gn` and its
-environment under `.environment/` on its own, and `west` supplies the venv
-Python to CMake. Set `ZEPHYR_SDK_INSTALL_DIR` only if Zephyr does not discover
-the SDK by itself.
+`scripts/activate.sh` alone is not enough here. Zephyr 4.4 requires Python 3.12
+(`PYTHON_MINIMUM_REQUIRED` in `zephyr/cmake/modules/python.cmake`) and the
+Matter environment provides 3.11, so the `west` it ships cannot configure this
+build. The venv above is what supplies a Python 3.12 `west`.
+
+The Matter build still finds `gn` and its environment under `.environment/` on
+its own. Set `ZEPHYR_SDK_INSTALL_DIR` only if Zephyr does not find the SDK.
 
 > **Note**: `west: unknown command "build"` means `ZEPHYR_BASE` is not set in
 > this terminal; source `zephyr-env.sh` again (it must be sourced, not run). If
@@ -323,6 +326,9 @@ The largest single block (about 100 KB) is the Zephyr system heap sized by
    pin in the board overlay. There are no buttons or status LEDs.
 4. **Separate Python environment.** Until the Matter environment provides Python
    3.12, the Zephyr venv must be maintained alongside it.
+5. **No build image.** There is no Docker image carrying the Zephyr tree, the
+   SDK and `west`, so each developer installs the workspace locally and the
+   example is not built in CI. A follow-up can add one.
 
 ---
 

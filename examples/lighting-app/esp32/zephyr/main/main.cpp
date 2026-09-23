@@ -18,9 +18,7 @@
 #include "AppTask.h"
 
 #include <lib/support/CHIPMem.h>
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 
@@ -28,6 +26,6 @@ int main()
 {
     CHIP_ERROR err = AppTask::Instance().StartApp();
 
-    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(AppServer, "Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }
