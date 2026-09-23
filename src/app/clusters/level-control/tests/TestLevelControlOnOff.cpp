@@ -243,6 +243,9 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownRunsWhileOff)
     data.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    // Only the upward direction turns the device on, so the move has to run with OnOff still false.
+    // Asserting here as well as at the end rules out a turn-on/turn-off pair spanning the transition.
+    EXPECT_FALSE(onOffCluster.GetOnOff());
     EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     while (mockTimer.IsTimerActive(nullptr))
