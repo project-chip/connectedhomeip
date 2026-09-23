@@ -48,7 +48,6 @@ import random
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -217,10 +216,7 @@ class TestFabricPendingCertScope(MatterBaseTest):
             # CommissioningComplete needs a new CASE session under the updated NOC, so it only
             # arrives if the node still holds that NOC.
             cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
-            try:
-                resp = await self.send_single_cmd(dev_ctrl=th2, node_id=node_id, cmd=cmd)
-            except ChipStackError as e:
-                asserts.fail(f"Could not reach the node under the updated NOC to complete the update: {e}")
+            resp = await self.send_single_cmd(dev_ctrl=th2, node_id=node_id, cmd=cmd)
             asserts.assert_equal(
                 resp.errorCode,
                 Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
