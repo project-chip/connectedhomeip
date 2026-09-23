@@ -21,7 +21,7 @@ source_set("room-air-conditioner") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/clusters/thermostat-server",
@@ -33,6 +33,8 @@ source_set("logging") {
   sources = [
     "impl/LoggingRoomAirConditioner.cpp",
     "impl/LoggingRoomAirConditioner.h",
+    "impl/LoggingRoomAirConditionerWithSensors.cpp",
+    "impl/LoggingRoomAirConditionerWithSensors.h",
   ]
 
   deps = [
@@ -42,6 +44,7 @@ source_set("logging") {
 
   public_deps = [
     ":room-air-conditioner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
     "${chip_root}/src/app/clusters/thermostat-user-interface-configuration-server",
   ]
 }

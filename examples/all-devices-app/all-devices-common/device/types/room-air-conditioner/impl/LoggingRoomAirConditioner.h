@@ -18,6 +18,8 @@
 #include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/types/room-air-conditioner/RoomAirConditioner.h>
 
+#include <optional>
+
 namespace chip::app {
 
 class LoggingRoomAirConditioner : public Clusters::IdentifyDelegate,
@@ -28,7 +30,8 @@ class LoggingRoomAirConditioner : public Clusters::IdentifyDelegate,
                                   public RoomAirConditioner
 {
 public:
-    LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable);
+    LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                              std::optional<EndpointComposition::SemanticTag> tag = std::nullopt);
     ~LoggingRoomAirConditioner() override = default;
 
     Clusters::ThermostatUserInterfaceConfigurationCluster & UserInterfaceCluster() { return mUserInterfaceCluster.Cluster(); }
@@ -87,6 +90,8 @@ public:
     void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
 protected:
+    CHIP_ERROR RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                  EndpointComposition composition = {}) override;
     CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
     void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
@@ -94,6 +99,8 @@ private:
     static constexpr int16_t kDefaultLocalTemperatureCentiCelsius = 2500;
 
     FabricTable & mFabricTable;
+    // Own the default tag so Descriptor's view remains valid throughout registration.
+    std::optional<EndpointComposition::SemanticTag> mTag;
     LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
     DataModel::Nullable<int16_t> mLocalTemperatureCentiCelsius{ kDefaultLocalTemperatureCentiCelsius };

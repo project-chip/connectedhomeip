@@ -18,13 +18,13 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
-#include <device/api/SingleEndpoint.h>
+#include <device/api/Interface.h>
 
 namespace chip::app {
 
-/// A single-endpoint room air conditioner with cooling.
-/// Optional clusters, including local UI configuration, belong to subclasses.
-class RoomAirConditioner : public SingleEndpoint
+/// A room air conditioner with cooling and optional child endpoints.
+/// Optional clusters and child devices belong to subclasses.
+class RoomAirConditioner : public DeviceInterface
 {
 public:
     using CoolingThermostat = Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::Delegate,
@@ -42,8 +42,12 @@ public:
     explicit RoomAirConditioner(const Context & context);
     ~RoomAirConditioner() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::OnOffCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }
@@ -60,7 +64,20 @@ protected:
     /// Overrides must tolerate clusters that were not constructed or registered.
     virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
 
+    /// Called after the parent endpoint is registered, within the same registration transaction.
+    /// Subclasses register owned children using allocator and GetEndpointId() as their parent.
+    /// Semantic tags and their backing storage belong to the subclass.
+    virtual CHIP_ERROR RegisterAdditionalEndpoints(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    /// Called before the parent endpoint is removed, also after partial registration failure.
+    /// Subclasses must remove only registered children, in reverse registration order.
+    virtual void UnregisterAdditionalEndpoints(CodeDrivenDataModelProvider & provider) {}
+
 private:
+    EndpointId mEndpointId = kInvalidEndpointId;
     TimerDelegate & mTimerDelegate;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
     Clusters::OnOffDelegate & mOnOffDelegate;

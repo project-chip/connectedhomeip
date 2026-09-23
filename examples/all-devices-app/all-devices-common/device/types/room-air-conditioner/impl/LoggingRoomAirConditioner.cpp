@@ -24,16 +24,21 @@ namespace chip::app {
 using namespace Clusters::Thermostat;
 using Protocols::InteractionModel::Status;
 
-LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable) :
-    RoomAirConditioner(RoomAirConditioner::Context{
-        .timerDelegate      = timerDelegate,
-        .identifyDelegate   = *this,
-        .onOffDelegate      = *this,
-        .thermostatDelegate = *this,
-        .coolingDelegate    = *this,
-    }),
-    mFabricTable(fabricTable)
+LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                                     std::optional<EndpointComposition::SemanticTag> tag) :
+    RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }), mFabricTable(fabricTable),
+    mTag(tag)
 {}
+
+CHIP_ERROR LoggingRoomAirConditioner::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                         EndpointComposition composition)
+{
+    if (composition.tagList.empty() && mTag.has_value())
+    {
+        composition.tagList = Span(&mTag.value(), 1);
+    }
+    return RoomAirConditioner::RegisterDescriptor(endpoint, provider, composition);
+}
 
 CHIP_ERROR LoggingRoomAirConditioner::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {

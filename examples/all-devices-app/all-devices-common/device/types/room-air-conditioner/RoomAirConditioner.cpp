@@ -20,18 +20,30 @@
 namespace chip::app {
 
 RoomAirConditioner::RoomAirConditioner(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoomAirConditioner, 1)),
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRoomAirConditioner, 1)),
     mTimerDelegate(context.timerDelegate), mIdentifyDelegate(context.identifyDelegate), mOnOffDelegate(context.onOffDelegate),
     mThermostatDelegate(context.thermostatDelegate), mCoolingDelegate(context.coolingDelegate)
 {}
 
-CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+CHIP_ERROR RoomAirConditioner::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                         EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    const EndpointId endpoint = allocator.Allocate();
+    VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    // Reject an occupied parent ID before rollback can attempt to remove it.
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpoints;
+    ReturnErrorOnFailure(provider.Endpoints(endpoints));
+    for (const auto & entry : endpoints.TakeBuffer())
+    {
+        VerifyOrReturnError(entry.id != endpoint, CHIP_ERROR_DUPLICATE_KEY_ID);
+    }
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+    mEndpointId = endpoint;
+    ReturnErrorOnFailure(RegisterDescriptor(
+        endpoint, provider,
+        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
@@ -49,13 +61,15 @@ CHIP_ERROR RoomAirConditioner::Register(EndpointId endpoint, CodeDrivenDataModel
     ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    ReturnErrorOnFailure(RegisterAdditionalEndpoints(allocator, provider));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
 void RoomAirConditioner::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterDescriptor(provider);
+    UnregisterAdditionalEndpoints(provider);
+    UnregisterDescriptor(mEndpointId, provider);
     UnregisterAdditionalClusters(provider);
     if (mThermostatCluster.IsConstructed())
     {
@@ -73,6 +87,7 @@ void RoomAirConditioner::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
+    mEndpointId = kInvalidEndpointId;
 }
 
 } // namespace chip::app
