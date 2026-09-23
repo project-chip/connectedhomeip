@@ -269,6 +269,37 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CertificationT
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosurePanelTag val)
+{
+    using EnumType = Globals::ClosurePanelTag;
+    switch (val)
+    {
+    case EnumType::kLift:
+    case EnumType::kTilt:
+    case EnumType::kSliding:
+    case EnumType::kRotate:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureTag val)
+{
+    using EnumType = Globals::ClosureTag;
+    switch (val)
+    {
+    case EnumType::kCovering:
+    case EnumType::kWindow:
+    case EnumType::kBarrier:
+    case EnumType::kCabinet:
+    case EnumType::kGate:
+    case EnumType::kGarageDoor:
+    case EnumType::kDoor:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
