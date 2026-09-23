@@ -73,7 +73,7 @@ public:
             mOnOffCluster = &onOffCluster;
             return *this;
         }
-        /// Enables the Options.CoupleColorTempToLevel behavior of spec 1.6.6.5: while that bit is set,
+        /// Enables the Options.CoupleColorTempToLevel behavior of spec 1.6.6.9.2: while that bit is set,
         /// every CurrentLevel change is forwarded to Color Control. Without this the bit stays inert.
         ///
         /// Takes the integration interface rather than ColorControlCluster so that a Level Control

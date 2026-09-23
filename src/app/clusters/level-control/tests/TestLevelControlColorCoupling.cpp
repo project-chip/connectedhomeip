@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-// Level Control side of the Options.CoupleColorTempToLevel behavior (spec 1.6.6.5). The Color Control
+// Level Control side of the Options.CoupleColorTempToLevel behavior (spec 1.6.6.9.2). The Color Control
 // side of the same feature — the level to mireds mapping — is covered by
 // src/app/clusters/color-control-server/tests/TestColorControlCoupling.cpp.
 
@@ -215,7 +215,7 @@ TEST_F(TestLevelControlColorCoupling, TestCommandOptionsOverrideSuppressesCoupli
     EXPECT_TRUE(mockColorControl.mCoupledLevels.empty());
 }
 
-// Spec 1.6.6.9.2: When not supporting the Lighting feature, CoupleColorTempToLevel SHALL be ignored.
+// Spec 1.6.6.9.2: When not supporting the Lighting feature, CoupleColorTempToLevel SHALL be zero and ignored.
 TEST_F(TestLevelControlColorCoupling, TestIgnoredWithoutLightingFeature)
 {
     LevelControlCluster cluster{ kTestEndpointId,
@@ -224,11 +224,24 @@ TEST_F(TestLevelControlColorCoupling, TestIgnoredWithoutLightingFeature)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     EnableCoupling(tester);
 
+    // Attribute write must have cleared the bit since Lighting feature is not present.
+    BitMask<OptionsBitmap> readOptions;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::Options::Id, readOptions).IsSuccess());
+    EXPECT_FALSE(readOptions.Has(OptionsBitmap::kCoupleColorTempToLevel));
+
     Commands::MoveToLevel::Type data;
     data.level = 100;
     data.transitionTime.SetNonNull(0);
     data.optionsMask.ClearAll();
     data.optionsOverride.ClearAll();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    EXPECT_TRUE(mockColorControl.mCoupledLevels.empty());
+
+    // Command-level override setting kCoupleColorTempToLevel cannot bypass the missing Lighting feature.
+    data.level = 110;
+    data.optionsMask.Set(OptionsBitmap::kCoupleColorTempToLevel);
+    data.optionsOverride.Set(OptionsBitmap::kCoupleColorTempToLevel);
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
 
     EXPECT_TRUE(mockColorControl.mCoupledLevels.empty());

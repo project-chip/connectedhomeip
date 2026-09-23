@@ -551,6 +551,11 @@ DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId command
 
 void LevelControlCluster::SetOptions(BitMask<OptionsBitmap> newOptions)
 {
+    // Spec 1.6.6.9.2: "When not supporting the Lighting feature, this bit SHALL be zero and ignored."
+    if (!mFeatureMap.Has(Feature::kLighting))
+    {
+        newOptions.Clear(OptionsBitmap::kCoupleColorTempToLevel);
+    }
     VerifyOrReturn(SetAttributeValue(mOptions, newOptions, Attributes::Options::Id));
     mDelegate.OnOptionsChanged(mOptions);
 }

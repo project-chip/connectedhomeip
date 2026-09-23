@@ -144,7 +144,7 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mColorControlCluster.Create(endpoint, colorConfig);
     ReturnErrorOnFailure(provider.AddCluster(mColorControlCluster.Registration()));
 
-    // Created after Color Control so the level config can point at it: Level Control 1.6.6.5 requires
+    // Created after Color Control so the level config can point at it: Level Control 1.6.6.9.2 requires
     // CurrentLevel changes to drive the color temperature while Options.CoupleColorTempToLevel is set.
     Clusters::LevelControlCluster::Config levelConfig(mContext.timerDelegate, mLevelControlDelegate);
     levelConfig.WithOnOff(mOnOffCluster.Cluster())

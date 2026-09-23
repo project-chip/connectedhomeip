@@ -34,7 +34,7 @@ public:
 
     /// Couples the color temperature to a Level Control CurrentLevel value.
     ///
-    /// Level Control 1.6.6.5 (CoupleColorTempToLevel Bit): "If this bit is set, changes to the
+    /// Level Control 1.6.6.9.2 (CoupleColorTempToLevel Bit): "If this bit is set, changes to the
     /// CurrentLevel attribute SHALL be coupled with the color temperature set in the Color Control
     /// cluster." Testing that bit is the caller's responsibility; this call is unconditional.
     ///
