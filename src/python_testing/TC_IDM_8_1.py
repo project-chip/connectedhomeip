@@ -272,10 +272,11 @@ class TC_IDM_8_1(IDMBaseTest):
                     populate_failure_reason = ("the DUT would not accept the commands that create an entry, so "
                                                "neither fabric held one")
                 elif not info.from_codegen:
-                    # Reported instead of the default reason below, which would claim no
-                    # populate sequence is known when one has just run.
+                    # The default reason claims no populate sequence is known, and one has just run.
                     populate_failure_reason = ("both fabrics were given an entry but the generated struct carries "
                                                "no FabricIndex, so no entry can be attributed to another fabric")
+                else:
+                    populate_failure_reason = "both fabrics were given an entry"
 
             # Counted across the reads and the subscription reports alike: a write on
             # TH1's fabric gives TH2's report a cross-fabric entry that the reads, taken
@@ -352,6 +353,7 @@ class TC_IDM_8_1(IDMBaseTest):
                                                            expected_attribute=info.attribute)
                 await handler_th1.start(self.th1, self.dut_node_id, info.endpoint_id, fabric_filtered=False)
                 await handler_th2.start(self.th2, self.dut_node_id, info.endpoint_id, fabric_filtered=False)
+                succeeded = False
                 try:
                     await self.write_fabric_scoped_attribute(info, self.th1, payload)
 
@@ -375,15 +377,18 @@ class TC_IDM_8_1(IDMBaseTest):
                     modified += 1
                     self.record_fabric_check(info.path_str, "write and report",
                                              FabricCheckOutcome.VERIFIED, location)
+                    succeeded = True
                 finally:
                     handler_th1.cancel()
                     handler_th2.cancel()
                     try:
                         await self.write_fabric_scoped_attribute(info, self.th1, original)
                     except Exception as e:
-                        # Logged rather than raised: the restore asserts on the write
-                        # status, and raising from a finally would replace the isolation
-                        # failure this step found with a cleanup failure.
+                        # Raising here would replace the isolation failure this step
+                        # found. Once the checks passed, the restore error is the
+                        # result: the DUT would otherwise stay modified.
+                        if succeeded:
+                            raise
                         log.warning("Could not restore %s on TH1's fabric: %s", info.path_str, e)
 
             # Keyed on the attribute's own quality rather than on whether the
@@ -458,7 +463,9 @@ class TC_IDM_8_1(IDMBaseTest):
         # Steps 6 and 7 need an event that exists on TH2's fabric, so they reuse the
         # events step 5 was able to trigger, this time triggered by TH2.
         for event_info in triggered:
-            await self.trigger_fabric_sensitive_event(event_info, self.th2)
+            asserts.assert_true(
+                await self.trigger_fabric_sensitive_event(event_info, self.th2),
+                f"{event_info.path_str}: TH2 could not trigger the event on its own fabric")
             # Trigger on TH1's fabric as well: the check below is only meaningful if the
             # priming report has something to carry, and an event log that has rolled
             # over since step 5 would otherwise leave it empty either way.
@@ -481,7 +488,9 @@ class TC_IDM_8_1(IDMBaseTest):
         self.step(7, "TH2 triggers the same fabric-sensitive event on its own fabric. TH1 then sends a Read Request Message with EventRequests set to that event path and fabric filtered set to false.",
                   expectation="The DUT sends a Report Data Message with no entry for the event associated with the fabric TH2 is on, and the response carries at least one event for TH1's own fabric.")
         for event_info in triggered:
-            await self.trigger_fabric_sensitive_event(event_info, self.th2)
+            asserts.assert_true(
+                await self.trigger_fabric_sensitive_event(event_info, self.th2),
+                f"{event_info.path_str}: TH2 could not trigger the event on its own fabric")
             # As in step 6, trigger on TH1's fabric as well so an event log that has
             # rolled over cannot make the assertion below pass on an empty response.
             await self.trigger_fabric_sensitive_event(event_info, self.th1)

@@ -59,6 +59,9 @@ def make_dut(composition: dict) -> idm_support.IDMBaseTest:
     dut = idm_support.IDMBaseTest.__new__(idm_support.IDMBaseTest)
     dut.endpoints_tlv = composition
     dut.xml_clusters = XML_CLUSTERS
+    dut.fabric_check_records = []
+    dut.fabric_entry_cleanups = []
+    dut.fabric_entry_markers = {}
     return dut
 
 
@@ -264,11 +267,9 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         dut = make_dut({0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)}})
         info = self.find(dut.discover_fabric_scoped_attributes(), Clusters.AccessControl.id, EXTENSION_ID)
         leaked = [Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=b'\x17\x18', fabricIndex=2)]
-        try:
+        with asserts.assert_raises(signals.TestFailure,
+                                   "Cross-fabric fabric-sensitive data must fail the masking assertion"):
             dut.assert_other_fabric_entries_masked(info, leaked, own_fabric_index=1)
-        except signals.TestFailure:
-            return
-        asserts.fail("Cross-fabric fabric-sensitive data must fail the masking assertion")
 
     def test_write_skip_reason_distinguishes_why_a_sweep_must_not_write(self):
         dut = make_dut({
@@ -323,11 +324,9 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         # Hostname is not fabric sensitive on its own, so this leak is only caught once
         # the attribute's own S quality is honoured.
         leaked = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
-        try:
+        with asserts.assert_raises(signals.TestFailure,
+                                   "A cross-fabric entry of a fabric-sensitive attribute must fail the masking assertion"):
             dut.assert_other_fabric_entries_masked(info, leaked, own_fabric_index=1)
-        except signals.TestFailure:
-            return
-        asserts.fail("A cross-fabric entry of a fabric-sensitive attribute must fail the masking assertion")
 
     def test_masking_reports_nothing_checked_for_own_fabric_only(self):
         # A fabric-filtered read returns only own-fabric entries, so there is nothing to
@@ -376,11 +375,9 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         info = self.find(dut.discover_fabric_scoped_attributes(),
                          Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID)
         returned = [Clusters.TlsClientManagement.Structs.TLSEndpointStruct(hostname=b'example.com', fabricIndex=2)]
-        try:
+        with asserts.assert_raises(signals.TestFailure,
+                                   "An entry belonging to another fabric must fail the withholding assertion"):
             dut.assert_other_fabrics_withheld(info, returned, own_fabric_index=1, reader_name="TH1")
-        except signals.TestFailure:
-            return
-        asserts.fail("An entry belonging to another fabric must fail the withholding assertion")
 
     def test_withholding_assertion_passes_when_the_entry_is_absent(self):
         dut = make_dut({0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID)}})

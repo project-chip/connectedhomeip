@@ -82,9 +82,14 @@ class ZapCluster:
     """Fabric markers on one ZAP ``<cluster>``."""
     name: str
     cluster_id: int
-    # isFabricSensitive on an <attribute>. ZAP has no isFabricScoped on
-    # attributes at all; scoping is inferred through the entry struct.
+    # Attributes marked fabric sensitive in either ZAP form: isFabricSensitive on
+    # the <attribute> tag, or fabricSensitive on its <access> child. ZAP has no
+    # isFabricScoped on attributes at all; scoping is inferred through the entry struct.
     fabric_sensitive_attribute_ids: frozenset[int]
+    # The subset marked through <access fabricSensitive="true"/>, the only form
+    # codegen turns into AttributeQualityFlags::kFabricSensitive. The reporting
+    # engine forces fabric filtering for those (src/app/reporting/Engine.cpp).
+    enforced_fabric_sensitive_attribute_ids: frozenset[int]
     # isFabricScoped on a <command source="client">. Response commands are
     # excluded: they are not invoked, so the quality does not apply to them.
     fabric_scoped_command_ids: frozenset[int]
@@ -156,11 +161,17 @@ def _parse_cluster(element: ElementTree.Element) -> ZapCluster | None:
         return None
 
     fabric_sensitive_attribute_ids = set()
+    enforced_fabric_sensitive_attribute_ids = set()
     entry_type_by_attribute_id = {}
     for attribute in element.findall('attribute'):
         attribute_id = _parse_id(attribute.attrib.get('code'))
         if attribute_id is None:
             continue
+        # Push AV Stream Transport CurrentConnections still uses the tag form,
+        # while webrtc-provider-cluster.xml CurrentSessions uses <access>.
+        if any(_is_true(access, 'fabricSensitive') for access in attribute.findall('access')):
+            enforced_fabric_sensitive_attribute_ids.add(attribute_id)
+            fabric_sensitive_attribute_ids.add(attribute_id)
         if _is_true(attribute, 'isFabricSensitive'):
             fabric_sensitive_attribute_ids.add(attribute_id)
         entry_type = attribute.attrib.get('entryType')
@@ -187,6 +198,7 @@ def _parse_cluster(element: ElementTree.Element) -> ZapCluster | None:
     return ZapCluster(name=(element.findtext('name') or '').strip(),
                       cluster_id=cluster_id,
                       fabric_sensitive_attribute_ids=frozenset(fabric_sensitive_attribute_ids),
+                      enforced_fabric_sensitive_attribute_ids=frozenset(enforced_fabric_sensitive_attribute_ids),
                       fabric_scoped_command_ids=frozenset(fabric_scoped_command_ids),
                       fabric_sensitive_event_ids=frozenset(fabric_sensitive_event_ids),
                       entry_type_by_attribute_id=entry_type_by_attribute_id)

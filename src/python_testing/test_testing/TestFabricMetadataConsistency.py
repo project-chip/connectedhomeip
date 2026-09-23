@@ -36,7 +36,8 @@ found whether or not any example app happens to implement the cluster.
 
 Known gaps are listed in KNOWN_FABRIC_METADATA_GAPS with the reason each is
 expected. Anything not listed there fails, which is what keeps new gaps from
-landing.
+landing, and a listed gap that no longer occurs fails too, so a fixed defect
+cannot come back unnoticed.
 """
 
 import sys
@@ -50,6 +51,7 @@ from mobly import asserts  # noqa: E402 - import must follow the sys.path setup 
 # MatterBaseTest subclass among this module's members.
 from support_modules import zap_fabric_metadata  # noqa: E402
 
+import matter.clusters as Clusters  # noqa: E402
 from matter.testing.global_attribute_ids import is_standard_cluster_id  # noqa: E402
 from matter.testing.matter_testing import CertificationUnitTestNoDevice  # noqa: E402
 from matter.testing.runner import default_matter_test_main  # noqa: E402
@@ -61,23 +63,31 @@ SPEC_GLOBAL_DATA_TYPES, _ = build_xml_global_data_types(PrebuiltDataModelDirecto
 SPEC_GLOBAL_STRUCTS = SPEC_GLOBAL_DATA_TYPES.get('structs', {})
 ZAP = zap_fabric_metadata.build_zap_fabric_metadata()
 
-# Clusters whose C++ implementation filters its fabric-sensitive list by the
-# accessing fabric itself, rather than relying on generated masking. The spec
-# requires a fabric-sensitive attribute to be reported as a fabric-filtered list
-# regardless of the request's FabricFiltered flag (Interaction Model, "Outgoing
-# Report Data Action"), and omitting the entries outright satisfies that. There
-# is no generic implementation of attribute-level fabric sensitivity to lean on:
-# AttributeQualityFlags::kFabricSensitive is set nowhere in the SDK, so each of
-# these clusters has to do it by hand, and this list records which ones do.
+# Clusters that filter a fabric-sensitive list by the accessing fabric in their
+# own C++ code. The spec requires such an attribute to be reported fabric
+# filtered whatever the request's FabricFiltered flag says (Interaction Model,
+# "Outgoing Report Data Action"). The reporting engine does that generically for
+# AttributeQualityFlags::kFabricSensitive, but codegen only sets the flag from
+# <access fabricSensitive="true"/>, so a cluster still using the older tag form
+# has to filter by hand.
 HAND_FILTERING_CLUSTERS = frozenset({
-    # TLSCertificateManagementCluster.cpp passes request.GetAccessingFabricIndex()
-    # into EncodeProvisionedRootCertificates / EncodeProvisionedClientCertificates.
-    0x0801,
-    # TLSClientManagementCluster.cpp passes it into EncodeProvisionedEndpoints.
-    0x0802,
+    # CurrentConnections uses isFabricSensitive on the <attribute> tag.
     # PushAVStreamTransportCluster.cpp passes aEncoder.AccessingFabricIndex()
     # into ReadAndEncodeCurrentConnections.
-    0x0555,
+    Clusters.PushAvStreamTransport.id,
+})
+
+# Fabric-scoped attributes whose entries carry no fabric-sensitive field in
+# either the spec or ZAP. Not a defect: these lists are protected by fabric
+# filtering and their read privilege. Listed so a new one is noticed, because
+# TC-IDM-8.1 can only verify the filtered-read half of them.
+FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING = frozenset({
+    'Binding/Binding (entries are TargetStruct)',
+    'Group Key Management/GroupKeyMap (entries are GroupKeyMapStruct)',
+    'Group Key Management/GroupTable (entries are GroupInfoMapStruct)',
+    'OTA Software Update Requestor/DefaultOTAProviders (entries are ProviderLocation)',
+    'Operational Credentials/Fabrics (entries are FabricDescriptorStruct)',
+    'Operational Credentials/NOCs (entries are NOCStruct)',
 })
 
 # Gaps that exist today. Each entry is the finding string the checks below
@@ -102,19 +112,6 @@ KNOWN_FABRIC_METADATA_GAPS = frozenset({
     'Messages/MessageQueued: spec fabricSensitive, ZAP not',
     'Messages/MessagePresented: spec fabricSensitive, ZAP not',
     'Messages/MessageComplete: spec fabricSensitive, ZAP not',
-
-    # WebRTCSessionStruct carries no fabric-sensitive fields and neither WebRTC
-    # cluster filters CurrentSessions by the accessing fabric, so an unfiltered
-    # read returns another fabric's sessions in full: peer node id, session id
-    # and stream ids. The spec marks the attribute fabric sensitive, which
-    # requires the list to be reported fabric filtered whatever the request
-    # asked for, and the SDK implements that quality nowhere generically.
-    # TODO: remove once the WebRTC clusters filter CurrentSessions; tracked in
-    # https://github.com/project-chip/connectedhomeip/issues/73946
-    'WebRTC Transport Provider/CurrentSessions: attribute is fabric sensitive but '
-    'WebRTCSessionStruct masks no field and the cluster does not hand-filter',
-    'WebRTC Transport Requestor/CurrentSessions: attribute is fabric sensitive but '
-    'WebRTCSessionStruct masks no field and the cluster does not hand-filter',
 
     # Spec master marks GroupKeySetStruct "Access Modifier: Fabric Scoped"; ZAP
     # does not. Lower impact than the entries above because the struct is only
@@ -160,14 +157,156 @@ def audited_cluster_ids() -> list[int]:
                   if is_standard_cluster_id(cluster_id) and cluster_id in ZAP.clusters)
 
 
+def struct_fabric_scoping_findings() -> list[str]:
+    """Structs the spec marks fabric scoped that ZAP does not."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        for name, struct in xml_cluster.structs.items():
+            if not struct.fabric_scoped:
+                continue
+            zap_struct = ZAP.struct(cluster_id, name)
+            if zap_struct is None:
+                continue
+            if not zap_struct.fabric_scoped:
+                findings.append(f"{xml_cluster.name}/{name}: spec fabricScoped, ZAP not")
+    return findings
+
+
+def struct_fabric_sensitive_field_findings() -> list[str]:
+    """Structs whose fabric-sensitive field ids differ between spec and ZAP."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        for name, struct in xml_cluster.structs.items():
+            zap_struct = ZAP.struct(cluster_id, name)
+            if zap_struct is None:
+                continue
+            spec_ids = sensitive_field_ids(struct)
+            if spec_ids == zap_struct.sensitive_field_ids:
+                continue
+            findings.append(f"{xml_cluster.name}/{name}: fabric-sensitive fields differ, "
+                            f"spec {sorted(spec_ids)} ZAP {sorted(zap_struct.sensitive_field_ids)}")
+    return findings
+
+
+def event_fabric_sensitivity_findings() -> list[str]:
+    """Events the spec marks fabric sensitive that ZAP does not."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        zap_cluster = ZAP.clusters[cluster_id]
+        for event_id, event in xml_cluster.events.items():
+            if not event.fabric_sensitive:
+                continue
+            if event_id not in zap_cluster.fabric_sensitive_event_ids:
+                findings.append(f"{xml_cluster.name}/{event.name}: spec fabricSensitive, ZAP not")
+    return findings
+
+
+def command_fabric_scoping_findings() -> list[str]:
+    """Commands the spec marks fabric scoped that ZAP does not."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        zap_cluster = ZAP.clusters[cluster_id]
+        for command_id, command in xml_cluster.accepted_commands.items():
+            if not command.fabric_scoped:
+                continue
+            if command_id not in zap_cluster.fabric_scoped_command_ids:
+                findings.append(f"{xml_cluster.name}/{command.name}: spec fabricScoped, ZAP not")
+    return findings
+
+
+def attribute_fabric_sensitivity_findings() -> list[str]:
+    """Attributes the spec marks fabric sensitive that ZAP does not."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        zap_cluster = ZAP.clusters[cluster_id]
+        for attribute_id, attribute in xml_cluster.attributes.items():
+            if not attribute.fabric_sensitive:
+                continue
+            if attribute_id not in zap_cluster.fabric_sensitive_attribute_ids:
+                findings.append(f"{xml_cluster.name}/{attribute.name}: spec fabricSensitive, ZAP not")
+    return findings
+
+
+def attribute_level_sensitivity_findings() -> list[str]:
+    """Fabric-sensitive attributes that nothing in the SDK filters or fully masks."""
+    findings = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        zap_cluster = ZAP.clusters[cluster_id]
+        for attribute_id, attribute in xml_cluster.attributes.items():
+            if not attribute.fabric_sensitive:
+                continue
+            if attribute_id in zap_cluster.enforced_fabric_sensitive_attribute_ids:
+                continue
+            if cluster_id in HAND_FILTERING_CLUSTERS:
+                continue
+            entry_type = zap_cluster.entry_type_by_attribute_id.get(attribute_id)
+            if entry_type is None:
+                continue
+            zap_struct = ZAP.struct(cluster_id, entry_type)
+            if zap_struct is None:
+                continue
+            # Every field has to be masked, because the whole entry is what
+            # the reader must not see. The FabricIndex is not among a ZAP
+            # struct's items, so the full field set is the right comparison.
+            if zap_struct.sensitive_field_ids == zap_struct.field_ids:
+                continue
+            if not zap_struct.sensitive_field_ids:
+                findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
+                                f"{entry_type} masks no field and the cluster does not hand-filter")
+            else:
+                findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
+                                f"{entry_type} masks only {sorted(zap_struct.sensitive_field_ids)} of "
+                                f"{sorted(zap_struct.field_ids)}")
+    return findings
+
+
+def all_fabric_metadata_findings() -> list[str]:
+    """Every finding the checks produce, across all six comparisons.
+
+    Each comparison only sees its own subset, so a listed gap can only be
+    matched against the combined set.
+    """
+    findings = []
+    findings.extend(struct_fabric_scoping_findings())
+    findings.extend(struct_fabric_sensitive_field_findings())
+    findings.extend(event_fabric_sensitivity_findings())
+    findings.extend(command_fabric_scoping_findings())
+    findings.extend(attribute_fabric_sensitivity_findings())
+    findings.extend(attribute_level_sensitivity_findings())
+    return findings
+
+
+def fabric_scoped_attributes_without_masking() -> list[str]:
+    """Fabric-scoped attributes whose entries carry no fabric-sensitive field."""
+    no_masking_rule = []
+    for cluster_id in audited_cluster_ids():
+        xml_cluster = SPEC_CLUSTERS[cluster_id]
+        zap_cluster = ZAP.clusters[cluster_id]
+        for attribute_id, attribute in xml_cluster.attributes.items():
+            if not attribute.fabric_scoped:
+                continue
+            entry_type = zap_cluster.entry_type_by_attribute_id.get(attribute_id)
+            if entry_type is None:
+                continue
+            zap_struct = ZAP.struct(cluster_id, entry_type)
+            spec_ids = sensitive_field_ids(spec_struct(cluster_id, entry_type))
+            zap_ids = zap_struct.sensitive_field_ids if zap_struct is not None else frozenset()
+            if spec_ids or zap_ids:
+                continue
+            no_masking_rule.append(f"{xml_cluster.name}/{attribute.name} (entries are {entry_type})")
+    return no_masking_rule
+
+
 class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
 
     def assert_findings_are_known(self, findings: list[str], subject: str) -> None:
-        """Fail on any finding not in the known-gap list, and flag stale entries.
-
-        A gap that has been fixed but is still listed is reported too: leaving it
-        behind would silently accept the defect if it ever came back.
-        """
+        """Fail on any finding that is not in the known-gap list."""
         unexpected = [finding for finding in findings if finding not in KNOWN_FABRIC_METADATA_GAPS]
         asserts.assert_equal(unexpected, [], f"{subject}: spec and ZAP disagree and the gap is not a known one")
 
@@ -178,18 +317,7 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         list encoder cannot filter the attribute and the entries of every fabric
         are returned to every reader.
         """
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            for name, struct in xml_cluster.structs.items():
-                if not struct.fabric_scoped:
-                    continue
-                zap_struct = ZAP.struct(cluster_id, name)
-                if zap_struct is None:
-                    continue
-                if not zap_struct.fabric_scoped:
-                    findings.append(f"{xml_cluster.name}/{name}: spec fabricScoped, ZAP not")
-        self.assert_findings_are_known(findings, "struct fabric scoping")
+        self.assert_findings_are_known(struct_fabric_scoping_findings(), "struct fabric scoping")
 
     def test_struct_fabric_sensitive_fields_match_spec(self):
         """The set of fabric-sensitive field ids must be the same on both sides.
@@ -198,32 +326,11 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         cross-fabric read, so a field the spec marks and ZAP does not is a field
         that leaks.
         """
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            for name, struct in xml_cluster.structs.items():
-                zap_struct = ZAP.struct(cluster_id, name)
-                if zap_struct is None:
-                    continue
-                spec_ids = sensitive_field_ids(struct)
-                if spec_ids == zap_struct.sensitive_field_ids:
-                    continue
-                findings.append(f"{xml_cluster.name}/{name}: fabric-sensitive fields differ, "
-                                f"spec {sorted(spec_ids)} ZAP {sorted(zap_struct.sensitive_field_ids)}")
-        self.assert_findings_are_known(findings, "struct fabric-sensitive fields")
+        self.assert_findings_are_known(struct_fabric_sensitive_field_findings(), "struct fabric-sensitive fields")
 
     def test_event_fabric_sensitivity_matches_spec(self):
         """An event the spec marks fabric sensitive must be isFabricSensitive in ZAP."""
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            zap_cluster = ZAP.clusters[cluster_id]
-            for event_id, event in xml_cluster.events.items():
-                if not event.fabric_sensitive:
-                    continue
-                if event_id not in zap_cluster.fabric_sensitive_event_ids:
-                    findings.append(f"{xml_cluster.name}/{event.name}: spec fabricSensitive, ZAP not")
-        self.assert_findings_are_known(findings, "event fabric sensitivity")
+        self.assert_findings_are_known(event_fabric_sensitivity_findings(), "event fabric sensitivity")
 
     def test_command_fabric_scoping_matches_spec(self):
         """A command the spec marks fabric scoped must be isFabricScoped in ZAP.
@@ -232,99 +339,46 @@ class TestFabricMetadataConsistency(CertificationUnitTestNoDevice):
         session with no accessing fabric, so a missing one leaves the command
         invocable over PASE.
         """
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            zap_cluster = ZAP.clusters[cluster_id]
-            for command_id, command in xml_cluster.accepted_commands.items():
-                if not command.fabric_scoped:
-                    continue
-                if command_id not in zap_cluster.fabric_scoped_command_ids:
-                    findings.append(f"{xml_cluster.name}/{command.name}: spec fabricScoped, ZAP not")
-        self.assert_findings_are_known(findings, "command fabric scoping")
+        self.assert_findings_are_known(command_fabric_scoping_findings(), "command fabric scoping")
 
     def test_attribute_fabric_sensitivity_matches_spec(self):
         """An attribute the spec marks fabric sensitive must be isFabricSensitive in ZAP."""
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            zap_cluster = ZAP.clusters[cluster_id]
-            for attribute_id, attribute in xml_cluster.attributes.items():
-                if not attribute.fabric_sensitive:
-                    continue
-                if attribute_id not in zap_cluster.fabric_sensitive_attribute_ids:
-                    findings.append(f"{xml_cluster.name}/{attribute.name}: spec fabricSensitive, ZAP not")
-        self.assert_findings_are_known(findings, "attribute fabric sensitivity")
+        self.assert_findings_are_known(attribute_fabric_sensitivity_findings(), "attribute fabric sensitivity")
 
     def test_attribute_level_sensitivity_is_consumed(self):
         """Something must act on an attribute the spec marks fabric sensitive.
 
-        This is the check the plain marker comparisons cannot make. For the
-        attributes carrying the quality, spec and ZAP agree that the marker is
-        there; what varies is whether anything uses it. The SDK has no generic
-        implementation, so the entries of another fabric are withheld only if the
-        entry struct masks every field, or the cluster filters the list itself.
-        A cluster doing neither returns another fabric's data in full.
+        This is the check the plain marker comparisons cannot make: a marker
+        can be present without anything consuming it. Another fabric's entries
+        are withheld when codegen sets kFabricSensitive (only from the <access>
+        form), when the cluster filters the list itself, or when the entry
+        struct masks every field. Anything else returns that data in full.
         """
-        findings = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            zap_cluster = ZAP.clusters[cluster_id]
-            for attribute_id, attribute in xml_cluster.attributes.items():
-                if not attribute.fabric_sensitive:
-                    continue
-                if cluster_id in HAND_FILTERING_CLUSTERS:
-                    continue
-                entry_type = zap_cluster.entry_type_by_attribute_id.get(attribute_id)
-                if entry_type is None:
-                    continue
-                zap_struct = ZAP.struct(cluster_id, entry_type)
-                if zap_struct is None:
-                    continue
-                # Every field has to be masked, because the whole entry is what
-                # the reader must not see. The FabricIndex is not among a ZAP
-                # struct's items, so the full field set is the right comparison.
-                if zap_struct.sensitive_field_ids == zap_struct.field_ids:
-                    continue
-                if not zap_struct.sensitive_field_ids:
-                    findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
-                                    f"{entry_type} masks no field and the cluster does not hand-filter")
-                else:
-                    findings.append(f"{xml_cluster.name}/{attribute.name}: attribute is fabric sensitive but "
-                                    f"{entry_type} masks only {sorted(zap_struct.sensitive_field_ids)} of "
-                                    f"{sorted(zap_struct.field_ids)}")
-        self.assert_findings_are_known(findings, "attribute-level fabric sensitivity")
+        self.assert_findings_are_known(attribute_level_sensitivity_findings(), "attribute-level fabric sensitivity")
+
+    def test_listed_gaps_still_occur(self):
+        """Every entry in KNOWN_FABRIC_METADATA_GAPS must still be produced.
+
+        Each check above only sees its own findings, so a gap that has been fixed
+        stays listed unless the combined set is compared. A listed gap that no
+        longer occurs would be accepted again if the defect came back.
+        """
+        stale = sorted(set(KNOWN_FABRIC_METADATA_GAPS) - set(all_fabric_metadata_findings()))
+        asserts.assert_equal(stale, [],
+                             "these listed gaps no longer occur; remove them from KNOWN_FABRIC_METADATA_GAPS")
 
     def test_fabric_scoped_attributes_have_a_masking_rule(self):
-        """Census of fabric-scoped attributes whose entries carry nothing to mask.
+        """Fabric-scoped attributes whose entries carry nothing to mask.
 
-        Not a defect on its own: plenty of fabric-scoped lists legitimately have
-        no sensitive fields, and are protected by fabric filtering and their read
-        privilege alone. It is logged rather than asserted because it is the set
-        TC-IDM-8.1 can only check the filtered-read half of, so it says which
-        attributes a passing run has said the least about.
+        Not a defect on its own: these lists are protected by fabric filtering
+        and their read privilege. The set is asserted so a new one is noticed,
+        because TC-IDM-8.1 can only verify the filtered-read half of it.
         """
-        no_masking_rule = []
-        for cluster_id in audited_cluster_ids():
-            xml_cluster = SPEC_CLUSTERS[cluster_id]
-            zap_cluster = ZAP.clusters[cluster_id]
-            for attribute_id, attribute in xml_cluster.attributes.items():
-                if not attribute.fabric_scoped:
-                    continue
-                entry_type = zap_cluster.entry_type_by_attribute_id.get(attribute_id)
-                if entry_type is None:
-                    continue
-                zap_struct = ZAP.struct(cluster_id, entry_type)
-                spec_ids = sensitive_field_ids(spec_struct(cluster_id, entry_type))
-                zap_ids = zap_struct.sensitive_field_ids if zap_struct is not None else frozenset()
-                if spec_ids or zap_ids:
-                    continue
-                no_masking_rule.append(f"{xml_cluster.name}/{attribute.name} (entries are {entry_type})")
-
-        self.print_step("census", f"{len(no_masking_rule)} fabric-scoped attribute(s) have no fabric-sensitive "
-                        f"field in either the spec or ZAP, so only their fabric filtering can be verified")
-        for entry in sorted(no_masking_rule):
+        found = sorted(fabric_scoped_attributes_without_masking())
+        for entry in found:
             self.print_step("census", f"  {entry}")
+        asserts.assert_equal(found, sorted(FABRIC_SCOPED_ATTRIBUTES_WITHOUT_MASKING),
+                             "the set of fabric-scoped attributes with nothing to mask changed")
 
 
 if __name__ == "__main__":

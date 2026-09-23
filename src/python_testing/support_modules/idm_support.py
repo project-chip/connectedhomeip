@@ -28,9 +28,9 @@ import types
 import typing
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, get_args
+from typing import Any, Awaitable, Callable, get_args
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -93,14 +93,16 @@ class FabricCheckOutcome(StrEnum):
     NOT_EXERCISED = 'not exercised'
 
 
+FabricCheckLocation = AttributePathLocation | EventPathLocation
+
+
 @dataclass(frozen=True)
 class FabricCheckRecord:
     """One check against one path, and what came of it."""
     path: str
     check: str
     outcome: FabricCheckOutcome
-    # AttributePathLocation or EventPathLocation, for the problem notice.
-    location: Any
+    location: FabricCheckLocation
     # Why, for anything that is not VERIFIED.
     reason: str = ''
 
@@ -218,6 +220,22 @@ class FabricSensitiveEventInfo:
     @property
     def path_str(self) -> str:
         return f"EP{self.endpoint_id} {self.cluster_name}.{self.event_name}"
+
+
+FabricEntryUndo = Callable[[], Awaitable[None]]
+FabricEntryMatch = Callable[[object], bool]
+FabricEntryPopulator = Callable[[FabricScopedAttributeInfo, ChipDeviceCtrl], Awaitable[bool]]
+
+
+def unsuccessful_write_statuses(result) -> list[str]:
+    """Status names from an attribute write that were not Success.
+
+    A list write returns one status per list operation. Status is an IntEnum,
+    which formats as a bare number under Python 3.11, so the name is what a
+    failure message can actually be read from.
+    """
+    return [str(getattr(entry.Status, 'name', entry.Status))
+            for entry in result if entry.Status != Status.Success]
 
 
 @dataclass
@@ -511,6 +529,12 @@ class IDMBaseTest(BasicCompositionTests):
     """Base test class for IDM tests with shared functionality."""
 
     ROOT_NODE_ENDPOINT_ID = 0
+
+    def setup_test(self):
+        super().setup_test()
+        self.fabric_check_records: list[FabricCheckRecord] = []
+        self.fabric_entry_cleanups: list[tuple[str, FabricEntryUndo]] = []
+        self.fabric_entry_markers: dict[tuple[str, int], FabricEntryMatch] = {}
 
     # ========================================================================
     # Descriptor and Cluster Reading Utilities
@@ -1675,8 +1699,7 @@ class IDMBaseTest(BasicCompositionTests):
         would otherwise be missed while the first status reports success.
         """
         result = await dev_ctrl.WriteAttribute(self.dut_node_id, [(info.endpoint_id, info.attribute(value=value))])
-        # Status is an IntEnum, which formats as a bare number under Python 3.11.
-        failures = [str(getattr(r.Status, 'name', r.Status)) for r in result if r.Status != Status.Success]
+        failures = unsuccessful_write_statuses(result)
         asserts.assert_equal(failures, [], f"{info.path_str}: write returned {', '.join(failures)}")
 
     def fabric_scoped_write_payload(self, info: FabricScopedAttributeInfo,
@@ -1727,10 +1750,8 @@ class IDMBaseTest(BasicCompositionTests):
     # ========================================================================
 
     def record_fabric_check(self, path: str, check: str, outcome: FabricCheckOutcome,
-                            location: Any, reason: str = '') -> None:
+                            location: FabricCheckLocation, reason: str = '') -> None:
         """Record what one check established about one path."""
-        if not hasattr(self, 'fabric_check_records'):
-            self.fabric_check_records = []
         self.fabric_check_records.append(FabricCheckRecord(path=path, check=check, outcome=outcome,
                                                            location=location, reason=reason))
 
@@ -1743,7 +1764,7 @@ class IDMBaseTest(BasicCompositionTests):
         not be exercised against, is what lets a reader tell a thorough run from
         an empty one without re-deriving it from the absence of failures.
         """
-        records = getattr(self, 'fabric_check_records', [])
+        records = self.fabric_check_records
         if not records:
             return
 
@@ -1779,7 +1800,7 @@ class IDMBaseTest(BasicCompositionTests):
     # Populating the Other Fabric's Entries (TC-IDM-8.1)
     # ========================================================================
 
-    def fabric_entry_populator(self, info: FabricScopedAttributeInfo):
+    def fabric_entry_populator(self, info: FabricScopedAttributeInfo) -> FabricEntryPopulator | None:
         """Return a populator for this attribute, or None when no sequence is known.
 
         The cross-fabric masking assertions only prove anything when the other
@@ -1805,7 +1826,7 @@ class IDMBaseTest(BasicCompositionTests):
         }
         return populators.get((info.cluster_id, info.attribute_id))
 
-    def record_fabric_entry_cleanup(self, description: str, undo) -> None:
+    def record_fabric_entry_cleanup(self, description: str, undo: FabricEntryUndo) -> None:
         """Remember how to undo something the test changed on a fabric.
 
         A command-owned entry cannot be restored by writing the attribute back, so
@@ -1813,8 +1834,6 @@ class IDMBaseTest(BasicCompositionTests):
         in reverse order by run_fabric_entry_cleanups, which matters where one
         entry references another.
         """
-        if not hasattr(self, 'fabric_entry_cleanups'):
-            self.fabric_entry_cleanups = []
         self.fabric_entry_cleanups.append((description, undo))
 
     async def run_fabric_entry_cleanups(self) -> None:
@@ -1823,7 +1842,7 @@ class IDMBaseTest(BasicCompositionTests):
         Failures are logged and skipped so one cluster refusing to clean up cannot
         hide the test's own result or prevent the remaining entries being removed.
         """
-        for description, undo in reversed(getattr(self, 'fabric_entry_cleanups', [])):
+        for description, undo in reversed(self.fabric_entry_cleanups):
             try:
                 await undo()
             except Exception as e:
@@ -1956,7 +1975,7 @@ class IDMBaseTest(BasicCompositionTests):
                 f"GroupKeyMap entry for group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
                 lambda: dev_ctrl.WriteAttribute(self.dut_node_id,
                                                 [(self.ROOT_NODE_ENDPOINT_ID, group_key_map(original_map))]))
-            failures = [str(getattr(r.Status, 'name', r.Status)) for r in write_result if r.Status != Status.Success]
+            failures = unsuccessful_write_statuses(write_result)
             asserts.assert_equal(failures, [], f"GroupKeyMap write returned {', '.join(failures)}")
 
             await dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
@@ -1965,7 +1984,7 @@ class IDMBaseTest(BasicCompositionTests):
                 f"group {POPULATE_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
                 lambda: dev_ctrl.SendCommand(self.dut_node_id, groups_endpoint,
                                              Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID)))
-        except Exception as e:
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
             log.info("Could not add a group on node %d's fabric: %s", dev_ctrl.nodeId, e)
             return False
 
@@ -1998,9 +2017,9 @@ class IDMBaseTest(BasicCompositionTests):
                     startTime=NullValue,
                     duration=NullValue,
                     messageText=POPULATE_MESSAGE_TEXT))
-        except Exception as e:
-            # Broad by intent, matching the other populators: a DUT that will not
-            # queue a message is a coverage gap rather than a fabric-check failure.
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
+            # A DUT that will not queue a message is a coverage gap rather than
+            # a fabric-check failure.
             log.info("Could not queue a message on node %d's fabric: %s", dev_ctrl.nodeId, e)
             return False
 
@@ -2014,7 +2033,8 @@ class IDMBaseTest(BasicCompositionTests):
                                         lambda entry: getattr(entry, 'messageID', None) == message_id)
         return True
 
-    def record_fabric_entry_marker(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl, matches) -> None:
+    def record_fabric_entry_marker(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl,
+                                   matches: FabricEntryMatch) -> None:
         """Remember how to recognise the entry a populator created on one fabric.
 
         The cross-fabric assertions attribute an entry to a fabric by its FabricIndex
@@ -2023,8 +2043,6 @@ class IDMBaseTest(BasicCompositionTests):
         registers a predicate here, so isolation can be checked by the entry's own
         identity rather than by a field the generated struct may be missing.
         """
-        if not hasattr(self, 'fabric_entry_markers'):
-            self.fabric_entry_markers = {}
         self.fabric_entry_markers[(info.path_str, dev_ctrl.nodeId)] = matches
 
     def assert_populated_entry_not_leaked(self, info: FabricScopedAttributeInfo, entries: list | Nullable,
@@ -2040,7 +2058,7 @@ class IDMBaseTest(BasicCompositionTests):
         Returns True when the check could be made, i.e. the other fabric registered a
         marker, so the caller can tell a verified check from one with nothing to check.
         """
-        matches = getattr(self, 'fabric_entry_markers', {}).get((info.path_str, other_ctrl.nodeId))
+        matches = self.fabric_entry_markers.get((info.path_str, other_ctrl.nodeId))
         if matches is None or not isinstance(entries, list):
             return False
         leaked = [entry for entry in entries if matches(entry)]
@@ -2075,9 +2093,9 @@ class IDMBaseTest(BasicCompositionTests):
                 self.dut_node_id,
                 [(self.ROOT_NODE_ENDPOINT_ID, attributes.Extension(
                     value=[Clusters.AccessControl.Structs.AccessControlExtensionStruct(data=D_OK_EMPTY)]))])
-            failures = [getattr(r.Status, 'name', r.Status) for r in result if r.Status != Status.Success]
+            failures = unsuccessful_write_statuses(result)
             if failures:
-                log.info("Cannot trigger %s: writing Extension returned %s", info.path_str, ', '.join(map(str, failures)))
+                log.info("Cannot trigger %s: writing Extension returned %s", info.path_str, ', '.join(failures))
                 return False
             return True
         if info.event_id == events.AccessControlEntryChanged.event_id:
