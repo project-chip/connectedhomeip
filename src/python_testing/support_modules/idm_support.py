@@ -26,9 +26,10 @@ import logging
 import time
 import types
 import typing
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, Awaitable, Callable, get_args
+from typing import Any, get_args
 
 from mobly import asserts, signals
 
