@@ -58,7 +58,7 @@ log = logging.getLogger(__name__)
 # An index in the valid 1..254 range that holds no fabric on a freshly commissioned DUT.
 UNOCCUPIED_FABRIC_INDEX = 200
 
-FAILSAFE_SECONDS = 15
+FAILSAFE_SECONDS = 60
 
 
 class TestFabricPendingCertScope(MatterBaseTest):
@@ -82,23 +82,17 @@ class TestFabricPendingCertScope(MatterBaseTest):
             Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
             f"ArmFailSafe({seconds}) was not accepted")
 
-    async def _release_failsafe_after_add(self, dev_ctrl, node_id):
-        """Give up the fail-safe once a fabric has been added under it.
-
-        A successful AddNOC moves the fail-safe context to the newly added fabric, so a disarm sent
-        from the original fabric is answered with BusyWithOtherAdmin. That is correct behaviour, so
-        accept it and let the fail-safe expire instead.
-        """
+    async def _disarm_failsafe(self, dev_ctrl, node_id):
+        """Disarm the fail-safe from the controller whose fabric holds it, which rolls back its changes."""
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         resp = await self.send_single_cmd(dev_ctrl=dev_ctrl, node_id=node_id, cmd=cmd)
-        enums = Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum
-        asserts.assert_in(
-            resp.errorCode, [enums.kOk, enums.kBusyWithOtherAdmin],
-            "Disarming the fail-safe returned an unexpected error")
-        return resp.errorCode == enums.kOk
+        asserts.assert_equal(
+            resp.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            "Disarming the fail-safe was not accepted")
 
-    async def _wait_for_fabric_list(self, expected: list, timeout_seconds: int = 40):
-        """Poll until the fabric list matches, so fail-safe expiry has time to roll a fabric back."""
+    async def _wait_for_fabric_list(self, expected: list, timeout_seconds: int = 10):
+        """Poll until the fabric list matches, since the fail-safe rollback completes asynchronously."""
         deadline = timeout_seconds
         while True:
             current = await self._read_fabric_indices()
@@ -139,6 +133,9 @@ class TestFabricPendingCertScope(MatterBaseTest):
         new_admin_node_id = dev_ctrl.nodeId + 1
         new_admin = new_fabric_admin.NewController(nodeId=new_admin_node_id)
 
+        # A successful AddNOC moves the fail-safe context to the added fabric, so only that fabric's
+        # administrator can disarm it afterwards.
+        failsafe_owner = dev_ctrl
         await self._arm_failsafe(dev_ctrl, node_id, FAILSAFE_SECONDS)
         try:
             cmd = self.opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
@@ -160,13 +157,15 @@ class TestFabricPendingCertScope(MatterBaseTest):
                 caseAdminSubject=new_admin_node_id,
                 adminVendorId=new_vendor_id)
             resp = await self.send_single_cmd(dev_ctrl=dev_ctrl, node_id=node_id, cmd=cmd)
+            if resp.statusCode == self.opcreds.Enums.NodeOperationalCertStatusEnum.kOk:
+                failsafe_owner = new_admin
             asserts.assert_equal(
                 resp.statusCode,
                 self.opcreds.Enums.NodeOperationalCertStatusEnum.kOk,
                 "AddNOC must still succeed after a RemoveFabric naming an unrelated index")
         finally:
-            # The fabric added above is rolled back when the fail-safe is given up.
-            await self._release_failsafe_after_add(dev_ctrl, node_id)
+            # Disarming rolls back the fabric added above.
+            await self._disarm_failsafe(failsafe_owner, node_id)
 
         fabrics_after = await self._wait_for_fabric_list(fabrics_before)
         asserts.assert_equal(
