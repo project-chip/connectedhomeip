@@ -578,7 +578,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     // BLEManagerImpl starts management itself once the BLE connection closes.
     if (config.enableWiFi)
     {
-        LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
+        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
     }
 #endif
 
