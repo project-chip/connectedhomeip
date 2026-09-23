@@ -85,7 +85,7 @@ private:
 
     SilabsLCD * mLCD = nullptr;
 #endif
-    bool mOn      = false;
+    bool mOn       = false;
     uint8_t mLevel = 0;
 };
 

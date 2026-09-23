@@ -265,7 +265,7 @@ void SilabsLCD::CycleScreens(void)
 {
     // Advance through: [Demo ->] Status -> [QRCode] -> DevicePages... -> wrap.
     // The demo screen is skipped entirely when at least one device page is registered.
-    const bool hasDevicePages = mDevicePageCount > 0;
+    const bool hasDevicePages  = mDevicePageCount > 0;
     const Screen_e kWrapScreen = hasDevicePages ? StatusScreen : DemoScreen;
 
     if (mCurrentScreen == DevicePageScreen)
@@ -317,7 +317,7 @@ void SilabsLCD::SetStatus(DisplayStatus_t & status)
 }
 
 CHIP_ERROR SilabsLCD::RegisterDevicePage(chip::EndpointId endpointId, const char * typeName, DevicePageDrawCB cb,
-                                        void * userContext, DevicePageButtonCB buttonCb)
+                                         void * userContext, DevicePageButtonCB buttonCb)
 {
     VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mDevicePageCount < mDevicePages.size(), CHIP_ERROR_NO_MEMORY);
