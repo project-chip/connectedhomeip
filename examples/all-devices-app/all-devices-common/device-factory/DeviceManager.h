@@ -23,12 +23,12 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
 #include <vector>
-#include <algorithm>
 namespace chip::app {
 
 template <typename DeviceFactoryT>
@@ -156,7 +156,7 @@ private:
     auto GetDeviceStorageIterator(EndpointId endpointId)
     {
         return std::find_if(mDevices.begin(), mDevices.end(),
-                       [endpointId](const auto & device) { return device.device.device->GetEndpointId() == endpointId; });
+                            [endpointId](const auto & device) { return device.device.device->GetEndpointId() == endpointId; });
     };
 
     std::vector<DeviceStorage> mDevices;
