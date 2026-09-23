@@ -19,6 +19,7 @@
 #include <app/MessageDef/StatusIB.h>
 #include <app/persistence/AttributePersistence.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip::app {
 
@@ -96,14 +97,19 @@ void LoggingRoomAirConditioner::OnIdentifyStop(Clusters::IdentifyCluster & clust
 
 void LoggingRoomAirConditioner::OnOffStartup(bool on)
 {
-    ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
-    LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
-                                   on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
-                          .ToChipError());
-    if (!on && mSystemMode != SystemModeEnum::kOff)
-    {
-        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
-    }
+    // Schedule the startup logic to run on the event loop.
+    // This ensures that all clusters (including ThermostatCluster) are fully
+    // initialized and their states are loaded from KVS before we attempt to sync them.
+    DeviceLayer::SystemLayer().ScheduleLambda([this, on]() {
+        ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
+                                       on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
+                              .ToChipError());
+        if (!on && mSystemMode != SystemModeEnum::kOff)
+        {
+            LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
+        }
+    });
 }
 
 void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
