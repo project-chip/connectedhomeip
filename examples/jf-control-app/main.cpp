@@ -30,20 +30,47 @@
 #include "commands/pairing/OpenJointCommissioningWindowCommand.h"
 
 #include "RpcClientProcessor.h"
+#include "RpcConnection.h"
 
 #include <zap-generated/cluster/Commands.h>
 
-/* RPC params can also be changed through command line arguments
- * see --rpc-server-ip/--rpc-server-port arguments
- */
-static std::string rpcServerIp = "127.0.0.1";
-static uint16_t rpcServerPort  = 33000;
-CHIP_ERROR RpcConnect();
+namespace {
 
-CHIP_ERROR RpcConnect(void)
+/* RPC connection parameters.
+ *
+ * The RPC server is hosted by the jf-admin-app, which is the Anchor
+ * Administrator this application commissions. The jf-admin-app may run on a
+ * separate host from this control application, so its address is not assumed.
+ * Rather than hardcoding the server IPv6 address, it is discovered via mDNS
+ * after the Anchor Administrator has been commissioned (the node id is then
+ * known).
+ *
+ * The address may still be provided manually through the --rpc-server-ip
+ * argument, in which case the RPC connection is established at startup and the
+ * post-commissioning discovery is skipped. The RPC port is a fixed pigweed
+ * listen port and is not discoverable over Matter, so it keeps a default value
+ * and can only be overridden through --rpc-server-port.
+ */
+std::string gRpcServerIp;
+uint16_t gRpcServerPort   = 33000;
+bool gRpcServerIpProvided = false;
+
+} // namespace
+
+bool RpcServerAddressProvidedManually()
 {
-    chip::rpc::client::SetRpcServerAddress(rpcServerIp.c_str());
-    chip::rpc::client::SetRpcServerPort(rpcServerPort);
+    return gRpcServerIpProvided;
+}
+
+uint16_t RpcServerPort()
+{
+    return gRpcServerPort;
+}
+
+CHIP_ERROR RpcConnect(const char * serverIp, uint16_t serverPort)
+{
+    chip::rpc::client::SetRpcServerAddress(serverIp);
+    chip::rpc::client::SetRpcServerPort(serverPort);
     return chip::rpc::client::StartPacketProcessing();
 }
 
@@ -79,12 +106,13 @@ int main(int argc, char * argv[])
     {
         if (args[i] == "--rpc-server-ip" && ((i + 1) < args.size()))
         {
-            rpcServerIp = args[i + 1];
+            gRpcServerIp         = args[i + 1];
+            gRpcServerIpProvided = true;
             ++i;
         }
         else if (args[i] == "--rpc-server-port" && ((i + 1) < args.size()))
         {
-            rpcServerPort = static_cast<uint16_t>(atoi(args[i + 1].c_str()));
+            gRpcServerPort = static_cast<uint16_t>(atoi(args[i + 1].c_str()));
             ++i;
         }
         else
@@ -94,13 +122,19 @@ int main(int argc, char * argv[])
         }
     }
 
-    /* connect to the jf-admin-app RPC server */
-    if (RpcConnect() != CHIP_NO_ERROR)
+    /* If the RPC server IP was provided manually, connect to the jf-admin-app RPC server now.
+     * Otherwise, the connection is deferred: the address is discovered via mDNS once the
+     * Anchor Administrator has been commissioned and its node id is known.
+     */
+    if (gRpcServerIpProvided)
     {
-        ChipLogError(JointFabric, "RPC: Unable to connect to the jf-admin-app@%s:%d", rpcServerIp.c_str(), rpcServerPort);
-        ChipLogError(JointFabric,
-                     "RPC: Try specifying a different IP Address/Port using --rpc-server-ip/rpc-server-port arguments!");
-        return -1;
+        if (RpcConnect(gRpcServerIp.c_str(), gRpcServerPort) != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "RPC: Unable to connect to the jf-admin-app@%s:%d", gRpcServerIp.c_str(), gRpcServerPort);
+            ChipLogError(JointFabric,
+                         "RPC: Try specifying a different IP Address/Port using --rpc-server-ip/rpc-server-port arguments!");
+            return -1;
+        }
     }
 
     ExampleCredentialIssuerCommands credIssuerCommands;

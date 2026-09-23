@@ -26,7 +26,10 @@
 #include <credentials/jcm/TrustVerification.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <lib/address_resolve/AddressResolve.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/Span.h>
+
 #include <lib/support/ThreadOperationalDataset.h>
 
 #include <optional>
@@ -75,8 +78,10 @@ class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
                        public JCMTrustVerificationDelegate,
-                       public chip::Credentials::DeviceAttestationDelegate
+                       public chip::Credentials::DeviceAttestationDelegate,
+                       public chip::AddressResolve::NodeListener
 {
+
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
@@ -245,10 +250,21 @@ public:
 #endif
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+
+        mAnchorRpcServerLookupHandle.SetListener(this);
+    }
+
+    ~PairingCommand() override { StopAnchorRpcServerResolution(); }
+
+    void Shutdown() override
+    {
+        StopAnchorRpcServerResolution();
+        CHIPCommand::Shutdown();
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
+
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(120)); }
 
     /////////// DevicePairingDelegate Interface /////////
@@ -276,8 +292,13 @@ public:
     CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
                                               ByteSpan & globallyTrustedRoot) override;
 
+    /////////// AddressResolve::NodeListener Interface /////////
+    void OnNodeAddressResolved(const chip::PeerId & peerId, const chip::AddressResolve::ResolveResult & result) override;
+    void OnNodeAddressResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR reason) override;
+
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
+
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId);
@@ -288,7 +309,16 @@ private:
     chip::Controller::CommissioningParameters GetCommissioningParameters();
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
 
+    // Resolve the Anchor Administrator operational IPv6 address via mDNS and, on success, establish the
+    // pigweed RPC connection to the jf-admin-app. Used when no RPC server IP was provided manually.
+    CHIP_ERROR ResolveAnchorRpcServerAddress(NodeId nodeId);
+    // Open the RPC GetStream towards the jf-admin-app for the just-commissioned Anchor Administrator.
+    void StartAnchorRpcStream(NodeId nodeId);
+    // Cancel the operational resolution started by ResolveAnchorRpcServerAddress if it is still active.
+    void StopAnchorRpcServerResolution();
+
     const PairingMode mPairingMode;
+
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
@@ -347,7 +377,13 @@ private:
     ::pw::rpc::NanopbClientReader<::RequestOptions> rpcGetStream;
     chip::ByteSpan mRemoteAdminTrustedRoot;
 
+    // Handle for the active AddressResolve lookup of the Anchor Administrator operational address. Using
+    // AddressResolve (rather than replacing the shared Dnssd::Resolver operational delegate) keeps the
+    // controller's operational resolution path intact for later CASE session address lookups.
+    chip::AddressResolve::NodeLookupHandle mAnchorRpcServerLookupHandle;
+
     // For unpair
+
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 
