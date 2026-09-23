@@ -102,9 +102,10 @@ void LoggingRoomAirConditioner::OnOffStartup(bool on)
     // initialized and their states are loaded from KVS before we attempt to sync them.
     DeviceLayer::SystemLayer().ScheduleLambda([this, on]() {
         ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
-        LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
-                                       on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
-                              .ToChipError());
+        LogErrorOnFailure(
+            StatusIB(ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
+                                                                : DataModel::NullNullable))
+                .ToChipError());
         if (!on && mSystemMode != SystemModeEnum::kOff)
         {
             LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
