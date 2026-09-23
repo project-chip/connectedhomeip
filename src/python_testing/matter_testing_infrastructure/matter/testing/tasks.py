@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import contextlib
 import logging
-import os
 import pathlib
 import re
 import shlex
-import signal
 import subprocess
 import sys
 import threading
-import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from enum import StrEnum
@@ -31,49 +27,6 @@ from typing import BinaryIO, Self
 from matter.testing.defaults import TestingDefaults
 
 LOGGER = logging.getLogger(__name__)
-
-# Interval for checking whether a signalled process group has emptied.
-TERMINATION_POLL_S = 0.1
-
-
-def terminate_process_group(proc: subprocess.Popen) -> None:
-    """Take down a process started with `start_new_session` and all its children.
-
-    `Popen.terminate()` signals only the process itself, leaving what it launched
-    to run on into the next test. Waiting on the leader is not enough either, as
-    it exits while a child that ignored the signal keeps running, so the group is
-    polled until it is empty. The caller must have used `start_new_session`, or
-    this kills the caller's own group.
-    """
-    try:
-        pgid = os.getpgid(proc.pid)
-    except ProcessLookupError:
-        return
-
-    for sig in (signal.SIGTERM, signal.SIGKILL):
-        with contextlib.suppress(ProcessLookupError):
-            os.killpg(pgid, sig)
-        if _wait_for_group_exit(proc, pgid):
-            return
-    LOGGER.warning("Process group %d survived SIGKILL, a stray process may be left behind", pgid)
-
-
-def _wait_for_group_exit(proc: subprocess.Popen, pgid: int) -> bool:
-    """Whether the group emptied within the termination timeout.
-
-    The leader is reaped on each pass, as a zombie counts as a group member and
-    would otherwise keep the group alive for as long as this waits.
-    """
-    deadline = time.monotonic() + TestingDefaults.TERMINATION_TIMEOUT_S
-    while time.monotonic() < deadline:
-        proc.poll()
-        try:
-            os.killpg(pgid, 0)
-        except ProcessLookupError:
-            return True
-        time.sleep(TERMINATION_POLL_S)
-    return False
-
 
 def forward_f(f_in: BinaryIO, f_out: BinaryIO, cb: Callable[[bytes, bool], bytes] | None = None, is_stderr: bool = False) -> None:
     """Forward f_in to f_out.
