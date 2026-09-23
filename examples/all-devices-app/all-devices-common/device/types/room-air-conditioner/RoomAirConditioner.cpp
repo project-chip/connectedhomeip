@@ -31,32 +31,25 @@ CHIP_ERROR RoomAirConditioner::Register(EndpointIdAllocator & allocator, CodeDri
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     const EndpointId endpoint = allocator.Allocate();
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    // Reject an occupied parent ID before rollback can attempt to remove it.
-    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpoints;
-    ReturnErrorOnFailure(provider.Endpoints(endpoints));
-    for (const auto & entry : endpoints.TakeBuffer())
-    {
-        VerifyOrReturnError(entry.id != endpoint, CHIP_ERROR_DUPLICATE_KEY_ID);
-    }
     DeviceRegistrationTransaction transaction(*this, provider);
 
-    mEndpointId = endpoint;
     ReturnErrorOnFailure(RegisterDescriptor(
         endpoint, provider,
         EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
+    mEndpointId = endpoint;
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
+    mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kCooling),
+                              CoolingThermostat::Config({}, mTimerDelegate), mThermostatDelegate, mCoolingDelegate);
+    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     Clusters::OnOffCluster::Context onOffContext{ mTimerDelegate };
     onOffContext.featureMap.Set(Clusters::OnOff::Feature::kDeadFrontBehavior);
     mOnOffCluster.Create(endpoint, onOffContext);
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
-
-    mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kCooling),
-                              CoolingThermostat::Config({}, mTimerDelegate), mThermostatDelegate, mCoolingDelegate);
-    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 

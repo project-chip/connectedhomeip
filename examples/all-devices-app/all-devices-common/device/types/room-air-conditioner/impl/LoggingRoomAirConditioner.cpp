@@ -16,6 +16,7 @@
 
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/persistence/AttributePersistence.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -96,22 +97,29 @@ void LoggingRoomAirConditioner::OnIdentifyStop(Clusters::IdentifyCluster & clust
 void LoggingRoomAirConditioner::OnOffStartup(bool on)
 {
     ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
-    ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
-                                               : DataModel::NullNullable);
+    LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
+                                   on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
+                          .ToChipError());
     if (!on && mSystemMode != SystemModeEnum::kOff)
     {
-        (void) ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
     }
 }
 
 void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
 {
     ChipLogProgress(AppServer, "RoomAirConditioner: turned %s", on ? "on" : "off");
-    ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
-                                               : DataModel::NullNullable);
+    LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
+                                   on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
+                          .ToChipError());
     if (!on && mSystemMode != SystemModeEnum::kOff)
     {
-        (void) ThermostatCluster().SetSystemMode(SystemModeEnum::kOff);
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
+    }
+    else if (on && mSystemMode == SystemModeEnum::kOff)
+    {
+        // Cool is the only supported operational mode for this simulator.
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kCool)).ToChipError());
     }
 }
 
