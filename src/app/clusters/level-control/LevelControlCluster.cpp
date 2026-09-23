@@ -400,11 +400,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 {
     VerifyOrReturnError(rate.IsNull() || rate.Value() != 0, Status::InvalidCommand);
     VerifyOrReturnError(!mCurrentLevel.value().IsNull(), Status::Failure);
-    VerifyOrReturnError(!rate.IsNull() || !mDefaultMoveRate.IsNull(), Status::Success); // No movement if rate is unspecified
 
-    // If rate is null, use default move rate (one of the two is guaranteed to be non-null here because of the earlier check)
-    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
-    VerifyOrReturnError(currentRate != 0, Status::ConstraintError);
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null, then the value of the DefaultMoveRate
+    // attribute SHALL be used if that attribute is supported and its value is not null."
+    // A null result means no rate is available; that case is handled once the target is known.
+    const DataModel::Nullable<uint8_t> effectiveRate = rate.IsNull() ? mDefaultMoveRate : rate;
+    VerifyOrReturnError(effectiveRate.IsNull() || effectiveRate.Value() != 0, Status::ConstraintError);
 
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
@@ -441,8 +442,21 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     uint8_t currentLevel = mCurrentLevel.value().Value();
     uint8_t difference   = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
 
-    // currentRate is known not to be 0 (ConstraintError check above)
-    uint32_t tickDurationMs = 1000 / currentRate;
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is
+    // either not supported or set to null, then the device SHOULD move as fast as it is able."
+    // Nothing paces the transition in that case, so go straight to the target.
+    if (effectiveRate.IsNull())
+    {
+        ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+        if (IsWithOnOffCommand(commandId) && targetLevel == mMinLevel)
+        {
+            ReturnErrorOnFailure(SetOnOff(false));
+        }
+        return Status::Success;
+    }
+
+    // effectiveRate is known not to be 0 (ConstraintError check above)
+    uint32_t tickDurationMs = 1000 / effectiveRate.Value();
     if (tickDurationMs == 0)
     {
         tickDurationMs = 1;
