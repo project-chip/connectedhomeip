@@ -61,11 +61,11 @@ CHIP_ERROR HumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataMode
     humidistatConfig.targetSetpoint = 40;
     humidistatConfig.mistType       = BitMask<Humidistat::MistTypeBitmap>(Humidistat::MistTypeBitmap::kMistCold);
     mHumidistatCluster.Create(endpoint,
-                              BitFlags<Humidistat::Feature>(
-                                  Humidistat::Feature::kHumidifier, Humidistat::Feature::kDehumidifier,
-                                  Humidistat::Feature::kContinuous, Humidistat::Feature::kSensor, Humidistat::Feature::kAuto,
-                                  Humidistat::Feature::kFanOnly, Humidistat::Feature::kOptimal, Humidistat::Feature::kWarmMist,
-                                  Humidistat::Feature::kColdMist, Humidistat::Feature::kCondPump),
+                              BitFlags<Humidistat::Feature>(Humidistat::Feature::kHumidifier, Humidistat::Feature::kDehumidifier,
+                                                            Humidistat::Feature::kContinuous, Humidistat::Feature::kSensor,
+                                                            Humidistat::Feature::kAuto, Humidistat::Feature::kFanOnly,
+                                                            Humidistat::Feature::kOptimal, Humidistat::Feature::kWarmMist,
+                                                            Humidistat::Feature::kColdMist, Humidistat::Feature::kCondPump),
                               HumidistatCluster::OptionalAttributeSet()
                                   .Set<Humidistat::Attributes::Sleep::Id>()
                                   .Set<Humidistat::Attributes::TargetSetpoint::Id>(),
