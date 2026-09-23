@@ -894,8 +894,6 @@ for that run, e.g.:
 #     app: ${TYPE_OF_APP}
 #     app-args: <app_arguments>
 #     script-args: <script_arguments>
-#     executor: <path_to_runner>   [optional]
-#     executor-args: <runner_arguments>   [optional]
 #     factory-reset: <true|false>
 #     timeout: <float>   [optional]
 #     quiet: <true|false>
@@ -951,25 +949,15 @@ for that run, e.g.:
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
--   `executor`: Path to a runner that takes over the whole run, for a test
-    needing a topology `run_python_test.py` does not model, such as more than
-    one application or a mocked transport. The runner is invoked with
-    `--script`, `--script-args` and `--timeout`, and owns the lifetime of
-    everything it starts. `app`, `app-args` and `factory-reset` are then the
-    runner's to interpret or ignore.
-
-    CI runs these like any other test, in a job of their own so that the
-    applications and privileges they need are set up once.
-    `local.py python-tests` skips them and names each one it skipped, because a
-    developer sweep has neither. List each such test under `dedicated_runner` in
-    `src/python_testing/test_metadata.yaml`.
+-   A test whose topology `run_python_test.py` does not model, such as one with
+    more than one application or a mocked transport, names a script as its
+    `app` that brings that topology up and logs a line for `app-ready-pattern`.
+    The test script then runs against it like any other. `local.py python-tests`
+    skips such tests and names each one it skipped, since they need root and
+    applications an ordinary sweep does not build. List each under
+    `dedicated_runner` in `src/python_testing/test_metadata.yaml`.
 
     -   Example: `scripts/tests/run_compro_test.py`
-
--   `executor-args`: Arguments appended to the `executor` invocation. Supports
-    the same `${...}` environment substitutions as `app` and `script-args`.
-
-    -   Example: `--proxy-app ${ALL_DEVICES_BLE_WIFI_APP}`
 
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test

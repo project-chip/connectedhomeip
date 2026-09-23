@@ -30,8 +30,6 @@ class Metadata:
     app_ready_pattern: str | None = None
     app_stdin_pipe: str | None = None
     script_args: str | None = None
-    executor: str | None = None
-    executor_args: str | None = None
     factory_reset: bool = False
     factory_reset_app_only: bool = False
     script_gdb: bool = False
@@ -156,8 +154,6 @@ class MetadataReader:
                 app_ready_pattern=attr.get("app-ready-pattern"),
                 app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
-                executor=attr.get("executor"),
-                executor_args=attr.get("executor-args"),
                 factory_reset=str(attr.get("factory-reset", False)).lower() == 'true',
                 timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',

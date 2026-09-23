@@ -57,20 +57,6 @@ class TestMetadataReader(unittest.TestCase):
         quiet=True
     )
 
-    executor_file_content = '''
-    # === BEGIN CI TEST ARGUMENTS ===
-    # test-runner-runs:
-    #  run1:
-    #   app: ${ALL_CLUSTERS_APP}
-    #   script-args: --commissioning-method on-network
-    #   executor: scripts/tests/run_compro_test.py
-    #   executor-args: >
-    #    --proxy-app ${ALL_CLUSTERS_APP}
-    #    --proxy-transport auto
-    #   timeout: 100
-    # === END CI TEST ARGUMENTS ===
-    '''
-
     def generate_temp_file(self, directory: str, file_content: str) -> str:
         fd, temp_file_path = tempfile.mkstemp(dir=directory)
         with os.fdopen(fd, 'w') as fp:
@@ -85,30 +71,6 @@ class TestMetadataReader(unittest.TestCase):
             reader = MetadataReader(env_file)
             self.expected_metadata.py_script_path = test_file
             self.assertEqual(self.expected_metadata, reader.parse_script(test_file)[0])
-
-    def test_executor_arg_generation(self):
-        """A test naming a dedicated runner reports it, with its args resolved."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            test_file = self.generate_temp_file(temp_dir, self.executor_file_content)
-            env_file = self.generate_temp_file(temp_dir, self.env_file_content)
-
-            metadata = MetadataReader(env_file).parse_script(test_file)[0]
-            self.assertEqual(metadata.executor, "scripts/tests/run_compro_test.py")
-            self.assertEqual(
-                metadata.executor_args,
-                "--proxy-app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/"
-                "chip-all-clusters-app --proxy-transport auto")
-            self.assertEqual(metadata.timeout, 100)
-
-    def test_no_executor_declared(self):
-        """A test without the key reports neither an executor nor its args."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            test_file = self.generate_temp_file(temp_dir, self.test_file_content)
-            env_file = self.generate_temp_file(temp_dir, self.env_file_content)
-
-            metadata = MetadataReader(env_file).parse_script(test_file)[0]
-            self.assertIsNone(metadata.executor)
-            self.assertIsNone(metadata.executor_args)
 
 
 if __name__ == "__main__":

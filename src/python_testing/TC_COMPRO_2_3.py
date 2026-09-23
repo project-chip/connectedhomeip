@@ -17,8 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_DEVICES_BLE_WIFI_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
+#     app: ${COMPRO_RUNNER}
+#     app-args: >
+#       --proxy-app ${ALL_DEVICES_BLE_WIFI_APP}
+#       --proxy-args "--trace-to json:${TRACE_APP}.json"
+#       --discriminator 1234
+#       --endpoint 5
+#       --proxy-transport auto
+#     app-ready-pattern: "COMPRO topology ready"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -26,15 +32,13 @@
 #       --passcode 20202021
 #       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg ed_app_path:${ALL_DEVICES_BLE_WIFI_APP}
+#       --string-arg ed_app_path:${ALL_DEVICES_BLE_WIFI_APP} ed_transport:both
+#       --string-arg 'ed_launch_wrapper:env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/chip-dbus-0 ip netns exec ns-wlx-app-0'
+#       --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437 --ble-controller 0'
 #       --int-arg ed_discriminator:3841 ed_passcode:20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     executor: scripts/tests/run_compro_test.py
-#     executor-args: >
-#       --proxy-app ${ALL_DEVICES_BLE_WIFI_APP}
-#       --ed-app ${ALL_DEVICES_BLE_WIFI_APP}
-#       --proxy-transport auto
+#       --fail-on-skipped
 #     factory-reset: true
 #     timeout: 600
 #     quiet: true

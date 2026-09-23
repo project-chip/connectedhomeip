@@ -986,6 +986,8 @@ def python_tests(
 
         # PushAV is special
         f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
+        # The COMPRO tests' app is the script that brings up their mocked topology
+        f.write("COMPRO_RUNNER: scripts/tests/run_compro_test.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:

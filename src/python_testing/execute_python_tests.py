@@ -297,8 +297,7 @@ def main():
     default="execute_python_tests script",
     help="Name for the JUnit XML test suite (default: execute_python_tests script).",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool,
-            summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
