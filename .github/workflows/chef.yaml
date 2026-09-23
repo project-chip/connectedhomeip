@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Chef CI (Reduced)
+name: Chef CI
 
 on:
     push:
@@ -32,7 +32,7 @@ env:
 jobs:
     chef_linux_reduced:
         name: Chef - Linux CI Examples (Reduced chef devices)
-        timeout-minutes: 60
+        timeout-minutes: 120
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]' && github.event_name != 'push'
 
