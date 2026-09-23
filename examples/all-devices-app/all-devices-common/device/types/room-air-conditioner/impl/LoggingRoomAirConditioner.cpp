@@ -100,7 +100,7 @@ void LoggingRoomAirConditioner::OnOffStartup(bool on)
     // Schedule the startup logic to run on the event loop.
     // This ensures that all clusters (including ThermostatCluster) are fully
     // initialized and their states are loaded from KVS before we attempt to sync them.
-    DeviceLayer::SystemLayer().ScheduleLambda([this, on]() {
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, on]() {
         ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
         LogErrorOnFailure(
             StatusIB(ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
@@ -110,7 +110,7 @@ void LoggingRoomAirConditioner::OnOffStartup(bool on)
         {
             LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
         }
-    });
+    }));
 }
 
 void LoggingRoomAirConditioner::OnOnOffChanged(bool on)
