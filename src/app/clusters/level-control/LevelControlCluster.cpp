@@ -76,7 +76,7 @@ LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & con
     mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
     mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate),
-    mOnOffCluster(config.mOnOffCluster), mTransitionHandler(*this)
+    mOnOffCluster(config.mOnOffCluster), mColorControl(config.mColorControl), mTransitionHandler(*this)
 {
     VerifyOrDie(!mFeatureMap.Has(Feature::kOnOff) || mOnOffCluster != nullptr);
 }
@@ -129,6 +129,12 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
     }
 
     // 4. Commit to Attribute and Delegate (Single SetValue call)
+    //
+    // Deliberately not routed through SetCurrentLevel, so Options.CoupleColorTempToLevel is not acted
+    // on here. Options carries no N quality (spec 1.6.6 attribute table), so it always reads as its
+    // default of 0 at boot and the coupling gate could never pass anyway. Should Options ever become
+    // persisted, the coupling call would have to be deferred to a later event loop pass: cluster
+    // Startup order within an endpoint is undefined, so Color Control may not be up yet at this point.
     mCurrentLevel.SetValue(currentLevel, System::SystemClock().GetMonotonicMilliseconds64());
 
     if (!mCurrentLevel.value().IsNull())
@@ -582,6 +588,15 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode rep
                                                                             : DataModel::AttributeChangeType::kQuiet);
     StoreCurrentLevel(mCurrentLevel.value());
     mDelegate.OnLevelChanged(level);
+
+    // Spec 1.6.6.5 (CoupleColorTempToLevel Bit): "If this bit is set, changes to the CurrentLevel
+    // attribute SHALL be coupled with the color temperature set in the Color Control cluster."
+    // Every change is forwarded, including the intermediate steps of a transition, so the color
+    // temperature tracks the ramp rather than jumping at the end.
+    if (mColorControl != nullptr && mOptions.Has(OptionsBitmap::kCoupleColorTempToLevel))
+    {
+        mColorControl->CoupleColorTempToLevel(level);
+    }
 
     return CHIP_NO_ERROR;
 }

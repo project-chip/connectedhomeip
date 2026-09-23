@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/clusters/color-control-server/ColorControlIntegrationDelegate.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
@@ -70,6 +71,16 @@ public:
         {
             mFeatureMap.Set(LevelControl::Feature::kOnOff);
             mOnOffCluster = &onOffCluster;
+            return *this;
+        }
+        /// Enables the Options.CoupleColorTempToLevel behavior of spec 1.6.6.5: while that bit is set,
+        /// every CurrentLevel change is forwarded to Color Control. Without this the bit stays inert.
+        ///
+        /// Takes the integration interface rather than ColorControlCluster so that a Level Control
+        /// without color support does not link the Color Control implementation.
+        Config & WithColorControl(ColorControlIntegrationDelegate & colorControl)
+        {
+            mColorControl = &colorControl;
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
@@ -128,7 +139,8 @@ public:
 
         LevelControlDelegate & mDelegate;
         TimerDelegate & mTimerDelegate;
-        OnOffCluster * mOnOffCluster = nullptr;
+        OnOffCluster * mOnOffCluster                    = nullptr;
+        ColorControlIntegrationDelegate * mColorControl = nullptr;
 
         uint8_t mMinLevel = 0;
         uint8_t mMaxLevel = kMaxLevel;
@@ -246,7 +258,8 @@ private:
     BitMask<LevelControl::Feature> mFeatureMap;
     LevelControlDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-    OnOffCluster * mOnOffCluster = nullptr;
+    OnOffCluster * mOnOffCluster                    = nullptr;
+    ColorControlIntegrationDelegate * mColorControl = nullptr;
 
     DataModel::Nullable<uint8_t> mLevelBeforeTurnedOff; // Stores the level before turning Off, to restore on On if OnLevel is null.
 

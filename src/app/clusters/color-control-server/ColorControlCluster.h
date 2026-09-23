@@ -19,6 +19,7 @@
 
 #include "ColorControlColorState.h"
 #include "ColorControlDelegate.h"
+#include "ColorControlIntegrationDelegate.h"
 #include <app/CommandHandler.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -184,7 +185,10 @@ class OnOffCluster;
 // registers this cluster with the endpoint's scene table (table->RegisterHandler(&cluster)) and must
 // call table->UnregisterHandler(&cluster) before destroying it. Shutdown() does not do this, because
 // the table stores the raw handler pointer and only the registering application knows its lifetime.
-class ColorControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, public TimerContext
+class ColorControlCluster : public DefaultServerCluster,
+                            public scenes::DefaultSceneHandlerImpl,
+                            public TimerContext,
+                            public ColorControlIntegrationDelegate
 {
 public:
     static constexpr uint32_t kTickMs = 100; // transition tick period
@@ -246,12 +250,12 @@ public:
                             const ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
                             MutableByteSpan & serializedBytes) override;
 
-    // Coupling color temperature to Level Control. The application calls this whenever Level Control's
-    // CurrentLevel changes and its CoupleColorTempToLevel option is set; `currentLevel` is that live value.
-    // The mapping is one-way (level → color temp) and only takes effect while the active mode is color
-    // temperature. Having the caller supply the level keeps this cluster free of any Level Control
-    // dependency.
-    void CoupleColorTempToLevel(uint8_t currentLevel);
+    // ---- ColorControlIntegrationDelegate override ----
+    // Level Control calls this whenever its CurrentLevel changes while its CoupleColorTempToLevel
+    // option is set; `currentLevel` is that live value. The mapping is one-way (level -> color temp)
+    // and only takes effect while the active mode is color temperature. Having the caller supply the
+    // level keeps this cluster free of any Level Control dependency.
+    void CoupleColorTempToLevel(uint8_t currentLevel) override;
 
     // ---- Live-state accessors (used by the scene handler to serialize a scene) ----
     // Each returns the value of the active color mode when it carries that field, otherwise a neutral
