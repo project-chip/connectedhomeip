@@ -710,7 +710,7 @@ private:
         {
             RegisterCreator("humidity-conditioner", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate);
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)

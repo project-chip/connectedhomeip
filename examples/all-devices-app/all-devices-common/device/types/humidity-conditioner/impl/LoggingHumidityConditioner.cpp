@@ -24,14 +24,64 @@ namespace chip::app {
 
 // LoggingHumidityConditioner
 
-LoggingHumidityConditioner::LoggingHumidityConditioner(TimerDelegate & timerDelegate) :
+LoggingHumidityConditioner::LoggingHumidityConditioner(TimerDelegate & timerDelegate,
+                                                       TestEventTriggerDelegate & testEventTriggerDelegate) :
     HumidityConditioner(HumidityConditioner::Config{
         .timerDelegate      = timerDelegate,
         .identifyDelegate   = *this,
         .onOffDelegate      = *this,
         .humidistatDelegate = *this,
-    })
+    }),
+    mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
+
+CHIP_ERROR LoggingHumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                                EndpointComposition composition)
+{
+    ReturnErrorOnFailure(HumidityConditioner::Register(endpoint, provider, composition));
+    mHumidistatTestEventTriggerHandler.SetCluster(&HumidistatCluster());
+    return mTestEventTriggerDelegate.AddHandler(&mHumidistatTestEventTriggerHandler);
+}
+
+void LoggingHumidityConditioner::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    mTestEventTriggerDelegate.RemoveHandler(&mHumidistatTestEventTriggerHandler);
+    mHumidistatTestEventTriggerHandler.SetCluster(nullptr);
+    HumidityConditioner::Unregister(provider);
+}
+
+CHIP_ERROR HumidistatSettingsTestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
+{
+    VerifyOrReturnError(mCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
+
+    switch (static_cast<HumidistatTrigger>(eventTrigger))
+    {
+    case HumidistatTrigger::kDisallowContinuous:
+        mCluster->SetSetSettingsAllowContinuous(false);
+        break;
+    case HumidistatTrigger::kAllowContinuous:
+        mCluster->SetSetSettingsAllowContinuous(true);
+        break;
+    case HumidistatTrigger::kDisallowSleep:
+        mCluster->SetSetSettingsAllowSleep(false);
+        break;
+    case HumidistatTrigger::kAllowSleep:
+        mCluster->SetSetSettingsAllowSleep(true);
+        break;
+    case HumidistatTrigger::kDisallowOptimal:
+        mCluster->SetSetSettingsAllowOptimal(false);
+        break;
+    case HumidistatTrigger::kAllowOptimal:
+        mCluster->SetSetSettingsAllowOptimal(true);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 void LoggingHumidityConditioner::OnModeChanged(Humidistat::ModeEnum newMode)
 {
