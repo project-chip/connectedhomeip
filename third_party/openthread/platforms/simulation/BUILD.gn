@@ -19,6 +19,12 @@ static_library("simulation") {
   defines = [
     "OPENTHREAD_SIMULATION_UART_ENABLE=0",
     "OPENTHREAD_PLATFORM_USE_PSEUDO_RESET=1",
+
+    # The simulation flash (settings) file defaults to the relative path
+    # "tmp" and the working directory the app runs from is not guaranteed to
+    # be writable (it is not in CI), which makes otPlatFlashInit() exit the
+    # app at startup. Use an absolute path so any working directory works.
+    "OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH=\"/tmp/openthread-simulation\"",
   ]
 
   public = [

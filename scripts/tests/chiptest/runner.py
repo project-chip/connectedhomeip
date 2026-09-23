@@ -23,7 +23,6 @@ import re
 import shlex
 import subprocess
 import threading
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, BinaryIO, Protocol
 
 import python_path
@@ -145,7 +144,7 @@ class Executor(contextlib.ExitStack):
     CLEANUP_TIMEOUT_S = 5
 
     def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
-            stderr: BinaryIO | LogPipe | None = None, cwd: Path | None = None) -> subprocess.Popen[bytes]:
+            stderr: BinaryIO | LogPipe | None = None) -> subprocess.Popen[bytes]:
         cmd = subproc.to_cmd()
         name = TerminablePopen.__class__.__name__ + (f"({cmd[0]})" if cmd else "")
 
@@ -161,7 +160,7 @@ class Executor(contextlib.ExitStack):
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr, but mypy doesn't think the same.
         terminable_process: TerminablePopen[bytes] = TerminablePopen(
             lambda: subprocess.Popen(cmd, start_new_session=True, stdin=stdin,
-                                     stdout=stdout, stderr=stderr, cwd=cwd),  # type: ignore[arg-type]
+                                     stdout=stdout, stderr=stderr),  # type: ignore[arg-type]
             name, terminate_debug_logging=False)
         return self.enter_context(terminable_process)
 
@@ -173,7 +172,7 @@ class Runner:
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait: bool = True, dependencies: list[AppsRegister] | None = None,
-                      timeout_seconds: int | None = None, stdin: BinaryIO | None = None, cwd: Path | None = None
+                      timeout_seconds: int | None = None, stdin: BinaryIO | None = None
                       ) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
         cmd = subproc.to_cmd()
         log.info('RunSubprocess starting application %s', " ".join(cmd))
@@ -184,7 +183,7 @@ class Runner:
         if self.capture_delegate:
             self.capture_delegate.Log(name, f'EXECUTING {cmd!r}')
 
-        s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe, cwd=cwd)
+        s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
         errpipe.close()
 
