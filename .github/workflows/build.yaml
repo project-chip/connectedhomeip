@@ -81,6 +81,7 @@ jobs:
                   # codeql.yml runs nightly on master only, so re-enable this if
                   # the push/pull_request triggers are ever restored.
                   trap-caching: false
+            # chip_build_all_platform_tests adds host-buildable platform unit tests (e.g. silabs)
             - name: Setup Build
               if: github.event.pull_request.number == null
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_build_all_platform_tests=true"
