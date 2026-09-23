@@ -559,26 +559,17 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                                   read_step, start_step, response_step, final_step) -> None:
         """Runs one technology pass of the DUT-as-client procedure across its four steps."""
         peer_for_i, peer_for_r = await self._run_read_step(spec, read_step)
-        # For the instant case, subscribe to TH_I's RangingResult BEFORE the StartRangingRequest is
-        # triggered: TH_I is the active initiator, so its instant session self-terminates right after
-        # its single measurement (~3 s, ProximityRangingDriver.cpp:388-392), emitting that one result
-        # then. A subscription created only in the final step would miss it under human pacing, so it
-        # is opened here and captures the event live regardless of how long the operator takes. The
-        # periodic case does not need this -- its session is not instant, so it lives until EndTime
-        # and keeps emitting -- and starting early would defeat its live inter-arrival cadence timing;
-        # it subscribes in its own final step.
-        result_handler = None
-        if not periodic:
-            result_handler = EventSubscriptionHandler(expected_cluster=_PR)
-            await result_handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
-                                       min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
+        # Subscribe to TH_I's RangingResult BEFORE StartRangingRequest (both cases) so no emission is
+        # missed under human pacing; the instant session self-terminates ~3 s in, the periodic at 30 s.
+        result_handler = EventSubscriptionHandler(expected_cluster=_PR)
+        await result_handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
+                                   min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
         try:
             await self._run_start_step(spec, start_step, peer_for_i, peer_for_r, periodic=periodic)
             await self._run_response_step(spec, response_step)
             await self._run_final_step(spec, final_step, periodic=periodic, result_handler=result_handler)
         finally:
-            if result_handler is not None:
-                result_handler.cancel()
+            result_handler.cancel()
 
     async def _run_read_step(self, spec: TechSpec, read_step) -> tuple:
         self.step(read_step)
@@ -668,7 +659,10 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         self._session_id_r = session_id_r
 
     def _wait_for_ranging_result(self, handler: EventSubscriptionHandler, session_id: int, timeout_sec: float):
-        """Returns the next RangingResult for ``session_id`` from TH_I, or fails on timeout.
+        """Returns the next RangingResult ``EventReadResult`` for ``session_id`` from TH_I, or fails on timeout.
+
+        The full read result is returned (not just ``.Data``) so callers can read ``.Header.Timestamp``
+        for the periodic cadence timing.
 
         The subscription is on the whole cluster, and several sessions can be active on TH_I at
         once (the periodic sessions from earlier passes run until their EndTime), so events for
@@ -687,52 +681,57 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 continue
             if event.Data.sessionID != session_id:
                 continue
-            return event.Data
+            return event
 
     async def _run_final_step(self, spec: TechSpec, final_step, *, periodic: bool, result_handler) -> None:
         self.step(final_step)
         if periodic:
-            await self._verify_periodic_cadence(spec)
+            await self._verify_periodic_cadence(spec, result_handler)
         else:
             await self._verify_instant_result_and_stop(spec, result_handler)
 
-    async def _verify_periodic_cadence(self, spec: TechSpec) -> None:
+    async def _verify_periodic_cadence(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
         """Verifies TH_I emits a RangingResult roughly once per interval.
 
-        Subscribes to RangingResult on TH_I (the emitting instance) over the harness fabric
-        -- events are not fabric-scoped, so this observes the session whether it was started
-        by the harness (CI) or by the DUT (manual). The plan's server-side counterpart allows
-        a +/- 3 s deviation on the interval; a run against the reference app measures
-        3.000-3.004 s.
-        """
-        handler = EventSubscriptionHandler(expected_cluster=_PR)
-        await handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
-                            min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
-        try:
-            # Collect four events for this session and time the arrival of each. The first is
-            # discarded before measuring gaps: it may have been buffered before the subscription
-            # or fall mid-interval, so only the gaps between subsequent live arrivals are full
-            # intervals. Each wait is bounded at a few intervals so a stalled emitter fails.
-            per_event_timeout = RANGING_INSTANCE_INTERVAL_SECONDS * 3 + 5
-            timestamps = []
-            for _ in range(4):
-                self._wait_for_ranging_result(handler, self._session_id_i, per_event_timeout)
-                timestamps.append(time.time())
-            if not self.is_pics_sdk_ci_only:
-                self.wait_for_user_input(
-                    prompt_msg=f"Confirm the DUT obtained the periodic RangingResult events for the {spec.name} "
-                    "pass (one roughly every "
-                    f"{RANGING_INSTANCE_INTERVAL_SECONDS} seconds).\n\nPress enter to continue.\n")
-        finally:
-            handler.cancel()
+        ``result_handler`` was subscribed before StartRangingRequest (see run_technology_pass); events
+        are not fabric-scoped, so the session is observed whether started by the harness (CI) or the DUT.
 
-        gaps = [later - earlier for earlier, later in zip(timestamps[1:], timestamps[2:])]
+        Cadence is measured from each event's server-side ``Header.Timestamp`` (in ms, /1000 to seconds),
+        not dequeue time, because buffered events dequeue back-to-back; the plan allows +/- 3 s deviation.
+        """
+        # Collect four events; the first is discarded (buffered before attach or mid-interval), so only
+        # the gaps between later emissions are full intervals. Each wait is bounded so a stalled emitter fails.
+        per_event_timeout = RANGING_INSTANCE_INTERVAL_SECONDS * 3 + 5
+        events = []
+        for _ in range(4):
+            events.append(self._wait_for_ranging_result(result_handler, self._session_id_i, per_event_timeout))
+        if not self.is_pics_sdk_ci_only:
+            self.wait_for_user_input(
+                prompt_msg=f"Confirm the DUT obtained the periodic RangingResult events for the {spec.name} "
+                "pass (one roughly every "
+                f"{RANGING_INSTANCE_INTERVAL_SECONDS} seconds).\n\nPress enter to continue.\n")
+
+        timestamps_ms = [event.Header.Timestamp for event in events]
+        timestamp_types = {event.Header.TimestampType for event in events}
+        asserts.assert_true(
+            all(ts is not None for ts in timestamps_ms),
+            "TH_I's RangingResult events carried no server-side timestamp, so the cadence cannot be measured "
+            "from the event header.")
+        # All four must share one timestamp type, else the subtraction is meaningless; either type is
+        # in ms, so the /1000 below is correct.
+        asserts.assert_equal(
+            len(timestamp_types), 1,
+            f"TH_I's RangingResult events mixed timestamp types {timestamp_types}; a single type is required to "
+            "compare emission times.")
+
+        gaps = [(later - earlier) / 1000.0 for earlier, later in zip(timestamps_ms[1:], timestamps_ms[2:])]
         for gap in gaps:
             asserts.assert_greater(
-                gap, 0.5, f"RangingResult events on TH_I arrived {gap:.3f} s apart, too close to be one per interval.")
+                gap, 0.5, f"RangingResult events on TH_I are timestamped {gap:.3f} s apart, too close to be one "
+                "per interval.")
             asserts.assert_less_equal(
                 gap, RANGING_INSTANCE_INTERVAL_SECONDS + 3,
-                f"RangingResult events on TH_I arrived {gap:.3f} s apart, outside the interval "
+                f"RangingResult events on TH_I are timestamped {gap:.3f} s apart, outside the interval "
                 f"({RANGING_INSTANCE_INTERVAL_SECONDS} s) plus the plan's +/- 3 s deviation.")
 
     async def _verify_instant_result_and_stop(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
@@ -744,7 +743,7 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         """
         result = self._wait_for_ranging_result(result_handler, self._session_id_i, timeout_sec=30)
         asserts.assert_not_equal(
-            result.sessionID, INVALID_SESSION_ID, "TH_I emitted a RangingResult with SessionID 0.")
+            result.Data.sessionID, INVALID_SESSION_ID, "TH_I emitted a RangingResult with SessionID 0.")
 
         # Mark TH_R's output position, then trigger the Stop. _assert_client_stop then requires -- in
         # the output produced after this mark -- a StopRangingRequest command receipt followed by
