@@ -49,7 +49,7 @@ from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -57,8 +57,6 @@ JFDS = Clusters.JointFabricDatastore
 
 
 class TC_JFDS_BindingSync(MatterBaseTest):
-    """Syncs Binding entries between the Joint Fabric Datastore and a node whose Binding list is not empty."""
-
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -196,21 +194,9 @@ class TC_JFDS_BindingSync(MatterBaseTest):
             cmd=JFDS.Commands.AddBindingToEndpointForNode(nodeID=self.target_node_id, endpointID=1, binding=binding),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
 
-    def steps_TC_JFDS_BindingSync(self) -> list[TestStep]:
-        return [
-            TestStep("1", "Commission the target node onto the Joint Fabric and grant the JF Administrator Administer access"),
-            TestStep("2", "Send AddPendingNode, AddACLToNode and RefreshNode for the target node",
-                     "Verify that the node reaches the Committed state"),
-            TestStep("3", "Send AddBindingToEndpointForNode with a first binding",
-                     "Verify that the target Binding list contains one entry"),
-            TestStep("4", "Send AddBindingToEndpointForNode with a second binding",
-                     "Verify that the target Binding list contains two entries and the JF Administrator is still running"),
-            TestStep("5", "Send RefreshNode for the target node",
-                     "Verify that the node reaches the Committed state and the JF Administrator is still running"),
-        ]
-
     @async_test_body
     async def test_TC_JFDS_BindingSync(self):
+        """[TC-JFDS-BindingSync] Binding sync with a node whose Binding list is not empty"""
         self.fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         self.certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
@@ -228,7 +214,7 @@ class TC_JFDS_BindingSync(MatterBaseTest):
                                    if JFDS.id in data[Clusters.Descriptor].serverList), None)
         asserts.assert_is_not_none(self.jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
 
-        self.step("1")
+        self.step(1, "Commission the target node onto the Joint Fabric and grant the JF Administrator Administer access")
         await self.devCtrlEcoA.CommissionOnNetwork(
             nodeId=self.target_node_id, setupPinCode=self.target_passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.target_discriminator)
@@ -243,7 +229,8 @@ class TC_JFDS_BindingSync(MatterBaseTest):
             targets=NullValue))
         await self.devCtrlEcoA.WriteAttribute(self.target_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
 
-        self.step("2")
+        self.step(2, "Send AddPendingNode, AddACLToNode and RefreshNode for the target node",
+                  expectation="Verify that the node reaches the Committed state")
         await self.send_single_cmd(
             cmd=JFDS.Commands.AddPendingNode(nodeID=self.target_node_id, friendlyName="binding-sync-target"),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
@@ -264,18 +251,21 @@ class TC_JFDS_BindingSync(MatterBaseTest):
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
         await self._wait_for_node_committed()
 
-        self.step("3")
+        self.step(3, "Send AddBindingToEndpointForNode with a first binding",
+                  expectation="Verify that the target Binding list contains one entry")
         await self._add_binding(JFDS.Structs.DatastoreBindingTargetStruct(node=0x55, endpoint=1))
         await self._wait_for_target_binding_count(1)
 
-        self.step("4")
+        self.step(4, "Send AddBindingToEndpointForNode with a second binding",
+                  expectation="Verify that the target Binding list contains two entries and the JF Administrator is still running")
         # The Binding list read back from the target is now non-empty, so this sync goes through the
         # path that converts each returned entry into a datastore entry.
         await self._add_binding(JFDS.Structs.DatastoreBindingTargetStruct(node=0x56, endpoint=1))
         await self._wait_for_target_binding_count(2)
         self._assert_admin_running()
 
-        self.step("5")
+        self.step(5, "Send RefreshNode for the target node",
+                  expectation="Verify that the node reaches the Committed state and the JF Administrator is still running")
         await self.send_single_cmd(
             cmd=JFDS.Commands.RefreshNode(nodeID=self.target_node_id),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
