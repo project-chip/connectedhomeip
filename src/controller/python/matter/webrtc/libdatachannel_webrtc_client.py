@@ -27,11 +27,21 @@ class LibdatachannelWebRTCClient:
         self._handle = self._lib.pychip_webrtc_client_create()
         self._local_desc_cb = None
         self._ice_cand_cb = None
+        self._gathering_cb = None
+        self._on_state_change_cb = None
 
-    def __del__(self):
+    def close(self) -> None:
+        """Destroys the native WebRTC client handle and releases callback references."""
         if self._handle:
             self._lib.pychip_webrtc_client_destroy(self._handle)
             self._handle = None
+            self._local_desc_cb = None
+            self._ice_cand_cb = None
+            self._gathering_cb = None
+            self._on_state_change_cb = None
+
+    def __del__(self):
+        self.close()
 
     def create_peer_connection(self, stun_url):
         return self._lib.pychip_webrtc_client_create_peer_connection(self._handle, stun_url.encode("utf-8"))
