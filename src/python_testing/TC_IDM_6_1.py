@@ -157,12 +157,12 @@ class TC_IDM_6_1(IDMBaseTest):
         # largest one still selects a non-empty set.
         await self.emit_access_control_entry_changed(ctrl=self.default_controller)
         latest_event_number = await self.read_latest_event_number(ctrl=self.default_controller,
-                                                                 events=paths.all_endpoints_all_events)
+                                                                  events=paths.all_endpoints_all_events)
         asserts.assert_is_not_none(latest_event_number, "DUT reported no events to derive an EventMin from")
         asserts.assert_greater(latest_event_number, 0, "DUT must report an event number above zero to test EventMin below it")
         event_min = latest_event_number - 1
         events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_events,
-                                       event_number_filter=event_min)
+                                        event_number_filter=event_min)
         self.assert_events_reported(events=events)
         self.assert_event_numbers_at_least(events=events, minimum=event_min)
 
@@ -174,7 +174,7 @@ class TC_IDM_6_1(IDMBaseTest):
                               "then verify that it contains EventReports with event numbers bigger than the one provided.")
         event_min = latest_event_number + EVENT_MIN_BEYOND_LATEST
         events = await self.read_events(ctrl=self.default_controller, events=paths.all_endpoints_all_events,
-                                       event_number_filter=event_min)
+                                        event_number_filter=event_min)
         self.assert_event_numbers_at_least(events=events, minimum=event_min)
 
         self.step(12, "[Testing Chunked Event Data] TH sends Read Request Message to DUT with EventRequests set to all "
