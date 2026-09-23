@@ -264,11 +264,14 @@ class IsolatedNetworkNamespace(TerminableResource):
 
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
                  mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True,
-                 proxy_link_name: str | None = None, proxy_link_up: bool = True):
+                 proxy_link_name: str | None = None, proxy_link_up: bool = True,
+                 tool_in_host_namespace: bool = False):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
-        - tool -- tool network for chip-tool.
+        - tool -- tool network for chip-tool. With ``tool_in_host_namespace`` the
+          tool link stays in the namespace this process runs in, for a tool that
+          is started by another process and cannot be moved into one.
         - app -- network for tested application(s).
         - proxy -- network for an intermediary application (e.g. a commissioning proxy),
           created only when ``proxy_link_name`` is given.
@@ -277,7 +280,7 @@ class IsolatedNetworkNamespace(TerminableResource):
         self.index = index
 
         self.app_ns = NetworkNamespace(f"ns-{app_link_name}-{index}")
-        self.tool_ns = NetworkNamespace(f"ns-{tool_link_name}-{index}")
+        self.tool_ns = None if tool_in_host_namespace else NetworkNamespace(f"ns-{tool_link_name}-{index}")
         self.mgmt_ns = NetworkNamespace(f"ns-{mgmt_link_name}-{index}")
 
         app_ipv6 = ["fe80::1/64"]
@@ -323,7 +326,7 @@ class IsolatedNetworkNamespace(TerminableResource):
 
     def resource_start(self) -> None:
         """Bring up selected links in parallel to reduce wait time."""
-        namespaces = [self.app_ns, self.tool_ns, self.mgmt_ns]
+        namespaces = [ns for ns in (self.app_ns, self.tool_ns, self.mgmt_ns) if ns is not None]
         links = [(self.app_link, self._app_link_up),
                  (self.tool_link, self._tool_link_up),
                  (self.mgmt_link, self._mgmt_link_up)]
@@ -348,7 +351,7 @@ class IsolatedNetworkNamespace(TerminableResource):
         resources: list[NetworkResource] = [self.bridge, self.app_link, self.tool_link, self.mgmt_link]
         if self.proxy_link is not None:
             resources.append(self.proxy_link)
-        resources += [self.app_ns, self.tool_ns, self.mgmt_ns]
+        resources += [ns for ns in (self.app_ns, self.tool_ns, self.mgmt_ns) if ns is not None]
         if self.proxy_ns is not None:
             resources.append(self.proxy_ns)
 
@@ -375,6 +378,8 @@ class IsolatedNetworkNamespace(TerminableResource):
             case SubprocessKind.APP:
                 return self.app_ns
             case SubprocessKind.TOOL:
+                if self.tool_ns is None:
+                    raise ValueError("The tool runs in the host namespace.")
                 return self.tool_ns
             case SubprocessKind.MGMT:
                 return self.mgmt_ns

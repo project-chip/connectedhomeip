@@ -25,10 +25,15 @@ from matter.testing.concurrency.context import TerminablePopen
 class DBusTestSystemBus(TerminablePopen[str]):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
-    SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
-    ADDRESS = f"unix:path={SOCKET}"
+    def __init__(self, socket: pathlib.Path | None = None) -> None:
+        """Start a bus on ``socket``.
 
-    def __init__(self) -> None:
+        Defaults to a path carrying this process's PID, so that concurrent runs
+        do not share a bus. A caller whose clients are started by another process
+        names the path instead, so that those clients can be told it.
+        """
+        self.SOCKET = socket or pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
+        self.ADDRESS = f"unix:path={self.SOCKET}"
         super().__init__(lambda: subprocess.Popen(["dbus-daemon", "--session", "--print-address", "--address", self.ADDRESS],
                                                   stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True))
         self._prev_system_bus_address: str | None = None
