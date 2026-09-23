@@ -65,7 +65,7 @@ class TC_PROXR_3_2(ProximityRangerTHServerTest):
             TestStep(3, "Trigger DUT to read all attributes from TH_I and TH_R.",
                      "DUT discovers TH_I and TH_R and obtains their attributes."),
             TestStep(4, f"Trigger DUT to send StartRangingRequest to TH_I (subscriber) and TH_R (publisher), with "
-                        f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
+                     f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
                      "DUT sends StartRangingRequest to TH_I with Role=WiFiSubscriberRole and PeerWiFiDevIK=TH_R's "
                      "WiFiDevIK, and to TH_R with Role=WiFiPublisherRole and PeerWiFiDevIK=TH_I's WiFiDevIK; PMK "
                      f"common to both; StartTime 0, EndTime 30, RangingInstanceInterval {interval} on TH_I."),
@@ -79,7 +79,7 @@ class TC_PROXR_3_2(ProximityRangerTHServerTest):
             TestStep(8, "Trigger DUT to read all attributes from TH_I and TH_R.",
                      "DUT discovers TH_I and TH_R and obtains their attributes."),
             TestStep(9, f"Trigger DUT to send StartRangingRequest to TH_I (initiator) and TH_R (reflector), with "
-                        f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
+                     f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
                      "DUT sends StartRangingRequest to TH_I with Role=BLTInitiatorRole and PeerBLTDevIK=TH_R's "
                      "BLTDevIK, and to TH_R with Role=BLTReflectorRole and PeerBLTDevIK=TH_I's BLTDevIK; LTK, "
                      f"BLTCSMode and BLTCSSecurityLevel common to both; StartTime 0, EndTime 30, "
@@ -93,7 +93,7 @@ class TC_PROXR_3_2(ProximityRangerTHServerTest):
             TestStep(13, "Trigger DUT to read all attributes from TH_I and TH_R.",
                      "DUT discovers TH_I and TH_R and obtains their attributes."),
             TestStep(14, f"Trigger DUT to send StartRangingRequest to TH_I (scanning) and TH_R (beacon), with "
-                         f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
+                     f"StartTime 0, EndTime 30 and RangingInstanceInterval {interval}.",
                      "DUT sends StartRangingRequest to TH_I with Role=BLEScanningRole and PeerBLEDeviceID=TH_R's "
                      "BLEDeviceID, and to TH_R with Role=BLEBeaconRole and PeerBLEDeviceID=TH_I's BLEDeviceID; "
                      f"SessionKey and BLERBCSecurityMode common to both; StartTime 0, EndTime 30, "

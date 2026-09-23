@@ -414,11 +414,11 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 option=self.th_controller.CommissioningWindowPasscode.kTokenWithRandomPin)
             self.wait_for_user_input(
                 prompt_msg=f"Using the DUT's commissioning interface, commission {instance.name} "
-                           "(a TH Proximity Ranging server) using the following parameters:\n"
-                           f"- setupPinCode:    {params.setupPinCode}\n"
-                           f"- setupManualCode: {params.setupManualCode}\n"
-                           f"- setupQRCode:     {params.setupQRCode}\n"
-                           f"\nPress enter once the DUT reports that commissioning of {instance.name} completed.\n")
+                "(a TH Proximity Ranging server) using the following parameters:\n"
+                f"- setupPinCode:    {params.setupPinCode}\n"
+                f"- setupManualCode: {params.setupManualCode}\n"
+                f"- setupQRCode:     {params.setupQRCode}\n"
+                f"\nPress enter once the DUT reports that commissioning of {instance.name} completed.\n")
 
     async def read_th_attribute(self, instance: THServerInstance, attribute):
         """Reads one Proximity Ranging attribute from a TH server."""
@@ -586,12 +586,12 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
                 prompt_msg=f"Trigger the DUT to read all Proximity Ranging attributes from TH_I and TH_R "
-                           f"for the {spec.name} pass, and confirm it discovers both and obtains their attributes.\n"
-                           f"For the StartRangingRequest in the next step, the DUT must cross the peer identities:\n"
-                           f"- TH_I ({spec.initiator_role.name}) peer = TH_R's identity: {self._peer_text(spec, peer_for_i)}\n"
-                           f"- TH_R ({spec.responder_role.name}) peer = TH_I's identity: {self._peer_text(spec, peer_for_r)}\n"
-                           f"- {spec.common_secret_note}\n"
-                           "\nPress enter once the DUT has read both TH servers' attributes.\n")
+                f"for the {spec.name} pass, and confirm it discovers both and obtains their attributes.\n"
+                f"For the StartRangingRequest in the next step, the DUT must cross the peer identities:\n"
+                f"- TH_I ({spec.initiator_role.name}) peer = TH_R's identity: {self._peer_text(spec, peer_for_i)}\n"
+                f"- TH_R ({spec.responder_role.name}) peer = TH_I's identity: {self._peer_text(spec, peer_for_r)}\n"
+                f"- {spec.common_secret_note}\n"
+                "\nPress enter once the DUT has read both TH servers' attributes.\n")
         return peer_for_i, peer_for_r
 
     async def _run_start_step(self, spec: TechSpec, start_step, peer_for_i, peer_for_r, *, periodic: bool) -> None:
@@ -622,13 +622,13 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             arrival_r = self.arm_command_arrival(self.th_r, spec.log_tag)
             self.wait_for_user_input(
                 prompt_msg=f"Trigger the DUT to send a StartRangingRequest for the {spec.name} pass to TH_I and TH_R"
-                           f"{interval_text}, with StartTime=0, EndTime={end_time}:\n"
-                           f"- To TH_I: Technology={spec.name}, Role={spec.initiator_role.name}, "
-                           f"peer identity = TH_R's ({self._peer_text(spec, peer_for_i)})\n"
-                           f"- To TH_R: Technology={spec.name}, Role={spec.responder_role.name}, "
-                           f"peer identity = TH_I's ({self._peer_text(spec, peer_for_r)})\n"
-                           f"- {spec.common_secret_note}\n"
-                           "\nPress enter once the DUT reports it sent both StartRangingRequest commands.\n")
+                f"{interval_text}, with StartTime=0, EndTime={end_time}:\n"
+                f"- To TH_I: Technology={spec.name}, Role={spec.initiator_role.name}, "
+                f"peer identity = TH_R's ({self._peer_text(spec, peer_for_i)})\n"
+                f"- To TH_R: Technology={spec.name}, Role={spec.responder_role.name}, "
+                f"peer identity = TH_I's ({self._peer_text(spec, peer_for_r)})\n"
+                f"- {spec.common_secret_note}\n"
+                "\nPress enter once the DUT reports it sent both StartRangingRequest commands.\n")
             self.assert_logged(self.th_i, arrival_i)
             self.assert_logged(self.th_r, arrival_r)
 
@@ -721,8 +721,8 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             if not self.is_pics_sdk_ci_only:
                 self.wait_for_user_input(
                     prompt_msg=f"Confirm the DUT obtained the periodic RangingResult events for the {spec.name} "
-                               "pass (one roughly every "
-                               f"{RANGING_INSTANCE_INTERVAL_SECONDS} seconds).\n\nPress enter to continue.\n")
+                    "pass (one roughly every "
+                    f"{RANGING_INSTANCE_INTERVAL_SECONDS} seconds).\n\nPress enter to continue.\n")
         finally:
             handler.cancel()
 
@@ -761,7 +761,7 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         else:
             self.wait_for_user_input(
                 prompt_msg=f"Confirm the DUT obtained the {spec.name} RangingResult event from TH_I, then trigger "
-                           f"the DUT to send a StopRangingRequest to TH_R with SessionID={self._session_id_r} "
-                           "(TH_R's SessionID from its StartRangingResponse).\n"
-                           "\nPress enter once the DUT reports it sent the StopRangingRequest.\n")
+                f"the DUT to send a StopRangingRequest to TH_R with SessionID={self._session_id_r} "
+                "(TH_R's SessionID from its StartRangingResponse).\n"
+                "\nPress enter once the DUT reports it sent the StopRangingRequest.\n")
         self._assert_client_stop(self.th_r, self._session_id_r, mark, spec)
