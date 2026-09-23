@@ -26,8 +26,8 @@ using Protocols::InteractionModel::Status;
 
 LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                                      std::optional<EndpointComposition::SemanticTag> tag) :
-    RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }), mFabricTable(fabricTable),
-    mTag(tag)
+    RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }),
+    mFabricTable(fabricTable), mTag(tag)
 {}
 
 CHIP_ERROR LoggingRoomAirConditioner::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
