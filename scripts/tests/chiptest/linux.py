@@ -24,6 +24,7 @@ import os
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 from typing import BinaryIO
 
 from chiptest.concurrency.worker import WorkerProcess
@@ -60,14 +61,14 @@ class LinuxNamespacedExecutor(Executor):
         self.ns = ns
 
     def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
-            stderr: BinaryIO | LogPipe | None = None):
+            stderr: BinaryIO | LogPipe | None = None, cwd: Path | None = None):
         try:
             subprocess_ns = self.ns.netns_for_subprocess_kind(subproc.kind)
             wrapped = subproc.wrap_with(*subprocess_ns.netns_cmd_wrapper)
         except ValueError as e:
             log.warning("%s", e)
             wrapped = subproc
-        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
+        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr, cwd=cwd)
 
 
 class LinuxWorkerProcess(WorkerProcess):

@@ -14,6 +14,7 @@
 
 import contextlib
 import logging
+from pathlib import Path
 from typing import BinaryIO
 
 from chiptest.concurrency.worker import WorkerProcess
@@ -25,10 +26,10 @@ log = logging.getLogger(__name__)
 
 class DarwinExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
-            stderr: BinaryIO | LogPipe | None = None):
+            stderr: BinaryIO | LogPipe | None = None, cwd: Path | None = None):
         # Try harder to avoid any stdout buffering in our tests
         wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
-        return super().run(wrapped, stdin, stdout, stderr)
+        return super().run(wrapped, stdin, stdout, stderr, cwd)
 
 
 class DarwinWorkerProcess(WorkerProcess):

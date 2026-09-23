@@ -172,7 +172,12 @@ class App:
                 subproc = subproc.with_args(key, value)
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
-        return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
+
+        # Run the app from the temporary directory instead of the harness working directory. The app process cannot assume the
+        # harness cwd is writable (it is not in CI), and it does write relative paths: the OpenThread simulation platform creates
+        # its flash (settings) and log files under cwd and exits via VerifyOrDie if it cannot. On Linux the worker remounts /tmp
+        # per worker, so this also isolates those files per test run.
+        return self.runner.RunSubprocess(subproc, name='APP ', wait=False, cwd=Path(tempfile.gettempdir()))
 
     def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: float = 10):
         """
