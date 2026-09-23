@@ -807,6 +807,7 @@ void LevelControlCluster::TransitionHandler::TimerFired()
 
 void LevelControlCluster::OnOnOffChanged(bool isOn)
 {
+    VerifyOrReturn(mFeatureMap.Has(Feature::kOnOff));
     VerifyOrReturn(!mCurrentLevel.value().IsNull() && !mTemporarilyIgnoreOnOffCallbacks);
 
     if (isOn)

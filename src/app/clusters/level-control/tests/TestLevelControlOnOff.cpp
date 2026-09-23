@@ -121,13 +121,15 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
 
     EXPECT_FALSE(cluster.GetFeatureMap().Has(Feature::kOnOff));
 
+    // MoveToLevelWithOnOff turns OnOffCluster On even without Feature::kOnOff (Spec 1.6.7.6).
     EXPECT_TRUE(cluster
-                    .MoveToLevel(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
-                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
-                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .MoveToLevelWithOnOff(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                          BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
                     .IsSuccess());
+    EXPECT_TRUE(onOffCluster.GetOnOff());
 
     EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+    EXPECT_FALSE(onOffCluster.GetOnOff());
 
     Commands::MoveToLevel::Type data;
     data.level = 20;
