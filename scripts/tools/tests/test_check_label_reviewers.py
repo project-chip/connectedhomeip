@@ -41,11 +41,11 @@ class TestParseLabelConfig(unittest.TestCase):
 
     def _write_temp_config(self, content: str) -> str:
         """Writes YAML content to a temporary file and registers cleanup."""
-        temp = tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".yaml", encoding="utf-8")
-        temp.write(content)
-        temp.close()
-        self.addCleanup(os.unlink, temp.name)
-        return temp.name
+        with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".yaml", encoding="utf-8") as temp:
+            temp.write(content)
+            temp_name = temp.name
+        self.addCleanup(os.unlink, temp_name)
+        return temp_name
 
     def test_valid_config_single_label(self) -> None:
         """Verifies parsing a single valid label rule."""
