@@ -57,6 +57,7 @@ from typing import BinaryIO
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.exceptions import ChipStackError
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
@@ -335,7 +336,13 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         if not os.path.exists(th_server_app):
             asserts.fail(f"The path {th_server_app} does not exist")
 
-        base_port = int(self.user_params.get("th_server_base_port", 5541))
+        # Default to two free ports via get_random_port() (fixed 5541/5542 collide on a shared CI host);
+        # th_server_base_port still forces a fixed base (base, base+1) for deterministic ports.
+        base_port = self.user_params.get("th_server_base_port", None)
+        if base_port is not None:
+            th_i_port, th_r_port = int(base_port), int(base_port) + 1
+        else:
+            th_i_port, th_r_port = self.get_random_port(), self.get_random_port()
 
         # A single controller on a harness-owned fabric observes both TH servers.
         certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -344,13 +351,19 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             nodeId=_HARNESS_CONTROLLER_NODE_ID,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-        self.th_i = self._start_th_server("TH_I", node_id=0x11, app=th_server_app, port=base_port)
-        self.th_r = self._start_th_server("TH_R", node_id=0x22, app=th_server_app, port=base_port + 1)
+        self.th_i = self._start_th_server("TH_I", node_id=0x11, app=th_server_app, port=th_i_port)
+        # Exclude TH_I's discriminator so a discriminator-filtered discovery can tell the two apart.
+        self.th_r = self._start_th_server("TH_R", node_id=0x22, app=th_server_app, port=th_r_port,
+                                          exclude_discriminator=self.th_i.discriminator)
 
-    def _start_th_server(self, name: str, node_id: int, app: str, port: int) -> THServerInstance:
-        # Keep each instance's KVS, discriminator, port and node id distinct.
+    def _start_th_server(self, name: str, node_id: int, app: str, port: int,
+                         exclude_discriminator: int | None = None) -> THServerInstance:
+        # Keep each instance's KVS, discriminator, port and node id distinct; draw the discriminator
+        # excluding the other server's so the two never collide.
         storage = tempfile.TemporaryDirectory(prefix=f"{self.__class__.__name__}-{name}-")
         discriminator = random.randint(0, 4095)
+        while discriminator == exclude_discriminator:
+            discriminator = random.randint(0, 4095)
         subprocess = ProximityRangerServerSubprocess(
             app, storage_dir=storage.name, discriminator=discriminator, port=port)
         subprocess.start(expected_output="Server initialization complete", timeout=30)
@@ -388,14 +401,26 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         to open CASE for CommissioningComplete, so mDNS is not eliminated entirely; but the
         operational record is a targeted, persistent advertisement (both servers keep
         advertising _matter._tcp), not the commissionable record that the first server drops,
-        so it is not subject to the same suppression race. ipaddr is the IPv6 loopback: the
-        app binds all interfaces and the CI job explicitly brings IPv6 up, so ::1 reaches each
-        server on the port the harness itself chose.
+        so it is not subject to the same suppression race. Each PASE tries ::1 then 127.0.0.1 (a
+        fallback for containers with no IPv6 loopback); the app binds all interfaces, so either reaches
+        it on the harness-chosen port.
         """
+        loopback_addresses = ("::1", "127.0.0.1")
         for instance in (self.th_i, self.th_r):
-            await self.th_controller.EstablishPASESessionIP(
-                ipaddr="::1", setupPinCode=FIXED_PASSCODE,
-                nodeId=instance.node_id, port=instance.port)
+            last_error: ChipStackError | None = None
+            for ipaddr in loopback_addresses:
+                try:
+                    await self.th_controller.EstablishPASESessionIP(
+                        ipaddr=ipaddr, setupPinCode=FIXED_PASSCODE,
+                        nodeId=instance.node_id, port=instance.port)
+                    break
+                except ChipStackError as e:  # chipstack-ok: try ::1 first, fall back to 127.0.0.1 for hosts without IPv6 loopback
+                    last_error = e
+                    continue
+            else:
+                asserts.fail(
+                    f"Could not open a PASE session to {instance.name} on any loopback address "
+                    f"(tried {', '.join(loopback_addresses)} at port {instance.port}). Last error: {last_error}")
             await self.th_controller.Commission(instance.node_id)
             log.info("Commissioned %s onto the harness fabric as node 0x%x", instance.name, instance.node_id)
 
