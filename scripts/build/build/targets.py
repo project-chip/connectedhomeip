@@ -85,6 +85,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'speaker',
     'temperature-sensor',
     'water-freeze-detector',
+    'water-heater',
     'water-leak-detector',
     'water-valve',
     # keep-sorted: end
