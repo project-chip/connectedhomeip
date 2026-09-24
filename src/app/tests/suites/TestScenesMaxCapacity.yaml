@@ -753,10 +753,10 @@ tests:
               [
                   {
                       SceneCount: 7,
-                      CurrentScene: 0x04,
-                      CurrentGroup: 0x0001,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 7,
                   },
               ]
@@ -770,10 +770,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: 0x01,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -787,10 +787,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: 0x01,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th3FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -886,10 +886,10 @@ tests:
               [
                   {
                       SceneCount: 7,
-                      CurrentScene: 0x04,
-                      CurrentGroup: 0x0001,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 7,
                   },
               ]
@@ -903,10 +903,10 @@ tests:
               [
                   {
                       SceneCount: 7,
-                      CurrentScene: 0x04,
-                      CurrentGroup: 0x0001,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 7,
                   },
               ]
@@ -920,10 +920,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: 0x01,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th3FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 6,
                   },
               ]
