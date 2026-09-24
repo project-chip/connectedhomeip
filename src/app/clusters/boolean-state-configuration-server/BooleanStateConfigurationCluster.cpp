@@ -16,7 +16,6 @@
  */
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Decode.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -93,20 +92,15 @@ CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & cont
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    if (GetSafeAttributePersistenceProvider()->ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
-                                                               mCurrentSensitivityLevel) != CHIP_NO_ERROR)
-    {
-        mCurrentSensitivityLevel = mDefaultSensitivityLevel;
-    }
+    AttributePersistence attributePersistence(context.attributeStorage);
+
+    attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
+                                               mCurrentSensitivityLevel, mDefaultSensitivityLevel);
 
     if (mCurrentSensitivityLevel >= mSupportedSensitivityLevels)
     {
         mCurrentSensitivityLevel = mSupportedSensitivityLevels - 1;
     }
-
-    // alarms enabled persistence was handled by ember previously (as opposed to AAI usage of sensitivity level)
-    // TODO: this is VERY inconvenient/strange and we should really fix this inconsistence
-    AttributePersistence attributePersistence(context.attributeStorage);
     AlarmModeBitMask::IntegerType alarmsEnabled;
     attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, alarmsEnabled,
                                                AlarmModeBitMask::IntegerType(0));
@@ -168,8 +162,9 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
             mAlarmsEnabled = alarms;
 
             AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
-            if (CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
-                                                                       { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
+            AttributePersistence attributePersistence(mContext->attributeStorage);
+            if (CHIP_ERROR err = attributePersistence.StoreNativeEndianValue(
+                    { mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, rawAlarmsEnabled);
                 err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to persist alarms enabled: %" CHIP_ERROR_FORMAT, err.Format());
@@ -325,6 +320,7 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
 
 CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t level)
 {
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
 
@@ -335,10 +331,9 @@ CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t 
     mCurrentSensitivityLevel = level;
     NotifyAttributeChanged(CurrentSensitivityLevel::Id);
 
-    // TODO: we should migrate this to not use `Safe` attribute persistence and use
-    //       a common persistence layer.
-    return GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        { mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id }, level);
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
+                                                       mCurrentSensitivityLevel);
 }
 
 Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms)

@@ -65,13 +65,17 @@ private:
     /*
      * Buffer up list data as they arrive.
      */
-    CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apReader);
+    CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData);
 
     //
     // ReadClient::Callback
     //
     void OnReportBegin() override;
     void OnReportEnd() override;
+    void NotifySubscriptionStillActive(const ReadClient & apReadClient) override
+    {
+        mCallback.NotifySubscriptionStillActive(apReadClient);
+    }
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnError(CHIP_ERROR aError) override
     {

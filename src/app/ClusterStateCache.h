@@ -665,6 +665,7 @@ private:
     //
     // ReadClient::Callback
     //
+    void NotifySubscriptionStillActive(const ReadClient & aReadClient) override;
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;

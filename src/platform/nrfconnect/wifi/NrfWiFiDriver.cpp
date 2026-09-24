@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -124,7 +125,11 @@ void NrfWiFiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connStat
 
     if (status == Status::kSuccess)
     {
-        ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        CHIP_ERROR err = ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "SetWiFiStationMode failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     if (mpNetworkStatusChangeCallback)
@@ -182,7 +187,7 @@ CHIP_ERROR NrfWiFiDriver::RevertConfiguration()
             return CHIP_NO_ERROR;
         }
 
-        WiFiManager::Instance().Disconnect();
+        ReturnErrorOnFailure(WiFiManager::Instance().Disconnect());
     }
 
     if (mStagingNetwork.IsConfigured())
@@ -254,7 +259,10 @@ void NrfWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
                  status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
-    WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    {
+        CHIP_ERROR err = WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+        VerifyOrExit(err == CHIP_NO_ERROR, status = Status::kUnknownError);
+    }
 
 exit:
     if (status != Status::kSuccess && mpConnectCallback)

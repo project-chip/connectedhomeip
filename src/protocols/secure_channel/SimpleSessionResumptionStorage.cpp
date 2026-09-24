@@ -193,9 +193,9 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveState(const ScopedNodeId & node, 
                                                      const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
 {
     // Save session state into key: /f/<fabricIndex>/s/<nodeId>
-    std::array<uint8_t, MaxStateSize()> buf;
+    Crypto::SensitiveDataFixedBuffer<MaxStateSize()> buf;
     TLV::TLVWriter writer;
-    writer.Init(buf);
+    writer.Init(buf.Bytes(), buf.Capacity());
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
@@ -213,20 +213,20 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveState(const ScopedNodeId & node, 
     const auto len = writer.GetLengthWritten();
     VerifyOrDie(CanCastTo<uint16_t>(len));
 
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), buf.Bytes(), static_cast<uint16_t>(len)));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
                                                      Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
-    std::array<uint8_t, MaxStateSize()> buf;
-    uint16_t len = static_cast<uint16_t>(buf.size());
+    Crypto::SensitiveDataFixedBuffer<MaxStateSize()> buf;
+    uint16_t len = static_cast<uint16_t>(buf.Capacity());
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), buf.data(), len));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), buf.Bytes(), len));
 
     TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf.data(), len);
+    reader.Init(buf.Bytes(), len);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType containerType;

@@ -392,9 +392,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    // Check for video stream name length constraints
+    // Check for video stream list count constraint (spec: max 16)
     if (transportOptions.videoStreams.HasValue())
     {
+        size_t vsCount   = 0;
+        CHIP_ERROR vsErr = transportOptions.videoStreams.Value().ComputeSize(&vsCount);
+        VerifyOrReturnValue(vsErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, vsErr.Format()));
+        VerifyOrReturnValue(vsCount <= kMaxVideoStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: VideoStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(vsCount), static_cast<unsigned>(kMaxVideoStreams)));
+
         for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().videoStreamName;
@@ -407,9 +420,22 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         }
     }
 
-    // Check for audio stream name length constraints
+    // Check for audio stream list count constraint (spec: max 16)
     if (transportOptions.audioStreams.HasValue())
     {
+        size_t asCount   = 0;
+        CHIP_ERROR asErr = transportOptions.audioStreams.Value().ComputeSize(&asCount);
+        VerifyOrReturnValue(asErr == CHIP_NO_ERROR, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams list TLV "
+                                         "validation failed: %" CHIP_ERROR_FORMAT,
+                                         mEndpointId, asErr.Format()));
+        VerifyOrReturnValue(asCount <= kMaxAudioStreams, Status::ConstraintError,
+                            ChipLogError(Zcl,
+                                         "Transport Options verification from command data[ep=%d]: AudioStreams count %u "
+                                         "exceeds max %u",
+                                         mEndpointId, static_cast<unsigned>(asCount), static_cast<unsigned>(kMaxAudioStreams)));
+
         for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
         {
             auto streamName = iter.GetValue().audioStreamName;
@@ -505,9 +531,16 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                 Zcl, "Transport Options verification from command data[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
                 mEndpointId));
     }
+    else if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
+    {
+        VerifyOrReturnValue(
+            !triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
+            ChipLogError(
+                Zcl, "Transport Options verification from command data[ep=%d]: Found Motion Time Control which is not expected ",
+                mEndpointId));
+    }
     else
     {
-
         VerifyOrReturnValue(
             !triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Found motion zones which is not expected",
@@ -545,6 +578,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     }
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+        triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext ||
         triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand)
     {
         VerifyOrReturnValue(triggerOptions.maxPreRollLen.HasValue(), Status::InvalidCommand,
@@ -607,51 +641,12 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Duration field not within allowed range",
                                          mEndpointId));
 
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size() == kMaxCENCKeyLength, Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key constraint "
-                             "Error, actual length: %" PRIu32 " not "
-                             "equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKey.Value().size())));
-        }
-
         if (!mFeatures.Has(Feature::kMetadata))
         {
             VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().metadataEnabled.HasValue(), Status::InvalidCommand,
                                 ChipLogError(Zcl,
                                              "Transport Options verification from command data[ep=%d]: Found CMAF Container "
                                              "Options MetadataEnabled which is not expected.",
-                                             mEndpointId));
-        }
-
-        if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
-        {
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: Missing CMAF Container Options CENC Key ID ",
-                             mEndpointId));
-
-            VerifyOrReturnValue(
-                containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size() == kMaxCENCKeyIDLength,
-                Status::ConstraintError,
-                ChipLogError(Zcl,
-                             "Transport Options verification from command data[ep=%d]: CMAF Container Options CENC Key ID "
-                             "constraint Error, actual "
-                             "length: %" PRIu32 " not equal to expected length of 16",
-                             mEndpointId,
-                             static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size())));
-        }
-        else
-        {
-            VerifyOrReturnValue(!containerOptions.CMAFContainerOptions.Value().CENCKeyID.HasValue(), Status::InvalidCommand,
-                                ChipLogError(Zcl,
-                                             "Transport Options verification from command data[ep=%d]: Found CMAF Container "
-                                             "Options CENC Key ID which is not expected",
                                              mEndpointId));
         }
     }
@@ -830,7 +825,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newVideoStream.videoStreamID   = finalVideoStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddVideoStream(newVideoStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddVideoStream(newVideoStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add video stream", mEndpointId));
         }
 
         if (transportOptions.audioStreamID.HasValue())
@@ -872,7 +868,8 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
             newAudioStream.audioStreamID   = finalAudioStreamID;
 
             // Add to storage and update the list
-            transportOptionsPtr->AddAudioStream(newAudioStream);
+            VerifyOrReturnValue(transportOptionsPtr->AddAudioStream(newAudioStream) == CHIP_NO_ERROR, Status::Failure,
+                                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Failed to add audio stream", mEndpointId));
         }
     }
 
@@ -1530,33 +1527,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     // Call the delegate
     status = mDelegate->ManuallyTriggerTransport(connectionID, activationReason, timeControl);
 
-    if (status == Status::Success)
-    {
-        // Get container type from transport configuration
-        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
-
-        // For CMAF container type, we need to provide CMAF session number
-        Optional<uint64_t> cmafSessionNumber;
-        if (containerType == ContainerFormatEnum::kCmaf)
-        {
-            uint64_t sessionNumber = 0;
-            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
-            {
-                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
-            }
-            else
-            {
-                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
-                             connectionID);
-                // Don't include the session number if we can't get it
-                cmafSessionNumber = Optional<uint64_t>();
-            }
-        }
-
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
-                                        containerType, cmafSessionNumber);
-    }
-
     handler.AddStatus(commandPath, status);
 
     return std::nullopt;
@@ -1624,6 +1594,249 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
     return std::nullopt;
 }
 
+std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::HandleUpdateMotionZoneOptions(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const PushAvStreamTransport::Commands::UpdateMotionZoneOptions::DecodableType & commandData)
+{
+    if (IsNullDelegateWithLogging(commandPath.mEndpointId))
+    {
+        handler.AddStatus(commandPath, Status::UnsupportedCommand);
+        return std::nullopt;
+    }
+
+    uint16_t connectionID   = commandData.connectionID;
+    FabricIndex fabricIndex = handler.GetAccessingFabricIndex();
+
+    TransportConfigurationStorage * transportConfiguration = FindStreamTransportConnectionWithinFabric(connectionID, fabricIndex);
+    if (transportConfiguration == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: ConnectionID (%u) Not Found for fabric %u", mEndpointId,
+                     connectionID, fabricIndex);
+        handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (mDelegate->GetTransportBusyStatus(connectionID) == PushAvStreamTransportStatusEnum::kBusy)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Connection is Busy", mEndpointId);
+        handler.AddStatus(commandPath, Status::Busy);
+        return std::nullopt;
+    }
+
+    auto transportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
+    if (transportOptionsPtr == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport options missing for connection %u", mEndpointId,
+                     connectionID);
+        handler.AddStatus(commandPath, Status::NotFound);
+        return std::nullopt;
+    }
+
+    if (transportOptionsPtr->triggerOptions.triggerType != TransportTriggerTypeEnum::kMotion)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Transport trigger type is not Motion", mEndpointId);
+        handler.AddStatus(commandPath, Status::InvalidCommand);
+        return std::nullopt;
+    }
+
+    // Validate MotionSensitivity
+    if (commandData.motionSensitivity.HasValue())
+    {
+        if (mFeatures.Has(Feature::kPerZoneSensitivity))
+        {
+            ChipLogError(Zcl,
+                         "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity cannot be set when PerZoneSensitivity is enabled",
+                         mEndpointId);
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        if (!commandData.motionSensitivity.Value().IsNull())
+        {
+            uint8_t sensitivity = commandData.motionSensitivity.Value().Value();
+            if (sensitivity < 1 || sensitivity > 10)
+            {
+                ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: MotionSensitivity out of range: %u", mEndpointId,
+                             sensitivity);
+                handler.AddStatus(commandPath, Status::ConstraintError);
+                return std::nullopt;
+            }
+        }
+    }
+
+    // Validate MotionZones
+    if (commandData.motionZones.HasValue() && !commandData.motionZones.Value().IsNull())
+    {
+        size_t zoneListSize = 0;
+        auto iterCount      = commandData.motionZones.Value().Value().begin();
+        while (iterCount.Next())
+        {
+            zoneListSize++;
+        }
+
+        if (iterCount.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
+        if (!isValidZoneSize)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid Motion Zone Size (%u)", mEndpointId,
+                         static_cast<unsigned>(zoneListSize));
+            handler.AddStatus(commandPath, Status::DynamicConstraintError);
+            return std::nullopt;
+        }
+
+        std::set<uint16_t> zoneIDsFound;
+        bool nullFound = false;
+
+        auto iterDup = commandData.motionZones.Value().Value().begin();
+        while (iterDup.Next())
+        {
+            auto & zoneOpt = iterDup.GetValue();
+
+            if (!zoneOpt.zone.IsNull())
+            {
+                uint16_t zoneID = zoneOpt.zone.Value();
+                if (zoneIDsFound.count(zoneID) != 0)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Zone ID (=%u) in Motion Zones", mEndpointId,
+                                 zoneID);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
+                }
+                zoneIDsFound.emplace(zoneID);
+            }
+            else
+            {
+                if (nullFound)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Duplicate Null Zone ID in Motion Zones", mEndpointId);
+                    handler.AddStatus(commandPath, Status::AlreadyExists);
+                    return std::nullopt;
+                }
+                nullFound = true;
+            }
+
+            if (mFeatures.Has(Feature::kPerZoneSensitivity))
+            {
+                if (!zoneOpt.sensitivity.HasValue())
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Missing Zone Sensitivity", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidCommand);
+                    return std::nullopt;
+                }
+
+                uint8_t sens = zoneOpt.sensitivity.Value();
+                if (sens < 1 || sens > 10)
+                {
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity out of range: %u", mEndpointId, sens);
+                    handler.AddStatus(commandPath, Status::ConstraintError);
+                    return std::nullopt;
+                }
+            }
+            else if (zoneOpt.sensitivity.HasValue())
+            {
+                ChipLogError(Zcl,
+                             "HandleUpdateMotionZoneOptions[ep=%d]: Zone sensitivity provided without PerZoneSensitivity feature",
+                             mEndpointId);
+                handler.AddStatus(commandPath, Status::InvalidCommand);
+                return std::nullopt;
+            }
+        }
+
+        if (iterDup.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+
+        auto iterZones = commandData.motionZones.Value().Value().begin();
+        while (iterZones.Next())
+        {
+            auto & zoneOpt = iterZones.GetValue();
+            if (!zoneOpt.zone.IsNull())
+            {
+                Status zoneIdStatus = mDelegate->ValidateZoneId(zoneOpt.zone.Value());
+                if (zoneIdStatus != Status::Success)
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidZone);
+                    ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Invalid ZoneId (%u)", mEndpointId,
+                                 zoneOpt.zone.Value());
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+            }
+        }
+
+        if (iterZones.GetStatus() != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+    }
+
+    std::shared_ptr<TransportOptionsStorage> updatedTransportOptionsPtr{ new (std::nothrow)
+                                                                             TransportOptionsStorage(*transportOptionsPtr) };
+    if (updatedTransportOptionsPtr == nullptr)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Memory Allocation failed for transportOptions", mEndpointId);
+        handler.AddStatus(commandPath, Status::ResourceExhausted);
+        return std::nullopt;
+    }
+
+    if (commandData.motionSensitivity.HasValue())
+    {
+        updatedTransportOptionsPtr->UpdateMotionSensitivity(commandData.motionSensitivity);
+    }
+
+    if (commandData.motionZones.HasValue())
+    {
+        CHIP_ERROR updateErr = updatedTransportOptionsPtr->UpdateMotionZones(commandData.motionZones);
+        if (updateErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Failed to update motion zones: %" CHIP_ERROR_FORMAT,
+                         mEndpointId, updateErr.Format());
+            handler.AddStatus(commandPath, Status::InvalidCommand);
+            return std::nullopt;
+        }
+    }
+
+    Status status = mDelegate->UpdateMotionZoneOptions(connectionID, *updatedTransportOptionsPtr);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Delegate UpdateMotionZoneOptions failed: %u", mEndpointId,
+                     to_underlying(status));
+        handler.AddStatus(commandPath, status);
+        return std::nullopt;
+    }
+
+    transportConfiguration->SetTransportOptionsPtr(updatedTransportOptionsPtr);
+
+    CHIP_ERROR err = StoreCurrentConnections();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl,
+                     "HandleUpdateMotionZoneOptions[ep=%d]: Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT,
+                     mEndpointId, err.Format());
+        Status rollbackStatus = mDelegate->UpdateMotionZoneOptions(connectionID, *transportOptionsPtr);
+        if (rollbackStatus != Status::Success)
+        {
+            ChipLogError(Zcl, "HandleUpdateMotionZoneOptions[ep=%d]: Delegate rollback failed: %u", mEndpointId,
+                         to_underlying(rollbackStatus));
+        }
+        transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
+        handler.AddStatus(commandPath, Status::Failure);
+        return std::nullopt;
+    }
+
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    handler.AddStatus(commandPath, Status::Success);
+    return std::nullopt;
+}
+
 Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum streamUsage)
 {
     bool hardPrivacyModeActive = false;
@@ -1688,10 +1901,10 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID      = connectionID;
-    event.triggerType       = triggerType;
-    event.activationReason  = activationReason;
-    event.containerType     = containerType;
+    event.connectionID     = connectionID;
+    event.triggerType      = triggerType;
+    event.activationReason = activationReason;
+    event.containerType.SetValue(containerType);
     event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
@@ -1715,7 +1928,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
     if (transportConfig != nullptr)
     {
-        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+        event.containerType.SetValue(transportConfig->transportOptions.Value().containerOptions.containerType);
 
         // For CMAF container type, we need to provide CMAF session number
         if (event.containerType == ContainerFormatEnum::kCmaf)
@@ -1741,7 +1954,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     else
     {
         // Fallback values if transport config not found
-        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.containerType.SetValue(ContainerFormatEnum::kCmaf); // Default fallback
         event.CMAFSessionNumber = Optional<uint64_t>();
     }
 

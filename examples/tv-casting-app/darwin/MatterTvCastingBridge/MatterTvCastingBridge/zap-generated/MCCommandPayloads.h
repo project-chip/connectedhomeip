@@ -198,17 +198,37 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nullable data;
 @property (nonatomic, copy) MCContentLauncherClusterPlaybackPreferencesStruct * _Nullable playbackPreferences;
 @property (nonatomic, copy) NSNumber * _Nullable useCurrentContext;
+@property (nonatomic, copy) NSNumber * _Nullable contentAppVendorID;
+@property (nonatomic, copy) NSNumber * _Nullable contentAppProductID;
 @end
 
 @interface MCContentLauncherClusterLaunchURLParams : MCAbstractPayload
 @property (nonatomic, copy) NSString * _Nonnull contentURL;
 @property (nonatomic, copy) NSString * _Nullable displayString;
 @property (nonatomic, copy) MCContentLauncherClusterBrandingInformationStruct * _Nullable brandingInformation;
+@property (nonatomic, copy) MCContentLauncherClusterPlaybackPreferencesStruct * _Nullable playbackPreferences;
+@property (nonatomic, copy) NSString * _Nullable contentType;
+@property (nonatomic, copy) NSArray * _Nullable contentHeaders;
+@property (nonatomic, copy) NSNumber * _Nullable offsetMillisecs;
+@property (nonatomic, copy) NSNumber * _Nullable queueType;
+@property (nonatomic, copy) NSString * _Nullable nextUrl;
 @end
 
 @interface MCContentLauncherClusterLauncherResponseParams : MCAbstractPayload
 @property (nonatomic, copy) NSNumber * _Nonnull status;
 @property (nonatomic, copy) NSString * _Nullable data;
+@end
+
+@interface MCContentLauncherClusterContentReplicationRequestParams : MCAbstractPayload
+@end
+
+@interface MCContentLauncherClusterContentReplicationResponseParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) MCContentLauncherClusterReplicationInfo * _Nullable replicationInfo;
+@end
+
+@interface MCContentLauncherClusterPlayPresetParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull presetID;
 @end
 
 // ApplicationLauncher cluster:
@@ -232,5 +252,46 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 // ApplicationBasic cluster:
+
+// MediaFileManagement cluster:
+
+@interface MCMediaFileManagementClusterAddFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@end
+
+@interface MCMediaFileManagementClusterAddFileResponseParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nullable fileID;
+@end
+
+@interface MCMediaFileManagementClusterDeleteFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull fileID;
+@end
+
+@interface MCMediaFileManagementClusterRequestSharedFilesParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull clientName;
+@property (nonatomic, copy) NSNumber * _Nonnull requestID;
+@property (nonatomic, copy) NSArray * _Nullable supportedMimeTypes;
+@end
+
+@interface MCMediaFileManagementClusterGetSharedFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull responseID;
+@end
+
+@interface MCMediaFileManagementClusterGetSharedFileResponseParams : MCAbstractPayload
+@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) MCMediaFileManagementClusterFileDescriptionStruct * _Nullable fileDescription;
+@end
+
+@interface MCMediaFileManagementClusterOfferFileParams : MCAbstractPayload
+@property (nonatomic, copy) NSString * _Nonnull clientName;
+@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSNumber * _Nonnull size;
+@property (nonatomic, copy) NSString * _Nonnull mimeType;
+@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@end
 
 NS_ASSUME_NONNULL_END

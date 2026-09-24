@@ -1,14 +1,33 @@
+/**
+ *
+ *    Copyright (c) 2020-2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
+#include <app/EventManagement.h>
+#include <app/clusters/access-control-server/AccessControlEventHelper.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
+#include <clusters/Groupcast/Events.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
-#include <transport/raw/GroupcastTesting.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -56,7 +75,7 @@ GroupcastCluster::~GroupcastCluster()
     // Shutdown() to ensure proper cleanup if the cluster was started.
     if (mContext != nullptr)
     {
-        Shutdown(ClusterShutdownType::kPermanentRemove);
+        GroupcastCluster::Shutdown(ClusterShutdownType::kPermanentRemove);
     }
 }
 
@@ -67,16 +86,41 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     SetDataModelProvider(context.provider);
     UpdateUsedMcastAddrCount();
 
+    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
+    {
+        mGroupcastContext.testing.SetDelegate(this);
+    }
+
     return CHIP_NO_ERROR;
 }
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    if (mGroupcastContext.groupDataProvider.IsGroupcastEnabled())
+    {
+        mGroupcastContext.testing.SetDelegate(nullptr);
+    }
+
     mGroupcastTestingTimer.Cancel();
     mMembershipChangedTimer.Cancel();
     mGroupcastContext.groupDataProvider.RemoveListener(this);
     ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
+}
+
+void GroupcastCluster::FlushGroupcastTestingEvent()
+{
+    VerifyOrReturn(mGroupcastContext.testing.IsEnabled());
+
+    Clusters::Groupcast::Events::GroupcastTesting::Type event;
+
+    // Convert to event type
+    mGroupcastContext.testing.ToEventType(event);
+
+    // Generate event on Root Endpoint (Endpoint 0)
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    mContext->interactionContext.eventsGenerator.ScheduleUrgentEventDeliverySync();
+    mGroupcastContext.testing.Clear();
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -97,7 +141,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return encoder.Encode(chip::Groupcast::GetTesting().GetFabricIndex());
+        return encoder.Encode(mGroupcastContext.testing.GetFabricIndex());
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -181,7 +225,7 @@ CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    FabricIndex fabricUnderTest = chip::Groupcast::GetTesting().GetFabricIndex();
+    FabricIndex fabricUnderTest = mGroupcastContext.testing.GetFabricIndex();
     VerifyOrReturnError(fabricUnderTest == kUndefinedFabricIndex || fabricUnderTest == fabricIndex, Status::ConstraintError);
 
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
@@ -213,14 +257,13 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    auto & testing = chip::Groupcast::GetTesting();
-    if (fabricUnderTest != testing.GetFabricIndex())
+    if (fabricUnderTest != mGroupcastContext.testing.GetFabricIndex())
     {
-        testing.Clear();
-        testing.SetFabricIndex(fabricUnderTest);
+        mGroupcastContext.testing.Clear();
+        mGroupcastContext.testing.SetFabricIndex(fabricUnderTest);
         NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
     }
-    testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
+    mGroupcastContext.testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
 }
 
 // MembershipChangedTimer implementation
@@ -273,29 +316,20 @@ CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescripto
 
     CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups, this](const auto & encoder) -> CHIP_ERROR {
         EndpointList endpoints;
-        CHIP_ERROR status              = CHIP_NO_ERROR;
-        GroupInfoIterator * group_iter = groups->IterateGroupInfo(fabric_index);
-        VerifyOrReturnError(nullptr != group_iter, CHIP_ERROR_NO_MEMORY);
+        AutoRelease group_iter(groups->IterateGroupInfo(fabric_index));
+        VerifyOrReturnError(!group_iter.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         GroupInfo info;
-        while (group_iter->Next(info) && (CHIP_NO_ERROR == status))
+        while (group_iter->Next(info))
         {
             // Group Key
             KeysetId keyset_id = kInvalidKeysetId;
             // Since keys are managed by the GroupKeyManagement cluster, groups may not have an associated keyset
-            status = groups->GetGroupKey(fabric_index, info.group_id, keyset_id).NoErrorIf(CHIP_ERROR_NOT_FOUND);
-            if (CHIP_NO_ERROR != status)
-            {
-                break;
-            }
+            ReturnErrorOnFailure(groups->GetGroupKey(fabric_index, info.group_id, keyset_id).NoErrorIf(CHIP_ERROR_NOT_FOUND));
 
             // Endpoints
-            EndpointIterator * end_iter = groups->IterateEndpoints(fabric_index, info.group_id);
-            if (nullptr == end_iter)
-            {
-                status = CHIP_ERROR_NO_MEMORY;
-                break;
-            }
+            AutoRelease end_iter(groups->IterateEndpoints(fabric_index, info.group_id));
+            VerifyOrReturnError(!end_iter.IsNull(), CHIP_ERROR_NO_MEMORY);
 
             Groupcast::Structs::MembershipStruct::Type group;
             group.fabricIndex     = fabric_index;
@@ -313,18 +347,17 @@ CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescripto
             size_t group_count = 0;
             size_t split_count = 0;
             GroupEndpoint mapping;
-            while (end_iter->Next(mapping) && (CHIP_NO_ERROR == status))
+            while (end_iter->Next(mapping))
             {
                 group_count++;
                 endpoints.entries[split_count++] = mapping.endpoint_id;
                 if ((group_count == group_total) || (split_count == kMaxMembershipEndpoints))
                 {
                     group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
-                    status          = encoder.Encode(group);
-                    split_count     = 0;
+                    ReturnErrorOnFailure(encoder.Encode(group));
+                    split_count = 0;
                 }
             }
-            end_iter->Release();
             if (group_count == 0)
             {
                 if (mFeatures.Has(Groupcast::Feature::kListener))
@@ -333,12 +366,11 @@ CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescripto
                     group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>());
                 }
 
-                status = encoder.Encode(group);
+                ReturnErrorOnFailure(encoder.Encode(group));
             }
         }
-        group_iter->Release();
 
-        return status;
+        return CHIP_NO_ERROR;
     });
 
     return err;
@@ -447,11 +479,10 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
         uint16_t total_count = 0;
         for (const FabricInfo & fabric : Fabrics())
         {
-            auto * iter = groups.IterateGroupInfo(fabric.GetFabricIndex());
-            if (iter != nullptr)
+            AutoRelease iter(groups.IterateGroupInfo(fabric.GetFabricIndex()));
+            if (!iter.IsNull())
             {
                 total_count += static_cast<uint16_t>(iter->Count());
-                iter->Release();
             }
         }
         VerifyOrReturnError(total_count < groups.getMaxMembershipCount(), Status::ResourceExhausted);
@@ -505,7 +536,7 @@ Status GroupcastCluster::JoinGroup(const ConcreteCommandPath & path, const Group
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -520,12 +551,21 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
     Status err                 = Status::Success;
 
     endpoints.count = 0;
+
+    // The Endpoints field is constrained to "1 to 20" per the spec; reject an oversized request.
+    if (data.endpoints.HasValue())
+    {
+        size_t endpoint_count = 0;
+        VerifyOrReturnError(data.endpoints.Value().ComputeSize(&endpoint_count) == CHIP_NO_ERROR, Status::Failure);
+        VerifyOrReturnError(endpoint_count <= kMaxCommandEndpoints, Status::ConstraintError);
+    }
+
     if (kUndefinedGroupId == data.groupID)
     {
         // Apply changes to all groups
-        GroupInfoIterator * iter = groups.IterateGroupInfo(fabricIndex);
-        VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
-        VerifyOrReturnError(iter->Count() > 0, Status::NotFound);
+        AutoRelease iter(groups.IterateGroupInfo(fabricIndex));
+        VerifyOrReturnError(!iter.IsNull(), Status::ResourceExhausted);
+        VerifyOrReturnError(iter->Count() != 0, Status::NotFound);
 
         GroupInfo info;
         while (iter->Next(info) && (Status::Success == err))
@@ -533,7 +573,6 @@ Status GroupcastCluster::LeaveGroup(const Groupcast::Commands::LeaveGroup::Decod
             // For leave group, the leaveGroupResponse SHALL NOT contain the endpoints that were removed.
             err = RemoveGroup(info.group_id, data, nullptr /* endpoints */, subjectDescriptor);
         }
-        iter->Release();
     }
     else
     {
@@ -593,7 +632,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(const Groupcast::Commands::Config
 
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -632,6 +671,7 @@ Status GroupcastCluster::SetKeySet(const ConcreteCommandPath & path, const chip:
         GroupDataProvider::EpochKey & epoch = ks.epoch_keys[0];
         VerifyOrReturnValue(key.Value().size() == GroupDataProvider::EpochKey::kLengthBytes, Status::ConstraintError);
         memcpy(epoch.key, key.Value().data(), GroupDataProvider::EpochKey::kLengthBytes);
+        epoch.start_time = 1;
         {
             // Get compressed fabric
             uint8_t compressedFabricIdBuffer[sizeof(uint64_t)];
@@ -689,8 +729,8 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
         if (endpoints != nullptr)
         {
             // Get the endpoints list for the LeaveGroupResponse
-            EndpointIterator * epIter = groups.IterateEndpoints(fabricIndex, group_id);
-            VerifyOrReturnError(nullptr != epIter, Status::ResourceExhausted);
+            AutoRelease epIter(groups.IterateEndpoints(fabricIndex, group_id));
+            VerifyOrReturnError(!epIter.IsNull(), Status::ResourceExhausted);
 
             if (epIter->Count() <= kMaxCommandEndpoints)
             {
@@ -700,7 +740,6 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
                     endpoints->entries[endpoints->count++] = ep.endpoint_id;
                 }
             }
-            epIter->Release();
         }
         // Remove whole group (with all endpoints)
         err = groups.RemoveGroupInfo(fabricIndex, group_id);
@@ -709,7 +748,7 @@ Status GroupcastCluster::RemoveGroup(GroupId group_id, const Groupcast::Commands
     }
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
-        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+        AccessControl::EmitAuxiliaryAccessUpdated(mContext->interactionContext.eventsGenerator, subjectDescriptor);
     }
 
     return Status::Success;
@@ -732,7 +771,7 @@ Status GroupcastCluster::RemoveGroupEndpoint(FabricIndex fabricIndex, GroupId gr
     {
         found = (endpoints->entries[i] == endpoint_id);
     }
-    if (!found)
+    if (!found && endpoints->count < kMaxMembershipEndpoints)
     {
         endpoints->entries[endpoints->count++] = endpoint_id;
     }
@@ -772,8 +811,8 @@ void GroupcastCluster::UpdateUsedMcastAddrCount()
     for (const FabricInfo & fabric : Fabrics())
     {
         // Count distinct group addresses
-        GroupInfoIterator * iter = Provider().IterateGroupInfo(fabric.GetFabricIndex());
-        VerifyOrReturn(nullptr != iter);
+        AutoRelease iter(Provider().IterateGroupInfo(fabric.GetFabricIndex()));
+        VerifyOrReturn(!iter.IsNull());
         GroupInfo group;
         while (iter->Next(group))
         {
@@ -786,7 +825,6 @@ void GroupcastCluster::UpdateUsedMcastAddrCount()
                 iana_address = 1;
             }
         }
-        iter->Release();
     }
     mIanaAddressUsed    = (iana_address > 0);
     mUsedMcastAddrCount = per_group_count + iana_address;
@@ -805,24 +843,6 @@ void GroupcastCluster::NotifyUsedMcastAddrCountOnChange()
     {
         NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
     }
-}
-
-void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
-{
-    VerifyOrReturn(mContext != nullptr);
-
-    AccessControl::Events::AuxiliaryAccessUpdated::Type event;
-    event.fabricIndex = subjectDescriptor.fabricIndex;
-    if (subjectDescriptor.subject != kUndefinedNodeId)
-    {
-        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
-    }
-    else
-    {
-        event.adminNodeID.SetNull();
-    }
-
-    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace Clusters

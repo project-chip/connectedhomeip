@@ -35,6 +35,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_4_fifo
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_4_fifo
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -87,17 +102,16 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.print_step(step_number, "Send GoHome command")
         ret = await self.send_go_home_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
     # Prints the step number, reads the operational state attribute and checks if it matches with expected_state
     async def read_operational_state_with_check(self, step_number, expected_state):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        log.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s", operational_state)
         asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
+                             f"OperationalState({operational_state}) should be {state_enum_to_text(expected_state)}")
 
     # Sends an RvcRunMode Change to mode command
     async def send_run_change_to_mode_cmd(self, new_mode):
@@ -134,13 +148,13 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
 
         if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
             step_name = "Manually put the device in the ERROR operational state"
             self.print_step(2, step_name)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "UnableToStartOrResume"})
+                self.write_to_app_pipe({"Name": "ErrorEvent", "EndpointId": self.endpoint, "Error": "UnableToStartOrResume"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -152,9 +166,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the CHARGING operational state"
             self.print_step(5, step_name)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
-                self.write_to_app_pipe({"Name": "Docked"})
-                self.write_to_app_pipe({"Name": "Charging"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Charging", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -166,7 +180,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             step_name = "Manually put the device in the DOCKED operational state"
             self.print_step(8, step_name)
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Charged"})
+                self.write_to_app_pipe({"Name": "Charged", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -193,9 +207,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             self.print_step(14, step_name)
 
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
-                self.write_to_app_pipe({"Name": "Docked"})
-                self.write_to_app_pipe({"Name": "EmptyingDustBin"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "EmptyingDustBin", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -209,9 +223,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             self.print_step(17, step_name)
 
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
-                self.write_to_app_pipe({"Name": "Docked"})
-                self.write_to_app_pipe({"Name": "CleaningMop"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "CleaningMop", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -225,9 +239,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             self.print_step(20, step_name)
 
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
-                self.write_to_app_pipe({"Name": "Docked"})
-                self.write_to_app_pipe({"Name": "FillingWaterTank"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "FillingWaterTank", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 
@@ -241,9 +255,9 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             self.print_step(23, step_name)
 
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "Reset"})
-                self.write_to_app_pipe({"Name": "Docked"})
-                self.write_to_app_pipe({"Name": "UpdatingMaps"})
+                self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "Docked", "EndpointId": self.endpoint})
+                self.write_to_app_pipe({"Name": "UpdatingMaps", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(prompt_msg=f"{step_name}, and press Enter when ready.")
 

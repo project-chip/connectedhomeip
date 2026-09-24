@@ -286,9 +286,19 @@ CHIP_ERROR ASRUtils::asr_wifi_connect(void)
     conf.dhcp_mode = WLAN_DHCP_CLIENT;
     TEMPORARY_RETURN_IGNORED asr_wifi_get_config(&stationConfig);
 
-    strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len);
+    // Bounds check added to prevent buffer overflow vulnerabilities.
+    VerifyOrReturnError(stationConfig.ssid_len <= sizeof(conf.wifi_ssid), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len);
+    // Keep old behaviour due to compatibility with SDK
+    strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len); // NOLINT(bugprone-unsafe-functions)
+
+    // Bounds check added to prevent buffer overflow vulnerabilities.
+    VerifyOrReturnError(stationConfig.key_len <= sizeof(conf.wifi_key), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Keep old behaviour due to compatibility with SDK
+    strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len); // NOLINT(bugprone-unsafe-functions)
+    conf.key_len = stationConfig.key_len;
+
     conf.security = stationConfig.security;
 
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]\r\n", StringOrNullMarker(conf.wifi_ssid));

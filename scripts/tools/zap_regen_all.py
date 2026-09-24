@@ -29,7 +29,6 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +107,7 @@ class ZapInput:
 
         return "chef" in self.zap_file
 
-    def build_command(self, script: str) -> List[str]:
+    def build_command(self, script: str) -> list[str]:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
@@ -228,7 +227,7 @@ class ZAPGenerateTarget:
         )
 
 
-class GoldenTestImageTarget():
+class GoldenTestImageTarget:
     def __init__(self):
         # NOTE: output-path is inside the tree. This is because clang-format
         #       will search for a .clang-format file in the directory tree
@@ -267,7 +266,7 @@ class GoldenTestImageTarget():
         log.info("  %s", shlex.join(self.command))
 
 
-class JinjaCodegenTarget():
+class JinjaCodegenTarget:
     def __init__(self, generator: str, output_directory: str, idl_path: str):
         # This runs a test, but the important bit is we pass `--regenerate`
         # to it and this will cause it to OVERWRITE golden images.
@@ -296,13 +295,6 @@ class JinjaCodegenTarget():
 
     def log_command(self):
         log.info("  %s", shlex.join(self.command))
-
-
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
 
 
 def setupArgumentsParser():
@@ -411,19 +403,19 @@ def getSpecificTemplatesTargets():
     return targets
 
 
-def getTargets(type):
+def getTargets(target_type):
     targets = []
 
-    if type & TargetType.GLOBAL:
+    if target_type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
 
-    if type & TargetType.SPECIFIC:
+    if target_type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
 
-    if type & TargetType.IDL_CODEGEN:
+    if target_type & TargetType.IDL_CODEGEN:
         targets.extend(getCodegenTemplates())
 
-    if type & TargetType.GOLDEN_TEST_IMAGES:
+    if target_type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
 
     log.info("Targets to be generated:")
@@ -442,7 +434,7 @@ def getTargets(type):
                 if t.distinct_output() == o:
                     log.error("   %s", t.zap_config)
 
-            raise Exception("Duplicate/overlapping output directory: %r" % o)
+            raise Exception(f"Duplicate/overlapping output directory: {o!r}")
 
         distinct_outputs.add(o)
 
@@ -482,7 +474,6 @@ def main():
             os.execv(launcher, [launcher, shlex.join(what_to_run)])
         sys.exit(1)
 
-    checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 
@@ -533,12 +524,9 @@ def main():
             tmpl = tmpl.replace("/zap-templates/", "/../")
             tmpl = tmpl.replace("/templates/", "/../")
 
-        print(" %8d | %50s | %50s" % (
-            timing.generate_time,
-            ".." + timing.config[len(timing.config) -
-                                 48:] if len(timing.config) > 50 else timing.config,
-            ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
-        ))
+        config = ".." + timing.config[len(timing.config) - 48:] if len(timing.config) > 50 else timing.config
+        template = ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl
+        print(f" {timing.generate_time:8} | {config:>50s} | {template:>50s}")
 
 
 if __name__ == '__main__':

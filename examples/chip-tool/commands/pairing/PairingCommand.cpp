@@ -41,6 +41,11 @@
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
 
+#include <algorithm>
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <app/data-model/Encode.h>
+#include <clusters/CommissioningProxy/Commands.h>
 #include <inttypes.h>
 #include <iostream>
 #include <memory>
@@ -53,6 +58,25 @@ using namespace ::chip;
 using namespace ::chip::Controller;
 
 namespace {
+
+// Endpoint used for the CommissioningProxy cluster when --proxy-endpoint is not given.
+constexpr chip::EndpointId kDefaultProxyEndpointId = 1;
+
+// Endpoint used for the Network Identity Management cluster when --pdc-netim-endpoint-id is not given.
+constexpr chip::EndpointId kDefaultNETIMEndpointId = 1;
+
+bool IsNoPasswordMarker(chip::ByteSpan password)
+{
+    // Use a one-character marker value (which is invalid in every supported Wi-Fi password encoding)
+    // to signal that no password is to be used. An empty string, which would otherwise be the more
+    // obvious choice, is used by the Network Commissioning Cluster to represent an open network.
+    return password.data_equal(ByteSpan::fromCharSpan("-"_span));
+}
+
+// Upper bound on back-to-back null-Message polls that yield a message but no reply.
+// A conformant proxy drains in a handful; the bound only stops a misbehaving one from
+// spinning the commissioner.
+constexpr uint8_t kMaxConsecutiveProxyPolls = 8;
 
 [[maybe_unused]] CHIP_ERROR ParseSetupPayload(SetupPayload & setupPayload, const char * onboardingPayload)
 {
@@ -71,6 +95,20 @@ namespace {
     return CHIP_NO_ERROR;
 }
 
+class DeviceDiscoveryDelegateRegistry
+{
+public:
+    DeviceDiscoveryDelegateRegistry() = delete;
+    DeviceDiscoveryDelegateRegistry(DeviceController & controller, DeviceDiscoveryDelegate * delegate) : mController(controller)
+    {
+        mController.RegisterDeviceDiscoveryDelegate(delegate);
+    }
+    ~DeviceDiscoveryDelegateRegistry() { mController.RegisterDeviceDiscoveryDelegate(nullptr); }
+
+private:
+    DeviceController & mController;
+};
+
 } // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
@@ -80,6 +118,17 @@ CHIP_ERROR PairingCommand::RunCommand()
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
     mDeviceIsICD = false;
+
+    if (mPDCRegistrarNodeId.HasValue())
+    {
+        mPDCRegistrar.emplace(CurrentCommissioner(), mPDCRegistrarNodeId.Value(),
+                              mPDCRegistrarEndpointId.ValueOr(kDefaultNETIMEndpointId));
+    }
+    else if (IsNoPasswordMarker(mPassword))
+    {
+        ChipLogError(chipTool, "Either a password (or '') or --pdc-netim-node-id is required");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
@@ -162,9 +211,75 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::AlreadyDiscoveredByIndexWithCode:
         err = PairWithMdnsOrBleByIndexWithCode(remoteId, mIndex);
         break;
+    case PairingMode::Proxy:
+        err = PairViaProxy(remoteId);
+        break;
     }
 
     return err;
+}
+
+void PairingCommand::Shutdown()
+{
+    if (mPDCRegistrar.has_value())
+    {
+        // Release the registrar before ResetArguments() invalidates the arguments it was built from.
+        // Stop the pairing first, as the NetworkIdentityRegistrar contract requires: this run may have
+        // ended on a timeout, with commissioning still under way and the commissioner still pointing at
+        // the registrar. An error just means there was nothing left to stop.
+        RETURN_SAFELY_IGNORED CurrentCommissioner().StopPairing(mNodeId);
+
+        // Drop the idle notification before releasing the registrar: destroying it aborts whatever
+        // is in flight, which would otherwise release the waiter and set an exit status from here,
+        // re-entering StopWaiting() while the rest of the shutdown is still running.
+        mPDCRegistrarIdleCallback.Cancel();
+
+        // Anything still in flight is a revocation the run did not last long enough to see through;
+        // the destructor aborts it and the commissioner reports the identity left behind.
+        mPDCRegistrar.reset();
+    }
+    CHIPCommand::Shutdown();
+}
+
+void PairingCommand::FinishCommand(CHIP_ERROR aExitErr)
+{
+    // A rollback of the Network Client Identity may still be under way; the commissioner does not
+    // generally wait (letting it complete in the background), but we should before quitting.
+    VerifyOrReturn(!DeferExitForPDCRegistrar(aExitErr));
+
+    SetCommandExitStatus(aExitErr);
+}
+
+bool PairingCommand::DeferExitForPDCRegistrar(CHIP_ERROR aExitErr)
+{
+    VerifyOrReturnValue(mPDCRegistrar.has_value() && !mPDCRegistrar->IsIdle(), false);
+
+    ChipLogProgress(chipTool, "Waiting for the Network Client Identity revocation to complete");
+    mPDCRegistrarExitErr = aExitErr;
+
+    // Stop the registrar taking on anything new, so that the revocation in flight is all we wait for.
+    mPDCRegistrar->StopAcceptingRequests();
+    mPDCRegistrar->WaitForIdle(&mPDCRegistrarIdleCallback);
+    return true;
+}
+
+void PairingCommand::OnPDCRegistrarIdle(void * context)
+{
+    auto * self = static_cast<PairingCommand *>(context);
+    self->SetCommandExitStatus(self->mPDCRegistrarExitErr);
+}
+
+WiFiCredentials PairingCommand::GetWiFiCredentials()
+{
+    if (!mPDCRegistrar.has_value())
+    {
+        return WiFiCredentials(mSSID, mPassword);
+    }
+    if (IsNoPasswordMarker(mPassword))
+    {
+        return WiFiCredentials(mSSID, &mPDCRegistrar.value()); // PDC only
+    }
+    return WiFiCredentials(mSSID, &mPDCRegistrar.value(), mPassword); // PDC if supported
 }
 
 CommissioningParameters PairingCommand::GetCommissioningParameters()
@@ -179,13 +294,13 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     switch (mNetworkType)
     {
     case PairingNetworkType::WiFi:
-        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        params.SetWiFiCredentials(GetWiFiCredentials());
         break;
     case PairingNetworkType::Thread:
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
     case PairingNetworkType::WiFiOrThread:
-        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        params.SetWiFiCredentials(GetWiFiCredentials());
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
     case PairingNetworkType::None:
@@ -230,8 +345,9 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
-                                                            sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -275,6 +391,22 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
     }
 
     return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, discoveryType);
+}
+
+CHIP_ERROR
+PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopParams)
+{
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    Inet::IPAddress ipAddr;
+    VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
+    meshcopParams.mBorderAgentAddress = PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value());
+    Thread::OperationalDatasetView dataset;
+    ReturnErrorOnFailure(dataset.Init(mOperationalDataset));
+    ReturnErrorOnFailure(dataset.GetPSKc(meshcopParams.mPSKcBuffer));
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
@@ -326,30 +458,26 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
         }
     }
 
-#if CHIP_SUPPORT_THREAD_MESHCOP
-    if (address.GetTransportType() == Transport::Type::kThreadMeshcop)
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
     {
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-        CommissioningParameters commissioningParams = GetCommissioningParameters();
-
-        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
-        auto error = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
-        return error;
+        SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
+        DeviceDiscoveryDelegateRegistry registry(CurrentCommissioner(), this);
+        ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
+        if (mPaseOnly.ValueOr(false))
+        {
+            return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
+                                                                 MakeOptional(meshcopParams));
+        }
+        auto commissioningParams = GetCommissioningParameters();
+        return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
+                                                NullOptional, MakeOptional(meshcopParams));
     }
-#endif // CHIP_SUPPORT_THREAD_MESHCOP
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
     {
-        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+        return CurrentCommissioner().EstablishPASEConnection(remoteId, params);
     }
-    else
-    {
-        auto commissioningParams = GetCommissioningParameters();
-        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
-    }
-    return err;
+    auto commissioningParams = GetCommissioningParameters();
+    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
 }
 
 CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index)
@@ -483,10 +611,14 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     else
     {
         ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
-    }
 
-    if (err != CHIP_NO_ERROR)
-    {
+        // PASE failed — commissioning will not proceed, so clean up the proxy session now.
+        if (mPairingMode == PairingMode::Proxy)
+        {
+            SendProxyDisconnect(err);
+            return;
+        }
+
         SetCommandExitStatus(err);
     }
 }
@@ -526,7 +658,15 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
-    SetCommandExitStatus(err);
+    if (mPairingMode == PairingMode::Proxy)
+    {
+        // Clean up the proxy session before exiting, regardless of success or failure.
+        // The disconnect completing is what eventually reaches FinishCommand().
+        SendProxyDisconnect(err);
+        return;
+    }
+
+    FinishCommand(err);
 }
 
 void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
@@ -652,8 +792,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
 
                 auto & commissioner            = CurrentCommissioner();
                 CommissioningParameters params = commissioner.GetCommissioningParameters();
-                auto credentials               = Controller::WiFiCredentials(mSSID, mPassword);
-                params.SetWiFiCredentials(credentials);
+                params.SetWiFiCredentials(GetWiFiCredentials());
                 TEMPORARY_RETURN_IGNORED commissioner.UpdateCommissioningParameters(params);
 
                 TEMPORARY_RETURN_IGNORED commissioner.NetworkCredentialsReady();
@@ -800,5 +939,491 @@ CHIP_ERROR PairingCommand::MaybeDisplayTermsAndConditions(CommissioningParameter
         params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
     }
 
+    return CHIP_NO_ERROR;
+}
+
+// ==========================================================================
+// Proxy commissioning support
+// ==========================================================================
+
+CHIP_ERROR PairingCommand::ParseProxyTransportArguments()
+{
+    using namespace chip::app::Clusters::CommissioningProxy;
+
+    // Interactive mode reuses this command instance, and Command::ResetArguments() only
+    // clears registered arguments, not what was derived from them.  Set() ORs, so without
+    // this a second run would send the union of both transports.
+    mProxyTransportBits.ClearAll();
+    mProxyWiFiBandBits.ClearValue();
+
+    VerifyOrReturnError(mProxyTransport != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(chipTool, "PairViaProxy: --proxy-transport is required (one of: ble | wifipaf)"));
+
+    if (strcmp(mProxyTransport, "wifipaf") == 0)
+    {
+        mProxyTransportBits.Set(CapabilitiesBitmap::kWiFiPAF);
+        if (mProxyWiFiBand.HasValue())
+        {
+            if (strcmp(mProxyWiFiBand.Value(), "2g4") == 0)
+            {
+                mProxyWiFiBandBits.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k2g4));
+            }
+            else if (strcmp(mProxyWiFiBand.Value(), "5g") == 0)
+            {
+                mProxyWiFiBandBits.SetValue(chip::BitMask<WiFiBandBitmap>(WiFiBandBitmap::k5g));
+            }
+            else
+            {
+                ChipLogError(chipTool, "PairViaProxy: --proxy-wifi-band must be 2g4 or 5g (got '%s')", mProxyWiFiBand.Value());
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+    }
+    else if (strcmp(mProxyTransport, "ble") == 0)
+    {
+        mProxyTransportBits.Set(CapabilitiesBitmap::kBle);
+        VerifyOrReturnError(!mProxyWiFiBand.HasValue(), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(chipTool, "PairViaProxy: --proxy-wifi-band only valid with --proxy-transport=wifipaf"));
+    }
+    else
+    {
+        ChipLogError(chipTool, "PairViaProxy: --proxy-transport must be 'ble' or 'wifipaf' (got '%s')", mProxyTransport);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PairingCommand::PairViaProxy(NodeId remoteId)
+{
+    // Refuse a new flow while a previous one still has a sender outstanding.  Interactive
+    // mode reuses this instance, and SendProxyDisconnect() only clears mProxySessionActive;
+    // it neither waits for nor clears the message senders.  A sender left over from an
+    // abandoned flow would otherwise run its callback against this flow's session state and
+    // tear down a session it knows nothing about.
+    VerifyOrReturnError(
+        mProxyConnectCmdSender == nullptr && mProxyMessageCmdSenders.empty() && mProxyDisconnectCmdSender == nullptr,
+        CHIP_ERROR_INCORRECT_STATE, ChipLogError(chipTool, "PairViaProxy: a previous proxy flow is still finishing"));
+
+    // Validate the command line before the CASE session below: a bad --proxy-transport
+    // should not cost a full handshake with the proxy first.
+    VerifyOrReturnError(mProxyNodeId != chip::kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(chipTool, "PairViaProxy: --proxy-node-id is required"));
+    ReturnErrorOnFailure(ParseProxyTransportArguments());
+
+    ChipLogProgress(chipTool, "PairViaProxy: connecting to proxy node 0x%" PRIx64, mProxyNodeId);
+
+    // Step 1: establish a CASE session to the proxy app.  The rest of the
+    // flow continues in OnProxyDeviceConnected().
+    return CurrentCommissioner().GetConnectedDevice(mProxyNodeId, &mOnProxyConnectedCallback, &mOnProxyConnectionFailureCallback,
+                                                    chip::TransportPayloadCapability::kLargePayload);
+}
+
+// static
+void PairingCommand::OnProxyDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                            const chip::SessionHandle & sessionHandle)
+{
+    auto * self = reinterpret_cast<PairingCommand *>(context);
+
+    ChipLogProgress(chipTool, "PairViaProxy: CASE session established to proxy, sending ProxyConnectRequest");
+
+    self->mProxyExchangeMgr = &exchangeMgr;
+    self->mProxySession.Grab(sessionHandle);
+
+    // Step 2: send ProxyConnectRequest to the proxy.
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(self, &exchangeMgr);
+    if (!cmdSender)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender");
+        self->mProxySession.Release();
+        self->SetCommandExitStatus(CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    using namespace chip::app::Clusters::CommissioningProxy;
+    Commands::ProxyConnectRequest::Type request;
+    request.address.SetNull();
+
+    // Already validated by ParseProxyTransportArguments() before the CASE session.
+    request.transport = self->mProxyTransportBits;
+    request.wiFiBand  = self->mProxyWiFiBandBits;
+
+    request.discriminator = self->mDiscriminator.value_or(0);
+    request.vendorID      = chip::VendorId::Common;
+    request.productID     = 0;
+    request.timeout       = self->mProxyConnectTimeout;
+
+    chip::app::CommandPathParams pathParams(self->mProxyEndpointId.ValueOr(kDefaultProxyEndpointId),
+                                            chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyConnectRequest::Id,
+                                            chip::app::CommandPathFlags::kEndpointIdValid);
+
+    if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: AddRequestData failed");
+        self->mProxySession.Release();
+        self->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    CHIP_ERROR err = cmdSender->SendCommandRequest(sessionHandle);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: SendCommandRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        self->mProxySession.Release();
+        self->SetCommandExitStatus(err);
+        return;
+    }
+
+    // Keep the sender alive until OnDone fires.  This must NOT be the same member the
+    // ProxyMessageRequest path uses: PASE is started from this sender's OnResponse, so
+    // the first ProxyMessageRequest is issued while this sender is still on the stack.
+    self->mProxyConnectCmdSender = std::move(cmdSender);
+}
+
+// static
+void PairingCommand::OnProxyDeviceConnectionFailed(void * context, const chip::ScopedNodeId & nodeId, CHIP_ERROR error)
+{
+    auto * self = reinterpret_cast<PairingCommand *>(context);
+    ChipLogError(chipTool, "PairViaProxy: failed to connect to proxy: %" CHIP_ERROR_FORMAT, error.Format());
+    self->SetCommandExitStatus(error);
+}
+
+void PairingCommand::OnProxyConnected(uint16_t sessionId)
+{
+    ChipLogProgress(chipTool, "PairViaProxy: ProxyConnectResponse received, sessionId=%u", sessionId);
+
+    mProxySessionId     = sessionId;
+    mProxySessionActive = true;
+
+    // Activate the ProxyTransport so commissioning packets are routed through it.
+    // GetTransportMgr() is null once the commissioner's system state is gone, and
+    // Activate() refuses to replace a session that is still live.
+    auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
+    auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
+    CHIP_ERROR err        = (proxyTransport == nullptr) ? CHIP_ERROR_INCORRECT_STATE : proxyTransport->Activate(sessionId, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: could not activate the proxy transport: %" CHIP_ERROR_FORMAT, err.Format());
+        SendProxyDisconnect(err);
+        return;
+    }
+
+    // Step 3: start the commissioning process via the proxy tunnel.
+    err = Pair(mNodeId, chip::Transport::PeerAddress::Proxy(sessionId));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: Pair() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        SendProxyDisconnect(err);
+    }
+}
+
+// CommandSender::Callback — called when a response to ProxyConnectRequest or
+// ProxyMessageRequest arrives.
+void PairingCommand::OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
+                                const chip::app::StatusIB & status, chip::TLV::TLVReader * data)
+{
+    using namespace chip::app::Clusters::CommissioningProxy::Commands;
+
+    if (path.mCommandId == ProxyConnectResponse::Id)
+    {
+        ProxyConnectResponse::DecodableType response;
+        if (data && chip::app::DataModel::Decode(*data, response) == CHIP_NO_ERROR)
+        {
+            OnProxyConnected(response.sessionID);
+        }
+        else
+        {
+            ChipLogError(chipTool, "PairViaProxy: failed to decode ProxyConnectResponse");
+            // The proxy may have accepted the request even though its response was
+            // undecodable, and no SessionID is known, so cancel rather than disconnect.
+            SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE, /* aCancelPendingConnect */ true);
+        }
+        return;
+    }
+
+    if (path.mCommandId == ProxyMessageResponse::Id)
+    {
+        // The request is no longer outstanding the moment its response arrives.  Clear
+        // this BEFORE injecting: the injection drives PASE/CASE forward synchronously and
+        // the reply it produces is sent from inside this call.
+        mProxyMessageAwaitingResponse = false;
+
+        ProxyMessageResponse::DecodableType response;
+        if (data && chip::app::DataModel::Decode(*data, response) == CHIP_NO_ERROR)
+        {
+            if (response.message.IsNull())
+            {
+                // Null means the proxy has nothing queued, so the drain is complete.
+                mProxyConsecutivePolls = 0;
+                return;
+            }
+
+            auto * transportMgr   = CurrentCommissioner().GetTransportMgr();
+            auto * proxyTransport = GetDeviceProxyTransport(transportMgr);
+            if (proxyTransport == nullptr)
+            {
+                ChipLogError(chipTool, "PairViaProxy: no proxy transport to inject into");
+                SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE);
+                return;
+            }
+
+            CHIP_ERROR injectErr = proxyTransport->OnProxyMessageReceived(response.sessionID, response.message.Value());
+            if (injectErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "PairViaProxy: failed to inject proxied message: %" CHIP_ERROR_FORMAT, injectErr.Format());
+                SendProxyDisconnect(injectErr);
+                return;
+            }
+
+            // The injection above may have driven the stack to send a reply, which takes
+            // the outstanding slot and will collect anything else queued.  Only when it
+            // produced nothing does the commissioner have to ask -- the commissionee can
+            // send more than one message per request (retransmits, standalone acks) and
+            // this session carries no MRP to prompt another send.
+            if (mProxyMessageAwaitingResponse)
+            {
+                return;
+            }
+
+            // Injecting above can complete PASE or commissioning synchronously, and those
+            // callbacks start the disconnect.  Draining further would issue a request against
+            // a session already being torn down, and that sender then blocks the next flow.
+            if (!mProxySessionActive || mProxyDisconnectCmdSender != nullptr)
+            {
+                return;
+            }
+
+            if (++mProxyConsecutivePolls > kMaxConsecutiveProxyPolls)
+            {
+                ChipLogError(chipTool, "PairViaProxy: stopping after %u consecutive queued-message polls",
+                             static_cast<unsigned>(kMaxConsecutiveProxyPolls));
+                mProxyConsecutivePolls = 0;
+                return;
+            }
+
+            CHIP_ERROR pollErr = PollProxyForQueuedMessage();
+            if (pollErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "PairViaProxy: failed to poll for queued messages: %" CHIP_ERROR_FORMAT, pollErr.Format());
+                SendProxyDisconnect(pollErr);
+            }
+        }
+        else
+        {
+            ChipLogError(chipTool, "PairViaProxy: failed to decode ProxyMessageResponse");
+            SendProxyDisconnect(CHIP_ERROR_INCORRECT_STATE);
+        }
+        return;
+    }
+}
+
+void PairingCommand::OnError(const chip::app::CommandSender * client, CHIP_ERROR error)
+{
+    if (client == mProxyDisconnectCmdSender.get())
+    {
+        // The disconnect is best-effort; log but use the original exit status.
+        ChipLogDetail(chipTool, "PairViaProxy: ProxyDisconnectRequest error (ignored): %" CHIP_ERROR_FORMAT, error.Format());
+        FinishCommand(mProxyDisconnectExitErr);
+        return;
+    }
+    ChipLogError(chipTool, "PairViaProxy CommandSender error: %" CHIP_ERROR_FORMAT, error.Format());
+
+    if (IsProxyMessageCmdSender(client))
+    {
+        // No response is coming, so stop treating the request as outstanding; otherwise
+        // the tunnel would refuse every later message with BUSY.
+        mProxyMessageAwaitingResponse = false;
+
+        // The tunnel is the only path to the commissionee and this session has no MRP,
+        // so nothing will retry underneath us.  Tear the proxy session down and report
+        // the real cause rather than letting commissioning stall until something
+        // unrelated times out.
+        ChipLogError(chipTool, "PairViaProxy: ProxyMessageRequest failed, abandoning commissioning");
+        SendProxyDisconnect(error);
+        return;
+    }
+
+    if (client == mProxyConnectCmdSender.get())
+    {
+        // ProxyConnectRequest failed.  The proxy may still be trying to reach the
+        // commissionee -- with Timeout 0 it will do so indefinitely -- so cancel it
+        // explicitly with a null SessionID before exiting.
+        SendProxyDisconnect(error, /* aCancelPendingConnect */ true);
+    }
+}
+
+bool PairingCommand::IsProxyMessageCmdSender(const chip::app::CommandSender * client) const
+{
+    return std::any_of(mProxyMessageCmdSenders.begin(), mProxyMessageCmdSenders.end(),
+                       [client](const auto & sender) { return sender.get() == client; });
+}
+
+void PairingCommand::OnDone(chip::app::CommandSender * client)
+{
+    if (mProxyConnectCmdSender.get() == client)
+    {
+        mProxyConnectCmdSender.reset();
+    }
+    else if (IsProxyMessageCmdSender(client))
+    {
+        // Destroying the sender from its own OnDone is the documented contract.
+        mProxyMessageCmdSenders.erase(std::remove_if(mProxyMessageCmdSenders.begin(), mProxyMessageCmdSenders.end(),
+                                                     [client](const auto & sender) { return sender.get() == client; }),
+                                      mProxyMessageCmdSenders.end());
+    }
+    else if (mProxyDisconnectCmdSender.get() == client)
+    {
+        mProxyDisconnectCmdSender.reset();
+        mProxySession.Release();
+        FinishCommand(mProxyDisconnectExitErr);
+    }
+}
+
+// Send ProxyDisconnectRequest to clean up the proxy session, then exit.
+// Finishing the command is deferred until the response (or a timeout) is received so
+// that chip-tool keeps the TCP session alive long enough for the proxy to reply.
+void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr, bool aCancelPendingConnect)
+{
+    // A cancel needs no session -- it is precisely for the case where ProxyConnectRequest
+    // never produced one -- but it still needs the CASE session to the proxy.
+    const bool haveSomethingToSend = aCancelPendingConnect || mProxySessionActive;
+    if (!haveSomethingToSend || mProxyExchangeMgr == nullptr || !static_cast<bool>(mProxySession))
+    {
+        FinishCommand(exitErr);
+        return;
+    }
+
+    // A disconnect already in flight owns the exit status; a second one would displace
+    // its sender and lose the callback.
+    if (mProxyDisconnectCmdSender)
+    {
+        return;
+    }
+
+    using namespace chip::app::Clusters::CommissioningProxy;
+
+    Commands::ProxyDisconnectRequest::Type request;
+    if (aCancelPendingConnect)
+    {
+        // Spec: "A null value SHALL cancel any ongoing ProxyConnectRequest for the
+        // invoking fabric."
+        request.sessionID.SetNull();
+        ChipLogProgress(chipTool, "PairViaProxy: cancelling any ongoing ProxyConnectRequest");
+    }
+    else
+    {
+        request.sessionID.SetNonNull(mProxySessionId);
+    }
+
+    chip::app::CommandPathParams pathParams(mProxyEndpointId.ValueOr(kDefaultProxyEndpointId),
+                                            chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyDisconnectRequest::Id,
+                                            chip::app::CommandPathFlags::kEndpointIdValid);
+
+    // Mark the session dead now so a duplicate call is a no-op.  mProxySessionId is left
+    // alone: 0 is a valid SessionID, so it cannot be used to mean "no session".
+    // Deactivating also releases the transport, which Activate() requires to be idle --
+    // in interactive mode a later "pairing proxy" reuses the same instance.
+    mProxySessionActive = false;
+    if (auto * proxyTransport = GetDeviceProxyTransport(CurrentCommissioner().GetTransportMgr()))
+    {
+        proxyTransport->Deactivate();
+    }
+    mProxyDisconnectExitErr = exitErr;
+
+    // Allocate only once the local session is retired: releasing the CASE session while
+    // the transport is still active would leave nothing able to deactivate it.
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr);
+    if (cmdSender == nullptr)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
+        mProxySession.Release();
+        FinishCommand(exitErr);
+        return;
+    }
+
+    if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
+        cmdSender->SendCommandRequest(mProxySession.Get().Value()) != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to send ProxyDisconnectRequest");
+        mProxySession.Release();
+        FinishCommand(exitErr);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "PairViaProxy: sent ProxyDisconnectRequest, waiting for response");
+    mProxyDisconnectCmdSender = std::move(cmdSender);
+    // Finishing the command is deferred until OnDone/OnError fires for mProxyDisconnectCmdSender.
+}
+
+// ProxyTransportDelegate — called by ProxyTransport when it needs to forward
+// a commissioning packet to the proxy app via ProxyMessageRequest.
+CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan message)
+{
+    // A real outbound message ends any drain in progress.
+    mProxyConsecutivePolls = 0;
+    return SendProxyMessageRequest(sessionId, chip::app::DataModel::MakeNullable(message));
+}
+
+CHIP_ERROR PairingCommand::PollProxyForQueuedMessage()
+{
+    ChipLogDetail(chipTool, "PairViaProxy: polling the proxy for a queued message (session %u)", mProxySessionId);
+    return SendProxyMessageRequest(mProxySessionId, chip::app::DataModel::Nullable<chip::ByteSpan>());
+}
+
+CHIP_ERROR PairingCommand::SendProxyMessageRequest(uint16_t sessionId,
+                                                   const chip::app::DataModel::Nullable<chip::ByteSpan> & message)
+{
+    VerifyOrReturnError(mProxyExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(static_cast<bool>(mProxySession), CHIP_ERROR_INCORRECT_STATE);
+
+    // Nothing may be sent for a session that is closing: the disconnect has already
+    // deactivated the transport, so a request issued now can only outlive the flow.
+    VerifyOrReturnError(mProxySessionActive && mProxyDisconnectCmdSender == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Only one ProxyMessageRequest may be outstanding per session; the proxy answers a
+    // second one with BUSY.  Refuse here so the caller can retry rather than displacing
+    // the in-flight request.  Note this tracks the RESPONSE, not the sender's lifetime:
+    // senders outlive their response by one callback, and the next message is sent from
+    // inside that window.
+    VerifyOrReturnError(!mProxyMessageAwaitingResponse, CHIP_ERROR_BUSY);
+
+    using namespace chip::app::Clusters::CommissioningProxy;
+
+    // Allow large payload so that commissioning messages fit inside ProxyMessageRequest.
+    auto cmdSender =
+        chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr, /* aIsTimedRequest */ false,
+                                                             /* aSuppressResponse */ false, /* aAllowLargePayload */ true);
+    VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    Commands::ProxyMessageRequest::Type request;
+    request.sessionID = sessionId;
+    // ConnectNetwork on Linux can take 20-30s (wpa_supplicant scan + join).
+    // The proxy exchange must stay open at least this long.
+    request.responseTimeout = 60;
+    request.message         = message;
+
+    chip::app::CommandPathParams pathParams(mProxyEndpointId.ValueOr(kDefaultProxyEndpointId),
+                                            chip::app::Clusters::CommissioningProxy::Id, Commands::ProxyMessageRequest::Id,
+                                            chip::app::CommandPathFlags::kEndpointIdValid);
+
+    ReturnErrorOnFailure(cmdSender->AddRequestData(pathParams, request));
+
+    // Take ownership before sending, and mark the request outstanding, so a re-entrant
+    // call is refused rather than displacing this one.  OnDone cannot run before
+    // SendCommandRequest returns, so undoing both on failure cannot race with it.
+    auto * sender = cmdSender.get();
+    mProxyMessageCmdSenders.push_back(std::move(cmdSender));
+    mProxyMessageAwaitingResponse = true;
+
+    // Give chip-tool's exchange a little extra headroom beyond responseTimeout
+    // so it does not expire before the proxy has a chance to forward the reply.
+    auto cmdTimeout = chip::System::Clock::Seconds16(request.responseTimeout + 10);
+    CHIP_ERROR err  = sender->SendCommandRequest(mProxySession.Get().Value(), chip::MakeOptional(cmdTimeout));
+    if (err != CHIP_NO_ERROR)
+    {
+        mProxyMessageAwaitingResponse = false;
+        mProxyMessageCmdSenders.pop_back();
+        return err;
+    }
     return CHIP_NO_ERROR;
 }

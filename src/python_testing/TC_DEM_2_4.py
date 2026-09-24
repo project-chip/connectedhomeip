@@ -108,7 +108,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("10", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("10a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E03(Resumed) sent with Cause=3 (UserOptOut)"),
             TestStep("11a", "TH reads from the DUT the ESAState",
@@ -126,7 +126,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("13", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("13a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("13b", "TH reads from the DUT the Forecast",
                      "Value has to include ForecastUpdateReason=Local Optimization"),
             TestStep("14", "TH sends command ResumeRequest",
@@ -138,7 +138,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("15", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("15a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("15b", "TH reads from the DUT the Forecast",
                      "Value has to include ForecastUpdateReason=Local Optimization"),
             TestStep("16", "TH sends command ResumeRequest",
@@ -148,7 +148,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("17", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("17a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("18", "Wait for minPauseDuration.",
                      "Event DEM.S.E03(Resumed) sent with Cause=0 (NormalCompletion)"),
             TestStep("18a", "TH reads from the DUT the ESAState",
@@ -350,7 +350,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPaused)
 
         self.step("18")
-        log.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
+        log.info("Sleeping for forecast.slots[0].minPauseDuration %ss", forecast.slots[0].minPauseDuration)
         await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)

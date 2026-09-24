@@ -18,16 +18,3 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
-
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/BindingManager.cpp"
-    "${CLUSTER_DIR}/BindingManager.h"
-    "${CLUSTER_DIR}/PendingNotificationMap.cpp"
-    "${CLUSTER_DIR}/PendingNotificationMap.h"
-    "${CLUSTER_DIR}/BindingCluster.cpp"
-    "${CLUSTER_DIR}/BindingCluster.h"
-    "${CLUSTER_DIR}/binding-table.cpp"
-    "${CLUSTER_DIR}/binding-table.h"
-)

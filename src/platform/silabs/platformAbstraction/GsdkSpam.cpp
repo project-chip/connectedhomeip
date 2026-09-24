@@ -33,11 +33,6 @@
 #include "sl_system_kernel.h"
 #endif
 
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-#include "sl_clock_manager.h"
-#include "sl_hal_wdog.h"
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
-
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
@@ -117,8 +112,6 @@ namespace DeviceLayer {
 namespace Silabs {
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
-
-SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
@@ -281,6 +274,7 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 extern "C" void sl_button_on_change(const sl_button_t * handle)
 {
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
@@ -303,12 +297,9 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     const sl_button_t * handle = SL_SIMPLE_BUTTON_INSTANCE(button);
     return nullptr == handle ? 0 : sl_button_get_state(handle);
 }
-
-#else
-uint8_t SilabsPlatform::GetButtonState(uint8_t button)
-{
-    return 0;
-}
+#ifdef SL_ICD_ENABLED
+void SilabsPlatform::SleepButtonActionHandler() {}
+#endif // SL_ICD_ENABLED
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
@@ -317,46 +308,6 @@ sl_status_t SilabsPlatform::EnableSi70xxSensorGpio()
     return SL_STATUS_OK;
 }
 #endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
-
-#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
-void SilabsPlatform::WatchdogInit()
-{
-    // Initialize WDOG with default configuration
-    sl_hal_wdog_init_t wdogInit = SL_HAL_WDOG_INIT_DEFAULT;
-    wdogInit.reset_disable      = true;                // For debug, do not trigger a system reset on timeout
-    wdogInit.period_select      = SL_WDOG_PERIOD_128k; // Set timeout period. 4s with our default LF clock at 32.768kHz
-
-    //  Initialize WDOG with our configuration
-    sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_WDOG0);
-    sl_hal_wdog_init(WDOG0, &wdogInit);
-
-    // Enable Watchdog Timeout interrupt
-    sl_hal_wdog_clear_interrupts(WDOG0, WDOG_IF_TOUT);
-    sl_hal_wdog_enable_interrupts(WDOG0, WDOG_IF_TOUT);
-
-    WatchdogEnable();
-}
-
-void SilabsPlatform::WatchdogFeed()
-{
-    sl_hal_wdog_feed(WDOG0);
-}
-
-void SilabsPlatform::WatchdogEnable()
-{
-    // Enable NVIC interrupt for WDOG
-    sl_interrupt_manager_clear_irq_pending(WDOG0_IRQn);
-    sl_interrupt_manager_enable_irq(WDOG0_IRQn);
-
-    sl_hal_wdog_enable(WDOG0);
-}
-
-void SilabsPlatform::WatchdogDisable()
-{
-    sl_hal_wdog_disable(WDOG0);
-    sl_interrupt_manager_disable_irq(WDOG0_IRQn);
-}
-#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 
 } // namespace Silabs
 } // namespace DeviceLayer

@@ -122,7 +122,7 @@ CHIP_ERROR PairingCommand::RunCommand()
                      ChipLogValueX64(anchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else
+    else if (!mRegularDevice.ValueOr(false))
     {
         // Skip commissioning complete for JCM and other device commissioning methods but not Anchor Administrator commissioning.
         mSkipCommissioningComplete = MakeOptional(true);
@@ -217,6 +217,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::AlreadyDiscoveredByIndexWithCode:
         err = PairWithMdnsOrBleByIndexWithCode(remoteId, mIndex);
         break;
+    case PairingMode::Proxy:
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        break;
     }
 
     return err;
@@ -286,8 +289,9 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
-                                                            sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -682,7 +686,11 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        if (!mSkipCommissioningComplete.ValueOr(false))
+        if (mRegularDevice.ValueOr(false))
+        {
+            ChipLogProgress(JointFabric, "Device (nodeId=%ld) commissioned with success", nodeId);
+        }
+        else if (!mSkipCommissioningComplete.ValueOr(false))
         {
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
             TEMPORARY_RETURN_IGNORED SetAnchorNodeId(nodeId);

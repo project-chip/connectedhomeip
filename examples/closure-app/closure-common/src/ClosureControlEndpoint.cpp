@@ -131,8 +131,24 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
 
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
-    mClusterInstance = GetInstance(mEndpoint);
-    VerifyOrReturnError(mClusterInstance != nullptr, CHIP_ERROR_INTERNAL);
+    ClusterConformance conformance;
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kVentilation)
+        .Set(Feature::kPedestrian)
+        .Set(Feature::kCalibration)
+        .Set(Feature::kProtection)
+        .Set(Feature::kManuallyOperable);
+    conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
+
+    ClusterInitParameters initParams;
+    initParams.mLatchControlModes.Set(LatchControlModesBitmap::kRemoteLatching).Set(LatchControlModesBitmap::kRemoteUnlatching);
+
+    ReturnErrorOnFailure(mInterface.Init(conformance, initParams));
+
+    mClusterInstance = &mInterface.Cluster();
     mDelegate.SetClusterInstance(mClusterInstance);
     return CHIP_NO_ERROR;
 }

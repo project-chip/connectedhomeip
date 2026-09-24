@@ -52,6 +52,11 @@
 #include <openthread/srp_client.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+#include <lib/dnssd/ServiceNaming.h>
+#include <openthread/mdns.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -456,7 +461,8 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     {
         mTemporaryRxOnWhenIdle = true;
         linkMode.mRxOnWhenIdle = true;
-        otThreadSetLinkMode(mOTInst, linkMode);
+        // Safe to ignore since this only fails if the instance is null and we perform this check above.
+        RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
     }
 #endif
 
@@ -484,6 +490,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished(otActiveScanResult * aResult)
 {
+    VerifyOrReturn(mOTInst);
     if (aResult == nullptr) // scan completed
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -492,7 +499,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
             otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
             linkMode.mRxOnWhenIdle    = false;
             mTemporaryRxOnWhenIdle    = false;
-            otThreadSetLinkMode(mOTInst, linkMode);
+            // Safe to ignore since this only fails if the instance is null and we perform this check above.
+            RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
         }
 #endif
 
@@ -735,6 +743,19 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    MutableByteSpan mac(macBuffer);
+    char hostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
+
+    err = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+    SuccessOrExit(err);
+    err = chip::Dnssd::MakeHostName(hostname, sizeof(hostname), mac);
+    SuccessOrExit(err);
+    otErr = otMdnsSetLocalHostName(mOTInst, hostname);
+    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
@@ -882,6 +903,9 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_CancelRendezvousAnnouncement()
 {
     DeviceLayer::SystemLayer().CancelTimer(_HandleRendezvousRetransmissionTimer, this);
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+    DeviceLayer::SystemLayer().CancelTimer(_HandleSeekerRestartTimer, this);
+#endif
     mRendezvousRetransmissionCount = 0;
 }
 
@@ -961,21 +985,36 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
 {
     otSockAddr targetAddr;
+    bool isRunning = otSeekerIsRunning(mOTInst);
 
     if (otSeekerSetUpNextConnection(mOTInst, &targetAddr) == OT_ERROR_NONE)
     {
         mRendezvousPeerAddr =
-            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, Inet::InterfaceId::Null());
+            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, mRendezvousInterface);
 
         DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
     }
-    else if (otSeekerIsRunning(mOTInst))
+    else if (isRunning)
     {
         otSeekerStop(mOTInst);
 
-        auto err = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+        CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS), _HandleSeekerRestartTimer, this);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to start Thread discovery timer: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "Restart Thread discovery in %d ms", CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS);
+        }
 
-        ChipLogProgress(DeviceLayer, "Restart rendezvous: %s", chip::ErrorStr(err));
+#else
+        auto err      = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+
+        ChipLogProgress(DeviceLayer, "Thread Discovery restarted, no delay: %s", chip::ErrorStr(err));
+#endif
     }
 }
 
@@ -995,9 +1034,14 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SendRendezvousAnnounce
         if (mRendezvousRetransmissionCount < kMaxRendezvousRetransmissions)
         {
             const uint32_t kRendezvousRetransmissionIntervalMs = 1250;
-            ChipLogProgress(DeviceLayer, "Try the current Thread network #%u", mRendezvousRetransmissionCount);
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
-                                                  _HandleRendezvousRetransmissionTimer, this);
+            ChipLogProgress(DeviceLayer, "Try the current Thread network #%" PRIu16 " in %" PRIu32 " ms",
+                            mRendezvousRetransmissionCount, kRendezvousRetransmissionIntervalMs);
+            err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
+                                                        _HandleRendezvousRetransmissionTimer, this);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to start rendezvous retransmission timer: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
         else
         {
@@ -1020,6 +1064,18 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleRendezvousRetra
     auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aAppState);
     self->SendRendezvousAnnouncement();
 }
+
+#if CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS > 0
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleSeekerRestartTimer(System::Layer * aLayer, void * aAppState)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aAppState);
+    self->Impl()->LockThreadStack();
+    auto err = MapOpenThreadError(otSeekerStart(self->mOTInst, _HandleSeekerScanEvaluator, self));
+    self->Impl()->UnlockThreadStack();
+    ChipLogProgress(DeviceLayer, "Thread Discovery restarted: %s", chip::ErrorStr(err));
+}
+#endif
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 template <class ImplClass>

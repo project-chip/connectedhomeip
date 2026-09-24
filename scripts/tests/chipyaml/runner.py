@@ -75,6 +75,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
+    f = click.option('--value-wait-extra-duration-ms', 'valueWaitExtraDurationMs', type=int, default=250, show_default=True,
+                     help='Extra timeout duration in milliseconds for WaitForAttributeValue.')(f)
     return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
                         help='Path to a directory containing additional pseudo clusters.')(f)
 
@@ -109,15 +111,6 @@ def websocket_runner_options(f):
                      help='Path to a websocket server to run at launch.')(f)
     return click.option('--server_arguments', type=str, default=None,
                         help='Optional arguments to pass to the websocket server at launch.')(f)
-
-
-def matter_repl_runner_options(f):
-    f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
-                     help='Path to persistent storage configuration file.')(f)
-    f = click.option('--commission_on_network_dut', type=bool, default=False,
-                     help='Prior to running test should we try to commission DUT on network.')(f)
-    return click.option('--runner', type=str, default=None, show_default=True,
-                        help='The runner to run the test with.')(f)
 
 
 @dataclass
@@ -237,10 +230,6 @@ CONTEXT_SETTINGS = {
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
-        'matter-repl': {
-            'adapter': 'chipyaml.adapters.repl.adapter',
-            'runner': 'chipyaml.adapters.repl.runner',
-        },
     },
     'max_content_width': 120,
 }
@@ -250,7 +239,7 @@ CONTEXT_SETTINGS = {
 @click.argument('test_name')
 @test_parser_options
 @click.pass_context
-def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, **kwargs):
+def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, valueWaitExtraDurationMs: int, **kwargs):
     pseudo_clusters = get_custom_pseudo_clusters(
         additional_pseudo_clusters_directory) if use_default_pseudo_clusters else PseudoClusters([])
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
@@ -260,6 +249,7 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
     if len(test_list) == 0:
         raise ValueError(f"No tests found for test name '{test_name}'")
 
+    kwargs['valueWaitExtraDurationMs'] = valueWaitExtraDurationMs
     parser_config = TestParserConfig(pics, specifications, kwargs)
     parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())
     parser_builder_config.options.stop_on_error = stop_on_error
@@ -322,24 +312,6 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
-    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
-
-
-@runner_base.command()
-@test_runner_options
-@matter_repl_runner_options
-@pass_parser_group
-def matter_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
-    """Run the test suite using matter-repl."""
-    adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
-    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
-    runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
-
-    node_id_to_commission = None
-    if commission_on_network_dut:
-        node_id_to_commission = parser_group.builder_config.parser_config.config_override['nodeId']
-    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, node_id_to_commission=node_id_to_commission)
     return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 

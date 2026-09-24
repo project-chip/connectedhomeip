@@ -133,7 +133,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("3c", "Send a first TimeSnapshot command and verify")
             response = await self.send_time_snapshot_expect_success()
-            log.info(f"Step 3c: {response}")
+            log.info("Step 3c: %s", response)
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following conditions met:
             #   - Value of PosixTimeMs field is not null.
@@ -162,7 +162,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
             self.print_step("3e", "Send a second TimeSnapshot command and verify")
 
             response = await self.send_time_snapshot_expect_success()
-            log.info(f"Step 3e: {response}")
+            log.info("Step 3e: %s", response)
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is not null and greater than PosixTimeMs1.
@@ -184,7 +184,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("4a", "Send a first TimeSnapshot command and verify")
             response = await self.send_time_snapshot_expect_success()
-            log.info(f"Step 4a: {response}")
+            log.info("Step 4a: %s", response)
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is null.
@@ -204,7 +204,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
             self.print_step("4c", "Send a second TimeSnapshot command and verify")
 
             response = await self.send_time_snapshot_expect_success()
-            log.info(f"Step 4c: {response}")
+            log.info("Step 4c: %s", response)
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is null.

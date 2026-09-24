@@ -88,7 +88,7 @@ def main(log_level, log_timestamps, output, raw_profile_filename):
                 sys.exit(0)
 
     log.info("Writing output to %s (profile name: %s)", output, raw_profile_filename)
-    with open(output, "wt") as f:
+    with open(output, "w") as f:
         f.write(expected_output)
 
     log.debug("Writing completed")

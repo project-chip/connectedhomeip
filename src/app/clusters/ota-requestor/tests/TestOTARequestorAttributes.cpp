@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
-#include <app/common/CompatEnumNames.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -29,6 +28,7 @@
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Events.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;

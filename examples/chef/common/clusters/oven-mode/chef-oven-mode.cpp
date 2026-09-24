@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,39 @@ static_assert(kOvenModeTableSize <= kEmberInvalidEndpointIndex, "OvenMode table 
 std::unique_ptr<OvenMode::ChefDelegate> gDelegateTable[kOvenModeTableSize];
 std::unique_ptr<ModeBase::Instance> gInstanceTable[kOvenModeTableSize];
 
+void InitOvenModeForEndpoint(EndpointId endpointId)
+{
+    uint16_t epIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, OvenMode::Id, MATTER_DM_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    VerifyOrDie(epIndex < kOvenModeTableSize);
+    VerifyOrDie(!gDelegateTable[epIndex] && !gInstanceTable[epIndex]);
+
+    gDelegateTable[epIndex] = std::make_unique<OvenMode::ChefDelegate>();
+    TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
+
+    gInstanceTable[epIndex] = std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
+
+    ChipLogProgress(DeviceLayer, "Endpoint %d OvenMode Initialized.", endpointId);
+}
+
+void ShutdownOvenModeForEndpoint(EndpointId endpointId)
+{
+    uint16_t epIndex =
+        emberAfGetClusterServerEndpointIndex(endpointId, OvenMode::Id, MATTER_DM_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOvenModeTableSize)
+    {
+        return;
+    }
+
+    if (gInstanceTable[epIndex])
+    {
+        gInstanceTable[epIndex]->Shutdown();
+        gInstanceTable[epIndex].reset();
+    }
+    gDelegateTable[epIndex].reset();
+}
+
 /**
  * Initializes OvenMode cluster for the app (all endpoints).
  */
@@ -56,26 +89,27 @@ void InitChefOvenModeCluster()
             continue;
         }
 
-        // Check if endpoint has OvenMode cluster enabled
         uint16_t epIndex =
             emberAfGetClusterServerEndpointIndex(endpointId, OvenMode::Id, MATTER_DM_OVEN_MODE_CLUSTER_SERVER_ENDPOINT_COUNT);
         if (epIndex >= kOvenModeTableSize)
+        {
             continue;
+        }
 
-        gDelegateTable[epIndex] = std::make_unique<OvenMode::ChefDelegate>();
-        TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
-
-        uint32_t featureMap = 0;
-        VerifyOrDieWithMsg(OvenMode::Attributes::FeatureMap::Get(endpointId, &featureMap) == Status::Success, DeviceLayer,
-                           "Failed to read OvenMode feature map for endpoint %d", endpointId);
-        gInstanceTable[epIndex] =
-            std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
-        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
-
-        ChipLogProgress(DeviceLayer, "Endpoint %d OvenMode Initialized.", endpointId);
+        InitOvenModeForEndpoint(endpointId);
     }
 }
 } // namespace ChefOvenMode
+
+void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
+{
+    ChefOvenMode::InitOvenModeForEndpoint(endpointId);
+}
+
+void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    ChefOvenMode::ShutdownOvenModeForEndpoint(endpointId);
+}
 
 CHIP_ERROR OvenMode::ChefDelegate::Init()
 {

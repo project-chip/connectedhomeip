@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
 
 import constants
 import stateful_shell
@@ -34,7 +35,7 @@ TermColors = constants.TermColors
 shell = stateful_shell.StatefulShell()
 
 _CHEF_SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
-_REPO_BASE_PATH = os.path.join(_CHEF_SCRIPT_PATH, "../../")
+_REPO_BASE_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 _DEVICE_FOLDER = os.path.join(_CHEF_SCRIPT_PATH, "devices")
 _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
@@ -43,6 +44,31 @@ _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
+]
+# Reduced set of devices for Linux presubmit CI that provides 100% coverage
+# of all C++ cluster implementations and preprocessor branches under examples/chef/common.
+_REDUCED_LINUX_CI_DEVICES = [
+    "multi_column_switch",
+    "rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45",
+    "rootnode_castingvideoplayer_contentapp_34699714e7",
+    "rootnode_chime_9991598b3f",
+    "rootnode_contactsensor_lightsensor_occupancysensor_temperaturesensor_pressuresensor_flowsensor_humiditysensor_airqualitysensor_powersource_367e7cea91",
+    "rootnode_dishwasher_cc105034fe",
+    "rootnode_doorlock_aNKYAreMXE",
+    "rootnode_heatpump_87ivjRAECh",
+    "rootnode_laundrydryer_01796fe396",
+    "rootnode_laundrywasher_fb10d238c8",
+    "rootnode_microwaveoven_37420684d3",
+    "rootnode_modeselect_6860d3a65a",
+    "rootnode_oven_temperaturecontrolledcabinet_cooktop_cooksurface_738dd18832",
+    "rootnode_pump_5f904818cc",
+    "rootnode_rainsensor_a7aa5d7738",
+    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
+    "rootnode_roboticvacuumcleaner_1807ff0c49",
+    "rootnode_smokecoalarm_686fe0dcb8",
+    "rootnode_waterheater_21bd13d651",
+    "rootnode_watervalve_6bb39f1f67",
+    "rootnode_windowcovering_RLCxaGi9Yx",
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
@@ -105,14 +131,7 @@ def load_config() -> None:
     return config
 
 
-def check_python_version() -> None:
-    if sys.version_info[0] < 3:
-        flush_print('Must use Python 3. Current version is ' +
-                    str(sys.version_info[0]))
-        exit(1)
-
-
-def load_cicd_config() -> Dict[str, Any]:
+def load_cicd_config() -> dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
         return json.loads(config_file.read())
 
@@ -275,7 +294,6 @@ def bundle_telink(device_name: str) -> None:
 
 def main() -> int:
 
-    check_python_version()
     config = load_config()
     cicd_config = load_cicd_config()
 
@@ -392,9 +410,13 @@ def main() -> int:
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
     parser.add_option("", "--ci_linux",
-                      help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
+                      help=("Builds all non-excluded Chef Examples on Linux for postsubmit CI. "
                             "Devices are built without -c for faster compilation."),
                       dest="ci_linux", action="store_true")
+    parser.add_option("", "--ci_linux_reduced",
+                      help=("Builds a reduced set of Chef Examples on Linux for presubmit CI. "
+                            "Devices are built without -c for faster compilation."),
+                      dest="ci_linux_reduced", action="store_true")
     parser.add_option("", "--cpu_type",
                       help="CPU type to compile for. Linux only.",
                       choices=["arm64", "arm", "x64"])
@@ -433,10 +455,17 @@ def main() -> int:
     # CI Linux
     #
 
-    if options.ci_linux:
-        for device_name in _DEVICE_LIST:
-            if device_name in _EXCLUDE_DEVICE_FROM_LINUX_CI:
-                continue
+    if options.ci_linux or options.ci_linux_reduced:
+        target_devices = (
+            _REDUCED_LINUX_CI_DEVICES
+            if options.ci_linux_reduced
+            else list(set(_DEVICE_LIST) - set(_EXCLUDE_DEVICE_FROM_LINUX_CI))
+        )
+        for device_name in target_devices:
+            if device_name not in _DEVICE_LIST:
+                flush_print(
+                    f"{device_name} in Linux CI list but not {_DEVICE_FOLDER}!")
+                exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -br -d {device_name} -t linux"
             flush_print(f"Building {command}", with_border=True)
@@ -539,7 +568,7 @@ def main() -> int:
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['nrfconnect']['ZEPHYR_BASE']}")
         shell.run_cmd(
-            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
+            f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/../.zephyrrc')
         # QUIRK:
         # When the Zephyr SDK is installed as a part of the NCS toolchain, the build system will use
         # build tools from the NCS toolchain, but it will not update the PATH and LD_LIBRARY_PATH
@@ -847,6 +876,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_VENDOR_ID={options.vid}
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
+                        CHEF_FLAGS += -DCONFIG_CHEF_SAMPLE_NAME=\\"{options.sample_device_type_name}\\"
                         """
                     ))
                 if options.do_clean:
@@ -886,6 +916,7 @@ def main() -> int:
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
                 'chip_app_data_model_target = "//:chef-data-model"',
+                'shell_use_all_clusters_data_model = false',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

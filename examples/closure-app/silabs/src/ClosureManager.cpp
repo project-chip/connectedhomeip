@@ -164,14 +164,6 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
     }
     ReturnErrorOnFailure(closureControlEndpoint.GetClusterInstance().SetMainState(MainStateEnum::kStopped));
 
-    if (featureMap.Has(ClosureControl::Feature::kMotionLatching))
-    {
-        BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
-        latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
-            .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
-        ReturnErrorOnFailure(closureControlEndpoint.GetClusterInstance().SetLatchControlModes(latchControlModes));
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -1265,7 +1257,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     return true;
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 ClosureUIData ClosureManager::GetClosureUIData()
 {
     ClosureUIData uiData;
@@ -1273,7 +1265,7 @@ ClosureUIData ClosureManager::GetClosureUIData()
     uiData.overallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
     return uiData;
 }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 bool ClosureManager::IsClosureControlMotionInProgress() const
 {

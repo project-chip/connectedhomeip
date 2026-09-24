@@ -21,7 +21,6 @@ import logging
 import re
 import sys
 import traceback
-from typing import Dict
 
 import fastcore  # type: ignore
 import memdf.report
@@ -133,7 +132,7 @@ class SizeContext:
 
         # Record size artifacts keyed by group and commit_hash to match them up
         # after we have the entire list.
-        size_artifacts: Dict[str, Dict[str, fastcore.basics.AttrDict]] = {}
+        size_artifacts: dict[str, dict[str, fastcore.basics.AttrDict]] = {}
         for a in self.gh.get_size_artifacts():
             if a.group not in size_artifacts:
                 size_artifacts[a.group] = {}
@@ -244,7 +243,7 @@ class SizeContext:
             return self.gh.update_comment(existing_comment.id, text)
         return self.gh.create_comment(pr, text)
 
-    def report_matching_commits(self) -> Dict[str, pd.DataFrame]:
+    def report_matching_commits(self) -> dict[str, pd.DataFrame]:
         """Report on all new comparable commits."""
         if not self.should_report():
             return {}

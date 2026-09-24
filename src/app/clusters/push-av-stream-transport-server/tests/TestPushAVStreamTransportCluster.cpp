@@ -90,17 +90,44 @@ protected:
     chip::Testing::ClusterTester mClusterTester;
 };
 
-static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
+class MockEventLoggingNoPerZoneSensitivity : public Testing::AppContext
 {
-    TLV::TLVReader reader;
-    size_t elementCount;
-    CircularEventBufferWrapper bufWrapper;
-    EXPECT_EQ(aLogMgmt.GetEventReader(reader, aPriority, &bufWrapper), CHIP_NO_ERROR);
+public:
+    MockEventLoggingNoPerZoneSensitivity() : mClusterTester(mServer) {}
 
-    EXPECT_EQ(TLV::Utilities::Count(reader, elementCount, false), CHIP_NO_ERROR);
+    void SetUp() override
+    {
+        const LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), PriorityLevel::Critical },
+        };
 
-    EXPECT_EQ(elementCount, expectedNumEvents);
-}
+        AppContext::SetUp();
+
+        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
+
+        EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
+                                               logStorageResources, &mEventCounter);
+
+        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+    }
+
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(nullptr);
+        EventManagement::DestroyEventManagement();
+        AppContext::TearDown();
+    }
+
+protected:
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>() };
+    chip::Testing::ClusterTester mClusterTester;
+};
+
 } // namespace app
 } // namespace chip
 
@@ -403,9 +430,6 @@ protected:
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -424,9 +448,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     // Create CMAFContainerOptionsStruct object
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -506,10 +527,171 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
     transportOptions.containerOptions = containerOptions;
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
+{
+    // Test that ValidateIncomingTransportOptions rejects >16 video streams
+    PushAvStreamTransportServerLogic logic(1, BitFlags<Feature>(1));
+
+    // Create valid base transport options
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    // Create valid CMAF container options
+    cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    // Create valid trigger options
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    // Create empty motion zones (valid for this test)
+    uint8_t tlvBuffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(writer.GetLengthWritten()));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    // Create valid transport options
+    transportOptions.streamUsage      = StreamUsageEnum::kAnalysis;
+    transportOptions.TLSEndpointID    = 1;
+    std::string url                   = "https://192.168.1.100:554/stream/";
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    // Test 1: Create video streams with 17 entries (>kMaxVideoStreams=16)
+    // Use std::vector<std::string> with reserve to keep CharSpan lifetimes stable
+    constexpr size_t kNumTestStreams = 17;
+    std::vector<std::string> videoStreamNames;
+    std::vector<Structs::VideoStreamStruct::Type> videoStreams;
+    videoStreamNames.reserve(kNumTestStreams);
+    videoStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        videoStreamNames.push_back("Stream" + std::to_string(i));
+        Structs::VideoStreamStruct::Type videoStream;
+        videoStream.videoStreamID   = static_cast<uint16_t>(i);
+        videoStream.videoStreamName = CharSpan(videoStreamNames.back().data(), videoStreamNames.back().size());
+        videoStreams.push_back(videoStream);
+    }
+
+    // Encode video streams into TLV
+    uint8_t videoTlvBuffer[1024];
+    TLV::TLVWriter videoWriter;
+    videoWriter.Init(videoTlvBuffer, sizeof(videoTlvBuffer));
+    TLV::TLVWriter videoArrayWriter;
+    err = videoWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & vs : videoStreams)
+    {
+        err = DataModel::Encode(videoArrayWriter, TLV::AnonymousTag(), vs);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = videoWriter.CloseContainer(videoArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader videoReader;
+    videoReader.Init(videoTlvBuffer, static_cast<uint32_t>(videoWriter.GetLengthWritten()));
+    err = videoReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType> videoDecodableList;
+    err = videoDecodableList.Decode(videoReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.videoStreams.SetValue(videoDecodableList);
+
+    // Should return ConstraintError for >16 video streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
+
+    // Test 2: Create audio streams with 17 entries (>kMaxAudioStreams=16)
+    transportOptions.videoStreams.ClearValue();
+
+    std::vector<std::string> audioStreamNames;
+    std::vector<Structs::AudioStreamStruct::Type> audioStreams;
+    audioStreamNames.reserve(kNumTestStreams);
+    audioStreams.reserve(kNumTestStreams);
+    for (size_t i = 0; i < kNumTestStreams; i++)
+    {
+        audioStreamNames.push_back("AudioStream" + std::to_string(i));
+        Structs::AudioStreamStruct::Type audioStream;
+        audioStream.audioStreamID   = static_cast<uint16_t>(i);
+        audioStream.audioStreamName = CharSpan(audioStreamNames.back().data(), audioStreamNames.back().size());
+        audioStreams.push_back(audioStream);
+    }
+
+    // Encode audio streams into TLV
+    uint8_t audioTlvBuffer[1024];
+    TLV::TLVWriter audioWriter;
+    audioWriter.Init(audioTlvBuffer, sizeof(audioTlvBuffer));
+    TLV::TLVWriter audioArrayWriter;
+    err = audioWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    for (const auto & as : audioStreams)
+    {
+        err = DataModel::Encode(audioArrayWriter, TLV::AnonymousTag(), as);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+    }
+
+    err = audioWriter.CloseContainer(audioArrayWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Decode into DecodableList
+    TLV::TLVReader audioReader;
+    audioReader.Init(audioTlvBuffer, static_cast<uint32_t>(audioWriter.GetLengthWritten()));
+    err = audioReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType> audioDecodableList;
+    err = audioDecodableList.Decode(audioReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    transportOptions.audioStreams.SetValue(audioDecodableList);
+
+    // Should return ConstraintError for >16 audio streams
+    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::ConstraintError);
 }
 
 void PrintBufHex(const uint8_t * buf, size_t size)
@@ -531,9 +713,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     /*
      * Test AllocatePushTransport
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -551,11 +730,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -722,20 +898,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     Structs::CMAFContainerOptionsStruct::Type respCMAFContainerOptions = respContainerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(respCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(respCMAFContainerOptions.chunkDuration, 500);
-    std::string respTrackName(respCMAFContainerOptions.trackName.data(), respCMAFContainerOptions.trackName.size());
+    std::string respTrackName(respCMAFContainerOptions.trackName.Value().data(), respCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(respTrackName, "video");
     EXPECT_FALSE(respCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string respCENCKeyStr(respCMAFContainerOptions.CENCKey.Value().data(),
-                               respCMAFContainerOptions.CENCKey.Value().data() + respCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(respCENCKeyStr, "1234567890ABCDEF");
-
-    std::string respCENCKeyIDStr(respCMAFContainerOptions.CENCKeyID.Value().data(),
-                                 respCMAFContainerOptions.CENCKeyID.Value().data() +
-                                     respCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(respCENCKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test ReadAttribute
@@ -858,19 +1023,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     Structs::CMAFContainerOptionsStruct::Type readCMAFContainerOptions = readContainerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(readCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(readCMAFContainerOptions.chunkDuration, 500);
-    std::string readTrackName(readCMAFContainerOptions.trackName.data(), readCMAFContainerOptions.trackName.size());
+    std::string readTrackName(readCMAFContainerOptions.trackName.Value().data(), readCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(readTrackName, "video");
     EXPECT_FALSE(readCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string cencKeyStr(readCMAFContainerOptions.CENCKey.Value().data(),
-                           readCMAFContainerOptions.CENCKey.Value().data() + readCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
-
-    std::string cencKeyIDStr(readCMAFContainerOptions.CENCKeyID.Value().data(),
-                             readCMAFContainerOptions.CENCKeyID.Value().data() + readCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test DeallocatePushTransport
@@ -893,9 +1048,6 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     /*
      * Test AllocatePushTransport and persistence of currentConnections list
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -913,11 +1065,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1077,19 +1226,9 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     Structs::CMAFContainerOptionsStruct::Type lCMAFContainerOptions = containerOptions.CMAFContainerOptions.Value();
     EXPECT_EQ(lCMAFContainerOptions.segmentDuration, 1000);
     EXPECT_EQ(lCMAFContainerOptions.chunkDuration, 500);
-    std::string lTrackName(lCMAFContainerOptions.trackName.data(), lCMAFContainerOptions.trackName.size());
+    std::string lTrackName(lCMAFContainerOptions.trackName.Value().data(), lCMAFContainerOptions.trackName.Value().size());
     EXPECT_EQ(lTrackName, "video");
     EXPECT_FALSE(lCMAFContainerOptions.metadataEnabled.HasValue());
-
-    std::string lCENCKeyStr(lCMAFContainerOptions.CENCKey.Value().data(),
-                            lCMAFContainerOptions.CENCKey.Value().data() + lCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(lCENCKeyStr, "1234567890ABCDEF");
-
-    std::string lCENCKeyIDStr(lCMAFContainerOptions.CENCKeyID.Value().data(),
-                              lCMAFContainerOptions.CENCKeyID.Value().data() + lCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(lCENCKeyIDStr, "1234567890ABCDEF");
 
     /*
      * Test DeallocatePushTransport; This should remove from the in-memory
@@ -1124,9 +1263,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     /*
      * Test AllocatePushTransport
      */
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -1144,11 +1280,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1244,12 +1377,6 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     cmafContainerOptions.segmentDuration = 30000;
     cmafContainerOptions.chunkDuration   = 1000;
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cencKey   = "ABCDEF1234567890";
-    cencKeyID = "ABCDEF1234567890";
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1420,24 +1547,11 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     EXPECT_EQ(findCMAFContainerOptions.chunkDuration, 1000);
     EXPECT_FALSE(findCMAFContainerOptions.metadataEnabled.HasValue());
 
-    std::string cencKeyStr(findCMAFContainerOptions.CENCKey.Value().data(),
-                           findCMAFContainerOptions.CENCKey.Value().data() + findCMAFContainerOptions.CENCKey.Value().size());
-
-    EXPECT_EQ(cencKeyStr, "ABCDEF1234567890");
-
-    std::string cencKeyIDStr(findCMAFContainerOptions.CENCKeyID.Value().data(),
-                             findCMAFContainerOptions.CENCKeyID.Value().data() + findCMAFContainerOptions.CENCKeyID.Value().size());
-
-    EXPECT_EQ(cencKeyIDStr, "ABCDEF1234567890");
-
     EXPECT_FALSE(iter.Next());
 }
 
 TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTriggerTransport)
 {
-    std::string cencKey   = "1234567890ABCDEF";
-    std::string cencKeyID = "1234567890ABCDEF";
-
     CMAFContainerOptionsStruct cmafContainerOptions;
     ContainerOptionsStruct containerOptions;
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
@@ -1455,11 +1569,8 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     cmafContainerOptions.segmentDuration = 1000;
     cmafContainerOptions.chunkDuration   = 500;
     std::string trackName                = "video";
-    cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
     cmafContainerOptions.metadataEnabled.ClearValue();
-
-    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
-    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     // Create ContainerOptionsStruct object
     containerOptions.containerType = ContainerFormatEnum::kCmaf;
@@ -1571,10 +1682,572 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
     mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
+}
 
-    EventManagement & logMgmt = EventManagement::GetInstance();
+TEST_F(MockEventLogging, Test_AllocateTransport_UpdateMotionZoneOptions)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
 
-    CheckLogState(logMgmt, 1, PriorityLevel::Info);
+    std::string url = "https://192.168.1.100:554/stream/";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    uint8_t tlvBuffer[512];
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    Structs::TransportZoneOptionsStruct::Type zone2;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.SetValue(5);
+
+    zone2.zone.SetNonNull(2);
+    zone2.sensitivity.SetValue(10);
+
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+    triggerOptions.motionSensitivity.ClearValue();
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+
+    /*
+     * Test UpdateMotionZoneOptions: NotFound for invalid connectionID
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = 9999;
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: NotFound for different fabric
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(2);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with empty motion zones list
+     */
+    {
+        uint8_t emptyTlvBuffer[32];
+        TLV::TLVWriter emptyWriter;
+        emptyWriter.Init(emptyTlvBuffer, sizeof(emptyTlvBuffer));
+
+        TLV::TLVWriter emptyContainerWriter;
+        CHIP_ERROR errEmpty = emptyWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, emptyContainerWriter);
+        EXPECT_EQ(errEmpty, CHIP_NO_ERROR);
+
+        errEmpty = emptyWriter.CloseContainer(emptyContainerWriter);
+        EXPECT_EQ(errEmpty, CHIP_NO_ERROR);
+
+        TLV::TLVReader emptyReader;
+        emptyReader.Init(emptyTlvBuffer, static_cast<uint32_t>(emptyWriter.GetLengthWritten()));
+        errEmpty = emptyReader.Next();
+        EXPECT_EQ(errEmpty, CHIP_NO_ERROR);
+
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> zonesList;
+        errEmpty = zonesList.Decode(emptyReader);
+        EXPECT_EQ(errEmpty, CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(zonesList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+        EXPECT_EQ(lTriggerOptions.motionZones.Value().Value().size(), (size_t) 0);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: InvalidCommand when zone entry is missing sensitivity with PerZoneSensitivity feature
+     */
+    {
+        uint8_t noSensTlvBuffer[256];
+        Structs::TransportZoneOptionsStruct::Type noSensZone;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> noSensDecodedList;
+
+        noSensZone.zone.SetNonNull(4);
+        noSensZone.sensitivity.ClearValue();
+
+        TLV::TLVWriter noSensWriter;
+        noSensWriter.Init(noSensTlvBuffer, sizeof(noSensTlvBuffer));
+
+        TLV::TLVWriter noSensContainerWriter;
+        EXPECT_EQ(noSensWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, noSensContainerWriter), CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(noSensContainerWriter, TLV::AnonymousTag(), noSensZone), CHIP_NO_ERROR);
+        EXPECT_EQ(noSensWriter.CloseContainer(noSensContainerWriter), CHIP_NO_ERROR);
+
+        TLV::TLVReader noSensReader;
+        noSensReader.Init(noSensTlvBuffer, static_cast<uint32_t>(noSensWriter.GetLengthWritten()));
+        EXPECT_EQ(noSensReader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(noSensDecodedList.Decode(noSensReader), CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(noSensDecodedList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with updated non-empty motion zones list and sensitivity
+     */
+    {
+        uint8_t updateTlvBuffer[256];
+        Structs::TransportZoneOptionsStruct::Type updateZone;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> updateDecodedList;
+
+        updateZone.zone.SetNonNull(3);
+        updateZone.sensitivity.SetValue(8);
+
+        TLV::TLVWriter updateWriter;
+        updateWriter.Init(updateTlvBuffer, sizeof(updateTlvBuffer));
+
+        TLV::TLVWriter updateContainerWriter;
+        CHIP_ERROR errUpdate = updateWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, updateContainerWriter);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = DataModel::Encode(updateContainerWriter, TLV::AnonymousTag(), updateZone);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = updateWriter.CloseContainer(updateContainerWriter);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        TLV::TLVReader updateReader;
+        updateReader.Init(updateTlvBuffer, static_cast<uint32_t>(updateWriter.GetLengthWritten()));
+        errUpdate = updateReader.Next();
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        errUpdate = updateDecodedList.Decode(updateReader);
+        EXPECT_EQ(errUpdate, CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(updateDecodedList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+        const auto & updatedZonesList = lTriggerOptions.motionZones.Value().Value();
+        EXPECT_EQ(updatedZonesList.size(), (size_t) 1);
+        EXPECT_FALSE(updatedZonesList[0].zone.IsNull());
+        EXPECT_EQ(updatedZonesList[0].zone.Value(), 3);
+        EXPECT_TRUE(updatedZonesList[0].sensitivity.HasValue());
+        EXPECT_EQ(updatedZonesList[0].sensitivity.Value(), 8);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: InvalidCommand when motionSensitivity provided with PerZoneSensitivity feature
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(7)));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success with null motion zones list
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::NullNullable);
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_TRUE(lTriggerOptions.motionZones.Value().IsNull());
+    }
+}
+
+TEST_F(MockEventLoggingNoPerZoneSensitivity, Test_AllocateTransport_UpdateMotionZoneOptions_NoPerZoneSensitivity)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url = "https://192.168.1.100:554/stream/";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    std::string trackName                = "video";
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    uint8_t tlvBuffer[512];
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.ClearValue();
+
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    TLV::TLVReader motionZonesReader;
+    motionZonesReader.Init(tlvBuffer, static_cast<uint32_t>(writer.GetLengthWritten()));
+    err = motionZonesReader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(motionZonesReader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(5)));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+
+    /*
+     * Test UpdateMotionZoneOptions: ConstraintError when motionSensitivity is 0 (out of range)
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(0)));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: ConstraintError when motionSensitivity is 11 (out of range)
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(11)));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success updating motionSensitivity to valid value (7)
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::MakeNullable(static_cast<uint8_t>(7)));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionSensitivity.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionSensitivity.Value().IsNull());
+        EXPECT_EQ(lTriggerOptions.motionSensitivity.Value().Value(), 7);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success updating motionSensitivity to Null
+     */
+    {
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionSensitivity.SetValue(DataModel::NullNullable);
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionSensitivity.HasValue());
+        EXPECT_TRUE(lTriggerOptions.motionSensitivity.Value().IsNull());
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: InvalidCommand when zone entry includes sensitivity without PerZoneSensitivity feature
+     */
+    {
+        uint8_t sensTlvBuffer[256];
+        Structs::TransportZoneOptionsStruct::Type sensZone;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> sensDecodedList;
+
+        sensZone.zone.SetNonNull(2);
+        sensZone.sensitivity.SetValue(5);
+
+        TLV::TLVWriter sensWriter;
+        sensWriter.Init(sensTlvBuffer, sizeof(sensTlvBuffer));
+
+        TLV::TLVWriter sensContainerWriter;
+        EXPECT_EQ(sensWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, sensContainerWriter), CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(sensContainerWriter, TLV::AnonymousTag(), sensZone), CHIP_NO_ERROR);
+        EXPECT_EQ(sensWriter.CloseContainer(sensContainerWriter), CHIP_NO_ERROR);
+
+        TLV::TLVReader sensReader;
+        sensReader.Init(sensTlvBuffer, static_cast<uint32_t>(sensWriter.GetLengthWritten()));
+        EXPECT_EQ(sensReader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(sensDecodedList.Decode(sensReader), CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(sensDecodedList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_EQ(updateHandler.GetLastStatus().status.GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    }
+
+    /*
+     * Test UpdateMotionZoneOptions: Success updating motionZones without sensitivity when PerZoneSensitivity is disabled
+     */
+    {
+        uint8_t updateTlvBuffer[256];
+        Structs::TransportZoneOptionsStruct::Type updateZone;
+        DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> updateDecodedList;
+
+        updateZone.zone.SetNonNull(2);
+        updateZone.sensitivity.ClearValue();
+
+        TLV::TLVWriter updateWriter;
+        updateWriter.Init(updateTlvBuffer, sizeof(updateTlvBuffer));
+
+        TLV::TLVWriter updateContainerWriter;
+        EXPECT_EQ(updateWriter.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, updateContainerWriter), CHIP_NO_ERROR);
+        EXPECT_EQ(DataModel::Encode(updateContainerWriter, TLV::AnonymousTag(), updateZone), CHIP_NO_ERROR);
+        EXPECT_EQ(updateWriter.CloseContainer(updateContainerWriter), CHIP_NO_ERROR);
+
+        TLV::TLVReader updateReader;
+        updateReader.Init(updateTlvBuffer, static_cast<uint32_t>(updateWriter.GetLengthWritten()));
+        EXPECT_EQ(updateReader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(updateDecodedList.Decode(updateReader), CHIP_NO_ERROR);
+
+        Testing::MockCommandHandler updateHandler;
+        updateHandler.SetFabricIndex(1);
+        ConcreteCommandPath kUpdatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::UpdateMotionZoneOptions::Id };
+        Commands::UpdateMotionZoneOptions::DecodableType updateData;
+        updateData.connectionID = allocatedConnectionID;
+        updateData.motionZones.SetValue(DataModel::MakeNullable(updateDecodedList));
+
+        mServer.GetLogic().HandleUpdateMotionZoneOptions(updateHandler, kUpdatePath, updateData);
+        EXPECT_TRUE(updateHandler.HasStatus());
+        EXPECT_TRUE(updateHandler.GetLastStatus().status.IsSuccess());
+
+        auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
+        EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
+        EXPECT_TRUE(currentConnection.transportOptions.HasValue());
+        auto lTransportOptions = currentConnection.transportOptions.Value();
+        auto lTriggerOptions   = lTransportOptions.triggerOptions;
+
+        EXPECT_TRUE(lTriggerOptions.motionZones.HasValue());
+        EXPECT_FALSE(lTriggerOptions.motionZones.Value().IsNull());
+        const auto & updatedZonesList = lTriggerOptions.motionZones.Value().Value();
+        EXPECT_EQ(updatedZonesList.size(), (size_t) 1);
+        EXPECT_FALSE(updatedZonesList[0].zone.IsNull());
+        EXPECT_EQ(updatedZonesList[0].zone.Value(), 2);
+        EXPECT_FALSE(updatedZonesList[0].sensitivity.HasValue());
+    }
 }
 
 } // namespace PushAvStreamTransport

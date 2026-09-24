@@ -113,10 +113,10 @@ public:
 
     // Passing capabilities request message to HandleWriteReceived should create
     // new BLE endpoint which later can be used to receive more data.
-    bool HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_OBJECT connObj)
+    bool HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_OBJECT connObj, uint8_t windowSize = BLE_MAX_RECEIVE_WINDOW_SIZE)
     {
-        constexpr uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x06 };
-        auto buf                   = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
+        const uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, windowSize };
+        auto buf               = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
         return HandleWriteReceived(connObj, &CHIP_BLE_SVC_ID, &CHIP_BLE_CHAR_1_UUID, std::move(buf));
     }
 
@@ -232,6 +232,14 @@ TEST_F(TestBleLayer, HandleWriteReceivedCapabilitiesRequest)
 {
     auto connObj = GetConnectionObject();
     EXPECT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+}
+
+// A window size of zero would underflow the receive window counters to 255 on the
+// first subscription and data fragment, so the handshake must be rejected.
+TEST_F(TestBleLayer, HandleWriteReceivedCapabilitiesRequestZeroWindowSize)
+{
+    auto connObj = GetConnectionObject();
+    EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj, 0));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeReceivedInvalidUUID)

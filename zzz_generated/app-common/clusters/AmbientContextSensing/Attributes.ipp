@@ -42,8 +42,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ambientContextType);
     case Attributes::AmbientContextTypeSupported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, ambientContextTypeSupported);
-    case Attributes::ObjectCountReached::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, objectCountReached);
+    case Attributes::ObjectCountThresholdReached::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, objectCountThresholdReached);
     case Attributes::ObjectCountConfig::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, objectCountConfig);
     case Attributes::ObjectCount::TypeInfo::GetAttributeId():
@@ -56,6 +56,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, holdTimeLimits);
     case Attributes::PredictedActivity::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, predictedActivity);
+    case Attributes::SensorFusionSupported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sensorFusionSupported);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

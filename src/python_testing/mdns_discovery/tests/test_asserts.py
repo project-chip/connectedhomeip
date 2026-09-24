@@ -1054,7 +1054,7 @@ class TestAssertValidPhKey(unittest.TestCase):
 
     def test_invalid_due_to_out_of_range(self):
         # Only bits 1 through 22 are defined.
-        msg = fail_msg(assert_valid_ph_key, str((1 << 23)))
+        msg = fail_msg(assert_valid_ph_key, str(1 << 23))
         self.assertIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_empty_string(self):

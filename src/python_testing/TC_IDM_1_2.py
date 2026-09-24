@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -44,7 +45,7 @@ from support_modules.idm_support import IDMBaseTest, client_cmd, get_all_cmds_fo
 import matter.clusters as Clusters
 import matter.discovery as Discovery
 import matter.testing.matchers as matchers
-from matter import ChipUtility
+from matter import ChipUtility, im_capture
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
@@ -113,7 +114,7 @@ class TC_IDM_1_2(IDMBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                log.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
+                log.info('Sending %s command to unsupported cluster %s on endpoint %s', name, cluster, i)
                 try:
                     await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
@@ -134,7 +135,7 @@ class TC_IDM_1_2(IDMBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                log.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
+                log.info('Checking cluster %s (%s) on ep %s for supported commands', cluster, cid, i)
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue
@@ -147,8 +148,8 @@ class TC_IDM_1_2(IDMBaseTest):
                     continue
 
                 # Let's just use the first unsupported command
-                id = unsupported_commands[0]
-                cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
+                _id = unsupported_commands[0]
+                cmd = next(filter(lambda x: x.command_id == _id, all_supported_cmds))
                 try:
                     ret = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')
@@ -237,22 +238,23 @@ class TC_IDM_1_2(IDMBaseTest):
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
-        # NOTE: This is out of scope currently due to https://github.com/project-chip/connectedhomeip/issues/8043
-        # We perform this step, but the DUT will likely incorrectly send a response
-        # Sending this command at least ensures the DUT doesn't crash with this flag set, even if the behvaior is not correct
+        im_capture.SetObserver(self.default_controller)
+        im_capture.Reset()
 
         # Lucky candidate ArmFailSafe is at it again - command side effect is to set breadcrumb attribute
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
         try:
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
-            # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
-        except ChipStackError:  # chipstack-ok: Using try/except to validate DUT behavior without failing the test on expected errors, assert_raises would fail the test
-            log.info("DUT correctly supressed the response")
+        except ChipStackError as e:  # chipstack-ok: Safety handler for unexpected controller errors
+            log.info("SendCommand with suppressResponse=True encountered local exception: %s", e)
 
-        # Verify that the command had the correct side effect even if a response was sent
+        # Verify that the command had the correct side effect on the DUT data model
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 2, "Breadcrumb was not correctly set on ArmFailSafe with response suppressed")
+
+        snapshot = im_capture.GetSnapshot()
+        await self.verify_suppress_response_message_count(snapshot, "suppressResponse")
 
         # Cleanup - Unset the failsafe
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)

@@ -156,6 +156,17 @@ Key points:
 
 ### Implementation (`<ClusterName>Cluster.cpp`)
 
+**When to call the base class**: You MUST call the base class from `Startup()`
+and `Shutdown()`. Do NOT call the base class from `ReadAttribute`,
+`WriteAttribute`, or `InvokeCommand` — there is no base-class behavior for these
+methods; return `UnsupportedAttribute` / `UnsupportedCommand` directly in the
+`default` case instead.
+
+**Only override `Startup`/`Shutdown` when custom code is needed** (e.g. reading
+persisted state on startup, registering a timer on startup and cancelling it on
+shutdown). If your override would only call the base, omit it entirely — a
+`Startup` that just calls `DefaultServerCluster::Startup` is dead weight.
+
 #### `ReadAttribute`
 
 ```cpp
@@ -179,7 +190,9 @@ DataModel::ActionReturnStatus FooCluster::ReadAttribute(
 ```
 
 -   **Return `Protocols::InteractionModel::Status::UnsupportedAttribute`
-    directly in the `default` case.**
+    directly in the `default` case. Do not call
+    `DefaultServerCluster::ReadAttribute` — it has no base behavior for read
+    operations.**
 -   The framework pre-filters requests so `ReadAttribute` is only called for
     paths that are in the `Attributes()` list; returning `UnsupportedAttribute`
     for anything unrecognised is the correct and consistent pattern.
@@ -283,9 +296,8 @@ DataModel::ActionReturnStatus FooCluster::WriteAttribute(
 ```
 
 Return `Protocols::InteractionModel::Status::UnsupportedAttribute` directly in
-the `default` case to avoid the overhead of a virtual call to
-`DefaultServerCluster::WriteAttribute`. This is consistent with the pattern used
-in `ReadAttribute`.
+the `default` case. Do not delegate to `DefaultServerCluster::WriteAttribute` —
+there is no base-class behavior for write operations.
 
 #### Commands
 
@@ -398,7 +410,8 @@ Override `EventInfo` only when non-default read privileges are needed.
 is the **only** place where Ember/ZAP APIs are allowed. Its responsibilities
 are:
 
-1. Allocate cluster instances via `LazyRegisteredServerCluster<FooCluster>`.
+1. Declare a file-scope array of `LazyRegisteredServerCluster<FooCluster>`
+   instances (never heap-allocate).
 2. Read ZAP attribute store defaults and construct `Config` structs.
 3. Register/unregister clusters via `CodegenClusterIntegration::RegisterServer`.
 4. Implement `FindClusterOnEndpoint()` and optional convenience setters.
@@ -599,6 +612,7 @@ TEST_F(TestFooCluster, ReadAttributes)
         model.
 -   [ ] `Startup` / `Shutdown` cycle works correctly.
 -   [ ] Protected setters are exposed via a `Testable*` subclass when needed.
+-   [ ] No `sleep()` calls — time-dependent behavior uses a mock clock instead.
 
 ---
 
@@ -678,6 +692,44 @@ These are patterns that reviewers have flagged repeatedly — avoid them:
       `CodegenIntegration.h/cpp` when the goal is to avoid direct coupling to
       `Server` / `InteractionModelEngine` in the cluster itself when only a
       small subset of their functionality is needed.
+13. **Namespace pollution in headers** — Do not add top-level
+    `using DataModel::X` aliases in headers. Exception: within a class body,
+    `using Feature = SomeConcreteCluster::Feature` is acceptable (and useful)
+    for base-cluster type aliasing so that codegen-derived types are accessible
+    through the base.
+14. **Unnecessary forward declarations** — Avoid forward declarations in cluster
+    headers; they often signal poor coupling. Exception: a delegate interface
+    header may forward-declare the cluster class when delegate methods take the
+    cluster as an argument (e.g.,
+    `void OnFooChanged(BarCluster & cluster, Foo newValue)`).
+15. **Storing mEndpointId** — Do not add a member `mEndpointId`. Use
+    `mPath.mEndpointId` (inherited from `DefaultServerCluster`) directly.
+16. **Numeric literal format** — Use whichever base is most readable for the
+    value. Decimal is clearer for small bounds (e.g., `9999`), but hex is better
+    for bitmasks, nullable sentinels (e.g., `0xFFFE`, `0xFF`), and range
+    boundaries that are naturally expressed in hex (e.g., `0x3FFF`, `0x7FFF`).
+    Do not mechanically convert hex to decimal just to avoid hex.
+17. **Redundant validity checks in `ReadAttribute` / `WriteAttribute` /
+    `InvokeCommand`** — Do not add checks to verify that the incoming path is
+    valid before dispatching. The API contract guarantees that these methods are
+    only called for paths that appear in `Attributes()` / `AcceptedCommands()`;
+    adding redundant guards wastes flash.
+
+---
+
+## Reference Implementations
+
+Study these clusters to understand specific implementation patterns:
+
+| Pattern                    | Reference Cluster                      | PR                                                                   |
+| -------------------------- | -------------------------------------- | -------------------------------------------------------------------- |
+| Simple Measurement         | `relative-humidity-measurement-server` | [#71424](https://github.com/project-chip/connectedhomeip/pull/71424) |
+| Command-heavy + Delegate   | `actions-server`                       | [#43471](https://github.com/project-chip/connectedhomeip/pull/43471) |
+| Multi-instance             | `closure-dimension-server`             | [#43720](https://github.com/project-chip/connectedhomeip/pull/43720) |
+| Singleton (Node-scoped)    | `basic-information`                    | [#40422](https://github.com/project-chip/connectedhomeip/pull/40422) |
+| Runtime-only (no defaults) | `flow-measurement-server`              | [#71552](https://github.com/project-chip/connectedhomeip/pull/71552) |
+| Identify/Timer-driven      | `identify-server`                      | [#41232](https://github.com/project-chip/connectedhomeip/pull/41232) |
+| Writable scalar + features | `switch-server`                        | [#42968](https://github.com/project-chip/connectedhomeip/pull/42968) |
 
 ---
 

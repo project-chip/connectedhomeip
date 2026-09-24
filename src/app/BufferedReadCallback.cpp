@@ -16,15 +16,15 @@
  *    limitations under the License.
  */
 
-#include "lib/core/TLV.h"
-#include "lib/core/TLVTags.h"
-#include "lib/core/TLVTypes.h"
-#include "protocols/interaction_model/Constants.h"
-#include "system/SystemPacketBuffer.h"
-#include "system/TLVPacketBufferBackingStore.h"
 #include <app/BufferedReadCallback.h>
 #include <app/InteractionModelEngine.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/ScopedMemoryBuffer.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -141,6 +141,7 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
 
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
+        VerifyOrReturnError(apData != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         TLV::TLVType outerContainer;
 
         VerifyOrReturnError(apData->GetType() == TLV::kTLVType_Array, CHIP_ERROR_INVALID_TLV_ELEMENT);
@@ -165,6 +166,7 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
+        VerifyOrReturnError(apData != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(BufferListItem(*apData));
     }
 

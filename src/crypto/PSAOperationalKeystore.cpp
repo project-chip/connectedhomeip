@@ -296,7 +296,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
 void PSAOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(HasPendingOpKeypair());
-    TEMPORARY_RETURN_IGNORED mPendingKeypair->Destroy();
+    LogErrorOnFailure(mPendingKeypair->Destroy());
     ReleasePendingKeypair();
 }
 

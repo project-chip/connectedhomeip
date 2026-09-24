@@ -39,6 +39,8 @@ void uartForceTransmit(const char * data, uint16_t length);
 
 void uartMainLoop(void * args);
 
+void sendLogImmediately(bool sendNow);
+
 // Implemented by in openthread code
 #ifndef PW_RPC_ENABLED
 extern void otPlatUartReceived(const uint8_t * aBuf, uint16_t aBufLength);

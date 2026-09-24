@@ -19,7 +19,11 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
+#include <zephyr/bluetooth/conn.h>
+#include <zephyr/random/random.h>
+#include <zephyr/version.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -30,6 +34,7 @@ namespace {
 sys_slist_t sRequests;
 
 bool sIsInitialized = false;
+atomic_t sRestart   = ATOMIC_INIT(0);
 uint8_t sBtId       = 0;
 
 // Cast an intrusive list node to the containing request object
@@ -37,6 +42,22 @@ const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
 {
     return *static_cast<const BLEAdvertisingArbiter::Request *>(node);
 }
+
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
+// Check if connection identity matches the identity used for advertising
+bool IsOurIdentity(const bt_conn * conn)
+{
+    VerifyOrReturnValue(conn, false);
+
+    bt_conn_info info{};
+    const int err = bt_conn_get_info(conn, &info);
+    VerifyOrReturnValue(err == 0, false);
+
+    return info.id == sBtId;
+}
+
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
 
 // Notify application about stopped advertising if the callback has been provided
 void NotifyAdvertisingStopped(const sys_snode_t * node)
@@ -64,6 +85,11 @@ CHIP_ERROR RestartAdvertising()
     const int result = bt_le_adv_start(&params, top.advertisingData.data(), top.advertisingData.size(), top.scanResponseData.data(),
                                        top.scanResponseData.size());
 
+    if (result == -ENOMEM)
+    {
+        ChipLogProgress(DeviceLayer, "Advertising start failed, will retry once connection is released");
+    }
+
     if (top.onStarted != nullptr)
     {
         top.onStarted(result);
@@ -72,6 +98,46 @@ CHIP_ERROR RestartAdvertising()
     return System::MapErrorZephyr(result);
 }
 
+#if KERNEL_VERSION_MAJOR >= 4
+BT_CONN_CB_DEFINE(conn_callbacks) = {
+    .disconnected =
+        [](struct bt_conn * conn, uint8_t reason) {
+            (void) reason;
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+            // Ignore disconnections from other identities
+            VerifyOrReturn(IsOurIdentity(conn));
+#else
+            (void) conn;
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+            atomic_set(&sRestart, 1);
+        },
+    .recycled =
+        []() {
+            // In this callback the connection object was returned to the pool and we can try to re-start connectable
+            // advertising, but only if the disconnection was detected or a previous restart attempt failed.
+            constexpr atomic_val_t oldValue = 1;
+            constexpr atomic_val_t newValue = 0;
+            const bool shouldRestart        = atomic_cas(&sRestart, oldValue, newValue);
+
+            if (shouldRestart)
+            {
+                TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([] {
+                    if (!sys_slist_is_empty(&sRequests))
+                    {
+                        // Starting from Zephyr 4.0 Automatic advertiser resumption is deprecated,
+                        // so the BLE Advertising Arbiter has to take over the responsibility of restarting the advertiser.
+                        // Restart advertising in this callback if there are pending requests after the connection is released.
+                        const CHIP_ERROR result = RestartAdvertising();
+                        if (result != CHIP_NO_ERROR)
+                        {
+                            atomic_set(&sRestart, 1);
+                        }
+                    }
+                });
+            }
+        },
+};
+#endif // KERNEL_VERSION_MAJOR >= 4
 } // namespace
 
 CHIP_ERROR Init(uint8_t btId)

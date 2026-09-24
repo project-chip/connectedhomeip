@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matter SDK Automation Reports</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            color: #fff;
+        }
+        h1 {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .container {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            width: 250px;
+            transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px;
+        }
+        .card.enabled:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+        .card.disabled {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+        .card.disabled:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        h2 {
+            color: #fff;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+        .card.disabled h2 {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+        .card.disabled p {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .status {
+            margin-top: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .card.enabled .status {
+            color: #38bdf8;
+        }
+        .card.disabled .status {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matter SDK Reports Hub</h1>
+    <div class="container">
+        <a href="./coverage/index.html" class="card __COVERAGE_CLASS__">
+            <div>
+                <h2>Coverage Report</h2>
+                <p>View code coverage results for the Matter SDK.</p>
+            </div>
+            <div class="status">__COVERAGE_STATUS__</div>
+        </a>
+        <a href="./conformance_report.html" class="card __CONFORMANCE_CLASS__">
+            <div>
+                <h2>Conformance Report</h2>
+                <p>View cluster conformance test results.</p>
+            </div>
+            <div class="status">__CONFORMANCE_STATUS__</div>
+        </a>
+        <a href="./sdk_spec_zapdiff.html" class="card __ALCHEMY_CLASS__">
+            <div>
+                <h2>SDK vs Spec Diff</h2>
+                <p>View differences between SDK ZAP XMLs and the specification.</p>
+            </div>
+            <div class="status">__ALCHEMY_STATUS__</div>
+        </a>
+    </div>
+</body>
+</html>

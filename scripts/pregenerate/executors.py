@@ -25,8 +25,8 @@ class ShellRunner:
         log.debug("Executing: %s", shlex.join(cmd))
         subprocess.check_call(cmd, cwd=cwd)
 
-    def ensure_directory_exists(self, dir):
-        os.makedirs(dir, exist_ok=True)
+    def ensure_directory_exists(self, path):
+        os.makedirs(path, exist_ok=True)
 
 
 class DryRunner:
@@ -36,5 +36,5 @@ class DryRunner:
         else:
             log.info("DRY-RUN: %s", shlex.join(cmd))
 
-    def ensure_directory_exists(self, dir):
-        log.info("DRY-RUN: mkdir '%s'", dir)
+    def ensure_directory_exists(self, path):
+        log.info("DRY-RUN: mkdir '%s'", path)

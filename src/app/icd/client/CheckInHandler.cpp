@@ -70,6 +70,7 @@ void CheckInHandler::Shutdown()
 {
     mpICDClientStorage = nullptr;
     mpCheckInDelegate  = nullptr;
+    mpImEngine         = nullptr;
     if (mpExchangeManager)
     {
         TEMPORARY_RETURN_IGNORED mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(

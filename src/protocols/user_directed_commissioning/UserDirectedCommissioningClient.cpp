@@ -269,12 +269,12 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
                     "UserDirectedCommissioningClient::OnMessageReceived() CommissionerDeclaration DataLength() = %" PRIu32,
                     static_cast<uint32_t>(msg->DataLength()));
 
-    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
-    size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
+    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
+    size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
+    ReturnOnFailure(msg->Read(udcPayload, udcPayloadLength));
 
     CommissionerDeclaration cd;
-    TEMPORARY_RETURN_IGNORED cd.ReadPayload(udcPayload, sizeof(udcPayload));
+    ReturnOnFailure(cd.ReadPayload(udcPayload, udcPayloadLength));
     cd.DebugLog();
 
     // Call the registered mCommissionerDeclarationHandler, if any.

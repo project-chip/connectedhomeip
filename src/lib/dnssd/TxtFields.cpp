@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
+#include <optional>
 #include <stdlib.h>
 #include <string.h>
 
@@ -80,6 +81,15 @@ uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val, uint32_t defaultValue = 0
     if (val.size() > 1 && *val.data() == static_cast<uint8_t>('0'))
         return defaultValue;
 
+    // value must be decimal digits only: strtoul() otherwise accepts a leading
+    // sign or whitespace, so a nonconformant TXT value like "+5" or " 5" would
+    // parse as 5 instead of being rejected.
+    for (uint8_t b : val)
+    {
+        if (b < '0' || b > '9')
+            return defaultValue;
+    }
+
     Platform::CopyString(nullTerminatedValue, sizeof(nullTerminatedValue), val);
 
     char * endPtr;
@@ -110,12 +120,11 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
 
 std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
 {
+    VerifyOrReturnValue(val.size() == 1, std::nullopt); // need to be a valid boolean (single char)
+
     char character = static_cast<char>(*val.data());
-    if (val.size() == 1 && ((character == '1') || (character == '0')))
-    {
-        return std::make_optional(character == '1');
-    }
-    return std::nullopt;
+    VerifyOrReturnValue((character == '1') || (character == '0'), std::nullopt); // need to be a valid boolean (single char)
+    return std::make_optional(character == '1');
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -136,7 +145,7 @@ size_t GetPlusSignIdx(const ByteSpan & value)
 uint16_t GetProduct(const ByteSpan & value)
 {
     size_t plussign = GetPlusSignIdx(value);
-    if (plussign < value.size() - 1)
+    if (plussign + 1 < value.size())
     {
         const uint8_t * productStrStart = value.data() + plussign + 1;
         size_t productStrLen            = value.size() - plussign - 1;

@@ -45,12 +45,12 @@
 #include <zephyr/settings/settings.h>
 #if defined(CONFIG_SETTINGS_NVS)
 #include <zephyr/fs/nvs.h>
-#elif defined(CONFIG_SETTINGS_ZMS)
+#elif defined(CONFIG_SETTINGS_ZMS) || defined(CONFIG_SETTINGS_ZMS_LEGACY)
 #include <zephyr/fs/zms.h>
-#endif // CONFIG_SETTINGS_NVS || CONFIG_SETTINGS_ZMS
+#endif // CONFIG_SETTINGS_NVS || CONFIG_SETTINGS_ZMS || CONFIG_SETTINGS_ZMS_LEGACY
 #endif // CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS
 
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#if defined(CONFIG_OPENTHREAD) || defined(CONFIG_NET_L2_OPENTHREAD)
 #include <platform/ThreadStackManager.h>
 #endif
 
@@ -198,7 +198,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 // Lock the Thread stack to avoid unwanted interaction with settings NVS during factory reset.
-#ifdef CONFIG_NET_L2_OPENTHREAD
+#if defined(CONFIG_OPENTHREAD) || defined(CONFIG_NET_L2_OPENTHREAD)
     ThreadStackMgr().LockThreadStack();
 #endif
 
@@ -210,9 +210,9 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     {
 #if defined(CONFIG_SETTINGS_NVS)
         status = nvs_clear(static_cast<nvs_fs *>(storage));
-#elif defined(CONFIG_SETTINGS_ZMS)
+#elif defined(CONFIG_SETTINGS_ZMS) || defined(CONFIG_SETTINGS_ZMS_LEGACY)
         status = zms_clear(static_cast<zms_fs *>(storage));
-#endif // CONFIG_SETTINGS_NVS || CONFIG_SETTINGS_ZMS
+#endif // CONFIG_SETTINGS_NVS || CONFIG_SETTINGS_ZMS || CONFIG_SETTINGS_ZMS_LEGACY
     }
     if (status)
     {

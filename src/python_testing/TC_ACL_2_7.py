@@ -61,13 +61,13 @@ class TC_ACL_2_7(MatterBaseTest):
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
         """Helper method to validate events for a TH"""
-        log.info(f"Found {len(events)} events for {controller_name}")
+        log.info("Found %s events for %s", len(events), controller_name)
 
         found_valid_events = 0
         found_other_event = False
 
         for event in events:
-            log.info(f"Examining event: {str(event)}")
+            log.info("Examining event: %s", event)
             if hasattr(event, 'Data') and hasattr(event.Data, 'changeType'):
                 if expected_node_id == self.th1.nodeId:
                     # Check for expected field values
@@ -164,7 +164,7 @@ class TC_ACL_2_7(MatterBaseTest):
         # TH1 writes Extension attribute with D_OK_EMPTY
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
-        log.info(f"TH1 writing extension with data {D_OK_EMPTY.hex()}")
+        log.info("TH1 writing extension with data %s", D_OK_EMPTY.hex())
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension]
@@ -180,7 +180,7 @@ class TC_ACL_2_7(MatterBaseTest):
         # TH2 writes Extension attribute with D_OK_SINGLE
         extension_th2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
-        log.info(f"TH2 writing extension with data {D_OK_SINGLE.hex()}")
+        log.info("TH2 writing extension with data %s", D_OK_SINGLE.hex())
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension_th2]

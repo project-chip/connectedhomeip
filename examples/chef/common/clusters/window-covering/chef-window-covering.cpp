@@ -17,9 +17,9 @@
  */
 
 #include "chef-window-covering.h"
+#include "app/clusters/window-covering-server/CodegenIntegration.h"
 #include "app/clusters/window-covering-server/window-covering-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
@@ -74,52 +74,33 @@ void InitChefWindowCoveringCluster()
 
 CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
 {
-    Status status;
     app::DataModel::Nullable<Percent100ths> current;
-
+    auto windowCoveringCluster = FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturnValue(windowCoveringCluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (type == WindowCoveringType::Lift)
     {
-        status = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, current);
-        if (status != Status::Success)
+
+        current = windowCoveringCluster->GetTargetPositionLiftPercent100ths();
+        if (current.IsNull())
         {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths with error code %d",
-                         to_underlying(status));
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionLiftPercent100ths");
             return CHIP_ERROR_READ_FAILED;
         }
-
-        // Instant update. No transition for now.
-        status = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(mEndpoint, current);
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionLiftPercent100ths with error code %d",
-                         to_underlying(status));
-            return CHIP_ERROR_WRITE_FAILED;
-        }
-
-        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
-                                               WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id);
+        windowCoveringCluster->SetCurrentPositionLiftPercent100ths(current);
 
         return CHIP_NO_ERROR;
     }
     else if (type == WindowCoveringType::Tilt)
     {
-        status = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, current);
-        if (status != Status::Success)
+        current = windowCoveringCluster->GetTargetPositionTiltPercent100ths();
+        if (current.IsNull())
         {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionTiltPercent100ths - %d", to_underlying(status));
+            ChipLogError(DeviceLayer, "HandleMovement: Failed to get TargetPositionTiltPercent100ths");
             return CHIP_ERROR_READ_FAILED;
         }
 
         // Instant update. No transition for now.
-        status = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(mEndpoint, current);
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "HandleMovement: Failed to set CurrentPositionTiltPercent100ths - %d", to_underlying(status));
-            return CHIP_ERROR_WRITE_FAILED;
-        }
-
-        MatterReportingAttributeChangeCallback(mEndpoint, WindowCovering::Id,
-                                               WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id);
+        windowCoveringCluster->SetCurrentPositionTiltPercent100ths(current);
 
         return CHIP_NO_ERROR;
     }

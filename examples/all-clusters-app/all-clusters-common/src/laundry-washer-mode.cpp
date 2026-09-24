@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af-types.h>
 #include <laundry-washer-mode.h>
 
 using namespace chip::app::Clusters;
@@ -94,7 +95,7 @@ void LaundryWasherMode::Shutdown()
     }
 }
 
-void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gLaundryWasherModeDelegate == nullptr && gLaundryWasherModeInstance == nullptr);
@@ -103,7 +104,7 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
 }
 
-void emberAfLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gLaundryWasherModeInstance)
     {

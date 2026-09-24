@@ -59,8 +59,12 @@ efr32_sdk("sdk") {
 }
 
 config("efr32_ldflags") {
-  _ldscript =
-      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    _ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    _ldscript =
+        "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  }
 
   ldflags = [
     "-T" + rebase_path(_ldscript, root_build_dir),
@@ -76,6 +80,7 @@ source_set("efr32_test_main") {
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_common_plat_dir}/PigweedLogger.cpp",
+    "${examples_common_plat_dir}/provision/ProvisionStorageCommon.cpp",
     "${examples_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
     "${examples_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
     "${examples_common_plat_dir}/syscalls_stubs.cpp",
@@ -107,7 +112,7 @@ source_set("efr32_test_main") {
   deps += pw_build_LINK_DEPS
 
   libs = [
-    "${matter_support_root}/provision/libs/libProvision_${silabs_family}.a",
+    "${matter_support_root}/provision/libs/libProvision-${silabs_family}.a",
   ]
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]

@@ -14,6 +14,13 @@
 
 name: 69.2.1. [TC-ILL-2.1] Attributes with server as DUT
 
+CI:
+    - name: "Test against all-devices/light-sensor"
+      app: all-devices
+      args:
+          - --device
+          - light-sensor
+
 PICS:
     - ILL.S
 

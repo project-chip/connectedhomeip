@@ -36,8 +36,6 @@ namespace DeviceLayer {
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
-    static DiagnosticDataProviderImpl & GetDefaultInstance();
-
     // ===== Methods that implement the PlatformManager abstract interface.
 
     bool SupportsWatermarks() override { return true; }
@@ -84,6 +82,11 @@ public:
     CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount) override;
     CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
+#endif
+
+private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool IsWiFiStaConnected();
 #endif
 };
 

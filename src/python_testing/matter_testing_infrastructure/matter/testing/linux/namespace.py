@@ -26,6 +26,7 @@ import subprocess
 import sys
 import time
 
+from matter.testing.concurrency.context import TerminableResource
 from matter.testing.tasks import SubprocessKind
 
 log = logging.getLogger(__name__)
@@ -33,16 +34,15 @@ log = logging.getLogger(__name__)
 test_environ = os.environ.copy()
 
 
-def ensure_network_namespace_availability():
+def ensure_namespace_availability():
     if os.getuid() == 0:
         log.debug("Current user is root")
         log.warning("Running as root and this will change global namespaces.")
         return
 
-    os.execvpe(
-        "unshare", ["unshare", "--map-root-user", "-n", "-m", sys.executable,
-                    sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
-        test_environ)
+    os.execvpe("unshare",
+               ["unshare", "--map-root-user", "-m", sys.executable, sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
+               test_environ)
 
 
 def ensure_private_state():
@@ -50,15 +50,11 @@ def ensure_private_state():
 
     log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        log.error("Failed to make / private")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
+        raise RuntimeError("Failed to make / private. Are you using --privileged if running in docker?")
 
     log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        log.error("Failed to mount /run as a temporary filesystem")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
+        raise RuntimeError("Failed to mount /run as a temporary filesystem. Are you using --privileged if running in docker?")
 
 
 @dataclasses.dataclass
@@ -130,7 +126,7 @@ class NetworkResource:
         log.debug("Executing: '%s' check=%s", shlex.join(cmd), check)
         try:
             # We're not interested in stdout/stderr for successful execution.
-            subprocess.run(cmd, check=check, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(cmd, check=check, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Failed to execute '{shlex.join(cmd)}'. Are you using --privileged if running in docker?",
                                f"Command stdout: '{e.stdout.rstrip()}'", f"Command stderr: '{e.stderr.rstrip()}'") from e
@@ -177,7 +173,9 @@ class NetworkLink(NetworkResource):
         if ns:  # Only needed when running in netns, otherwise can be an unintended side-effect
             up_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
 
-        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
+        # A second "add" fails inside the mock's association task, so the run stalls.
+        # "replace" allows the test to associate several times without issue.
+        up_cmds.extend(NetworkCmd(f"ip addr replace {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
         if self.ipv6_addrs:
             up_cmds.append(NetworkCmd(f"ip -6 addr flush {name}", ns_wrapper=True))
@@ -258,91 +256,133 @@ class NetworkNamespace(NetworkResource):
         return self.netns_cmd_wrapper + cmd
 
 
-class IsolatedNetworkNamespace:
-    """Helper class to create and remove network namespaces for tests."""
+class IsolatedNetworkNamespace(TerminableResource):
+    """Helper class to create and remove network namespaces for tests.
+
+    Should be used as a context manager or with explicit call to `resource_start()` and `resource_terminate()`.
+    """
 
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
-                 mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
+                 mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True,
+                 proxy_link_name: str | None = None, proxy_link_up: bool = True,
+                 tool_in_host_namespace: bool = False, ula_prefix: str = "fd00:0:1:1"):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
-        - tool -- tool network for chip-tool.
+        - tool -- tool network for chip-tool. With ``tool_in_host_namespace`` the
+          tool link stays in the namespace this process runs in, for a tool that
+          is started by another process and cannot be moved into one.
+        - ula_prefix -- the /64 the ULAs are taken from. A topology whose tool link
+          is in the host namespace needs one that namespace does not already route.
         - app -- network for tested application(s).
+        - proxy -- network for an intermediary application (e.g. a commissioning proxy),
+          created only when ``proxy_link_name`` is given.
         """
+        super().__init__()
         self.index = index
 
         self.app_ns = NetworkNamespace(f"ns-{app_link_name}-{index}")
-        self.tool_ns = NetworkNamespace(f"ns-{tool_link_name}-{index}")
+        self.tool_ns = None if tool_in_host_namespace else NetworkNamespace(f"ns-{tool_link_name}-{index}")
+        self.mgmt_ns = NetworkNamespace(f"ns-{mgmt_link_name}-{index}")
 
         app_ipv6 = ["fe80::1/64"]
         if add_ula:
-            app_ipv6.append("fd00:0:1:1::1/64")
+            app_ipv6.append(f"{ula_prefix}::1/64")
         self.app_link = NetworkLink(f"{app_link_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6, ns=self.app_ns)
+        self._app_link_up = app_link_up
 
         tool_ipv6 = ["fe80::2/64"]
         if add_ula:
-            tool_ipv6.append("fd00:0:1:1::2/64")
+            tool_ipv6.append(f"{ula_prefix}::2/64")
         self.tool_link = NetworkLink(f"{tool_link_name}-{index}",
                                      ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
+        self._tool_link_up = tool_link_up
 
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:
-            mgmt_ipv6.append("fd00:0:1:1::5/64")
-        self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}", ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6)
+            mgmt_ipv6.append(f"{ula_prefix}::5/64")
+        self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}",
+                                     ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
+        self._mgmt_link_up = mgmt_link_up
+
+        # An optional fourth namespace, for a test that needs a second application
+        # alongside the one under test. Not created unless a name is given.
+        self.proxy_ns: NetworkNamespace | None = None
+        self.proxy_link: NetworkLink | None = None
+        self._proxy_link_up = proxy_link_up
+        if proxy_link_name is not None:
+            self.proxy_ns = NetworkNamespace(f"ns-{proxy_link_name}-{index}")
+            proxy_ipv6 = ["fe80::6/64"]
+            if add_ula:
+                proxy_ipv6.append(f"{ula_prefix}::6/64")
+            self.proxy_link = NetworkLink(f"{proxy_link_name}-{index}",
+                                          ipv4_addrs=["10.10.10.6/24"], ipv6_addrs=proxy_ipv6, ns=self.proxy_ns)
 
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)
         self.bridge.attach_link(self.tool_link)
         self.bridge.attach_link(self.mgmt_link)
+        if self.proxy_link is not None:
+            self.bridge.attach_link(self.proxy_link)
 
-        try:
-            # Bring up selected links in parallel to reduce wait time.
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3, thread_name_prefix="NetnsSetup") as executor:
-                list(executor.map(lambda x: x(), (
-                    self.app_ns.setup,
-                    self.tool_ns.setup,
-                )))
+    def resource_start(self) -> None:
+        """Bring up selected links in parallel to reduce wait time."""
+        namespaces = [ns for ns in (self.app_ns, self.tool_ns, self.mgmt_ns) if ns is not None]
+        links = [(self.app_link, self._app_link_up),
+                 (self.tool_link, self._tool_link_up),
+                 (self.mgmt_link, self._mgmt_link_up)]
 
-                list(executor.map(lambda x: x(), (
-                    self.app_link.setup,
-                    self.tool_link.setup,
-                    self.mgmt_link.setup,
-                )))
+        if self.proxy_ns is not None and self.proxy_link is not None:
+            namespaces.append(self.proxy_ns)
+            links.append((self.proxy_link, self._proxy_link_up))
 
-                self.bridge.setup()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(namespaces), thread_name_prefix="NetnsSetup") as executor:
+            list(executor.map(lambda x: x(), (ns.setup for ns in namespaces)))
 
-                list(executor.map(lambda x: x(), (
-                    link.up for link, should_up in (
-                        (self.app_link, app_link_up),
-                        (self.tool_link, tool_link_up),
-                        (self.mgmt_link, mgmt_link_up)
-                    ) if should_up)))
+            list(executor.map(lambda x: x(), (link.setup for link, _ in links)))
 
-                self.bridge.up()
+            self.bridge.setup()
 
-        except BaseException:
-            log.exception("Encountered error while setting up network namespaces")
-            # Ensure that we leave a clean state on any exception.
-            self.terminate()
-            raise
+            list(executor.map(lambda x: x(), (link.up for link, should_up in links if should_up)))
+
+            self.bridge.up()
+
+    def resource_terminate(self):
+        """Execute all teardown, gracefully omitting errors."""
+        resources: list[NetworkResource] = [self.bridge, self.app_link, self.tool_link, self.mgmt_link]
+        if self.proxy_link is not None:
+            resources.append(self.proxy_link)
+        resources += [ns for ns in (self.app_ns, self.tool_ns, self.mgmt_ns) if ns is not None]
+        if self.proxy_ns is not None:
+            resources.append(self.proxy_ns)
+
+        for obj in resources:
+            try:
+                obj.teardown()
+            except Exception:
+                log.exception("Encountered an error during teardown of network resource '%s'", obj)
+
+    def link_for_name(self, name: str) -> NetworkLink | None:
+        """The link whose device name begins with ``name``.
+
+        Mock servers are configured with the base link names, while the devices
+        themselves carry the namespace index as a suffix, so an exact match will
+        not do. Returns None when no link matches.
+        """
+        for link in (self.app_link, self.tool_link, self.mgmt_link, self.proxy_link):
+            if link is not None and link.name.startswith(name):
+                return link
+        return None
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind) -> NetworkNamespace:
         match kind:
             case SubprocessKind.APP:
                 return self.app_ns
             case SubprocessKind.TOOL:
+                if self.tool_ns is None:
+                    raise ValueError("The tool runs in the host namespace.")
                 return self.tool_ns
+            case SubprocessKind.MGMT:
+                return self.mgmt_ns
             case _:
                 raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
-
-    def terminate(self):
-        """Execute all teardown, gracefully omitting errors."""
-        for obj in (
-            self.bridge,
-            self.app_link, self.tool_link, self.mgmt_link,
-            self.app_ns, self.tool_ns
-        ):
-            try:
-                obj.teardown()
-            except Exception:
-                log.exception("Encountered an error during teardown of network resource '%s'", obj)

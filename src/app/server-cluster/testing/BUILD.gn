@@ -29,7 +29,6 @@ source_set("testing") {
     "TestAttributeChangeListener.h",
     "TestEventGenerator.h",
     "TestServerClusterContext.h",
-    "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
   ]
 

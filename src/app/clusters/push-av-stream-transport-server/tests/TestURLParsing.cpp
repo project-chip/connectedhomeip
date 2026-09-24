@@ -166,8 +166,8 @@ public:
 
         // Set container options
         CMAFContainerOptionsStruct cmafOptions;
-        cmafOptions.segmentDuration                     = 4000;
-        cmafOptions.trackName                           = Span(trackName.data(), trackName.size());
+        cmafOptions.segmentDuration = 4000;
+        cmafOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
         transportOptions.containerOptions.containerType = ContainerFormatEnum::kCmaf;
         transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafOptions);
 

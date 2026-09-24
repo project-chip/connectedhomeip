@@ -23,6 +23,10 @@ namespace MessageComplete {
 inline constexpr EventId Id = 0x00000002;
 } // namespace MessageComplete
 
+namespace MessageNotPresented {
+inline constexpr EventId Id = 0x00000003;
+} // namespace MessageNotPresented
+
 } // namespace Events
 } // namespace Messages
 } // namespace Clusters

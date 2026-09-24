@@ -26,7 +26,7 @@ namespace Minimal {
 class RecordResponder : public Responder
 {
 public:
-    RecordResponder(QType qType, const FullQName & qName) : Responder(qType, qName) {}
+    RecordResponder(chip::Dnssd::QType qType, const chip::Dnssd::FullQName & qName) : Responder(qType, qName) {}
 };
 
 } // namespace Minimal

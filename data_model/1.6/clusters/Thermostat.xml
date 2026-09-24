@@ -69,7 +69,7 @@ Davis, CA 95616, USA
     <revision revision="8" summary="Added comment regarding writing to ControlSequenceOfOperation."/>
     <revision revision="9" summary="Removed AlarmMask attribute and AlarmCodeBitmap Type."/>
     <revision revision="10" summary="Removed Zigbee related elements and P quality, deprecated ThermostatProgrammingOperationMode and removed ProgrammingOperationModeBitmap. and deprecated Setback feature and related elements."/>
-    <revision revision="11" summary="Added events. Added support for Thermostat suggestions."/>
+    <revision revision="11" summary="Added support for Thermostat suggestions. Added events."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0201" name="Thermostat"/>
@@ -116,13 +116,10 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="10" code="TSUGGEST" name="Thermostat Suggestions" summary="Thermostat supports suggestions">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="PRES"/>
-        </optionalConform>
-      </otherwiseConform>
+    <feature bit="10" code="TSUGGEST" name="ThermostatSuggestions" summary="Thermostat supports suggestions">
+      <optionalConform>
+        <feature name="PRES"/>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -495,52 +492,28 @@ Davis, CA 95616, USA
     </bitmap>
     <bitmap name="ThermostatSuggestionNotFollowingReasonBitmap">
       <bitfield name="DemandResponseEvent" bit="0" summary="Thermostat is responding to a Demand Response event">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="OngoingHold" bit="1" summary="Thermostat has an ongoing setpoint hold">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="Schedule" bit="2" summary="Thermostat is following a schedule">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="Occupancy" bit="3" summary="Thermostat is following the occupancy signal">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="VacationMode" bit="4" summary="Thermostat is set to Vacation mode">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="TimeOfUseCostSavings" bit="5" summary="Thermostat is following a Time Of Use based cost savings plan">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="PreCoolingOrPreHeating" bit="6" summary="Thermostat is precooling or preheating based on an energy forecast signal">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
       <bitfield name="ConflictingSuggestions" bit="7" summary="Thermostat has conflicting suggestions and is unable to choose one">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </bitfield>
     </bitmap>
     <struct name="PresetStruct">
@@ -704,31 +677,19 @@ Davis, CA 95616, USA
     </struct>
     <struct name="ThermostatSuggestionStruct">
       <field id="0" name="UniqueID" type="uint8">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </field>
       <field id="1" name="PresetHandle" type="octstr">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
         <constraint>
           <maxLength value="16"/>
         </constraint>
       </field>
       <field id="2" name="EffectiveTime" type="epoch-s">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </field>
       <field id="3" name="ExpirationTime" type="epoch-s">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </field>
     </struct>
     <struct name="WeeklyScheduleTransitionStruct">
@@ -1213,12 +1174,9 @@ Davis, CA 95616, USA
     <attribute id="0x0053" name="MaxThermostatSuggestions" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
       <constraint>
         <min value="5"/>
       </constraint>
@@ -1227,12 +1185,9 @@ Davis, CA 95616, USA
       <entry type="ThermostatSuggestionStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
       <constraint>
         <maxCount>
           <attribute name="MaxThermostatSuggestions"/>
@@ -1242,22 +1197,16 @@ Davis, CA 95616, USA
     <attribute id="0x0055" name="CurrentThermostatSuggestion" type="ThermostatSuggestionStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
     </attribute>
     <attribute id="0x0056" name="ThermostatSuggestionNotFollowingReason" type="ThermostatSuggestionNotFollowingReasonBitmap">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -1275,12 +1224,9 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="AddThermostatSuggestionResponse" direction="responseFromServer">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
       <field id="0" name="UniqueID" type="uint8">
         <mandatoryConform/>
       </field>
@@ -1312,12 +1258,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x07" name="AddThermostatSuggestion" direction="commandToServer" response="AddThermostatSuggestionResponse">
       <access invokePrivilege="manage"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
       <field id="0" name="PresetHandle" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -1343,12 +1286,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x08" name="RemoveThermostatSuggestion" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TSUGGEST"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TSUGGEST"/>
+      </mandatoryConform>
       <field id="0" name="UniqueID" type="uint8">
         <mandatoryConform/>
       </field>

@@ -195,6 +195,18 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 234));
+
+    // Test kQuiet
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    cluster.NotifyAttributeChanged(345, AttributeChangeType::kQuiet);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().ChangedList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().ChangedList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 345));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }
 
 TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
@@ -231,6 +243,25 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     context.ChangeListener().DirtyList().clear();
     ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
     ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // test kQuiet success - version should change, changed list populated, dirty list empty
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(456, Status::Success, AttributeChangeType::kQuiet), Status::Success);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_EQ(context.ChangeListener().ChangedList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().ChangedList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 456));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // test kQuiet failure - nothing should change, lists should be empty
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(456, Status::Failure, AttributeChangeType::kQuiet), Status::Failure);
+    ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().ChangedList().empty());
     ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }
 

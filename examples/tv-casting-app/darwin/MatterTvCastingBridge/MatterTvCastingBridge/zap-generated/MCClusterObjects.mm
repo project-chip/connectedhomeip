@@ -577,6 +577,18 @@
     return cppAttribute != nil ? [[MCMediaPlaybackClusterAvailableTextTracksAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
 }
 
+- (id)availableCommandsAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::AvailableCommands::Id);
+    return cppAttribute != nil ? [[MCMediaPlaybackClusterAvailableCommandsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)contentInfoAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::ContentInfo::Id);
+    return cppAttribute != nil ? [[MCMediaPlaybackClusterContentInfoAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
 - (id)generatedCommandListAttribute
 {
     void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::GeneratedCommandList::Id);
@@ -671,6 +683,18 @@
     return cppCommand != nil ? [[MCContentLauncherClusterLaunchURLCommand alloc] initWithCppCommand:cppCommand] : nil;
 }
 
+- (id)contentReplicationRequestCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::ContentReplicationRequest::Id);
+    return cppCommand != nil ? [[MCContentLauncherClusterContentReplicationRequestCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)playPresetCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id);
+    return cppCommand != nil ? [[MCContentLauncherClusterPlayPresetCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
 // ContentLauncher cluster attributes:
 
 - (id)acceptHeaderAttribute
@@ -683,6 +707,18 @@
 {
     void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     return cppAttribute != nil ? [[MCContentLauncherClusterSupportedStreamingProtocolsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)movableAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Movable::Id);
+    return cppAttribute != nil ? [[MCContentLauncherClusterMovableAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)presetsAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Presets::Id);
+    return cppAttribute != nil ? [[MCContentLauncherClusterPresetsAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
 }
 
 - (id)generatedCommandListAttribute
@@ -869,5 +905,98 @@
 {
     void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::Id);
     return cppAttribute != nil ? [[MCApplicationBasicClusterClusterRevisionAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+@end
+
+// MediaFileManagement cluster:
+
+@implementation MCMediaFileManagementCluster
+
+// MediaFileManagement cluster commands:
+
+- (id)addFileCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id);
+    return cppCommand != nil ? [[MCMediaFileManagementClusterAddFileCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)deleteFileCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::DeleteFile::Id);
+    return cppCommand != nil ? [[MCMediaFileManagementClusterDeleteFileCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)requestSharedFilesCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id);
+    return cppCommand != nil ? [[MCMediaFileManagementClusterRequestSharedFilesCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)getSharedFileCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id);
+    return cppCommand != nil ? [[MCMediaFileManagementClusterGetSharedFileCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+- (id)offerFileCommand
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id);
+    return cppCommand != nil ? [[MCMediaFileManagementClusterOfferFileCommand alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+// MediaFileManagement cluster attributes:
+
+- (id)totalStorageAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterTotalStorageAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)availableStorageAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::AvailableStorage::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterAvailableStorageAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)availableFilesAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::AvailableFiles::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterAvailableFilesAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)supportedMimeTypesAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::SupportedMimeTypes::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterSupportedMimeTypesAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)generatedCommandListAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::GeneratedCommandList::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterGeneratedCommandListAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)acceptedCommandListAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::AcceptedCommandList::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterAcceptedCommandListAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)attributeListAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::AttributeList::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterAttributeListAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)featureMapAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::FeatureMap::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterFeatureMapAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+
+- (id)clusterRevisionAttribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::ClusterRevision::Id);
+    return cppAttribute != nil ? [[MCMediaFileManagementClusterClusterRevisionAttribute alloc] initWithCppAttribute:cppAttribute] : nil;
 }
 @end

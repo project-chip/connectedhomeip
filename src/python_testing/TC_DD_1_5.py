@@ -25,13 +25,15 @@ from mobly import asserts, signals
 import matter.testing.nfc
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestUncommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DD_1_5(MatterBaseTest):
+class TC_DD_1_5(MatterTestUncommissionedDevice):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_1_5(self) -> str:
         return "[TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT - Commissionee]"
 
@@ -92,13 +94,14 @@ class TC_DD_1_5(MatterBaseTest):
         self.step("2b")
         monitoring_task = asyncio.create_task(reader.activate_tag_monitoring())
         user_input_task = asyncio.create_task(self.wait_for_user_input_async(
-            "Press enter when steps 2a and 2b are done", ""
+            "Unpack the DUT from its packaging, activate the NFC tag (if required by the DUT),"
+            " and bring the TH NFC reader close to the DUT's NFC tag. Press Enter when you are done.", ""
         ))
         await user_input_task
 
         reader.deactivate_tag_monitoring()
         nfc_tag_content = await monitoring_task
-        log.info(f"nfc_tag_content: {nfc_tag_content}")
+        log.info("nfc_tag_content: %s", nfc_tag_content)
         asserts.assert_true(reader.is_onboarding_data(nfc_tag_content), "No NFC tag with onboarding data found")
 
         ###########
@@ -125,7 +128,7 @@ class TC_DD_1_5(MatterBaseTest):
             asserts.assert_true(self.matter_test_config.qr_code_content,
                                 "This test needs to be run with qr_code param")
             qr_code_content = self.matter_test_config.qr_code_content[0]
-            log.info(f"qr_code_content: {qr_code_content}")
+            log.info("qr_code_content: %s", qr_code_content)
 
             asserts.assert_equal(
                 qr_code_content,

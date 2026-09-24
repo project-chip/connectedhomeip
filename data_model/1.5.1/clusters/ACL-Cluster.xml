@@ -230,7 +230,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ACL" type="list" default="desc">
+    <attribute id="0x0000" name="ACL" type="list">
       <entry type="AccessControlEntryStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
@@ -238,7 +238,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="Extension" type="list" default="desc">
+    <attribute id="0x0001" name="Extension" type="list">
       <entry type="AccessControlExtensionStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform>
@@ -248,31 +248,40 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16" default="4">
+    <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <min value="4"/>
+        <between>
+          <from value="4"/>
+          <to value="65534"/>
+        </between>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="TargetsPerAccessControlEntry" type="uint16" default="3">
+    <attribute id="0x0003" name="TargetsPerAccessControlEntry" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <min value="3"/>
+        <between>
+          <from value="3"/>
+          <to value="65534"/>
+        </between>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="4">
+    <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <min value="4"/>
+        <between>
+          <from value="4"/>
+          <to value="65534"/>
+        </between>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="CommissioningARL" type="list" default="empty">
+    <attribute id="0x0005" name="CommissioningARL" type="list">
       <entry type="CommissioningAccessRestrictionEntryStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
@@ -283,7 +292,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="ARL" type="list" default="empty">
+    <attribute id="0x0006" name="ARL" type="list">
       <entry type="AccessRestrictionEntryStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform>
@@ -300,7 +309,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>
-      <field id="0" name="ARL" type="list" default="desc">
+      <field id="0" name="ARL" type="list">
         <entry type="CommissioningAccessRestrictionEntryStruct"/>
         <mandatoryConform/>
         <constraint>

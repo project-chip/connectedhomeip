@@ -18,7 +18,8 @@
 #pragma once
 
 #include <cctype>
-#include <nlassert.h>
+#include <cstdio>
+#include <lib/support/Assertions.h>
 
 #include "BufferWriter.h"
 
@@ -30,7 +31,7 @@ class StringBuilderBase
 public:
     StringBuilderBase(char * buffer, size_t size) : mWriter(reinterpret_cast<uint8_t *>(buffer), size - 1)
     {
-        nlASSERT(size > 0);
+        VerifyOrDieWithoutLogging(size > 0);
         buffer[0] = 0; // make c-str work by default
     }
 

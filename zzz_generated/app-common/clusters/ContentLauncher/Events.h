@@ -42,7 +42,41 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ContentLauncher {
-namespace Events {} // namespace Events
+namespace Events {
+namespace ContentReplication {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ContentReplication::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    StatusEnum status = static_cast<StatusEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ContentReplication::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+
+    StatusEnum status = static_cast<StatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ContentReplication
+} // namespace Events
 } // namespace ContentLauncher
 } // namespace Clusters
 } // namespace app

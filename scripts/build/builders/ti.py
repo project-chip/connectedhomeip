@@ -14,9 +14,10 @@
 
 import os
 from enum import Enum, auto
-from typing import Optional
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -38,7 +39,7 @@ class TIApp(Enum):
             return 'lighting-app'
         if self == TIApp.SHELL:
             return 'shell'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self, board):
         if self == TIApp.LOCK:
@@ -51,7 +52,7 @@ class TIApp(Enum):
             return f'chip-{board.BoardName()}-lighting-example'
         if self == TIApp.SHELL:
             return f'chip-{board.BoardName()}-shell-example'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root, board):
         return os.path.join(root, 'examples', self.ExampleName() + '/ti/', board.FamilyName())
@@ -63,25 +64,24 @@ class TIBoard(Enum):
     def BoardName(self):
         if self == TIBoard.LP_EM_CC1354P10_6:
             return 'LP_EM_CC1354P10_6'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
     def FamilyName(self):
         if self == TIBoard.LP_EM_CC1354P10_6:
             return 'cc13x4_26x4'
-        raise Exception('Unknown board type: %r' % self)
+        raise Exception(f'Unknown board type: {self!r}')
 
 
 class TIBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
-                 openthread_ftd: Optional[bool] = None):
-        super(TIBuilder, self).__init__(
-            root=app.BuildRoot(root, board),
-            runner=runner)
+                 openthread_ftd: bool | None = None):
+        super().__init__(root=app.BuildRoot(root, board), runner=runner, output_dir_lock=output_dir_lock)
         self.code_root = root
         self.app = app
         self.board = board
@@ -90,8 +90,8 @@ class TIBuilder(GnBuilder):
     def GnBuildArgs(self):
         args = super().GnBuildArgs()
         args.extend([
-            'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
-            'ti_simplelink_board="%s"' % self.board.BoardName(),
+            'ti_sysconfig_root="{}"'.format(os.environ['TI_SYSCONFIG_ROOT']),
+            f'ti_simplelink_board="{self.board.BoardName()}"',
             # FIXME: It seems that TI SDK expects link map file to be present.
             #        In order to make it optional, SDK fix is needed.
             'chip_generate_link_map_file=true',
@@ -105,6 +105,7 @@ class TIBuilder(GnBuilder):
 
         return args
 
+    @lock_output_dir
     def build_outputs(self):
         if self.board == TIBoard.LP_EM_CC1354P10_6:
             if self.app in [TIApp.LOCK,

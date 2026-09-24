@@ -102,8 +102,6 @@ enum class TestCommandResult : uint8_t
     kFailure
 };
 
-TestCommandResult gLastCommandResult = TestCommandResult::kUndefined;
-
 void HandleReadComplete()
 {
     auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -175,7 +173,6 @@ public:
         printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.mEndpointId, aPath.mClusterId,
                aPath.mCommandId);
 
-        gLastCommandResult                              = TestCommandResult::kSuccess;
         auto respTime                                   = chip::System::SystemClock().GetMonotonicTimestamp();
         chip::System::Clock::Milliseconds64 transitTime = respTime - gLastMessageTime;
 
@@ -188,7 +185,6 @@ public:
     void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
         gCommandRespCount += (aError.IsIMStatus());
-        gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
     void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }

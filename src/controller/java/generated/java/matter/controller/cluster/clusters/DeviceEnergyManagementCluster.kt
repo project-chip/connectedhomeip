@@ -71,6 +71,19 @@ class DeviceEnergyManagementCluster(
     object SubscriptionEstablished : ForecastAttributeSubscriptionState()
   }
 
+  class PowerRangeAdjustmentAttribute(
+    val value: DeviceEnergyManagementClusterPowerRangeAdjustStruct?
+  )
+
+  sealed class PowerRangeAdjustmentAttributeSubscriptionState {
+    data class Success(val value: DeviceEnergyManagementClusterPowerRangeAdjustStruct?) :
+      PowerRangeAdjustmentAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : PowerRangeAdjustmentAttributeSubscriptionState()
+
+    object SubscriptionEstablished : PowerRangeAdjustmentAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -291,6 +304,60 @@ class DeviceEnergyManagementCluster(
 
   suspend fun cancelRequest(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 7u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun powerRangeAdjustRequest(
+    minPower: Long?,
+    maxPower: Long?,
+    duration: UInt,
+    cause: UByte,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 8u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_MIN_POWER_REQ: Int = 0
+    minPower?.let { tlvWriter.put(ContextSpecificTag(TAG_MIN_POWER_REQ), minPower) }
+
+    val TAG_MAX_POWER_REQ: Int = 1
+    maxPower?.let { tlvWriter.put(ContextSpecificTag(TAG_MAX_POWER_REQ), maxPower) }
+
+    val TAG_DURATION_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_DURATION_REQ), duration)
+
+    val TAG_CAUSE_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_CAUSE_REQ), cause)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun cancelPowerRangeAdjustRequest(timedInvokeTimeout: Duration? = null) {
+    val commandId: UInt = 9u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1009,6 +1076,109 @@ class DeviceEnergyManagementCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readPowerRangeAdjustmentAttribute(): PowerRangeAdjustmentAttribute {
+    val ATTRIBUTE_ID: UInt = 8u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Powerrangeadjustment attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: DeviceEnergyManagementClusterPowerRangeAdjustStruct? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          DeviceEnergyManagementClusterPowerRangeAdjustStruct.fromTlv(AnonymousTag, tlvReader)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return PowerRangeAdjustmentAttribute(decodedValue)
+  }
+
+  suspend fun subscribePowerRangeAdjustmentAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<PowerRangeAdjustmentAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 8u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            PowerRangeAdjustmentAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Powerrangeadjustment attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: DeviceEnergyManagementClusterPowerRangeAdjustStruct? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                DeviceEnergyManagementClusterPowerRangeAdjustStruct.fromTlv(AnonymousTag, tlvReader)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(PowerRangeAdjustmentAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(PowerRangeAdjustmentAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

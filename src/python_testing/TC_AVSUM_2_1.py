@@ -93,8 +93,8 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
         self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
         self.has_feature_mpresets = (feature_map & cluster.Bitmaps.Feature.kMechanicalPresets) != 0
 
-        log.info(
-            f"Feature map: 0x{feature_map:x}. MPAN: {self.has_feature_mpan}, MTILT:{self.has_feature_mtilt}, MZOOM:{self.has_feature_mzoom}, DPTZ:{self.has_feature_dptz}")
+        log.info("Feature map: 0x%x. MPAN: %s, MTILT:%s, MZOOM:%s, DPTZ:%s",
+                 feature_map, self.has_feature_mpan, self.has_feature_mtilt, self.has_feature_mzoom, self.has_feature_dptz)
 
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 

@@ -18,74 +18,25 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/microwave-oven-control-server/AppDelegate.h>
+#include <lib/core/Optional.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace MicrowaveOvenControl {
+#include <cstdint>
+
+namespace chip::app::Clusters::MicrowaveOvenControl {
 
 class Instance;
 
 /** @brief
  *  Defines methods for implementing application-specific logic for the MicrowaveOvenControl Cluster.
  */
-class Delegate
+class Delegate : public AppDelegate
 {
 public:
     Delegate() = default;
 
     virtual ~Delegate() = default;
-
-    /**
-     *   @brief Handle Command Callback in application: SetCookingParameters.
-     *   @return Returns the Interaction Model status code which was user determined in the business logic.
-     *   @param  cookMode: the input cook mode value. Callee needs to define the cooking mode value in the Microwave Oven Mode
-     * instance.
-     *   @param  cookTimeSec: the input cook time value.
-     *   @param  startAfterSetting: if true, the cooking operation will start after handling the command.
-     *   @param  powerSettingNum: the input power setting value.
-     *   @param  wattSettingIndex: the input watts setting index.
-     *   Note: powerSettingNum and wattSettingIndex must be mutually exclusive.
-     *   If using power as number, wattSettingIndex will be set to NullOptional.
-     *   If using power in watts, powerSettingNum will be set to NullOptional.
-     */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                                   bool startAfterSetting,
-                                                                                   Optional<uint8_t> powerSettingNum,
-                                                                                   Optional<uint8_t> wattSettingIndex) = 0;
-
-    /**
-     *   @brief Handle Command Callback in application: AddMoreTime.
-     *   @return Returns the Interaction Model status code which was user determined in the business logic.
-     *   @param  finalCookTimeSec: the cook time value after adding input time.
-     */
-    virtual Protocols::InteractionModel::Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) = 0;
-
-    /**
-     *   Get the watt setting from the supported watts list.
-     *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no
-     * gaps.
-     *   @param wattSetting A reference to receive the watt setting on success.
-     *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully,
-     *   CHIP_ERROR_NOT_FOUND if the index in beyond the list of available labels.
-     */
-    virtual CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) = 0;
-
-    virtual uint32_t GetMaxCookTimeSec() const = 0;
-
-    virtual uint8_t GetPowerSettingNum() const = 0;
-
-    virtual uint8_t GetMinPowerNum() const = 0;
-
-    virtual uint8_t GetMaxPowerNum() const = 0;
-
-    virtual uint8_t GetPowerStepNum() const = 0;
-
-    virtual uint8_t GetCurrentWattIndex() const = 0;
-
-    virtual uint16_t GetWattRating() const = 0;
 
     /**
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
@@ -119,7 +70,4 @@ protected:
     Instance * GetInstance() { return mInstance; }
 };
 
-} // namespace MicrowaveOvenControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::MicrowaveOvenControl

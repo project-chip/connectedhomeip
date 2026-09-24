@@ -44,6 +44,11 @@ void LEDWidget::InitGpio()
     matter_led_init(kLedPwmParam, kLedPinNum);
 }
 
+void LEDWidget::InitGpio(T_LED_PWM_PARAM * ledPwmList, uint8_t ledPwmNum)
+{
+    matter_led_init(ledPwmList, ledPwmNum);
+}
+
 void LEDWidget::Init(uint8_t gpioNum)
 {
     mLEDHandle = matter_led_create(gpioNum, false, 0);

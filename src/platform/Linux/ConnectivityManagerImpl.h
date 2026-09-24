@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -42,74 +43,64 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/wpa/DBusWpa.h>
-#include <platform/Linux/dbus/wpa/DBusWpaBss.h>
-#include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
-#include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
-#include <system/SystemMutex.h>
-
-#include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
-#endif
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#include <atomic>
+#include <cstring>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/NetworkCommissioning.h>
 #include <vector>
 
-namespace chip {
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1BSS>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1Interface>
-{
-    using deleter = GObjectDeleter;
-};
-
-template <>
-struct GAutoPtrDeleter<WpaSupplicant1Network>
-{
-    using deleter = GObjectDeleter;
-};
-
+#include "WpaSupplicantClient.h"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+namespace chip {
 namespace DeviceLayer {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-struct GDBusWpaSupplicant
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+struct NanPeerInfo
 {
-    GAutoPtr<WpaSupplicant1> proxy;
-    GAutoPtr<WpaSupplicant1Interface> iface;
-    GAutoPtr<char> interfacePath;
-    GAutoPtr<char> networkPath;
+    uint8_t mac[6]{};
+    uint16_t vid           = 0;
+    uint16_t pid           = 0;
+    uint16_t discriminator = 0;
+    uint8_t opcode         = 0;
+    uint16_t srvProtoType  = 0;
 
-    // Must be called synchronously on the GLib thread while the GLib main loop is still running.
-    void Reset()
+    std::vector<uint8_t> storage; // ExtendedData storage
+    bool hasExtendedData = false;
+    uint16_t band        = 0; // WiFiBandBitmap value derived from scan frequency; 0 = unknown
+
+    /// Two reports are the same peer when the MAC and discriminator match.
+    bool operator==(const NanPeerInfo & o) const
     {
-        iface.reset();
-        proxy.reset();
-        interfacePath.reset();
-        networkPath.reset();
+        return memcmp(mac, o.mac, sizeof(mac)) == 0 && discriminator == o.discriminator;
     }
 };
-#endif
+
+struct ScanTimerCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
+    guint subscribe_id;
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+// Records when the radio can carry Wi-Fi PAF frames
+enum class PafChannelState : uint8_t
+{
+    kAvailable,   // The radio is free and PAF frames may be sent
+    kConnecting,  // Station connect in progress (scan, authenticate, associate, key handshake),
+                  // during which the radio cannot carry PAF frames
+    kAwaitingNan, // STA link up but NAN not yet ready
+    kNoInterface, // No wpa_supplicant interface to send on
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
@@ -135,6 +126,10 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
 #endif
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    ,
+                                      public Internal::WpaSupplicantClient
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -154,12 +149,14 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
     void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
     CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+    uint32_t GetPendingConnectSubscribeId() const { return mPendingConnectSubscribeId; }
     void OnDiscoveryResult(GVariant * obj);
     void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
@@ -168,12 +165,15 @@ public:
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
+#else
+    inline void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex) {}
 #endif
 
     void PostNetworkConnect();
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
+    CHIP_ERROR StartWiFiManagementSync();
     // Release GLib objects before the GLib main loop is quit.
     // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
     void StopWiFiManagement();
@@ -186,8 +186,67 @@ public:
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+public:
+    void ScanNanReceive(GVariant * obj);
+    void ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason);
+    void ScanDiscoveryResult(GVariant * discov_info);
+    using PafScanResultsCallback = void (*)(void * context, const std::vector<NanPeerInfo> & results);
+    CHIP_ERROR WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext);
+    /** Per-peer callback fired each time a new NAN discovery result arrives
+     *  during a background scan (including re-discoveries, to allow TTL reset). */
+    using BgScanDiscoveryCallback = void (*)(void * ctx, const NanPeerInfo & peer);
+
+    /**
+     * Start a continuous background NAN discovery scan.
+     * @param cb      Called on every discovery result (including duplicates).
+     * @param cbCtx   Passed unchanged to cb.
+     * @return CHIP_ERROR_BUSY if a one-shot scan is already running.
+     */
+    CHIP_ERROR WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx);
+
+    /**
+     * Stop the background scan started by WiFiPAFStartBackgroundScan.
+     * No-op if no background scan is active.
+     */
+    void WiFiPAFStopBackgroundScan();
+
 private:
-    bool _IsWiFiInterfaceEnabled() CHIP_REQUIRES(mWpaSupplicantMutex);
+    /// Peers seen by the current scan, as a rolling window. Bounded at the same value the
+    /// CommissioningProxy cluster caps a ProxyScanResponse.
+    static constexpr size_t kMaxScanPeers = CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS;
+    std::vector<NanPeerInfo> mNanScanPeers;
+    /// Index of the oldest entry, overwritten next once the window is full.
+    size_t mNanScanPeersNext        = 0;
+    PafScanResultsCallback mScanCb  = nullptr;
+    void * mScanCbContext           = nullptr;
+    uint32_t mActiveScanSubscribeId = 0; // subscribe_id of the current one-shot scan
+    void FinishWiFiPAFScan(ScanTimerCtx * ctx);
+
+    BgScanDiscoveryCallback mBgScanCb = nullptr;
+    void * mBgScanCbCtx               = nullptr;
+    uint32_t mBgScanSubscribeId       = 0;
+    uint32_t mScanFreq                = 0; // freq (MHz) used for the current scan (one-shot or background)
+
+    // Handler IDs for the three scan GLib signals (nandiscovery-result, nanreceive,
+    // nansubscribe-terminated).  Stored so DisconnectScanSignals() can remove exactly
+    // the scan handlers without disturbing PAF connect-path handlers on the same signals.
+    gulong mScanSignalIds[3] = {};
+
+    /** Connect the scan GLib signal handlers.  Must be called before NANSubscribe;
+     *  see the definition for why.  Caller must hold mWpaSupplicantMutex. */
+    void ConnectScanSignals() CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /** Disconnect the scan GLib signal handlers registered by ConnectScanSignals().
+     *  Uses stored handler IDs so it does not accidentally remove connect-path
+     *  handlers on the same signals. */
+    void DisconnectScanSignals();
+
+    /** As DisconnectScanSignals(), for callers that already hold mWpaSupplicantMutex. */
+    void DisconnectScanSignalsLocked() CHIP_REQUIRES(mWpaSupplicantMutex);
+#endif
+
+private:
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
@@ -205,8 +264,17 @@ public:
     void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
     void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
 
+    // Network Commissioning Action Delegation Methods
+
+    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
+    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
+    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                        Optional<int32_t> inConnectStatus) noexcept;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
+    CHIP_ERROR SetWiFiIfName(const char * ifName);
 #endif
 
 private:
@@ -251,7 +319,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     WiFiPAFAdvertiseParam mPafAdvParam;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
@@ -259,34 +326,49 @@ private:
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
+    uint32_t mPendingConnectSubscribeId = 0; // set by _WiFiPAFSubscribe, read by app layer on timeout
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
-    bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };
     // The resource checking is needed right before sending data packets that they are initialized and connected.
-    bool mPafChannelAvailable = true;
+    bool _WiFiPAFResourceAvailable() { return mPafChannelState.load() == PafChannelState::kAvailable; };
+    // Written from both the glib D-Bus thread and the CHIP thread.
+    std::atomic<PafChannelState> mPafChannelState{ PafChannelState::kAvailable };
+    // Association hooks, called from the wpa_supplicant state machine.  Defined in
+    // ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp; no-ops below when PAF is disabled so the
+    // call sites need no #if.
+    void OnAssociationRequested();
+    void OnAssociationStarting();
+    void OnAssociationFailed();
+    void OnAssociationCompleted();
+    void OnInterfaceRemoved();
+    // Evidence from the NAN layer that the radio is carrying PAF traffic again.
+    void PafChannelNoteNanActivity();
+    void ArmNanRecoveryTimer();
+    static void HandleNanRecoveryTimeout(chip::System::Layer * layer, void * context);
+    // True if this call released the wait, false if there was none to release.
+    bool TryReleaseNanRecoveryWait();
+    // Identifies the NAN recovery wait a timer was armed for, so it releases only its own.
+    std::atomic<uint32_t> mNanRecoveryId{ 0 };
+    std::atomic<uint32_t> mArmedNanRecoveryId{ 0 };
+#else
+    void OnAssociationRequested() {}
+    void OnAssociationStarting() {}
+    void OnAssociationFailed() {}
+    void OnAssociationCompleted() {}
+    void OnInterfaceRemoved() {}
 #endif
 
-    bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();
 
     bool mAssociationStarted             = false;
     unsigned int mAssociationRetriesLeft = 0;
-    GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
-    // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
-    // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
-    std::mutex mWpaSupplicantMutex;
 
-#endif
-    // Network Commissioning Action Delegation Methods
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
-                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
-    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
-    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
-                        Optional<int32_t> inConnectStatus) noexcept;
-
+private:
     // ==================== ConnectivityManager Private Methods ====================
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

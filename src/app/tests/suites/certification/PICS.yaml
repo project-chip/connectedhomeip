@@ -70,11 +70,6 @@ PICS:
       id: MCORE.DD.DEV_BARRIER
 
     - label:
-          "Does the commissionee device have a vendor specific information
-          element (IE)?"
-      id: MCORE.DD.IE
-
-    - label:
           "Does the commissionee device or device packaging have a QR code based
           onboarding payload?"
       id: MCORE.DD.QR
@@ -123,13 +118,6 @@ PICS:
 
     - label: "Does the commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
-
-    - label:
-          "Does the commissioner support Discovery Capability over IP Network?"
-      id: MCORE.DD.DISCOVERY_IP
-
-    - label: "Does the commissioner support Discovery Capability over SoftAP?"
-      id: MCORE.DD.DISCOVERY_SOFTAP
 
     - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
       id: MCORE.DD.DISCOVERY_PAF
@@ -306,8 +294,8 @@ PICS:
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
 
-    - label: "Does Device support TCP transport?"
-      id: MCORE.SC.TCP
+    - label: "Does the device support a TCP server? "
+      id: MCORE.SC.S.TCP
 
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
@@ -362,6 +350,9 @@ PICS:
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -606,11 +597,6 @@ PICS:
           "Is the device a Client and supports subscribing to an attribute of
           DataType List"
       id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
-
-    - label:
-          "Is the device a Server and capable of generating large data which is
-          greater than 1 MTU(1280 bytes)"
-      id: MCORE.IDM.S.LargeData
 
     - label:
           "Is the device a Client and supports subscribing to an individual
@@ -3853,9 +3839,6 @@ PICS:
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
 
-    - label: "Does the device implement the GroupcastAdoption attribute?"
-      id: GRPKEY.S.A0004
-
     #
     # server commandsGenerated
     #
@@ -4004,6 +3987,10 @@ PICS:
           "Does the DUT(client) implement invoking/generating
           AddGroupIfIdentifying Command?"
       id: G.C.C05.Tx
+
+    # Groupcast Cluster Test Plan
+    - label: "Does the device implement the Groupcast cluster as a server?"
+      id: GC.S
 
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
@@ -6593,6 +6580,13 @@ PICS:
           attribute?"
       id: TSTAT.S.A0056
 
+    - label: "Does the device implement the CriticalFreezeProtection attribute?"
+      id: TSTAT.S.A0057
+
+    - label:
+          "Does the device implement the CriticalOverheatProtection attribute?"
+      id: TSTAT.S.A0058
+
     #
     # server / commandsReceived
     #
@@ -8815,6 +8809,80 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
 
+    # Smoke Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a server?"
+      id: SMOKECONC.S
+
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a client?"
+      id: SMOKECONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: SMOKECONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: SMOKECONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: SMOKECONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: SMOKECONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: SMOKECONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: SMOKECONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: SMOKECONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: SMOKECONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: SMOKECONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: SMOKECONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: SMOKECONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: SMOKECONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: SMOKECONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: SMOKECONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: SMOKECONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: SMOKECONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: SMOKECONC.S.A000a
+
     ##  Fan control
 
     # Features
@@ -8961,6 +9029,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:
@@ -10328,6 +10399,62 @@ PICS:
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
 
     #
+    # Thermostat Mode Cluster
+    #
+
+    - label: "Does the device implement the TSTATM cluster as a server?"
+      id: TSTATM.S
+
+    # server / features
+    - label: "Does the device support the CoreModes feature?"
+      id: TSTATM.S.F01
+
+    # server / attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TSTATM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TSTATM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TSTATM.S.A0002
+
+    - label: "Does the device implement the CoreModeTags attribute?"
+      id: TSTATM.S.A0004
+
+    # server / Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TSTATM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
+      id: TSTATM.S.C02.Rsp
+
+    # server / Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TSTATM.S.C01.Tx
+
+    # Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TSTATM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: TSTATM.S.M.CAN_MANUALLY_CONTROLLED
+
+    # PIXIT
+    - label:
+          "ID of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TSTATM.MODE_CHANGE_FAIL
+
+    - label:
+          "ID of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TSTATM.MODE_CHANGE_OK
+
+    #
     # Power Topology Cluster
     #
     - label: "Does the device implement the Power Topology Cluster as a server?"
@@ -10353,12 +10480,20 @@ PICS:
     - label: "Can the provided set of endpoints change?"
       id: PWRTL.S.F03
 
+    - label:
+          "Does the associated endpoint provide information about downstream
+          nodes on its circuit?"
+      id: PWRTL.S.F04
+
     #Server attributes
     - label: "Does the device implement the AvailableEndpoints attribute?"
       id: PWRTL.S.A0000
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    - label: "Does the device implement the ElectricalCircuitNodes attribute?"
+      id: PWRTL.S.A0002
 
     #
     # Thread Border Router Management Cluster
@@ -10728,3 +10863,66 @@ PICS:
 
     - label: "Does the device implement the End command?"
       id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Proximity Ranging Cluster
+    #
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a server?"
+      id: PROXR.S
+
+    # Features
+    - label: "Does the device support the Wi-Fi USD Proximity Ranging feature?"
+      id: PROXR.S.F00
+
+    - label: "Does the device support the Bluetooth Channel Sounding feature?"
+      id: PROXR.S.F01
+
+    - label: "Does the device support the BLE Beacon RSSI feature?"
+      id: PROXR.S.F02
+
+    - label: "Does the device support the UWB Ranging feature?"
+      id: PROXR.S.F03
+
+    # Server attributes
+    - label: "Does the device implement the RangingCapabilities attribute?"
+      id: PROXR.S.A0000
+
+    - label: "Does the device implement the WiFiDevIK attribute?"
+      id: PROXR.S.A0001
+
+    - label: "Does the device implement the BLEDeviceID attribute?"
+      id: PROXR.S.A0002
+
+    - label: "Does the device implement the BLTDevIK attribute?"
+      id: PROXR.S.A0003
+
+    - label: "Does the device implement the BLTCSSecurityLevel attribute?"
+      id: PROXR.S.A0004
+
+    - label: "Does the device implement the BLTCSModeCapability attribute?"
+      id: PROXR.S.A0005
+
+    - label: "Does the device implement the SessionIDList attribute?"
+      id: PROXR.S.A0006
+
+    - label: "Does the device implement the RangingConstraints attribute?"
+      id: PROXR.S.A0007
+
+    # Commands received
+    - label: "Does the device implement the StartRangingRequest command?"
+      id: PROXR.S.C00.Rsp
+
+    - label: "Does the device implement the StopRangingRequest command?"
+      id: PROXR.S.C02.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the StartRangingResponse command?"
+      id: PROXR.S.C01.Tx
+
+    # Events
+    - label: "Does the device implement the RangingResult event?"
+      id: PROXR.S.E00
+
+    - label: "Does the device implement the RangingSessionStatus event?"
+      id: PROXR.S.E01

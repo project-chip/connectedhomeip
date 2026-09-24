@@ -39,7 +39,7 @@ struct TestLevelControlBase : public LevelControlTestBase
 TEST_F(TestLevelControlBase, TestAcceptedCommands)
 {
     // Verify that all commands are present even without the OnOff feature enabled
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -58,7 +58,7 @@ TEST_F(TestLevelControlBase, TestAcceptedCommands)
 
 TEST_F(TestLevelControlBase, TestReadAttributes)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -75,7 +75,7 @@ TEST_F(TestLevelControlBase, TestReadAttributes)
 
 TEST_F(TestLevelControlBase, TestWriteOptions)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -89,7 +89,7 @@ TEST_F(TestLevelControlBase, TestReadMinMaxLevel)
 {
     // Default
     {
-        LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+        LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -99,9 +99,8 @@ TEST_F(TestLevelControlBase, TestReadMinMaxLevel)
 
     // Configured
     {
-        LevelControlCluster cluster{
-            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithMinLevel(10).WithMaxLevel(200)
-        };
+        LevelControlCluster cluster{ kTestEndpointId,
+                                     LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(10).WithMaxLevel(200) };
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -115,9 +114,8 @@ TEST_F(TestLevelControlBase, TestDefaultMoveRate)
 {
     // Configured
     {
-        LevelControlCluster cluster{
-            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithDefaultMoveRate(50)
-        };
+        LevelControlCluster cluster{ kTestEndpointId,
+                                     LevelControlCluster::Config(mockTimer, mockDelegate).WithDefaultMoveRate(50) };
         chip::Testing::TestServerClusterContext context;
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -131,7 +129,7 @@ TEST_F(TestLevelControlBase, TestDefaultMoveRate)
 
 TEST_F(TestLevelControlBase, TestWriteDefaultMoveRateZero)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithDefaultMoveRate(50) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithDefaultMoveRate(50) };
     chip::Testing::ClusterTester tester(cluster);
     // EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -140,7 +138,7 @@ TEST_F(TestLevelControlBase, TestWriteDefaultMoveRateZero)
 
 TEST_F(TestLevelControlBase, TestAttributes)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -155,7 +153,7 @@ TEST_F(TestLevelControlBase, TestAttributes)
 
 TEST_F(TestLevelControlBase, TestDelegateCallbacks)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithDefaultMoveRate(50) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithDefaultMoveRate(50) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -165,11 +163,12 @@ TEST_F(TestLevelControlBase, TestDelegateCallbacks)
     EXPECT_EQ(mockDelegate.mOptions, options);
 }
 
-TEST_F(TestLevelControlBase, TestMaxLevelConstraint)
+// Spec 1.6.7.1: "If the value of the Level field is below the MinLevel or above the MaxLevel for
+// the device, the value SHALL be clipped to the applicable boundary value."
+TEST_F(TestLevelControlBase, TestMoveToLevelClipsAboveMaxLevel)
 {
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithMinLevel(1).WithMaxLevel(200)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(1).WithMaxLevel(200) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -185,12 +184,55 @@ TEST_F(TestLevelControlBase, TestMaxLevelConstraint)
     data.optionsMask.ClearAll();
     data.optionsOverride.ClearAll();
 
-    EXPECT_FALSE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_EQ(cluster.GetCurrentLevel(), DataModel::MakeNullable<uint8_t>(200));
+}
+
+TEST_F(TestLevelControlBase, TestMoveToLevelClipsBelowMinLevel)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(1).WithMaxLevel(200) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(10, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // A Level of 0 is what controllers send to mean "off"; on a device with MinLevel 1 this must
+    // clip rather than fail.
+    Commands::MoveToLevel::Type data;
+    data.level = 0; // < MinLevel
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_EQ(cluster.GetCurrentLevel(), DataModel::MakeNullable<uint8_t>(1));
+}
+
+// The Level field itself is constrained to "max 254", so 255 is a genuine constraint violation and
+// is not subject to clipping.
+TEST_F(TestLevelControlBase, TestMoveToLevelRejectsBeyondFieldConstraint)
+{
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 255; // > 254
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_EQ(tester.Invoke(Commands::MoveToLevel::Id, data).status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestLevelControlBase, TestMoveRateZero)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -205,7 +247,7 @@ TEST_F(TestLevelControlBase, TestMoveRateZero)
 
 TEST_F(TestLevelControlBase, TestStepSizeZero)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -221,7 +263,7 @@ TEST_F(TestLevelControlBase, TestStepSizeZero)
 
 TEST_F(TestLevelControlBase, TestNormalConfigWorks)
 {
-    LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
+    LevelControlCluster::Config config(mockTimer, mockDelegate);
     config.WithMinLevel(10).WithMaxLevel(200);
 
     EXPECT_EQ(config.mMinLevel, 10u);
@@ -231,7 +273,7 @@ TEST_F(TestLevelControlBase, TestNormalConfigWorks)
 TEST_F(TestLevelControlBase, TestImmediateExecution)
 {
     // Use 0 transition time to ensure immediate execution in Full Cluster
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -260,7 +302,7 @@ TEST_F(TestLevelControlBase, TestImmediateExecution)
 
 TEST_F(TestLevelControlBase, TestGetters)
 {
-    LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
+    LevelControlCluster::Config config(mockTimer, mockDelegate);
     config.WithMinLevel(10)
         .WithMaxLevel(200)
         .WithDefaultMoveRate(50)
@@ -268,7 +310,7 @@ TEST_F(TestLevelControlBase, TestGetters)
         .WithOffTransitionTime(200)
         .WithOnOffTransitionTime(300);
 
-    LevelControlCluster cluster(config);
+    LevelControlCluster cluster(kTestEndpointId, config);
 
     EXPECT_EQ(cluster.GetMinLevel(), 10u);
     EXPECT_EQ(cluster.GetMaxLevel(), 200u);
@@ -284,10 +326,10 @@ TEST_F(TestLevelControlBase, TestFeatureMap)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
+    LevelControlCluster::Config config(mockTimer, mockDelegate);
     config.WithOnOff(onOffCluster).WithLighting(DataModel::NullNullable);
 
-    LevelControlCluster cluster(config);
+    LevelControlCluster cluster(kTestEndpointId, config);
 
     EXPECT_TRUE(cluster.GetFeatureMap().Has(LevelControl::Feature::kOnOff));
     EXPECT_TRUE(cluster.GetFeatureMap().Has(LevelControl::Feature::kLighting));
@@ -295,8 +337,8 @@ TEST_F(TestLevelControlBase, TestFeatureMap)
 
 TEST_F(TestLevelControlBase, TestStateGetters)
 {
-    LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
-    LevelControlCluster cluster(config);
+    LevelControlCluster::Config config(mockTimer, mockDelegate);
+    LevelControlCluster cluster(kTestEndpointId, config);
 
     EXPECT_TRUE(cluster
                     .MoveToLevel(100, DataModel::MakeNullable<uint16_t>(0u),
@@ -316,7 +358,7 @@ TEST_F(TestLevelControlBase, TestStateGetters)
 
 TEST_F(TestLevelControlBase, TestMoveToLevelCommand)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -345,7 +387,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevelCommand)
 
 TEST_F(TestLevelControlBase, TestMoveToLevel_NullCurrentLevel)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -370,7 +412,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevel_NullCurrentLevel)
 
 TEST_F(TestLevelControlBase, TestTimerFired)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -410,7 +452,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
 
 TEST_F(TestLevelControlBase, TestStopCommand)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -441,7 +483,7 @@ TEST_F(TestLevelControlBase, TestStopCommand)
 TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
 {
     // Test that if we are transitioning, a new command overrides it.
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOffTransitionTime(0) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffTransitionTime(0) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -485,9 +527,8 @@ TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
 
 TEST_F(TestLevelControlBase, TestMoveCommand)
 {
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -527,9 +568,8 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
 
 TEST_F(TestLevelControlBase, TestStepCommand)
 {
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -565,7 +605,7 @@ TEST_F(TestLevelControlBase, TestStepCommand)
 
 TEST_F(TestLevelControlBase, TestCurrentLevelReporting)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -637,9 +677,8 @@ TEST_F(TestLevelControlBase, TestStartUpCurrentLevelPersistence)
 
     // 1. Initialize and Write StartUpCurrentLevel
     {
-        LevelControlCluster cluster{
-            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
-        };
+        LevelControlCluster cluster{ kTestEndpointId,
+                                     LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(DataModel::NullNullable) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         chip::Testing::ClusterTester tester(cluster);
@@ -665,9 +704,8 @@ TEST_F(TestLevelControlBase, TestCurrentLevelPersistence)
     // 1. Initialize and Set CurrentLevel
     {
         // Start with an initial level so the attribute is not null (MoveToLevel fails if current is null)
-        LevelControlCluster cluster{
-            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithInitialCurrentLevel(10)
-        };
+        LevelControlCluster cluster{ kTestEndpointId,
+                                     LevelControlCluster::Config(mockTimer, mockDelegate).WithInitialCurrentLevel(10) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         chip::Testing::ClusterTester tester(cluster);

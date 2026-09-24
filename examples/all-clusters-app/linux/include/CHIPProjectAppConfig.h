@@ -67,3 +67,7 @@
 
 // Max Binding entries per fabric for CI tests
 #define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 1
+
+// Endpoint 1 hosts five scene-capable clusters (On/Off, Level Control, Color Control,
+// Mode Select, Audio Control); the default of 4 makes StoreScene fail with RESOURCE_EXHAUSTED.
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 5

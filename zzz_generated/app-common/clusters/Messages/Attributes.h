@@ -68,6 +68,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveMessageIDs
+namespace SupportedLanguageCodes {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLanguageCodes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedLanguageCodes
+namespace SupportedMimeTypes {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedMimeTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedMimeTypes
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -109,6 +133,8 @@ struct TypeInfo
 
         Attributes::Messages::TypeInfo::DecodableType messages;
         Attributes::ActiveMessageIDs::TypeInfo::DecodableType activeMessageIDs;
+        Attributes::SupportedLanguageCodes::TypeInfo::DecodableType supportedLanguageCodes;
+        Attributes::SupportedMimeTypes::TypeInfo::DecodableType supportedMimeTypes;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

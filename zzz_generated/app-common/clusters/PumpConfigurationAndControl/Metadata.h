@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace PumpConfigurationAndControl {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
 

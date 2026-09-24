@@ -36,7 +36,7 @@
 #include <common/CHIPDeviceManager.h>
 #include <lib/dnssd/Advertiser.h>
 
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_LED_TYPE_RMT
 #include <app-common/zap-generated/ids/Clusters.h>
 #endif
 
@@ -104,7 +104,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
     case Clusters::LevelControl::Id:
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_LED_TYPE_RMT
     case Clusters::ColorControl::Id:
         OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
@@ -150,9 +150,8 @@ exit:
     return;
 }
 
-// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has
-// an on-board RGB-LED
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+// ColorControl is supported when using an RMT/addressable LED
+#if CONFIG_LED_TYPE_RMT
 void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     using namespace chip::app::Clusters::ColorControl::Attributes;

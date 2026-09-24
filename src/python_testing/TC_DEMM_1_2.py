@@ -99,11 +99,11 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
                     self.assert_true(False, "No Optimization cannot be combined with other optimization tags")
                 else:
                     # Success - No Optimization is not combined with other tags
-                    log.info(
-                        f'Extra Check - Mode {mode.label}: No Optimization is valid, not combined with any other optimization tags.')
+                    log.info('Extra Check - Mode %s: No Optimization is valid, not combined with any other optimization tags.',
+                             mode.label)
             else:
                 # No Optimization tag is not found in mode
-                log.info(f'Extra Check - {mode.label}: No Optimization tag not found.')
+                log.info('Extra Check - %s: No Optimization tag not found.', mode.label)
 
         # Log the final result for the extra check after processing all modes
         if all_modes_valid:

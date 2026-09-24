@@ -38,7 +38,7 @@ TEST_F(TestLevelControlLighting, TestStartUpCurrentLevel)
     {
         DataModel::Nullable<uint8_t> startup;
         startup.SetNonNull(50);
-        LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(startup) };
+        LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(startup) };
         chip::Testing::ClusterTester tester(cluster);
 
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -52,9 +52,10 @@ TEST_F(TestLevelControlLighting, TestStartUpCurrentLevel)
 TEST_F(TestLevelControlLighting, TestInitialLevelValidation)
 {
     // Test case to confirm bug fix: InitialCurrentLevel(0) should be clamped to MinLevel(1) if Lighting is enabled.
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
-                                     .WithInitialCurrentLevel(0)
-                                     .WithLighting(DataModel::NullNullable) };
+    LevelControlCluster cluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, mockDelegate).WithInitialCurrentLevel(0).WithLighting(DataModel::NullNullable)
+    };
     chip::Testing::ClusterTester tester(cluster);
 
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -70,7 +71,7 @@ TEST_F(TestLevelControlLighting, TestInitialLevelValidation)
 TEST_F(TestLevelControlLighting, TestLightingEnforcesConstraints)
 {
     {
-        LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
+        LevelControlCluster::Config config(mockTimer, mockDelegate);
         config.WithLighting(DataModel::NullNullable);
 
         EXPECT_EQ(config.mMinLevel, 1u);
@@ -81,9 +82,8 @@ TEST_F(TestLevelControlLighting, TestLightingEnforcesConstraints)
 
 TEST_F(TestLevelControlLighting, TestLightingAttributesPresence)
 {
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(DataModel::NullNullable) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -96,9 +96,8 @@ TEST_F(TestLevelControlLighting, TestLightingAttributesPresence)
 
 TEST_F(TestLevelControlLighting, TestRemainingTimeDefault)
 {
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(DataModel::NullNullable) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -109,9 +108,10 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeDefault)
 
 TEST_F(TestLevelControlLighting, TestRemainingTime)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
-                                     .WithLighting(DataModel::NullNullable)
-                                     .WithMaxLevel(254) };
+    LevelControlCluster cluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(DataModel::NullNullable).WithMaxLevel(254)
+    };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -164,9 +164,8 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
 TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
 {
     chip::Testing::TestServerClusterContext context;
-    LevelControlCluster cluster{
-        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
-    };
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithLighting(DataModel::NullNullable) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Testing::ClusterTester tester(cluster);
@@ -276,7 +275,7 @@ TEST_F(TestLevelControlLighting, TestReportingAtTransitionEnd)
     // Regression test for issue where the final level report was suppressed
     // if the transition finished within the quieter reporting interval.
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
     chip::Testing::TestServerClusterContext context;
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 

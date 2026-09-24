@@ -15,6 +15,7 @@ import shutil
 import stat
 import subprocess
 import sys
+from platform import machine
 from zipfile import ZipFile
 
 logger = logging.getLogger(__name__)
@@ -35,15 +36,17 @@ def setup_logging(verbose=False):
 def get_platform_vars():
     """Set platform-specific variables and URLs for SLT CLI download. Linux and macOS only."""
     platform = sys.platform
+    host_arch = "x64"
     if platform == "darwin":
         platform_name = "mac"
+        host_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.1.1-{platform_name}-x64.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{host_arch}.zip"
     return platform_name, slt_cli_url
 
 
@@ -75,7 +78,7 @@ def parse_version_from_slt(file_path):
     # This regex finds the [dependency] section and captures the first version string in it.
     pattern = re.compile(r"\[dependency\][^\[]*version\s*=\s*\"([^\"]+)\"")
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             content = f.read()
     except OSError:
         return None
@@ -115,7 +118,7 @@ def read_install_done_versions():
         return None
     versions = {}
     try:
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 line = line.strip()
                 if "=" in line:
@@ -312,7 +315,7 @@ def is_git_submodule_checkout(dir_path):
     if not os.path.isfile(git_file):
         return False
     try:
-        with open(git_file, "r") as f:
+        with open(git_file) as f:
             return f.read().strip().startswith("gitdir:")
     except OSError:
         return False
@@ -421,7 +424,7 @@ def parse_key_from_file(file_path, key):
         return None
     prefix = key + ": "
     try:
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             for line in f:
                 line = line.strip()
                 if line.startswith(prefix):
@@ -444,9 +447,9 @@ def get_installed_sdk_versions(repo_root):
 
     missing = []
     if simplicity_sdk_version is None:
-        missing.append("sdk_version from %s" % simplicity_slcs)
+        missing.append(f"sdk_version from {simplicity_slcs}")
     if wiseconnect_version is None:
-        missing.append("version from %s" % wiseconnect_slce)
+        missing.append(f"version from {wiseconnect_slce}")
     if missing:
         logger.error("Could not read required version fields: %s", "; ".join(missing))
         sys.exit(1)
@@ -484,8 +487,8 @@ def setup_slt_environment(verbose=False):
     check_silabs_not_submodules(repo_root)
 
     # Using exact version to avoid ambiguity when multiple versions are installed.
-    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.2")
-    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect/4.0.1")
+    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2026.6.0")
+    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect/4.1.0")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
     versions = get_installed_sdk_versions(repo_root)

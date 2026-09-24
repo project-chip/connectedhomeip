@@ -22,6 +22,7 @@
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/OtaSoftwareUpdateRequestor.h>
 #include <app/util/attribute-table.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
@@ -58,6 +59,14 @@ public:
         if (mDestination)
         {
             mDestination->HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
+        }
+    }
+
+    void OnFabricRemoved(FabricIndex fabricIndex) override
+    {
+        if (mDestination)
+        {
+            mDestination->OnFabricRemoved(fabricIndex);
         }
     }
 
@@ -103,7 +112,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(endpointId, gCommandForwarder, gAttributes);
+        gServer.Create(endpointId, gCommandForwarder, gAttributes, Server::GetInstance().GetFabricTable());
         gEventForwarder.SetDestination(&gServer.Cluster());
         return gServer.Registration();
     }

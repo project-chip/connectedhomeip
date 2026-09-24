@@ -102,11 +102,13 @@ public:
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
+    const SessionParameters & GetLocalSessionParameters() const { return mLocalSessionParams; }
+    void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
+
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
-                                              TLV::TLVWriter & tlvWriter);
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const SessionParameters & sessionParams, TLV::TLVWriter & tlvWriter);
 
 protected:
     /**
@@ -228,7 +230,12 @@ protected:
     SessionHolderWithDelegate mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
-    SessionManager * mSessionManager                  = nullptr;
+    SessionManager * mSessionManager = nullptr;
+    // mSystemLayer is captured from the session manager at allocation time and
+    // is intentionally NOT cleared by Clear().  It outlives the session itself
+    // (it is a process-scoped singleton) and is needed by OnSessionReleased()
+    // after Clear() has already nulled mSessionManager.
+    System::Layer * mSystemLayer                      = nullptr;
     Optional<Messaging::ExchangeHandle> mExchangeCtxt = NullOptional;
     SessionEstablishmentDelegate * mDelegate          = nullptr;
 
@@ -236,6 +243,7 @@ protected:
     // mRemoteSessionParams is received from other end and set to our session.
     // It is set the first time that session establishment is initiated.
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    SessionParameters mLocalSessionParams;
     SessionParameters mRemoteSessionParams;
 
 private:

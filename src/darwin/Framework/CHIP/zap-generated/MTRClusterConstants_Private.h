@@ -22,23 +22,23 @@
 #pragma mark - Private Cluster IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
-    MTRPrivateClusterIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateClusterIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 };
 
 #pragma mark - Private Attribute IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
-    MTRPrivateAttributeIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateAttributeIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 };
 
 #pragma mark - Private Command IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
-    MTRPrivateCommandIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateCommandIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 };
 
 #pragma mark - Private Event IDs
 
 typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
-    MTRPrivateEventIDTypeReserved MTR_NEWLY_AVAILABLE = 0xFFFFFFFF,
+    MTRPrivateEventIDTypeReserved MTR_PROVISIONALLY_AVAILABLE = 0xFFFFFFFF,
 };

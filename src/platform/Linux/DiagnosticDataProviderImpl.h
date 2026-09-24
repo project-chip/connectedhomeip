@@ -67,6 +67,7 @@ public:
     CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount) override;
     CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount) override;
     CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect) override;
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -90,11 +91,12 @@ public:
 #endif
 
 private:
-    uint64_t mEthPacketRxCount  = 0;
-    uint64_t mEthPacketTxCount  = 0;
-    uint64_t mEthTxErrCount     = 0;
-    uint64_t mEthCollisionCount = 0;
-    uint64_t mEthOverrunCount   = 0;
+    uint64_t mEthPacketRxCount          = 0;
+    uint64_t mEthPacketTxCount          = 0;
+    uint64_t mEthTxErrCount             = 0;
+    uint64_t mEthCollisionCount         = 0;
+    uint64_t mEthOverrunCount           = 0;
+    uint64_t mEthTimeSinceResetBaseline = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     uint32_t mBeaconLostCount        = 0;

@@ -262,6 +262,15 @@ else()
     chip_gn_arg_append("chip_enable_thread"                     "false")
 endif()
 
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "true")
+    chip_gn_arg_append("chip_openthread_target"                  "\"//:openthread\"")
+    chip_gn_arg_append("chip_with_lwip"                         "false")
+else()
+    chip_gn_arg_append("chip_system_config_use_openthread_inet_endpoints" "false")
+    chip_gn_arg_append("chip_with_lwip"                         "true")
+endif()
+
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
 else()
@@ -340,6 +349,10 @@ if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
+if (CONFIG_SECURE_ENABLE_TEE)
+    chip_gn_arg_append("chip_enable_esp32_tee" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
@@ -354,6 +367,10 @@ endif()
 
 if (CONFIG_CHIP_ENABLE_GROUPCAST)
 chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
+endif()
+
+if (CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+chip_gn_arg_bool("chip_device_config_enable_thread_meshcop" CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -372,6 +389,11 @@ set(filter_out "-DHAVE_CONFIG_H" "-DIDF_VER=\\\"${idf_ver}\\\"" )
 list(APPEND filter_out "-Iconfig")
 idf_build_get_property(config_dir CONFIG_DIR)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-I${config_dir}")
+
+if (CONFIG_CHIP_USE_OT_ENDPOINT)
+    idf_component_get_property(openthread_dir openthread COMPONENT_DIR)
+    target_compile_options(${COMPONENT_LIB} PRIVATE "-I${openthread_dir}/private_include")
+endif()
 
 if(filter_out)
     set(filter_arg "--filter-out=${filter_out}")
@@ -450,6 +472,32 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
     "${freertos_dir}/include/freertos"
     "${freertos_dir}/FreeRTOS-Kernel/include/freertos")
 
+# ESP32TEEOpKey.cpp / ESP32TEEOperationalKeystore.cpp (and, on the PBKDF2 DAC path,
+# ESP32SecureCertDACProvider.cpp) include esp_tee_sec_storage.h, owned by the tee_sec_storage
+# component (an esp_tee subproject component that is not in this component's REQUIRES). The
+# operational keystore is compiled whenever CONFIG_SECURE_ENABLE_TEE is set, so add the include
+# dir to the gn compile path under that condition. A config-gated PRIV_REQUIRES is unreliable
+# here: CONFIG_* is unset during IDF's early-expansion pass when REQUIRES is resolved, so inject
+# the dir directly instead.
+if (CONFIG_SECURE_ENABLE_TEE)
+    # tee_sec_storage lives under esp_tee/subproject and is NOT auto-discovered just because
+    # CONFIG_SECURE_ENABLE_TEE is set; the app must add it to the build (the bundled lighting-app
+    # does this from EXTRA_COMPONENT_DIRS when its sdkconfig defaults enable TEE). Check the build's
+    # component list first and fail with an actionable message if it is absent: calling
+    # idf_component_get_property on an undiscovered component aborts with a bare
+    # "Failed to resolve component 'tee_sec_storage'" that hides the real cause.
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    if (NOT "tee_sec_storage" IN_LIST build_components)
+        message(FATAL_ERROR
+                "CONFIG_SECURE_ENABLE_TEE is set but the 'tee_sec_storage' component was not found. "
+                "Add it to the application's EXTRA_COMPONENT_DIRS, e.g. "
+                "\"$ENV{IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage\" "
+                "(see examples/lighting-app/esp32/CMakeLists.txt).")
+    endif()
+    idf_component_get_property(tee_sec_storage_dir tee_sec_storage COMPONENT_DIR)
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${tee_sec_storage_dir}/include")
+endif()
+
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
     "${CHIP_ROOT}/src/platform/OpenThread"
@@ -475,20 +523,27 @@ elseif("mdns" IN_LIST build_components)
     list(APPEND matter_requires mdns)
 endif()
 
-if (CONFIG_OPENTHREAD_BORDER_ROUTER)
-    list(APPEND matter_requires espressif__esp_rcp_update)
-endif()
-
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
+if (CONFIG_SECURE_ENABLE_TEE)
+    # Links esp_tee_sec_storage_* used by the operational keystore and the PBKDF2 TEE-DAC path.
+    list(APPEND matter_requires tee_sec_storage)
 endif()
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
-add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
-                     REQUIRES ${matter_requires})
+if (CONFIG_ENABLE_DELTA_OTA)
+    list(APPEND matter_requires espressif__esp_delta_ota)
+endif()
+
+if(NOT TARGET matterlib)
+    add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
+                         REQUIRES ${matter_requires})
+endif()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}

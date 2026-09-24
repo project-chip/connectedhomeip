@@ -53,5 +53,8 @@ CONFIG_ESP_TASK_WDT=n
 # Enable HKDF in mbedtls
 CONFIG_MBEDTLS_HKDF_C=y
 
+# Enable TCP endpoint tests in the QEMU image.
+CONFIG_ENABLE_TCP_TRANSPORT=y
+
 # Build chip tests
 CONFIG_BUILD_CHIP_TESTS=y

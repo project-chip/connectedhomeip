@@ -88,7 +88,7 @@ def _get_start_options(request):
     return options
 
 
-class AccessoryServerBridge():
+class AccessoryServerBridge:
     def start(request):
         register_key = _get_option(request, 'registerKey', _DEFAULT_KEY)
         options = _get_start_options(request)

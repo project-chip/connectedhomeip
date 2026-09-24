@@ -163,14 +163,6 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
     }
     ReturnErrorOnFailure(closureControlEndpoint.GetClusterInstance().SetMainState(MainStateEnum::kStopped));
 
-    if (featureMap.Has(ClosureControl::Feature::kMotionLatching))
-    {
-        BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
-        latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
-            .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
-        ReturnErrorOnFailure(closureControlEndpoint.GetClusterInstance().SetLatchControlModes(latchControlModes));
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -394,7 +386,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         overallTargetState.SetNonNull(GenericOverallTargetState{});
     }
 
-    ClosureDimensionEndpoint mClosurePanelEndpoint =
+    ClosureDimensionEndpoint & mClosurePanelEndpoint =
         endpointId == kClosurePanelEndpoint2 ? mClosurePanelEndpoint2 : mClosurePanelEndpoint3;
     ClosureDimension::ClusterConformance mClosurePanelConformance = mClosurePanelEndpoint.GetClusterInstance().GetConformance();
 

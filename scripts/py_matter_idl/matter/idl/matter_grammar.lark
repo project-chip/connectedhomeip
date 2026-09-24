@@ -26,12 +26,13 @@ bitmap: [shared] "bitmap"i id ":" type "{" constant_entry* "}"
 
 event_access: "access" "(" ("read" ":" access_privilege)? ")"
 
+event_optional: "optional"i
 event_with_access: "event" event_access? id
 
-event: event_qualities event_priority event_with_access "=" positive_integer "{" (struct_field ";")* "}"
+event: event_qualities event_priority [event_optional] event_with_access "=" positive_integer "{" (struct_field ";")* "}"
 
 event_quality: "fabric_sensitive" -> event_fabric_sensitive
-event_qualities: event_quality*
+event_qualities: event_quality* -> event_qualities
 
 ?event_priority: "critical"i -> critical_priority
                | "info"i     -> info_priority
@@ -55,15 +56,16 @@ request_struct: "request"i struct
 // Response structures must have a response id
 response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field ";") * "}"
 
-command_quality: "timed"i -> timed_command
-                 | "fabric"i -> fabric_scoped_command
-command_qualities: command_quality*
-
 command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
 
+command_quality: "fabric"i   -> command_fabric_scoped
+               | "timed"i    -> command_timed
+command_qualities: command_quality* -> command_qualities
+
+command_optional: "optional"i
 command_with_access: "command"i command_access? id
 
-command: command_qualities command_with_access "(" id? ")" ":" id "=" positive_integer ";"
+command: command_qualities [command_optional] command_with_access "(" id? ")" ":" id "=" positive_integer ";"
 
 cluster_revision: "revision"i positive_integer ";"
 

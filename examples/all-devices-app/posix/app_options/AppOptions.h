@@ -19,44 +19,78 @@
 #pragma once
 
 #include <Options.h>
+#include <app_options/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
 class AppOptions
 {
 public:
-    /**
-     * @brief Configuration for a single device instance.
-     *
-     * This structure holds the device type string (e.g. "on-off-light") and the
-     * endpoint ID where this device should be instantiated.
-     */
-    struct DeviceConfig
+    /// Default listen port for the Pigweed RPC server. Matches the default used by the
+    /// other Linux examples (see LinuxDeviceOptions::rpcServerPort) so that existing
+    /// tooling keeps working when no port is given on the command line.
+    static constexpr uint16_t kDefaultRpcServerPort = 33000;
+
+    struct AppConfig
     {
-        std::string type;
-        chip::EndpointId endpoint;
+        std::vector<DeviceTypeParser::Entry> deviceTypeEntries;
+        std::optional<uint16_t> port;
+        bool enableGroupcast = false;
+        std::string appPipePath;
+        std::vector<std::string> traceTo;
+
+        std::optional<uint16_t> discriminator;
+        std::optional<uint32_t> passcode;
+        std::optional<uint16_t> vendorId;
+        std::optional<uint16_t> productId;
+        std::optional<uint32_t> interfaceId;
+        std::string kvsPath;
+        std::optional<std::string> dacProvider;
+        uint8_t testEventTriggerEnableKey[16] = { 0 };
+        bool enableWiFi                       = false;
+        uint32_t bleController                = 0;
+        /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
+        /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
+        /// support (chip_enable_pw_rpc), so that the option stays unit-testable and the struct
+        /// layout does not vary per build flavor. Callers should fall back to
+        /// kDefaultRpcServerPort.
+        std::optional<uint16_t> rpcServerPort;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        std::string wifipafExtCmds;
+        // Frequencies in MHz parsed out of "--wifipaf freq_list=", in the order given.
+        std::vector<uint16_t> wifipafFreqList;
+#endif
     };
 
     static chip::ArgParser::OptionSet * GetOptions();
 
-    static const std::vector<DeviceConfig> & GetDeviceConfigs();
+    static const AppConfig & GetConfig();
 
-    static const char * GetDeviceType() { return GetDeviceConfigs().front().type.c_str(); }
+    /// Parse a TCP/UDP port number given on the command line. Accepts decimal, octal and
+    /// hexadecimal notation (strtoul with base 0). Returns false, leaving `port` untouched,
+    /// when the value is empty, is not entirely numeric, or does not fit in a uint16_t.
+    static bool ParsePortNumber(const char * value, uint16_t & port);
 
-    static chip::EndpointId GetDeviceEndpoint() { return GetDeviceConfigs().front().endpoint; }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    /// Parse the frequencies out of a "--wifipaf" argument of the form
+    /// "freq_list=<freq_1>,<freq_2>...".  Returns an empty list when the key is absent
+    /// or carries nothing parsable, and skips entries outside a uint16_t.
+    static std::vector<uint16_t> ParseWiFiPafFreqList(const std::string & extCmds);
+#endif
 
-    static bool EnableWiFi() { return mEnableWiFi; }
+    static const AppConfig * TryGetConfig() { return sIsConfigValidated ? &mConfig : nullptr; }
+    static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
+    static CHIP_ERROR ValidateConfig();
 
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
-    static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
-    static bool ParseDeviceConfig(const char * value, DeviceConfig & config);
-
-    static std::vector<DeviceConfig> mDeviceConfigs;
-    static bool mEnableWiFi;
+    static DeviceTypeParser sParser;
+    static AppConfig mConfig;
+    static bool sIsConfigValidated;
 };

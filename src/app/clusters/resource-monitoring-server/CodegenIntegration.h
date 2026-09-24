@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/resource-monitoring-server/ResourceMonitoringCluster.h>
+#include <app/clusters/resource-monitoring-server/CodegenResourceMonitoringCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
@@ -78,7 +78,7 @@ struct Instance
     bool GetInPlaceIndicator() const { return mCluster.Cluster().GetInPlaceIndicator(); }
     DataModel::Nullable<uint32_t> GetLastChangedTime() const { return mCluster.Cluster().GetLastChangedTime(); }
 
-    chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::ResourceMonitoringCluster> mCluster;
+    chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::CodegenResourceMonitoringCluster> mCluster;
 };
 
 } // namespace ResourceMonitoring

@@ -31,10 +31,7 @@
  *  3. Enable spake HSM class in src\protocols\secure_channel\PASESession.h (change Crypto::Spake2p_P256_SHA256_HKDF_HMAC
  * mSpake2p; to Crypto::Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;). Also include the header
  * <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h> in PASESession.h.
- *  4. Modify build files -
- *    4a - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/app/server/BUILD.gn,
- *    4b - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/controller/BUILD.gn,
- *    4c - Define ENABLE_SE05X_SPAKE_VERIFIER in  src/protocols/secure_channel/BUILD.gn.
+ *  4. Set ENABLE_SE05X_SPAKE_VERIFIER to 1 in src\platform\nxp\crypto\se05x\CHIPCryptoPALHsm_se05x_config.h.
  */
 
 #ifndef ENABLE_SE05X_SPAKE_VERIFIER

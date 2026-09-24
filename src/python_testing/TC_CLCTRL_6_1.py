@@ -172,7 +172,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
         # Read the FeatureMap attribute
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         is_ps_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_mo_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
         is_is_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
@@ -188,7 +188,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         self.step("2c")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         # STEP 2d: TH establishes a wildcard subscription to all attributes and events on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2d")
@@ -214,7 +214,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("3b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -226,7 +226,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
-                log.info(f"LatchControlModes: {LatchControlModes}")
+                log.info("LatchControlModes: %s", LatchControlModes)
                 if LatchControlModes is NullValue:
                     asserts.assert_fail("LatchControlModes is NullValue.")
             else:
@@ -302,7 +302,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("3k")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -358,7 +358,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         # Wait for the OperationalError event to be emitted
         data = event_sub_handler.wait_for_event_type_report(
             Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
-        log.info(f"-> OperationalError event last received: {data.errorState}")
+        log.info("-> OperationalError event last received: %s", data.errorState)
 
         asserts.assert_not_equal(data.errorState, [], "The CurrentErrorList attribute is empty.")
 
@@ -441,7 +441,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
             if attributes.MainState.attribute_id in attribute_list:
                 main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-                log.info(f"MainState: {main_state}")
+                log.info("MainState: %s", main_state)
                 asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
                                      "MainState is not in the expected state")
             else:
@@ -513,7 +513,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 

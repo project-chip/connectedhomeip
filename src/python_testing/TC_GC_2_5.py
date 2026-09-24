@@ -20,8 +20,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -160,13 +160,13 @@ class TC_GC_2_5(MatterBaseTest):
                             f"Could not find valid AuxiliaryACL entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoints_list[0]}")
 
         self.step(4)
+        membership_sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
             groupID=groupID1,
             useAuxiliaryACL=False)
         )
 
         self.step("5a")
-        membership_sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=False)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 

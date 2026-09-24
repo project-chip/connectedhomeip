@@ -242,6 +242,8 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 
 using HKDF_sha_crypto = HKDF_sha;
 
+#if !CHIP_CRYPTO_SPAKE2P_PSA
+
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
 {
     const uint64_t u64_len = in_len;
@@ -550,6 +552,36 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
+{
+    SensitiveDataFixedBuffer<kSpake2p_WS_Length * 2> serializedWS;
+    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS.Bytes(), serializedWS.Capacity()));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t len;
+
+    // Create local Spake2+ object for w0 and L computations.
+    Spake2p_P256_SHA256_HKDF_HMAC spake2p;
+    uint8_t context[kSHA256_Hash_Length] = { 0 };
+    SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
+
+    // Compute w0
+    len = sizeof(mW0);
+    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, serializedWS.Bytes(), kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
+
+    // Compute L
+    len = sizeof(mL);
+    SuccessOrExit(err = spake2p.ComputeL(mL, &len, serializedWS.Bytes() + kSpake2p_WS_Length, kSpake2p_WS_Length));
+    VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
+
+exit:
+    spake2p.Clear();
+    return err;
+}
+
+#endif // !CHIP_CRYPTO_SPAKE2P_PSA
+
 CHIP_ERROR Spake2pVerifier::Serialize(MutableByteSpan & outSerialized) const
 {
     VerifyOrReturnError(outSerialized.size() >= kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
@@ -572,47 +604,19 @@ CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
-{
-    uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
-    ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t len;
-
-    // Create local Spake2+ object for w0 and L computations.
-    Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-    uint8_t context[kSHA256_Hash_Length] = { 0 };
-    SuccessOrExit(err = spake2p.Init(context, sizeof(context)));
-
-    // Compute w0
-    len = sizeof(mW0);
-    SuccessOrExit(err = spake2p.ComputeW0(mW0, &len, &serializedWS[0], kSpake2p_WS_Length));
-    VerifyOrExit(len == sizeof(mW0), err = CHIP_ERROR_INTERNAL);
-
-    // Compute L
-    len = sizeof(mL);
-    SuccessOrExit(err = spake2p.ComputeL(mL, &len, &serializedWS[kSpake2p_WS_Length], kSpake2p_WS_Length));
-    VerifyOrExit(len == sizeof(mL), err = CHIP_ERROR_INTERNAL);
-
-exit:
-    spake2p.Clear();
-    return err;
-}
-
 CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws,
                                       uint32_t ws_len)
 {
     PBKDF2_sha256 pbkdf2;
-    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
-    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setupPin);
+    SensitiveDataFixedBuffer<sizeof(uint32_t)> littleEndianSetupPINCode;
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode.Bytes(), setupPin);
 
     VerifyOrReturnError(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length && salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
                         CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(pbkdf2IterCount >= kSpake2p_Min_PBKDF_Iterations && pbkdf2IterCount <= kSpake2p_Max_PBKDF_Iterations,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+    return pbkdf2.pbkdf2_sha256(littleEndianSetupPINCode.Bytes(), littleEndianSetupPINCode.Capacity(), salt.data(), salt.size(),
                                 pbkdf2IterCount, ws_len, ws);
 }
 

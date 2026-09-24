@@ -52,9 +52,7 @@ if (optimize_apk_size) {
   #   is_debug = false
   #   matter_enable_tracing_support = false
   #   use_static_libcxx = true
-  #   chip_tlv_decoder_attribute_source_override  (tv-casting-app only)
-  #   chip_tlv_decoder_event_source_override     (tv-casting-app only)
-  #   chip_cluster_objects_source_override        (tv-casting-app only)
+  #   chip_data_model_overrides_dir     (tv-casting-app only)
   #
   # The assignments below are kept for documentation and for any
   # build path that evaluates args.gni AFTER args.gn (e.g. a manual
@@ -62,18 +60,18 @@ if (optimize_apk_size) {
   chip_build_libshell = false
   optimize_for_size = true  # -Os (size) instead of -O2 (speed)
   symbol_level = 0  # -g0: no debug symbols
+  enable_rtti =
+      false  # Disable C++ RTTI to remove type_info and vtable overhead
 
-  # Slim TLV decoders covering only the 18 casting clusters.  These
-  # replace the full zap-generated decoders (~200+ clusters) at build
-  # time, keeping ChipClusters.java read/subscribe APIs functional
+  # Point the build at the override directory containing slim source
+  # files (cluster-objects, TLV decoders, accessors, cluster servers)
+  # covering only the ~36 casting-relevant clusters.  The build system
+  # resolves well-known filenames inside this directory automatically,
+  # replacing the full zap-generated sources (~200+ clusters) with slim
+  # versions that keep ChipClusters.java read/subscribe APIs functional
   # while reducing binary size.
-  chip_tlv_decoder_attribute_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-CHIPAttributeTLVValueDecoder.cpp"
-  chip_tlv_decoder_event_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-CHIPEventTLVValueDecoder.cpp"
-
-  # Compile only the ~36 casting-relevant clusters instead of the full
-  # generated cluster-objects.cpp (~200+ clusters).  This is the same
-  # slim file already used by Linux and Darwin builds.
-  chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+  chip_data_model_overrides_dir =
+      "${chip_root}/examples/tv-casting-app/tv-casting-common"
 } else {
   # Default development build: full debug features, fast compilation
   chip_build_libshell = true

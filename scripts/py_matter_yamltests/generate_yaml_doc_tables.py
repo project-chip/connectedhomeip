@@ -47,8 +47,8 @@ def get_type_list_and_vars(typetuple) -> (list[type], bool):
 def print_tree(f: TextIO, indent: str, tree: SchemaTree) -> None:
     for tag, typetuple in tree.schema.items():
         vars_str = ""
-        typelist, vars = get_type_list_and_vars(typetuple)
-        vars_str = "Y" if vars else ""
+        typelist, variables = get_type_list_and_vars(typetuple)
+        vars_str = "Y" if variables else ""
         typestr = ','.join([t.__name__ for t in typelist])
 
         try:

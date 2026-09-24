@@ -61,6 +61,27 @@ class MessagesCluster(private val controller: MatterController, private val endp
     object SubscriptionEstablished : ActiveMessageIDsAttributeSubscriptionState()
   }
 
+  class SupportedLanguageCodesAttribute(val value: List<String>?)
+
+  sealed class SupportedLanguageCodesAttributeSubscriptionState {
+    data class Success(val value: List<String>?) :
+      SupportedLanguageCodesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SupportedLanguageCodesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedLanguageCodesAttributeSubscriptionState()
+  }
+
+  class SupportedMimeTypesAttribute(val value: List<String>?)
+
+  sealed class SupportedMimeTypesAttributeSubscriptionState {
+    data class Success(val value: List<String>?) : SupportedMimeTypesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SupportedMimeTypesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedMimeTypesAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -99,6 +120,8 @@ class MessagesCluster(private val controller: MatterController, private val endp
     duration: ULong?,
     messageText: String,
     responses: List<MessagesClusterMessageResponseOptionStruct>?,
+    languageCode: String?,
+    messageURI: String?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
@@ -132,6 +155,12 @@ class MessagesCluster(private val controller: MatterController, private val endp
       }
       tlvWriter.endArray()
     }
+
+    val TAG_LANGUAGE_CODE_REQ: Int = 7
+    languageCode?.let { tlvWriter.put(ContextSpecificTag(TAG_LANGUAGE_CODE_REQ), languageCode) }
+
+    val TAG_MESSAGE_URI_REQ: Int = 8
+    messageURI?.let { tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_URI_REQ), messageURI) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -360,6 +389,216 @@ class MessagesCluster(private val controller: MatterController, private val endp
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ActiveMessageIDsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSupportedLanguageCodesAttribute(): SupportedLanguageCodesAttribute {
+    val ATTRIBUTE_ID: UInt = 2u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Supportedlanguagecodes attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<String>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<String> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return SupportedLanguageCodesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSupportedLanguageCodesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SupportedLanguageCodesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 2u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SupportedLanguageCodesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Supportedlanguagecodes attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<String>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<String> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getString(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(SupportedLanguageCodesAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SupportedLanguageCodesAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSupportedMimeTypesAttribute(): SupportedMimeTypesAttribute {
+    val ATTRIBUTE_ID: UInt = 3u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Supportedmimetypes attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<String>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<String> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return SupportedMimeTypesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSupportedMimeTypesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SupportedMimeTypesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 3u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SupportedMimeTypesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Supportedmimetypes attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<String>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<String> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getString(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(SupportedMimeTypesAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SupportedMimeTypesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

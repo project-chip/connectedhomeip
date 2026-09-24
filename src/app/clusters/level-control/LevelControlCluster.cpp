@@ -66,8 +66,8 @@ constexpr CommandId kInternalOffTransition = 0xFFFFFFFF; // Sentinel value to id
 
 } // namespace
 
-LevelControlCluster::LevelControlCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
+LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & config) :
+    DefaultServerCluster({ endpoint, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
     mOnLevel(DataModel::Nullable<uint8_t>()),
     mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
@@ -189,6 +189,10 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
+        if (!onLevel.IsNull())
+        {
+            VerifyOrReturnError(IsValidLevel(onLevel.Value()), Status::ConstraintError);
+        }
         SetOnLevel(onLevel);
         return Status::Success;
     }
@@ -322,7 +326,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {
@@ -520,9 +529,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
-    // The command is one of the ‘without On/Off’ commands: ... Stop."
-    VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    // Spec 1.6.6.9: "Command execution SHALL NOT continue beyond the Options processing if ...
+    // The command is one of the 'without On/Off' commands: Move, Move to Level, Step, or Stop."
+    // StopWithOnOff is not on that list, so only the plain Stop is gated.
+    VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.
@@ -573,10 +583,9 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode rep
                                                 chip::System::Clock::Milliseconds64(1000)));
     }
 
-    if (dirtyState == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::CurrentLevel::Id);
-    }
+    NotifyAttributeChanged(Attributes::CurrentLevel::Id,
+                           (dirtyState == AttributeDirtyState::kMustReport) ? DataModel::AttributeChangeType::kReportable
+                                                                            : DataModel::AttributeChangeType::kQuiet);
     StoreCurrentLevel(mCurrentLevel.value());
     mDelegate.OnLevelChanged(level);
 
@@ -587,12 +596,9 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
 {
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), value));
 }
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
@@ -600,11 +606,9 @@ CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8
     VerifyOrReturnError(SetAttributeValue(mStartUpCurrentLevel, startupLevel, Attributes::StartUpCurrentLevel::Id), CHIP_NO_ERROR);
     VerifyOrReturnError(mContext != nullptr, CHIP_NO_ERROR);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(startupLevel, storageValue);
-    return mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), startupLevel);
 }
 
 void LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)
@@ -665,6 +669,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
 
     // Convert ms to ds (rounding up)
     uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+    VerifyOrReturn(mRemainingTime.value() != DataModel::MakeNullable(remainingTimeDs));
 
     auto now = System::SystemClock().GetMonotonicMilliseconds64();
 
@@ -672,25 +677,26 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
     // - When it changes from 0 to any value higher than 10, or
     // - When it changes, with a delta larger than 10, caused by the invoke of a command, or
     // - When it changes to 0."
-    if (mRemainingTime.SetValue(DataModel::MakeNullable(remainingTimeDs), now, [this, mode](const auto & candidate) {
-            // "As this attribute is not being reported during a regular countdown..."
-            if (mode == ReportingMode::kQuietReport)
-            {
-                return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
-            }
+    auto dirtyState = mRemainingTime.SetValue(DataModel::MakeNullable(remainingTimeDs), now, [this, mode](const auto & candidate) {
+        // "As this attribute is not being reported during a regular countdown..."
+        if (mode == ReportingMode::kQuietReport)
+        {
+            return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
+        }
 
-            // Transitions shorter than 1 second (10ds) will never satisfy the "higher than 10" requirement for the initial report,
-            // so we filter them out early to avoid unnecessary processing.
-            VerifyOrReturnValue(mTransitionHandler.GetTransitionTimeMs() >= 1000, false);
+        // Transitions shorter than 1 second (10ds) will never satisfy the "higher than 10" requirement for the initial report,
+        // so we filter them out early to avoid unnecessary processing.
+        VerifyOrReturnValue(mTransitionHandler.GetTransitionTimeMs() >= 1000, false);
 
-            auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
-            auto newValue  = candidate.newValue.ValueOr(0);
+        auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
+        auto newValue  = candidate.newValue.ValueOr(0);
 
-            return ((newValue == 0 && lastDirty != 0) || (newValue > lastDirty ? newValue - lastDirty : lastDirty - newValue) > 10);
-        }) == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::RemainingTime::Id);
-    }
+        return ((newValue == 0 && lastDirty != 0) || (newValue > lastDirty ? newValue - lastDirty : lastDirty - newValue) > 10);
+    });
+
+    NotifyAttributeChanged(Attributes::RemainingTime::Id,
+                           (dirtyState == AttributeDirtyState::kMustReport) ? DataModel::AttributeChangeType::kReportable
+                                                                            : DataModel::AttributeChangeType::kQuiet);
 }
 
 void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel,

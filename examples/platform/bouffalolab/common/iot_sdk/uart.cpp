@@ -20,6 +20,7 @@
 #include <semphr.h>
 
 #include <mboard.h>
+#include <uart.h>
 
 #ifdef CFG_USB_CDC_ENABLE
 #include <aos/kernel.h>
@@ -29,6 +30,8 @@
 #include <hal_board.h>
 #include <libfdt.h>
 #include <vfs.h>
+extern "C" int usb_cdc_data_send(const uint8_t * data, uint32_t len);
+extern "C" void usb_cdc_start(int fd_console);
 #else
 #include <bl_uart.h>
 #include <hosal_uart.h>
@@ -51,7 +54,59 @@ typedef struct _chipUart
 
 static chipUart_t chipUart_var;
 
-#ifndef CFG_USB_CDC_ENABLE
+#ifdef CFG_USB_CDC_ENABLE
+static void aosUartRxCallback(int fd, void * param)
+{
+    int len = 0, readlen = 0;
+
+    if (chipUart_var.head >= chipUart_var.tail)
+    {
+        if (chipUart_var.head < MAX_BUFFER_SIZE)
+        {
+            readlen = len = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
+            if (len < 0)
+            {
+                return;
+            }
+            chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
+        }
+
+        if (0 == chipUart_var.head)
+        {
+            len = aos_read(fd, chipUart_var.rxbuf, chipUart_var.tail - 1);
+            if (len < 0)
+            {
+                return;
+            }
+            chipUart_var.head += len;
+            readlen += len;
+        }
+    }
+    else
+    {
+        readlen = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
+        if (readlen < 0)
+        {
+            return;
+        }
+        chipUart_var.head += readlen;
+    }
+
+    if (chipUart_var.head != chipUart_var.tail)
+    {
+        if (xPortIsInsideInterrupt())
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        else
+        {
+            xSemaphoreGive(chipUart_var.sema);
+        }
+    }
+}
+#else
 static int uartTxCallback(void * p_arg)
 {
     hosal_uart_ioctl(&uart_stdio, HOSAL_UART_TX_TRIGGER_OFF, NULL);
@@ -91,77 +146,6 @@ static int uartRxCallback(void * p_arg)
 
     return 0;
 }
-#else
-void aosUartRxCallback(int fd, void * param)
-{
-    uint32_t len = 0, readlen = 0;
-    BaseType_t xHigherPriorityTaskWoken = 1;
-
-    if (chipUart_var.head >= chipUart_var.tail)
-    {
-        if (chipUart_var.head < MAX_BUFFER_SIZE)
-        {
-            readlen = len     = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
-            chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
-        }
-
-        if (0 == chipUart_var.head)
-        {
-            len = aos_read(fd, chipUart_var.rxbuf, chipUart_var.tail - 1);
-            chipUart_var.head += len;
-            readlen += len;
-        }
-    }
-    else
-    {
-        readlen = aos_read(fd, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
-        chipUart_var.head += readlen;
-    }
-
-    if (chipUart_var.head != chipUart_var.tail)
-    {
-        xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
-    }
-}
-
-static int uartTxCallback(void * p_arg)
-{
-
-    return 0;
-}
-
-static int uartRxCallback(void * p_arg)
-{
-    uint32_t len                        = 0;
-    BaseType_t xHigherPriorityTaskWoken = 1;
-
-    if (chipUart_var.head >= chipUart_var.tail)
-    {
-        if (chipUart_var.head < MAX_BUFFER_SIZE)
-        {
-            // len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
-            chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
-        }
-
-        if (0 == chipUart_var.head)
-        {
-            // len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf, chipUart_var.tail - 1);
-            chipUart_var.head += len;
-        }
-    }
-    else
-    {
-        chipUart_var.head +=
-        // hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
-    }
-
-    if (chipUart_var.head != chipUart_var.tail)
-    {
-        xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
-    }
-
-    return 0;
-}
 #endif
 
 void uartInit(void)
@@ -178,6 +162,20 @@ void uartInit(void)
     hosal_uart_ioctl(&uart_stdio, HOSAL_UART_MODE_SET, (void *) HOSAL_UART_MODE_INT);
 #endif
 }
+
+#ifdef CFG_USB_CDC_ENABLE
+void uartStartUsbCdc(void)
+{
+    int fdConsole = aos_open("/dev/ttyS0", 0);
+
+    if (fdConsole >= 0)
+    {
+        aos_poll_read_fd(fdConsole, aosUartRxCallback, NULL);
+    }
+
+    usb_cdc_start(fdConsole);
+}
+#endif
 
 int16_t uartRead(char * Buf, uint16_t NbBytesToRead)
 {
@@ -204,23 +202,14 @@ int16_t uartRead(char * Buf, uint16_t NbBytesToRead)
 }
 #endif
 
-#ifndef CFG_USB_CDC_ENABLE
+#ifdef CFG_USB_CDC_ENABLE
 int16_t uartWrite(const char * Buf, uint16_t BufLength)
 {
-    return hosal_uart_send(&uart_stdio, Buf, BufLength);
+    return usb_cdc_data_send(reinterpret_cast<const uint8_t *>(Buf), BufLength);
 }
 #else
 int16_t uartWrite(const char * Buf, uint16_t BufLength)
 {
-    uint16_t sent = 0;
-    do
-    {
-        extern int vfs_fd;
-        if (vfs_fd >= 0)
-        {
-            sent += (uint8_t) aos_write(vfs_fd, Buf + sent, BufLength - sent);
-        }
-    } while (sent < BufLength);
-    return sent;
+    return hosal_uart_send(&uart_stdio, Buf, BufLength);
 }
 #endif
