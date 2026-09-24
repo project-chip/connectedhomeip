@@ -55,6 +55,7 @@ CHIP_ERROR IncreasingTemperatureSensor::Register(EndpointId endpoint, CodeDriven
                                                  EndpointComposition composition)
 {
     ReturnErrorOnFailure(TemperatureSensor::Register(endpoint, provider, composition));
+    ThermostatUserInterfaceConfigurationCluster().SetDelegate(this);
     // Kick off the timer loop to increase temperature every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec);
 }
@@ -85,6 +86,17 @@ void IncreasingTemperatureSensor::TimerFired()
     LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
+}
+
+void IncreasingTemperatureSensor::OnTemperatureDisplayModeChanged(
+    ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: TemperatureDisplayMode changed to %u", static_cast<unsigned>(value));
+}
+
+void IncreasingTemperatureSensor::OnKeypadLockoutChanged(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: KeypadLockout changed to %u", static_cast<unsigned>(value));
 }
 
 } // namespace app

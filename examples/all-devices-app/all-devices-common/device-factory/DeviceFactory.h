@@ -65,6 +65,7 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -600,6 +601,17 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
+        {
+            RegisterCreator("thermostat", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingThermostat>(Thermostat::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {

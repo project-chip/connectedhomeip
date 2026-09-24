@@ -25,6 +25,7 @@ source_set("temperature-sensor") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/temperature-measurement-server",
+    "${chip_root}/src/app/clusters/thermostat-user-interface-configuration-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
