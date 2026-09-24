@@ -75,7 +75,6 @@ extern "C" {
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #include "sl_component_catalog.h"
-#include "sl_mbedtls.h"
 #if SILABS_LOG_OUT_UART || (defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL) ||                                                    \
     defined(CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #ifdef SL_CATALOG_CLI_PRESENT

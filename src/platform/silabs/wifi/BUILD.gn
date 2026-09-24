@@ -117,6 +117,7 @@ source_set("wifi-platform") {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/SlNetConfig.cpp",
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sli_si91x_wifi_command_engine/src/sli_si91x_wifi_command_engine_config.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]

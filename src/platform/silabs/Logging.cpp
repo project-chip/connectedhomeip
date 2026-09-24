@@ -69,10 +69,10 @@
 #endif // SILABS_LOG_ENABLED
 using namespace chip::Logging::Platform;
 
-#if SILABS_LOG_ENABLED
+#if SILABS_LOG_ENABLED && (!SILABS_LOG_OUT_UART || (CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS))
 static bool sLogInitialized = false;
 #endif
-#if LOG_RTT_BUFFER_INDEX != 0
+#if SILABS_LOG_ENABLED && !SILABS_LOG_OUT_UART && LOG_RTT_BUFFER_INDEX != 0
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
 static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 #endif
@@ -240,7 +240,9 @@ extern "C" void silabsInitLog(void)
 #ifdef PW_RPC_ENABLED
     PigweedLogger::init();
 #endif
+#if !SILABS_LOG_OUT_UART || (CHIP_DEVICE_CONFIG_ENABLE_THREAD && SL_MATTER_FORWARD_OT_LOGS)
     sLogInitialized = true;
+#endif
 #endif // SILABS_LOG_ENABLED
 }
 
