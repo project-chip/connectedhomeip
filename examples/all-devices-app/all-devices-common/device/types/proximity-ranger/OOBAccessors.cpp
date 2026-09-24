@@ -38,7 +38,7 @@ std::optional<CHIP_ERROR> ProximityRangerOOBAccessor::HandleAction(CharSpan acti
     return std::nullopt;
 }
 
-// Allows OOB configuration of Rnnging Contraints
+// Allows OOB configuration of Ranging Contraints
 std::optional<CHIP_ERROR> ProximityRangerOOBAccessor::HandleSetRangingConstraints(ByteSpan tlvData) const
 {
     TLV::TLVReader reader;
