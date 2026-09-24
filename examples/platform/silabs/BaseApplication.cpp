@@ -173,6 +173,7 @@ ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEV
 
 int sCodeDrivenIdentifyActiveCount                                 = 0;
 Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+[[maybe_unused]] Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant   = Clusters::Identify::EffectVariantEnum::kDefault;
 
 // Protects the three sCodeDrivenIdentify* variables above.
 osSemaphoreId_t sCodeDrivenIdentifyLock = nullptr;
@@ -853,6 +854,7 @@ void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectId
 {
     osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
     sCodeDrivenIdentifyEffect  = effect;
+    sCodeDrivenIdentifyVariant = variant;
     osSemaphoreRelease(sCodeDrivenIdentifyLock);
 
     if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
