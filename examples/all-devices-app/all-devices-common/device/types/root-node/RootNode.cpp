@@ -25,10 +25,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <clusters/OtaSoftwareUpdateProvider/ClusterId.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -36,15 +32,14 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-CHIP_ERROR RootNode::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
-{
-    static constexpr ClusterId kClientClusters[] = { OtaSoftwareUpdateProvider::Id };
-    return out.ReferenceExisting(Span<const ClusterId>(kClientClusters));
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-
 CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+{
+    ReturnErrorOnFailure(RegisterRootClusters(endpointId, provider, composition));
+    return provider.AddEndpoint(mEndpointRegistration);
+}
+
+CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                          EndpointComposition composition)
 {
     composition.pattern = DataModel::EndpointCompositionPattern::kFullFamily;
     ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
@@ -146,7 +141,7 @@ CHIP_ERROR RootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    return CHIP_NO_ERROR;
 }
 
 void RootNode::Unregister(CodeDrivenDataModelProvider & provider)

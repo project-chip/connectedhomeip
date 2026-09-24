@@ -125,6 +125,7 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -839,6 +840,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -1309,6 +1311,7 @@ registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1380,6 +1383,7 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
