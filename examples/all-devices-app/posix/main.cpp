@@ -574,14 +574,12 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    // Non-concurrent builds are excluded: they must not run Wi-Fi alongside BLE, so
-    // BLEManagerImpl starts management itself once the BLE connection closes.
+    // Non-concurrent builds are excluded: BLEManagerImpl starts management itself
+    // once the BLE connection closes.
     //
     // Synchronous on purpose. The Wi-Fi PAF publish that follows starts management
     // itself if it is not up yet, and a second start while the first is still
-    // completing deadlocks: StartWiFiManagement() holds the wpa_supplicant mutex
-    // across its wait on the GLib thread, whose pending proxy-ready callback needs
-    // that same mutex.
+    // completing deadlocks.
     if (config.enableWiFi)
     {
         LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());

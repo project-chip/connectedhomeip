@@ -19,28 +19,21 @@
 """Bring up the mocked BLE / Wi-Fi topology and the commissioning proxy for a COMPRO test.
 
 The COMPRO tests need three actors, one more than `run_python_test.py` starts.
-Each test names this script as its `app`, so `run_python_test.py` starts it,
-waits for the ready line and then runs the test script as it does for any other
-test. This script manages:
+Each test names this script as its `app`: `run_python_test.py` starts it, waits
+for the ready line, then runs the test script as usual. This script manages:
 
     host namespace   the test script itself (TH), reaching the proxy over IP
     ns-<proxy>-N     the commissioning proxy, on-network from the start
     ns-wlx-app-N     the end device, with no IP address until it associates
 
-BLE and Wi-Fi are from the mock servers in `matter.testing.linux`: `bluezoo`
-for BlueZ and `WpaSupplicantMock` (including its NAN simulator) for
-wpa_supplicant. Both applications use the test D-Bus, which listens on
-/tmp/chip-dbus-N so that a test's CI arguments block can name it. Each
-application resolves its own interface by the name in its namespace.
-
+BLE and Wi-Fi come from the mock servers in `matter.testing.linux` (`bluezoo`,
+`WpaSupplicantMock` with its NAN simulator) over a test D-Bus at /tmp/chip-dbus-N.
 The test script starts the end device itself, so its CI arguments block carries
 the end device's launch wrapper (namespace and bus address) and arguments.
 
-Must run as root, so that the namespaces and the mock D-Bus bus can be created.
-Re-executing under `unshare --map-root-user` as an ordinary user is not enough:
-`ip netns add` sets the network namespace back to the one it started in, which
-the mapped root does not own, and fails with EPERM. Use sudo, or a privileged
-container as CI does.
+Must run as root to create the namespaces and the bus. `unshare --map-root-user`
+is not enough: `ip netns add` fails with EPERM under it. Use sudo, or a
+privileged container as CI does.
 
 Example, running one test the way CI does:
 
@@ -79,9 +72,8 @@ DEFAULT_PROXY_PASSCODE = 20202021
 # NAN operating frequency: channel 6, the default Matter PAF channel.
 PAF_FREQ_LIST = "2437"
 
-# bluezoo exposes two adapters. The end device advertises on the first, which its
-# CI arguments block names, and the proxy scans and connects as central on the
-# second.
+# bluezoo exposes two adapters: the end device advertises on the first, the
+# proxy scans and connects as central on the second.
 BLE_CONTROLLER_PROXY = 1
 
 # Logged by every example application once it is up and commissionable
@@ -93,8 +85,7 @@ APP_READY_TIMEOUT_S = 30
 READY_PATTERN = "COMPRO topology ready"
 
 # The proxy application is asked which transports it was built with. Bounded so
-# that a binary which does not exit on --help fails here rather than hanging
-# before --timeout is in force.
+# that a binary which does not exit on --help fails here rather than hanging.
 HELP_PROBE_TIMEOUT_S = 30
 
 
@@ -128,12 +119,8 @@ class ProxyAppSubprocess(AppServerSubprocess):
 class Transport(enum.StrEnum):
     """Transport the proxy uses to reach the end device.
 
-    BOTH makes the end device commissionable over BLE and Wi-Fi PAF at the same
-    time, which the scan tests need in order to receive device reports per
-    transport.
-
-    AUTO is whatever the proxy was built with, so one CI arguments block serves
-    both a two-transport CI build and a single-transport local one.
+    BOTH configures the proxy for BLE and Wi-Fi PAF at the same time, which the
+    scan tests need. AUTO is whatever the proxy was built with.
     """
 
     WIFIPAF = "wifipaf"
@@ -167,15 +154,12 @@ def wpa_interface_names(transport: str) -> list[str]:
 def proxy_app_args(transport: str, endpoint: int, proxy_ble: bool) -> list[str]:
     """Arguments for the proxy application.
 
-    BLE is given to the proxy whichever transport is under test. The proxy
-    advertises every transport it was built with, and the tests scan on that
-    whole bitmap -- TC_COMPRO_2_8 step 10 passes the Transport attribute
-    straight back as ProxyBackGroundScanStartRequest.transport -- so a proxy
-    built with BLE but denied an adapter fails the scan outright.
+    BLE is given whichever transport is under test: the tests scan on the whole
+    Transport bitmap the proxy was built with, so a proxy built with BLE but
+    denied an adapter fails the scan.
     """
     args = ["--device", f"commissioning-proxy:{endpoint}"]
-    # --ble-controller is compiled out of a proxy built without BLE, and passing
-    # an option the application does not know is fatal to it.
+    # Only a build with BLE accepts --ble-controller.
     if proxy_ble:
         args += ["--ble-controller", str(BLE_CONTROLLER_PROXY)]
     if transport != Transport.BLE:
@@ -307,12 +291,9 @@ def run(proxy_app: str, proxy_args: str, transport: str, endpoint: int, discrimi
     with contextlib.ExitStack() as stack:
         net_ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
             index=ns_index,
-            # The test script is started by run_python_test.py in the host
-            # namespace, so that is where it reaches the proxy from. That
-            # namespace may already route the default ULA prefix (CI's add-ipv6
-            # step gives it fd00:0:1:1::/64 on a link of its own), and with two
-            # routes for one /64 the script's traffic to the proxy takes
-            # whichever came first. So the topology gets a prefix of its own.
+            # The test script runs in the host namespace, which CI already gives
+            # fd00:0:1:1::/64 (its add-ipv6 step). A second route for that /64
+            # would send the script's traffic down whichever link came first.
             tool_in_host_namespace=True,
             ula_prefix="fd00:0:1:2",
             # The end device must not be reachable over IP before it is
@@ -332,7 +313,6 @@ def run(proxy_app: str, proxy_args: str, transport: str, endpoint: int, discrimi
 
         # Both applications open these fixed paths regardless of --KVS, so they
         # carry state from one run to the next and between the two applications.
-        # The YAML worker avoids this by bind-mounting a private /tmp.
         for stale in ("/tmp/chip_factory.ini", "/tmp/chip_config.ini",
                       "/tmp/chip_counters.ini", "/tmp/chip_kvs"):
             with contextlib.suppress(OSError):
@@ -356,8 +336,7 @@ def run(proxy_app: str, proxy_args: str, transport: str, endpoint: int, discrimi
         assert proxy.p is not None
 
         # run_python_test.py ends this process with SIGTERM once the test script
-        # has finished. Turned into an exception so that the stack unwinds and
-        # the mocks, the proxy and the namespaces are taken down.
+        # has finished. Raised as an exception so the stack unwinds and tears down.
         def on_sigterm(signum: int, frame: object) -> None:
             raise SystemExit(0)
         signal.signal(signal.SIGTERM, on_sigterm)

@@ -284,11 +284,9 @@ not_automated:
           CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
 
-# Tests whose `app` is a script that brings up a mocked topology around the
-# application under test, rather than the application itself. CI runs them like
-# any other test. The developer sweep (`local.py python-tests`) skips them and
-# names each one it skipped, because they need root and applications built with
-# BLE and Wi-Fi.
+# Tests whose `app` is a script that brings up a mocked topology. CI runs them
+# like any other test. `local.py python-tests` skips them, because they need
+# root and applications built with BLE and Wi-Fi.
 dedicated_runner:
     - name: TC_COMPRO_2_1.py
       reason:

@@ -31,11 +31,10 @@ BLUEZ_SERVICE = "org.bluez"
 class BluetoothMock(TerminablePopen[str]):
     """Run a BlueZ mock server in a subprocess.
 
-    The mock never re-reports a device, it exports a device the first time it
-    sees a peer advertising and keeps it and the RSSI never changes. So the SDK
-    which re-reports on an RSSI change misses a peer that stops advertising and
-    comes back.  Advertising state is therefore watched here and stale device
-    objects evicted, so the next sweep exports a fresh one.
+    bluezoo exports a peer once and never updates its RSSI, so the SDK, which
+    re-reports a known device only on an RSSI change, misses a peer that stops
+    advertising and comes back. Advertising is watched here and the stale device
+    object evicted, so the next sweep exports a fresh one.
     """
 
     # The MAC addresses of the virtual Bluetooth adapters.
@@ -76,16 +75,12 @@ class BluetoothMock(TerminablePopen[str]):
 
     def __init__(self) -> None:
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        # Advertising instances per adapter as last seen by the watcher. An
-        # adapter is only interesting once it goes from silent back to
-        # advertising, so the initial state has to be "silent" rather than
-        # unknown.
+        # Advertising instances per adapter as last seen. Only a silent-to-
+        # advertising transition matters, so the initial state is "silent".
         self._advertising = dict.fromkeys(range(len(self.ADAPTERS)), 0)
         self._loop = asyncio.new_event_loop()
         self._loop_thread: threading.Thread | None = None
-        # Watcher tasks are kept referenced: a task nothing holds can be
-        # garbage collected mid-run, and a watcher that stops silently takes
-        # re-discovery with it.
+        # Kept referenced, or the loop may drop a watcher mid-run.
         self._watchers: list[asyncio.Task] = []
         super().__init__(lambda: subprocess.Popen(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True))
 
@@ -114,9 +109,7 @@ class BluetoothMock(TerminablePopen[str]):
                 await adapter.RemoveDevice(device_path)
                 log.debug("Removed stale device %s so it is discovered again", device_path)
             except sdbus.DbusFailedError:
-                # Nothing cached for this peer on that adapter, which is the
-                # common case. Only an adapter that has already discovered the
-                # peer holds an object for it.
+                # Only an adapter that has discovered the peer holds an object for it.
                 pass
 
     async def _watch_advertising(self, adapter_index: int) -> None:

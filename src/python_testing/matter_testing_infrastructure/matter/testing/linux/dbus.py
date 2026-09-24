@@ -28,9 +28,8 @@ class DBusTestSystemBus(TerminablePopen[str]):
     def __init__(self, socket: pathlib.Path | None = None) -> None:
         """Start a bus on ``socket``.
 
-        Defaults to a path carrying this process's PID, so that concurrent runs
-        do not share a bus. A caller whose clients are started by another process
-        names the path instead, so that those clients can be told it.
+        Defaults to a path carrying this process's PID, so concurrent runs do not
+        share a bus. A caller whose clients another process starts names the path.
         """
         self.SOCKET = socket or pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
         self.ADDRESS = f"unix:path={self.SOCKET}"

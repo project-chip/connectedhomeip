@@ -535,22 +535,16 @@ class EDFixture:
     # Local subprocess implementation
     # ------------------------------------------------------------------
 
-    # The ED is only usable by the proxy once it is actually reachable over the
-    # transport under test, which is later than its event loop starting: BLE
-    # advertising and the NAN publish both come up afterwards. Returning from
-    # start() too early lets a proxy scan run before the ED is discoverable and
-    # find nothing.
-    # The BLE line is the only signal that advertising actually started, and it is
-    # logged at detail level. An end device built with chip_detail_logging=false
-    # never prints it, so a healthy device times out here. The PAF line is progress
-    # level. There is no progress-level BLE equivalent to use instead.
+    # The proxy can only use the ED once it advertises, which is after its event
+    # loop starts, so start() waits for the transport lines rather than the loop.
+    # The BLE line is logged at detail level: an end device built with
+    # chip_detail_logging=false never prints it and times out here.
     APP_READY_PATTERNS: dict[str, str | list[str]] = {
         "ble": "BLE advertisement started successfully",
         "wifipaf": "WiFi-PAF: publish_id:",
         "both": ["BLE advertisement started successfully", "WiFi-PAF: publish_id:"],
     }
-    # Logged by every Linux example app once its event loop is running. Only a
-    # fallback: it says nothing about either transport being up.
+    # Fallback only: the event loop running says nothing about either transport.
     APP_READY_PATTERN = "APP STATUS: Starting event loop"
     APP_READY_TIMEOUT_S = 30
 
@@ -574,9 +568,8 @@ class EDFixture:
             extra_args=shlex.split(self._extra_args) if self._extra_args else [],
             wrapper=self._launch_wrapper,
         )
-        # Wait for the readiness line rather than a fixed delay: startup time
-        # differs by an order of magnitude between real hardware and a mocked
-        # transport, and a delay that is generous on one is short on the other.
+        # Startup differs by an order of magnitude between hardware and a mock, so
+        # wait for the line rather than a delay.
         ready_pattern = self.APP_READY_PATTERNS.get(self._ed_transport, self.APP_READY_PATTERN)
         await asyncio.to_thread(self._process.start,
                                 expected_output=ready_pattern,

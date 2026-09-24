@@ -36,9 +36,7 @@ log = logging.getLogger(__name__)
 
 # Discovery must not be reported before the call that asked for it has returned:
 # a subscriber sets up its result handling after NANSubscribe replies, and a
-# signal that arrives first is simply dropped. Real NAN discovery takes at least
-# a beacon interval, so a short delay is both realistic and what keeps the
-# ordering deterministic.
+# signal that arrives first is dropped. A short delay keeps that order.
 DISCOVERY_DELAY_S = 0.1
 
 if TYPE_CHECKING:
@@ -106,9 +104,8 @@ class NANSimulator:
     async def announce_publisher(self, pub_iface_name: str, pub_id: int, pub_args: dict):
         """Tell the running subscriber about a publisher that just started.
 
-        A subscriber does not have to be started after the publisher to see it: an
-        active subscriber keeps receiving unsolicited publish frames, which is how a
-        background scan notices a device that appears while the scan is running.
+        An active subscriber keeps receiving publish frames, which is how a
+        background scan notices a device that appears while it is running.
         """
         await asyncio.sleep(DISCOVERY_DELAY_S)
         with self._lock:
@@ -301,9 +298,7 @@ class WpaSupplicantMock(TerminableThread):
                 if interface.interface_name_in_sim in ifname.lower():
                     return interface.path
             # The platform falls back to CreateInterface once GetInterface has
-            # failed. The mock cannot honour it as its interfaces are created up
-            # front and bound to a network link, so there is nothing to bind a
-            # new one to.
+            # failed. The mock's interfaces are bound to links up front, so it cannot.
             registered = [i.interface_name_in_sim for i in self.mock.interfaces]
             log.error("Cannot create mock interface '%s'; the mock serves %s only. "
                       "Is the application in the right network namespace?", ifname, registered)
@@ -315,10 +310,8 @@ class WpaSupplicantMock(TerminableThread):
             for interface in self.mock.interfaces:
                 if interface.interface_name_in_sim in name.lower():  # Case-insensitive match
                     return interface.path
-            # Handing back some other application's interface makes a
-            # misplaced application look like a NAN problem instead of the
-            # configuration one it is, and two applications sharing one
-            # interface then take each other's link down.
+            # Handing back another application's interface would make a misplaced
+            # application look like a NAN problem, and the two would share one link.
             registered = [i.interface_name_in_sim for i in self.mock.interfaces]
             log.error("No mock interface matches '%s'; registered names are %s. "
                       "Is the application in the right network namespace?", name, registered)
@@ -371,8 +364,7 @@ class WpaSupplicantMock(TerminableThread):
             """Reset the association when a different application takes over.
 
             A restarted application must not still be reachable over IP from the
-            previous association. Waiting for the old owner to say goodbye does not
-            work: a killed process says nothing.
+            previous association, and a killed process never says goodbye.
             """
             sender = self._current_sender()
             if sender is None or sender == self.owner:
@@ -472,10 +464,8 @@ class WpaSupplicantMock(TerminableThread):
                 if self.link is not None and self.associated:
                     await asyncio.get_running_loop().run_in_executor(None, self.link.down)
                     self.associated = False
-            # Disconnect() runs before every SelectNetwork, and sdbus emits
-            # PropertiesChanged whether or not the value changed, so reporting
-            # unconditionally would have the platform record a disconnection
-            # that never happened.
+            # Disconnect() runs before every SelectNetwork and sdbus emits
+            # PropertiesChanged even when unchanged, so report only a real change.
             if self.state != "disconnected":
                 await self.State.set_async("disconnected")
 
@@ -570,8 +560,7 @@ class WpaSupplicantMock(TerminableThread):
                 "id": subscribe_id,
                 "args": args_dict,
                 "active": True,
-                # The application owning the session, so a restart can drop the
-                # sessions of the instance that went away.
+                # Owning application's bus name.
                 "owner": self._current_sender(),
             }
             self.nan_sessions[subscribe_id] = session_info

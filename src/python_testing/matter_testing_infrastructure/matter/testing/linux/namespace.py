@@ -305,9 +305,8 @@ class IsolatedNetworkNamespace(TerminableResource):
                                      ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
         self._mgmt_link_up = mgmt_link_up
 
-        # An optional fourth namespace, used when a test needs a second application
-        # alongside the one under test. Not created unless a name is given, so the
-        # topology seen by existing tests is unchanged.
+        # An optional fourth namespace, for a test that needs a second application
+        # alongside the one under test. Not created unless a name is given.
         self.proxy_ns: NetworkNamespace | None = None
         self.proxy_link: NetworkLink | None = None
         self._proxy_link_up = proxy_link_up
