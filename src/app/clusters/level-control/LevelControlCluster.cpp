@@ -721,6 +721,11 @@ void LevelControlCluster::TransitionHandler::StopTransition()
     mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport);
 }
 
+bool LevelControlCluster::TransitionHandler::IsInternalOffTransitionActive()
+{
+    return (mCurrentCommandId == kInternalOffTransition) && mCluster.mTimerDelegate.IsTimerActive(this);
+}
+
 void LevelControlCluster::TransitionHandler::TimerFired()
 {
     VerifyOrReturn(!mCluster.mCurrentLevel.value().IsNull());
@@ -816,7 +821,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
     {
         // On Transition
         // 2. Determine Target Level (Capture before setting to Min)
-        const uint8_t target = mOnLevel.ValueOr(mLevelBeforeTurnedOff.ValueOr(kMaxLevel));
+        // Spec stores CurrentLevel on receipt of On. If the Off fade is still running, the level stored
+        // by that Off is kept instead, so the level from before the Off is restored.
+        uint8_t storedLevel = mCurrentLevel.value().Value();
+        if (mTransitionHandler.IsInternalOffTransitionActive())
+        {
+            storedLevel = mLevelBeforeTurnedOff.ValueOr(storedLevel);
+        }
+        const uint8_t target = mOnLevel.ValueOr(storedLevel);
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
