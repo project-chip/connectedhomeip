@@ -268,6 +268,7 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
     "${CHIP_ROOT}/src/app/clusters/thermostat-server/thermostat-server.cpp"
+    "${CHIP_ROOT}/src/app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.cpp"
 )
 
 # No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
