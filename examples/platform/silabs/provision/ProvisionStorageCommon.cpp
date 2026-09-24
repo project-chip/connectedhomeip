@@ -21,6 +21,9 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceError.h>
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
 
 #include <cstdio>
 #include <cstdlib>
@@ -166,7 +169,7 @@ CHIP_ERROR Storage::GetDeviceAttestationCertForProfile(chip::Credentials::Device
         }
     }
 #ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
-    return Examples::GetExampleDACProvider()->GetDeviceAttestationCertForProfile(profile, out_dac_buffer);
+    return Credentials::Examples::GetExampleDACProvider()->GetDeviceAttestationCertForProfile(profile, out_dac_buffer);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -184,7 +187,7 @@ CHIP_ERROR Storage::GetProductAttestationIntermediateCertForProfile(chip::Creden
         }
     }
 #ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
-    return Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCertForProfile(profile, out_pai_buffer);
+    return Credentials::Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCertForProfile(profile, out_pai_buffer);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -230,7 +233,7 @@ CHIP_ERROR Storage::GetDeviceAttestationDocumentSegment(chip::Credentials::Devic
         }
     }
 #ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
-    return Examples::GetExampleDACProvider()->GetDeviceAttestationDocumentSegment(documentType, profile, offset,
+    return Credentials::Examples::GetExampleDACProvider()->GetDeviceAttestationDocumentSegment(documentType, profile, offset,
                                                                                    out_document_buffer, out_document_size);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
