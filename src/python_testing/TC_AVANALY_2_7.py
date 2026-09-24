@@ -88,7 +88,6 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
         """Returns the PICS requirements for TC-AVANALY-2.7."""
         return [
             "AVANALY.S",
-            "AVANALY.S.E02",
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis))
