@@ -171,8 +171,10 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedWithoutOnOffFeature)
     // Without Feature::kOnOff, On/Off changes do not fade or restore CurrentLevel.
     mockDelegate.mLevelChangedCalled = false;
     EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
-    EXPECT_FALSE(mockDelegate.mLevelChangedCalled);
     EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+    // Run past OnOffTransitionTime (10 s) so a fade, if one started, would have called OnLevelChanged.
+    AdvanceClock(System::Clock::Milliseconds64(10000));
+    EXPECT_FALSE(mockDelegate.mLevelChangedCalled);
 
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
     EXPECT_FALSE(mockDelegate.mLevelChangedCalled);

@@ -63,8 +63,8 @@ public:
 
     enum class OnOffSetting : uint8_t
     {
-        kAdvertiseFeature,      ///< Set OO. On/Off commands change CurrentLevel.
-        kDoNotAdvertiseFeature, ///< Clear OO. On/Off commands do not change CurrentLevel.
+        kAdvertiseFeature,      ///< FeatureMap has OO. OnOff changes move CurrentLevel through MinLevel.
+        kDoNotAdvertiseFeature, ///< FeatureMap lacks OO. OnOff changes do not change CurrentLevel.
     };
 
     struct Config
@@ -75,21 +75,26 @@ public:
         /// Links the On/Off cluster on the same endpoint. Call this whenever the endpoint has an
         /// On/Off cluster, in both modes.
         ///
-        /// Both modes: *WithOnOff commands set OnOff. MoveToLevel/Move/Step/Stop do nothing while
-        /// OnOff is FALSE, unless ExecuteIfOff is set (spec "Options Attribute").
+        /// Both modes: *WithOnOff commands set OnOff to TRUE when raising CurrentLevel and to FALSE
+        /// when CurrentLevel reaches MinLevel. MoveToLevel/Move/Step/Stop do nothing while OnOff is
+        /// FALSE, unless ExecuteIfOff is set (spec "Options Attribute"). ExecuteIfOff is only
+        /// conformant with OO or Lighting.
         ///
-        /// kAdvertiseFeature: Off fades CurrentLevel to MinLevel and On ramps it back up.
+        /// kAdvertiseFeature: OnOff changes move CurrentLevel as in spec "Effect of On/Off Commands
+        /// on the CurrentLevel attribute". Off moves to MinLevel; if OnLevel is null, CurrentLevel then
+        /// returns to the pre-off level. On starts at MinLevel and moves to OnLevel, or to the pre-off
+        /// level if OnLevel is null. The move uses OnTransitionTime/OffTransitionTime/OnOffTransitionTime.
         ///   - Dimmable light (device type requires OO): Off fades to dark, On fades back.
         ///   - TV speaker with OnLevel null: mute ramps volume down, unmute ramps it back to the
         ///     previous volume. CurrentLevel reads the previous volume while muted.
-        /// kDoNotAdvertiseFeature: On/Off commands do not change CurrentLevel. The application
-        ///   acts on OnOff itself.
+        /// kDoNotAdvertiseFeature: OnOff changes do not change CurrentLevel. The application acts on
+        ///   OnOff itself.
         ///   - Pump or fan with its own motor drive: Off stops the motor, the speed setpoint stays.
         ///   - Amplifier with a motorized volume knob: mute uses a relay, the knob does not move.
         ///
-        /// Caller registers with onOffCluster.AddDelegate(&levelControl) after construction and calls
-        /// RemoveDelegate() before destruction. The delegate does nothing with kDoNotAdvertiseFeature,
-        /// but AddDelegate and RemoveDelegate must still be paired.
+        /// For kAdvertiseFeature, register with onOffCluster.AddDelegate(&levelControl) after
+        /// construction. The delegate removes itself from the list when destroyed. With
+        /// kDoNotAdvertiseFeature the delegate does nothing, so registering is optional.
         Config & WithOnOff(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
         {
             mOnOffCluster = &onOffCluster;

@@ -871,7 +871,7 @@ bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask,
 
     // 1. If the On/Off cluster is not on this endpoint, there is no dependency, so we execute.
     //    Spec "Effect of Level Control Commands Depends on OnOff": the dependency holds "Even if the
-    //    On/Off (OO) feature set bit is set to zero", so this does not depend on the feature bit.
+    //    On/Off (OO) feature set bit is set to zero", so the check uses cluster presence, not the OO bit.
     // 2. If the OnOff state is On, we execute.
     if (mOnOffCluster == nullptr || GetOnOff())
     {
