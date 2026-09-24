@@ -852,7 +852,7 @@ void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectId
                                                     Clusters::Identify::EffectVariantEnum variant)
 {
     osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
-    sCodeDrivenIdentifyEffect  = effect;
+    sCodeDrivenIdentifyEffect = effect;
     osSemaphoreRelease(sCodeDrivenIdentifyLock);
 
     if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
