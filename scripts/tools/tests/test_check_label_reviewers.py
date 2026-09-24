@@ -308,6 +308,18 @@ class TestExtractApprovers(unittest.TestCase):
         empty_data: dict[str, object] = {}
         self.assertEqual(extract_approvers(empty_data), set())
 
+    def test_skips_null_author_reviews(self) -> None:
+        """Verifies that reviews with null author are skipped without raising AttributeError."""
+        pr_data = {
+            "author": None,
+            "reviews": [
+                {"author": None, "state": "APPROVED", "submittedAt": "2026-09-20T09:00:00Z"},
+                {"author": {"login": "alice"}, "state": "APPROVED", "submittedAt": "2026-09-20T10:00:00Z"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice"})
+
 
 class TestCheckOverridePresent(unittest.TestCase):
     """Tests checking for the presence of override labels."""

@@ -185,7 +185,7 @@ def parse_label_config(config_path: str) -> dict[str, LabelRule]:
 
 def extract_approvers(pr_data: dict[str, Any]) -> set[str]:
     """Extracts lowercase usernames of approved reviewers from PR JSON data, excluding the author."""
-    pr_author = pr_data.get("author", {}).get("login", "")
+    pr_author = (pr_data.get("author") or {}).get("login", "")
     author_lower = pr_author.lower() if pr_author else ""
     raw_reviews = pr_data.get("reviews")
     if raw_reviews is None:
@@ -196,7 +196,7 @@ def extract_approvers(pr_data: dict[str, Any]) -> set[str]:
     )
     latest_states: dict[str, str] = {}
     for review in reviews:
-        reviewer = review.get("author", {}).get("login", "").lower()
+        reviewer = (review.get("author") or {}).get("login", "").lower()
         state = review.get("state")
         if reviewer and state not in {"COMMENTED", "PENDING"}:
             latest_states[reviewer] = state
@@ -571,7 +571,7 @@ def main() -> int:
         return 2
 
     pr_title = pr_data.get("title", "")
-    pr_author = pr_data.get("author", {}).get("login", "")
+    pr_author = (pr_data.get("author") or {}).get("login", "")
     pr_state = pr_data.get("state", "")
     pr_labels = [label.get("name", "") for label in pr_data.get("labels", [])]
 
