@@ -51,7 +51,13 @@ CHIP_ERROR LoggingHumidityConditioner::Register(EndpointId endpoint, CodeDrivenD
                                                 EndpointComposition composition)
 {
     ReturnErrorOnFailure(HumidityConditioner::Register(endpoint, provider, composition));
-    return mTestEventTriggerDelegate.AddHandler(this);
+    CHIP_ERROR err = mTestEventTriggerDelegate.AddHandler(this);
+    if (err != CHIP_NO_ERROR)
+    {
+        // HumidityConditioner::Register() already committed the endpoint/clusters; roll them back here.
+        HumidityConditioner::Unregister(provider);
+    }
+    return err;
 }
 
 void LoggingHumidityConditioner::Unregister(CodeDrivenDataModelProvider & provider)
