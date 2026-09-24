@@ -63,8 +63,8 @@ public:
 
     enum class OnOffSetting : uint8_t
     {
-        kAdvertiseFeature,      ///< Coupled: advertises Feature::kOnOff (default, e.g. Dimmable Light).
-        kDoNotAdvertiseFeature, ///< Decoupled: links cluster without advertising Feature::kOnOff (e.g. Speaker).
+        kAdvertiseFeature,      ///< Set OO. On/Off commands change CurrentLevel.
+        kDoNotAdvertiseFeature, ///< Clear OO. On/Off commands do not change CurrentLevel.
     };
 
     struct Config
@@ -72,31 +72,16 @@ public:
         Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        /// Links the OnOffCluster on the same endpoint to this LevelControlCluster.
+        /// Links the On/Off cluster on the same endpoint. Call this whenever the endpoint has an
+        /// On/Off cluster, in both modes.
         ///
-        /// @param onOffCluster The OnOffCluster instance on this endpoint.
-        /// @param setting      Whether to advertise Feature::kOnOff (OO) in FeatureMap.
+        /// Both modes: *WithOnOff commands set OnOff. MoveToLevel/Move/Step/Stop do nothing while
+        /// OnOff is FALSE, unless ExecuteIfOff is set (spec "Options Attribute").
+        /// kAdvertiseFeature only: Off fades CurrentLevel to MinLevel, On restores it.
         ///
-        /// Use Cases:
-        /// - OnOffSetting::kAdvertiseFeature (default, e.g. Dimmable Light):
-        ///   Level and power state are coupled. Reaching minimum level turns the device off,
-        ///   increasing level turns the device on, and turning on/off fades or restores level.
-        ///
-        /// - OnOffSetting::kDoNotAdvertiseFeature (e.g. Speaker volume, rotary dimmer with separate power switch):
-        ///   Volume and power/mute operate independently (adjusting volume does not unmute/power on,
-        ///   and muting/powering off does not reset the volume level). The cluster link is still
-        ///   required because Matter spec 1.6.4.1.3 and 1.6.6.9 enforce that if OnOff exists on
-        ///   the endpoint, commands without 'WithOnOff' or ExecuteIfOff are suppressed while OnOff
-        ///   is false, even when the OO feature bit is 0.
-        ///
-        /// Sequencing Contract:
-        /// 1. Construct OnOffCluster.
-        /// 2. Configure LevelControlCluster::Config with WithOnOff(onOffCluster).
-        /// 3. Construct LevelControlCluster.
-        /// 4. Register LevelControlCluster as an OnOffDelegate:
-        ///      onOffCluster.AddDelegate(&levelControlCluster);
-        /// 5. On teardown, remove delegate before destroying clusters:
-        ///      onOffCluster.RemoveDelegate(&levelControlCluster);
+        /// Caller registers with onOffCluster.AddDelegate(&levelControl) after construction and calls
+        /// RemoveDelegate() before destruction. The delegate does nothing with kDoNotAdvertiseFeature,
+        /// but AddDelegate and RemoveDelegate must still be paired.
         Config & WithOnOff(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
         {
             mOnOffCluster = &onOffCluster;

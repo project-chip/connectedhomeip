@@ -105,8 +105,9 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff_OverrideOff)
     EXPECT_EQ(readLevel.Value(), 10u); // Should remain 10
 }
 
-// Spec 1.6.6.9 conditions command suppression on "The On/Off cluster exists on the same endpoint as this cluster",
-// and 1.6.4.1.3 adds that this holds "Even if the On/Off (OO) feature set bit is set to zero".
+// Spec "Options Attribute" conditions command suppression on "The On/Off cluster exists on the same endpoint as this
+// cluster", and "Effect of Level Control Commands Depends on OnOff" adds that this holds "Even if the On/Off (OO) feature
+// set bit is set to zero".
 TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
@@ -122,7 +123,7 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
 
     EXPECT_FALSE(cluster.GetFeatureMap().Has(Feature::kOnOff));
 
-    // MoveToLevelWithOnOff turns OnOffCluster On even without Feature::kOnOff (Spec 1.6.7.6).
+    // MoveToLevelWithOnOff turns OnOffCluster On even without Feature::kOnOff (spec "'With On/Off' Commands").
     EXPECT_TRUE(cluster
                     .MoveToLevelWithOnOff(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
                                           BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
@@ -144,6 +145,51 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 10u);
+}
+
+TEST_F(TestLevelControlOnOff, TestOnOffChangedWithoutOnOffFeature)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    // A non-zero OnOffTransitionTime makes an unwanted fade visible as an active timer.
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithOnOff(onOffCluster, LevelControlCluster::OnOffSetting::kDoNotAdvertiseFeature)
+                                     .WithOnOffTransitionTime(100) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)), BitMask<LevelControl::OptionsBitmap>(0),
+                                 BitMask<LevelControl::OptionsBitmap>(0))
+                    .IsSuccess());
+
+    // Without Feature::kOnOff, On/Off changes do not fade or restore CurrentLevel.
+    mockDelegate.mLevelChangedCalled = false;
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+    EXPECT_FALSE(mockDelegate.mLevelChangedCalled);
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_FALSE(mockDelegate.mLevelChangedCalled);
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 100u);
+
+    // StepWithOnOff down to MinLevel still turns OnOff off (spec "'With On/Off' Commands").
+    EXPECT_TRUE(cluster
+                    .StepWithOnOff(StepModeEnum::kDown, 255, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                   BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
+                    .IsSuccess());
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+    EXPECT_FALSE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestWriteOnLevel)
