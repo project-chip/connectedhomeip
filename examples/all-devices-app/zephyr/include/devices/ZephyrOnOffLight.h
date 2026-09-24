@@ -22,25 +22,13 @@
 #include <device/capabilities/on-off-load/impl/LoggingOnOffDelegate.h>
 #include <zephyr/devicetree.h>
 
-#include "ZephyrIdentifyDelegate.h"
-
-#if DT_NODE_EXISTS(DT_ALIAS(led0))
-#define ALL_DEVICES_ONOFF_LED_NODE DT_ALIAS(led0)
-#endif
-
-#if defined(ALL_DEVICES_ONOFF_LED_NODE)
-#define ALL_DEVICES_HAS_ONOFF_LED 1
-#else
-#define ALL_DEVICES_HAS_ONOFF_LED 0
-#endif
-
 namespace chip::app::AllDevices {
 
-/// On/Off Light that drives the board's led0 alias
+/// On/Off Light that drives the board's led0 alias for normal On/Off state.
 class ZephyrOnOffLight : private LoggingOnOffDelegate, public OnOffLoad
 {
 public:
-    explicit ZephyrOnOffLight(const Context & context);
+    explicit ZephyrOnOffLight(const OnOffLoad::Context & context);
     ~ZephyrOnOffLight() override;
 
 protected:
@@ -50,11 +38,7 @@ protected:
 private:
     void Apply(bool on);
     void SetLed(bool on);
-    ZephyrIdentifyDelegate & mIdentifyDelegate;
-    bool mOn = false;
-#if ALL_DEVICES_HAS_ONOFF_LED
     bool mLedReady = false;
-#endif
 };
 
 } // namespace chip::app::AllDevices

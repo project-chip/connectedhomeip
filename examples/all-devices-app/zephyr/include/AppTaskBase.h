@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "ZephyrIdentifyDelegate.h"
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
@@ -28,6 +27,8 @@
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
+#include "delegates/ZephyrIdentifyDelegate.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Zephyr/wifi/ZephyrWifiDriver.h>

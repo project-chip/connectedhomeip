@@ -26,7 +26,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
-#include <device/types/root-node/ThreadRootNode.h>
+#include <device/types/root-node/RootNodeWith.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,9 +38,18 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include "Buttons.h"
-#include "ZephyrOnOffLight.h"
+#include "devices/ZephyrOnOffLight.h"
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <device/types/root-node/features/ThreadFeature.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <device/types/root-node/features/WifiFeature.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <device/types/root-node/features/OtaFeature.h>
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
 #endif
 
@@ -158,7 +167,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider = DeviceLayer::GetDeviceInstanceInfoProvider();
     VerifyOrReturnError(deviceInstanceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    const RootNode::Context context{
+    const RootNode::Context rootNodeContext{
         .commissioningWindowManager          = Server::GetInstance().GetCommissioningWindowManager(),
         .configurationManager                = DeviceLayer::ConfigurationMgr(),
         .deviceControlServer                 = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
@@ -185,18 +194,36 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 #error "Thread + Wi-Fi root node is not implemented"
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // WiFi
-#error "Wi-Fi root node is not implemented"
+    using NetworkFeature = WifiFeature;
+    NetworkFeature::Context networkContext{
+        .wifiDriver = mWifiDriver,
+    };
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    // Thread
-    mRootNode = std::make_unique<ThreadRootNode>(context, ThreadFeature::Context{ .threadDriver = mThreadDriver });
+    using NetworkFeature = ThreadFeature;
+    NetworkFeature::Context networkContext{
+        .threadDriver = mThreadDriver,
+    };
 
 #else
     // None
 #error "No network technology enabled."
 
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OtaFeature::Context otaContext{
+        .otaCommands          = mOTARequestorCore,
+        .attributes           = mOTARequestorAttributes,
+    };
+
+    using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
+    mRootNode = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+#else
+    using RootNodeType = RootNodeWith<NetworkFeature>;
+    mRootNode = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+    
+#endif    
 
     VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
