@@ -98,10 +98,7 @@ public:
         Config & WithOnOff(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
         {
             mOnOffCluster = &onOffCluster;
-            if (setting == OnOffSetting::kAdvertiseFeature)
-            {
-                mFeatureMap.Set(LevelControl::Feature::kOnOff);
-            }
+            mFeatureMap.Set(LevelControl::Feature::kOnOff, setting == OnOffSetting::kAdvertiseFeature);
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)

@@ -194,6 +194,24 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedWithoutOnOffFeature)
     EXPECT_FALSE(onOffCluster.GetOnOff());
 }
 
+TEST_F(TestLevelControlOnOff, TestWithOnOffLastSettingWins)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster withoutOO{ kTestEndpointId,
+                                   LevelControlCluster::Config(mockTimer, mockDelegate)
+                                       .WithOnOff(onOffCluster)
+                                       .WithOnOff(onOffCluster, LevelControlCluster::OnOffSetting::kDoNotAdvertiseFeature) };
+    EXPECT_FALSE(withoutOO.GetFeatureMap().Has(Feature::kOnOff));
+
+    LevelControlCluster withOO{ kTestEndpointId,
+                                LevelControlCluster::Config(mockTimer, mockDelegate)
+                                    .WithOnOff(onOffCluster, LevelControlCluster::OnOffSetting::kDoNotAdvertiseFeature)
+                                    .WithOnOff(onOffCluster) };
+    EXPECT_TRUE(withOO.GetFeatureMap().Has(Feature::kOnOff));
+}
+
 TEST_F(TestLevelControlOnOff, TestWriteOnLevel)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
