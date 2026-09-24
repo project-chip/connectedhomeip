@@ -35,11 +35,11 @@
 
 enum
 {
-    kMaxHashOps  = 4,
-    kMaxKeys     = 8,
+    kMaxHashOps = 4,
+    kMaxKeys    = 8,
     kP256PubLen = 65,
     kP256SigLen = 64,
-    kP256Bits    = 256,
+    kP256Bits   = 256,
 };
 
 typedef struct
