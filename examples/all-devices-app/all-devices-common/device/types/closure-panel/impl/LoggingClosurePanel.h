@@ -17,20 +17,27 @@
 #pragma once
 
 #include <device/types/closure-panel/ClosurePanel.h>
-
+#include <lib/support/TimerDelegate.h>
 namespace chip::app {
 
-class LoggingClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate, public ClosurePanel
+class LoggingClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate,
+                            public ClosurePanel,
+                            public TimerContext
 {
 public:
-    explicit LoggingClosurePanel(Config config);
-    ~LoggingClosurePanel() override = default;
+    explicit LoggingClosurePanel(Config config, TimerDelegate & delegate);
+    ~LoggingClosurePanel() override;
 
     Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<bool> & latch,
                                                         const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleStep(const Clusters::ClosureDimension::StepDirectionEnum & direction,
                                                    const uint16_t & numberOfSteps,
                                                    const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
+    void TimerFired() override;
+
+private:
+    static constexpr uint32_t kMotionDurationSec = 1;
+    TimerDelegate & mTimerDelegate;
 };
 
 } // namespace chip::app

@@ -50,9 +50,8 @@ namespace app {
 LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
                                Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                std::vector<PanelList> panels, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(CConfig, Tdelegate, Idelegate, *this),
-    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(panels)),
-    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(CConfig, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
+    mPanelList(std::move(panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 LoggingClosure::~LoggingClosure()
@@ -200,7 +199,7 @@ CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDr
 
     for (const auto & panel : mPanelList)
     {
-        auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config);
+        auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config, mTimerDelegate);
         // Each panel is a part of this closure endpoint and carries its own tags.
         EndpointComposition panelComposition(GetEndpointId(), composition.pattern, panel.tags);
         ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, panelComposition));

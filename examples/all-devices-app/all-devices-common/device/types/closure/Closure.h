@@ -32,6 +32,7 @@ public:
         std::optional<BitFlags<Clusters::ClosureControl::LatchControlModesBitmap>> motionLatching;
         bool withInstantaneous    = false;
         bool withSpeed            = false;
+        bool withVentilation      = false;
         bool withPedestrian       = false;
         bool withCalibration      = false;
         bool withManuallyOperable = false;

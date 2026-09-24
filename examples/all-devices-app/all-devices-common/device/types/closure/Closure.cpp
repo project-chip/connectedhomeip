@@ -59,8 +59,8 @@ bool IsAccess(Span<const SemanticTag> tags)
 
 Closure::Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
                  Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)),
-    mConfig(config), mTimerDelegate(Tdelegate), mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)), mConfig(config), mTimerDelegate(Tdelegate),
+    mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
 {}
 
 CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -113,6 +113,10 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
     if (mConfig.withProtection)
     {
         CCconfig.WithProtection();
+    }
+    if (mConfig.withVentilation)
+    {
+        CCconfig.WithVentilation();
     }
 
     mClosureControlCluster.Create(CCconfig);

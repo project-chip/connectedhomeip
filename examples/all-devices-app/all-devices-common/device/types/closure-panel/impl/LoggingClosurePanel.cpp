@@ -22,7 +22,14 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-LoggingClosurePanel::LoggingClosurePanel(Config config) : ClosurePanel(*this, config) {}
+LoggingClosurePanel::LoggingClosurePanel(Config config, TimerDelegate & delegate) :
+    ClosurePanel(*this, config), mTimerDelegate(delegate)
+{}
+
+LoggingClosurePanel::~LoggingClosurePanel()
+{
+    mTimerDelegate.CancelTimer(this);
+}
 
 Protocols::InteractionModel::Status LoggingClosurePanel::HandleSetTarget(const Optional<Percent100ths> & position,
                                                                          const Optional<bool> & latch,
@@ -30,6 +37,12 @@ Protocols::InteractionModel::Status LoggingClosurePanel::HandleSetTarget(const O
 {
     ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleSetTarget() -> position=%u latch=%d speed=%u", position.ValueOr(0),
                     latch.ValueOr(false), to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
+
+    mTimerDelegate.CancelTimer(this);
+    VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
+        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+    }),
+                        Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -39,8 +52,36 @@ Protocols::InteractionModel::Status LoggingClosurePanel::HandleStep(const Closur
 {
     ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleStep() -> direction=%u numberOfSteps=%u speed=%u",
                     to_underlying(direction), numberOfSteps, to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
+    mTimerDelegate.CancelTimer(this);
+    VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
+        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+    }),
+                        Protocols::InteractionModel::Status::Failure);
 
     return Protocols::InteractionModel::Status::Success;
+}
+
+void LoggingClosurePanel::TimerFired()
+{
+    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::TimerFired()");
+    auto target = ClosureDimensionCluster().GetTargetState();
+    VerifyOrReturn(!target.IsNull());
+
+    auto current = ClosureDimensionCluster().GetCurrentState();
+    auto next    = current.IsNull() ? Clusters::ClosureDimension::GenericDimensionStateStruct{} : current.Value();
+    if (target.Value().position.HasValue())
+    {
+        next.position = target.Value().position;
+    }
+    if (target.Value().latch.HasValue())
+    {
+        next.latch = target.Value().latch;
+    }
+    if (target.Value().speed.HasValue())
+    {
+        next.speed = target.Value().speed;
+    }
+    LogErrorOnFailure(ClosureDimensionCluster().SetCurrentState(DataModel::MakeNullable(next)));
 }
 
 } // namespace chip::app

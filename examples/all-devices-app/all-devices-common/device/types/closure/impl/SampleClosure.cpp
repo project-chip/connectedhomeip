@@ -73,7 +73,7 @@ ClosurePanel::Config RotatingPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                        ClosureDimension::OverflowEnum::kTopInside },
+                                                            ClosureDimension::OverflowEnum::kTopInside },
             },
     };
 }
@@ -91,6 +91,7 @@ SampleClosure MakeSampleClosure()
                 ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
             .withInstantaneous          = false, // mutually exclusive with Speed below
             .withSpeed                  = true,
+            .withVentilation            = true,
             .withPedestrian             = true,
             .withCalibration            = true,
             .withManuallyOperable       = true,
