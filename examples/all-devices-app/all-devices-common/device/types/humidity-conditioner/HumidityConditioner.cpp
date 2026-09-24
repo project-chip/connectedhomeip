@@ -37,7 +37,6 @@ CHIP_ERROR HumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataMode
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    // Identify
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
@@ -50,7 +49,7 @@ CHIP_ERROR HumidityConditioner::Register(EndpointId endpoint, CodeDrivenDataMode
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    // Humidistat: matches the all-clusters-app zap defaults (all features enabled).
+    // Humidistat: all features enabled to support the full range of humidistat functionality for testing.
     HumidistatCluster::StartupConfiguration humidistatConfig;
     humidistatConfig.mode           = Humidistat::ModeEnum::kHumidifier;
     humidistatConfig.systemState    = Humidistat::SystemStateEnum::kIdle;

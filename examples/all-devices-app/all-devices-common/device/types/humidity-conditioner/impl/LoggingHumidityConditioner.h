@@ -23,22 +23,13 @@
 #include <device/types/humidity-conditioner/HumidityConditioner.h>
 
 namespace chip::app {
-/// Applies the Humidistat cert-test event triggers (see HumidistatTestEventTriggerHandler.h) by toggling which
-/// settings the SetSettings command is allowed to change. The target cluster is bound after Register().
-class HumidistatSettingsTestEventTriggerHandler : public TestEventTriggerHandler
-{
-public:
-    void SetCluster(Clusters::HumidistatCluster * cluster) { mCluster = cluster; }
 
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
-private:
-    Clusters::HumidistatCluster * mCluster = nullptr;
-};
-
+// Applies the Humidistat cert-test event triggers (see HumidistatTestEventTriggerHandler.h) directly to this
+// instance's HumidistatCluster; only meaningful once Register() has constructed the cluster.
 class LoggingHumidityConditioner : private LoggingIdentifyDelegate,
                                    private LoggingOnOffDelegate,
                                    private Clusters::HumidistatDelegate,
+                                   public TestEventTriggerHandler,
                                    public HumidityConditioner
 {
 public:
@@ -47,6 +38,9 @@ public:
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    // TestEventTriggerHandler
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
     // HumidistatDelegate
     void OnModeChanged(Clusters::Humidistat::ModeEnum newMode) override;
@@ -62,7 +56,6 @@ public:
 
 private:
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
-    HumidistatSettingsTestEventTriggerHandler mHumidistatTestEventTriggerHandler;
 };
 
 } // namespace chip::app

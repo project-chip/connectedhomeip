@@ -22,6 +22,18 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
+namespace {
+
+// Mirrors TestEventTriggerHandler::clearEndpointInEventTrigger's bit layout (bits 32-47).
+constexpr uint64_t kEndpointMask = 0x0000FFFF00000000;
+
+EndpointId GetEndpointIdFromEventTrigger(uint64_t eventTrigger)
+{
+    return static_cast<EndpointId>((eventTrigger & kEndpointMask) >> 32);
+}
+
+} // namespace
+
 // LoggingHumidityConditioner
 
 LoggingHumidityConditioner::LoggingHumidityConditioner(TimerDelegate & timerDelegate,
@@ -39,42 +51,42 @@ CHIP_ERROR LoggingHumidityConditioner::Register(EndpointId endpoint, CodeDrivenD
                                                 EndpointComposition composition)
 {
     ReturnErrorOnFailure(HumidityConditioner::Register(endpoint, provider, composition));
-    mHumidistatTestEventTriggerHandler.SetCluster(&HumidistatCluster());
-    return mTestEventTriggerDelegate.AddHandler(&mHumidistatTestEventTriggerHandler);
+    return mTestEventTriggerDelegate.AddHandler(this);
 }
 
 void LoggingHumidityConditioner::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mTestEventTriggerDelegate.RemoveHandler(&mHumidistatTestEventTriggerHandler);
-    mHumidistatTestEventTriggerHandler.SetCluster(nullptr);
+    mTestEventTriggerDelegate.RemoveHandler(this);
     HumidityConditioner::Unregister(provider);
 }
 
-CHIP_ERROR HumidistatSettingsTestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
+CHIP_ERROR LoggingHumidityConditioner::HandleEventTrigger(uint64_t eventTrigger)
 {
-    VerifyOrReturnError(mCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    // Endpoint 0 (unset) is treated as unscoped and matches any instance; otherwise only ours.
+    EndpointId triggerEndpoint = GetEndpointIdFromEventTrigger(eventTrigger);
+    VerifyOrReturnError(triggerEndpoint == 0 || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
 
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
 
     switch (static_cast<HumidistatTrigger>(eventTrigger))
     {
     case HumidistatTrigger::kDisallowContinuous:
-        mCluster->SetSetSettingsAllowContinuous(false);
+        HumidistatCluster().SetSetSettingsAllowContinuous(false);
         break;
     case HumidistatTrigger::kAllowContinuous:
-        mCluster->SetSetSettingsAllowContinuous(true);
+        HumidistatCluster().SetSetSettingsAllowContinuous(true);
         break;
     case HumidistatTrigger::kDisallowSleep:
-        mCluster->SetSetSettingsAllowSleep(false);
+        HumidistatCluster().SetSetSettingsAllowSleep(false);
         break;
     case HumidistatTrigger::kAllowSleep:
-        mCluster->SetSetSettingsAllowSleep(true);
+        HumidistatCluster().SetSetSettingsAllowSleep(true);
         break;
     case HumidistatTrigger::kDisallowOptimal:
-        mCluster->SetSetSettingsAllowOptimal(false);
+        HumidistatCluster().SetSetSettingsAllowOptimal(false);
         break;
     case HumidistatTrigger::kAllowOptimal:
-        mCluster->SetSetSettingsAllowOptimal(true);
+        HumidistatCluster().SetSetSettingsAllowOptimal(true);
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
