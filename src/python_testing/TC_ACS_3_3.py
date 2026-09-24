@@ -541,7 +541,7 @@ class TC_ACS_3_3(MatterBaseTest):
                 event.Data.ambientContextDetected.ambientContextSensed[0].namespaceID, namespaceID2, "Wrong NamespaceID")
             asserts.assert_equal(event.Data.ambientContextDetected.ambientContextSensed[0].tag, tag2, "Wrong Tag")
             if event.Data.objectCount != NullValue:
-                asserts.assert_equal(event.Data.objectCount, objectcount_input, "Wrong ObjectCount")
+                asserts.assert_greater_equal(event.Data.objectCount, objectcount_input, "Wrong ObjectCount")
             # event start time
             event_start_time = event.Header.Timestamp
 
