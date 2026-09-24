@@ -395,37 +395,43 @@ class TC_AVSM_2_7(MatterBaseTest):
             pass
 
         self.step(18)
-        try:
-            notSupportedStreamUsage = next(
-                (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities and e != Globals.Enums.StreamUsageEnum.kInternal),
-                Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
-            )
-            videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=notSupportedStreamUsage,
-                videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
-                maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewportRes,
-                maxResolution=cluster.Structs.VideoResolutionStruct(
-                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
-                ),
-                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                keyFrameInterval=4000,
-                watermarkEnabled=watermark,
-                OSDEnabled=osd,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.fail(
-                "Unexpected success when expecting INVALID_IN_STATE due to StreamUsage set to a value not in aStreamUsagePriorities",
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.InvalidInState,
-                "Unexpected error returned when expecting InvalidInState due to StreamUsage set to a value not in aStreamUsagePriorities",
-            )
-            pass
+        notSupportedStreamUsage = next(
+            (e for e in Globals.Enums.StreamUsageEnum
+             if e not in aStreamUsagePriorities
+             and e not in (Globals.Enums.StreamUsageEnum.kInternal, Globals.Enums.StreamUsageEnum.kUnknownEnumValue)),
+            None)
+        if notSupportedStreamUsage is None:
+            # A DUT whose StreamUsagePriorities holds every StreamUsage leaves no valid
+            # unsupported value to send; the INVALID_IN_STATE path cannot be exercised on it.
+            log.info("StreamUsagePriorities holds every StreamUsage; no unsupported value exists to send, skipping step 18")
+            self.mark_current_step_skipped()
+        else:
+            try:
+                videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                    streamUsage=notSupportedStreamUsage,
+                    videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                    minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
+                    maxFrameRate=aVideoSensorParams.maxFPS,
+                    minResolution=aMinViewportRes,
+                    maxResolution=cluster.Structs.VideoResolutionStruct(
+                        width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                    ),
+                    minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    keyFrameInterval=4000,
+                    watermarkEnabled=watermark,
+                    OSDEnabled=osd,
+                )
+                await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+                asserts.fail(
+                    "Unexpected success when expecting INVALID_IN_STATE due to StreamUsage set to a value not in aStreamUsagePriorities",
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected error returned when expecting InvalidInState due to StreamUsage set to a value not in aStreamUsagePriorities",
+                )
 
         self.step(19)
         try:
