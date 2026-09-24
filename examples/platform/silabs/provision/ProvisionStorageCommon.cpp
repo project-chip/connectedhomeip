@@ -180,6 +180,38 @@ CHIP_ERROR Storage::GetSpake2pVerifier(MutableByteSpan & out_value, size_t & out
     return CHIP_NO_ERROR;
 }
 
+
+// PQC
+CHIP_ERROR Storage::GetDeviceAttestationCertForProfile(chip::Credentials::DeviceAttestationCertProfile profile,
+                                                MutableByteSpan & out_dac_buffer)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+CHIP_ERROR Storage::GetProductAttestationIntermediateCertForProfile(chip::Credentials::DeviceAttestationCertProfile profile,
+                                                            MutableByteSpan & out_pai_buffer)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+
+chip::Credentials::DeviceAttestationCertProfile Storage::GetPreferredDeviceAttestationChainProfile() const
+{
+    return chip::Credentials::DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+}
+
+chip::Credentials::DeviceAttestationProfileSupport Storage::GetDeviceAttestationProfileSupport() const
+{
+    const auto legacy = BitMask<chip::Credentials::DeviceAttestationCertProfileBitmap>(chip::Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+    return { legacy, legacy, legacy };
+}
+
+CHIP_ERROR Storage::GetDeviceAttestationDocumentSegment(chip::Credentials::DeviceAttestationDocumentType documentType,
+                                                chip::Credentials::DeviceAttestationCertProfile profile, size_t offset,
+                                                MutableByteSpan & out_document_buffer, size_t & out_document_size)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace Provision
 } // namespace Silabs
 } // namespace DeviceLayer
