@@ -50,8 +50,9 @@ namespace app {
 LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
                                Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                std::vector<PanelList> panels, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(CConfig, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
-    mPanelList(std::move(panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(CConfig, Tdelegate, Idelegate, *this),
+    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(panels)),
+    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 LoggingClosure::~LoggingClosure()
