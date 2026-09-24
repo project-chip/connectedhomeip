@@ -68,6 +68,7 @@ tests:
       response:
           value: 0
 
+    # StartUpMode is a nullable optional attribute and defaults to null.
     - label: "Read StartUpMode"
       command: "readAttribute"
       attribute: "StartUpMode"
