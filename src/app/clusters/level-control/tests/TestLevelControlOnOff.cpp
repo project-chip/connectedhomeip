@@ -105,7 +105,7 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff_OverrideOff)
     EXPECT_EQ(readLevel.Value(), 10u); // Should remain 10
 }
 
-// Spec 1.6.6.9 keys the gate on "The On/Off cluster exists on the same endpoint as this cluster",
+// Spec 1.6.6.9 conditions command suppression on "The On/Off cluster exists on the same endpoint as this cluster",
 // and 1.6.4.1.3 adds that this holds "Even if the On/Off (OO) feature set bit is set to zero".
 TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
 {
@@ -113,7 +113,8 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
     LevelControlCluster cluster{ kTestEndpointId,
-                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffDependency(onOffCluster) };
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithOnOffCluster(onOffCluster, /* advertiseFeature = */ false) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

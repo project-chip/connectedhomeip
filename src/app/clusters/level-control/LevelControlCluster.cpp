@@ -631,7 +631,7 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
 
 CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    // Spec 1.6.7.6 keys the 'with On/Off' side effects on the On/Off cluster being implemented on
+    // Spec 1.6.7.6 conditions 'with On/Off' side effects on whether the On/Off cluster is implemented on
     // the same endpoint, not on the OO feature bit.
     VerifyOrReturnError(mOnOffCluster != nullptr, CHIP_NO_ERROR);
     VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
@@ -871,7 +871,7 @@ bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask,
 
     // 1. If the On/Off cluster is not on this endpoint, there is no dependency, so we execute.
     //    Spec 1.6.4.1.3: the dependency holds "Even if the On/Off (OO) feature set bit is set to
-    //    zero", so this must not be keyed on the feature bit.
+    //    zero", so this does not depend on the feature bit.
     // 2. If the OnOff state is On, we execute.
     if (mOnOffCluster == nullptr || GetOnOff())
     {

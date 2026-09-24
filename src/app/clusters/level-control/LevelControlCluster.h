@@ -66,19 +66,45 @@ public:
         Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        /// Declares that the On/Off cluster is present on this endpoint without advertising the
-        /// OO feature. Spec 1.6.6.9 keys the command dependency on the On/Off cluster existing on
-        /// the same endpoint, and 1.6.4.1.3 states that this holds "Even if the On/Off (OO)
-        /// feature set bit is set to zero".
-        Config & WithOnOffDependency(OnOffCluster & onOffCluster)
+        /// Links the OnOffCluster on the same endpoint to this LevelControlCluster.
+        ///
+        /// @param onOffCluster     The OnOffCluster instance on this endpoint.
+        /// @param advertiseFeature If true, sets Feature::kOnOff (OO) in FeatureMap.
+        ///
+        /// Use Cases:
+        /// - Coupled (default, advertiseFeature = true, e.g. Dimmable Light):
+        ///   Level and power state are coupled. Reaching minimum level turns the device off,
+        ///   increasing level turns the device on, and turning on/off fades or restores level.
+        ///
+        /// - Decoupled (advertiseFeature = false, e.g. Speaker volume, rotary dimmer with separate power switch):
+        ///   Volume and power/mute operate independently (adjusting volume does not unmute/power on,
+        ///   and muting/powering off does not reset the volume level). The cluster link is still
+        ///   required because Matter spec 1.6.4.1.3 and 1.6.6.9 enforce that if OnOff exists on
+        ///   the endpoint, commands without 'WithOnOff' or ExecuteIfOff are suppressed while OnOff
+        ///   is false, even when the OO feature bit is 0.
+        ///
+        /// Sequencing Contract:
+        /// 1. Construct OnOffCluster.
+        /// 2. Configure LevelControlCluster::Config with WithOnOffCluster(onOffCluster).
+        /// 3. Construct LevelControlCluster.
+        /// 4. Register LevelControlCluster as an OnOffDelegate:
+        ///      onOffCluster.AddDelegate(&levelControlCluster);
+        /// 5. On teardown, remove delegate before destroying clusters:
+        ///      onOffCluster.RemoveDelegate(&levelControlCluster);
+        Config & WithOnOffCluster(OnOffCluster & onOffCluster, bool advertiseFeature = true)
         {
             mOnOffCluster = &onOffCluster;
+            if (advertiseFeature)
+            {
+                mFeatureMap.Set(LevelControl::Feature::kOnOff);
+            }
             return *this;
         }
+
+        /// Convenience alias for WithOnOffCluster(onOffCluster, true).
         Config & WithOnOff(OnOffCluster & onOffCluster)
         {
-            mFeatureMap.Set(LevelControl::Feature::kOnOff);
-            return WithOnOffDependency(onOffCluster);
+            return WithOnOffCluster(onOffCluster, true);
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
         {
