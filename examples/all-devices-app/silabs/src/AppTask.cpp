@@ -101,7 +101,12 @@ std::unique_ptr<chip::app::DeviceInterface> sRootNode;
 // Using a std::array (rather than std::vector) avoids heap allocation for the
 // container itself and enforces the bound at compile time, which is important
 // on RAM-constrained embedded platforms.
+// 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+constexpr std::size_t kMaxConstructedDevices = (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT + 1 : 2;
+#else
 constexpr std::size_t kMaxConstructedDevices = (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1;
+#endif
 std::array<std::unique_ptr<chip::app::DeviceInterface>, kMaxConstructedDevices> sConstructedDevices;
 std::size_t sConstructedDeviceCount = 0;
 
@@ -173,10 +178,15 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 }
 
 CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
-                                            chip::Credentials::GroupDataProvider * groupDataProvider)
+                                            chip::Credentials::GroupDataProvider * groupDataProvider,
+                                            chip::Crypto::SessionKeystore * sessionKeyStore)
 {
     ReturnErrorOnFailure(sAttributePersistenceProvider.Init(&storage));
     ReturnErrorOnFailure(sSafeAttributePersistenceProvider.Init(&storage));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    VerifyOrReturnError(sessionKeyStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+#endif
+
     chip::app::SetSafeAttributePersistenceProvider(&sSafeAttributePersistenceProvider);
 
     sDataModelProvider = std::make_unique<chip::app::CodeDrivenDataModelProvider>(storage, sAttributePersistenceProvider);
@@ -226,7 +236,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     // already owned/initialized by chip::Server when CHIP_CONFIG_ENABLE_ICD_SERVER=1,
     // so no extra setup is required here.
     chip::app::IcdFeature::Context icdContext{
-        .symmetricKeystore = *chip::Server::GetInstance().GetSessionKeystore(),
+        .symmetricKeystore = *sessionKeyStore,
     };
     ChipLogProgress(AppServer, "ICD server enabled: registering ICDManagement cluster on the root endpoint");
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -409,7 +419,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     }
 
     ReturnErrorOnFailure(instantiateDevice(deviceType));
-    ReturnErrorOnFailure(maybeAddPowerSource());
+    if (deviceType != "power-source")
+    {
+        ReturnErrorOnFailure(maybeAddPowerSource());
+    }
     return CHIP_NO_ERROR;
 }
 

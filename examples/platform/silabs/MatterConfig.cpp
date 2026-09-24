@@ -353,7 +353,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // App is using code-driven data model - initialize it
-    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider, initParams.sessionKeystore);
     if (dmErr == CHIP_NO_ERROR)
     {
         initParams.dataModelProvider = AppTask::GetDataModelProvider();

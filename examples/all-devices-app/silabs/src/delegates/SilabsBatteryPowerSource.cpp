@@ -68,8 +68,7 @@ void SilabsBatteryPowerSource::TimerFired()
     LogErrorOnFailure(batteryCluster.SetBatPercentRemaining(batteryLevel));
 
     // Also drop the battery voltage linearly with the remaining percentage so
-    // commissioners (e.g. Home Assistant) can display a live voltage reading.
-    // Range: 3.0V (full) -> 2.0V (empty), expressed in millivolts.
+    // commissioners that periodically read attributes can display a voltage reading.
     constexpr uint32_t kFullVoltageMv  = 3000;
     constexpr uint32_t kEmptyVoltageMv = 2000;
     DataModel::Nullable<uint32_t> batteryVoltage;
