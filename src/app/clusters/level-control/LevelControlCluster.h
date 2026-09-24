@@ -102,10 +102,7 @@ public:
         }
 
         /// Convenience alias for WithOnOffCluster(onOffCluster, true).
-        Config & WithOnOff(OnOffCluster & onOffCluster)
-        {
-            return WithOnOffCluster(onOffCluster, true);
-        }
+        Config & WithOnOff(OnOffCluster & onOffCluster) { return WithOnOffCluster(onOffCluster, true); }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
         {
             mFeatureMap.Set(LevelControl::Feature::kLighting);

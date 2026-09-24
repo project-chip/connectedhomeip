@@ -112,9 +112,10 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOffWithoutOnOffFeature)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ kTestEndpointId,
-                                 LevelControlCluster::Config(mockTimer, mockDelegate)
-                                     .WithOnOffCluster(onOffCluster, /* advertiseFeature = */ false) };
+    LevelControlCluster cluster{
+        kTestEndpointId,
+        LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOffCluster(onOffCluster, /* advertiseFeature = */ false)
+    };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
