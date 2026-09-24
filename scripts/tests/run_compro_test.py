@@ -308,8 +308,13 @@ def run(proxy_app: str, proxy_args: str, transport: str, endpoint: int, discrimi
         net_ns = stack.enter_context(chiptest.linux.IsolatedNetworkNamespace(
             index=ns_index,
             # The test script is started by run_python_test.py in the host
-            # namespace, so that is where it reaches the proxy from.
+            # namespace, so that is where it reaches the proxy from. That
+            # namespace may already route the default ULA prefix (CI's add-ipv6
+            # step gives it fd00:0:1:1::/64 on a link of its own), and with two
+            # routes for one /64 the script's traffic to the proxy takes
+            # whichever came first. So the topology gets a prefix of its own.
             tool_in_host_namespace=True,
+            ula_prefix="fd00:0:1:2",
             # The end device must not be reachable over IP before it is
             # commissioned, so its link stays down until the mock reports the
             # Wi-Fi association complete.

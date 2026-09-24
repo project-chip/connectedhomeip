@@ -265,13 +265,15 @@ class IsolatedNetworkNamespace(TerminableResource):
     def __init__(self, index: int = 0, mgmt_link_name: str = 'eth-mgmt', tool_link_name: str = 'eth-tool', app_link_name: str = 'eth-app',
                  mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True,
                  proxy_link_name: str | None = None, proxy_link_up: bool = True,
-                 tool_in_host_namespace: bool = False):
+                 tool_in_host_namespace: bool = False, ula_prefix: str = "fd00:0:1:1"):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
         - tool -- tool network for chip-tool. With ``tool_in_host_namespace`` the
           tool link stays in the namespace this process runs in, for a tool that
           is started by another process and cannot be moved into one.
+        - ula_prefix -- the /64 the ULAs are taken from. A topology whose tool link
+          is in the host namespace needs one that namespace does not already route.
         - app -- network for tested application(s).
         - proxy -- network for an intermediary application (e.g. a commissioning proxy),
           created only when ``proxy_link_name`` is given.
@@ -285,20 +287,20 @@ class IsolatedNetworkNamespace(TerminableResource):
 
         app_ipv6 = ["fe80::1/64"]
         if add_ula:
-            app_ipv6.append("fd00:0:1:1::1/64")
+            app_ipv6.append(f"{ula_prefix}::1/64")
         self.app_link = NetworkLink(f"{app_link_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6, ns=self.app_ns)
         self._app_link_up = app_link_up
 
         tool_ipv6 = ["fe80::2/64"]
         if add_ula:
-            tool_ipv6.append("fd00:0:1:1::2/64")
+            tool_ipv6.append(f"{ula_prefix}::2/64")
         self.tool_link = NetworkLink(f"{tool_link_name}-{index}",
                                      ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
         self._tool_link_up = tool_link_up
 
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:
-            mgmt_ipv6.append("fd00:0:1:1::5/64")
+            mgmt_ipv6.append(f"{ula_prefix}::5/64")
         self.mgmt_link = NetworkLink(f"{mgmt_link_name}-{index}",
                                      ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6, ns=self.mgmt_ns)
         self._mgmt_link_up = mgmt_link_up
@@ -313,7 +315,7 @@ class IsolatedNetworkNamespace(TerminableResource):
             self.proxy_ns = NetworkNamespace(f"ns-{proxy_link_name}-{index}")
             proxy_ipv6 = ["fe80::6/64"]
             if add_ula:
-                proxy_ipv6.append("fd00:0:1:1::6/64")
+                proxy_ipv6.append(f"{ula_prefix}::6/64")
             self.proxy_link = NetworkLink(f"{proxy_link_name}-{index}",
                                           ipv4_addrs=["10.10.10.6/24"], ipv6_addrs=proxy_ipv6, ns=self.proxy_ns)
 
