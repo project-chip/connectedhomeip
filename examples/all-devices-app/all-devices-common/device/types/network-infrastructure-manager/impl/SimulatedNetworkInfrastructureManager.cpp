@@ -138,7 +138,7 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::GetDataset(Thread::Operational
 }
 
 void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                   ActivateDatasetCallback * callback)
+                                                             ActivateDatasetCallback * callback)
 {
     ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
     if (!std::holds_alternative<NoActiveDataset>(mActive))

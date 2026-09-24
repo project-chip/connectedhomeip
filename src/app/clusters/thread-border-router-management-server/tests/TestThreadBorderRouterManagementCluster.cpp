@@ -107,11 +107,11 @@ public:
     bool mCommitCalled             = false;
 
     // When set, SetActiveDataset keeps the callback instead of completing right away.
-    bool mDeferActivation                     = false;
+    bool mDeferActivation = false;
     // When set, RevertActiveDataset completes the kept callback with CHIP_ERROR_CANCELLED.
-    bool mCompleteOnRevert                    = false;
+    bool mCompleteOnRevert                     = false;
     ActivateDatasetCallback * mPendingCallback = nullptr;
-    uint32_t mPendingSequence                 = 0;
+    uint32_t mPendingSequence                  = 0;
 };
 
 class MockBreadcrumbTracker : public BreadCrumbTracker
