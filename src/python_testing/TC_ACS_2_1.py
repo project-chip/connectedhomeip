@@ -36,7 +36,6 @@
 
 import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -117,15 +116,15 @@ class TC_ACS_2_1(MatterBaseTest):
                 await asyncio.sleep(ci_wait_time)
 
                 # testing ci attribute readiness wait time (can be commented out)
-                #start_time = time.perf_counter()
-                #end_time = start_time
-                #while (end_time-start_time) < ci_wait_time:
+                # start_time = time.perf_counter()
+                # end_time = start_time
+                # while (end_time-start_time) < ci_wait_time:
                 #    sensorFusionSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported)
                 #    if sensorFusionSupported is sensorFusionSupported_input:
                 #        break
                 #    end_time = time.perf_counter()
-                #log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)
-                #log.info("SensorFusionSupported is %s", sensorFusionSupported)
+                # log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)
+                # log.info("SensorFusionSupported is %s", sensorFusionSupported)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
