@@ -81,8 +81,10 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
     // the real value once it runs. A client can still enter calibration mode at any time by writing
     // Mode.CalibrationMode; see OnModeChanged()/TimerFired().
     auto & cluster = WindowCoveringCluster();
-    cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    cluster.SetCurrentPositionLiftPercent100ths(
+        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    cluster.SetCurrentPositionTiltPercent100ths(
+        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
     return CHIP_NO_ERROR;
 }
