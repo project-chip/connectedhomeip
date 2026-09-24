@@ -69,7 +69,7 @@ public:
     ~ProximityRangingServer();
 
     /**
-     * Construct the underlying cluster with the supplied feature set and optional attributres
+     * Construct the underlying cluster with the supplied feature set and optional attributes
      * and register it with the codegen data model provider.
      */
     CHIP_ERROR Init(BitMask<Feature> features, uint32_t optionalAttributeBits = 0);
