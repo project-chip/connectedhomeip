@@ -156,7 +156,8 @@ CHIP_ERROR Storage::GetSpake2pSalt(MutableByteSpan & value)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Storage::GetDeviceAttestationCertForProfile(chip::Credentials::DeviceAttestationCertProfile profile, MutableByteSpan & out_dac_buffer)
+CHIP_ERROR Storage::GetDeviceAttestationCertForProfile(chip::Credentials::DeviceAttestationCertProfile profile,
+                                                       MutableByteSpan & out_dac_buffer)
 {
     // Silabs storage only tracks the legacy Matter chain today; any other profile is served
     // via the example provider so callers keep a defined error path.
@@ -195,7 +196,8 @@ CHIP_ERROR Storage::GetProductAttestationIntermediateCertForProfile(chip::Creden
 
 chip::Credentials::DeviceAttestationProfileSupport Storage::GetDeviceAttestationProfileSupport() const
 {
-    const auto legacy = BitMask<chip::Credentials::DeviceAttestationCertProfileBitmap>(chip::Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
+    const auto legacy = BitMask<chip::Credentials::DeviceAttestationCertProfileBitmap>(
+        chip::Credentials::DeviceAttestationCertProfileBitmap::kSupportsEcdsaMatterLegacy);
     return { legacy, legacy, legacy };
 }
 
@@ -233,8 +235,8 @@ CHIP_ERROR Storage::GetDeviceAttestationDocumentSegment(chip::Credentials::Devic
         }
     }
 #ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
-    return Credentials::Examples::GetExampleDACProvider()->GetDeviceAttestationDocumentSegment(documentType, profile, offset,
-                                                                                   out_document_buffer, out_document_size);
+    return Credentials::Examples::GetExampleDACProvider()->GetDeviceAttestationDocumentSegment(
+        documentType, profile, offset, out_document_buffer, out_document_size);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
