@@ -26,7 +26,7 @@
 #include <zephyr/drivers/gpio.h>
 #define ALL_DEVICES_HAS_IDENTIFY_LED 1
 namespace {
-const struct gpio_dt_spec sIdentifyLed = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
+const struct gpio_dt_spec sIdentifyLed    = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 constexpr uint8_t sTargetBlinkToogleCount = 6;
 } // namespace
 #else
@@ -38,8 +38,10 @@ namespace chip::app::AllDevices {
 ZephyrIdentifyDelegate::ZephyrIdentifyDelegate()
 {
 #if ALL_DEVICES_HAS_IDENTIFY_LED
-    VerifyOrReturn(gpio_is_ready_dt(&sIdentifyLed), ChipLogError(DeviceLayer, "Identify LED GPIO not ready; Identify effects disabled"));
-    VerifyOrReturn(gpio_pin_configure_dt(&sIdentifyLed, GPIO_OUTPUT_INACTIVE) == 0, ChipLogError(DeviceLayer, "Identify LED GPIO configure failed; Identify effects disabled"));
+    VerifyOrReturn(gpio_is_ready_dt(&sIdentifyLed),
+                   ChipLogError(DeviceLayer, "Identify LED GPIO not ready; Identify effects disabled"));
+    VerifyOrReturn(gpio_pin_configure_dt(&sIdentifyLed, GPIO_OUTPUT_INACTIVE) == 0,
+                   ChipLogError(DeviceLayer, "Identify LED GPIO configure failed; Identify effects disabled"));
     mLedReady = true;
 #else
     ChipLogProgress(DeviceLayer, "No led0 GPIO available; Identify effects disabled");
@@ -62,14 +64,14 @@ void ZephyrIdentifyDelegate::OnTriggerEffect(Clusters::IdentifyCluster & cluster
 {
     const auto effect = cluster.GetEffectIdentifier();
     ChipLogProgress(DeviceLayer, "ZephyrIdentifyDelegate: TriggerEffect (%u)", static_cast<unsigned>(effect));
-    switch (effect){
-        case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
-        case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
-            LogErrorOnFailure(StopBlink());
-            break;
-        default:
-            LogErrorOnFailure(StartBlink());
-
+    switch (effect)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        LogErrorOnFailure(StopBlink());
+        break;
+    default:
+        LogErrorOnFailure(StartBlink());
     }
 }
 
@@ -79,8 +81,8 @@ CHIP_ERROR ZephyrIdentifyDelegate::StartBlink()
     VerifyOrReturnError(mLedReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrDo(!mBlinking, DeviceLayer::SystemLayer().CancelTimer(BlinkTimerHandler, this));
 
-    mBlinking    = true;
-    mToggleCount = 0;
+    mBlinking            = true;
+    mToggleCount         = 0;
     const CHIP_ERROR err = ScheduleBlinkTimer();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, mBlinking = false);
 #endif
@@ -119,7 +121,7 @@ void ZephyrIdentifyDelegate::BlinkTimerHandler(System::Layer *, void * appState)
     VerifyOrReturn(delegate->mBlinking);
 
     VerifyOrReturn(delegate->ToggleLed() == CHIP_NO_ERROR, LogErrorOnFailure(delegate->StopBlink()));
-    
+
     if (++delegate->mToggleCount >= sTargetBlinkToogleCount)
     {
         LogErrorOnFailure(delegate->StopBlink());

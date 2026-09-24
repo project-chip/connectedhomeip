@@ -42,9 +42,9 @@ private:
     CHIP_ERROR ScheduleBlinkTimer();
     static void BlinkTimerHandler(System::Layer * systemLayer, void * appState);
 
-    [[maybe_unused]]bool mLedReady = false;
-    [[maybe_unused]]bool mBlinking = false;
-    [[maybe_unused]]uint8_t mToggleCount = 0;
+    [[maybe_unused]] bool mLedReady       = false;
+    [[maybe_unused]] bool mBlinking       = false;
+    [[maybe_unused]] uint8_t mToggleCount = 0;
 };
 
 } // namespace chip::app::AllDevices

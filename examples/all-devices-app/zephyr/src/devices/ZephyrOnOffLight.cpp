@@ -36,9 +36,8 @@ const struct gpio_dt_spec sOnOffLed = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 namespace chip::app::AllDevices {
 
 ZephyrOnOffLight::ZephyrOnOffLight(const OnOffLoad::Context & context) :
-    LoggingOnOffDelegate(),
-    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this,
-              context.identifyDelegate, context)
+    LoggingOnOffDelegate(), OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1), *this, *this,
+                                      context.identifyDelegate, context)
 {
 #if ALL_DEVICES_HAS_ONOFF_LED
     VerifyOrReturn(gpio_is_ready_dt(&sOnOffLed), ChipLogError(DeviceLayer, "On/Off LED GPIO not ready"));

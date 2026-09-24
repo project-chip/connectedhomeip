@@ -213,17 +213,17 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OtaFeature::Context otaContext{
-        .otaCommands          = mOTARequestorCore,
-        .attributes           = mOTARequestorAttributes,
+        .otaCommands = mOTARequestorCore,
+        .attributes  = mOTARequestorAttributes,
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
-    mRootNode = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
 #else
     using RootNodeType = RootNodeWith<NetworkFeature>;
-    mRootNode = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
-    
-#endif    
+    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+
+#endif
 
     VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
