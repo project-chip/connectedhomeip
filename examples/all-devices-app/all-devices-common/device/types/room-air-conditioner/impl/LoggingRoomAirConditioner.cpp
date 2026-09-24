@@ -29,8 +29,13 @@ using Protocols::InteractionModel::Status;
 LoggingRoomAirConditioner::LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                                      std::optional<EndpointComposition::SemanticTag> tag) :
     RoomAirConditioner(RoomAirConditioner::Context{ timerDelegate, *this, *this, *this, *this }),
-    mFabricTable(fabricTable), mTag(tag)
+    mTimerDelegate(timerDelegate), mFabricTable(fabricTable), mTag(tag)
 {}
+
+LoggingRoomAirConditioner::~LoggingRoomAirConditioner()
+{
+    mTimerDelegate.CancelTimer(this);
+}
 
 CHIP_ERROR LoggingRoomAirConditioner::RegisterDescriptor(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                          EndpointComposition composition)
@@ -97,21 +102,26 @@ void LoggingRoomAirConditioner::OnIdentifyStop(Clusters::IdentifyCluster & clust
 
 void LoggingRoomAirConditioner::OnOffStartup(bool on)
 {
-    // Schedule the startup logic to run on the event loop.
+    mStartupOn = on;
+    // Schedule the startup logic using the timer delegate.
     // This ensures that all clusters (including ThermostatCluster) are fully
     // initialized and their states are loaded from KVS before we attempt to sync them.
-    CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, on]() {
-        ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
-        LogErrorOnFailure(
-            StatusIB(ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
-                                                                : DataModel::NullNullable))
-                .ToChipError());
-        if (!on && mSystemMode != SystemModeEnum::kOff)
-        {
-            LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
-        }
-    });
+    CHIP_ERROR err = mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(0));
     LogErrorOnFailure(err);
+}
+
+void LoggingRoomAirConditioner::TimerFired()
+{
+    bool on = mStartupOn;
+    ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
+    LogErrorOnFailure(
+        StatusIB(ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
+                                                            : DataModel::NullNullable))
+            .ToChipError());
+    if (!on && mSystemMode != SystemModeEnum::kOff)
+    {
+        LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
+    }
 }
 
 void LoggingRoomAirConditioner::OnOnOffChanged(bool on)

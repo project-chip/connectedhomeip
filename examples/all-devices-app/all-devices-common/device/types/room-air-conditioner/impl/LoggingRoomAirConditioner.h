@@ -17,6 +17,7 @@
 
 #include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/types/room-air-conditioner/RoomAirConditioner.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <optional>
 
@@ -27,14 +28,18 @@ class LoggingRoomAirConditioner : public Clusters::IdentifyDelegate,
                                   public Clusters::Thermostat::Delegate,
                                   public Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
                                   public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
-                                  public RoomAirConditioner
+                                  public RoomAirConditioner,
+                                  public TimerContext
 {
 public:
     LoggingRoomAirConditioner(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                               std::optional<EndpointComposition::SemanticTag> tag = std::nullopt);
-    ~LoggingRoomAirConditioner() override = default;
+    ~LoggingRoomAirConditioner() override;
 
     Clusters::ThermostatUserInterfaceConfigurationCluster & UserInterfaceCluster() { return mUserInterfaceCluster.Cluster(); }
+
+    // TimerContext
+    void TimerFired() override;
 
     // IdentifyDelegate
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
@@ -97,6 +102,9 @@ protected:
 
 private:
     static constexpr int16_t kDefaultLocalTemperatureCentiCelsius = 2500;
+
+    TimerDelegate & mTimerDelegate;
+    bool mStartupOn = false;
 
     FabricTable & mFabricTable;
     // Own the default tag so Descriptor's view remains valid throughout registration.
