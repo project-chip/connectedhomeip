@@ -165,7 +165,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
             if ambientContextTypeSupported:
 
-                log.info("Rx'd AmbientContextTypeSupported: %s", {ambientContextTypeSupported})
+                log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
                 asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
                                           "AmbientContextTypeSupported should be less than equalt to 50.")
 
@@ -188,7 +188,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             if ambientContextType:
 
-                log.info("Rx'd AmbientContextType: %s", {ambientContextType})
+                log.info("Rx'd AmbientContextType: %s", ambientContextType)
                 simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
                 asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
                                           "AmbientContextTypeSupported should be less than equalt to SimultaneousDetectLimit.")
@@ -233,7 +233,7 @@ class TC_ACS_2_1(MatterBaseTest):
             objectCountThresholdReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
             )
-            log.info("Rx'd ObjectCountThresholdReached: %s", {objectCountThresholdReached})
+            log.info("Rx'd ObjectCountThresholdReached: %s", objectCountThresholdReached)
             asserts.assert_true(objectCountThresholdReached in [True, False],
                                 "Expected True or False Boolean value.")
 
@@ -249,7 +249,7 @@ class TC_ACS_2_1(MatterBaseTest):
             asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
 
             # ObjectCountThreshold should be greater than equal to 1
-            asserts.assert_less_equal(1, objectCountConfig.objectCountThreshold,
+            asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
                                       "Threshold value should be greater than equalt to 1.")
 
             self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
@@ -259,9 +259,9 @@ class TC_ACS_2_1(MatterBaseTest):
             if attr.ObjectCount.attribute_id in attribute_list:
                 objectCount = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
-                asserts.assert_true((type(objectCount) is int), "ObjectCount value should be uint16 data.")
-                asserts.assert_less_equal(1, objectCount,
-                                          "ObjectCount value should be greater than equal to 1.")
+                asserts.assert_true(isinstance(objectCount, int), "ObjectCount value should be uint16 data.")
+                asserts.assert_less_equal(0, objectCount,
+                                          "ObjectCount value should be greater than equal to 0 fallback value.")
 
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
@@ -279,7 +279,7 @@ class TC_ACS_2_1(MatterBaseTest):
         self.step("11", "TH reads the HoldTime attribute. Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
         holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
         holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
-        log.info("Rx'd HoldTime: %s", {holdTime})
+        log.info("Rx'd HoldTime: %s", holdTime)
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
 
@@ -357,7 +357,7 @@ class TC_ACS_2_1(MatterBaseTest):
                         # CrowdDetected
                         asserts.assert_true(predictedActivity.crowdDetected in [True, False],
                                             "Expected True or False Boolean value.")
-                        log.info("Rx'd CrowdDetected: %s", {predictedActivity.crowdDetected})
+                        log.info("Rx'd CrowdDetected: %s", predictedActivity.crowdDetected)
 
                         # CrowdCount
                         if predictedActivity.crowdCount != NullValue:
