@@ -250,7 +250,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
             # ObjectCountThreshold should be greater than equal to 1
             asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
-                                      "Threshold value should be greater than equalt to 1.")
+                                         "Threshold value should be greater than equalt to 1.")
 
             self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
             # ObjectCount should be uint16 (optional)
