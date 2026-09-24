@@ -24,6 +24,7 @@
 #include <lib/support/TimerDelegate.h>
 
 #include <string>
+#include <variant>
 
 namespace chip {
 namespace app {
@@ -100,6 +101,40 @@ private:
     void OnActiveDatasetTimerFired();
     void OnPendingDatasetTimerFired();
 
+    // State of the active dataset.
+    //
+    //   event                  from                           to
+    //   ---------------------  -----------------------------  -----------------
+    //   SetActiveDataset       NoActiveDataset                Activating
+    //   active timer fires     Activating                     ActiveUncommitted
+    //   CommitActiveDataset    ActiveUncommitted              ActiveCommitted
+    //   RevertActiveDataset    Activating, ActiveUncommitted  NoActiveDataset
+    //   pending timer fires    any                            ActiveCommitted
+    //   Unregister             any                            NoActiveDataset
+    struct NoActiveDataset
+    {
+    };
+    struct Activating
+    {
+        Thread::OperationalDataset dataset;
+        ActivateDatasetCallback * callback;
+        uint32_t sequence;
+    };
+    struct ActiveUncommitted
+    {
+        Thread::OperationalDataset dataset;
+    };
+    struct ActiveCommitted
+    {
+        Thread::OperationalDataset dataset;
+    };
+
+    // Returns the dataset visible to GetDataset(kActive), or nullptr when there is none.
+    const Thread::OperationalDataset * ActiveDataset() const;
+    // Leaves the Activating state (if in it) and completes its callback with `error`.
+    void CompleteActivation(CHIP_ERROR error);
+    void ReportAttributeChange(AttributeId attributeId);
+
     TimerDelegate & mTimerDelegate;
     std::string mBorderRouterName;
 
@@ -107,12 +142,8 @@ private:
     PendingDatasetTimerContext mPendingDatasetTimerContext{ *this };
 
     AttributeChangeCallback * mAttributeChangeCallback = nullptr;
-    Thread::OperationalDataset mActiveDataset;
-    Thread::OperationalDataset mStagedActiveDataset;
-    Thread::OperationalDataset mPendingDataset;
-
-    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
-    uint32_t mActivateDatasetSequence                  = 0;
+    std::variant<NoActiveDataset, Activating, ActiveUncommitted, ActiveCommitted> mActive;
+    Thread::OperationalDataset mPendingDataset; // empty when there is no pending dataset
 };
 
 } // namespace app

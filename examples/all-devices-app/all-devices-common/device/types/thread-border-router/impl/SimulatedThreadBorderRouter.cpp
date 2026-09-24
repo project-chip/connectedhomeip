@@ -52,14 +52,9 @@ void SimulatedThreadBorderRouter::Unregister(CodeDrivenDataModelProvider & provi
 {
     mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
     mTimerDelegate.CancelTimer(&mPendingDatasetTimerContext);
-    if (mActivateDatasetCallback != nullptr)
-    {
-        mActivateDatasetCallback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_ERROR_CANCELLED);
-    }
-    mActivateDatasetCallback = nullptr;
+    CompleteActivation(CHIP_ERROR_CANCELLED);
+    mActive                  = NoActiveDataset{};
     mAttributeChangeCallback = nullptr;
-    mStagedActiveDataset.Clear();
-    mActiveDataset.Clear();
     mPendingDataset.Clear();
     ThreadBorderRouter::Unregister(provider);
 }
@@ -124,25 +119,25 @@ uint16_t SimulatedThreadBorderRouter::GetThreadVersion()
 bool SimulatedThreadBorderRouter::GetInterfaceEnabled()
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::GetInterfaceEnabled called");
-    return !mActiveDataset.IsEmpty();
+    return ActiveDataset() != nullptr;
 }
 
 CHIP_ERROR SimulatedThreadBorderRouter::GetDataset(Thread::OperationalDataset & dataset, DatasetType type)
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::GetDataset called (type: %d)", static_cast<int>(type));
-    Thread::OperationalDataset * source;
+    const Thread::OperationalDataset * source = nullptr;
     switch (type)
     {
     case DatasetType::kActive:
-        source = &mActiveDataset;
+        source = ActiveDataset();
         break;
     case DatasetType::kPending:
-        source = &mPendingDataset;
+        source = mPendingDataset.IsEmpty() ? nullptr : &mPendingDataset;
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    VerifyOrReturnError(!source->IsEmpty(), CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(source != nullptr, CHIP_ERROR_NOT_FOUND);
     return dataset.Init(source->AsByteSpan());
 }
 
@@ -150,56 +145,55 @@ void SimulatedThreadBorderRouter::SetActiveDataset(const Thread::OperationalData
                                                    ActivateDatasetCallback * callback)
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
-    if (mActivateDatasetCallback != nullptr)
+    if (!std::holds_alternative<NoActiveDataset>(mActive))
     {
         callback->OnActivateDatasetComplete(sequenceNum, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    Thread::OperationalDataset tempDataset;
-    CHIP_ERROR err = tempDataset.Init(activeDataset.AsByteSpan());
+    Activating activating;
+    activating.callback = callback;
+    activating.sequence = sequenceNum;
+    CHIP_ERROR err      = activating.dataset.Init(activeDataset.AsByteSpan());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mTimerDelegate.StartTimer(&mActiveDatasetTimerContext, System::Clock::Seconds32(1));
+    }
     if (err != CHIP_NO_ERROR)
     {
         callback->OnActivateDatasetComplete(sequenceNum, err);
         return;
     }
 
-    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
-    err = mTimerDelegate.StartTimer(&mActiveDatasetTimerContext, System::Clock::Seconds32(1));
-    if (err != CHIP_NO_ERROR)
-    {
-        callback->OnActivateDatasetComplete(sequenceNum, err);
-        return;
-    }
-
-    mStagedActiveDataset     = tempDataset;
-    mActivateDatasetCallback = callback;
-    mActivateDatasetSequence = sequenceNum;
+    mActive = activating;
 }
 
 CHIP_ERROR SimulatedThreadBorderRouter::CommitActiveDataset()
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::CommitActiveDataset called");
-    mStagedActiveDataset.Clear();
+    if (auto * uncommitted = std::get_if<ActiveUncommitted>(&mActive))
+    {
+        mActive = ActiveCommitted{ uncommitted->dataset };
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SimulatedThreadBorderRouter::RevertActiveDataset()
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::RevertActiveDataset called");
-    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
-    if (mActivateDatasetCallback != nullptr)
+    if (std::holds_alternative<Activating>(mActive))
     {
-        mActivateDatasetCallback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_ERROR_CANCELLED);
+        // The dataset was never visible, so no attribute changes.
+        mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+        CompleteActivation(CHIP_ERROR_CANCELLED);
     }
-    mActivateDatasetCallback = nullptr;
-    mStagedActiveDataset.Clear();
-    mActiveDataset.Clear();
-    if (mAttributeChangeCallback != nullptr)
+    else if (std::holds_alternative<ActiveUncommitted>(mActive))
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
+        mActive = NoActiveDataset{};
+        ReportAttributeChange(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+        ReportAttributeChange(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
     }
+    // ActiveCommitted and NoActiveDataset: nothing to revert.
     return CHIP_NO_ERROR;
 }
 
@@ -216,50 +210,85 @@ CHIP_ERROR SimulatedThreadBorderRouter::SetPendingDataset(const Thread::Operatio
     if (err != CHIP_NO_ERROR)
     {
         mPendingDataset.Clear();
-        if (mAttributeChangeCallback != nullptr)
-        {
-            mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
-        }
+        ReportAttributeChange(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
         return err;
     }
 
     mPendingDataset = tempDataset;
-    if (mAttributeChangeCallback != nullptr)
-    {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
-    }
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
     return CHIP_NO_ERROR;
 }
 
 void SimulatedThreadBorderRouter::OnActiveDatasetTimerFired()
 {
-    auto * callback          = mActivateDatasetCallback;
-    auto sequenceNum         = mActivateDatasetSequence;
-    mActivateDatasetCallback = nullptr;
+    auto * activating = std::get_if<Activating>(&mActive);
+    VerifyOrReturn(activating != nullptr);
 
-    mActiveDataset = mStagedActiveDataset;
-    if (mAttributeChangeCallback != nullptr)
-    {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
-    }
+    auto * callback = activating->callback;
+    auto sequence   = activating->sequence;
+    mActive         = ActiveUncommitted{ activating->dataset };
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
 
     if (callback != nullptr)
     {
-        callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+        callback->OnActivateDatasetComplete(sequence, CHIP_NO_ERROR);
     }
 }
 
 void SimulatedThreadBorderRouter::OnPendingDatasetTimerFired()
 {
-    CHIP_ERROR err = mActiveDataset.Init(mPendingDataset.AsByteSpan());
-    LogErrorOnFailure(err);
+    ActiveCommitted committed;
+    CHIP_ERROR err = committed.dataset.Init(mPendingDataset.AsByteSpan());
     mPendingDataset.Clear();
-    if (err == CHIP_NO_ERROR && mAttributeChangeCallback != nullptr)
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
+    if (err != CHIP_NO_ERROR)
     {
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id);
-        mAttributeChangeCallback->ReportAttributeChanged(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
+        LogErrorOnFailure(err);
+        return;
+    }
+
+    // A pending dataset replaces any activation still in progress.
+    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    CompleteActivation(CHIP_ERROR_CANCELLED);
+
+    mActive = committed;
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
+    ReportAttributeChange(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
+}
+
+const Thread::OperationalDataset * SimulatedThreadBorderRouter::ActiveDataset() const
+{
+    if (auto * uncommitted = std::get_if<ActiveUncommitted>(&mActive))
+    {
+        return &uncommitted->dataset;
+    }
+    if (auto * committed = std::get_if<ActiveCommitted>(&mActive))
+    {
+        return &committed->dataset;
+    }
+    return nullptr;
+}
+
+void SimulatedThreadBorderRouter::CompleteActivation(CHIP_ERROR error)
+{
+    auto * activating = std::get_if<Activating>(&mActive);
+    VerifyOrReturn(activating != nullptr);
+
+    auto * callback = activating->callback;
+    auto sequence   = activating->sequence;
+    mActive         = NoActiveDataset{};
+    if (callback != nullptr)
+    {
+        callback->OnActivateDatasetComplete(sequence, error);
+    }
+}
+
+void SimulatedThreadBorderRouter::ReportAttributeChange(AttributeId attributeId)
+{
+    if (mAttributeChangeCallback != nullptr)
+    {
+        mAttributeChangeCallback->ReportAttributeChanged(attributeId);
     }
 }
 
