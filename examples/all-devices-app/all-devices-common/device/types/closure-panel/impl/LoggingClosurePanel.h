@@ -34,6 +34,7 @@ public:
                                                    const uint16_t & numberOfSteps,
                                                    const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
     void TimerFired() override;
+    void CancelTimer() { mTimerDelegate.CancelTimer(this); };
 
 private:
     static constexpr uint32_t kMotionDurationSec = 1;

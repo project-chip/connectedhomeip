@@ -64,6 +64,10 @@ Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
     ChipLogProgress(DeviceLayer, "LoggingClosure::HandleStopCommand()");
     CancelTimer();
     mPendingCurrentState.reset();
+    for (auto & panel : mLoggingClosurePanel)
+    {
+        panel->CancelTimer();
+    }
     return Protocols::InteractionModel::Status::Success;
 }
 
