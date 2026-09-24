@@ -442,7 +442,14 @@ class ResultProcessingThread(TerminableThread):
             self.result_queue.close()
 
             if self.exception is not None:
-                raise self.exception
+                # KeyboardInterrupt and ResultError are already user-meaningful (the latter carries the
+                # message from _process_result, e.g. the expected-failure count mismatch), so they are
+                # re-raised as-is. Any other exception reaching the result thread is unexpected, so it is
+                # wrapped to mark it as a result-processing-thread failure while keeping the original as
+                # the cause.
+                if isinstance(self.exception, (KeyboardInterrupt, ResultError)):
+                    raise self.exception
+                raise ResultError("Result processing thread terminated with an exception") from self.exception
 
             if not self.resource_thread_join():
                 raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
