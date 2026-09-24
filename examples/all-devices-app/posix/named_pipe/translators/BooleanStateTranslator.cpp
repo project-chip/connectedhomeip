@@ -16,6 +16,9 @@
 
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
 
+#include <clusters/BooleanState/AttributeIds.h>
+#include <clusters/BooleanState/ClusterId.h>
+
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
@@ -31,7 +34,9 @@ CHIP_ERROR BooleanStateTranslator::TranslateAndExecute(EndpointId endpointId, co
         newState = ExtractBool(json, "BooleanState");
     }
     VerifyOrReturnError(newState.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    return DispatchAction(registry, "SetBooleanState"_span, endpointId, *newState);
+    return DispatchSetAttribute(
+        registry, ConcreteAttributePath(endpointId, Clusters::BooleanState::Id, Clusters::BooleanState::Attributes::StateValue::Id),
+        *newState);
 }
 
 } // namespace chip::app::NamedPipe

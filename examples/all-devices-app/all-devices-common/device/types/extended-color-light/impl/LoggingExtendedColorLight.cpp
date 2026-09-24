@@ -16,22 +16,12 @@
  */
 
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
-#include <devices/Types.h>
-
-#include <clusters/ColorControl/Enums.h>
 
 namespace chip {
 namespace app {
 
 LoggingExtendedColorLight::LoggingExtendedColorLight(const Context & context) :
-    LoggingLightDriver(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kExtendedColorLight, 1), context,
-                       Conformance{
-                           .colorFeatures = BitMask<Clusters::ColorControl::Feature>(
-                               Clusters::ColorControl::Feature::kXy, Clusters::ColorControl::Feature::kColorTemperature,
-                               Clusters::ColorControl::Feature::kHueAndSaturation, Clusters::ColorControl::Feature::kEnhancedHue,
-                               Clusters::ColorControl::Feature::kColorLoop),
-                           .initialColor = Clusters::ColorControl::XYColor{},
-                       })
+    ExtendedColorLight(LoggingLightDriver::GetDelegates(), context)
 {}
 
 } // namespace app

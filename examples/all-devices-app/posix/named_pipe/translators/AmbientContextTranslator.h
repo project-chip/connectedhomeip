@@ -40,6 +40,7 @@ public:
             "RemoveAmbientSensingNonMatterContributor"_span,
             "UpdateAmbientSensingContributorStatus"_span,
             "SetAmbientSensingUnionName"_span,
+            "SetAmbientSensingUnionHealth"_span,
         };
         return Span<const CharSpan>(kNames);
     }
@@ -68,6 +69,8 @@ private:
                                                               OOBAccessorRegistry & registry) const;
     CHIP_ERROR TranslateSetAmbientSensingUnionName(EndpointId endpointId, const Json::Value & json,
                                                    OOBAccessorRegistry & registry) const;
+    CHIP_ERROR TranslateSetAmbientSensingUnionHealth(EndpointId endpointId, const Json::Value & json,
+                                                     OOBAccessorRegistry & registry) const;
 };
 
 } // namespace chip::app::NamedPipe
