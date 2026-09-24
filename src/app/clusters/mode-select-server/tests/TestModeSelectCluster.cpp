@@ -467,6 +467,8 @@ TEST_F(TestModeSelectCluster, ApplySceneClampsEquidistantModeToLowerSupportedMod
     ModeSelectCluster cluster(kRootEndpointId, spacedModesDelegate, MakeConfig());
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    // Start from mode 4 so the assertion below proves ApplyScene actually moved CurrentMode to 0.
+    ASSERT_EQ(cluster.UpdateCurrentMode(4), Status::Success);
 
     ScenesManagement::Structs::AttributeValuePairStruct::Type pairs[1];
     pairs[0].attributeID = CurrentMode::Id;
