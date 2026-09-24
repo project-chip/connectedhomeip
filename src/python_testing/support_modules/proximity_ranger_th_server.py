@@ -37,10 +37,11 @@ the superseded CLI-Manual YAML stood in for.
 The reference ``all-devices-app`` uses ``--port`` and has no ``--passcode`` flag
 (the passcode is fixed at 20202021), so the stock ``AppServerSubprocess`` -- which
 passes ``--secured-device-port`` and ``--passcode`` -- cannot launch it. This module
-subclasses it to build the correct command line while keeping the
+builds the app's own flags on the base ``Subprocess`` instead, keeping its
 arm/wait output-matching machinery used to confirm a command reached the server.
 """
 
+import asyncio
 import logging
 import os
 import queue
@@ -49,6 +50,8 @@ import re
 import tempfile
 import threading
 import time
+from collections.abc import Callable
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from sys import stderr, stdout
 from tempfile import NamedTemporaryFile
@@ -58,7 +61,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
-from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
@@ -141,15 +143,15 @@ class TechSpec:
     """
 
     name: str
-    log_tag: str                 # WFUSDPD / BLTCS / BLERBC
-    technology: object           # RangingTechEnum member
-    peer_attribute: object       # WiFiDevIK / BLTDevIK / BLEDeviceID attribute
-    peer_is_bytes: bool          # WiFi/BLT peer identities are octstr; BLE's is a uint
-    initiator_role: object       # role for TH_I
-    responder_role: object       # role for TH_R
-    request_field: str           # StartRangingRequest field holding the role config
-    build_role_config: object    # (role, peer) -> role config struct
-    common_secret_note: str      # what the operator must keep identical across TH_I/TH_R
+    log_tag: str                                                       # WFUSDPD / BLTCS / BLERBC
+    technology: Clusters.ProximityRanging.Enums.RangingTechEnum
+    peer_attribute: type[Clusters.ClusterObjects.ClusterAttributeDescriptor]  # WiFiDevIK / BLTDevIK / BLEDeviceID
+    peer_is_bytes: bool                                                # WiFi/BLT peer identities are octstr; BLE's is a uint
+    initiator_role: Clusters.ProximityRanging.Enums.RangingRoleEnum    # role for TH_I
+    responder_role: Clusters.ProximityRanging.Enums.RangingRoleEnum    # role for TH_R
+    request_field: str                                                 # StartRangingRequest field holding the role config
+    build_role_config: Callable[..., object]                          # (role, peer) -> role config struct
+    common_secret_note: str                                            # what the operator must keep identical across TH_I/TH_R
 
 
 WIFI_SPEC = TechSpec(
@@ -206,21 +208,23 @@ class THServerLogExpectation:
     description: str
 
 
-class ProximityRangerServerSubprocess(AppServerSubprocess):
+class ProximityRangerServerSubprocess(Subprocess):
     """Starts an ``all-devices-app`` proximity-ranger instance in a subprocess.
 
-    Reuses :class:`AppServerSubprocess`'s output arm/wait machinery but rebuilds the
-    command line: the reference app takes ``--port`` (not ``--secured-device-port``) and
-    has no ``--passcode`` flag, so :class:`AppServerSubprocess`'s own ``__init__`` would
-    pass options the app rejects. The base ``__init__`` is deliberately bypassed in
-    favour of the grandparent :class:`Subprocess` initializer.
+    Builds the reference app's own flags (``--device``, ``--KVS``, ``--port`` -- not
+    ``--secured-device-port`` -- ``--discriminator``, and no ``--passcode``, since its
+    passcode is fixed), and prefixes and retains every forwarded line so a later step can
+    scan the output. The output arm/wait matching this relies on lives in the base
+    :class:`Subprocess`.
     """
-
-    PREFIX = b"[PR-SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int, port: int,
                  device: str = "proximity-ranger:1", kvs_path: str | None = None,
+                 prefix: bytes = b"[PR-SERVER]",
                  f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+        # Prefix every forwarded line so the two servers' interleaved output is attributable;
+        # a constructor arg (rather than a class constant) lets a caller distinguish instances.
+        self.prefix = prefix
         if kvs_path is None:
             # Deleted when this object is garbage collected.
             self.kvs_tmp_file = NamedTemporaryFile(dir=storage_dir, prefix="kvs-proxr-")  # noqa: SIM115
@@ -239,15 +243,15 @@ class ProximityRangerServerSubprocess(AppServerSubprocess):
         # threads, so guard it with a lock.
         self._captured = bytearray()
         self._capture_lock = threading.Lock()
-        Subprocess.__init__(
-            self, *command,
+        super().__init__(
+            *command,
             output_cb=self._capture_and_prefix,
             f_stdout=f_stdout, f_stderr=f_stderr)
 
     def _capture_and_prefix(self, line: bytes, is_stderr: bool) -> bytes:
         with self._capture_lock:
             self._captured.extend(line)
-        return self.PREFIX + line
+        return self.prefix + line
 
     def output_len(self) -> int:
         """Current length of the retained output, used as a mark to scan only later lines."""
@@ -446,10 +450,18 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 f"\nPress enter once the DUT reports that commissioning of {instance.name} completed.\n")
 
     async def read_th_attribute(self, instance: THServerInstance, attribute):
-        """Reads one Proximity Ranging attribute from a TH server."""
-        read = await self.th_controller.ReadAttribute(
-            instance.node_id, [(instance.endpoint, attribute)])
-        return read[instance.endpoint][Clusters.ProximityRanging][attribute]
+        """Reads one Proximity Ranging attribute from a TH server.
+
+        Routed through ``read_single_attribute_check_success`` so a decoder error (a
+        ValueDecodeFailure returned in place of the value) fails the read here rather than
+        flowing on as if it were the attribute value. These are plain (non-fabric-scoped)
+        reads, so the helper's fabric_filtered=True default does not change what is read; the
+        wildcard-subscription cross-check is inert because it is gated on the DUT node id and
+        the harness never opens a session to the DUT (node_id here is a TH server's).
+        """
+        return await self.read_single_attribute_check_success(
+            cluster=Clusters.ProximityRanging, attribute=attribute,
+            dev_ctrl=self.th_controller, node_id=instance.node_id, endpoint=instance.endpoint)
 
     async def send_client_command(self, instance: THServerInstance, cmd):
         """Sends a Proximity Ranging client command to a TH server over the harness fabric.
@@ -491,7 +503,7 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         instance.subprocess.arm_output_match(expectation.pattern)
         return expectation
 
-    def _assert_client_stop(self, instance: THServerInstance, session_id: int, mark: int, spec: TechSpec) -> None:
+    async def _assert_client_stop(self, instance: THServerInstance, session_id: int, mark: int, spec: TechSpec) -> None:
         """Asserts the DUT sent a StopRangingRequest that TH_R accepted for ``session_id``.
 
         The plan (steps 6/11/16) requires the DUT to send a StopRangingRequest to TH_R with TH_R's
@@ -528,7 +540,9 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 return
             if time.time() >= deadline:
                 break
-            time.sleep(0.2)
+            # await, not time.sleep: this runs on the asyncio event loop, and a blocking sleep
+            # would stall every other coroutine (e.g. the subscription pump) for the poll interval.
+            await asyncio.sleep(0.2)
         tail = instance.subprocess.output_snapshot(mark)
         asserts.assert_true(
             receipt.search(tail) is not None,
@@ -580,24 +594,29 @@ class ProximityRangerTHServerTest(MatterBaseTest):
         setattr(request, spec.request_field, spec.build_role_config(role, peer))
         return request
 
-    async def run_technology_pass(self, spec: TechSpec, *, periodic: bool,
-                                  read_step, start_step, response_step, final_step) -> None:
-        """Runs one technology pass of the DUT-as-client procedure across its four steps."""
-        peer_for_i, peer_for_r = await self._run_read_step(spec, read_step)
-        # Subscribe to TH_I's RangingResult BEFORE StartRangingRequest (both cases) so no emission is
-        # missed under human pacing; the instant session self-terminates ~3 s in, the periodic at 30 s.
+    @asynccontextmanager
+    async def ranging_result_subscription(self):
+        """Subscribes to TH_I's RangingResult for one pass, cancelling the subscription on exit.
+
+        Entered AFTER the read step and BEFORE the StartRangingRequest (both cases) so no
+        emission is missed under human pacing; the instant session self-terminates ~3 s in, the
+        periodic at 30 s. The finally guarantees the subscription is cancelled even if a step
+        inside the block fails.
+        """
         result_handler = EventSubscriptionHandler(expected_cluster=_PR)
         await result_handler.start(self.th_controller, self.th_i.node_id, self.th_i.endpoint,
                                    min_interval_sec=0, max_interval_sec=RANGING_INSTANCE_INTERVAL_SECONDS)
         try:
-            await self._run_start_step(spec, start_step, peer_for_i, peer_for_r, periodic=periodic)
-            await self._run_response_step(spec, response_step)
-            await self._run_final_step(spec, final_step, periodic=periodic, result_handler=result_handler)
+            yield result_handler
         finally:
             result_handler.cancel()
 
-    async def _run_read_step(self, spec: TechSpec, read_step) -> tuple:
-        self.step(read_step)
+    async def read_pass_attributes(self, spec: TechSpec) -> tuple:
+        """The read step's work: read both TH servers' attributes and prompt the operator.
+
+        Returns the crossed peer identities (TH_I is told TH_R's, and vice versa) for the
+        StartRangingRequest. The caller has already called self.step() for the read step.
+        """
         peer_for_i, peer_for_r = await self._read_common_technology_and_peers(spec)
         if not self.is_pics_sdk_ci_only:
             self.wait_for_user_input(
@@ -610,8 +629,11 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 "\nPress enter once the DUT has read both TH servers' attributes.\n")
         return peer_for_i, peer_for_r
 
-    async def _run_start_step(self, spec: TechSpec, start_step, peer_for_i, peer_for_r, *, periodic: bool) -> None:
-        self.step(start_step)
+    async def send_start_ranging(self, spec: TechSpec, peer_for_i, peer_for_r, *, periodic: bool) -> None:
+        """The start step's work: trigger (CI) or prompt for (manual) the StartRangingRequest.
+
+        The caller has already called self.step() for the start step.
+        """
         end_time = PERIODIC_END_TIME_SECONDS if periodic else INSTANT_END_TIME_SECONDS
         interval_text = (f", RangingInstanceInterval={RANGING_INSTANCE_INTERVAL_SECONDS}" if periodic else
                          " (no RangingInstanceInterval field)")
@@ -668,8 +690,11 @@ class ProximityRangerTHServerTest(MatterBaseTest):
             "(or the StartRangingRequest never reached it).")
         return int(ids[-1])
 
-    async def _run_response_step(self, spec: TechSpec, response_step) -> None:
-        self.step(response_step)
+    async def verify_start_responses(self, spec: TechSpec) -> None:
+        """The response step's work: recover each SessionID and apply the SessionID criterion.
+
+        The caller has already called self.step() for the response step.
+        """
         if self.is_pics_sdk_ci_only:
             session_id_i = self._ci_response_i.sessionID
             session_id_r = self._ci_response_r.sessionID
@@ -708,17 +733,10 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 continue
             return event
 
-    async def _run_final_step(self, spec: TechSpec, final_step, *, periodic: bool, result_handler) -> None:
-        self.step(final_step)
-        if periodic:
-            await self._verify_periodic_cadence(spec, result_handler)
-        else:
-            await self._verify_instant_result_and_stop(spec, result_handler)
-
-    async def _verify_periodic_cadence(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
+    async def verify_periodic_cadence(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
         """Verifies TH_I emits a RangingResult roughly once per interval.
 
-        ``result_handler`` was subscribed before StartRangingRequest (see run_technology_pass); events
+        ``result_handler`` was subscribed before StartRangingRequest (see ranging_result_subscription); events
         are not fabric-scoped, so the session is observed whether started by the harness (CI) or the DUT.
 
         Cadence is measured from each event's server-side ``Header.Timestamp`` (in ms, /1000 to seconds),
@@ -759,11 +777,11 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 f"RangingResult events on TH_I are timestamped {gap:.3f} s apart, outside the interval "
                 f"({RANGING_INSTANCE_INTERVAL_SECONDS} s) plus the plan's +/- 3 s deviation.")
 
-    async def _verify_instant_result_and_stop(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
+    async def verify_instant_result_and_stop(self, spec: TechSpec, result_handler: EventSubscriptionHandler) -> None:
         """Verifies a RangingResult is obtained from TH_I, then a StopRangingRequest to TH_R.
 
         ``result_handler`` was subscribed to TH_I's RangingResult BEFORE the StartRangingRequest (see
-        run_technology_pass), so TH_I's single instant result -- emitted as its session self-terminates
+        ranging_result_subscription), so TH_I's single instant result -- emitted as its session self-terminates
         ~3 s after StartSession -- is already captured and survives a human-paced operator.
         """
         result = self._wait_for_ranging_result(result_handler, self._session_id_i, timeout_sec=30)
@@ -788,4 +806,4 @@ class ProximityRangerTHServerTest(MatterBaseTest):
                 f"the DUT to send a StopRangingRequest to TH_R with SessionID={self._session_id_r} "
                 "(TH_R's SessionID from its StartRangingResponse).\n"
                 "\nPress enter once the DUT reports it sent the StopRangingRequest.\n")
-        self._assert_client_stop(self.th_r, self._session_id_r, mark, spec)
+        await self._assert_client_stop(self.th_r, self._session_id_r, mark, spec)
