@@ -126,6 +126,16 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
                                                rawMode, rawMode);
     mMode = chip::BitMask<Mode>(rawMode);
 
+    if (mMode.Has(Mode::kCalibrationMode))
+    {
+        // Mode is restored directly above rather than via SetMode(), so the delegate was never
+        // notified. If the device was mid-calibration when it last shut down (e.g. a crash), let it
+        // know now so it can resume/restart its own calibration state - otherwise the device would
+        // be permanently locked (see GetMotionLockStatus()) with nothing left to ever complete the
+        // calibration routine and leave calibration mode.
+        mDelegate.OnModeChanged(mMode);
+    }
+
     uint8_t rawConfigStatus = mConfigStatus.Raw();
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id), rawConfigStatus,

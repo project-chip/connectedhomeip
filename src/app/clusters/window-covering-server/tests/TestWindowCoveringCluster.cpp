@@ -56,10 +56,17 @@ public:
         return mHandleStopMotionResult;
     }
 
+    void OnModeChanged(chip::BitMask<Mode> newMode) override
+    {
+        mOnModeChangedCallCount++;
+        mLastMode = newMode;
+    }
+
     void Reset()
     {
         mHandleMovementCallCount   = 0;
         mHandleStopMotionCallCount = 0;
+        mOnModeChangedCallCount    = 0;
     }
 
     int mHandleMovementCallCount         = 0;
@@ -68,6 +75,9 @@ public:
 
     int mHandleStopMotionCallCount     = 0;
     CHIP_ERROR mHandleStopMotionResult = CHIP_NO_ERROR;
+
+    int mOnModeChangedCallCount = 0;
+    chip::BitMask<Mode> mLastMode;
 };
 
 // Exposes the protected `SetType` / `SetEndProductType` setters, which otherwise have no
@@ -761,6 +771,49 @@ TEST_F(TestWindowCoveringCluster, PersistenceRoundTrip)
         EXPECT_EQ(cluster.GetCurrentPositionLiftPercent100ths().Value(), 2500);
 
         EXPECT_EQ(cluster.GetType(), Type::kUnknown); // not persisted -> resets to Config's default
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+// If the device shuts down (e.g. crashes) while Mode has CalibrationMode set, Startup() restores
+// Mode via a raw field assignment rather than SetMode(), so the delegate is never notified through
+// the normal path. Startup() must notify it explicitly in this case, or the delegate has no way to
+// know it needs to resume/restart its own calibration state, permanently stuck locked out (see
+// GetMotionLockStatus()) with nothing left to ever complete the routine.
+TEST_F(TestWindowCoveringCluster, StartupNotifiesDelegateWhenRestoredModeIsCalibrating)
+{
+    TestServerClusterContext sharedContext;
+
+    // First boot: a client sets CalibrationMode, then the device shuts down uncleanly (e.g. a
+    // crash) without ever clearing it.
+    {
+        MockWindowCoveringDelegate delegate;
+        WindowCoveringCluster::Config config(delegate);
+        config.WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
+
+        TestableWindowCoveringCluster cluster(kTestEndpointId, config);
+        ASSERT_EQ(cluster.Startup(sharedContext.Get()), CHIP_NO_ERROR);
+
+        chip::BitMask<Mode> mode(Mode::kCalibrationMode);
+        cluster.SetMode(mode);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Second boot: a brand-new cluster and delegate against the same storage. Mode is restored
+    // with CalibrationMode still set, so the (fresh, never-notified) delegate must be told.
+    {
+        MockWindowCoveringDelegate delegate;
+        WindowCoveringCluster::Config config(delegate);
+        config.WithFeatures(BitFlags<Feature>{ Feature::kLift, Feature::kPositionAwareLift });
+
+        TestableWindowCoveringCluster cluster(kTestEndpointId, config);
+        ASSERT_EQ(cluster.Startup(sharedContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(cluster.GetMode().Has(Mode::kCalibrationMode));
+        EXPECT_EQ(delegate.mOnModeChangedCallCount, 1);
+        EXPECT_TRUE(delegate.mLastMode.Has(Mode::kCalibrationMode));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }

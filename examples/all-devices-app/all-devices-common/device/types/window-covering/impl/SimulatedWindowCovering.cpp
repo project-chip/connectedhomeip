@@ -27,9 +27,7 @@ namespace {
 
 constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(500);
 constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(3000);
-// Delay before deciding whether the device still needs its initial calibration; see Register().
-constexpr System::Clock::Milliseconds32 kInitialCalibrationCheckDelay = System::Clock::Milliseconds32(250);
-constexpr Percent100ths kPositionStep                                 = 500; // 5% step
+constexpr Percent100ths kPositionStep                        = 500; // 5% step
 
 // Returns the next position, moved at most kPositionStep towards target.
 Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
@@ -76,20 +74,17 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
 {
     ReturnErrorOnFailure(WindowCovering::Register(endpoint, provider, composition));
 
-    // This simulated device starts uncalibrated: both current positions are null (targets stay
-    // null until a client commands a movement) until a calibration completes. Device registration
-    // happens before the cluster's Startup(), which only then loads any persisted positions from
-    // NVS on later boots, so whether an initial calibration is still needed can only be decided
-    // after that load - hence the deferred check below rather than a check at register time.
-    //
-    // If the positions are still unknown once Startup() is done (fresh install, nothing
-    // persisted), the device enters calibration mode by itself instead of waiting for a client to
-    // request it, and resolves to a known position shortly after startup on its own (see
-    // TimerFired()). A client can also enter calibration mode at any time by writing
-    // Mode.CalibrationMode. No movement commands are accepted by the cluster while calibrating
-    // (GetMotionLockStatus()), and any movement or calibration transition cancels this pending
-    // check timer, so the two paths cannot interfere.
-    return mContext.timerDelegate.StartTimer(this, kInitialCalibrationCheckDelay);
+    // Register() always runs before Startup() (which loads any persisted position from NVS), so
+    // there's no real NVS state to check here yet - we deliberately want this device to always
+    // have a known position, so seed a default unconditionally. If a position was actually
+    // persisted from a previous run, Startup() will correctly load and overwrite this default with
+    // the real value once it runs. A client can still enter calibration mode at any time by writing
+    // Mode.CalibrationMode; see OnModeChanged()/TimerFired().
+    auto & cluster = WindowCoveringCluster();
+    cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+
+    return CHIP_NO_ERROR;
 }
 
 void SimulatedWindowCovering::Unregister(CodeDrivenDataModelProvider & provider)
@@ -163,8 +158,8 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     auto currentTilt               = cluster.GetCurrentPositionTiltPercent100ths();
     [[maybe_unused]] auto opStatus = cluster.GetOperationalStatus();
 
-    // Positions may be null while the device is uncalibrated (a fresh install before its initial
-    // calibration completes), so only log the values when they are known.
+    // Positions may be null while the device is uncalibrated (a client-requested calibration in
+    // progress), so only log the values when they are known.
     if (currentLift.IsNull() || currentTilt.IsNull())
     {
         ChipLogProgress(DeviceLayer, "WindowCovering: Halted while uncalibrated, positions unknown | OpStatus raw=0x%02X",
@@ -230,21 +225,6 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
 void SimulatedWindowCovering::TimerFired()
 {
     auto & cluster = WindowCoveringCluster();
-
-    // The deferred initial-calibration check from Register(): if there is still no known position
-    // once Startup() has loaded persisted state (fresh install), run the initial calibration by
-    // entering calibration mode; OnModeChanged() takes it from here. Any client-initiated
-    // calibration or movement would have cancelled this timer before it could fire, so this cannot
-    // interrupt a transition already in progress.
-    if (!mCalibrating && !mMovingLift && !mMovingTilt &&
-        (cluster.GetCurrentPositionLiftPercent100ths().IsNull() || cluster.GetCurrentPositionTiltPercent100ths().IsNull()))
-    {
-        ChipLogProgress(DeviceLayer, "WindowCovering: No known position after startup, starting initial calibration");
-        chip::BitMask<Mode> mode = cluster.GetMode();
-        mode.Set(Mode::kCalibrationMode);
-        cluster.SetMode(mode);
-        return;
-    }
 
     if (mCalibrating)
     {
