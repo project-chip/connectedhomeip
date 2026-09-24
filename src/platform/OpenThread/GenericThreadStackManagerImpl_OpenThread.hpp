@@ -55,7 +55,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 #include <lib/dnssd/ServiceNaming.h>
 #include <openthread/mdns.h>
-#endif //CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
