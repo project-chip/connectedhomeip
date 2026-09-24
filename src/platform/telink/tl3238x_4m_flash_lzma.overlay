@@ -1,0 +1,74 @@
+&flash {
+	reg = <0x20000000 0x400000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+// reserve 20k for software bootloader , 64k for mcuboot,need to disable log for mcuboot；		
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x16000>; 
+		};
+		slot0_partition: partition@16000 {
+			label = "image-0";
+			reg = <0x16000 0x1e5000>; // total slot0 is 1940k
+		};
+// add information , increase part for matter & zigbee
+// currently , matter slot0 is 1640k, zigbee is 276k ,reserve 20k for matter ota trailor
+		slot0_matter_partition: partition@16000_1 {
+			label = "image-0-matter";
+			reg = <0x16000 0x19a000>; // suppose matter is 1640k (0x19a000)
+		};
+		slot0_zb_partition: partition@1b0000 {
+			label = "image-0-zb";
+			reg = <0x1b0000 0x46000>; // suppose zigbee is 280k (0x46000)
+		};
+		slot0_trailor_partition: partition@1f6000 {
+			label = "image-0-trailor";
+			reg = <0x1f6000 0x5000>; // suppose trailor is 20k
+		};
+// the total fw area is 1940k */
+		slot1_partition: partition@1fb000 {
+			label = "image-1";
+			reg = <0x1fb000 0x1e5000>; 
+		};
+		user_rfu_partition: partition@3e0000 {
+ 			label = "user_rfu";
+			reg = <0x3e0000 0x4000>;
+ 		};
+        storage_partition: partition@3e4000 {
+			label = "matter-nvs";
+			reg = <0x3e4000 0x8000>; // matter nvs part , total is 32k.
+		};
+        zigbee_nvs_partition: partition@3ec000 {
+			label = "zigbee-nvs";
+			reg = <0x3ec000 0xc000>; // zigbee nvs part , total is 48k.
+		};
+		secure_partition: partition@3f8000 {
+ 			label = "secure";
+			reg = <0x3f8000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
+ 		};
+		user_config_partition: partition@3f9000 {
+ 			label = "user_config";
+			reg = <0x3f9000 0x1000>; // user_config ,for the secure-boot sign logic changes ,it can release for user .
+ 		};
+		dual_mode_partition: partition@3fa000 {
+ 			label = "dual-mode";
+			reg = <0x3fa000 0x2000>; // user:store the mode info and the key info part.same as public area for dual mode
+ 		};
+		dac_keypair_partition: partition@3fc000 {
+			label = "dac-keypair";
+			reg = <0x3fc000 0x1000>; // store dac and key pair.
+		};
+		factory_partition: partition@3fd000 {
+			label = "factory-data";
+			reg = <0x3fd000 0x1000>; // factory data info 
+		};
+		vendor_partition: partition@3fe000 {
+			label = "vendor-data";
+			reg = <0x3fe000 0x2000>; // mac and rf info.
+		};
+	};
+};

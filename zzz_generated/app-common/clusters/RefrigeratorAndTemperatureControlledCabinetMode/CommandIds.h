@@ -13,7 +13,7 @@ namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 1;
+inline constexpr uint32_t kAcceptedCommandsCount = 2;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 1;
@@ -21,6 +21,10 @@ inline constexpr uint32_t kGeneratedCommandsCount = 1;
 namespace ChangeToMode {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
+
+namespace ChangeToModeByCoreTag {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeByCoreTag
 
 namespace ChangeToModeResponse {
 inline constexpr CommandId Id = 0x00000001;

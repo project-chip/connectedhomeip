@@ -157,10 +157,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
             return CriticalOverheatProtection::kMetadataEntry;
         case Sensors::Id:
             return Sensors::kMetadataEntry;
-        case AvailableSensors::Id:
-            return AvailableSensors::kMetadataEntry;
-        case EnabledSensors::Id:
-            return EnabledSensors::kMetadataEntry;
+        case AvailableSensorHandles::Id:
+            return AvailableSensorHandles::kMetadataEntry;
+        case EnabledSensorHandles::Id:
+            return EnabledSensorHandles::kMetadataEntry;
         case NumberOfSensorScheduleTransitions::Id:
             return NumberOfSensorScheduleTransitions::kMetadataEntry;
         case SensorSchedule::Id:

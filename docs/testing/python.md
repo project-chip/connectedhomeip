@@ -556,6 +556,12 @@ await self.request_device_reboot()
 await self.request_device_factory_reset()
 ```
 
+`request_device_reboot()` or `request_device_factory_reset` fails the test if
+the background wildcard subscription is still running, so a rebooting or factory
+resetting test class must set `disable_wildcard_subscription = True`. See
+[Rebooting or factory resetting the DUT](#rebooting-or-factory-resetting-the-dut)
+for why.
+
 ```shell
 # Example Command w/ run_python_test.py test runner:
 scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
@@ -1149,6 +1155,17 @@ the subscription controller):
 -   Per test class: `default_verify_wildcard_subscription = False`
 -   Single read: pass `verify_wildcard_subscription=False` to the read helper,
     otherwise this defaults to True.
+
+### Rebooting Or Factory Resetting the DUT
+
+The subscription runs with `autoResubscribe=False`, so a DUT reboot or factory
+reset ends it: no further reports arrive and the cache keeps serving the values
+it held before the reboot. Post-reboot reads would then be verified against
+stale data, which can pass a test that should fail.
+
+`request_device_reboot()` or `request_device_factory_reset()` therefore fails
+the test when the subscription is still active. Test classes that reboot must
+set `disable_wildcard_subscription = True`.
 
 ### Known limitations
 
