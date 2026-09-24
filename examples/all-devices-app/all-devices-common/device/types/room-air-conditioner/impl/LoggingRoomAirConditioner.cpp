@@ -114,10 +114,9 @@ void LoggingRoomAirConditioner::TimerFired()
 {
     bool on = mStartupOn;
     ChipLogProgress(AppServer, "RoomAirConditioner: starting %s", on ? "on" : "off");
-    LogErrorOnFailure(
-        StatusIB(ThermostatCluster().SetLocalTemperature(on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius)
-                                                            : DataModel::NullNullable))
-            .ToChipError());
+    LogErrorOnFailure(StatusIB(ThermostatCluster().SetLocalTemperature(
+                                   on ? DataModel::MakeNullable(kDefaultLocalTemperatureCentiCelsius) : DataModel::NullNullable))
+                          .ToChipError());
     if (!on && mSystemMode != SystemModeEnum::kOff)
     {
         LogErrorOnFailure(StatusIB(ThermostatCluster().SetSystemMode(SystemModeEnum::kOff)).ToChipError());
