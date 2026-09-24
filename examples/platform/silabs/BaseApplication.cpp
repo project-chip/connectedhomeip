@@ -173,7 +173,6 @@ ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEV
 
 int sCodeDrivenIdentifyActiveCount                                 = 0;
 Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant   = Clusters::Identify::EffectVariantEnum::kDefault;
 
 // Protects the three sCodeDrivenIdentify* variables above.
 osSemaphoreId_t sCodeDrivenIdentifyLock = nullptr;
@@ -853,8 +852,7 @@ void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectId
                                                     Clusters::Identify::EffectVariantEnum variant)
 {
     osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
-    sCodeDrivenIdentifyEffect  = effect;
-    sCodeDrivenIdentifyVariant = variant;
+    sCodeDrivenIdentifyEffect = effect;
     osSemaphoreRelease(sCodeDrivenIdentifyLock);
 
     if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
@@ -1106,6 +1104,9 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     break;
 
     case DeviceEventType::kCommissioningComplete: {
+        ChipLogProgress(AppServer, "BLUETOOTH DOWN!");
+        sl_bt_system_stop_bluetooth();
+
 #if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
         TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(
             WifiSleepManager::PowerEvent::kCommissioningComplete);
