@@ -27,6 +27,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LaundryWashe
             return SupportedModes::kMetadataEntry;
         case CurrentMode::Id:
             return CurrentMode::kMetadataEntry;
+        case CoreModeTags::Id:
+            return CoreModeTags::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -43,6 +45,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Laundr
         {
         case ChangeToMode::Id:
             return ChangeToMode::kMetadataEntry;
+        case ChangeToModeByCoreTag::Id:
+            return ChangeToModeByCoreTag::kMetadataEntry;
 
         default:
             return std::nullopt;

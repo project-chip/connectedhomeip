@@ -19,8 +19,8 @@
 
 #include "QName.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool SerializedQNameIterator::Next()
 {
@@ -198,5 +198,5 @@ bool FullQName::operator==(const FullQName & other) const
     return true;
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

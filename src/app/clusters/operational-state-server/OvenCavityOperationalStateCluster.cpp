@@ -27,7 +27,7 @@ namespace Clusters {
 namespace OvenCavityOperationalState {
 
 OvenCavityOperationalStateCluster::OvenCavityOperationalStateCluster(
-    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
+    EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate & delegate,
     const OperationalState::OperationalStateCluster::Config & config) :
     OperationalState::OperationalStateCluster(endpointId, OvenCavityOperationalState::Id, OvenCavityOperationalState::kRevision,
                                               delegate, config)

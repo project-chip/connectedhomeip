@@ -31,7 +31,7 @@ Span<const Chime::Sound> MapSounds(PosixAudioManager & audioManager)
     {
         for (const auto & sound : audioManager.GetSupportedSounds())
         {
-            sMappedSounds.push_back(Chime::Sound{ sound.id, chip::Span<const char>(sound.name, strlen(sound.name)) });
+            sMappedSounds.push_back(Chime::Sound{ sound.id, CharSpan::fromCharString(sound.name) });
         }
     }
     return Span<const Chime::Sound>(sMappedSounds.data(), sMappedSounds.size());

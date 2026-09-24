@@ -1235,6 +1235,17 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & candidateCertificate, c
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
+
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

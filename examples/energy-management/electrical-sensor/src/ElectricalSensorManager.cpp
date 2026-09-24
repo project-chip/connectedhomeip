@@ -49,7 +49,8 @@ CHIP_ERROR ElectricalSensorManager::Init(EndpointId endpointId, const EpmConfig 
     SuccessOrShutdown(CodegenDataModelProvider::Instance().Registry().Register(mEEMCluster->Registration()));
 
     // --- Initialize Power Topology ---
-    SuccessOrShutdown(PowerTopology::PowerTopologyInit(endpointId, mPTDelegate, mPTInstance, ptConfig.features));
+    SuccessOrShutdown(
+        PowerTopology::PowerTopologyInit(endpointId, mPTDelegate, mPTInstance, ptConfig.features, ptConfig.fabricTable));
 
     return CHIP_NO_ERROR;
 }

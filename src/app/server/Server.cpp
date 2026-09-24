@@ -37,6 +37,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistedCounter.h>
@@ -235,6 +236,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
+    SessionParameters localSessionParams;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
@@ -550,6 +552,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (tcpListenParams.IsServerListenEnabled())
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
+    }
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer. Make sure we subtract the framing length prefix.
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                            SessionParameters::kTCPFramingHeaderSize);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
@@ -583,6 +598,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Don't provide an MRP local config, so each CASE initiation will use
             // the then-current value.
             .mrpLocalConfig = NullOptional,
+            .localSessionParams = localSessionParams,
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -594,6 +610,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
+
+    mCASEServer.SetLocalSessionParameters(localSessionParams);
+    mCommissioningWindowManager.SetLocalSessionParameters(localSessionParams);
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);
@@ -808,8 +827,8 @@ void Server::RejoinExistingMulticastGroups()
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
 
-        auto * iterator = mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex());
-        if (iterator)
+        AutoRelease iterator(mGroupsProvider->IterateGroupInfo(fabric.GetFabricIndex()));
+        if (!iterator.IsNull())
         {
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
@@ -833,14 +852,11 @@ void Server::RejoinExistingMulticastGroups()
 
                     // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved
                     // before the next join. Exit the loop to save rescources.
-                    iterator->Release();
                     return;
                 }
                 if (use_iana_addr)
                     groupcast_joined = true;
             }
-
-            iterator->Release();
         }
     }
 }

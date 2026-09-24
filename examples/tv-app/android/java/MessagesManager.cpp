@@ -305,7 +305,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses, const Optional<CharSpan> & /* languageCode */,
-    const Optional<CharSpan> & /* messageUri */)
+    const Optional<CharSpan> & /* messageUri */, FabricIndex /* fabricIndex */)
 {
     DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -326,9 +326,9 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                 chip::Encoding::BytesToUppercaseHexString(messageId.data(), messageId.size(), hex_buf, sizeof(hex_buf)),
             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid    = nullptr;
-        CHIP_ERROR err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(hex_buf, strlen(hex_buf)),
-                                                                      reinterpret_cast<jobject &>(jid));
+        jstring jid = nullptr;
+        CHIP_ERROR err =
+            JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(hex_buf), reinterpret_cast<jobject &>(jid));
         if (err != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_INTERNAL;
@@ -454,9 +454,9 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
                                 chip::Encoding::BytesToUppercaseHexString(id.data(), id.size(), hex_buf, sizeof(hex_buf)),
                             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        jstring jid      = nullptr;
-        CHIP_ERROR idErr = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(hex_buf, strlen(hex_buf)),
-                                                                        reinterpret_cast<jobject &>(jid));
+        jstring jid = nullptr;
+        CHIP_ERROR idErr =
+            JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(hex_buf), reinterpret_cast<jobject &>(jid));
         if (idErr != CHIP_NO_ERROR)
         {
             return CHIP_ERROR_INTERNAL;

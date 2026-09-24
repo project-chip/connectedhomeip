@@ -106,7 +106,7 @@ public:
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
-        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+        return StoreNativeEndianValue(path, value);
     }
 
     /// Nullable type handling
@@ -122,11 +122,7 @@ public:
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
-
-        typename NumericAttributeTraits<T>::StorageType storageValue;
-        NullableToStorage(value, storageValue);
-
-        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+        return StoreNativeEndianValue(path, value);
     }
 
     // Specialization for enums
@@ -143,7 +139,7 @@ public:
         VerifyOrReturnError(decodedValue != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
-        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
+        return StoreNativeEndianValue(path, value);
     }
 
     // Nullable
@@ -162,11 +158,7 @@ public:
                             CHIP_IM_GLOBAL_STATUS(ConstraintError));
         VerifyOrReturnValue(decodedValue != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         value = decodedValue;
-
-        typename NumericAttributeTraits<T>::StorageType storageValue;
-        NullableToStorage(value, storageValue);
-
-        return mProvider.WriteValue(path, { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+        return StoreNativeEndianValue(path, value);
     }
 
     /// Load the given string from concrete storage.

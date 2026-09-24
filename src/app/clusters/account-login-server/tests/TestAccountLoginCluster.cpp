@@ -81,10 +81,13 @@ public:
 
     uint16_t GetClusterRevision(EndpointId) override { return mClusterRevision; }
 
+    uint32_t GetFeatureMap(EndpointId) override { return mFeatureMap; }
+
     bool mLoginResult         = true;
     bool mLogoutResult        = true;
     bool mOAuthLoggedIn       = false;
     uint16_t mClusterRevision = 3;
+    uint32_t mFeatureMap      = 0;
     CharSpan mSetupPin        = "1234"_span;
     CharSpan mUserCode        = "ABCD-EFGH"_span;
     CharSpan mVerificationURI = "https://example.com/device"_span;

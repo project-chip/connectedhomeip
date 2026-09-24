@@ -47,11 +47,14 @@ std::string MakeTempDir(const char * suffix)
     return dir;
 }
 
+// A stand-in peer identity for the command handlers under test.
+const ScopedNodeId kTestPeer(0x1122334455667788ULL, 1);
+
 Commands::AddFileResponse::Type AddFile(MediaFileManagementManager & mgr, const char * name, uint64_t size, const char * mime,
                                         const char * uri)
 {
     Commands::AddFileResponse::Type response;
-    Status status = mgr.HandleAddFile(CharSpan::fromCharString(name), size, CharSpan::fromCharString(mime),
+    Status status = mgr.HandleAddFile(kTestPeer, CharSpan::fromCharString(name), size, CharSpan::fromCharString(mime),
                                       CharSpan::fromCharString(uri), response);
     EXPECT_EQ(status, Status::Success);
     return response;
@@ -117,7 +120,7 @@ TEST_F(TestMediaFileManagementManager, AddFileRejectedWhenExceedingCapacity)
     MediaFileManagementManager mgr(MakeTempDir("capacity"));
 
     Commands::AddFileResponse::Type response;
-    Status status = mgr.HandleAddFile(CharSpan::fromCharString("huge"), mgr.GetTotalStorage() + 1,
+    Status status = mgr.HandleAddFile(kTestPeer, CharSpan::fromCharString("huge"), mgr.GetTotalStorage() + 1,
                                       CharSpan::fromCharString("video/mp4"), CharSpan::fromCharString("u"), response);
     EXPECT_EQ(status, Status::Success);
     EXPECT_EQ(response.status, FileStatusEnum::kInsufficientStorage);

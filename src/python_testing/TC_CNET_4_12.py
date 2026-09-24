@@ -54,6 +54,14 @@ class TC_CNET_4_12(MatterBaseTest):
     CLUSTER_CGEN = Clusters.GeneralCommissioning
     failsafe_expiration_seconds = 900
 
+    # The test repeatedly switches the DUT between two Thread networks (steps 7, 16, 21)
+    # and expires the TH's CASE sessions to it (self.default_controller.ExpireSessions)
+    # while waiting on mDNS/SRP for the new address. A background wildcard subscription
+    # cannot survive those DUT-side network transitions and only adds noise/instability,
+    # similar to the issue avoided in TC_CGEN_2_2
+    # (https://github.com/project-chip/connectedhomeip/issues/72732).
+    disable_wildcard_subscription = True
+
     def get_dut_instance_name(self) -> str:
         # TODO: Consolidate this with other tests after SVE
         node_id = self.dut_node_id

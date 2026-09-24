@@ -31,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
 #include <vector>
@@ -41,6 +42,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ProximityRanging;
+using chip::Protocols::InteractionModel::ClusterStatusCode;
+using chip::Protocols::InteractionModel::Status;
 
 /// Records every PrepareSession/StartSession/StopSession call and exposes
 /// its Callback so tests can drive OnMeasurementData /
@@ -63,12 +66,12 @@ public:
         return cap;
     }
 
-    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
+    ClusterStatusCode PrepareSession(uint8_t sessionId, const StartSessionParams & params) override
     {
         mLastPrepareSessionId = sessionId;
         mLastPrepareParams    = params;
         mPrepareCalls++;
-        if (mPrepareResult == ResultCodeEnum::kAccepted)
+        if (mPrepareResult.IsSuccess())
         {
             mPreparedIds.push_back(sessionId);
         }
@@ -136,7 +139,7 @@ public:
 
     Callback * GetCallback() const { return mCallback; }
 
-    ResultCodeEnum mPrepareResult = ResultCodeEnum::kAccepted;
+    ClusterStatusCode mPrepareResult = ClusterStatusCode(Status::Success);
     /// Configurable return for StartSession. Set to CHIP_ERROR_BUSY to
     /// simulate "previous measurement still in flight".
     CHIP_ERROR mStartError        = CHIP_NO_ERROR;
@@ -225,7 +228,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMin)
     Structs::ReportingConditionStruct::Type rc;
     rc.minDistanceCondition.SetValue(50);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type below;
     below.distance.SetNonNull(static_cast<uint16_t>(20));
@@ -254,7 +257,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceFilterMax)
     Structs::ReportingConditionStruct::Type rc;
     rc.maxDistanceCondition.SetValue(100);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type above;
     above.distance.SetNonNull(static_cast<uint16_t>(200));
@@ -283,7 +286,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullWithCondition)
     Structs::ReportingConditionStruct::Type rc;
     rc.minDistanceCondition.SetValue(50);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type m;
     m.distance.SetNull();
@@ -303,7 +306,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataDistanceNullNoCondition)
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, MakeBleRequest()).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type m;
     m.distance.SetNull();
@@ -327,7 +330,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataErrorMarginFilter)
     Structs::ReportingConditionStruct::Type rc;
     rc.errorMarginCondition.SetValue(10);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type sloppy;
     sloppy.distance.SetNonNull(static_cast<uint16_t>(100));
@@ -354,7 +357,7 @@ TEST_F(TestProximityRangingDriver, OnMeasurementDataNoReportingCondition)
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, MakeBleRequest()).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type m;
     m.distance.SetNonNull(static_cast<uint16_t>(123));
@@ -380,7 +383,7 @@ TEST_F(TestProximityRangingDriver, TerminationStatusPeerNotFoundWhenNoMeasuremen
     Structs::ReportingConditionStruct::Type rc;
     rc.minDistanceCondition.SetValue(1000);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type tooClose;
     tooClose.distance.SetNonNull(static_cast<uint16_t>(50));
@@ -404,7 +407,7 @@ TEST_F(TestProximityRangingDriver, TerminationStatusEndTimeReached)
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, MakeBleRequest()).IsSuccess());
 
     Structs::RangingMeasurementDataStruct::Type m;
     m.distance.SetNonNull(static_cast<uint16_t>(100));
@@ -429,7 +432,7 @@ TEST_F(TestProximityRangingDriver, AdapterDrivenHardwareErrorPassthrough)
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, MakeBleRequest()).IsSuccess());
 
     ble.GetCallback()->OnRangingSessionStopped(kSessionId, RangingSessionStatusEnum::kHardwareError);
     ASSERT_EQ(cb.stops.size(), 1u);
@@ -458,7 +461,7 @@ TEST_F(TestProximityRangingDriver, StartSessionParamsForwardsRoleConfigsNotTrigg
     Structs::ReportingConditionStruct::Type rc;
     rc.minDistanceCondition.SetValue(10);
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     // Adapter-facing params carry the role config (peerBLEDeviceID from
     // MakeBleRequest is 0x1234) but no trigger / interval fields exist on
@@ -483,7 +486,7 @@ TEST_F(TestProximityRangingDriver, ZeroStartTimeFiresPrepareThenStartSynchronous
 
     auto request              = MakeBleRequest();
     request.trigger.startTime = 0;
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     EXPECT_EQ(ble.mPrepareCalls, 1);
     EXPECT_EQ(ble.mStartCalls, 1);
@@ -508,7 +511,7 @@ TEST_F(TestProximityRangingDriver, NonZeroStartTimeDefersStartUntilTimerFires)
     auto request              = MakeBleRequest();
     request.trigger.startTime = 5;
     request.trigger.endTime   = 60;
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     EXPECT_EQ(ble.mPrepareCalls, 1);
     EXPECT_EQ(ble.mStartCalls, 0);
@@ -544,7 +547,7 @@ TEST_F(TestProximityRangingDriver, EndTimeFiresWhileSessionActive)
     auto request              = MakeBleRequest();
     request.trigger.startTime = 0;
     request.trigger.endTime   = 10;
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
     EXPECT_EQ(ble.mStartCalls, 1);
 
     timer.AdvanceClock(System::Clock::Milliseconds32(11'000));
@@ -561,13 +564,14 @@ TEST_F(TestProximityRangingDriver, PrepareSessionRejectedByAdapter)
 {
     TimerDelegateMock timer;
     MockRangingAdapter ble(RangingTechEnum::kBLEBeaconRSSIRanging);
-    ble.mPrepareResult          = ResultCodeEnum::kRejectedInfeasibleRanging;
+    ble.mPrepareResult          = ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRanging);
     RangingAdapter * adapters[] = { &ble };
     ProximityRangingDriver driver{ Span<RangingAdapter * const>(adapters), timer };
     RecordingClusterCallback cb;
     ASSERT_EQ(driver.Init(cb), CHIP_NO_ERROR);
 
-    EXPECT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()), ResultCodeEnum::kRejectedInfeasibleRanging);
+    EXPECT_EQ(driver.HandleStartRanging(kSessionId, MakeBleRequest()),
+              ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRanging));
     EXPECT_EQ(ble.mPrepareCalls, 1);
     EXPECT_EQ(ble.mStartCalls, 0);
     EXPECT_EQ(ble.mStopCalls, 0);
@@ -589,7 +593,7 @@ TEST_F(TestProximityRangingDriver, ShutdownCancelsPendingTimers)
 
     auto request              = MakeBleRequest();
     request.trigger.startTime = 5;
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     driver.Shutdown();
 
@@ -618,7 +622,7 @@ TEST_F(TestProximityRangingDriver, PeriodicRangingDriverReinvokesStartSession)
     request.trigger.startTime = 0;
     request.trigger.endTime   = 60;
     request.trigger.rangingInstanceInterval.SetValue(2);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     // Initial synchronous StartSession invocation.
     EXPECT_EQ(ble.mStartCalls, 1);
@@ -651,7 +655,7 @@ TEST_F(TestProximityRangingDriver, InstantRangingTerminatesOnFirstPassingMeasure
     request.trigger.startTime = 0;
     request.trigger.endTime   = 60;
     // No rangingInstanceInterval -> instant ranging.
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
     EXPECT_EQ(ble.mStartCalls, 1);
 
     // Adapter delivers a passing measurement. Driver forwards it AND calls
@@ -689,7 +693,7 @@ TEST_F(TestProximityRangingDriver, InstantRangingFilteredMeasurementDoesNotRetry
     Structs::ReportingConditionStruct::Type rc;
     rc.minDistanceCondition.SetValue(1000); // 100cm measurement will be filtered
     request.reportingCondition.SetValue(rc);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
     EXPECT_EQ(ble.mStartCalls, 1);
 
     Structs::RangingMeasurementDataStruct::Type tooClose;
@@ -728,7 +732,7 @@ TEST_F(TestProximityRangingDriver, PassiveResponderSessionDoesNotRemapToPeerNotF
     role.role            = RangingRoleEnum::kBLEBeaconRole; // passive responder
     role.peerBLEDeviceID = 0x1234;
     request.BLERangingDeviceRoleConfig.SetValue(role);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     // No measurement is delivered; adapter terminates with kSessionEndTimeReached
     // (e.g. driver-issued StopSession at end-time). Driver MUST NOT remap to
@@ -756,7 +760,7 @@ TEST_F(TestProximityRangingDriver, PeriodicRangingBusyAdapterDoesNotRetireSessio
     request.trigger.startTime = 0;
     request.trigger.endTime   = 60;
     request.trigger.rangingInstanceInterval.SetValue(2);
-    ASSERT_EQ(driver.HandleStartRanging(kSessionId, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(kSessionId, request).IsSuccess());
 
     // Even though every StartSession returns CHIP_ERROR_BUSY, the session
     // remains alive and the periodic schedule keeps firing.
@@ -809,8 +813,8 @@ TEST_F(TestProximityRangingDriver, ShutdownStopsActiveSessions)
 
     auto request              = MakeBleRequest();
     request.trigger.startTime = 0;
-    ASSERT_EQ(driver.HandleStartRanging(11, request), ResultCodeEnum::kAccepted);
-    ASSERT_EQ(driver.HandleStartRanging(12, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(11, request).IsSuccess());
+    ASSERT_TRUE(driver.HandleStartRanging(12, request).IsSuccess());
     ASSERT_EQ(driver.GetNumActiveSessionIds(), 2u);
 
     // Shutdown must drive each adapter's StopSession path; the mock then
@@ -832,8 +836,8 @@ TEST_F(TestProximityRangingDriver, GetActiveSessionIdsBufferTooSmall)
 
     auto request              = MakeBleRequest();
     request.trigger.startTime = 0;
-    ASSERT_EQ(driver.HandleStartRanging(1, request), ResultCodeEnum::kAccepted);
-    ASSERT_EQ(driver.HandleStartRanging(2, request), ResultCodeEnum::kAccepted);
+    ASSERT_TRUE(driver.HandleStartRanging(1, request).IsSuccess());
+    ASSERT_TRUE(driver.HandleStartRanging(2, request).IsSuccess());
 
     uint8_t buffer[1] = {};
     Span<uint8_t> tooSmall(buffer, 1);

@@ -67,7 +67,39 @@ extern void LwIPLog(const char * fmt, ...);
     } while (0)
 
 // Place LwIP pools into their own subsections of .bss to make it easier to see
-// their sizes in the linker map file.
+// their sizes in the linker map file. On SiWx with the PSRAM code classifier,
+// place the pools in PSRAM via SL_SI91X_CODE_CLASSIFY.
+#if defined(SL_SI91X_CODE_CLASSIFIER_ENABLE) && defined(SLI_SI91X_MCU_PSRAM_PRESENT)
+#include "sl_si91x_code_classifier.h"
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_ND6_QUEUE, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_ND6_QUEUE_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_IP6_REASSDATA, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_IP6_REASSDATA_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_RAW_PCB, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_RAW_PCB_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_TCP_SEG, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_TCP_SEG_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_PBUF_POOL, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_PBUF_POOL_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_FRAG_PBUF, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_FRAG_PBUF_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_PBUF, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_PBUF_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_TCP_PCB_LISTEN, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_TCP_PCB_LISTEN_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_REASSDATA, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_REASSDATA_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_UDP_PCB, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_UDP_PCB_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_MLD6_GROUP, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_MLD6_GROUP_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_IGMP_GROUP, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_IGMP_GROUP_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_TCP_PCB, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_TCP_PCB_base[];
+SL_SI91X_CODE_CLASSIFY(bss_to_psram, lwip_SYS_TIMEOUT, SL_CODE_CLASS_FORCE_PSRAM)
+extern uint8_t memp_memory_SYS_TIMEOUT_base[];
+#else
 extern uint8_t __attribute__((section(".bss.lwip_ND6_QUEUE"))) memp_memory_ND6_QUEUE_base[];
 extern uint8_t __attribute__((section(".bss.lwip_IP6_REASSDATA"))) memp_memory_IP6_REASSDATA_base[];
 extern uint8_t __attribute__((section(".bss.lwip_RAW_PCB"))) memp_memory_RAW_PCB_base[];
@@ -82,6 +114,7 @@ extern uint8_t __attribute__((section(".bss.lwip_MLD6_GROUP"))) memp_memory_MLD6
 extern uint8_t __attribute__((section(".bss.lwip_IGMP_GROUP"))) memp_memory_IGMP_GROUP_base[];
 extern uint8_t __attribute__((section(".bss.lwip_TCP_PCB"))) memp_memory_TCP_PCB_base[];
 extern uint8_t __attribute__((section(".bss.lwip_SYS_TIMEOUT"))) memp_memory_SYS_TIMEOUT_base[];
+#endif
 
 #if __cplusplus
 }

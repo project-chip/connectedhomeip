@@ -59,6 +59,9 @@ public:
     struct PtConfig
     {
         BitMask<PowerTopology::Feature> features;
+        // Optional: pass the fabric table when the CIRC feature is enabled so the Power Topology
+        // cluster can purge a removed fabric's ElectricalCircuitNodes entries. Null otherwise.
+        FabricTable * fabricTable = nullptr;
     };
 
     CHIP_ERROR Init(EndpointId endpointId, const EpmConfig & epmConfig, const EemConfig & eemConfig, const PtConfig & ptConfig);

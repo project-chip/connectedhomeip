@@ -94,6 +94,16 @@ constexpr DataModel::DeviceTypeEntry kSecondaryNetworkInterface = {
     .deviceTypeRevision = kSecondaryNetworkInterfaceDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kStreamingAudioPlayer = {
+    .deviceTypeId       = kStreamingAudioPlayerDeviceTypeId,
+    .deviceTypeRevision = kStreamingAudioPlayerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kCastingAudioPlayer = {
+    .deviceTypeId       = kCastingAudioPlayerDeviceTypeId,
+    .deviceTypeRevision = kCastingAudioPlayerDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kSpeaker = {
     .deviceTypeId       = kSpeakerDeviceTypeId,
     .deviceTypeRevision = kSpeakerDeviceTypeRevision,
@@ -239,9 +249,9 @@ constexpr DataModel::DeviceTypeEntry kLaundryDryer = {
     .deviceTypeRevision = kLaundryDryerDeviceTypeRevision,
 };
 
-constexpr DataModel::DeviceTypeEntry kHumidifierDehumidifier = {
-    .deviceTypeId       = kHumidifierDehumidifierDeviceTypeId,
-    .deviceTypeRevision = kHumidifierDehumidifierDeviceTypeRevision,
+constexpr DataModel::DeviceTypeEntry kHumidityConditioner = {
+    .deviceTypeId       = kHumidityConditionerDeviceTypeId,
+    .deviceTypeRevision = kHumidityConditionerDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kNetworkInfrastructureManager = {
@@ -372,6 +382,11 @@ constexpr DataModel::DeviceTypeEntry kCameraController = {
 constexpr DataModel::DeviceTypeEntry kDoorbell = {
     .deviceTypeId       = kDoorbellDeviceTypeId,
     .deviceTypeRevision = kDoorbellDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kAvAnalysisNode = {
+    .deviceTypeId       = kAvAnalysisNodeDeviceTypeId,
+    .deviceTypeRevision = kAvAnalysisNodeDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kAmbientContextSensor = {
@@ -517,6 +532,11 @@ constexpr DataModel::DeviceTypeEntry kElectricalSurgeProtector = {
 constexpr DataModel::DeviceTypeEntry kResidualCurrentCircuitBreaker = {
     .deviceTypeId       = kResidualCurrentCircuitBreakerDeviceTypeId,
     .deviceTypeRevision = kResidualCurrentCircuitBreakerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kAuxiliaryLoadSwitch = {
+    .deviceTypeId       = kAuxiliaryLoadSwitchDeviceTypeId,
+    .deviceTypeRevision = kAuxiliaryLoadSwitchDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kControlBridge = {

@@ -170,6 +170,8 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
                 peer = WebRTCManager._peerconnection_map[node_id]
                 if isinstance(peer, BrowserPeerConnection):
                     await peer.close()
+                elif isinstance(peer, LibdatachannelPeerConnection):
+                    peer.close()
                 del WebRTCManager._peerconnection_map[node_id]
                 del WebRTCManager._node_id_map[session_id]
             WebRTCManager._session_id_event_map[session_id].clear()
@@ -182,6 +184,13 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
         session_ids = list(WebRTCManager._node_id_map.keys())
         for session_id in session_ids:
             await WebRTCManager.remove_peer(session_id)
+        with WebRTCManager._lock:
+            for peer in list(WebRTCManager._peerconnection_map.values()):
+                if isinstance(peer, BrowserPeerConnection):
+                    await peer.close()
+                elif isinstance(peer, LibdatachannelPeerConnection):
+                    peer.close()
+            WebRTCManager._peerconnection_map.clear()
 
     @staticmethod
     def handle_offer(sessionId: int, offerSdp: bytes) -> int:

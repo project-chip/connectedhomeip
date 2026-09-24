@@ -48,9 +48,9 @@
 
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/wire/BytesRange.h>
 #include <lib/dnssd/wire/QName.h>
+#include <lib/dnssd/wire/RecordData.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
@@ -58,7 +58,7 @@ namespace {
 
 using namespace chip;
 using namespace fuzztest;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 void EnsureInitialized()
 {
