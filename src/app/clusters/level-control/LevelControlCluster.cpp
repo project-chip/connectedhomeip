@@ -326,7 +326,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {
@@ -524,9 +529,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
-    // The command is one of the ‘without On/Off’ commands: ... Stop."
-    VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    // Spec 1.6.6.9: "Command execution SHALL NOT continue beyond the Options processing if ...
+    // The command is one of the 'without On/Off' commands: Move, Move to Level, Step, or Stop."
+    // StopWithOnOff is not on that list, so only the plain Stop is gated.
+    VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.
