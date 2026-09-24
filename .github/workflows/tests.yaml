@@ -513,6 +513,18 @@ jobs:
                      --script-args '--storage-path /tmp/cnet_4_9_admin_storage.json --commissioning-method ble-wifi --discriminator 3840 --passcode 20202021 --dut-node-id 0x12344321 --endpoint 0 --ble-controller 1 --wifi-ssid MatterAP --wifi-passphrase MatterAPPassword --PICS src/app/tests/suites/certification/ci-pics-values' \
                   "
 
+            - name: Run TC_CNET_4_15 with BLE-WiFi mocks
+              run: |
+                  ./scripts/run_in_python_env.sh out/venv \
+                  "./scripts/tests/run_python_test.py \
+                     --factory-reset \
+                     --app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-ready-pattern 'APP STATUS: Starting event loop' \
+                     --app-args '--discriminator 3840 --KVS /tmp/cnet_4_15_kvs --ble-controller 0 --wifi --interface-id -1' \
+                     --script src/python_testing/TC_CNET_4_15.py \
+                     --script-args '--storage-path /tmp/cnet_4_15_admin_storage.json --commissioning-method ble-wifi --discriminator 3840 --passcode 20202021 --dut-node-id 0x12344321 --endpoint 0 --ble-controller 1 --wifi-ssid MatterAP --wifi-passphrase MatterAPPassword --PICS src/app/tests/suites/certification/ci-pics-values' \
+                  "
+
             - name: Run WiFiPAF-WiFi commissioning test
               env:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
