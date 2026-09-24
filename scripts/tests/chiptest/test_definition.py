@@ -111,6 +111,8 @@ class App:
 
         for path in self.kvsPathSet | PERSISTENT_CONFIG_PATHS:
             Path(path).unlink(missing_ok=True)
+        Path("thread.log").unlink(missing_ok=True)
+        Path("/run/thread.log").unlink(missing_ok=True)
 
         if wasRunning:
             return self.start()
@@ -199,6 +201,15 @@ class App:
             if self.process.poll() is not None:
                 died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
                 log.error(died_str)
+                for log_file in ["/run/thread.log", "thread.log", "/tmp/thread.log"]:
+                    p = Path(log_file)
+                    if p.exists():
+                        try:
+                            content = p.read_text(errors="replace")
+                            log.error("--- Content of %s (%d bytes) ---\n%s\n--- End of %s ---",
+                                      log_file, len(content), content, log_file)
+                        except Exception as e:
+                            log.error("Failed to read %s: %s", log_file, e)
                 raise RuntimeError(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
                 raise TimeoutError(f'Timeout while waiting for {patterns!r}')
@@ -617,6 +628,15 @@ class TestDefinition:
 
         except BaseException:
             log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+            for log_file in ["/run/thread.log", "thread.log", "/tmp/thread.log"]:
+                p = Path(log_file)
+                if p.exists():
+                    try:
+                        content = p.read_text(errors="replace")
+                        log.error("--- Content of %s (%d bytes) ---\n%s\n--- End of %s ---",
+                                  log_file, len(content), content, log_file)
+                    except Exception as e:
+                        log.error("Failed to read %s: %s", log_file, e)
             runner.capture_delegate.LogContents()
             loggedCapturedLogs = True
             raise
