@@ -118,8 +118,8 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
-    static void StartBleAdvButtonEventHandler(void);
-    static void StartBleAdvHandler(AppEvent * aEvent);
+    static void ToggleBleAdvButtonEventHandler(void);
+    static void ToggleBleAdvHandler(AppEvent * aEvent);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     static void StartThreadButtonEventHandler(void);
@@ -142,6 +142,8 @@ protected:
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void UpdateStatusLED(void);
+
+    static void OtaEventsHandler(const ChipDeviceEvent * event);
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
