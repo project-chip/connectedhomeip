@@ -326,7 +326,10 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             targetColorMode = static_cast<EnhancedColorModeEnum>(p.valueUnsigned8.Value());
             break;
         default:
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an
+            // attribute that is not implemented on the endpoint is ignored rather than failing
+            // the recall.
+            break;
         }
     }
 

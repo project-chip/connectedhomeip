@@ -162,6 +162,43 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A pair referencing an attribute that is not implemented on the endpoint is ignored rather than
+// failing the recall (Scenes Management AttributeValuePairStruct): the remaining pairs still apply.
+TEST_F(TestColorControlScenes, ApplySceneIgnoresUnknownAttributePairs)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kXy);
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // The unknown pair comes first so the test proves skipping does not derail the later pairs.
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = 0x9999;
+    pairs[0].valueUnsigned8.SetValue(1);
+    pairs[1].attributeID = Attributes::CurrentX::Id;
+    pairs[1].valueUnsigned16.SetValue(100);
+    pairs[2].attributeID = Attributes::CurrentY::Id;
+    pairs[2].valueUnsigned16.SetValue(200);
+    pairs[3].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[3].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kCurrentXAndCurrentY));
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    EXPECT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
+    Complete();
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    Complete();
+    EXPECT_EQ(cluster.CurrentX(), 100u);
+    EXPECT_EQ(cluster.CurrentY(), 200u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // A scene's transition time is a uint32 of milliseconds (AddScene constrains it to 60000000), so the
 // RemainingTime it implies does not fit in uint16 deciseconds: it must saturate at the attribute's
 // constraint max (0xFFFE) rather than wrap — 600000 tenths would come back as 10176.
