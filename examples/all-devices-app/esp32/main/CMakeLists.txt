@@ -35,11 +35,21 @@ set(PRIV_INCLUDE_DIRS_LIST
 )
 
 if (CONFIG_HAVE_DISPLAY)
-    list(APPEND PRIV_INCLUDE_DIRS_LIST
-        "${CMAKE_CURRENT_LIST_DIR}/display"
-        "${CHIP_ROOT}/examples/common/screen-framework/include"
-        "${CHIP_ROOT}/examples/common/QRCode/repo/c"
-    )
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/display")
+    if (CONFIG_DISPLAY_LVGL)
+        list(APPEND PRIV_INCLUDE_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/clusters"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
+        )
+    else()
+        list(APPEND PRIV_INCLUDE_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
+            "${CHIP_ROOT}/examples/common/screen-framework/include"
+            "${CHIP_ROOT}/examples/common/QRCode/repo/c"
+        )
+    endif()
 endif()
 
 # Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
@@ -49,9 +59,9 @@ set(APP_TOPLEVEL_EXTRA_SRCS
 )
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
-    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.cpp")
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/ThreadFeature.cpp")
 else()
-    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/WifiRootNode.cpp")
+    list(APPEND APP_TOPLEVEL_EXTRA_SRCS "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/WifiFeature.cpp")
 endif()
 
 set(SRC_DIRS_LIST
@@ -66,9 +76,26 @@ set(SRC_DIRS_LIST
 )
 
 if (CONFIG_HAVE_DISPLAY)
-    list(APPEND SRC_DIRS_LIST
-        "${CMAKE_CURRENT_LIST_DIR}/display"
-    )
+    # Exactly one renderer implementation is compiled; it supplies the
+    # display/DeviceDisplay.h interface that main.cpp depends on.
+    if (CONFIG_DISPLAY_LVGL)
+        list(APPEND SRC_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/clusters"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
+        )
+    else()
+        list(APPEND SRC_DIRS_LIST
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft"
+            "${CMAKE_CURRENT_LIST_DIR}/display/tft/screens"
+        )
+    endif()
+endif()
+
+if (CONFIG_HAVE_SPEAKER)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
+    list(APPEND SRC_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
