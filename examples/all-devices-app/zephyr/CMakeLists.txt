@@ -67,11 +67,18 @@ if(NOT DEFINED ALL_DEVICES_ENABLED_DEVICES)
 endif()
 include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
 
-# Count how many are ALL_DEVICES_ENABLE_<NAME>=1 to size AppTask's device array
+# Count enabled device keys to size AppTask's device array. 
 get_cmake_property(_all_devices_vars VARIABLES)
 set(ALL_DEVICES_ENABLED_DEVICE_COUNT 0)
 foreach(_var IN LISTS _all_devices_vars)
     if(_var MATCHES "^ALL_DEVICES_ENABLE_" AND ${_var})
+        math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
+    endif()
+endforeach()
+
+#Some keys register more than one creator, so include those additional creators as well.
+foreach(_variant_key FAN OVEN REFRIGERATOR)
+    if(ALL_DEVICES_ENABLE_${_variant_key})
         math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
     endif()
 endforeach()
@@ -126,10 +133,12 @@ target_sources(app PRIVATE
     include/AppTaskBase.ipp
     include/AppTask.h
     include/Buttons.h
-    include/ZephyrIdentifyDelegate.h
     src/Buttons.cpp
     src/main.cpp
-    src/ZephyrIdentifyDelegate.cpp
+
+    # Identify
+    include/delegates/ZephyrIdentifyDelegate.h
+    src/delegates/ZephyrIdentifyDelegate.cpp
 
     # all-devices-common
     ${ALL_DEVICES_DEVICE_SOURCES}
@@ -142,23 +151,23 @@ set_source_files_properties(include/AppTaskBase.ipp PROPERTIES HEADER_FILE_ONLY 
 # Board-specific device implementation; AppTaskBase substitutes it into the factory.
 if(ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
     target_sources(app PRIVATE
-        include/ZephyrOnOffLight.h
-        src/ZephyrOnOffLight.cpp
+        include/devices/ZephyrOnOffLight.h
+        src/devices/ZephyrOnOffLight.cpp
     )
 endif()
 
 # Matches CHIP_DEVICE_CONFIG_ENABLE_THREAD, which AppTaskBase.ipp gates on.
 if(CONFIG_OPENTHREAD)
     target_sources(app PRIVATE
-        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/ThreadRootNode.h
         ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/ThreadFeature.cpp
-    )
+        )
 endif()
 
 # TODO: Wi-Fi
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/OtaFeature.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
