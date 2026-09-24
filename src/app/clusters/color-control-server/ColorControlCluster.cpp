@@ -276,10 +276,46 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     uint8_t saturation   = 0;
     ColorLoopState loop;
 
+    // A pair is applicable only when the endpoint actually implements the attribute it references: the
+    // feature map gates which cluster attributes exist (e.g. CurrentHue without the HueAndSaturation
+    // feature). Pairs for non-implemented attributes — like unknown IDs — are ignored per the Scenes
+    // Management cluster (AttributeValuePairStruct) rather than failing the recall or driving the mode
+    // validation and target construction below.
+    auto isImplementedAttribute = [this](AttributeId id) {
+        switch (id)
+        {
+        case Attributes::CurrentX::Id:
+        case Attributes::CurrentY::Id:
+            return HasFeature(Feature::kXy);
+        case Attributes::CurrentHue::Id:
+        case Attributes::CurrentSaturation::Id:
+            return HasFeature(Feature::kHueAndSaturation);
+        case Attributes::EnhancedCurrentHue::Id:
+            return HasFeature(Feature::kEnhancedHue);
+        case Attributes::ColorTemperatureMireds::Id:
+            return HasFeature(Feature::kColorTemperature);
+        case Attributes::ColorLoopActive::Id:
+        case Attributes::ColorLoopDirection::Id:
+        case Attributes::ColorLoopTime::Id:
+            return HasFeature(Feature::kColorLoop);
+        case Attributes::EnhancedColorMode::Id:
+            return true;
+        default:
+            return false;
+        }
+    };
+
+    bool sawApplicablePair = false;
+
     auto it = attributeValueList.begin();
     while (it.Next())
     {
         auto & p = it.GetValue();
+        if (!isImplementedAttribute(p.attributeID))
+        {
+            continue;
+        }
+        sawApplicablePair = true;
         switch (p.attributeID)
         {
         case Attributes::CurrentX::Id:
@@ -326,11 +362,15 @@ CHIP_ERROR ColorControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             targetColorMode = static_cast<EnhancedColorModeEnum>(p.valueUnsigned8.Value());
             break;
         default:
-            // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an
-            // attribute that is not implemented on the endpoint is ignored rather than failing
-            // the recall.
             break;
         }
+    }
+
+    // A scene whose pairs are all ignored (or empty) leaves the color untouched rather than applying
+    // zero-initialized defaults.
+    if (!sawApplicablePair)
+    {
+        return CHIP_NO_ERROR;
     }
 
     // Build the single alternative matching the scene's declared mode. The color loop can be active in any
