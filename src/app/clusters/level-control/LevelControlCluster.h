@@ -77,7 +77,15 @@ public:
         ///
         /// Both modes: *WithOnOff commands set OnOff. MoveToLevel/Move/Step/Stop do nothing while
         /// OnOff is FALSE, unless ExecuteIfOff is set (spec "Options Attribute").
-        /// kAdvertiseFeature only: Off fades CurrentLevel to MinLevel, On restores it.
+        ///
+        /// kAdvertiseFeature: Off fades CurrentLevel to MinLevel and On ramps it back up.
+        ///   - Dimmable light (device type requires OO): Off fades to dark, On fades back.
+        ///   - TV speaker with OnLevel null: mute ramps volume down, unmute ramps it back to the
+        ///     previous volume. CurrentLevel reads the previous volume while muted.
+        /// kDoNotAdvertiseFeature: On/Off commands do not change CurrentLevel. The application
+        ///   acts on OnOff itself.
+        ///   - Pump or fan with its own motor drive: Off stops the motor, the speed setpoint stays.
+        ///   - Amplifier with a motorized volume knob: mute uses a relay, the knob does not move.
         ///
         /// Caller registers with onOffCluster.AddDelegate(&levelControl) after construction and calls
         /// RemoveDelegate() before destruction. The delegate does nothing with kDoNotAdvertiseFeature,
