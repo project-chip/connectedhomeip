@@ -1124,8 +1124,8 @@ administer privilege, which can otherwise add noise and unnecessary DUT load.
 Before the subscription starts, the framework snapshots the DUT ACL and appends
 an administer entry for the subscription controller.
 
-`teardown_test` restores the original ACL snapshot so each test starts from a
-known ACL state.
+The framework restores the original ACL snapshot after each test, so each test
+starts from a known ACL state.
 
 Tests that replace the entire ACL during a step should include the subscription
 controller entry (see `get_subscription_acl_entry()` on `MatterBaseTest`) if

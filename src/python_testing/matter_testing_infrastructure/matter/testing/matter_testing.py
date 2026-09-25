@@ -555,17 +555,6 @@ class MatterBaseTest(base_test.BaseTestClass):
     requires_dut: bool = True
     enable_server_interactions: bool = True
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        if 'teardown_test' in cls.__dict__:
-            original = cls.__dict__['teardown_test']
-
-            def _wrapped_teardown(self, _original=original):
-                _original(self)
-                MatterBaseTest.teardown_test(self)
-
-            cls.teardown_test = _wrapped_teardown
-
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -584,9 +573,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # check that gates the ACL baseline capture.
         self._dut_confirmed_available = False
         self._framework_cleanup_done = False
-        # Prevents double-execution when the override calls super().teardown_test()
-        # and __init_subclass__ also calls it afterward.
-        self._teardown_ran = False
 
     #
     # Mobly Test Controller Methods (Framework Interface)
@@ -636,7 +622,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # Populated by _start_wildcard_subscription (called from setup_test) with the
         # BackgroundWildcardSubscriptionCache that drives subscription-cache verification.
-        # Shut down in teardown_test.
+        # Shut down in _framework_teardown_test.
         self.wildcard_subscription_handler = None
 
         # Secondary controller for the background wildcard subscription.  A separate node_id
@@ -646,7 +632,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.subscription_controller = None
 
         # ACL snapshot taken immediately before the subscription controller's Administer
-        # entry is appended.  Restored in teardown_test so every test sees a clean,
+        # entry is appended.  Restored in _framework_teardown_test so every test sees a clean,
         # unmodified ACL regardless of what the test did to it.
         self._pre_subscription_acl = None
 
@@ -767,15 +753,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Before the subscription starts the current ACL is snapshotted into
         _pre_subscription_acl and a single Administer entry for the secondary controller is
-        appended.  teardown_test restores the ACL from the snapshot so every test sees an
-        unmodified ACL regardless of what the test did to it.
+        appended.  _framework_teardown_test restores the ACL from the snapshot so every test
+        sees an unmodified ACL regardless of what the test did to it.
 
         autoResubscribe=False is intentional: if a test removes the subscription
         controller's ACL entry (e.g. via a full ACL overwrite), the subscription stops
         receiving reports rather than repeatedly retrying with failing re-subscriptions.
 
         The subscription handler is stored as self.wildcard_subscription_handler and is
-        shut down automatically in teardown_test.
+        shut down automatically in _framework_teardown_test.
 
         This is a synchronous wrapper around an async operation; it uses self.event_loop
         (set by the test runner before setup_class is called).
@@ -816,7 +802,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                     self._extra_cas.remove(sub_ca)
 
             # Snapshot the current ACL, then append an Administer entry for the subscription
-            # controller.  teardown_test will restore from this snapshot after every test.
+            # controller.  _framework_teardown_test will restore from this snapshot after
+            # every test.
             acl_result = await self.default_controller.ReadAttribute(
                 nodeId=self.dut_node_id,
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
@@ -1574,7 +1561,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_start_time = datetime.now(UTC)
         self.step_skipped = False
         self.failed = False
-        self._teardown_ran = False
         self._framework_cleanup_done = False
         self.cleanup_config = TestCleanupConfig()
         self._validate_test_parameters()
@@ -1607,23 +1593,39 @@ class MatterBaseTest(base_test.BaseTestClass):
             if steps is None:
                 self.step(1)
 
+    def _teardown_test(self, test_name):
+        """Mobly's proxy around teardown_test, where a base class guarantees its own teardown.
+
+        The framework teardown runs from here rather than from teardown_test so that it runs
+        after every override in the class hierarchy, and runs even when one of them raises.
+        Note that an override that does not call super() still skips the teardown of any
+        other class in the hierarchy; only the framework's own is guaranteed.
+
+        Mobly documents _teardown_test as the proxy that guarantees the base implementation
+        of teardown_test is called, so this is the intended hook; mobly still records an
+        error raised by an override against the test. Note that the underscore makes it a
+        private API, so check the pairing whenever the mobly pin moves.
+        """
+        try:
+            super()._teardown_test(test_name)
+        finally:
+            self._framework_teardown_test()
+
     def teardown_test(self):
         """Per-test teardown called by the Mobly framework after every test_ method.
 
+        Empty, and here to be overridden: this is where a test class does its own per-test
+        cleanup. An override should call super().teardown_test(), so that the teardown of
+        every other class in the hierarchy runs as well.
 
-        Shuts down the background wildcard subscription.
-
-        Framework cleanup (DUT state restoration, extra controller shutdown) runs
-        once at class end in teardown_class, not here. Override this method to add
-        custom per-test teardown.
-
-        Subclasses do not need to call super().teardown_test() — __init_subclass__
-        wraps every override so this base method always runs after the override
-        completes, regardless of whether super() was called.
-
-        Idempotency: _teardown_ran prevents double-execution if super() was called
-        explicitly from the override.
+        The framework's own per-test teardown is not here but in _teardown_test, so that an
+        override cannot leave it out. Framework cleanup (DUT state restoration, extra
+        controller shutdown) runs once at class end in teardown_class.
         """
+        super().teardown_test()
+
+    def _framework_teardown_test(self):
+        """Shuts the background wildcard subscription down, and restores the ACL it changed."""
         _config = getattr(self, 'matter_test_config', None)
         if _config is None or not self._wildcard_subscription_disabled():
             # Restore the ACL snapshot taken when starting the subscription controller so each test
@@ -1646,10 +1648,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                     LOGGER.warning("[MatterBaseTest] Error shutting down wildcard subscription: %s", e)
                 self.wildcard_subscription_handler = None
             LOGGER.info("Wildcard subscription shut down")
-
-        if not self._teardown_ran:
-            self._teardown_ran = True
-            super().teardown_test()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
