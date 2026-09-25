@@ -846,9 +846,10 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
             transitionTime.SetNonNull(mOnOffTransitionTime);
         }
 
-        // 4. Move
-        BitMask<OptionsBitmap> options;
-        MoveToLevelCommand(Commands::MoveToLevelWithOnOff::Id, target, transitionTime, options, options);
+        // 4. Move. OnOff is already true here; use MoveToLevel so reaching MinLevel does not
+        // turn OnOff back off.
+        BitMask<OptionsBitmap> executeIfOff(OptionsBitmap::kExecuteIfOff);
+        MoveToLevelCommand(Commands::MoveToLevel::Id, target, transitionTime, executeIfOff, executeIfOff);
     }
     else
     {

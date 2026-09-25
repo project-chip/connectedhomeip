@@ -448,6 +448,7 @@ TEST_F(TestLevelControlOnOff, TestOnWithoutOnLevelUsesCurrentLevel)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 0u);
+    EXPECT_TRUE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
@@ -607,6 +608,7 @@ TEST_F(TestLevelControlOnOff, TestOnAfterMoveToLevelWithOnOffToMinLevel)
     // 5. Check Level.
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), minLevel);
+    EXPECT_TRUE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestOnUsesLevelSetWhileOff)
