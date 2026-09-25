@@ -450,7 +450,51 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
+    - label: "Step 3d: TH reads ScenesManagement ClusterRevision from DUT"
+      endpoint: endpoint
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: ScenesManagementClusterRevision
+          constraints:
+              type: int16u
+              anyOf: [1, 2]
+
+    - label:
+          "Check if ScenesManagement cluster revision is 2 (stubbed
+          implementation)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ScenesManagementClusterRevision
+              - name: "Value2"
+                value: 2
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsRevision2
+
+    ## Currently this test only expects cluster revision 1 or 2.
+    ## If a new version is added, we should create a GreaterThanOrEqual command for the YAML parser or migrate this test to python testing.
+    - label:
+          "Determine if test should run (ScenesManagement cluster revision 1)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ScenesManagementClusterRevision
+              - name: "Value2"
+                value: 1
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsRevision1
+
+    - label: "Step 3e: TH reads attribute FabricSceneInfo from DUT"
+      runIf: IsRevision2
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -461,6 +505,22 @@ tests:
                       CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       SceneValid: false,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
+
+    - label: "Step 3f: TH reads attribute FabricSceneInfo from DUT"
+      runIf: IsRevision1
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -1522,6 +1582,7 @@ tests:
           "Step 13a: If Groupcast is enabled on RootNode, TH sends JoinGroup
           with G2, Scene endpoint, and KeySetID 0x01a1"
       PICS: GC.S
+      runIf: ContinueTest
       cluster: "Groupcast"
       endpoint: groupcastendpoint
       command: "JoinGroup"

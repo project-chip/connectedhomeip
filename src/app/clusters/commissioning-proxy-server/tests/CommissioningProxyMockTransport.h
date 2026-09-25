@@ -101,7 +101,7 @@ public:
     void SetBgScanStartStatus(Protocols::InteractionModel::Status s) { mBgScanStartStatus = s; }
     /// True once BgScanStart() succeeded and no BgScanStop() has followed.
     bool BgScanRunning() const { return mBgScanRunning; }
-    unsigned BgScanStopCount() const { return mBgScanStopCount; }
+    uint32_t BgScanStopCount() const { return mBgScanStopCount; }
     void SetBgScanStopStatus(Protocols::InteractionModel::Status s) { mBgScanStopStatus = s; }
     void SetSendMessageError(CHIP_ERROR e) { mSendMessageError = e; }
     // When true (default), a successful SendMessage synchronously delivers a null
@@ -123,7 +123,7 @@ public:
     uint16_t LastSessionId() const { return mLastSessionId; }
     uint8_t OnAllSessionsClosedCount() const { return mOnAllSessionsClosedCount; }
     bool CancelCalled() const { return mCancelCalled; }
-    unsigned FabricRemovedCount() const { return mFabricRemovedCount; }
+    uint32_t FabricRemovedCount() const { return mFabricRemovedCount; }
     FabricIndex LastRemovedFabric() const { return mLastRemovedFabric; }
     FabricIndex LastCancelFabric() const { return mLastCancelFabric; }
 
@@ -135,7 +135,7 @@ private:
     Protocols::InteractionModel::Status mDisconnectStatus  = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mScanStatus        = Protocols::InteractionModel::Status::Success;
     bool mBgScanRunning                                    = false;
-    unsigned mBgScanStopCount                              = 0;
+    uint32_t mBgScanStopCount                              = 0;
     Protocols::InteractionModel::Status mBgScanStartStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mBgScanStopStatus  = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mSendMessageError                           = CHIP_NO_ERROR;
@@ -147,7 +147,7 @@ private:
     bool mCancelCalled                                     = false;
     FabricIndex mLastCancelFabric                          = kUndefinedFabricIndex;
     FabricIndex mPendingConnectFabric                      = kUndefinedFabricIndex;
-    unsigned mFabricRemovedCount                           = 0;
+    uint32_t mFabricRemovedCount                           = 0;
     FabricIndex mLastRemovedFabric                         = kUndefinedFabricIndex;
 };
 

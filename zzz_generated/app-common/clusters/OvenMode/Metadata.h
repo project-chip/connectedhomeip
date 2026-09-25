@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace OvenMode {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -30,6 +30,11 @@ namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentMode
+namespace CoreModeTags {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CoreModeTags::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace CoreModeTags
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
     CurrentMode::kMetadataEntry,
@@ -44,6 +49,10 @@ namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace ChangeToMode
+namespace ChangeToModeByCoreTag {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(ChangeToModeByCoreTag::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+} // namespace ChangeToModeByCoreTag
 
 } // namespace Commands
 

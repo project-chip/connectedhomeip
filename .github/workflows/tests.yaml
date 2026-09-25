@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -138,6 +138,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-distribution-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-protection-alarm-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-preference-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -250,6 +251,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thermostat-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-border-router-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-directory-cluster.xml \
@@ -263,6 +265,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/water-heater-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/webrtc-requestor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/webrtc-provider-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
@@ -786,6 +789,7 @@ jobs:
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            BLE_WIFI_BUILD_VARIANT: asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -794,7 +798,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -879,6 +883,15 @@ jobs:
                   --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-clang-test"
+
+            # The Commissioning Proxy tests drive BLE and Wi-Fi through mock D-Bus
+            # servers, so they need an application with both compiled in.
+            - name: Build linux-x64-all-devices with BLE and Wi-Fi
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-lit-icd
               run: >-
@@ -972,6 +985,13 @@ jobs:
                   --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-tv-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-tv-app-${BUILD_VARIANT}-clang
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-tv-app-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-python-bindings
               run: >-
@@ -1083,6 +1103,7 @@ jobs:
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
+            BLE_WIFI_BUILD_VARIANT: asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
             CHIP_IP_PACKET_CAPTURE: 1
@@ -1091,7 +1112,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:211
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1146,6 +1167,7 @@ jobs:
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_NO_GROUPCAST_APP: objdir-clone/linux-x64-all-clusters-no-groupcast-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_BLE_WIFI_APP: objdir-clone/linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-${BUILD_VARIANT}/chip-camera-controller" >> /tmp/test_env.yaml
@@ -1167,9 +1189,11 @@ jobs:
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/src/server.py" >> /tmp/test_env.yaml
+                  echo "COMPRO_RUNNER: scripts/tests/run_compro_test.py" >> /tmp/test_env.yaml
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TV_APP: objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}-clang/chip-tv-app" >> /tmp/test_env.yaml
                   echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
@@ -1183,10 +1207,19 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_network_identity.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_OPCREDS_3_9.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_SC_7_1.py'
+                  # The ML-DSA cases here need hazmat.primitives.asymmetric.mldsa; the
+                  # cryptography>=46 floor in src/python_testing/requirements.txt is what keeps
+                  # them running rather than silently skipping.
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetection.py'
@@ -1227,6 +1260,9 @@ jobs:
               env:
                   KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
               run: |
+                  # The tests trace into this directory, and perfetto fails if it
+                  # is missing.
+                  mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}

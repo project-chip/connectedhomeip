@@ -233,7 +233,6 @@ jobs:
                     - "-realtek-zephyr"
                     - "-silabs-zephyr"
                     - "-telink"
-                    - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
         steps:

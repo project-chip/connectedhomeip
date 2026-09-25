@@ -108,6 +108,17 @@ TEST_F(AutoCommissionerTest, DetectsCSRNonceExceedsBuffer)
     ASSERT_EQ(r, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST_F(AutoCommissionerTest, DetectsPDCPossessionNonceExceedsBuffer)
+{
+    auto possession_nonce_buffer_up = std::make_unique<uint8_t[]>(CommissioningParameters::kPossessionNonceLen + 1);
+
+    mParams.SetPDCPossessionNonce(ByteSpan{ possession_nonce_buffer_up.get(), CommissioningParameters::kPossessionNonceLen + 1 });
+
+    auto r = mCommissioner.SetCommissioningParameters(mParams);
+
+    ASSERT_EQ(r, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 TEST_F(AutoCommissionerTest, FeaturesPassedDSTOffsetsValue)
 {
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
@@ -155,6 +166,87 @@ TEST_F(AutoCommissionerTest, FeaturesPassedTimeZoneValue)
     ASSERT_EQ(commissioning_params.GetTimeZone().Value()[0].validAt, epochJanFirst2000);
     ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.HasValue());
     ASSERT_TRUE(commissioning_params.GetTimeZone().Value()[0].name.Value().data_equal("ARG"_span));
+}
+
+TEST_F(AutoCommissionerTest, ControllerSupportedAttestationRequestProfilesAlwaysIncludeLegacyFallback)
+{
+    const auto profiles = Internal::GetControllerSupportedAttestationRequestProfiles();
+
+    EXPECT_TRUE(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy));
+    EXPECT_EQ(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44),
+              Crypto::IsMlDsa44Supported());
+    EXPECT_EQ(profiles.Has(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65),
+              Crypto::IsMlDsa65Supported());
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersHighestSharedProfile)
+{
+    if (!Crypto::IsMlDsa65Supported())
+    {
+        GTEST_SKIP() << "Build has no ML-DSA-65 support, so the preference order cannot be exercised";
+    }
+
+    Internal::AttestationProfileBitmap deviceProfiles;
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersMlDsa44OverLegacy)
+{
+    if (!Crypto::IsMlDsa44Supported())
+    {
+        GTEST_SKIP() << "Build has no ML-DSA-44 support, so its preference over legacy cannot be exercised";
+    }
+
+    Internal::AttestationProfileBitmap deviceProfiles(
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileReturnsLegacyWhenItIsOnlySharedProfile)
+{
+    Internal::AttestationProfileBitmap deviceProfiles(
+        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+
+    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
+
+    ASSERT_TRUE(selectedProfile.HasValue());
+    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+}
+
+TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilesIndependently)
+{
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+
+    if (!Crypto::IsMlDsa65Supported() || !Crypto::IsMlDsa44Supported())
+    {
+        GTEST_SKIP() << "Build needs both ML-DSA-65 and ML-DSA-44 support to exercise independent PQC profiles";
+    }
+
+    Internal::AttestationProfileBitmap paiProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa65);
+    Internal::AttestationProfileBitmap dacProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
+                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa44);
+
+    const auto selectedPaiProfile = Internal::SelectControllerSupportedAttestationRequestProfile(paiProfiles);
+    const auto selectedDacProfile = Internal::SelectControllerSupportedAttestationRequestProfile(dacProfiles);
+
+    ASSERT_TRUE(selectedPaiProfile.HasValue());
+    ASSERT_TRUE(selectedDacProfile.HasValue());
+    EXPECT_EQ(selectedPaiProfile.Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    EXPECT_EQ(selectedDacProfile.Value(), AttestationCryptoProfileEnum::kMlDsa44);
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
@@ -689,6 +781,27 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
     }
 }
 
+TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationRequestProfiles)
+{
+    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    mParams.SetPAIAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kMlDsa65)
+        .SetDACAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
+
+    // Updating a buffer-backed parameter must retain the already selected scalar profiles.
+    CommissioningParameters updated = mCommissioner.GetCommissioningParameters();
+    updated.SetCountryCode("US"_span);
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
+
+    const auto & stored = mCommissioner.GetCommissioningParameters();
+    ASSERT_TRUE(stored.GetPAIAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetPAIAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kMlDsa65);
+    ASSERT_TRUE(stored.GetDACAttestationCertificateRequestProfile().HasValue());
+    EXPECT_EQ(stored.GetDACAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_TRUE(stored.GetCountryCode().HasValue());
+    EXPECT_TRUE(stored.GetCountryCode().Value().data_equal("US"_span));
+}
+
 TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
 {
     uint8_t source[32]{ 0xde, 0xad }; // length 32 is valid for all these except country code
@@ -698,6 +811,7 @@ TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
     CommissioningParameters params{};
     params.SetAttestationNonce(sourceSpan32);
     params.SetCSRNonce(sourceSpan32);
+    params.SetPDCPossessionNonce(sourceSpan32);
     params.SetThreadOperationalDataset(sourceSpan32);
     params.SetWiFiCredentials(WiFiCredentials(sourceSpan32, sourceSpan32));
     params.SetCountryCode(sourceCountryCode);
@@ -711,6 +825,10 @@ TEST_F(AutoCommissionerTest, SetCommissioningParametersCopiesSpans)
     ASSERT_TRUE(storedParams.GetCSRNonce().HasValue());
     EXPECT_NE(storedParams.GetCSRNonce().Value().data(), sourceSpan32.data());
     EXPECT_TRUE(storedParams.GetCSRNonce().Value().data_equal(sourceSpan32));
+
+    ASSERT_TRUE(storedParams.GetPDCPossessionNonce().HasValue());
+    EXPECT_NE(storedParams.GetPDCPossessionNonce().Value().data(), sourceSpan32.data());
+    EXPECT_TRUE(storedParams.GetPDCPossessionNonce().Value().data_equal(sourceSpan32));
 
     ASSERT_TRUE(storedParams.GetThreadOperationalDataset().HasValue());
     EXPECT_NE(storedParams.GetThreadOperationalDataset().Value().data(), sourceSpan32.data());

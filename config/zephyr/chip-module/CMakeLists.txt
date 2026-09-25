@@ -79,6 +79,13 @@ if(CONFIG_CHIP)
         if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
             zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
         endif()
+
+        # Put the NXP accel header (Kconfig.defaults TF_PSA_CRYPTO_USER_CONFIG_FILE)
+        # on the include path so tf-psa-crypto can find it. SGI-PKC gate keeps
+        # non-NXP targets unaffected.
+        if(CONFIG_PSA_CRYPTO_DRIVER_SGI_PKC)
+            zephyr_include_directories(${CHIP_ROOT}/config/nxp/chip-module)
+        endif()
     endif()
 
 
@@ -138,14 +145,21 @@ if(CONFIG_CHIP)
     endif()
 
     if(CONFIG_CHIP_ENABLE_DNSSD_SRP)
+        # Explicit SRP DNS-SD: use the SRP-client backed DNS-SD platform layer
+        # regardless of Wi-Fi/Ethernet so OpenThreadDnssdImpl.cpp is compiled.
         matter_add_gn_arg_string("chip_mdns" "platform")
+    elseif(CONFIG_CHIP_WIFI OR CONFIG_CHIP_ETHERNET)
+        if(CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+            matter_add_gn_arg_string("chip_mdns" "platform")
+        else()
+            # IP-only, or Wi-Fi/Ethernet + Thread non-Border-Router: advertise
+            # over the IP interface using the minimal mDNS implementation. On a
+            # non-Border-Router build OpenThread mDNS is not enabled, so the
+            # Thread side relies on the SRP client at runtime.
+            matter_add_gn_arg_string("chip_mdns" "minimal")
         endif()
-
-    if(CONFIG_CHIP_WIFI)
-        matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_CHIP_ETHERNET)
-        matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_OPENTHREAD)
+    elseif(CONFIG_NET_L2_OPENTHREAD)
+        # Thread-only (SRP-client backed DNS-SD).
         matter_add_gn_arg_string("chip_mdns" "platform")
     else()
         matter_add_gn_arg_string("chip_mdns" "none")

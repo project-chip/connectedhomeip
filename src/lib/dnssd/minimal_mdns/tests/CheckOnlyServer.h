@@ -228,7 +228,7 @@ public:
                chip::Inet::InterfaceId interface) override
     {
         mPacketData = chip::Dnssd::BytesRange(data->Start(), data->Start() + data->TotalLength());
-        chip::Dnssd::ParsePacket(mPacketData, this);
+        chip::Dnssd::ParseMdnsPacket(mPacketData, this);
         if (mHeaderFound)
         {
             TestGotAllExpectedPackets();
