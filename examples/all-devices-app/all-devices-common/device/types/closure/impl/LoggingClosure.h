@@ -15,28 +15,58 @@
  */
 
 #pragma once
+
 #include <app/TestEventTriggerDelegate.h>
 #include <device/types/closure-panel/impl/LoggingClosurePanel.h>
 #include <device/types/closure/Closure.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <lib/support/TimerDelegate.h>
+
 namespace chip {
 namespace app {
 
-struct PanelList
-{
-    ClosurePanel::Config config;
-    Span<const EndpointComposition::SemanticTag> tags;
-};
-
+/// A closure owns the ClosureControl cluster and the panels below it, and drives the movement of
+/// every attribute that opens and closes them: position, latch and speed.
+///
+/// This implementation simulates that movement instead of driving hardware. A command is always
+/// accepted and always completes, after a fixed delay standing in for the time a real closure
+/// would take to travel. Stop abandons a movement still in flight, leaving the door where it was
+/// when the command arrived.
+///
+/// It reports itself secure only while every securing mechanism it supports is engaged, so a fully
+/// closed but unlatched door is not secure. The MainStates a real closure enters on its own —
+/// error, protected, disengaged, setup required — are unreachable by command here and are driven
+/// by test event triggers addressed to this endpoint or to the root endpoint.
+///
+/// Composed of one LoggingClosurePanel per Config::panels entry, each on its own endpoint, plus a
+/// LoggingOnOffLight.
 class LoggingClosure : public Clusters::ClosureControl::ClosureControlClusterDelegate,
                        public Closure,
                        public TimerContext,
                        public TestEventTriggerHandler
 {
 public:
-    LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
-                   Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable, std::vector<PanelList> panels,
+    struct PanelList
+    {
+        ClosurePanel::Config config;
+        Span<const EndpointComposition::SemanticTag> tags;
+    };
+
+    /// Feature selection and panel composition of the closure. Shadows the inherited
+    /// Closure::Config, which it carries as `closure`; refer to the base one by its qualified name.
+    struct Config
+    {
+        Closure::Config closure;
+        std::vector<PanelList> panels;
+    };
+
+    /// The closure exposed by `--device closure`: a door that positions, latches and moves at a
+    /// selectable speed, composed of a translating lift panel, a flow-modulating panel and a
+    /// latching rotating panel. The semantic tags it references have static storage duration.
+    static Config ThreePanelDoorClosureConfig();
+
+    LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
+                   Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                    TestEventTriggerDelegate & testEventTriggerDelegate);
     ~LoggingClosure() override;
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -58,6 +88,8 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 private:
+    /// Stands in for how long a real closure would take to move, and is reported as-is by the
+    /// countdown attributes. Kept short so tests do not have to wait on it.
     static constexpr uint32_t kTimeoutDurationSec = 1;
     bool RegistersAccessDevicePanel() const override;
     void CancelTimer();

@@ -13,7 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
+
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
@@ -40,6 +42,7 @@ public:
         bool withAccess           = false;
         DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
     };
+
     Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
             Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate);
     ~Closure() = default;
@@ -51,6 +54,7 @@ public:
         VerifyOrDie(mIdentifyCluster.IsConstructed());
         return mIdentifyCluster.Cluster();
     }
+
     Clusters::ClosureControl::ClosureControlCluster & ClosureControlCluster()
     {
         VerifyOrDie(mClosureControlCluster.IsConstructed());

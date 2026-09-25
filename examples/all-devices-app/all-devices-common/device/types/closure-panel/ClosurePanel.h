@@ -15,6 +15,7 @@
  */
 
 #pragma once
+
 #include <app/clusters/closure-dimension-server/ClosureDimensionCluster.h>
 #include <app/clusters/closure-dimension-server/ClosureDimensionClusterDelegate.h>
 #include <device/api/SingleEndpoint.h>
@@ -32,11 +33,13 @@ public:
         Clusters::ClosureDimension::TranslationDirectionEnum direction =
             Clusters::ClosureDimension::TranslationDirectionEnum::kUnknownEnumValue;
     };
+
     struct RotationParams
     {
         Clusters::ClosureDimension::RotationAxisEnum axis = Clusters::ClosureDimension::RotationAxisEnum::kUnknownEnumValue;
         Clusters::ClosureDimension::OverflowEnum overflow = Clusters::ClosureDimension::OverflowEnum::kUnknownEnumValue;
     };
+
     struct ModulationParams
     {
         Clusters::ClosureDimension::ModulationTypeEnum type = Clusters::ClosureDimension::ModulationTypeEnum::kUnknownEnumValue;

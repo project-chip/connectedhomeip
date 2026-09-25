@@ -18,8 +18,13 @@
 
 #include <device/types/closure-panel/ClosurePanel.h>
 #include <lib/support/TimerDelegate.h>
+
 namespace chip::app {
 
+/// One panel of a LoggingClosure, behaving the same way: it reaches its commanded position, latch
+/// and speed after a fixed delay, without passing through intermediate positions. A Step lands on
+/// the end position in one go rather than travelling step by step. A new command supersedes one
+/// still in flight, and the owning closure abandons the movement when it handles Stop.
 class LoggingClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate,
                             public ClosurePanel,
                             public TimerContext
@@ -33,10 +38,14 @@ public:
     Protocols::InteractionModel::Status HandleStep(const Clusters::ClosureDimension::StepDirectionEnum & direction,
                                                    const uint16_t & numberOfSteps,
                                                    const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;
+    /// Applies the target the cluster committed. ClosureDimensionCluster stores TargetState only
+    /// after the delegate returns Success, so the target cannot be read from the handlers above.
     void TimerFired() override;
     void CancelTimer() { mTimerDelegate.CancelTimer(this); }
 
 private:
+    /// Stands in for how long the panel would take to reach its target. Kept short so tests do not
+    /// have to wait on it.
     static constexpr uint32_t kMotionDurationSec = 1;
     TimerDelegate & mTimerDelegate;
 };

@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#include "SampleClosure.h"
+#include "LoggingClosure.h"
+
 #include <clusters/shared/Enums.h>
 
 namespace chip::app {
@@ -73,14 +74,14 @@ ClosurePanel::Config RotatingPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                        ClosureDimension::OverflowEnum::kTopInside },
+                                                            ClosureDimension::OverflowEnum::kTopInside },
             },
     };
 }
 
 } // namespace
 
-SampleClosure MakeSampleClosure()
+LoggingClosure::Config LoggingClosure::ThreePanelDoorClosureConfig()
 {
     return {
         .closure = Closure::Config{
@@ -99,7 +100,7 @@ SampleClosure MakeSampleClosure()
             .withAccess                 = true,
             .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(
                 MakeOptional(DataModel::MakeNullable(ClosureControl::CurrentPositionEnum::kFullyClosed)),
-                MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto))),
+                MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto),DataModel::MakeNullable(false))),
         },
         .panels = {
             PanelList{ LiftPanel(), Span<const EndpointComposition::SemanticTag>(kLiftTag) },

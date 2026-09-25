@@ -40,7 +40,7 @@ Protocols::InteractionModel::Status LoggingClosurePanel::HandleSetTarget(const O
 
     mTimerDelegate.CancelTimer(this);
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "LoggingClosurePanel: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
@@ -54,7 +54,7 @@ Protocols::InteractionModel::Status LoggingClosurePanel::HandleStep(const Closur
                     to_underlying(direction), numberOfSteps, to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
     mTimerDelegate.CancelTimer(this);
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "LoggingClosurePanel: failed to start step timer: %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
 

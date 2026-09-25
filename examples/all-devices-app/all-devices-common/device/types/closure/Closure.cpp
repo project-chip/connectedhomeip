@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include "Closure.h"
 #include <clusters/shared/Enums.h>
 #include <devices/Types.h>
@@ -34,22 +35,17 @@ CHIP_ERROR ValidateClosureTagList(chip::Span<const chip::app::EndpointCompositio
     return CHIP_NO_ERROR;
 }
 
-} // namespace
+using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
+using chip::app::Clusters::Globals::ClosureTag;
 
-namespace chip {
-namespace app {
-
-using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
-using Clusters::Globals::ClosureTag;
-
-bool IsAccess(Span<const SemanticTag> tags)
+bool IsAccess(chip::Span<const SemanticTag> tags)
 {
     for (const auto & tag : tags)
     {
         if (tag.namespaceID == chip::app::CommonNamespace::kClosureId &&
-            (to_underlying(ClosureTag::kWindow) == tag.tag || to_underlying(ClosureTag::kDoor) == tag.tag ||
-             to_underlying(ClosureTag::kBarrier) == tag.tag || to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
-             to_underlying(ClosureTag::kGate) == tag.tag))
+            (chip::to_underlying(ClosureTag::kWindow) == tag.tag || chip::to_underlying(ClosureTag::kDoor) == tag.tag ||
+             chip::to_underlying(ClosureTag::kBarrier) == tag.tag || chip::to_underlying(ClosureTag::kGarageDoor) == tag.tag ||
+             chip::to_underlying(ClosureTag::kGate) == tag.tag))
         {
             return true;
         }
@@ -57,10 +53,15 @@ bool IsAccess(Span<const SemanticTag> tags)
     return false;
 }
 
+} // namespace
+
+namespace chip {
+namespace app {
+
 Closure::Closure(Config config, TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate,
                  Clusters::ClosureControl::ClosureControlClusterDelegate & CCdelegate) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)),
-    mConfig(config), mTimerDelegate(Tdelegate), mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kClosure, 1)), mConfig(config), mTimerDelegate(Tdelegate),
+    mIdentifyDelegate(Idelegate), mClosureControlClusterDelegate(CCdelegate)
 {}
 
 CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,

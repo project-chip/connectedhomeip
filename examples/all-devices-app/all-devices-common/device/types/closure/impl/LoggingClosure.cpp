@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-// helper to return tags for the closurepanel
 #include "LoggingClosure.h"
 
 namespace {
@@ -47,18 +46,18 @@ MapToCurrentPosition(chip::app::Clusters::ClosureControl::TargetPositionEnum tar
 namespace chip {
 namespace app {
 
-LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Closure::Config CConfig,
+LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                                Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
-                               std::vector<PanelList> panels, TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(CConfig, Tdelegate, Idelegate, *this),
-    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(panels)),
-    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+                               TestEventTriggerDelegate & testEventTriggerDelegate) :
+    Closure(config.closure, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
+    mPanelList(std::move(config.panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 LoggingClosure::~LoggingClosure()
 {
     CancelTimer();
 }
+
 Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::HandleStopCommand()");
@@ -127,21 +126,25 @@ bool LoggingClosure::IsReadyToMove()
     ChipLogProgress(DeviceLayer, "LoggingClosure::IsReadyToMove()");
     return true;
 }
+
 ElapsedS LoggingClosure::GetCalibrationCountdownTime()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::GetCalibrationCountdownTime()");
-    return 0u;
+    return kTimeoutDurationSec;
 }
+
 ElapsedS LoggingClosure::GetMovingCountdownTime()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::GetMovingCountdownTime()");
-    return 0u;
+    return kTimeoutDurationSec;
 }
+
 ElapsedS LoggingClosure::GetWaitingForMotionCountdownTime()
 {
     ChipLogProgress(DeviceLayer, "LoggingClosure::GetWaitingForMotionCountdownTime()");
-    return 0u;
+    return kTimeoutDurationSec;
 }
+
 bool LoggingClosure::RegistersAccessDevicePanel() const
 {
     for (const auto & panel : mPanelList)
@@ -166,8 +169,12 @@ void LoggingClosure::TimerFired()
     LogErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
     LogErrorOnFailure(ClosureControlCluster().GenerateMovementCompletedEvent());
 }
+
 CHIP_ERROR LoggingClosure::HandleEventTrigger(uint64_t eventTrigger)
 {
+    const auto triggerEndpoint = static_cast<EndpointId>((eventTrigger >> 32) & 0xFFFF);
+    VerifyOrReturnError(triggerEndpoint == kRootEndpointId || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
+
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
     switch (eventTrigger)
     {
@@ -198,10 +205,10 @@ void LoggingClosure::CancelTimer()
 {
     mTimerDelegate.CancelTimer(this);
 }
+
 CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                          EndpointComposition composition)
 {
-
     for (const auto & panel : mPanelList)
     {
         auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config, mTimerDelegate);
