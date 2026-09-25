@@ -19,6 +19,7 @@ Support module for IDM (Interaction Data Model) test modules containing shared f
 """
 
 import asyncio
+import builtins
 import contextlib
 import copy
 import inspect
@@ -2330,6 +2331,23 @@ class IDMBaseTest(BasicCompositionTests):
         sub.SetEventUpdateCallback(handler)
         handler._subscription = sub
         return handler, sub
+
+    @contextlib.contextmanager
+    def retain_client_subscription(self, sub: SubscriptionTransaction):
+        """Leave `sub` running while another subscribe is sent with KeepSubscriptions false.
+
+        Read() drops this controller's older subscriptions before that request is
+        sent. Taken out of that list, the first ReadClient stays up and only the
+        DUT can end it.
+        """
+        subscriptions = builtins.chipStack._subscriptions
+        key = id(sub)
+        held = subscriptions.pop(key, None)
+        try:
+            yield
+        finally:
+            if held is not None and key not in subscriptions:
+                subscriptions[key] = held
 
     @contextlib.asynccontextmanager
     async def event_subscription(self, ctrl: ChipDeviceCtrl, events: list, **kwargs):
