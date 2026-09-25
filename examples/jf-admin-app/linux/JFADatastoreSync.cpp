@@ -605,7 +605,7 @@ public:
                                 entry.binding.endpoint = responseEntry.endpoint;
                                 entry.binding.cluster  = responseEntry.cluster;
                                 entry.binding.group    = responseEntry.group;
-                                entry.endpointID       = lambdaCbContext->objectToWrite.Value().endpointID;
+                                entry.endpointID       = lambdaCbContext->endpointId;
                                 bindingEntries.push_back(entry);
                             }
 
