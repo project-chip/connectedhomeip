@@ -10988,3 +10988,8 @@ PICS:
 
     - label: "Does the device implement the RangingSessionStatus event?"
       id: PROXR.S.E01
+
+    # Client
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a client?"
+      id: PROXR.C
