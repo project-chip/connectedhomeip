@@ -415,7 +415,10 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     {
         ReturnErrorOnFailure(SetOnOff(true));
     }
-    else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
+    // Spec 1.6.6.9 gates only the 'without On/Off' commands: Move, Move to Level, Step, Stop.
+    // MoveWithOnOff is exempt in both directions, so the gate must not be reached just because
+    // the MoveMode is Down.
+    else if (!IsWithOnOffCommand(commandId) && !ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
     }

@@ -214,6 +214,88 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 }
 
+// Spec 1.6.6.9 gates only Move, MoveToLevel, Step and Stop. MoveWithOnOff is exempt regardless of
+// the MoveMode, so a Down move must run even while the device is off with ExecuteIfOff clear.
+TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownRunsWhileOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // Off, and the Options attribute leaves ExecuteIfOff clear.
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    Commands::MoveWithOnOff::Type data;
+    data.moveMode = MoveModeEnum::kDown;
+    data.rate.SetNonNull(10);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    // Only the upward direction turns the device on, so the move has to run with OnOff still false.
+    // Asserting here as well as at the end rules out a turn-on/turn-off pair spanning the transition.
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+
+    while (mockTimer.IsTimerActive(nullptr))
+    {
+        AdvanceClock(System::Clock::Milliseconds64(1000));
+    }
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 0u);
+
+    // The device was already off and moving down keeps it off.
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+}
+
+// The counterpart of the test above: the plain Move command is on the gated list, so a Down move
+// while off with ExecuteIfOff clear must succeed without changing the level.
+TEST_F(TestLevelControlOnOff, TestMoveDownIsGatedWhileOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    Commands::Move::Type data;
+    data.moveMode = MoveModeEnum::kDown;
+    data.rate.SetNonNull(10);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 100u);
+}
+
 // Spec 1.6.6.9 gates only Move, MoveToLevel, Step and Stop. StopWithOnOff is not on that list, so
 // it must terminate an in-flight transition even while the device is off with ExecuteIfOff clear.
 TEST_F(TestLevelControlOnOff, TestStopWithOnOffTerminatesTransitionWhileOff)
