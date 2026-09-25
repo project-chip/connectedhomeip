@@ -871,7 +871,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 #if !(CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
     const bool hasPendingAction = mPendingActiveModeOnNetworkAttach;
 #else
-    const bool hasPendingAction = (mPendingActiveModeOnNetworkAttach || mPendingCheckInType != PendingCheckInType::kNone);
+    const bool hasPendingAction  = (mPendingActiveModeOnNetworkAttach || mPendingCheckInType != PendingCheckInType::kNone);
 #endif
     VerifyOrReturn(hasPendingAction);
 

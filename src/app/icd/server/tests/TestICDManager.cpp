@@ -117,7 +117,7 @@ class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
     TestSubscriptionsInfoProvider() = default;
-    ~TestSubscriptionsInfoProvider() {};
+    ~TestSubscriptionsInfoProvider(){};
 
     void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
     void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
