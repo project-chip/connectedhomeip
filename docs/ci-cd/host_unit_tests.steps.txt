@@ -26,7 +26,7 @@ build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Run Tests wi
   on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
   job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
   if:     github.event.pull_request.number == null
-  gn: is_clang=true is_asan=true | is_clang=true is_tsan=true chip_enable_wifi=false | is_clang=true is_ubsan=true
+  gn: is_clang=true is_asan=true | is_clang=true is_msan=true | is_clang=true is_tsan=true chip_enable_wifi=false | is_clang=true is_ubsan=true
 
 build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Run fake linux tests with build_examples
   on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
