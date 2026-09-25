@@ -27,21 +27,141 @@ namespace app {
 
 namespace {
 
-AirQualitySensor::Config DefaultSimulatedConfig()
+using namespace chip::app::Clusters::ConcentrationMeasurement;
+
+SimulatedAirQualitySensor::ConcentrationCluster::Config MakeGasConfig(ClusterId clusterId, MeasurementUnitEnum unit, float min, float max)
 {
-    AirQualitySensor::Config config;
+    return SimulatedAirQualitySensor::ConcentrationCluster::Config{
+        .clusterId   = clusterId,
+        .features    = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement, Feature::kAverageMeasurement,
+                                      Feature::kLevelIndication),
+        .medium      = MeasurementMediumEnum::kAir,
+        .unit        = unit,
+        .minMeasured = DataModel::MakeNullable(min),
+        .maxMeasured = DataModel::MakeNullable(max),
+    };
+}
+
+SimulatedAirQualitySensor::Config DefaultSimulatedConfig()
+{
+    SimulatedAirQualitySensor::Config config;
     config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
     return config;
 }
 
 } // namespace
 
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features)
+{
+    baseConfig.WithAirQuality(features);
+    return *this;
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithTemperature(int16_t min, int16_t max)
+{
+    temperature = Clusters::TemperatureMeasurementCluster::StartupConfiguration{
+        .minMeasuredValue = DataModel::MakeNullable(min),
+        .maxMeasuredValue = DataModel::MakeNullable(max),
+    };
+    return *this;
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithRelativeHumidity(uint16_t min, uint16_t max)
+{
+    Clusters::RelativeHumidityMeasurementCluster::Config cfg;
+    cfg.minMeasuredValue = DataModel::MakeNullable(min);
+    cfg.maxMeasuredValue = DataModel::MakeNullable(max);
+    humidity             = cfg;
+    return *this;
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithConcentration(const ConcentrationCluster::Config & customConfig)
+{
+    for (size_t i = 0; i < numConcentrationConfigs; ++i)
+    {
+        if (concentrationConfigs[i].clusterId == customConfig.clusterId)
+        {
+            concentrationConfigs[i] = customConfig;
+            return *this;
+        }
+    }
+    VerifyOrDie(numConcentrationConfigs < kMaxConcentrationClusters);
+    concentrationConfigs[numConcentrationConfigs++] = customConfig;
+    return *this;
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithCarbonDioxide(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(CarbonDioxideConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithPm25(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(Pm25ConcentrationMeasurement::Id, MeasurementUnitEnum::kUgm3, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithTotalVolatileOrganicCompounds(float min, float max)
+{
+    return WithConcentration(
+        MakeGasConfig(TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithCarbonMonoxide(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(CarbonMonoxideConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithNitrogenDioxide(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(NitrogenDioxideConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithOzone(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(OzoneConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithFormaldehyde(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(FormaldehydeConcentrationMeasurement::Id, MeasurementUnitEnum::kPpm, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithPm1(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(Pm1ConcentrationMeasurement::Id, MeasurementUnitEnum::kUgm3, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithPm10(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(Pm10ConcentrationMeasurement::Id, MeasurementUnitEnum::kUgm3, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithRadon(float min, float max)
+{
+    return WithConcentration(MakeGasConfig(RadonConcentrationMeasurement::Id, MeasurementUnitEnum::kBqm3, min, max));
+}
+
+SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithAllConcentrationClusters()
+{
+    WithCarbonDioxide();
+    WithPm25();
+    WithTotalVolatileOrganicCompounds();
+    WithCarbonMonoxide();
+    WithNitrogenDioxide();
+    WithOzone();
+    WithFormaldehyde();
+    WithPm1();
+    WithPm10();
+    WithRadon();
+    return *this;
+}
+
 SimulatedAirQualitySensor::SimulatedAirQualitySensor(TimerDelegate & timerDelegate, const Config & config) :
-    AirQualitySensor(timerDelegate, config)
+    AirQualitySensor(timerDelegate, config.baseConfig), mConfig(config)
 {}
 
 SimulatedAirQualitySensor::SimulatedAirQualitySensor(TimerDelegate & timerDelegate) :
-    AirQualitySensor(timerDelegate, DefaultSimulatedConfig())
+    AirQualitySensor(timerDelegate, DefaultSimulatedConfig().baseConfig), mConfig(DefaultSimulatedConfig())
 {}
 
 SimulatedAirQualitySensor::~SimulatedAirQualitySensor()
@@ -60,6 +180,81 @@ void SimulatedAirQualitySensor::Unregister(CodeDrivenDataModelProvider & provide
 {
     mTimerDelegate.CancelTimer(this);
     AirQualitySensor::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedAirQualitySensor::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    if (mConfig.temperature.has_value())
+    {
+        mTemperatureCluster.Create(endpoint, TemperatureMeasurementCluster::OptionalAttributeSet(), *mConfig.temperature);
+        ReturnErrorOnFailure(provider.AddCluster(mTemperatureCluster.Registration()));
+    }
+
+    if (mConfig.humidity.has_value())
+    {
+        mHumidityCluster.Create(endpoint, *mConfig.humidity);
+        ReturnErrorOnFailure(provider.AddCluster(mHumidityCluster.Registration()));
+    }
+
+    mNumConcentrationClusters = mConfig.numConcentrationConfigs;
+    for (size_t i = 0; i < mNumConcentrationClusters; ++i)
+    {
+        mConcentrationClusters[i].Create(endpoint, mConfig.concentrationConfigs[i]);
+        ReturnErrorOnFailure(provider.AddCluster(mConcentrationClusters[i].Registration()));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedAirQualitySensor::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    for (size_t i = 0; i < mNumConcentrationClusters; ++i)
+    {
+        if (mConcentrationClusters[i].IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mConcentrationClusters[i].Cluster()));
+            mConcentrationClusters[i].Destroy();
+        }
+    }
+    mNumConcentrationClusters = 0;
+
+    if (mHumidityCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mHumidityCluster.Cluster()));
+        mHumidityCluster.Destroy();
+    }
+    if (mTemperatureCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mTemperatureCluster.Cluster()));
+        mTemperatureCluster.Destroy();
+    }
+}
+
+Clusters::TemperatureMeasurementCluster * SimulatedAirQualitySensor::TemperatureCluster()
+{
+    return mTemperatureCluster.IsConstructed() ? &mTemperatureCluster.Cluster() : nullptr;
+}
+
+Clusters::RelativeHumidityMeasurementCluster * SimulatedAirQualitySensor::HumidityCluster()
+{
+    return mHumidityCluster.IsConstructed() ? &mHumidityCluster.Cluster() : nullptr;
+}
+
+SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::GetConcentrationCluster(ClusterId clusterId)
+{
+    for (size_t i = 0; i < mNumConcentrationClusters; ++i)
+    {
+        if (mConcentrationClusters[i].IsConstructed() && mConfig.concentrationConfigs[i].clusterId == clusterId)
+        {
+            return &mConcentrationClusters[i].Cluster();
+        }
+    }
+    return nullptr;
+}
+
+SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::CO2Cluster()
+{
+    return GetConcentrationCluster(CarbonDioxideConcentrationMeasurement::Id);
 }
 
 void SimulatedAirQualitySensor::TimerFired()

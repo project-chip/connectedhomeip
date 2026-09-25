@@ -54,20 +54,48 @@ TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
     EXPECT_EQ(sensor.GetEndpointId(), 1);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
-    EXPECT_EQ(sensor.TemperatureCluster(), nullptr);
-    EXPECT_EQ(sensor.HumidityCluster(), nullptr);
-    EXPECT_EQ(sensor.CO2Cluster(), nullptr);
-    EXPECT_EQ(sensor.GetConcentrationCluster(Pm25ConcentrationMeasurement::Id), nullptr);
 
     sensor.Unregister(mProvider);
 }
 
+class CustomAirQualitySensor : public AirQualitySensor
+{
+public:
+    using AirQualitySensor::AirQualitySensor;
+
+    bool registeredAdditionalCalled   = false;
+    bool unregisteredAdditionalCalled = false;
+
+protected:
+    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override
+    {
+        registeredAdditionalCalled = true;
+        return CHIP_NO_ERROR;
+    }
+
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override
+    {
+        unregisteredAdditionalCalled = true;
+    }
+};
+
+TEST_F(TestAirQualitySensor, TestExtensionHooks)
+{
+    CustomAirQualitySensor sensor(mTimerDelegate);
+
+    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
+    EXPECT_TRUE(sensor.registeredAdditionalCalled);
+
+    sensor.Unregister(mProvider);
+    EXPECT_TRUE(sensor.unregisteredAdditionalCalled);
+}
+
 TEST_F(TestAirQualitySensor, TestFluentBuilder)
 {
-    AirQualitySensor::Config config;
+    SimulatedAirQualitySensor::Config config;
     config.WithTemperature(-2000, 6000).WithRelativeHumidity(1000, 9000).WithCarbonDioxide(400.0f, 2000.0f);
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    SimulatedAirQualitySensor sensor(mTimerDelegate, config);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_NE(sensor.TemperatureCluster(), nullptr);
@@ -90,10 +118,10 @@ TEST_F(TestAirQualitySensor, TestFluentBuilder)
 
 TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 {
-    AirQualitySensor::Config config;
+    SimulatedAirQualitySensor::Config config;
     config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    SimulatedAirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().SetAirQuality(AirQualityEnum::kFair), Protocols::InteractionModel::Status::Success);
@@ -154,10 +182,10 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
 
 TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 {
-    AirQualitySensor::Config config;
+    SimulatedAirQualitySensor::Config config;
     config.WithTemperature().WithRelativeHumidity().WithAllConcentrationClusters();
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    SimulatedAirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_NE(sensor.TemperatureCluster(), nullptr);
@@ -180,9 +208,9 @@ TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 
 TEST_F(TestAirQualitySensor, TestCleanTeardown)
 {
-    AirQualitySensor::Config config;
+    SimulatedAirQualitySensor::Config config;
     config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
-    AirQualitySensor sensor(mTimerDelegate, config);
+    SimulatedAirQualitySensor sensor(mTimerDelegate, config);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     sensor.Unregister(mProvider);
@@ -193,14 +221,14 @@ TEST_F(TestAirQualitySensor, TestCleanTeardown)
 
 TEST_F(TestAirQualitySensor, TestDuplicateConcentrationClusterConfig)
 {
-    AirQualitySensor::Config config;
+    SimulatedAirQualitySensor::Config config;
     config.WithCarbonDioxide(400.0f, 2000.0f).WithCarbonDioxide(500.0f, 3000.0f);
 
     EXPECT_EQ(config.numConcentrationConfigs, 1u);
     EXPECT_FLOAT_EQ(config.concentrationConfigs[0].minMeasured.Value(), 500.0f);
     EXPECT_FLOAT_EQ(config.concentrationConfigs[0].maxMeasured.Value(), 3000.0f);
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    SimulatedAirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_NE(sensor.CO2Cluster(), nullptr);
     sensor.Unregister(mProvider);

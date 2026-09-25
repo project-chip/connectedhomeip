@@ -318,13 +318,13 @@ private:
         {
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                AirQualitySensor::Config config;
+                SimulatedAirQualitySensor::Config config;
                 config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
                 return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
             });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
-                AirQualitySensor::Config config;
+                SimulatedAirQualitySensor::Config config;
                 config.WithTemperature().WithRelativeHumidity().WithAllConcentrationClusters();
                 return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
             });
