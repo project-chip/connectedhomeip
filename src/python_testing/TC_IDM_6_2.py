@@ -202,20 +202,19 @@ class TC_IDM_6_2(IDMBaseTest):
             min_interval_sec=0,
             max_interval_sec=self.max_interval_ceiling_sec,
             keep_subscriptions=False,
-        ) as (_, first_sub):
-            async with self.event_subscription(
-                th,
-                [(endpoint, EVENT, False)],
-                event=EVENT,
-                min_interval_sec=0,
-                max_interval_sec=self.max_interval_ceiling_sec,
-                keep_subscriptions=False,
-            ) as (second_handler, second_sub):
-                asserts.assert_not_equal(
-                    first_sub.subscriptionId, second_sub.subscriptionId,
-                    "KeepSubscriptions=False did not allocate a new SubscriptionId")
-                await self.emit_access_control_entry_changed(ctrl=th)
-                self.collect_event_reports(second_handler, second_sub, mrp_timeout_sec, minimum=1)
+        ) as (_, first_sub), self.event_subscription(
+            th,
+            [(endpoint, EVENT, False)],
+            event=EVENT,
+            min_interval_sec=0,
+            max_interval_sec=self.max_interval_ceiling_sec,
+            keep_subscriptions=False,
+        ) as (second_handler, second_sub):
+            asserts.assert_not_equal(
+                first_sub.subscriptionId, second_sub.subscriptionId,
+                "KeepSubscriptions=False did not allocate a new SubscriptionId")
+            await self.emit_access_control_entry_changed(ctrl=th)
+            self.collect_event_reports(second_handler, second_sub, mrp_timeout_sec, minimum=1)
 
         self.step(11, "TH sends Subscribe Request Message to DUT + DUT sends Report Data message to DUT. "
                   "TH sends Status Response Message with a success Status code.",
