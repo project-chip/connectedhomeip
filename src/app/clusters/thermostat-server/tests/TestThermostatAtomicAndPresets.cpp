@@ -272,7 +272,23 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteRollback)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+constexpr FabricIndex kOtherFabricIndex = 2;
+constexpr NodeId kOtherNodeId           = 0x55667788ULL;
+
 constexpr GroupId kTestGroupId = 0x0101;
+
+struct ClientIdentity
+{
+    NodeId nodeId;
+    FabricIndex fabricIndex;
+};
+
+// CASE clients that differ from the atomic write owner in node ID, fabric index, or both.
+constexpr ClientIdentity kNonOwnerClients[] = {
+    { kOtherNodeId, kOtherFabricIndex },
+    { kOtherNodeId, Thermostat::kTestFabricIndex },
+    { Thermostat::kTestNodeId, kOtherFabricIndex },
+};
 
 void SetSubject(ClusterTester & tester, Access::AuthMode authMode, NodeId subject, FabricIndex fabricIndex)
 {
@@ -282,6 +298,11 @@ void SetSubject(ClusterTester & tester, Access::AuthMode authMode, NodeId subjec
     subjectDescriptor.subject     = subject;
     tester.SetSubjectDescriptor(subjectDescriptor);
     tester.SetFabricIndex(fabricIndex);
+}
+
+void SetOtherClientSubject(ClusterTester & tester)
+{
+    SetSubject(tester, Access::AuthMode::kCase, kOtherNodeId, kOtherFabricIndex);
 }
 
 void SetGroupSubject(ClusterTester & tester)
@@ -362,6 +383,143 @@ TEST_F(ThermostatTestFixture, TestAtomicRequestCommitAndRollbackRejectedFromGrou
     // The owner's session must still be open.
     SetupTesterSubject(tester);
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestAtomicWriteRollbackByOtherClientRejected)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type req;
+    req.requestType             = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Presets::Id };
+    req.attributeRequests       = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+
+    SetOtherClientSubject(tester);
+
+    // The other client is seen as a distinct client: its BeginWrite is refused with a per-attribute BUSY rather
+    // than the INVALID_IN_STATE the session owner would get.
+    result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Failure));
+        auto attrStatusIter = result.response.value().attributeStatus.begin();
+        EXPECT_TRUE(attrStatusIter.Next());
+        EXPECT_EQ(attrStatusIter.GetValue().statusCode, to_underlying(Status::Busy));
+    }
+
+    // Rollback is only allowed for the client associated with the atomic write: both the node ID and the
+    // fabric index must match.
+    req.requestType = AtomicRequestTypeEnum::kRollbackWrite;
+    req.timeout     = NullOptional;
+    for (const auto & client : kNonOwnerClients)
+    {
+        ChipLogProgress(Test, "RollbackWrite from node 0x" ChipLogFormatX64 " on fabric %u", ChipLogValueX64(client.nodeId),
+                        client.fabricIndex);
+        SetSubject(tester, Access::AuthMode::kCase, client.nodeId, client.fabricIndex);
+        EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
+    }
+
+    // The owner's session must still be open.
+    SetupTesterSubject(tester);
+    EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestAtomicWriteCommitByOtherClientRejected)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handle[4] = { 1, 2, 3, 4 };
+    EXPECT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))), CHIP_NO_ERROR);
+    preset.SetBuiltIn(DataModel::MakeNullable(true));
+    preset.SetHeatingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2000)));
+    preset.SetCoolingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2600)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type req;
+    req.requestType             = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Presets::Id };
+    req.attributeRequests       = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+
+    std::vector<Structs::PresetStruct::Type> newPresetsList;
+    Structs::PresetStruct::Type updateEntry;
+    updateEntry.presetScenario  = PresetScenarioEnum::kOccupied;
+    updateEntry.presetHandle    = DataModel::MakeNullable(ByteSpan(handle));
+    updateEntry.builtIn         = DataModel::MakeNullable(true);
+    updateEntry.heatingSetpoint = MakeOptional<int16_t>(static_cast<int16_t>(2100));
+    updateEntry.coolingSetpoint = MakeOptional<int16_t>(static_cast<int16_t>(2500));
+    newPresetsList.push_back(updateEntry);
+    auto listPayload = DataModel::List<const Structs::PresetStruct::Type>(newPresetsList.data(), newPresetsList.size());
+    ASSERT_EQ(tester.WriteAttribute(Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    // Commit is only allowed for the client associated with the atomic write: both the node ID and the
+    // fabric index must match.
+    req.requestType = AtomicRequestTypeEnum::kCommitWrite;
+    req.timeout     = NullOptional;
+    for (const auto & client : kNonOwnerClients)
+    {
+        ChipLogProgress(Test, "CommitWrite from node 0x" ChipLogFormatX64 " on fabric %u", ChipLogValueX64(client.nodeId),
+                        client.fabricIndex);
+        SetSubject(tester, Access::AuthMode::kCase, client.nodeId, client.fabricIndex);
+        EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
+    }
+
+    EXPECT_EQ(mPresetsDelegate.mPresets.size(), 1u);
+    if (!mPresetsDelegate.mPresets.empty())
+    {
+        EXPECT_EQ(mPresetsDelegate.mPresets[0].GetHeatingSetpoint().Value(), 2000);
+    }
+
+    // The owner can still commit its pending presets.
+    SetupTesterSubject(tester);
+    result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+    EXPECT_EQ(mPresetsDelegate.mPresets.size(), 1u);
+    if (!mPresetsDelegate.mPresets.empty())
+    {
+        EXPECT_EQ(mPresetsDelegate.mPresets[0].GetHeatingSetpoint().Value(), 2100);
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

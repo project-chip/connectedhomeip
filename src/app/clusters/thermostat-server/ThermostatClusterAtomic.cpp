@@ -175,6 +175,10 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, AtomicAttrib
     {
         return false;
     }
+    if (mNodeId != GetSourceScopedNodeId(commandObj))
+    {
+        return false;
+    }
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
         bool hasAttribute = false;
@@ -380,7 +384,7 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
     if (!InAtomicWrite(commandObj, attributeStatuses))
     {
-        // There's no open atomic write
+        // This client has no open atomic write for these attributes
         return Status::InvalidInState;
     }
 
