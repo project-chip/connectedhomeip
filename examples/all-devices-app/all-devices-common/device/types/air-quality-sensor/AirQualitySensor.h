@@ -17,12 +17,22 @@
 
 #pragma once
 
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/air-quality-server/AirQualityCluster.h>
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
+#include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/Interface.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -31,11 +41,37 @@ class AirQualitySensor : public SingleEndpoint
 {
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+    static constexpr size_t kMaxConcentrationClusters = 10;
 
     struct Config
     {
-        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures;
-        ConcentrationCluster::Config co2Config;
+        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{
+            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
+            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor
+        };
+        std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> temperature;
+        std::optional<Clusters::RelativeHumidityMeasurementCluster::Config> humidity;
+        std::array<ConcentrationCluster::Config, kMaxConcentrationClusters> concentrationConfigs;
+        size_t numConcentrationConfigs = 0;
+
+        Config & WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features);
+        Config & WithTemperature(int16_t min = -4000, int16_t max = 8000);     // 0.01 deg C
+        Config & WithRelativeHumidity(uint16_t min = 0, uint16_t max = 10000); // 0.01 %
+
+        // Standard spec-compliant gases:
+        Config & WithCarbonDioxide(float min = 0.0f, float max = 5000.0f);
+        Config & WithPm25(float min = 0.0f, float max = 1000.0f);
+        Config & WithTotalVolatileOrganicCompounds(float min = 0.0f, float max = 10000.0f);
+        Config & WithCarbonMonoxide(float min = 0.0f, float max = 1000.0f);
+        Config & WithNitrogenDioxide(float min = 0.0f, float max = 1000.0f);
+        Config & WithOzone(float min = 0.0f, float max = 1000.0f);
+        Config & WithFormaldehyde(float min = 0.0f, float max = 1000.0f);
+        Config & WithPm1(float min = 0.0f, float max = 1000.0f);
+        Config & WithPm10(float min = 0.0f, float max = 1000.0f);
+        Config & WithRadon(float min = 0.0f, float max = 10000.0f);
+
+        Config & WithConcentration(const ConcentrationCluster::Config & customConfig);
+        Config & WithAllConcentrationClusters();
     };
 
     AirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
@@ -45,8 +81,13 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public cluster accessors
     Clusters::AirQualityCluster & AirQualityCluster();
-    ConcentrationCluster & CO2Cluster();
+    Clusters::TemperatureMeasurementCluster * TemperatureCluster();
+    Clusters::RelativeHumidityMeasurementCluster * HumidityCluster();
+
+    ConcentrationCluster * GetConcentrationCluster(ClusterId clusterId);
+    ConcentrationCluster * CO2Cluster();
 
 protected:
     TimerDelegate & mTimerDelegate;
@@ -54,7 +95,11 @@ protected:
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AirQualityCluster> mAirQualityCluster;
-    LazyRegisteredServerCluster<ConcentrationCluster> mCO2Cluster;
+    LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureCluster;
+    LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mHumidityCluster;
+
+    std::array<LazyRegisteredServerCluster<ConcentrationCluster>, kMaxConcentrationClusters> mConcentrationClusters;
+    size_t mNumConcentrationClusters = 0;
 };
 
 } // namespace app

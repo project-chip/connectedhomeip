@@ -25,6 +25,7 @@
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
+#include <device/types/air-quality-sensor/impl/SimulatedAirQualitySensor.h>
 #include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
@@ -317,22 +318,19 @@ private:
         {
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                using namespace Clusters::ConcentrationMeasurement;
-                return MakeDevice<AirQualitySensor>(
-                    mContext->timerDelegate,
-                    AirQualitySensor::Config{
-                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
-                            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
-                            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
-                        .co2Config =
-                            ConcentrationMeasurementCluster::Config{
-                                .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                                .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
-                                .medium    = MeasurementMediumEnum::kAir,
-                                .unit      = MeasurementUnitEnum::kPpm,
-                            },
-                    });
+                AirQualitySensor::Config config;
+                config.WithTemperature()
+                      .WithRelativeHumidity()
+                      .WithCarbonDioxide();
+                return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
+            });
+            RegisterCreator("air-quality-sensor-full", [this]() {
+                VerifyOrDie(mContext.has_value());
+                AirQualitySensor::Config config;
+                config.WithTemperature()
+                      .WithRelativeHumidity()
+                      .WithAllConcentrationClusters();
+                return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
