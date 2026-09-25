@@ -44,18 +44,7 @@ endif()
 # Find required programs
 # ==============================================================================
 find_package(Python3 REQUIRED)
-# Fall back to the gn installed by scripts/bootstrap.sh when the Matter
-# environment is not activated in the current shell.
-find_program(GN_EXECUTABLE gn REQUIRED PATHS ${CHIP_ROOT}/.environment/cipd/packages/pigweed)
-
-# The GN build imports build_overrides/pigweed_environment.gni from the Matter
-# environment root. scripts/activate.sh exports it; default to the location
-# scripts/bootstrap.sh creates so that west can be run without activating.
-if(DEFINED ENV{_PW_ACTUAL_ENVIRONMENT_ROOT})
-    set(CHIP_PW_ENVIRONMENT_ROOT "$ENV{_PW_ACTUAL_ENVIRONMENT_ROOT}")
-else()
-    set(CHIP_PW_ENVIRONMENT_ROOT "${CHIP_ROOT}/.environment")
-endif()
+find_program(GN_EXECUTABLE gn REQUIRED)
 
 # Parse the 'gn --version' output to find the installed version.
 set(MIN_GN_VERSION 1851)
@@ -147,16 +136,14 @@ macro(matter_build target)
         # Replace the config only if it has changed to avoid triggering unnecessary rebuilds
         COMMAND                 "${CMAKE_COMMAND}" -E copy_if_different "args.gn.tmp" "args.gn"
         # Regenerate the ninja build system
-        COMMAND                 ${CMAKE_COMMAND} -E env _PW_ACTUAL_ENVIRONMENT_ROOT=${CHIP_PW_ENVIRONMENT_ROOT}
-                                ${GN_EXECUTABLE}
+        COMMAND                 ${GN_EXECUTABLE}
                                     --root=${CHIP_ROOT}
                                     --root-target=${GN_ROOT_TARGET}
                                     --dotfile=${GN_ROOT_TARGET}/.gn
                                     --script-executable=${Python3_EXECUTABLE}
                                     gen --check --fail-on-unused-args --add-export-compile-commands=*
                                     ${CMAKE_CURRENT_BINARY_DIR}
-        COMMAND                 ${CMAKE_COMMAND} -E env _PW_ACTUAL_ENVIRONMENT_ROOT=${CHIP_PW_ENVIRONMENT_ROOT}
-                                ninja
+        COMMAND                 ninja
         COMMAND                 ${CMAKE_COMMAND} -E echo "Matter library build complete"
         INSTALL_COMMAND         ""
         # Byproducts are removed by the clean target removing config and .ninja_deps
