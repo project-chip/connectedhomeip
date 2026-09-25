@@ -21,6 +21,8 @@ source_set("named_pipe") {
     "CommandTranslator.h",
     "Dispatcher.cpp",
     "Dispatcher.h",
+    "translators/AddBridgedDeviceTranslator.cpp",
+    "translators/AddBridgedDeviceTranslator.h",
     "translators/AmbientContextTranslator.cpp",
     "translators/AmbientContextTranslator.h",
     "translators/BasicInformationTranslator.cpp",
@@ -35,6 +37,8 @@ source_set("named_pipe") {
     "translators/OccupancyTranslator.h",
     "translators/OnOffTranslator.cpp",
     "translators/OnOffTranslator.h",
+    "translators/RemoveBridgedDeviceTranslator.cpp",
+    "translators/RemoveBridgedDeviceTranslator.h",
     "translators/RvcTranslator.cpp",
     "translators/RvcTranslator.h",
   ]
