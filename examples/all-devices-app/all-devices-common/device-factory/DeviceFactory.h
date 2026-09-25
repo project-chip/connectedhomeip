@@ -41,6 +41,7 @@
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
@@ -61,6 +62,8 @@
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
 #include <device/types/refrigerator/impl/LoggingRefrigerator.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
@@ -525,6 +528,28 @@ private:
                 });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)
+        {
+            RegisterCreator("room-air-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Distinguish the two RAC variants when both are included by --device '*'.
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
+            });
+            RegisterCreator("room-air-conditioner-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
         {
             RegisterCreator("speaker", [this]() {
@@ -703,6 +728,13 @@ private:
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<WaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
+        {
+            RegisterCreator("humidity-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
