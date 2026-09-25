@@ -221,8 +221,10 @@ class TC_ACS_2_1(MatterBaseTest):
                     # If SensorFusion feature supported
                     if self.SensorFusionDetected:
                         detectionConfidence = context.detectionConfidence
+                        asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
                         if detectionConfidence != NullValue:
                             asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                            asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
