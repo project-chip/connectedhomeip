@@ -300,7 +300,15 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         case Presets::Id:
         case Schedules::Id:
         case SensorSchedule::Id:
-            statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+            if (InAtomicWrite(std::make_optional(attributeStatus.attributeID)))
+            {
+                statusCode = Status::Busy;
+            }
+            else if (mState == State::Open)
+            {
+                // Only one Atomic Write State is supported, and it belongs to another client.
+                statusCode = Status::ResourceExhausted;
+            }
             break;
         default:
             statusCode = Status::InvalidCommand;

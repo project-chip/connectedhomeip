@@ -524,6 +524,86 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteCommitByOtherClientRejected)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestAtomicWriteBeginByOtherClientDoesNotReplaceOpenWrite)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSensors);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    ptype.presetTypeFeatures.Set(PresetTypeFeaturesBitmap::kSupportsNames);
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handle[4] = { 1, 2, 3, 4 };
+    EXPECT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))), CHIP_NO_ERROR);
+    preset.SetBuiltIn(DataModel::MakeNullable(true));
+    preset.SetHeatingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2000)));
+    preset.SetCoolingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2600)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSensorsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type req;
+    req.requestType                    = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId presetsAttrIds[] = { Presets::Id };
+    req.attributeRequests              = DataModel::List<const chip::AttributeId>(presetsAttrIds, 1);
+    req.timeout                        = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+
+    std::vector<Structs::PresetStruct::Type> newPresetsList;
+    Structs::PresetStruct::Type updateEntry;
+    updateEntry.presetScenario  = PresetScenarioEnum::kOccupied;
+    updateEntry.presetHandle    = DataModel::MakeNullable(ByteSpan(handle));
+    updateEntry.builtIn         = DataModel::MakeNullable(true);
+    updateEntry.heatingSetpoint = MakeOptional<int16_t>(static_cast<int16_t>(2100));
+    updateEntry.coolingSetpoint = MakeOptional<int16_t>(static_cast<int16_t>(2500));
+    newPresetsList.push_back(updateEntry);
+    auto listPayload = DataModel::List<const Structs::PresetStruct::Type>(newPresetsList.data(), newPresetsList.size());
+    ASSERT_EQ(tester.WriteAttribute(Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    // Only one Atomic Write State is supported, so another client's BeginWrite for a different atomic attribute
+    // cannot be pended while the first one is open.
+    SetOtherClientSubject(tester);
+    chip::AttributeId sensorScheduleAttrIds[] = { SensorSchedule::Id };
+    req.attributeRequests                     = DataModel::List<const chip::AttributeId>(sensorScheduleAttrIds, 1);
+    result                                    = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Failure));
+        auto attrStatusIter = result.response.value().attributeStatus.begin();
+        EXPECT_TRUE(attrStatusIter.Next());
+        EXPECT_EQ(attrStatusIter.GetValue().statusCode, to_underlying(Status::ResourceExhausted));
+        EXPECT_FALSE(attrStatusIter.Next());
+    }
+
+    // The owner's atomic write is still open and commits. Assertions stay non-fatal from here so the cluster
+    // is always shut down and unregistered from the fabric table.
+    SetupTesterSubject(tester);
+    req.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    req.attributeRequests = DataModel::List<const chip::AttributeId>(presetsAttrIds, 1);
+    req.timeout           = NullOptional;
+    result                = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+    EXPECT_EQ(mPresetsDelegate.mPresets.size(), 1u);
+    if (!mPresetsDelegate.mPresets.empty())
+    {
+        EXPECT_EQ(mPresetsDelegate.mPresets[0].GetHeatingSetpoint().Value(), 2100);
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestAtomicWriteTimerExpiration)
 {
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
