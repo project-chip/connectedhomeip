@@ -20,6 +20,7 @@ from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.esp32_zephyr import Esp32ZephyrApp, Esp32ZephyrBoard, Esp32ZephyrBuilder
 from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
@@ -340,6 +341,27 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
+
+    return target
+
+
+def BuildEsp32ZephyrTarget() -> BuildTarget:
+    """Create the ESP32 Zephyr build target."""
+    target = BuildTarget('esp32', Esp32ZephyrBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('zephyr'),
+    ])
+
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+    ])
+
+    # applications
+    target.AppendFixedTargets([
+        TargetPart('light', app=Esp32ZephyrApp.LIGHT),
+    ])
 
     return target
 
@@ -948,6 +970,7 @@ BUILD_TARGETS = [
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
+    BuildEsp32ZephyrTarget(),
     BuildGenioTarget(),
     BuildHostFakeTarget(),
     BuildHostTarget(),
