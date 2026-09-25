@@ -124,13 +124,13 @@ jobs:
             - name: Clean out build output
               if: inputs.run-codeql != true && github.event.pull_request.number == null
               run: rm -rf ./out
+            # PR-only: master pushes build and test the memory-debug-checks configuration above.
             - name: Set up Build Without Logging
-              if: inputs.run-codeql != true
+              if: inputs.run-codeql != true && github.event.pull_request.number != null
               run: scripts/build/gn_gen.sh --args="chip_logging=false chip_build_all_platform_tests=true"
             - name: Run Build Without Logging
-              if: inputs.run-codeql != true
+              if: inputs.run-codeql != true && github.event.pull_request.number != null
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            # Master pushes already run the tests above in the memory-debug-checks build.
             - name: Run Tests Without Logging
               if: inputs.run-codeql != true && github.event.pull_request.number != null
               run: scripts/tests/gn_tests.sh
