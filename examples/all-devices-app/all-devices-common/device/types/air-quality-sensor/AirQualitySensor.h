@@ -40,15 +40,15 @@ namespace app {
 class AirQualitySensor : public SingleEndpoint
 {
 public:
-    using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+    using ConcentrationCluster                        = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
     static constexpr size_t kMaxConcentrationClusters = 10;
 
     struct Config
     {
-        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{
-            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
-            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor
-        };
+        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{ Clusters::AirQuality::Feature::kFair,
+                                                                    Clusters::AirQuality::Feature::kModerate,
+                                                                    Clusters::AirQuality::Feature::kVeryPoor,
+                                                                    Clusters::AirQuality::Feature::kExtremelyPoor };
         std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> temperature;
         std::optional<Clusters::RelativeHumidityMeasurementCluster::Config> humidity;
         std::array<ConcentrationCluster::Config, kMaxConcentrationClusters> concentrationConfigs;

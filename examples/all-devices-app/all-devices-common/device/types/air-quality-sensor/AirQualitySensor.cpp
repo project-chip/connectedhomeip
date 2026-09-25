@@ -33,8 +33,8 @@ AirQualitySensor::ConcentrationCluster::Config MakeGasConfig(ClusterId clusterId
 {
     return AirQualitySensor::ConcentrationCluster::Config{
         .clusterId   = clusterId,
-        .features    = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                         Feature::kAverageMeasurement, Feature::kLevelIndication),
+        .features    = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement, Feature::kAverageMeasurement,
+                                      Feature::kLevelIndication),
         .medium      = MeasurementMediumEnum::kAir,
         .unit        = unit,
         .minMeasured = DataModel::MakeNullable(min),

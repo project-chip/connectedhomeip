@@ -118,8 +118,8 @@ void SimulatedAirQualitySensor::TimerFired()
     }
 
     ChipLogProgress(AppServer, "SimulatedAirQuality: AQ=%u, Temp=%.2fC, Humidity=%.1f%%, CO2=%.0fppm",
-                    static_cast<unsigned>(aqValue), static_cast<double>(tempVal) / 100.0,
-                    static_cast<double>(humidityVal) / 100.0, static_cast<double>(co2Val));
+                    static_cast<unsigned>(aqValue), static_cast<double>(tempVal) / 100.0, static_cast<double>(humidityVal) / 100.0,
+                    static_cast<double>(co2Val));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kDefaultUpdateInterval));
 }

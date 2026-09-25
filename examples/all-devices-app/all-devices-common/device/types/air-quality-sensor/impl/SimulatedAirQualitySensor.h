@@ -31,8 +31,7 @@ public:
     explicit SimulatedAirQualitySensor(TimerDelegate & timerDelegate);
     ~SimulatedAirQualitySensor() override;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext

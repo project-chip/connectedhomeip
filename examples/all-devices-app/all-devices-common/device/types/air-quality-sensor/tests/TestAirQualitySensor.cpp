@@ -40,7 +40,6 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
 protected:
-
     Testing::TestServerClusterContext mContext;
     CodeDrivenDataModelProvider mProvider{ mContext.StorageDelegate(), mContext.AttributePersistenceProvider() };
     TimerDelegateMock mTimerDelegate;
@@ -66,9 +65,7 @@ TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
 TEST_F(TestAirQualitySensor, TestFluentBuilder)
 {
     AirQualitySensor::Config config;
-    config.WithTemperature(-2000, 6000)
-        .WithRelativeHumidity(1000, 9000)
-        .WithCarbonDioxide(400.0f, 2000.0f);
+    config.WithTemperature(-2000, 6000).WithRelativeHumidity(1000, 9000).WithCarbonDioxide(400.0f, 2000.0f);
 
     AirQualitySensor sensor(mTimerDelegate, config);
 
@@ -94,9 +91,7 @@ TEST_F(TestAirQualitySensor, TestFluentBuilder)
 TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 {
     AirQualitySensor::Config config;
-    config.WithTemperature()
-        .WithRelativeHumidity()
-        .WithCarbonDioxide();
+    config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
 
     AirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
@@ -160,9 +155,7 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
 TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 {
     AirQualitySensor::Config config;
-    config.WithTemperature()
-        .WithRelativeHumidity()
-        .WithAllConcentrationClusters();
+    config.WithTemperature().WithRelativeHumidity().WithAllConcentrationClusters();
 
     AirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
