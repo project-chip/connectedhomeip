@@ -139,7 +139,7 @@ if(CONFIG_CHIP)
 
     if(CONFIG_CHIP_ENABLE_DNSSD_SRP)
         matter_add_gn_arg_string("chip_mdns" "platform")
-    endif()
+        endif()
 
     if(CONFIG_CHIP_WIFI)
         matter_add_gn_arg_string("chip_mdns" "minimal")
@@ -187,6 +187,7 @@ if(CONFIG_CHIP)
             ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
             ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
             ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
         )
         target_link_libraries(chip_codedriven_data_model PRIVATE chip)
     endif()
