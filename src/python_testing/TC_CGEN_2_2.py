@@ -48,13 +48,13 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackException
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CGEN_2_2(MatterBaseTest):
+class TC_CGEN_2_2(MatterTestCommissionedDevice):
     # Disables framework wildcard subscription from running during test to avoid
     # issue noticed in https://github.com/project-chip/connectedhomeip/issues/72732
     disable_wildcard_subscription = True

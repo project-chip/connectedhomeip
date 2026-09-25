@@ -42,11 +42,11 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_9(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_9(self) -> str:
         """Returns a description of this test"""
         return "[TC-WEBRTCP-2.9] Validate SolicitOffer with ICEServers and ICETransportPolicy"

@@ -37,7 +37,7 @@ import matter.case_capture as case_capture
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # Matter spec constants (Section 4.4 / 4.13.2)
@@ -49,7 +49,7 @@ GENERAL_CODE_SUCCESS = 0
 PROTOCOL_CODE_SESSION_ESTABLISHMENT_SUCCESS = 0
 
 
-class TC_SC_3_1(MatterBaseTest):
+class TC_SC_3_1(MatterTestCommissionedDevice):
 
     @pics('MCORE.ROLE.COMMISSIONEE')
     @async_test_body

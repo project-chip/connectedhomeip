@@ -23,7 +23,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ def parse_openthread_dataset_stream(dataset_hex: str) -> dict[str, str] | None:
     return tlvs
 
 
-class TC_CNET_4_10(MatterBaseTest):
+class TC_CNET_4_10(MatterTestCommissionedDevice):
     """
     [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command [DUT-Server]
 

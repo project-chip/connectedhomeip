@@ -40,7 +40,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ MAX_UINT64 = 0xFFFFFFFFFFFFFFFF
 #   --commissioning-method on-network --endpoint 1 --app-pipe /tmp/asu_fifo"
 
 
-class TC_ASU_2_1(MatterBaseTest):
+class TC_ASU_2_1(MatterTestCommissionedDevice):
 
     @pics('ASU.S')
     @async_test_body

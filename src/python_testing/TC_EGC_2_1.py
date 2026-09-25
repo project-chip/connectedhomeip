@@ -46,13 +46,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 
 
-class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_EGC_2_1."""
 
     def desc_TC_EGC_2_1(self) -> str:

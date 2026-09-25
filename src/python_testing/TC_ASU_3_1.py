@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ log = logging.getLogger(__name__)
 #   --commissioning-method on-network --endpoint 1 --app-pipe /tmp/asu_fifo --bool-arg simulate_ambientsensing:true"
 
 
-class TC_ASU_3_1(MatterBaseTest):
+class TC_ASU_3_1(MatterTestCommissionedDevice):
 
     def setup_test(self):
         super().setup_test()

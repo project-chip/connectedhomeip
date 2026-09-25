@@ -45,13 +45,13 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_8(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
     """This test case verifies the primary functionality of the Energy EVSE
     Cluster server with the optional PlugAndCharge feature supported."""
 

@@ -39,11 +39,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_BINFO_3_2(MatterBaseTest):
+class TC_BINFO_3_2(MatterTestCommissionedDevice):
     async def read_binfo_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.BasicInformation
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
