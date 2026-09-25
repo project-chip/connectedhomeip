@@ -94,6 +94,17 @@ public:
 
     virtual Setpoints GetSetpoints() = 0;
 
+    /**
+     * @brief Apply new occupied heating and/or cooling setpoints and persist them, clamped to the user setpoint
+     *        limits.
+     *
+     * @param[in] heat The new occupied heating setpoint to apply, if any.
+     * @param[in] cool The new occupied cooling setpoint to apply, if any.
+     * @return The status of the operation.
+     */
+    virtual Protocols::InteractionModel::Status ApplyOccupiedSetpoints(chip::Optional<temperature> heat,
+                                                                       chip::Optional<temperature> cool) = 0;
+
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
 
