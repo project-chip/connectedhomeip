@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ log = logging.getLogger(__name__)
 MAX_ENERGY_MEASUREMENT_VALUE = 0x3FFFFFFFFFFFFFFF
 
 
-class TC_ELDIST_2_1(MatterBaseTest):
+class TC_ELDIST_2_1(MatterTestCommissionedDevice):
 
     @property
     def default_endpoint(self) -> int:

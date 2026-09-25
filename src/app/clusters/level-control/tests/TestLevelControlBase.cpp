@@ -163,7 +163,9 @@ TEST_F(TestLevelControlBase, TestDelegateCallbacks)
     EXPECT_EQ(mockDelegate.mOptions, options);
 }
 
-TEST_F(TestLevelControlBase, TestMaxLevelConstraint)
+// Spec 1.6.7.1: "If the value of the Level field is below the MinLevel or above the MaxLevel for
+// the device, the value SHALL be clipped to the applicable boundary value."
+TEST_F(TestLevelControlBase, TestMoveToLevelClipsAboveMaxLevel)
 {
     LevelControlCluster cluster{ kTestEndpointId,
                                  LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(1).WithMaxLevel(200) };
@@ -182,7 +184,50 @@ TEST_F(TestLevelControlBase, TestMaxLevelConstraint)
     data.optionsMask.ClearAll();
     data.optionsOverride.ClearAll();
 
-    EXPECT_FALSE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_EQ(cluster.GetCurrentLevel(), DataModel::MakeNullable<uint8_t>(200));
+}
+
+TEST_F(TestLevelControlBase, TestMoveToLevelClipsBelowMinLevel)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(1).WithMaxLevel(200) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(10, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // A Level of 0 is what controllers send to mean "off"; on a device with MinLevel 1 this must
+    // clip rather than fail.
+    Commands::MoveToLevel::Type data;
+    data.level = 0; // < MinLevel
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    EXPECT_EQ(cluster.GetCurrentLevel(), DataModel::MakeNullable<uint8_t>(1));
+}
+
+// The Level field itself is constrained to "max 254", so 255 is a genuine constraint violation and
+// is not subject to clipping.
+TEST_F(TestLevelControlBase, TestMoveToLevelRejectsBeyondFieldConstraint)
+{
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::MoveToLevel::Type data;
+    data.level = 255; // > 254
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_EQ(tester.Invoke(Commands::MoveToLevel::Id, data).status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestLevelControlBase, TestMoveRateZero)
@@ -519,6 +564,73 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     stopData.optionsOverride.ClearAll();
     EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stopData).IsSuccess());
     EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+}
+
+// Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is either
+// not supported or set to null, then the device SHOULD move as fast as it is able."
+TEST_F(TestLevelControlBase, TestMoveWithNullRateMovesImmediately)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // DefaultMoveRate is not supported on this configuration, so no rate is available at all.
+    Commands::Move::Type data;
+    data.moveMode = MoveModeEnum::kUp;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 254u);
+}
+
+// A null Rate still falls back to DefaultMoveRate when that attribute holds a value.
+TEST_F(TestLevelControlBase, TestMoveWithNullRateUsesDefaultMoveRate)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithMinLevel(0)
+                                     .WithMaxLevel(254)
+                                     .WithDefaultMoveRate(DataModel::MakeNullable<uint8_t>(10)) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    Commands::Move::Type data;
+    data.moveMode = MoveModeEnum::kUp;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+
+    // 10 units/s
+    for (int i = 0; i < 10; i++)
+    {
+        AdvanceClock(System::Clock::Milliseconds64(100));
+    }
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 10u);
 }
 
 TEST_F(TestLevelControlBase, TestStepCommand)

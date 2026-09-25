@@ -45,15 +45,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
-    """Implementation of test case TC-AVANALY-2.7."""
-
+class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
     def desc_TC_AVANALY_2_7(self) -> str:
         """Returns the description of TC-AVANALY-2.7."""
         return "[TC-AVANALY-2.7] Validate PerceivedContext event generation and context list handling with Server as DUT"
@@ -162,10 +160,10 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
                                            "SourceNodeId must be present when REMCONDETECT is supported")
                 asserts.assert_equal(event1.sourceNodeId, self.dut_node_id,
                                      f"SourceNodeId ({event1.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                if event1.sourceStartTimestamp is not None:
-                    log.info("SourceStartTimestamp present in event 1: %s", event1.sourceStartTimestamp)
-                else:
-                    log.warning("SourceStartTimestamp not provided by DUT in event 1")
+                asserts.assert_is_not_none(
+                    event1.sourceStartTimestamp,
+                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                )
             asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
             new_tags_1 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event1.newIdentifiedContexts]
             asserts.assert_in((context_a.namespaceID, context_a.tag), new_tags_1,
@@ -203,10 +201,10 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
                                            "SourceNodeId must be present when REMCONDETECT is supported")
                 asserts.assert_equal(event2.sourceNodeId, self.dut_node_id,
                                      f"SourceNodeId ({event2.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                if event2.sourceStartTimestamp is not None:
-                    log.info("SourceStartTimestamp present in event 2: %s", event2.sourceStartTimestamp)
-                else:
-                    log.warning("SourceStartTimestamp not provided by DUT in event 2")
+                asserts.assert_is_not_none(
+                    event2.sourceStartTimestamp,
+                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                )
             asserts.assert_is_not_none(event2.newIdentifiedContexts, "newIdentifiedContexts must be present in event 2")
             new_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event2.newIdentifiedContexts]
             asserts.assert_in((context_b.namespaceID, context_b.tag), new_tags_2,
@@ -249,10 +247,10 @@ class TC_AVANALY_2_7(MatterBaseTest, AVANALYTestBase):
                                            "SourceNodeId must be present when REMCONDETECT is supported")
                 asserts.assert_equal(event3.sourceNodeId, self.dut_node_id,
                                      f"SourceNodeId ({event3.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                if event3.sourceStartTimestamp is not None:
-                    log.info("SourceStartTimestamp present in event 3: %s", event3.sourceStartTimestamp)
-                else:
-                    log.warning("SourceStartTimestamp not provided by DUT in event 3")
+                asserts.assert_is_not_none(
+                    event3.sourceStartTimestamp,
+                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                )
             asserts.assert_is_not_none(event3.expiredContexts, "expiredContexts must be present in event 3")
             expired_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event3.expiredContexts]
             asserts.assert_in((context_a.namespaceID, context_a.tag), expired_tags_3,

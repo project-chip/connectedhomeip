@@ -42,13 +42,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_StreamReuseRangeParams(MatterBaseTest):
+class TC_AVSM_StreamReuseRangeParams(MatterTestCommissionedDevice):
     def desc_TC_AVSM_StreamReuseRangeParams(self) -> str:
         return "[TC_AVSM_StreamReuseRangeParams] Validate Snapshot Stream Allocation reuse with selection of intersection of range parameters"
 

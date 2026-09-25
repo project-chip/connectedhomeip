@@ -30,7 +30,7 @@ from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -988,7 +988,7 @@ async def verify_operational_network(test, ssid):
         pass
 
 
-class TC_CNET_4_11(MatterBaseTest):
+class TC_CNET_4_11(MatterTestCommissionedDevice):
     # The test repeatedly switches the TH's own Wi-Fi connection between two access
     # points (steps 7-8, 11-12, 16-17), so the transport to the DUT is torn down and
     # rebuilt several times. A background wildcard subscription cannot survive that and

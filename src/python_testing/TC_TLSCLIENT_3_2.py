@@ -42,10 +42,11 @@ from TC_TLSCLIENT_Base import TC_TLSCLIENT_Base
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_TLSCLIENT_3_2(TC_TLSCLIENT_Base):
+class TC_TLSCLIENT_3_2(MatterTestCommissionedDevice, TC_TLSCLIENT_Base):
     def pics_TC_TLSCLIENT_3_2(self):
         return ["TLSCLIENT.S", "TLSCERT.S"]
 

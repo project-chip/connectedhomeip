@@ -36,11 +36,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_TCTL_2_3(MatterBaseTest):
+class TC_TCTL_2_3(MatterTestCommissionedDevice):
     def desc_TC_TCTL_2_3(self) -> str:
         return "[TC-TCTL-2.3] Optional temperature level attributes with DUT as Server"
 

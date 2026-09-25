@@ -16,8 +16,15 @@
 #
 
 from .browser_peer_connection import BrowserPeerConnection
-from .libdatachannel_peer_connection import LibdatachannelPeerConnection
+from .libdatachannel_peer_connection import LibdatachannelPeerConnection, MediaDeliveryStats
 from .types import IceCandidate, IceCandidateList
 from .webrtc_manager import WebRTCManager
 
-__all__ = ["BrowserPeerConnection", "LibdatachannelPeerConnection", "WebRTCManager", "IceCandidate", "IceCandidateList"]
+__all__ = [
+    "BrowserPeerConnection",
+    "LibdatachannelPeerConnection",
+    "MediaDeliveryStats",
+    "WebRTCManager",
+    "IceCandidate",
+    "IceCandidateList",
+]

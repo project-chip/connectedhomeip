@@ -41,6 +41,7 @@
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
@@ -61,6 +62,8 @@
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
 #include <device/types/refrigerator/impl/LoggingRefrigerator.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
@@ -303,7 +306,7 @@ private:
         {
             RegisterCreator("air-purifier", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingAirPurifier>(FanLoad::Context{
+                return MakeDevice<LoggingAirPurifier>(LoggingAirPurifier::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -429,13 +432,13 @@ private:
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<DimmablePlugInUnit>(
-                    LoggingDimmableLight::Context{
+                    DimmablePlugInUnit::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    DimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
@@ -464,20 +467,20 @@ private:
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<MountedDimmableLoadControl>(
-                    LoggingDimmableLight::Context{
+                    MountedDimmableLoadControl::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedOnOffControl>(LoggingOnOffLight::Context{
+                return MakeDevice<MountedOnOffControl>(MountedOnOffControl::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -517,12 +520,34 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffPlugInUnit>(LoggingOnOffLight::Context{
+                return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                     .identifyDelegate  = mContext->identifyDelegate,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)
+        {
+            RegisterCreator("room-air-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Distinguish the two RAC variants when both are included by --device '*'.
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
+            });
+            RegisterCreator("room-air-conditioner-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
@@ -612,7 +637,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ExtractorHood>(FanLoad::Context{
+                return MakeDevice<ExtractorHood>(ExtractorHood::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -703,6 +728,13 @@ private:
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<WaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
+        {
+            RegisterCreator("humidity-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)

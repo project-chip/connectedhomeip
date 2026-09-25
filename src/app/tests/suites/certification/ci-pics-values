@@ -2316,6 +2316,23 @@ ACFREMON.S.A0004=1
 ACFREMON.S.A0005=1
 ACFREMON.S.C00.Rsp=1
 
+# Humidistat Cluster
+HSTAT.S=1
+HSTAT.C=0
+HSTAT.S.F00=1
+HSTAT.S.F01=1
+HSTAT.S.F02=1
+HSTAT.S.F03=1
+HSTAT.S.F04=1
+HSTAT.S.F05=1
+HSTAT.S.F06=1
+HSTAT.S.F07=1
+HSTAT.S.F08=1
+HSTAT.S.F09=1
+HSTAT.S.M.ContinuousError=1
+HSTAT.S.M.SleepError=1
+HSTAT.S.M.OptimalError=1
+
 # Air Quality
 AIRQUAL.C=0
 AIRQUAL.S=1
@@ -3283,3 +3300,6 @@ PROXR.S.C01.Tx=1   # StartRangingResponse
 # Events
 PROXR.S.E00=1      # RangingResult
 PROXR.S.E01=1      # RangingSessionStatus
+
+# Client role (DUT-as-client tests TC-PROXR-3.1/3.2)
+PROXR.C=1

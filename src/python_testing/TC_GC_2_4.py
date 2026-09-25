@@ -45,13 +45,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_4(MatterBaseTest):
+class TC_GC_2_4(MatterTestCommissionedDevice):
     def desc_TC_GC_2_4(self):
         return "[TC-GC-2.4] LeaveGroup partial & full removal with DUT as Server - PROVISIONAL"
 
@@ -213,6 +213,7 @@ class TC_GC_2_4(MatterBaseTest):
                 self.mark_step_range_skipped("4c", "4d")
             else:
                 self.step("4c")
+                membership_sub.reset()
                 endpoint_2 = [endpoints_list[1]]
                 resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(
                     groupID=groupID3,
@@ -223,7 +224,6 @@ class TC_GC_2_4(MatterBaseTest):
                                      f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to {endpoint_2}")
 
                 self.step("4d")
-                membership_sub.reset()
                 membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=[endpoints_list[0]])
                 membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
@@ -255,13 +255,13 @@ class TC_GC_2_4(MatterBaseTest):
                                  f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
         self.step(6)
+        membership_sub.reset()
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
         asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
         asserts.assert_equal(resp.endpoints, [],
                              f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to an empty list")
 
         self.step(7)
-        membership_sub.reset()
         event_sub.wait_for_event_expect_no_report(timeout_sec=5)
 
         self.step(8)

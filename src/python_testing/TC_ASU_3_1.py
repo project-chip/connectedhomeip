@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ log = logging.getLogger(__name__)
 #   --commissioning-method on-network --endpoint 1 --app-pipe /tmp/asu_fifo --bool-arg simulate_ambientsensing:true"
 
 
-class TC_ASU_3_1(MatterBaseTest):
+class TC_ASU_3_1(MatterTestCommissionedDevice):
 
     def setup_test(self):
         super().setup_test()
@@ -81,14 +81,10 @@ class TC_ASU_3_1(MatterBaseTest):
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # CI test values
-        contnode_str_1 = "0x123456789ABCDEF"
-        contend_1 = 1234
-        contstatus_online = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
-
-        contnode_str_2 = "0x123456789AAAAAA"
-        contnode_2 = int(contnode_str_2, 16)
-        contend_2 = 1235
-        contstatus_2 = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
+        contnode_str = "0x123456789AAAAAA"
+        contnode = int(contnode_str, 16)
+        contend = 1235
+        contstatus = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
         self.step("3", "Change UnionName attribute.")
         union_name_write = "TestUnionName"
@@ -106,39 +102,28 @@ class TC_ASU_3_1(MatterBaseTest):
         log.info("Verified UnionName subscription report: %s", union_name_sub)
         attrib_listener.reset()
 
-        self.step("5", "Change UnionHealth attribute by adding an offline contributor to affect the union health.")
-        # Read the current UnionHealth before the mutation so we can verify the report reflects the change.
-        union_health_before = await self.read_single_attribute_check_success(
-            cluster=cluster, attribute=attr.UnionHealth, endpoint=endpoint)
-        log.info("UnionHealth before contributor add: %s", union_health_before)
-        # Adding an online contributor is expected to transition health to kFullyFunctional.
-        expected_union_health = Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kFullyFunctional
-        # UnionHealth is read-only and derived from contributor statuses. Adding an online contributor
-        # will cause the cluster to recalculate and report a new UnionHealth value.
+        self.step("5", "Change UnionHealth attribute directly via the app-pipe SetAmbientSensingUnionHealth command.")
+        expected_union_health = Clusters.AmbientSensingUnion.Enums.UnionHealthEnum.kLimitedDegraded
         if self.is_ci:
             self.write_to_app_pipe({
-                "Name": "AddAmbientSensingContributor",
+                "Name": "SetAmbientSensingUnionHealth",
                 "EndpointId": endpoint,
-                "NodeId": contnode_str_1,
-                "ContributorEndpointId": contend_1,
-                "Status": contstatus_online.value,
+                "UnionHealth": expected_union_health.value,
             })
             await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
-                prompt_msg="Change the UnionHealth attribute (e.g. by adding/removing contributors), then type any letter and press ENTER.")
+                prompt_msg="Change the UnionHealth attribute to LimitedDegraded via a manufacturer mechanism, then type any letter and press ENTER.")
 
         self.step("6", "TH awaits a ReportDataMessage containing an attribute report for UnionHealth attribute. Verify that the value of UnionHealth attribute reflects the change made in step 5.")
-        # reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionHealth)
-        # asserts.assert_true(reports is not None and len(reports) > 0,
-        #                    "No subscription report received for UnionHealth after the change.")
-        # union_health_sub = reports[-1].value
-        # log.info("UnionHealth subscription report after contributor add: %s", union_health_sub)
-        # Temporary bypass the above test step until an api-pipe command to change UnionHealth attribute is available.
-        union_health_sub = expected_union_health
+        reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionHealth)
+        asserts.assert_true(reports is not None and len(reports) > 0,
+                            "No subscription report received for UnionHealth after the change.")
+        union_health_sub = reports[-1].value
+        log.info("UnionHealth subscription report after SetAmbientSensingUnionHealth: %s", union_health_sub)
         asserts.assert_equal(union_health_sub, expected_union_health,
                              f"UnionHealth subscription report ({union_health_sub}) does not match expected value "
-                             f"({expected_union_health}) after adding an online contributor.")
+                             f"({expected_union_health}).")
         attrib_listener.reset()
 
         self.step("7", "Change UnionContributorList attribute by adding a contributor.")
@@ -146,9 +131,9 @@ class TC_ASU_3_1(MatterBaseTest):
             self.write_to_app_pipe({
                 "Name": "AddAmbientSensingContributor",
                 "EndpointId": endpoint,
-                "NodeId": contnode_str_2,
-                "ContributorEndpointId": contend_2,
-                "Status": contstatus_2.value,
+                "NodeId": contnode_str,
+                "ContributorEndpointId": contend,
+                "Status": contstatus.value,
             })
             await asyncio.sleep(ci_wait_time)
         else:
@@ -163,10 +148,10 @@ class TC_ASU_3_1(MatterBaseTest):
 
         exist_flag = False
         for contributor in reported_list:
-            if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode_2:
-                asserts.assert_equal(contributor.contributorEndpointID, contend_2,
+            if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
+                asserts.assert_equal(contributor.contributorEndpointID, contend,
                                      "ContributorEndpointID does not match the added contributor.")
-                asserts.assert_equal(contributor.contributorStatus, contstatus_2,
+                asserts.assert_equal(contributor.contributorStatus, contstatus,
                                      "ContributorStatus does not match the added contributor.")
                 exist_flag = True
 
@@ -178,8 +163,8 @@ class TC_ASU_3_1(MatterBaseTest):
             self.write_to_app_pipe({
                 "Name": "RemoveAmbientSensingContributor",
                 "EndpointId": endpoint,
-                "NodeId": contnode_str_2,
-                "ContributorEndpointId": contend_2,
+                "NodeId": contnode_str,
+                "ContributorEndpointId": contend,
             })
             await asyncio.sleep(ci_wait_time)
         else:
@@ -193,9 +178,9 @@ class TC_ASU_3_1(MatterBaseTest):
         reported_list = reports[-1].value
 
         for contributor in reported_list:
-            if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode_2:
+            if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
                 asserts.fail(
-                    f"Removed contributor (NodeID={contnode_str_2}) is still found in UnionContributorList subscription report.")
+                    f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
 
         log.info("Verified removed contributor is absent from UnionContributorList subscription report.")
         attrib_listener.reset()

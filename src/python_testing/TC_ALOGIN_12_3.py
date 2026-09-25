@@ -24,7 +24,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -37,7 +37,7 @@ _TIMED_REQUEST_TIMEOUT_MS = 5000
 _USER_CODE_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9 \-]*$"
 
 
-class TC_ALOGIN_12_3(MatterBaseTest):
+class TC_ALOGIN_12_3(MatterTestCommissionedDevice):
 
     def desc_TC_ALOGIN_12_3(self) -> str:
         return "[TC-ALOGIN-12.3] OAuth Device Authorization Verification"

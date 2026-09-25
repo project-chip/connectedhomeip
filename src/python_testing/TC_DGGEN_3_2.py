@@ -19,11 +19,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_DGGEN_3_2(MatterBaseTest):
+class TC_DGGEN_3_2(MatterTestCommissionedDevice):
     def steps_TC_DGGEN_3_2(self):
         return [TestStep(0, "Commission DUT (already done)", is_commissioning=True),
                 TestStep(1, "TH reads the MaxPathsPerInvoke attribute from the Basic Information Cluster from DUT. Save the value as `max_paths_per_invoke",

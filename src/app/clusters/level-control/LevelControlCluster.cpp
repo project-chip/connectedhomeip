@@ -326,7 +326,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {
@@ -400,49 +405,49 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 {
     VerifyOrReturnError(rate.IsNull() || rate.Value() != 0, Status::InvalidCommand);
     VerifyOrReturnError(!mCurrentLevel.value().IsNull(), Status::Failure);
-    VerifyOrReturnError(!rate.IsNull() || !mDefaultMoveRate.IsNull(), Status::Success); // No movement if rate is unspecified
 
-    // If rate is null, use default move rate (one of the two is guaranteed to be non-null here because of the earlier check)
-    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
-    VerifyOrReturnError(currentRate != 0, Status::ConstraintError);
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null, then the value of the DefaultMoveRate
+    // attribute SHALL be used if that attribute is supported and its value is not null."
+    // A null result means no rate is available; that case is handled once the target is known.
+    const DataModel::Nullable<uint8_t> effectiveRate =
+        (rate.IsNull() && mOptionalAttributes.IsSet(Attributes::DefaultMoveRate::Id)) ? mDefaultMoveRate : rate;
+    VerifyOrReturnError(effectiveRate.IsNull() || effectiveRate.Value() != 0, Status::ConstraintError);
 
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
         ReturnErrorOnFailure(SetOnOff(true));
     }
-    else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
+    else if (!IsWithOnOffCommand(commandId) && !ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
     }
 
     mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
-    // Determine Direction first
-    bool increasing = (moveMode == MoveModeEnum::kUp);
-    uint8_t targetLevel;
-
-    // Now determine Target and Check Constraints (safe from clobbering)
-    if (increasing)
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel < targetLevel, Status::Success);
-    }
-    else
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel > targetLevel, Status::Success);
-    }
+    bool increasing      = (moveMode == MoveModeEnum::kUp);
+    uint8_t currentLevel = mCurrentLevel.value().Value();
+    uint8_t targetLevel  = increasing ? (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel)
+                                      : (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0);
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
-    uint8_t currentLevel = mCurrentLevel.value().Value();
-    uint8_t difference   = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+    uint8_t difference = increasing ? (currentLevel < targetLevel ? static_cast<uint8_t>(targetLevel - currentLevel) : 0)
+                                    : (currentLevel > targetLevel ? static_cast<uint8_t>(currentLevel - targetLevel) : 0);
 
-    // currentRate is known not to be 0 (ConstraintError check above)
-    uint32_t tickDurationMs = 1000 / currentRate;
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is
+    // either not supported or set to null, then the device SHOULD move as fast as it is able."
+    // Nothing paces the transition in that case (or when already at the target), so go straight to the target.
+    if (effectiveRate.IsNull() || difference == 0)
+    {
+        ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+        if (IsWithOnOffCommand(commandId) && targetLevel == mMinLevel)
+        {
+            ReturnErrorOnFailure(SetOnOff(false));
+        }
+        return Status::Success;
+    }
+
+    // effectiveRate is known not to be 0 (ConstraintError check above)
+    uint32_t tickDurationMs = 1000 / effectiveRate.Value();
     if (tickDurationMs == 0)
     {
         tickDurationMs = 1;
@@ -524,9 +529,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
-    // The command is one of the ‘without On/Off’ commands: ... Stop."
-    VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    // Spec 1.6.6.9: "Command execution SHALL NOT continue beyond the Options processing if ...
+    // The command is one of the 'without On/Off' commands: Move, Move to Level, Step, or Stop."
+    // StopWithOnOff is not on that list, so only the plain Stop is gated.
+    VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.

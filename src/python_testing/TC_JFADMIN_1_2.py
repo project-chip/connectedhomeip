@@ -46,14 +46,14 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader, TLVWriter
 
 log = logging.getLogger(__name__)
 
 
-class TC_JFADMIN_1_2(MatterBaseTest):
+class TC_JFADMIN_1_2(MatterTestCommissioner):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _OPERATIONAL_CREDENTIALS_ENDPOINT = 0
     _GENERAL_COMMISSIONING_ENDPOINT = 0

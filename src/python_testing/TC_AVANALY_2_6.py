@@ -45,15 +45,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
-    """Implementation of test case TC-AVANALY-2.6."""
-
+class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
     def desc_TC_AVANALY_2_6(self) -> str:
         """Returns the description of TC-AVANALY-2.6."""
         return "[TC-AVANALY-2.6] Validate AnalysisSessionStart and AnalysisSessionEnd event generation with Server as DUT"
@@ -138,11 +136,11 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
             asserts.assert_in(start_event_data.triggeredZones, [NullValue, None],
                               "TriggeredZones should be null when configured for entire frame")
             if self.has_feature_remcondetect:
-                asserts.assert_is_not_none(start_event_data.sourceNodeID,
+                asserts.assert_is_not_none(start_event_data.sourceNodeId,
                                            "SourceNodeID must be present when REMCONDETECT is supported")
-                asserts.assert_equal(start_event_data.sourceNodeID, self.dut_node_id,
-                                     f"SourceNodeID ({start_event_data.sourceNodeID}) must match source camera NodeID ({self.dut_node_id})")
-                source_node_id = start_event_data.sourceNodeID
+                asserts.assert_equal(start_event_data.sourceNodeId, self.dut_node_id,
+                                     f"SourceNodeID ({start_event_data.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
+                source_node_id = start_event_data.sourceNodeId
         else:
             log.info("CI mode: skipping blocking event wait in Step 4")
             session_id = 0
@@ -167,10 +165,10 @@ class TC_AVANALY_2_6(MatterBaseTest, AVANALYTestBase):
             asserts.assert_equal(end_event_data.sessionID, session_id,
                                  f"SessionID in AnalysisSessionEnd ({end_event_data.sessionID}) does not match AnalysisSessionStart ({session_id})")
             if self.has_feature_remcondetect:
-                asserts.assert_is_not_none(end_event_data.sourceNodeID,
+                asserts.assert_is_not_none(end_event_data.sourceNodeId,
                                            "SourceNodeID must be present when REMCONDETECT is supported")
-                asserts.assert_equal(end_event_data.sourceNodeID, source_node_id,
-                                     f"SourceNodeID in AnalysisSessionEnd ({end_event_data.sourceNodeID}) does not match Step 4 ({source_node_id})")
+                asserts.assert_equal(end_event_data.sourceNodeId, source_node_id,
+                                     f"SourceNodeID in AnalysisSessionEnd ({end_event_data.sourceNodeId}) does not match Step 4 ({source_node_id})")
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
