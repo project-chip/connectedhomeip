@@ -118,8 +118,6 @@ tests:
           Notes:
           The file can be stored in any location on the build system.
           The current SDK implementation stores log files transferred via the BDX protocol in the /tmp folder.
-          if {PICS_MCORE_DLOG_S_UTCTIMESTAMP} then verify that UTCTimeStamp is included in the RetrieveLogsResponse command
-          if {PICS_MCORE_DLOG_S_TIMESINCEBOOT} then verify that TimeSinceBoot is included in the RetrieveLogsResponse command
       disabled: true
 
     - label:
