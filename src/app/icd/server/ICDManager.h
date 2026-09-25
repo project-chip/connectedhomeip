@@ -105,8 +105,14 @@ public:
         ICDModeChange,
     };
 
-#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&                                         \
-    CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+    static constexpr System::Clock::Milliseconds32 kDefaultNetworkAttachSettleDelay =
+        System::Clock::Seconds32(CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC);
+
+    void SetNetworkAttachSettleDelay(System::Clock::Milliseconds32 delay) { mNetworkAttachSettleDelay = delay; }
+    System::Clock::Milliseconds32 GetNetworkAttachSettleDelay() const { return mNetworkAttachSettleDelay; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     enum class PendingCheckInType : uint8_t
     {
         kNone,
@@ -114,8 +120,8 @@ public:
         kBroadcast,
     };
     static constexpr size_t kMaxPendingCheckInSubjects = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
-#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_CONFIG_ENABLE_ICD_CIP &&
-       // CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
     /**
      * @brief Verifier template function
@@ -240,12 +246,20 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    enum class CheckInTriggerReason : uint8_t
+    {
+        kColdBoot,
+        kRuntime,
+    };
+
     /**
      * @brief Trigger the ICDManager to send Check-In message if necessary
      *
      * @param[in] function to use to determine if we need to send check-in messages
+     * @param[in] reason why Check-In messages are being triggered (e.g. cold boot vs runtime)
      */
-    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function,
+                                CheckInTriggerReason reason = CheckInTriggerReason::kColdBoot);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     /**
@@ -309,8 +323,9 @@ private:
      *        ActiveMode -> IdleMode   : Transition ICD to IdleMode and start the IdleMode timer.
      *
      * @param state requested OperationalState for the ICD to transition to
+     * @param sendCheckInMsgs true if Check-In messages should be sent when transitioning from IdleMode to ActiveMode
      */
-    void UpdateOperationState(OperationalState state);
+    void UpdateOperationState(OperationalState state, bool sendCheckInMsgs = true);
 
     /**
      * @brief Set or Remove a keep ActiveMode requirement for the given flag
@@ -396,6 +411,11 @@ private:
     bool mTransitionToIdleCalled       = false;
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     bool mPendingActiveModeOnNetworkAttach = false;
+    // Set when the server sends kServerReady. It is sent once at boot and a later Thread attach
+    // does not repeat it, so we have to keep it.
+    bool mIsServerReady                                     = false;
+    System::Clock::Milliseconds32 mNetworkAttachSettleDelay = kDefaultNetworkAttachSettleDelay;
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     PendingCheckInType mPendingCheckInType = PendingCheckInType::kNone;
     std::array<Access::SubjectDescriptor, kMaxPendingCheckInSubjects> mPendingCheckInSubjects;
@@ -414,6 +434,8 @@ private:
      */
     static void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
+    static void OnNetworkAttachSettleTimerDone(System::Layer * aLayer, void * appState);
+    void FlushPendingNetworkAttachActions();
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
 #if CHIP_CONFIG_ENABLE_ICD_DSLS
