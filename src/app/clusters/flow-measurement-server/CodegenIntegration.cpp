@@ -46,18 +46,11 @@ public:
         using namespace chip::Protocols::InteractionModel;
 
         // Read default values from the Ember attribute store. Not all apps set
-        // defaults, so failure is tolerated.
+        // defaults, so a missing default yields null.
         FlowMeasurementCluster::Config config;
 
-        if (MinMeasuredValue::GetDefault(endpointId, config.minMeasuredValue) != Status::Success)
-        {
-            config.minMeasuredValue.SetNull();
-        }
-
-        if (MaxMeasuredValue::GetDefault(endpointId, config.maxMeasuredValue) != Status::Success)
-        {
-            config.maxMeasuredValue.SetNull();
-        }
+        MinMeasuredValue::GetDefaultOr(endpointId, config.minMeasuredValue, DataModel::NullNullable);
+        MaxMeasuredValue::GetDefaultOr(endpointId, config.maxMeasuredValue, DataModel::NullNullable);
 
         // If both values are non-null but form an invalid range (e.g. ZAP defaults of 0/0),
         // treat both as null rather than crashing.
@@ -72,7 +65,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
+            Tolerance::GetDefaultOr(endpointId, tolerance, 0);
             config.WithTolerance(tolerance);
         }
 

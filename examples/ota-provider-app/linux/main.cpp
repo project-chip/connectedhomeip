@@ -58,6 +58,8 @@ constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
+// Long-only option (no short form): identifier chosen above the printable-char range.
+constexpr uint16_t kOptionPersistQueryImageStatus = 0x1000;
 
 NamedPipeCommands sChipNamedPipeCommands;
 OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
@@ -77,6 +79,7 @@ static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
 static uint32_t gPollInterval                        = 0;
 static std::optional<uint16_t> gMaxBDXBlockSize      = std::nullopt;
+static bool gPersistQueryImageStatus                 = false;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -263,6 +266,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     }
+    case kOptionPersistQueryImageStatus:
+        gPersistQueryImageStatus = true;
+        break;
 
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -287,6 +293,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
     { "pollInterval", chip::ArgParser::kArgumentRequired, kOptionPollInterval },
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
+    { "persistQueryImageStatus", chip::ArgParser::kNoArgument, kOptionPersistQueryImageStatus },
     {},
 };
 
@@ -330,7 +337,12 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -y, --ignoreApplyUpdate <ignore count>\n"
                              "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n"
                              "  -P, --pollInterval <time in milliseconds>\n"
-                             "        Poll interval for the BDX transfer \n" };
+                             "        Poll interval for the BDX transfer \n"
+                             "  --persistQueryImageStatus\n"
+                             "        If supplied, the value of --queryImageStatus (and its DelayedActionTime) is\n"
+                             "        used for EVERY QueryImageResponse instead of reverting to updateAvailable after\n"
+                             "        the first response. Lets busy/updateNotAvailable be served on all queries\n"
+                             "        without restarting the provider.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -363,6 +375,7 @@ void ApplicationInit()
     GetOtaProviderExample().SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     GetOtaProviderExample().SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
     GetOtaProviderExample().SetQueryImageStatus(gQueryImageStatus);
+    GetOtaProviderExample().SetPersistQueryImageStatus(gPersistQueryImageStatus);
     GetOtaProviderExample().SetApplyUpdateAction(gOptionUpdateAction);
     GetOtaProviderExample().SetDelayedQueryActionTimeSec(gDelayedQueryActionTimeSec);
     GetOtaProviderExample().SetDelayedApplyActionTimeSec(gDelayedApplyActionTimeSec);

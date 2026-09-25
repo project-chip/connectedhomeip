@@ -58,6 +58,7 @@ function atomicType(arg)
     return 'chip::EventNumber';
   case 'fabric_idx':
     return 'chip::FabricIndex';
+  case 'medium_type':
   case 'status':
     // We can't make this into InteractionModel::Status, since it might be a
     // cluster-specific status.

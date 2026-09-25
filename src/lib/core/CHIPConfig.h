@@ -1757,6 +1757,20 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC
+ *
+ * @brief How long, in seconds, to wait after Thread attaches and DNS-SD is up before sending the
+ *        deferred ActiveMode and Check-In actions.
+ *
+ * A registered client needs time to publish its DNS-SD records again after its border router or
+ * controller reboots. This can take 1 to 40 seconds or more. A Check-In sent before that cannot
+ * reach the client. Set to 0 to send right away.
+ */
+#ifndef CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC
+#define CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC 60
+#endif
+
+/**
  * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
  *
  * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute

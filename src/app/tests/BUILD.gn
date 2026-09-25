@@ -178,11 +178,13 @@ chip_test_suite("tests") {
     "TestDefaultSafeAttributePersistenceProvider.cpp",
     "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestDynamicAttributeMetadata.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFabricSensitiveAttributeRead.cpp",
     "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
@@ -254,6 +256,7 @@ chip_test_suite("tests") {
     public_deps += [
       "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
+      "${chip_root}/src/lib/shell:shell",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
   }

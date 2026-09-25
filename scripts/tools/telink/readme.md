@@ -185,9 +185,9 @@ You can try one of these factory partition FW on developing stage.
    specific address:
 
     > Note: The offset for Matter
-    > [v1.0-branch](https://github.com/telink-semi/zephyr/blob/telink_matter_v1.0-branch/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
+    > [v1.0-branch](https://github.com/telink-semi/tl_zephyr/blob/telink_matter_v1.0-branch/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
     > is `0xF4000` and for
-    > [master branch](https://github.com/telink-semi/zephyr/blob/telink_matter/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
+    > [master branch](https://github.com/telink-semi/tl_zephyr/blob/telink_matter/boards/riscv/tlsr9518adk80d/tlsr9518adk80d.dts)
     > is `0x107000`. You can check the `factory_partition` reg at
     > `tlsr9518adk80d.dts` for details.
 

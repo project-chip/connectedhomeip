@@ -28,6 +28,18 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
+// Enum for BLERBCSecurityModeEnum
+enum class BLERBCSecurityModeEnum : uint8_t
+{
+    kBLEDeviceIDObfuscation   = 0x00,
+    kEncryptedAdvertisingData = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for BLTCSModeEnum
 enum class BLTCSModeEnum : uint8_t
 {
@@ -60,7 +72,6 @@ enum class NADMEnum : uint16_t
 {
     kAttackExtremelyUnlikely = 0x00,
     kAttackVeryUnlikely      = 0x01,
-    kAttackUnlikely          = 0x02,
     kAttackIsPossible        = 0x03,
     kAttackIsLikely          = 0x04,
     kAttackVeryLikely        = 0x05,
@@ -70,7 +81,20 @@ enum class NADMEnum : uint16_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
+    kUnknownEnumValue = 2,
+};
+
+// Enum for RDRCapabilityEnum
+enum class RDRCapabilityEnum : uint8_t
+{
+    kNoRDR            = 0x00,
+    kAzimuthOnly      = 0x01,
+    kAzimuthElevation = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Enum for RDRReferenceEnum
@@ -101,29 +125,20 @@ enum class RangingRoleEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Enum for RangingSecurityEnum
-enum class RangingSecurityEnum : uint8_t
-{
-    kSecureRanging = 0x00,
-    kOpenRanging   = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
 // Enum for RangingSessionStatusEnum
 enum class RangingSessionStatusEnum : uint8_t
 {
-    kSessionEndTimeReached = 0x00,
-    kPeerNotFound          = 0x01,
-    kHardwareError         = 0x02,
+    kSessionStarted          = 0x00,
+    kSessionEndTimeReached   = 0x01,
+    kSessionStoppedByRequest = 0x02,
+    kPeerNotFound            = 0x03,
+    kHardwareError           = 0x04,
+    kSessionFailed           = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 6,
 };
 
 // Enum for RangingTechEnum
@@ -140,19 +155,18 @@ enum class RangingTechEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for ResultCodeEnum
-enum class ResultCodeEnum : uint8_t
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
 {
-    kAccepted                          = 0x00,
-    kRejectedInfeasibleRanging         = 0x01,
-    kRejectedInfeasibleRangingTriggers = 0x02,
-    kBusySessionCapacityReached        = 0x03,
-    kBusyTryAgainLater                 = 0x04,
+    kRejectedInfeasibleRanging         = 0x02,
+    kRejectedInfeasibleRangingTriggers = 0x03,
+    kBusySessionCapacityReached        = 0x04,
+    kBusyTryAgainLater                 = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 0,
 };
 
 // Bitmap for Feature
@@ -189,6 +203,13 @@ enum class RangingBandwidthBitmap : uint32_t
     k80MHz  = 0x80,
     k160MHz = 0x100,
     k320MHz = 0x200,
+};
+
+// Bitmap for RangingRoleSupportBitmap
+enum class RangingRoleSupportBitmap : uint8_t
+{
+    kInitiatorSupport = 0x1,
+    kResponderSupport = 0x2,
 };
 } // namespace ProximityRanging
 } // namespace Clusters
