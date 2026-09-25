@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 165.2.1. [TC-ACFREMON-2.1] Attributes with server as DUT
+name: 165.2.1. [TC-WTLREPMON-2.1] Attributes with server as DUT
 
 PICS:
-    - ACFREMON.S
+    - WTLREPMON.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Activated Carbon Filter Monitoring"
+    cluster: "Water Tank Level Monitoring"
     endpoint: 1
 
 tests:
@@ -34,7 +34,7 @@ tests:
                 value: nodeId
 
     - label: "Step 2: TH reads from the DUT the Condition attribute."
-      PICS: ACFREMON.S.A0000
+      PICS: WTLREPMON.S.A0000
       command: "readAttribute"
       attribute: "Condition"
       response:
@@ -45,7 +45,7 @@ tests:
 
     - label:
           "Step 3: TH reads from the DUT the DegradationDirection attribute.."
-      PICS: ACFREMON.S.A0001
+      PICS: WTLREPMON.S.A0001
       command: "readAttribute"
       attribute: "DegradationDirection"
       response:
@@ -55,7 +55,7 @@ tests:
               maxValue: 1
 
     - label: "Step 4a: TH reads from the DUT the ChangeIndication attribute."
-      PICS: ACFREMON.S.A0002 && !ACFREMON.S.F01
+      PICS: WTLREPMON.S.A0002 && !WTLREPMON.S.F01
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
@@ -64,7 +64,7 @@ tests:
               anyOf: [0, 2]
 
     - label: "Step 4b: TH reads from the DUT the ChangeIndication attribute."
-      PICS: ACFREMON.S.F01 && ACFREMON.S.A0002
+      PICS: WTLREPMON.S.F01 && WTLREPMON.S.A0002
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
@@ -74,7 +74,7 @@ tests:
               maxValue: 2
 
     - label: "Step 5: TH reads from the DUT the InPlaceIndicator attribute"
-      PICS: ACFREMON.S.A0003
+      PICS: WTLREPMON.S.A0003
       command: "readAttribute"
       attribute: "InPlaceIndicator"
       response:
@@ -82,7 +82,7 @@ tests:
               type: boolean
 
     - label: "Step 6: TH reads from the DUT the LastChangedTime attribute"
-      PICS: ACFREMON.S.A0004
+      PICS: WTLREPMON.S.A0004
       command: "readAttribute"
       attribute: "LastChangedTime"
       response:
@@ -91,7 +91,7 @@ tests:
 
     - label:
           "Step 7: TH reads from the DUT the ReplacementProductList attribute"
-      PICS: ACFREMON.S.A0005
+      PICS: WTLREPMON.S.A0005
       command: "readAttribute"
       attribute: "ReplacementProductList"
       response:
@@ -100,7 +100,7 @@ tests:
 
     - label:
           "Step 8: TH reads from the DUT the Medium attribute"
-      PICS: ACFREMON.S.A0006
+      PICS: WTLREPMON.S.A0006
       command: "readAttribute"
       attribute: "Medium"
       response:
