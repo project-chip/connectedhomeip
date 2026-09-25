@@ -32,6 +32,13 @@ using namespace Identify::Attributes;
 using namespace chip::app::Clusters::Identify;
 
 namespace {
+
+IntrusiveList<IdentifyCluster, IntrusiveMode::AutoUnlink> & GetInstances()
+{
+    static IntrusiveList<IdentifyCluster, IntrusiveMode::AutoUnlink> sInstances;
+    return sInstances;
+}
+
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Identify::Commands::Identify::kMetadataEntry,
 };
@@ -47,7 +54,24 @@ IdentifyCluster::IdentifyCluster(const Config & config) :
     DefaultServerCluster({ config.endpointId, Identify::Id }), mIdentifyTime(0), mIdentifyType(config.identifyType),
     mIdentifyDelegate(config.identifyDelegate), mEffectIdentifier(config.effectIdentifier), mEffectVariant(config.effectVariant),
     mTimerDelegate(config.timerDelegate)
-{}
+{
+    if (!IsInList())
+    {
+        GetInstances().PushBack(this);
+    }
+}
+
+IdentifyCluster * IdentifyCluster::FindByEndpoint(EndpointId endpointId)
+{
+    for (auto & instance : GetInstances())
+    {
+        if (instance.GetPaths()[0].mEndpointId == endpointId)
+        {
+            return &instance;
+        }
+    }
+    return nullptr;
+}
 
 DataModel::ActionReturnStatus IdentifyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                              AttributeValueEncoder & encoder)
