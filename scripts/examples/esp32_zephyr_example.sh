@@ -28,6 +28,9 @@
 #                         .venv in the west workspace root. Zephyr 4.4 rejects
 #                         the Python 3.11 of the Matter build environment.
 #
+# The Matter environment (scripts/activate.sh) is sourced for gn and the
+# Pigweed environment; the venv is then put ahead of it on PATH.
+#
 # The output lands in examples/<application>/esp32/zephyr/build.
 
 set -e
@@ -56,6 +59,8 @@ export ZEPHYR_BASE
 if [[ -n "${ESP32_ZEPHYR_SDK_DIR:-}" ]]; then
     export ZEPHYR_SDK_INSTALL_DIR="$ESP32_ZEPHYR_SDK_DIR"
 fi
+
+source scripts/activate.sh
 
 VENV="${ESP32_ZEPHYR_VENV:-$ZEPHYR_BASE/../.venv}"
 if [[ -x "$VENV/bin/west" ]]; then
