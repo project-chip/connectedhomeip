@@ -42,9 +42,11 @@ python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
 
 ### Setting up the build environment
 
-In every new terminal:
+In every new terminal, activate the Matter environment first, then the Zephyr
+venv so that its Python and `west` come first on `PATH`:
 
 ```shell
+source "$CHIP/scripts/activate.sh"
 source "$ZEPHYR_WORKSPACE/.venv/bin/activate"
 source "$ZEPHYR_WORKSPACE/zephyr/zephyr-env.sh"
 ```
@@ -54,7 +56,7 @@ source "$ZEPHYR_WORKSPACE/zephyr/zephyr-env.sh"
 
 > **Note**: `west: unknown command "build"` means `zephyr-env.sh` was not
 > sourced in this terminal. If `which west` points to the Matter `.environment`,
-> activate the Zephyr venv after `scripts/activate.sh`.
+> the Zephyr venv was activated before `scripts/activate.sh`.
 
 ## Building the example
 
