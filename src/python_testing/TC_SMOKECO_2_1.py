@@ -42,7 +42,7 @@ from mobly import asserts
 from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -89,6 +89,11 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         return [
             "SMOKECO.S",
         ]
+
+    @async_test_body
+    async def setup_test(self):
+        await self.smokeco_cluster_checks()
+        super().setup_test()
 
     @run_if_endpoint_matches(has_cluster(Clusters.SmokeCoAlarm))
     async def test_TC_SMOKECO_2_1(self):
