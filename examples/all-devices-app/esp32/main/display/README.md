@@ -75,6 +75,7 @@ display/
     │   ├── BooleanStateClusterWidget          # Boolean state with caller-supplied labels
     │   ├── IdentifyClusterWidget              # Read-only identify countdown
     │   ├── ChimeClusterWidget                 # Sound selection, enable and play
+    │   ├── ValveConfigurationAndControlClusterWidget # Valve state, countdown, level and open/close
     │   └── BridgedDeviceBasicInformationClusterWidget # Node label and reachability
     ├── devices/                    # Matter device type screens (composed from cluster widgets)
     │   ├── DeviceHeader.h/.cpp           # Standard device metadata header card
@@ -86,6 +87,7 @@ display/
     │   ├── OccupancySensorScreen        # Occupancy sensor
     │   ├── TemperatureSensorScreen      # Temperature sensor
     │   ├── ChimeScreen                  # Chime
+    │   ├── WaterValveScreen             # Water valve
     │   ├── BridgedNodeScreen            # Bridged node
     │   └── AggregatorScreen             # Aggregator
     └── screens/                    # Application screens, reached by navigation
