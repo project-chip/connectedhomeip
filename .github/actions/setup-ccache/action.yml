@@ -12,6 +12,10 @@ inputs:
     required: false
     default: ''
     description: 'Optional suffix appended to the cache key to force rotation (e.g., a short hash).'
+  use-cache-volume:
+    required: false
+    default: 'false'
+    description: 'Back .ccache with the Namespace cache volume attached to the runner instead of actions/cache. The volume identity comes from the runs-on label, not from here.'
 outputs:
   cache-primary-key:
     description: "The primary key used for the cache"
@@ -19,6 +23,9 @@ outputs:
   cache-hit:
     description: "A boolean value to indicate an exact match was found for the primary key"
     value: ${{ steps.ccache-restore.outputs.cache-hit }}
+  using-volume:
+    description: "True when .ccache is backed by a Namespace cache volume rather than actions/cache"
+    value: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
 runs:
   using: "composite"
   steps:
@@ -31,6 +38,8 @@ runs:
       uses: pyTooling/Actions/with-post-step@41364cfc6f3b879b802af27ffe979b8148aa4401 # v8.1.0
       with:
         main: |
+          # Created here rather than by the cache-volume step below, which links an
+          # existing directory onto the volume.
           mkdir -p .ccache
           echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
           echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
@@ -65,8 +74,42 @@ runs:
 
         CCACHE_RESTORE_KEY="ccache-${{ runner.os }}-${{ inputs.build-variant }}-"
         echo "CCACHE_RESTORE_KEY=${CCACHE_RESTORE_KEY}" >> "$GITHUB_ENV"
+    # spacectl shells out to `sudo chown`/`sudo mkdir` around the mount even when
+    # already root, and chip-build ships no sudo -- precisely because it runs as
+    # root -- so the mount fails on a missing binary rather than on permissions.
+    # TODO: drop this step once chip-build carries sudo, or spacectl checks euid.
+    - name: Ensure sudo is available for the cache mount
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      shell: bash
+      run: |
+        if ! command -v sudo >/dev/null 2>&1; then
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends sudo
+        fi
+    # Must run after checkout: checkout wipes the workspace and would remove the link.
+    - name: Link .ccache onto the attached cache volume
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
+      with:
+        path: ${{ github.workspace }}/.ccache
+    # The actions/cache path below gates its save step to master; that gate does not
+    # port here. The mount is copy-on-write, so nothing a run writes persists unless
+    # the profile's Protected branches setting lists its ref, and CCACHE_READONLY
+    # would only stop this job's two dozen apps reusing each other's compiles --
+    # 61% hits on an empty volume rather than 0%.
+
+    # The directory always exists -- mkdir above, and Docker creates a missing
+    # bind-mount source -- so check the bind, not the path. Otherwise an unmounted
+    # volume is silent: the build is simply cold.
+    - name: Verify the cache volume is mounted
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume == 'true' }}
+      shell: bash
+      run: |
+        if ! awk -v d="${CCACHE_DIR}" '$5 == d { found = 1 } END { exit !found }' /proc/self/mountinfo; then
+          echo "::error::${CCACHE_DIR} is not a mount point, so it is not on the cache volume"
+          exit 1
+        fi
     - name: Restore ccache
-      if: ${{ inputs.disable != 'true' }}
+      if: ${{ inputs.disable != 'true' && inputs.use-cache-volume != 'true' }}
       id: ccache-restore
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
