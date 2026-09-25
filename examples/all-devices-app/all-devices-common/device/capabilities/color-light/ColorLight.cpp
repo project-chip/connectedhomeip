@@ -122,20 +122,6 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    Clusters::LevelControlCluster::Config levelConfig(mContext.timerDelegate, mLevelControlDelegate);
-    levelConfig.WithOnOff(mOnOffCluster.Cluster()).WithLighting(DataModel::Nullable<uint8_t>());
-    mLevelControlCluster.Create(endpoint, levelConfig);
-    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
-    ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
-
-    mGroupsCluster.Create(endpoint,
-                          Clusters::GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
-    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
-
     Clusters::ColorControlCluster::Config colorConfig(mColorDelegate, mContext.timerDelegate);
     colorConfig.onOff = &mOnOffCluster.Cluster();
     // The ColorValue variant defaults to XY; the leaf picks the mode matching its feature map.
@@ -157,6 +143,24 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     colorConfig.ctConfig.coupleColorTempToLevelMinMireds = 153;
     mColorControlCluster.Create(endpoint, colorConfig);
     ReturnErrorOnFailure(provider.AddCluster(mColorControlCluster.Registration()));
+
+    // Created after Color Control so the level config can point at it: Level Control 1.6.6.9.2 requires
+    // CurrentLevel changes to drive the color temperature while Options.CoupleColorTempToLevel is set.
+    Clusters::LevelControlCluster::Config levelConfig(mContext.timerDelegate, mLevelControlDelegate);
+    levelConfig.WithOnOff(mOnOffCluster.Cluster())
+        .WithColorControl(mColorControlCluster.Cluster())
+        .WithLighting(DataModel::Nullable<uint8_t>());
+    mLevelControlCluster.Create(endpoint, levelConfig);
+    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
+    ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
+
+    mGroupsCluster.Create(endpoint,
+                          Clusters::GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
+                              .identifyIntegration = &mIdentifyCluster.Cluster(),
+                          });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     mDynamicLightingCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mDynamicLightingCluster.Registration()));
@@ -225,12 +229,6 @@ void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
         mDynamicLightingCluster.Destroy();
     }
 
-    if (mColorControlCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mColorControlCluster.Cluster()));
-        mColorControlCluster.Destroy();
-    }
-
     if (mGroupsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
@@ -241,6 +239,12 @@ void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mLevelControlCluster.Cluster()));
         mLevelControlCluster.Destroy();
+    }
+
+    if (mColorControlCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mColorControlCluster.Cluster()));
+        mColorControlCluster.Destroy();
     }
 
     if (mOnOffCluster.IsConstructed())

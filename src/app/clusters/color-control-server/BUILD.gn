@@ -15,6 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+source_set("delegates") {
+  sources = [ "ColorControlIntegrationDelegate.h" ]
+}
+
 source_set("color-control-server") {
   sources = [
     "ColorControlCluster.cpp",
@@ -24,6 +28,7 @@ source_set("color-control-server") {
   ]
 
   public_deps = [
+    ":delegates",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/cluster-building-blocks",
     "${chip_root}/src/app/clusters/on-off-server",

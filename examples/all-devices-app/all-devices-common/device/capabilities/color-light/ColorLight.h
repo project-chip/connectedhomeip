@@ -130,11 +130,11 @@ private:
     DefaultScenesManagementTableProvider mScenesTableProvider;
 
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
+    LazyRegisteredServerCluster<Clusters::ColorControlCluster> mColorControlCluster;
     LazyRegisteredServerCluster<Clusters::LevelControlCluster> mLevelControlCluster;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::ColorControlCluster> mColorControlCluster;
     LazyRegisteredServerCluster<Clusters::DynamicLightingCluster> mDynamicLightingCluster;
 };
 

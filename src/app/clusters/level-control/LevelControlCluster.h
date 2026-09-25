@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/cluster-building-blocks/QuieterReporting.h>
+#include <app/clusters/color-control-server/ColorControlIntegrationDelegate.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
@@ -70,6 +71,16 @@ public:
         {
             mFeatureMap.Set(LevelControl::Feature::kOnOff);
             mOnOffCluster = &onOffCluster;
+            return *this;
+        }
+        /// Enables the Options.CoupleColorTempToLevel behavior of spec 1.6.6.9.2: while that bit is set,
+        /// every CurrentLevel change is forwarded to Color Control. Without this the bit stays inert.
+        ///
+        /// Takes the integration interface rather than ColorControlCluster so that a Level Control
+        /// without color support does not link the Color Control implementation.
+        Config & WithColorControl(ColorControlIntegrationDelegate & colorControl)
+        {
+            mColorControl = &colorControl;
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
@@ -128,7 +139,8 @@ public:
 
         LevelControlDelegate & mDelegate;
         TimerDelegate & mTimerDelegate;
-        OnOffCluster * mOnOffCluster = nullptr;
+        OnOffCluster * mOnOffCluster                    = nullptr;
+        ColorControlIntegrationDelegate * mColorControl = nullptr;
 
         uint8_t mMinLevel = 0;
         uint8_t mMaxLevel = kMaxLevel;
@@ -225,7 +237,11 @@ private:
         kQuietReport
     };
 
-    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode);
+    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode)
+    {
+        return SetCurrentLevel(level, reportingMode, ShouldCoupleColorTempToLevel({}, {}));
+    }
+    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode, bool coupleColorTemp);
 
     // Attributes
     app::QuieterReportingAttribute<uint8_t> mCurrentLevel;
@@ -246,7 +262,8 @@ private:
     BitMask<LevelControl::Feature> mFeatureMap;
     LevelControlDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-    OnOffCluster * mOnOffCluster = nullptr;
+    OnOffCluster * mOnOffCluster                    = nullptr;
+    ColorControlIntegrationDelegate * mColorControl = nullptr;
 
     DataModel::Nullable<uint8_t> mLevelBeforeTurnedOff; // Stores the level before turning Off, to restore on On if OnLevel is null.
 
@@ -259,7 +276,7 @@ private:
         ~TransitionHandler();
 
         void StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel, uint32_t transitionTimeMs,
-                             uint32_t stepDurationMs);
+                             uint32_t stepDurationMs, bool coupleColorTemp);
         void StopTransition();
 
         uint32_t GetTransitionTimeMs() const { return mTransitionTimeMs; }
@@ -278,6 +295,7 @@ private:
         uint32_t mTickDurationMs        = 0;
         uint64_t mTransitionStartTimeMs = 0;
         CommandId mCurrentCommandId     = kInvalidCommandId;
+        bool mCoupleColorTemp           = false;
     };
 
     TransitionHandler mTransitionHandler;
@@ -293,6 +311,8 @@ private:
     CHIP_ERROR SetOnOff(bool on);
     bool GetOnOff();
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    bool ShouldCoupleColorTempToLevel(BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                      BitMask<LevelControl::OptionsBitmap> optionsOverride) const;
 
     // Helper to write CurrentLevel to NVM.
     void StoreCurrentLevel(DataModel::Nullable<uint8_t> value);

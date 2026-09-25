@@ -32,6 +32,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestLevelControlBase.cpp",
+    "TestLevelControlColorCoupling.cpp",
     "TestLevelControlLighting.cpp",
     "TestLevelControlOnOff.cpp",
     "TestLevelControlScenes.cpp",
