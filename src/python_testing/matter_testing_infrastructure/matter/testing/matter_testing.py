@@ -70,7 +70,7 @@ from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.pixit import _PIXIT_NO_DEFAULT, get_pixit_definitions
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
-from matter.testing.runner import TestRunnerHooks, TestStep
+from matter.testing.runner import TestRunnerHooks, TestStep, read_global_wildcard_async
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
 from matter.tlv import uint
 
@@ -901,9 +901,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         controller-side cleanup. Each step is gated by TestCleanupConfig so individual
         steps can be disabled by test authors when needed.
 
-        Cluster-presence checks use ``stored_global_wildcard``, which the
-        test runner populates in ``user_params`` at session start (see ``read_global_wildcard`` in
-        ``runner.run_tests_no_exit``). If that read failed, cleanup steps that need it log and skip.
+        Cluster-presence checks use ``stored_global_wildcard``. The test runner normally
+        populates it in ``user_params`` at session start (see ``_prepopulate_global_wildcard``
+        in ``runner.run_tests_no_exit``). When ``--skip-global-wildcard-population`` is used
+        and no guard populated it during the class, it is read on demand here before DUT
+        cleanup. If that read fails, cleanup steps that need it log and skip.
         """
 
         # If a teardown_test override already called this (per-test cleanup
@@ -946,6 +948,15 @@ class MatterBaseTest(base_test.BaseTestClass):
                 dut_reachable = False
 
         if dut_reachable:
+            # No-op when the runner pre-populated the wildcard; needed when
+            # --skip-global-wildcard-population was used and no guard ran in this class,
+            # otherwise the cluster-dependent cleanup steps below would silently skip.
+            try:
+                await self._populate_wildcard()
+            except Exception as e:  # Keep going: steps that need the wildcard log and skip on None
+                LOGGER.warning("[CLN] Could not read global wildcard; cluster-dependent cleanup "
+                               "steps will be skipped: %s", e)
+
             # DUT cleanup (run first as controller must still be alive to send commands)
             # - Scenes must be removed before group memberships: RemoveAllScenes requires the target
             #   group to still exist on the DUT, so group memberships cannot be cleared first.
@@ -1816,8 +1827,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     def stored_global_wildcard(self) -> Attribute.AsyncReadTransaction.ReadResponse | None:
         """Returns the runner's cached global wildcard read, or None if it was never stashed.
 
-        Framework cleanup uses this to skip steps when the wildcard was unavailable. Test bodies and
-        guards should use :py:attr:`stored_global_wildcard` instead, which raises if the stash is missing.
+        Guards call _populate_wildcard() first so they always see a populated value; framework
+        cleanup checks for None and skips the steps that need the wildcard.
         """
         wildcard = global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
         if wildcard is None:
@@ -2284,12 +2295,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Populates the stored global wildcard through the stash if not already filled.
 
         Called by attribute_guard / command_guard / feature_guard before consulting
-        the wildcard. Cheap when the value is already present, so calling it from
-        every guard entry point is fine.
+        the wildcard, and by framework cleanup before the cluster-dependent steps.
+        Cheap when the value is already present, so calling it from every entry point
+        is fine.
 
         Value resolution, in order:
           1. Stash already populated (either by the runner's _prepopulate_global_wildcard
-             on the default path, or by a prior on-demand read in this same test).
+             on the default path, or by a prior on-demand read in this same run).
           2. On-demand read from the DUT. Reached when the runner deliberately
              skipped pre-populate: the CLI passed --skip-global-wildcard-population,
              or the runner's attempt failed (e.g. NFC in-test commissioning,
@@ -2300,9 +2312,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.stored_global_wildcard is not None:
             return
 
-        # Local import: runner.py imports symbols defined here, so a top-level
-        # import would form a cycle.
-        from matter.testing.runner import read_global_wildcard_async
         wildcard = await read_global_wildcard_async(
             self.default_controller, self.dut_node_id)
         # Write through the stash where stored_global_wildcard reads from — the
@@ -2354,11 +2363,11 @@ class MatterBaseTest(base_test.BaseTestClass):
            For example can be used to check if a test step should be run:
 
               self.step("1")
-              if await self.attribute_guard(condition1_needs_to_be_true_to_execute):
+              if await self.feature_guard(condition1_needs_to_be_true_to_execute):
                   # do the test for step 1
 
               self.step("2")
-              if await self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+              if await self.feature_guard(condition2_needs_to_be_false_to_skip_step):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()

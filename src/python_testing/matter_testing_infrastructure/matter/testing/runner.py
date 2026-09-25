@@ -371,9 +371,9 @@ async def read_global_wildcard_async(default_controller: ChipDeviceCtrl.ChipDevi
     AcceptedCommandList on every endpoint) with a 60-second timeout.
 
     Reusable by both the runner (pre-populate path) and MatterBaseTest guards
-    (on-demand fallback when --skip-global-wildcard-population is set, when the test
-    class opts out of pre-populate, or when the DUT was simply not reachable at
-    runner time — e.g. NFC in-test commissioning or file-based BasicComposition).
+    (on-demand fallback when --skip-global-wildcard-population is set, or when the
+    DUT was not reachable at runner time, e.g. NFC in-test commissioning or
+    file-based BasicComposition).
     Keeping the Read in a single function means the attribute set and timeout stay
     in lockstep between the two entry points.
     """
@@ -419,17 +419,11 @@ async def _prepopulate_wildcard_via_pase(default_controller, node_id, matter_tes
     reuse it via FindOrEstablishPASESession instead of forcing the device
     to reopen its commissioning window.
     """
-    setup_code: str | None = None
-    if matter_test_config.manual_code:
-        setup_code = matter_test_config.manual_code[0]
-    elif matter_test_config.qr_code_content:
-        setup_code = matter_test_config.qr_code_content[0]
-    elif matter_test_config.setup_passcodes and matter_test_config.discriminators:
-        setup_code = default_controller.CreateManualCode(
-            matter_test_config.discriminators[0],
-            matter_test_config.setup_passcodes[0],
-        )
+    # Local import: matter_testing imports runner at module level, so a top-level
+    # import here would form a real cycle.
+    from matter.testing.matter_testing import get_first_setup_code
 
+    setup_code = get_first_setup_code(default_controller, matter_test_config)
     if setup_code is None:
         LOGGER.warning(
             "Device not commissioned and no setup code available — "
@@ -580,7 +574,7 @@ def run_tests_no_exit(
 
             # Decide whether to pre-populate the global wildcard from the runner.
             #
-            # Three mutually exclusive branches, evaluated in order:
+            # Two mutually exclusive branches:
             #
             #  1. CLI escape hatch --skip-global-wildcard-population is set. Used for
             #     ad-hoc runs and for flows where the DUT is not reachable at runner

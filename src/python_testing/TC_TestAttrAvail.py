@@ -45,10 +45,12 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --KVS kvs1
+#     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --endpoint 1
+#       --discriminator 1234
+#       --passcode 20202021
 #     factory-reset: false
 #     quiet: true
 # === END CI TEST ARGUMENTS ===

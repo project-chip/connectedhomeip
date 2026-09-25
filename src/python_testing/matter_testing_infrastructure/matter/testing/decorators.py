@@ -28,7 +28,7 @@ from enum import IntFlag
 from functools import partial, wraps
 from typing import TYPE_CHECKING
 
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.clusters import Attribute
@@ -41,11 +41,34 @@ if TYPE_CHECKING:
 
 LOGGER = logging.getLogger(__name__)
 
-EndpointCheckFunction = Callable[[
-    Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, int], bool]
+ReadResponse = Clusters.Attribute.AsyncReadTransaction.ReadResponse
+
+EndpointCheckFunction = Callable[[ReadResponse | None, int], bool]
 
 
-def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
+def _require_wildcard(wildcard: ReadResponse | None, check: str, target, endpoint: int) -> ReadResponse:
+    """Return the wildcard, raising a test script error if it is missing.
+
+    Every caller of the _has_* helpers supplies a populated wildcard:
+      - attribute_guard / command_guard / feature_guard call _populate_wildcard first,
+      - run_if_endpoint_matches / run_on_singleton_matching_endpoint perform a fresh Read,
+      - framework cleanup checks for None itself before calling these helpers.
+
+    A None wildcard here is therefore a bug in the test script, not a "not present" result,
+    and must not be silently treated as a skip.
+
+    Raises:
+        signals.TestError: If wildcard is None.
+    """
+    if wildcard is None:
+        raise signals.TestError(
+            f"Test script error: {check} check for {target} on endpoint {endpoint} was called "
+            "without a wildcard read. Use attribute_guard/command_guard/feature_guard or "
+            "run_if_endpoint_matches, which populate the wildcard first.")
+    return wildcard
+
+
+def _has_cluster(wildcard: ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -55,14 +78,12 @@ def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse 
 
     Returns:
         bool: True if the cluster exists on the endpoint, False otherwise
-            Returns False if endpoint is not found in wildcard attributes, or wildcard is None
+            Returns False if endpoint is not found in wildcard attributes
+
+    Raises:
+        signals.TestError: If wildcard is None (test script error)
     """
-    if wildcard is None:
-        LOGGER.warning(
-            "has_cluster check for %s on endpoint %d: wildcard read result is None. "
-            "Treating as not present, which may cause the test to be skipped silently.",
-            cluster, endpoint)
-        return False
+    wildcard = _require_wildcard(wildcard, "has_cluster", cluster, endpoint)
     return endpoint in wildcard.attributes and cluster in wildcard.attributes[endpoint]
 
 
@@ -89,7 +110,7 @@ def has_cluster(cluster: ClusterObjects.ClusterObjectDescriptor) -> EndpointChec
     return partial(_has_cluster, cluster=cluster)
 
 
-def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
+def _has_attribute(wildcard: ReadResponse | None, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor) -> bool:
     """Check if an attribute exists in a cluster's AttributeList on a specific endpoint.
 
     Args:
@@ -99,18 +120,14 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
 
     Returns:
         bool: True if the attribute ID exists in the cluster's AttributeList, False otherwise
-            Returns False if endpoint, cluster, or AttributeList is not found, or wildcard is None
+            Returns False if endpoint, cluster, or AttributeList is not found
 
     Raises:
+        signals.TestError: If wildcard is None (test script error)
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    if wildcard is None:
-        LOGGER.warning(
-            "has_attribute check for %s on endpoint %d: wildcard read result is None. "
-            "Treating as not present, which may cause the test to be skipped silently.",
-            attribute, endpoint)
-        return False
+    wildcard = _require_wildcard(wildcard, "has_attribute", attribute, endpoint)
     cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
@@ -157,7 +174,7 @@ def has_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> Endpo
     return partial(_has_attribute, attribute=attribute)
 
 
-def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
+def _has_command(wildcard: ReadResponse | None, endpoint: int, command: ClusterObjects.ClusterCommand) -> bool:
     """Check if a command exists in a cluster's AcceptedCommandList on a specific endpoint.
 
     Args:
@@ -167,18 +184,14 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse 
 
     Returns:
         bool: True if the command ID exists in the cluster's AcceptedCommandList, False otherwise
-            Returns False if endpoint, cluster, or AcceptedCommandList is not found, or wildcard is None
+            Returns False if endpoint, cluster, or AcceptedCommandList is not found
 
     Raises:
+        signals.TestError: If wildcard is None (test script error)
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    if wildcard is None:
-        LOGGER.warning(
-            "has_command check for %s on endpoint %d: wildcard read result is None. "
-            "Treating as not present, which may cause the test to be skipped silently.",
-            command, endpoint)
-        return False
+    wildcard = _require_wildcard(wildcard, "has_command", command, endpoint)
     cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
@@ -223,13 +236,25 @@ def has_command(command: ClusterObjects.ClusterCommand) -> EndpointCheckFunction
     return partial(_has_command, command=command)
 
 
-def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
-    if wildcard is None:
-        LOGGER.warning(
-            "has_feature check for %s / %s on endpoint %d: wildcard read result is None. "
-            "Treating as not present, which may cause the test to be skipped silently.",
-            cluster, feature, endpoint)
-        return False
+def _has_feature(wildcard: ReadResponse | None, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFlag) -> bool:
+    """Check if a feature bit is set in a cluster's FeatureMap on a specific endpoint.
+
+    Args:
+        wildcard: A wildcard read result containing endpoint attributes mapping
+        endpoint: The endpoint ID to check
+        cluster: The Cluster object whose FeatureMap is checked
+        feature: The feature bit(s) to look for
+
+    Returns:
+        bool: True if the feature bit is set in the cluster's FeatureMap, False otherwise
+            Returns False if endpoint, cluster, or FeatureMap is not found
+
+    Raises:
+        signals.TestError: If wildcard is None (test script error)
+        ValueError: If FeatureMap value is not an int
+    """
+    wildcard = _require_wildcard(wildcard, "has_feature", f"{cluster} / {feature}", endpoint)
+
     if endpoint not in wildcard.attributes:
         return False
 

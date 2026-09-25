@@ -849,16 +849,6 @@ cluster plus the `AttributeList`, `FeatureMap`, and `AcceptedCommandList` global
 attributes on every endpoint, and is dispatched over CASE if the device is
 already commissioned or over PASE otherwise.
 
-Centralizing the read in the runner means:
-
--   Each test pays for the wildcard read **once per run**, not once per guard
-    call.
--   When PASE is used, the session is kept alive so `CommissionDeviceTest` and
-    `BasicCompositionTests.setup_class_helper` can reuse it instead of forcing
-    the device to reopen its commissioning window.
--   Guards read a known-populated value from the stash rather than triggering an
-    on-demand read from inside a test step.
-
 ### The `--skip-global-wildcard-population` flag
 
 There are cases where the runner **cannot** or **should not** perform the
