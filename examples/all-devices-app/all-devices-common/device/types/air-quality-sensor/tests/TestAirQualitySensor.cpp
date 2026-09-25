@@ -73,10 +73,7 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override
-    {
-        unregisteredAdditionalCalled = true;
-    }
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override { unregisteredAdditionalCalled = true; }
 };
 
 TEST_F(TestAirQualitySensor, TestExtensionHooks)

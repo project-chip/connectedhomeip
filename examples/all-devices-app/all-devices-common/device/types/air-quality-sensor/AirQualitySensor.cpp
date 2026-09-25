@@ -30,9 +30,7 @@ AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config &
     mConfig(config)
 {}
 
-AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate) :
-    AirQualitySensor(timerDelegate, Config{})
-{}
+AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate) : AirQualitySensor(timerDelegate, Config{}) {}
 
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                       EndpointComposition composition)

@@ -29,7 +29,8 @@ namespace {
 
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-SimulatedAirQualitySensor::ConcentrationCluster::Config MakeGasConfig(ClusterId clusterId, MeasurementUnitEnum unit, float min, float max)
+SimulatedAirQualitySensor::ConcentrationCluster::Config MakeGasConfig(ClusterId clusterId, MeasurementUnitEnum unit, float min,
+                                                                      float max)
 {
     return SimulatedAirQualitySensor::ConcentrationCluster::Config{
         .clusterId   = clusterId,
@@ -51,7 +52,8 @@ SimulatedAirQualitySensor::Config DefaultSimulatedConfig()
 
 } // namespace
 
-SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features)
+SimulatedAirQualitySensor::Config &
+SimulatedAirQualitySensor::Config::WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features)
 {
     baseConfig.WithAirQuality(features);
     return *this;
@@ -75,7 +77,8 @@ SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithRelat
     return *this;
 }
 
-SimulatedAirQualitySensor::Config & SimulatedAirQualitySensor::Config::WithConcentration(const ConcentrationCluster::Config & customConfig)
+SimulatedAirQualitySensor::Config &
+SimulatedAirQualitySensor::Config::WithConcentration(const ConcentrationCluster::Config & customConfig)
 {
     for (size_t i = 0; i < numConcentrationConfigs; ++i)
     {
