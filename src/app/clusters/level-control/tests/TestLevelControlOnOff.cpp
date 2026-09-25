@@ -214,6 +214,55 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 }
 
+// Without a Rate and without DefaultMoveRate the move is immediate, so MoveWithOnOff Down has to reach
+// MinLevel and turn the device off within the invocation, with no transition left running.
+TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownNullRateTurnsOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // DefaultMoveRate is not configured, so a null Rate leaves no rate at all.
+    Commands::MoveWithOnOff::Type data;
+    data.moveMode = MoveModeEnum::kDown;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    // When OnOff is true and CurrentLevel is already at MinLevel, MoveWithOnOff(kDown) must still set OnOff to false.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(cluster.GetMinLevel(), DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
+                    .IsSuccess());
+    EXPECT_TRUE(onOffCluster.GetOnOff());
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+}
+
 // Spec 1.6.6.9 gates only Move, MoveToLevel, Step and Stop. StopWithOnOff is not on that list, so
 // it must terminate an in-flight transition even while the device is off with ExecuteIfOff clear.
 TEST_F(TestLevelControlOnOff, TestStopWithOnOffTerminatesTransitionWhileOff)
