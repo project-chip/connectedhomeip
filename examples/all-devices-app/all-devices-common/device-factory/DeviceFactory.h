@@ -29,6 +29,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/LoggingClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -354,23 +355,24 @@ private:
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
+        if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
-            RegisterCreator("color-temperature-light", [this]() {
+            RegisterCreator("chime", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                static const Chime::Sound kDefaultSounds[] = {
+                    { 0, "Ding Dong"_span },
+                    { 1, "Ring Ring"_span },
+                };
+                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("contact-sensor", [this]() {
+            RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                return MakeDevice<LoggingClosure>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                  LoggingClosure::ThreePanelDoorClosureConfig(), mContext->groupDataProvider,
+                                                  mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -388,15 +390,23 @@ private:
                 return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CHIME)
+        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
         {
-            RegisterCreator("chime", [this]() {
+            RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Chime::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        {
+            RegisterCreator("contact-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)

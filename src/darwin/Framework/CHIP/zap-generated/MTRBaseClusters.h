@@ -20225,6 +20225,23 @@ typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
     MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRDataTypeClosurePanelTag) {
+    MTRDataTypeClosurePanelTagLift MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosurePanelTagTilt MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosurePanelTagSliding MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosurePanelTagRotate MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureTag) {
+    MTRDataTypeClosureTagCovering MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureTagWindow MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureTagBarrier MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosureTagCabinet MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeClosureTagGate MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeClosureTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeClosureTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x06,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagAirConditioner MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRDataTypeLandmarkTagAirPurifier MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,

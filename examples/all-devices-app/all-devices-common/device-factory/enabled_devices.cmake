@@ -44,6 +44,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/LoggingClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ThreePanelDoorClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/LoggingClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/impl/LoggingColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/Cooktop.cpp"
@@ -173,6 +178,7 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        closure
         color-temperature-light
         commissioning-proxy
         contact-sensor

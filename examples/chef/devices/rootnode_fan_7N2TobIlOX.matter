@@ -109,6 +109,23 @@ enum CertificationTypeEnum : enum8 {
   kVIDSignerPKI = 2;
 }
 
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;

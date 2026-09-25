@@ -320,6 +320,31 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class ClosurePanelTag(MatterIntEnum):
+            kLift = 0x00
+            kTilt = 0x01
+            kSliding = 0x02
+            kRotate = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class ClosureTag(MatterIntEnum):
+            kCovering = 0x00
+            kWindow = 0x01
+            kBarrier = 0x02
+            kCabinet = 0x03
+            kGate = 0x04
+            kGarageDoor = 0x05
+            kDoor = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
             kAirPurifier = 0x01
