@@ -37,6 +37,8 @@ constexpr uint32_t kCountdownTimeSeconds          = 10;
 constexpr uint32_t kCalibrateCountdownTimeMs      = 3000; // 3 seconds for calibrate motion
 constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
 constexpr chip::Percent100ths kMotionPositionStep = 2000; // 20% of the total range per motion interval.
+constexpr chip::Percent100ths kDefaultResolution  = 100;  // 1% resolution in Percent100ths.
+constexpr chip::Percent100ths kDefaultStepValue   = 1000; // 10% step value in Percent100ths.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -83,10 +85,48 @@ void ClosureManager::Init()
     VerifyOrDie(mClosureEndpoint1.Init() == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Control Endpoint initialized successfully");
 
-    VerifyOrDie(mClosurePanelEndpoint2.Init() == CHIP_NO_ERROR);
+    ClosureDimension::ClusterConformance conformanceEndpoint2;
+    conformanceEndpoint2.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kTranslation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint2;
+    clusterInitParametersEndpoint2.resolution           = kDefaultResolution;
+    clusterInitParametersEndpoint2.stepValue            = kDefaultStepValue;
+    clusterInitParametersEndpoint2.unit                 = ClosureUnitEnum::kMillimeter;
+    clusterInitParametersEndpoint2.translationDirection = TranslationDirectionEnum::kDownward;
+    clusterInitParametersEndpoint2.overflow             = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint2.modulationType       = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint2.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    VerifyOrDie(mClosurePanelEndpoint2.Init(conformanceEndpoint2, clusterInitParametersEndpoint2) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Panel Endpoint 2 initialized successfully");
 
-    VerifyOrDie(mClosurePanelEndpoint3.Init() == CHIP_NO_ERROR);
+    ClosureDimension::ClusterConformance conformanceEndpoint3;
+    conformanceEndpoint3.FeatureMap()
+        .Set(ClosureDimension::Feature::kPositioning)
+        .Set(ClosureDimension::Feature::kMotionLatching)
+        .Set(ClosureDimension::Feature::kUnit)
+        .Set(ClosureDimension::Feature::kLimitation)
+        .Set(ClosureDimension::Feature::kSpeed)
+        .Set(ClosureDimension::Feature::kRotation);
+
+    ClosureDimension::ClusterInitParameters clusterInitParametersEndpoint3;
+    clusterInitParametersEndpoint3.resolution     = kDefaultResolution;
+    clusterInitParametersEndpoint3.stepValue      = kDefaultStepValue;
+    clusterInitParametersEndpoint3.unit           = ClosureUnitEnum::kDegree;
+    clusterInitParametersEndpoint3.rotationAxis   = RotationAxisEnum::kCenteredVertical;
+    clusterInitParametersEndpoint3.overflow       = OverflowEnum::kTopInside;
+    clusterInitParametersEndpoint3.modulationType = ModulationTypeEnum::kVentilation;
+    clusterInitParametersEndpoint3.latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+
+    VerifyOrDie(mClosurePanelEndpoint3.Init(conformanceEndpoint3, clusterInitParametersEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Panel Endpoint 3 initialized successfully");
 
     // Set Taglist for Closure endpoints
@@ -192,9 +232,18 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 
     if (conformance.HasFeature(ClosureDimension::Feature::kUnit))
     {
-        ReturnErrorOnFailure(
-            closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
-                .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+        if (conformance.HasFeature(ClosureDimension::Feature::kRotation))
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(360) })); // degree
+        }
+        else
+        {
+            ReturnErrorOnFailure(
+                closurePanelEndpoint.GetClusterInstance().SetUnitRange(ClosureDimension::Structs::UnitRangeStruct::Type{
+                    .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) })); // millimeter
+        }
     }
     if (conformance.HasFeature(ClosureDimension::Feature::kLimitation))
     {
