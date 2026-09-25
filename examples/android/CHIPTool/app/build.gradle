@@ -121,6 +121,7 @@ dependencies {
     implementation "androidx.camera:camera-view:${camerax_version}"
 
     implementation 'com.google.protobuf:protobuf-java:3.22.0'
+    implementation 'io.getstream:stream-webrtc-android:1.1.1'
 }
 
 repositories {

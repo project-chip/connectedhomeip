@@ -37,6 +37,32 @@ CHIP_ERROR LiveViewStartCommand::RunCommand()
     // Use provided stream usage or default to 3 (LiveView)
     uint8_t streamUsage = mStreamUsage.HasValue() ? mStreamUsage.Value() : 3;
 
+    if (mClientSdp.HasValue())
+    {
+        std::string base64Sdp(mClientSdp.Value());
+        if (base64Sdp.size() > UINT16_MAX)
+        {
+            ChipLogError(Camera, "Base64 SDP length exceeds UINT16_MAX");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        std::vector<uint8_t> decodedSdpBuf(base64Sdp.size());
+        uint16_t decodedSdpLen =
+            chip::Base64Decode(base64Sdp.c_str(), static_cast<uint16_t>(base64Sdp.size()), decodedSdpBuf.data());
+        if (decodedSdpLen == UINT16_MAX)
+        {
+            ChipLogError(Camera, "Invalid Base64 in --client-sdp");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        std::string clientSdp(reinterpret_cast<const char *>(decodedSdpBuf.data()), decodedSdpLen);
+
+        camera::DeviceManager::Instance().SetClientSdp(clientSdp);
+    }
+    else
+    {
+        camera::DeviceManager::Instance().SetClientSdp("");
+    }
+
     return camera::DeviceManager::Instance().AllocateVideoStream(mPeerNodeId, streamUsage, camera::WebRTCOfferType::kProvideOffer,
                                                                  mMinResWidth, mMinResHeight, mMinFrameRate, mMinBitRate);
 }

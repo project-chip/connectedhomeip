@@ -677,7 +677,14 @@ public class ChipDeviceController {
    */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
     GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
-    getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
+    getConnectedDevicePointer(deviceControllerPtr, nodeId, false, jniCallback.getCallbackHandle());
+  }
+
+  public void getConnectedDevicePointer(
+      long nodeId, boolean allowLargePayload, GetConnectedDeviceCallback callback) {
+    GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
+    getConnectedDevicePointer(
+        deviceControllerPtr, nodeId, allowLargePayload, jniCallback.getCallbackHandle());
   }
 
   public void releaseConnectedDevicePointer(long devicePtr) {
@@ -1020,6 +1027,65 @@ public class ChipDeviceController {
 
   public void stopDnssd() {
     stopDnssd(deviceControllerPtr);
+  }
+
+  /**
+   * Sends a SolicitOffer command to the device.
+   *
+   * @param deviceId The Node ID of the device to communicate with.
+   * @param endpointId The target Endpoint ID.
+   * @param callback The callback to receive the success or failure of the command.
+   */
+  public void webRTCTransportSolicitOffer(
+      long deviceId, int endpointId, @Nonnull WebRTCTransportSolicitOfferCallback callback) {
+    webRTCTransportSolicitOffer(deviceControllerPtr, deviceId, endpointId, callback);
+  }
+
+  /**
+   * Sends a ProvideOffer command to the device.
+   *
+   * @param deviceId The Node ID of the device to communicate with.
+   * @param endpointId The target Endpoint ID.
+   * @param offerSdp The SDP Offer string to be delivered.
+   * @param callback The callback to receive the success or failure of the command.
+   */
+  public void webRTCTransportProvideOffer(
+      long deviceId,
+      int endpointId,
+      @Nullable Integer videoStreamId,
+      @Nullable Integer audioStreamId,
+      @Nonnull String offerSdp,
+      @Nonnull WebRTCTransportProvideOfferCallback callback) {
+    webRTCTransportProvideOffer(
+        deviceControllerPtr,
+        deviceId,
+        endpointId,
+        videoStreamId,
+        audioStreamId,
+        offerSdp,
+        callback);
+  }
+
+  /**
+   * Starts the WebRTC Transport Requestor and registers the callback delegate.
+   *
+   * @param delegate The callback implementation to receive WebRTC events.
+   */
+  public void startWebRTCTransportRequestor(WebRTCTransportRequestorDelegate delegate) {
+    if (deviceControllerPtr == 0) {
+      throw new IllegalStateException("Device controller is not initialized.");
+    }
+    // Internally passes the C++ pointer handle and the delegate object to JNI.
+    startWebRTCTransportRequestor(deviceControllerPtr, delegate);
+  }
+
+  /** Finishes the WebRTC Transport Requestor operation and cleans up resources. */
+  public void finishWebRTCTransportRequestor() {
+    if (deviceControllerPtr == 0) {
+      throw new IllegalStateException("Device controller is not initialized.");
+    }
+    // Internally passes the C++ pointer handle to JNI to perform the shutdown procedure.
+    finishWebRTCTransportRequestor(deviceControllerPtr);
   }
 
   /**
@@ -1739,7 +1805,7 @@ public class ChipDeviceController {
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
   private native void getConnectedDevicePointer(
-      long deviceControllerPtr, long deviceId, long callbackHandle);
+      long deviceControllerPtr, long deviceId, boolean allowLargePayload, long callbackHandle);
 
   private native void releaseOperationalDevicePointer(long devicePtr);
 
@@ -1837,6 +1903,26 @@ public class ChipDeviceController {
 
   private native void setWiFiCredentialsNeededListener(
       long deviceControllerPtr, WiFiCredentialsNeededListener listener);
+
+  private native void webRTCTransportSolicitOffer(
+      long deviceControllerPtr,
+      long deviceId,
+      int endpointId,
+      WebRTCTransportSolicitOfferCallback callback);
+
+  private native void webRTCTransportProvideOffer(
+      long deviceControllerPtr,
+      long deviceId,
+      int endpointId,
+      @Nullable Integer videoStreamId,
+      @Nullable Integer audioStreamId,
+      String offerSdp,
+      WebRTCTransportProvideOfferCallback callback);
+
+  private native void startWebRTCTransportRequestor(
+      long deviceControllerPtr, WebRTCTransportRequestorDelegate delegate);
+
+  private native void finishWebRTCTransportRequestor(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");
