@@ -33,21 +33,13 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import logging
-import time
-
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-from mdns_discovery.utils.asserts import (assert_is_commissioner_type, assert_valid_commissionable_instance_name,
-                                          assert_valid_dn_key, assert_valid_dt_key, assert_valid_hostname,
-                                          assert_valid_ipv6_addresses, assert_valid_vp_key)
-from mobly import asserts
+from mdns_discovery.mdns_discovery import MdnsServiceType
+from mdns_discovery.utils.support import (get_verify_commissioner_service, get_verify_srv_record, verify_aaaa_records,
+                                          verify_commissioner_txt_record_keys, verify_devtype_subtype)
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-
-log = logging.getLogger(__name__)
 
 '''
 Purpose
@@ -59,17 +51,6 @@ and the TH is a passive DNS-SD scanner; the DUT is never commissioned and no
 PASE or CASE session is established. The test expects the DUT to be the only
 commissioner advertising on the test network.
 '''
-
-# Timeout for the subtype PTR browse; browses that get an answer end early via
-# MdnsDiscovery's discovery-silence monitor, so the full 5s is only paid when
-# the subtype is not advertised.
-SUBTYPE_BROWSE_TIMEOUT_SEC = 5
-
-# Overall deadline for the commissioner service to appear (see the browse retry
-# loop in _get_verify_commissioner_service). Sized for a real DUT bringing up its
-# advertisement after the instruction step; CI apps typically answer within the
-# first couple of attempts.
-COMMISSIONER_BROWSE_DEADLINE_SEC = 30
 
 
 class TC_SC_4_6(MatterBaseTest):
@@ -121,140 +102,6 @@ class TC_SC_4_6(MatterBaseTest):
     def desc_TC_SC_4_6(self) -> str:
         return "[TC-SC-4.6] Commissioner Discovery [DUT as Commissioner]"
 
-    async def _get_verify_commissioner_service(self):
-        # TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD.
-        #
-        # This absorbs two startup lags: in CI, a freshly started app takes a few
-        # seconds before it answers queries; against a real DUT, the advertisement
-        # may come up a few seconds after the operator confirms the instruction step.
-        deadline = time.monotonic() + COMMISSIONER_BROWSE_DEADLINE_SEC
-        while True:
-            services = await MdnsDiscovery().get_commissioner_services(log_output=True)
-            if services or time.monotonic() >= deadline:
-                break
-            log.info("No commissioner service discovered yet, retrying browse...")
-            await asyncio.sleep(2)
-
-        # Verify that there is one, and only one, commissioner service advertised
-        # (the DUT is expected to be the only commissioner on the test network)
-        asserts.assert_equal(len(services), 1,
-                             f"There must only be one commissioner service advertised, found {len(services)}.")
-        service = services[0]
-
-        # Verify that the DNS-SD instance name is a 64-bit ID expressed as a
-        # sixteen-char hex string with capital letters (the rule is shared with
-        # the commissionable instance name)
-        assert_valid_commissionable_instance_name(service.instance_name)
-
-        # Verify that the service type is '_matterd._udp' and service domain '.local'
-        assert_is_commissioner_type(service.service_type)
-
-        return service
-
-    async def _get_verify_srv_record(self, instance_name: str) -> str:
-        # TH performs a 'Commissioner Service' SRV record query against the instance name
-        srv_record = await MdnsDiscovery().get_srv_record(
-            service_name=f"{instance_name}.{MdnsServiceType.COMMISSIONER.value}",
-            service_type=MdnsServiceType.COMMISSIONER.value,
-            log_output=True
-        )
-
-        # Verify SRV record is returned
-        asserts.assert_true(srv_record is not None, "SRV record was not returned")
-
-        # Verify that the SRV record's instance name is equal to the browsed instance name
-        asserts.assert_equal(srv_record.instance_name, instance_name,
-                             "SRV record's instance name must be equal to the commissioner service instance name.")
-
-        # Verify that the target hostname is expressed as a twelve or sixteen
-        # capital letter hex string
-        assert_valid_hostname(srv_record.hostname)
-
-        return srv_record.hostname
-
-    async def _verify_txt_record_keys(self, instance_name: str) -> str | None:
-        # TH performs a 'Commissioner Service' TXT record query against the instance name
-        txt_record = await MdnsDiscovery().get_txt_record(
-            service_name=f"{instance_name}.{MdnsServiceType.COMMISSIONER.value}",
-            service_type=MdnsServiceType.COMMISSIONER.value,
-            log_output=True
-        )
-        # All commissioner TXT keys are optional, so the record itself may be absent;
-        # treat that as an empty key set.
-        txt = txt_record.txt if txt_record and txt_record.txt else {}
-
-        # *** VP KEY ***
-        # If the 'VP' key is present
-        if 'VP' in txt:
-            # Verify that it is non-empty
-            vp_key = txt['VP']
-            asserts.assert_true(vp_key, "'VP' key is present but has no value.")
-
-            # Verify that it contains at least Vendor ID, and if Product ID
-            # is present, both values must be separated by a + sign
-            assert_valid_vp_key(vp_key)
-
-        # *** DT KEY ***
-        # If the 'DT' key is present
-        if 'DT' in txt:
-            # Verify that it is non-empty
-            dt_key = txt['DT']
-            asserts.assert_true(dt_key, "'DT' key is present but has no value.")
-
-            # Verify that it contains the device type identifier encoded as a
-            # variable length decimal number in ASCII text without leading zeros
-            assert_valid_dt_key(dt_key)
-
-        # *** DN KEY ***
-        # If the 'DN' key is present
-        if 'DN' in txt:
-            # Verify that it is non-empty
-            dn_key = txt['DN']
-            asserts.assert_true(dn_key, "'DN' key is present but has no value.")
-
-            # Verify that it is a valid UTF-8 encoded string of maximum length of 32 bytes
-            assert_valid_dn_key(dn_key)
-
-        return txt.get('DT')
-
-    async def _verify_devtype_subtype(self, instance_name: str, dt_key: str) -> None:
-        # The 'Devtype Subtype' _T value is the DUT's device type. The DUT is not
-        # commissioned in this test, so the Descriptor cluster cannot be read; the
-        # advertised DT TXT key is the only available device type claim to verify
-        # the subtype against.
-
-        # Construct the 'Devtype Subtype' _T from the DUT's advertised device type
-        devtype_subtype = f"_T{int(dt_key)}._sub.{MdnsServiceType.COMMISSIONER.value}"
-
-        # TH performs a PTR record query against the 'Devtype Subtype'
-        ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[devtype_subtype],
-            discovery_timeout_sec=SUBTYPE_BROWSE_TIMEOUT_SEC,
-            log_output=True
-        )
-
-        # Verify that there is one, and only one, 'Devtype Subtype' PTR record
-        asserts.assert_equal(len(ptr_records), 1,
-                             f"There must only be one 'Devtype Subtype' ({devtype_subtype}) PTR record, found {len(ptr_records)}.")
-
-        # Verify that the 'Devtype Subtype' PTR record's instance name is
-        # equal to the commissioner service instance name
-        asserts.assert_equal(ptr_records[0].instance_name, instance_name,
-                             "'Devtype Subtype' PTR record's instance name must be equal to the commissioner service instance name.")
-
-    @staticmethod
-    async def _verify_aaaa_records(srv_hostname: str) -> None:
-        # TH performs a AAAA record query against the target 'hostname'
-        # listed in the 'Commissioner Service' SRV record
-        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_hostname, log_output=True)
-
-        # Verify that at least 1 AAAA record is returned for each IPv6 address
-        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_hostname}'")
-
-        # Verify that each AAAA record contains a valid IPv6 address
-        ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
-        assert_valid_ipv6_addresses(ipv6_addresses)
-
     @async_test_body
     async def test_TC_SC_4_6(self):
         # *** STEP 1 ***
@@ -269,31 +116,31 @@ class TC_SC_4_6(MatterBaseTest):
         # *** STEP 2 ***
         # TH browses for the 'Commissioner Service' (_matterd._udp) through DNS-SD
         self.step(2)
-        service = await self._get_verify_commissioner_service()
+        service = await get_verify_commissioner_service()
 
         # *** STEP 3 ***
         # TH performs a 'Commissioner Service' SRV record query against the instance name
         self.step(3)
-        srv_hostname = await self._get_verify_srv_record(service.instance_name)
+        srv_hostname = await get_verify_srv_record(service.instance_name, MdnsServiceType.COMMISSIONER.value)
 
         # *** STEP 4 ***
         # TH performs a 'Commissioner Service' TXT record query against the instance name
         self.step(4)
-        dt_key = await self._verify_txt_record_keys(service.instance_name)
+        dt_key = await verify_commissioner_txt_record_keys(service.instance_name)
 
         # *** STEP 5 ***
         # If the DT key is present, TH performs a PTR record query against the
         # 'Devtype Subtype' (_T<ddd>) constructed from the DT key
         if dt_key is not None:
             self.step(5)
-            await self._verify_devtype_subtype(service.instance_name, dt_key)
+            await verify_devtype_subtype(service.instance_name, dt_key, MdnsServiceType.COMMISSIONER.value)
         else:
             self.skip_step(5)
 
         # *** STEP 6 ***
         # TH performs a AAAA record query against the target hostname listed in the SRV record
         self.step(6)
-        await self._verify_aaaa_records(srv_hostname)
+        await verify_aaaa_records(srv_hostname)
 
 
 if __name__ == "__main__":
