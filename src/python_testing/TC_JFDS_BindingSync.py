@@ -48,7 +48,7 @@ from matter.clusters.Types import NullValue
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ log = logging.getLogger(__name__)
 JFDS = Clusters.JointFabricDatastore
 
 
-class TC_JFDS_BindingSync(MatterBaseTest):
+class TC_JFDS_BindingSync(MatterTestCommissioner):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
