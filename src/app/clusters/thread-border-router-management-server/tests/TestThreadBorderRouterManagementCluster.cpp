@@ -73,6 +73,12 @@ public:
     void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
                           ActivateDatasetCallback * callback) override
     {
+        if (mDeferActivation)
+        {
+            mPendingCallback = callback;
+            mPendingSequence = sequenceNum;
+            return;
+        }
         if (callback != nullptr)
         {
             callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
@@ -86,6 +92,12 @@ public:
     CHIP_ERROR RevertActiveDataset() override
     {
         mRevertCalled = true;
+        if (mCompleteOnRevert && mPendingCallback != nullptr)
+        {
+            auto * callback  = mPendingCallback;
+            mPendingCallback = nullptr;
+            callback->OnActivateDatasetComplete(mPendingSequence, CHIP_ERROR_CANCELLED);
+        }
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override { return CHIP_NO_ERROR; }
@@ -93,6 +105,13 @@ public:
     bool mRevertCalled             = false;
     bool mReturnNotFoundForDataset = false;
     bool mCommitCalled             = false;
+
+    // When set, SetActiveDataset keeps the callback instead of completing right away.
+    bool mDeferActivation = false;
+    // When set, RevertActiveDataset completes the kept callback with CHIP_ERROR_CANCELLED.
+    bool mCompleteOnRevert                     = false;
+    ActivateDatasetCallback * mPendingCallback = nullptr;
+    uint32_t mPendingSequence                  = 0;
 };
 
 class MockBreadcrumbTracker : public BreadCrumbTracker
@@ -368,6 +387,36 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeTimerExpired)
     cluster.OnPlatformEventHandler(&event, reinterpret_cast<intptr_t>(&cluster));
 
     EXPECT_TRUE(delegate.mRevertCalled);
+}
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeExpiryRespondsTimeoutWhenDelegateCompletesInRevert)
+{
+    delegate.mReturnNotFoundForDataset = true;
+    delegate.mDeferActivation          = true;
+    delegate.mCompleteOnRevert         = true;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestFabricIndex, System::Clock::Seconds16(kTestFailSafeTimeout)), CHIP_NO_ERROR);
+
+    Commands::SetActiveDatasetRequest::Type request;
+    request.activeDataset = ByteSpan();
+    request.breadcrumb.SetValue(42);
+
+    // The delegate defers completion, so Invoke() has no status yet. ClusterTester reports that as an
+    // error; the response is checked below after the fail-safe expires.
+    (void) tester.Invoke(request);
+    ASSERT_NE(delegate.mPendingCallback, nullptr);
+
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
+    ThreadBorderRouterManagementCluster::OnPlatformEventHandler(&event, reinterpret_cast<intptr_t>(&cluster));
+
+    // The delegate reported CANCELLED from RevertActiveDataset. The cluster must ignore it and answer Timeout.
+    const auto & statuses = tester.GetCommandHandler().GetStatuses();
+    ASSERT_EQ(statuses.size(), 1u);
+    EXPECT_EQ(statuses[0].status, Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Timeout));
+    EXPECT_FALSE(breadcrumbTracker.mCalled);
 }
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestBreadcrumbHandling)
