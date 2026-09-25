@@ -56,6 +56,9 @@ declare_args() {
   # Enable or disable support for C++ exceptions.
   enable_exceptions = false
 
+  # Enable identical code folding (--icf=all) in release builds.
+  enable_icf = false
+
   # Disable this to allow for overriding built-in defines, such as __FILE__.
   warn_builtin_macro_redefined = true
 }
@@ -741,5 +744,15 @@ config("link_as_needed") {
 config("arc_default") {
   if (current_os == "mac" || current_os == "ios") {
     cflags = [ "-fobjc-arc" ]
+  }
+}
+
+config("icf_default") {
+  if (enable_icf && !is_debug && is_clang) {
+    if (current_os == "android") {
+      ldflags = [ "-Wl,--icf=safe" ]
+    } else if (current_os == "linux") {
+      ldflags = [ "-Wl,--icf=all" ]
+    }
   }
 }
