@@ -39,12 +39,13 @@ source_set("dimmable-load") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingDimmableLoad.cpp",
-    "impl/LoggingDimmableLoad.h",
+    "impl/LoggingDimmableDelegate.cpp",
+    "impl/LoggingDimmableDelegate.h",
   ]
 
   public_deps = [
     ":dimmable-load",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load:logging",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/level-control",
     "${chip_root}/src/app/clusters/on-off-server",
