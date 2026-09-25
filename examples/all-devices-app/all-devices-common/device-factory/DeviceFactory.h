@@ -41,6 +41,7 @@
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
@@ -746,6 +747,13 @@ private:
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<WaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
+        {
+            RegisterCreator("humidity-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)

@@ -65,6 +65,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
@@ -185,6 +187,7 @@ foreach(_key
         fan
         flow-sensor
         generic-switch
+        humidity-conditioner
         humidity-sensor
         laundry-dryer
         laundry-washer
