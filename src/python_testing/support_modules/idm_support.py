@@ -23,6 +23,7 @@ import contextlib
 import copy
 import inspect
 import logging
+import queue
 import time
 from dataclasses import dataclass
 from typing import Any, get_args
@@ -32,14 +33,15 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Attribute import (AttributePath, EventReadResult, EventTimestampType, SubscriptionTransaction,
+                                       TypedAttributePath, ValueDecodeFailure)
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conformance import is_disallowed
-from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler, WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
@@ -129,6 +131,19 @@ class ChangedAttribute:
     attribute: Any
     old_value: Any
     new_value: Any
+
+
+@dataclass(frozen=True)
+class EventSubscribePath:
+    """One EventRequests shape used by the TC-IDM-6.2 subscribe steps.
+
+    `events` is passed straight to ChipDeviceController.ReadEvent.
+    `specific_event` is true when the path names one event id.
+    `endpoint` is set when the path names one endpoint; None is an endpoint wildcard.
+    """
+    events: list
+    specific_event: bool
+    endpoint: int | None
 
 
 # Clusters whose commands must never be auto-invoked by IDM constraint fuzzing.
@@ -2153,3 +2168,291 @@ class IDMBaseTest(BasicCompositionTests):
                             test_step, attr.__name__, ep, old_value, resp[0].Status)
 
         return verified_count
+
+    # ========================================================================
+    # Event Subscription Helpers
+    # ========================================================================
+
+    def wildcard_event_paths(self, endpoint: int, cluster, event) -> list[EventSubscribePath]:
+        """Return the six EventRequests shapes from TC-IDM-6.2 steps 1-6, in order."""
+        return [
+            EventSubscribePath(events=[(endpoint, event, False)], specific_event=True, endpoint=endpoint),
+            EventSubscribePath(events=[(endpoint, cluster, False)], specific_event=False, endpoint=endpoint),
+            EventSubscribePath(events=[endpoint], specific_event=False, endpoint=endpoint),
+            EventSubscribePath(events=[event], specific_event=True, endpoint=None),
+            EventSubscribePath(events=[cluster], specific_event=False, endpoint=None),
+            EventSubscribePath(events=['*'], specific_event=False, endpoint=None),
+        ]
+
+    def negotiated_max_interval_sec(self, sub: SubscriptionTransaction) -> int:
+        """MaxInterval the DUT agreed to for this subscription, in seconds."""
+        _min_interval, max_interval = sub.GetReportingIntervalsSeconds()
+        return max_interval
+
+    async def emit_access_control_entry_changed(self, ctrl: ChipDeviceCtrl, ep: int = ROOT_NODE_ENDPOINT_ID) -> None:
+        """Rewrite the ACL and restore it so the DUT emits AccessControlEntryChanged.
+
+        Writing the list back unchanged does not change the attribute, so an extra
+        view entry is added and then removed.
+        """
+        original = await self.get_dut_acl(ctrl, ep)
+        extra = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[ctrl.nodeId],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
+        )
+        updated = copy.deepcopy(original)
+        updated.append(extra)
+        await self.write_dut_acl(ctrl, updated, ep)
+        await self.write_dut_acl(ctrl, original, ep)
+
+    def successful_event_reports(self, events, event=None) -> list[EventReadResult]:
+        """Return event data records, optionally limited to one event id."""
+        matched = []
+        for report in events:
+            if report.Status != Status.Success or report.Header is None:
+                continue
+            if event is not None and (report.Header.ClusterId != event.cluster_id or report.Header.EventId != event.event_id):
+                continue
+            matched.append(report)
+        return matched
+
+    def assert_event_status(self, events, status: Status, expected_count: int = 1) -> None:
+        """Require `expected_count` EventStatusIB entries with `status`."""
+        actual = len([report for report in events if report.Status == status])
+        asserts.assert_equal(actual, expected_count, f"Expected {expected_count} EventStatusIB {status}, found {actual}")
+
+    def verify_event_subscription(self, sub: SubscriptionTransaction, path: EventSubscribePath, event, cluster) -> None:
+        """Check the priming report for a TC-IDM-6.2 EventRequests shape.
+
+        SubscriptionId must be a uint32 and the report must include `event`.
+        A specific-event path must not include any other event. An endpoint-specific
+        path must not include events from any other endpoint.
+        """
+        asserts.assert_true(self.is_valid_uint32_value(sub.subscriptionId),
+                            f"SubscriptionId {sub.subscriptionId} is not a uint32")
+        reports = self.successful_event_reports(sub.GetEvents())
+        asserts.assert_true(reports, "Priming report did not include any event data")
+        matched = [
+            report for report in reports
+            if report.Header.ClusterId == cluster.id and report.Header.EventId == event.event_id
+        ]
+        asserts.assert_true(matched, f"Priming report did not include {event.__name__}")
+        if path.specific_event:
+            others = [
+                report for report in reports
+                if report.Header.ClusterId != cluster.id or report.Header.EventId != event.event_id
+            ]
+            asserts.assert_equal(others, [], "Specific event path returned a different event")
+        if path.endpoint is not None:
+            off_endpoint = [report for report in reports if report.Header.EndpointId != path.endpoint]
+            asserts.assert_equal(off_endpoint, [], f"Priming report included events outside endpoint {path.endpoint}")
+
+    async def subscribe_event_path(self, ctrl: ChipDeviceCtrl, path: EventSubscribePath, event, cluster,
+                                   seen_ids: set[int]) -> None:
+        """Subscribe to one TC-IDM-6.2 path shape and record its SubscriptionId."""
+        async with self.event_subscription(
+            ctrl,
+            path.events,
+            cluster=cluster,
+            event=event,
+            min_interval_sec=0,
+            max_interval_sec=3,
+        ) as (_handler, sub):
+            self.verify_event_subscription(sub, path, event, cluster)
+            asserts.assert_not_in(sub.subscriptionId, seen_ids, f"SubscriptionId 0x{sub.subscriptionId:08x} was reused")
+            seen_ids.add(sub.subscriptionId)
+            log.info("Event subscription 0x%08x established", sub.subscriptionId)
+
+    async def read_event_numbers(self, ctrl: ChipDeviceCtrl, endpoint: int, event) -> list[int]:
+        """Read `event` and return its event numbers in ascending order."""
+        events = await ctrl.ReadEvent(
+            nodeId=self.dut_node_id,
+            events=[(endpoint, event, False)],
+            fabricFiltered=False,
+        )
+        return sorted(report.Header.EventNumber for report in self.successful_event_reports(events, event))
+
+    async def read_events_since(self, ctrl: ChipDeviceCtrl, event_number_filter: int) -> list[EventReadResult]:
+        """Read every event at or after event_number_filter, on any cluster."""
+        events = await ctrl.ReadEvent(
+            nodeId=self.dut_node_id,
+            events=['*'],
+            eventNumberFilter=event_number_filter,
+            fabricFiltered=False,
+        )
+        return self.successful_event_reports(events)
+
+    async def verify_node_event_numbers(self, ctrl: ChipDeviceCtrl, subscribed: list[EventReadResult]) -> list[EventReadResult]:
+        """Check event numbers increase by 1 across every cluster.
+
+        A subscription filtered to one event hides numbers used by other clusters,
+        so a gap there is not a DUT failure. Re-read from the smallest subscribed
+        number with a wildcard path and check that sequence.
+        """
+        numbers = [report.Header.EventNumber for report in subscribed]
+        logged = await self.read_events_since(ctrl, min(numbers))
+        self.verify_monotonic_event_records(logged)
+        return logged
+
+    async def start_event_subscription(
+        self,
+        ctrl: ChipDeviceCtrl,
+        events: list,
+        *,
+        cluster=None,
+        event=None,
+        min_interval_sec: int = 0,
+        max_interval_sec: int = 5,
+        keep_subscriptions: bool = False,
+        event_number_filter: int | None = None,
+    ) -> tuple[EventSubscriptionHandler, SubscriptionTransaction]:
+        """Subscribe to `events` and queue later reports on an EventSubscriptionHandler.
+
+        EventSubscriptionHandler.start() only covers one cluster on one endpoint
+        and always sets IsUrgent. The handler is attached after ReadEvent so
+        wildcard, urgent and EventMin paths share the same queue and cancel().
+        """
+        if event is not None:
+            handler = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        else:
+            handler = EventSubscriptionHandler(expected_cluster=cluster)
+        sub = await ctrl.ReadEvent(
+            nodeId=self.dut_node_id,
+            events=events,
+            eventNumberFilter=event_number_filter,
+            fabricFiltered=False,
+            reportInterval=(min_interval_sec, max_interval_sec),
+            keepSubscriptions=keep_subscriptions,
+            autoResubscribe=False,
+        )
+        sub.SetEventUpdateCallback(handler)
+        handler._subscription = sub
+        return handler, sub
+
+    @contextlib.asynccontextmanager
+    async def event_subscription(self, ctrl: ChipDeviceCtrl, events: list, **kwargs):
+        """start_event_subscription() plus cancel() when the block exits."""
+        handler, sub = await self.start_event_subscription(ctrl, events, **kwargs)
+        try:
+            yield handler, sub
+        finally:
+            handler.cancel()
+
+    def take_event_reports(self, handler: EventSubscriptionHandler, timeout_sec: float, minimum: int) -> tuple[list[EventReadResult], float]:
+        """Block until `minimum` queued event reports arrive. Returns them and the time of the first.
+
+        After the minimum is met, keep pulling until the queue stays empty so a
+        burst split across two ReportData messages is collected together.
+        """
+        reports: list[EventReadResult] = []
+        first_at = 0.0
+        deadline = time.time() + timeout_sec
+        while True:
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                break
+            wait = remaining if len(reports) < minimum else min(0.5, remaining)
+            try:
+                reports.append(handler.get_event_from_queue(block=True, timeout=wait))
+            except queue.Empty:
+                if len(reports) >= minimum:
+                    break
+                continue
+            if len(reports) == 1:
+                first_at = time.time()
+        asserts.assert_greater_equal(len(reports), minimum,
+                                     f"Expected at least {minimum} event report(s), got {len(reports)}")
+        return reports, first_at
+
+    async def assert_reports_held_for_min_interval(
+        self,
+        handler: EventSubscriptionHandler,
+        sub_time: float,
+        min_interval_sec: int,
+        timeout_sec: float,
+        minimum_events: int,
+        slack_sec: float = 1.0,
+    ) -> tuple[list[EventReadResult], float]:
+        """Fail if a report arrives before MinInterval, then collect the reports that follow.
+
+        The publisher starts MinInterval when it sends the priming report, which
+        is before ReadEvent returns. slack_sec covers that gap.
+        """
+        hold_until = sub_time + min_interval_sec - slack_sec
+        while time.time() < hold_until:
+            asserts.assert_equal(handler.get_size(), 0, "Event report arrived before MinInterval expired")
+            await asyncio.sleep(0.05)
+        remaining = timeout_sec - (time.time() - sub_time)
+        return self.take_event_reports(handler, timeout_sec=max(0.1, remaining), minimum=minimum_events)
+
+    def collect_event_reports(
+        self,
+        handler: EventSubscriptionHandler,
+        sub: SubscriptionTransaction,
+        mrp_timeout_sec: float,
+        minimum: int,
+    ) -> list[EventReadResult]:
+        """Wait for queued reports until the DUT's MaxInterval plus one MRP timeout."""
+        timeout_sec = self.negotiated_max_interval_sec(sub) + mrp_timeout_sec + 1
+        reports, _first_at = self.take_event_reports(handler, timeout_sec, minimum)
+        return reports
+
+    async def await_reports_held_until_min_interval(
+        self,
+        handler: EventSubscriptionHandler,
+        sub: SubscriptionTransaction,
+        started_at: float,
+        mrp_timeout_sec: float,
+        *,
+        min_interval_sec: int,
+        minimum_events: int = 1,
+        arrival_limit_sec: float | None = None,
+    ) -> list[EventReadResult]:
+        """The trigger must finish before MinInterval, and the first report must wait out that floor.
+
+        arrival_limit_sec defaults to the DUT's MaxInterval plus one MRP timeout.
+        Pass a lower limit when the report has to beat MaxInterval, as with IsUrgent.
+        """
+        asserts.assert_less(
+            time.time() - started_at, min_interval_sec,
+            "Event was not triggered before MinInterval")
+        max_interval = self.negotiated_max_interval_sec(sub)
+        if arrival_limit_sec is None:
+            arrival_limit_sec = max_interval + mrp_timeout_sec
+        reports, first_at = await self.assert_reports_held_for_min_interval(
+            handler,
+            started_at,
+            min_interval_sec,
+            max_interval + mrp_timeout_sec + 1,
+            minimum_events,
+        )
+        elapsed = first_at - started_at
+        asserts.assert_less(
+            elapsed, arrival_limit_sec,
+            f"First event report took {elapsed:.2f}s, past the {arrival_limit_sec:.2f}s limit")
+        return reports
+
+    def verify_monotonic_event_records(self, events: list[EventReadResult]) -> None:
+        """Event numbers increase by 1. Each record carries a System or Epoch timestamp.
+
+        ReadClient adds a delta timestamp onto the previous absolute timestamp
+        before the report reaches this test, so every record observed here is
+        System or Epoch, including records after the first in a report.
+        """
+        asserts.assert_greater(len(events), 1, "Need more than one event to check EventNumber monotonicity")
+        ordered = sorted(events, key=lambda report: report.Header.EventNumber)
+        for report in ordered:
+            asserts.assert_is_not_none(report.Header.Timestamp, "Event record has no timestamp")
+            asserts.assert_in(
+                report.Header.TimestampType,
+                (EventTimestampType.SYSTEM, EventTimestampType.EPOCH),
+                f"Event {report.Header.EventNumber} timestamp is not System or Epoch",
+            )
+        for prev, curr in zip(ordered, ordered[1:]):
+            asserts.assert_equal(
+                curr.Header.EventNumber,
+                prev.Header.EventNumber + 1,
+                f"EventNumber {curr.Header.EventNumber} is not one greater than {prev.Header.EventNumber}",
+            )
