@@ -59,7 +59,6 @@ jobs:
                         - 'third_party/mbedtls/**'
                         - '.github/workflows/unit_integration_test.yaml'
             - name: Checkout submodules & Bootstrap
-              id: bootstrap
               if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -72,10 +71,7 @@ jobs:
                     "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build" \
                     && rm -rf out/linux-x64-tests-psa-asan-clang
             - name: Build and run mbedTLS unit tests (ASan)
-              # Runs even if the PSA step failed, but not if bootstrap failed.
-              if: >
-                !cancelled() && steps.bootstrap.outcome == 'success' &&
-                (github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true')
+              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \

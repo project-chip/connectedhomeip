@@ -111,5 +111,5 @@ unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build an
 unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run mbedTLS unit tests (ASan)
   on:     push[master,v*-branch], pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
-  if:     !cancelled() && steps.bootstrap.outcome == 'success' && (github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true')
+  if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
   targets: linux-x64-tests-mbedtls-asan-clang
