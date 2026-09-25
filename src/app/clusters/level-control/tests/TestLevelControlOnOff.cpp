@@ -296,6 +296,86 @@ TEST_F(TestLevelControlOnOff, TestMoveDownIsGatedWhileOff)
     EXPECT_EQ(readLevel.Value(), 100u);
 }
 
+// Spec 1.6.6.9 gates only Move, MoveToLevel, Step and Stop. StopWithOnOff is not on that list, so
+// it must terminate an in-flight transition even while the device is off with ExecuteIfOff clear.
+TEST_F(TestLevelControlOnOff, TestStopWithOnOffTerminatesTransitionWhileOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    // Start a transition that runs while off by overriding ExecuteIfOff on the Move itself. The
+    // plain Move leaves OnOff untouched, so the device stays off while the transition runs.
+    Commands::Move::Type move;
+    move.moveMode = MoveModeEnum::kUp;
+    move.rate.SetNonNull(10);
+    move.optionsMask.Set(OptionsBitmap::kExecuteIfOff);
+    move.optionsOverride.Set(OptionsBitmap::kExecuteIfOff);
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, move).IsSuccess());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+
+    // StopWithOnOff with ExecuteIfOff left clear must still stop the transition.
+    Commands::StopWithOnOff::Type stop;
+    stop.optionsMask.ClearAll();
+    stop.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::StopWithOnOff::Id, stop).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+}
+
+// The counterpart of the test above: the plain Stop command is on the gated list, so it leaves the
+// transition running while the device is off with ExecuteIfOff clear.
+TEST_F(TestLevelControlOnOff, TestStopIsGatedWhileOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    Commands::Move::Type move;
+    move.moveMode = MoveModeEnum::kUp;
+    move.rate.SetNonNull(10);
+    move.optionsMask.Set(OptionsBitmap::kExecuteIfOff);
+    move.optionsOverride.Set(OptionsBitmap::kExecuteIfOff);
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, move).IsSuccess());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+
+    Commands::Stop::Type stop;
+    stop.optionsMask.ClearAll();
+    stop.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stop).IsSuccess());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+}
+
 TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };

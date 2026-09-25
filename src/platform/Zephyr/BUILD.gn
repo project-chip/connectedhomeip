@@ -67,9 +67,35 @@ static_library("Zephyr") {
     ]
     deps += [ "${chip_root}/src/app:app_config" ]
 
-    if (chip_mdns == "platform") {
+    if (chip_openthread_border_router) {
       sources += [
-        "../OpenThread/DnssdImpl.cpp",
+        "../../app/clusters/thread-border-router-management-server/ThreadBorderRouterManagementDelegate.h",
+        "../../app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+        "../OpenThread/GenericThreadBorderRouterDelegate.cpp",
+        "../OpenThread/GenericThreadBorderRouterDelegate.h",
+      ]
+    }
+
+    if (chip_mdns == "platform") {
+      if (chip_openthread_border_router) {
+        # Border Router build: compile both DNS-SD backends and dispatch at
+        # runtime in DnssdImplBr.cpp. The OpenThread mDNS module backend
+        # (OpenThreadBrDnssdImpl.cpp) advertises services on the backbone
+        # interface, while the SRP-client backend (OpenThreadDnssdImpl.cpp)
+        # registers services with the Thread SRP server. Compiling both keeps
+        # the SRP client initialized on border router builds.
+        sources += [
+          "../OpenThread/DnssdImplBr.cpp",
+          "../OpenThread/OpenThreadBrDnssdImpl.cpp",
+          "../OpenThread/OpenThreadBrDnssdImpl.h",
+        ]
+      } else {
+        # Thread-only build: use the SRP-client backed DNS-SD platform layer.
+        sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      }
+
+      # SRP-client backend, required by both configurations.
+      sources += [
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
       ]
