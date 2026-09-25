@@ -140,6 +140,28 @@
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 /**
+ *  @def INET_CONFIG_ENABLE_UDP_ERRQUEUE
+ *
+ *  @brief
+ *    Defines whether (1) or not (0) a UDP endpoint can learn that a peer's port
+ *    is unreachable from the socket error queue.
+ *
+ *  Linux only: it needs IPV6_RECVERR plus the sock_extended_err layout from
+ *  <linux/errqueue.h>. Deliberately keyed on __linux__ alone and not on
+ *  IPV6_RECVERR, so that it cannot depend on whether a system header happens to
+ *  have been included yet -- the implementation and its test must agree on this,
+ *  and a condition that silently evaluates to 0 disables the feature while every
+ *  build stays green.
+ */
+#ifndef INET_CONFIG_ENABLE_UDP_ERRQUEUE
+#if defined(__linux__)
+#define INET_CONFIG_ENABLE_UDP_ERRQUEUE                     1
+#else
+#define INET_CONFIG_ENABLE_UDP_ERRQUEUE                     0
+#endif
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE
+
+/**
  *  @def INET_CONFIG_ENABLE_UDP_ENDPOINT
  *
  *  @brief

@@ -500,3 +500,170 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     ShutdownSystemLayer();
 }
 #endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+#if INET_CONFIG_ENABLE_UDP_ERRQUEUE && INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+#include <unistd.h>
+
+namespace {
+
+struct PeerUnreachableProbe
+{
+    bool fired     = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    IPAddress peerAddr;
+    uint16_t peerPort = 0;
+};
+
+void HandlePeerUnreachable(UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+{
+    auto * probe = static_cast<PeerUnreachableProbe *>(endPoint->mAppState);
+    ASSERT_NE(probe, nullptr);
+    probe->fired = true;
+    probe->err   = err;
+    if (pktInfo != nullptr)
+    {
+        probe->peerAddr = pktInfo->DestAddress;
+        probe->peerPort = pktInfo->DestPort;
+    }
+}
+
+void HandleDatagram(UDPEndPoint * endPoint, PacketBufferHandle && msg, const IPPacketInfo * pktInfo)
+{
+    *static_cast<bool *>(endPoint->mAppState) = true;
+}
+
+} // namespace
+
+// Exercises the real kernel error queue end to end: send to a closed loopback port and let the
+// resulting ICMPv6 port-unreachable come back through IPV6_RECVERR and DrainErrorQueue. Nothing
+// here is synthesized, so it is the only coverage that the setsockopt, the cmsg walk and the
+// msg_name-derived peer agree with what Linux actually delivers.
+TEST_F(TestInetEndPoint, TestUdpPeerPortUnreachable)
+{
+    // Whether the layer is still up depends on whether TestInetEndPointLimit above was compiled
+    // in, so do not assume either way. Teardown is left to TearDownTestSuite, but every endpoint
+    // must be released before then: ShutdownNetwork asserts on a surviving one.
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+
+    // Bind an ephemeral port and drop it: that port is then almost certainly not listening.
+    uint16_t closedPort = 0;
+    {
+        UDPEndPointHandle scratch;
+        ASSERT_EQ(gUDP.NewEndPoint(scratch), CHIP_NO_ERROR);
+        ASSERT_EQ(scratch->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+        closedPort = scratch->GetBoundPort();
+        scratch->Close();
+        scratch.Release();
+    }
+    ASSERT_NE(closedPort, 0);
+
+    PeerUnreachableProbe probe;
+    UDPEndPointHandle ep;
+    ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Listen(nullptr /*OnMessageReceived*/, HandlePeerUnreachable, &probe), CHIP_NO_ERROR);
+
+    PacketBufferHandle buf = PacketBufferHandle::NewWithData("unreachable", 11);
+    ASSERT_FALSE(buf.IsNull());
+
+    IPPacketInfo pktInfo;
+    pktInfo.Clear();
+    pktInfo.DestAddress = loopback;
+    pktInfo.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&pktInfo, std::move(buf)), CHIP_NO_ERROR);
+
+    int passes                           = 0;
+    const System::Clock::Timestamp start = System::SystemClock().GetMonotonicTimestamp();
+    for (; passes < 50 && !probe.fired; passes++)
+    {
+        ServiceEvents(10);
+    }
+    const System::Clock::Timestamp elapsed = System::SystemClock().GetMonotonicTimestamp() - start;
+
+    // Reported on failure because the two ways this can fail look identical otherwise: a fast spin
+    // means the descriptor stayed error-readable without the queue being consumed, whereas passes
+    // that actually waited mean the kernel never queued an error to begin with.
+    EXPECT_TRUE(probe.fired) << "no ICMPv6 error surfaced after " << passes << " event-loop passes in " << elapsed.count() << "ms";
+    EXPECT_EQ(probe.err, CHIP_ERROR_PEER_PORT_UNREACHABLE);
+    EXPECT_EQ(probe.peerPort, closedPort);
+    EXPECT_TRUE(probe.peerAddr == loopback);
+
+    ep->Close();
+    ep.Release();
+}
+
+// IPV6_RECVERR also makes Linux fail the socket's next send, to any destination, with the pending
+// error. An endpoint serves many peers (and minimal-mDNS answers many queriers), so one peer's
+// closed port must not cost a datagram to another. Deliberately no event servicing between the two
+// sends: that is the window in which the error has not been drained yet.
+TEST_F(TestInetEndPoint, TestUdpSendSurvivesPendingPortUnreachable)
+{
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+
+    uint16_t closedPort = 0;
+    {
+        UDPEndPointHandle scratch;
+        ASSERT_EQ(gUDP.NewEndPoint(scratch), CHIP_NO_ERROR);
+        ASSERT_EQ(scratch->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+        closedPort = scratch->GetBoundPort();
+        scratch->Close();
+        scratch.Release();
+    }
+    ASSERT_NE(closedPort, 0);
+
+    bool received = false;
+    UDPEndPointHandle live;
+    ASSERT_EQ(gUDP.NewEndPoint(live), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Listen(HandleDatagram, nullptr /*OnReceiveError*/, &received), CHIP_NO_ERROR);
+
+    PeerUnreachableProbe probe;
+    UDPEndPointHandle ep;
+    ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Listen(nullptr /*OnMessageReceived*/, HandlePeerUnreachable, &probe), CHIP_NO_ERROR);
+
+    IPPacketInfo toClosed;
+    toClosed.Clear();
+    toClosed.DestAddress = loopback;
+    toClosed.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&toClosed, PacketBufferHandle::NewWithData("gone", 4)), CHIP_NO_ERROR);
+    usleep(20000);
+
+    IPPacketInfo toLive;
+    toLive.Clear();
+    toLive.DestAddress = loopback;
+    toLive.DestPort    = live->GetBoundPort();
+    EXPECT_EQ(ep->SendMsg(&toLive, PacketBufferHandle::NewWithData("alive", 5)), CHIP_NO_ERROR);
+
+    for (int i = 0; i < 50 && !(received && probe.fired); i++)
+    {
+        ServiceEvents(10);
+    }
+    EXPECT_TRUE(received);
+    // The report the failed send consumed is still delivered.
+    EXPECT_TRUE(probe.fired);
+    EXPECT_EQ(probe.peerPort, closedPort);
+
+    ep->Close();
+    ep.Release();
+    live->Close();
+    live.Release();
+}
+
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE && INET_CONFIG_ENABLE_UDP_ENDPOINT

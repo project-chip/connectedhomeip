@@ -407,6 +407,12 @@ public:
     void MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
 
     /**
+     * Mark active CASE sessions to @p peer defunct after its transport endpoint reported itself
+     * unreachable. Skips PASE, and sessions with nothing recently in flight. Idempotent.
+     */
+    void HandleConnectionExpired(const Transport::PeerAddress & peer);
+
+    /**
      * @brief
      *   Update all CASE sessions that match `node` with the provided transport peer address.
      *
@@ -472,6 +478,9 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * ctxt = nullptr) override;
+
+    /// TransportMgrDelegate: forwards to HandleConnectionExpired.
+    void OnConnectionExpired(const Transport::PeerAddress & peer) override;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,

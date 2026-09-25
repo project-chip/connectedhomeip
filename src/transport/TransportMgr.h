@@ -58,6 +58,9 @@ public:
     virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                                    Transport::MessageTransportContext * ctxt = nullptr) = 0;
 
+    /// A peer's transport endpoint reported itself unreachable. Default: no-op.
+    virtual void OnConnectionExpired(const Transport::PeerAddress & peer) {}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      * @brief

@@ -508,7 +508,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         SecureSession * secure = sessionHandle->AsSecureSession();
 
         // This marks any connection where we send data to as 'active'
-        secure->MarkActive();
+        secure->MarkActiveTx();
 
         destination = &secure->GetPeerAddress();
     }
@@ -659,6 +659,41 @@ void SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
     });
 }
 
+void SessionManager::HandleConnectionExpired(const Transport::PeerAddress & peer)
+{
+    const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+
+    mSecureSessions.ForEachSession([&peer, now](auto session) {
+        // PASE cannot re-establish itself, so an unauthenticated error must not abort commissioning.
+        if (!session->IsActiveSession() || !session->IsCASESession())
+        {
+            return Loop::Continue;
+        }
+
+        // Address and port only: PeerAddress equality includes the interface, which a link-local
+        // session carries and an ICMPv6-derived address does not.
+        const Transport::PeerAddress & sessionPeer = session->GetPeerAddress();
+        if (sessionPeer.GetTransportType() != peer.GetTransportType() || sessionPeer.GetIPAddress() != peer.GetIPAddress() ||
+            sessionPeer.GetPort() != peer.GetPort())
+        {
+            return Loop::Continue;
+        }
+
+        // ICMPv6 is unauthenticated and the embedded destination is the sender's choice, so act only
+        // where the error can be answering traffic of ours. A session that has never transmitted is
+        // excluded outright: the monotonic clock is time since boot, so early in uptime a zero
+        // timestamp would otherwise fall inside the window.
+        if (session->GetLastTxTime() == System::Clock::kZero || now - session->GetLastTxTime() > session->GetMRPBaseTimeout())
+        {
+            return Loop::Continue;
+        }
+
+        ChipLogProgress(Inet, "Session %u peer reported its port unreachable; marking defunct", session->GetLocalSessionId());
+        session->MarkPeerUnreachable();
+        return Loop::Continue;
+    });
+}
+
 void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
 {
     mSecureSessions.ForEachSession([&node, &addr](auto session) {
@@ -719,6 +754,11 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
+}
+
+void SessionManager::OnConnectionExpired(const Transport::PeerAddress & peer)
+{
+    HandleConnectionExpired(peer);
 }
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg,
