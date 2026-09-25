@@ -62,6 +62,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'fan',
     'flow-sensor',
     'generic-switch',
+    'humidity-conditioner',
     'humidity-sensor',
     'laundry-dryer',
     'laundry-washer',
