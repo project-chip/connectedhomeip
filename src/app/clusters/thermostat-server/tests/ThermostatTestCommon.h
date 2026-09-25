@@ -123,6 +123,8 @@ public:
         return mSetRemoteSensingStatus;
     }
 
+    SetpointChangeSourceEnum GetSetpointChangeSource() override { return mSetpointChangeSource; }
+
     FabricTable * mFabricTable                                               = nullptr;
     DataModel::Nullable<temperature> mLocalTemperature                       = 2000;
     DataModel::Nullable<temperature> mOutdoorTemperature                     = 1500;
@@ -132,6 +134,7 @@ public:
     BitMask<RelayStateBitmap> mRunningState                                  = 0;
     int8_t mCalibration                                                      = 0;
     BitMask<RemoteSensingBitmap> mRemoteSensing                              = 0;
+    SetpointChangeSourceEnum mSetpointChangeSource                           = SetpointChangeSourceEnum::kManual;
     Protocols::InteractionModel::Status mSetLocalTemperatureStatus           = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mGetOutdoorTemperatureStatus         = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mSetSystemModeStatus                 = Protocols::InteractionModel::Status::Success;

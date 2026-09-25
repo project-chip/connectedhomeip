@@ -16,8 +16,10 @@ details.
     -   [Building](#building)
     -   [Commandline Arguments](#commandline-arguments)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Presets](#presets)
-    -   [ThermostatSuggestions](#thermostatsuggestions)
+    -   [Features](#features)
+        -   [Presets](#presets)
+        -   [SetpointChange Tracking](#setpointchange-tracking)
+        -   [ThermostatSuggestions](#thermostatsuggestions)
 
 <hr>
 
@@ -109,9 +111,11 @@ details.
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
 
-## Presets
+## Features
 
-### Read presets
+### Presets
+
+#### Read presets
 
 ```shell
 chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
@@ -136,7 +140,7 @@ chip-tool-x86-64 thermostat read presets <nodeID> 1 | grep TOO
 [1758985235.351] [4022:4024] [TOO]      }
 ```
 
-### Write presets
+#### Write presets
 
 Write the 3-presets value using the atomic-request:
 
@@ -176,7 +180,7 @@ chip-tool-x86-64 thermostat write presets '[ { "presetHandle": "01", "presetScen
 chip-tool-x86-64 thermostat atomic-request 1 '[80]' <nodeID> 1
 ```
 
-### Set active preset
+#### Set active preset
 
 Select PresetHandle `02`:
 
@@ -187,7 +191,7 @@ chip-tool-x86-64 thermostat set-active-preset-request hex:02 <nodeID> 1 | grep T
 [1758995148.195] [4607:4609] [TOO] Sending cluster (0x00000201) command (0x00000006) on endpoint 1
 ```
 
-### Read active PresetHandle
+#### Read active PresetHandle
 
 ```shell
 chip-tool-x86-64 thermostat read active-preset-handle <nodeID> 1 | grep TOO
@@ -198,13 +202,73 @@ chip-tool-x86-64 thermostat read active-preset-handle <nodeID> 1 | grep TOO
 [1758995260.396] [4613:4615] [TOO]   ActivePresetHandle: 02
 ```
 
-## ThermostatSuggestions
+### SetpointChange Tracking
+
+`SetpointChangeSource`, `SetpointChangeAmount` and
+`SetpointChangeSourceTimestamp` are updated whenever one of the operational
+setpoints (`OccupiedCoolingSetpoint`, `OccupiedHeatingSetpoint`,
+`UnoccupiedCoolingSetpoint`, `UnoccupiedHeatingSetpoint`) changes value. Writes
+to the absolute/user setpoint limits do not update these attributes. This
+example app's delegate doesn't override `GetSetpointChangeSource()`, so
+`SetpointChangeSource` always reads back `Manual` (0).
+
+#### Write a setpoint to trigger a tracked change
+
+```shell
+chip-tool-x86-64 thermostat write occupied-heating-setpoint 2150 <nodeID> 1 | grep TOO
+[1758995380.221] [4656:4658] [TOO] Sending command to node 0x1e
+[1758995380.511] [4656:4658] [TOO] Sending WriteAttribute to:
+[1758995380.511] [4656:4658] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0012, endpoint 1
+[1758995380.519] [4656:4658] [TOO] WriteResponse: {
+[1758995380.519] [4656:4658] [TOO]   Status: Success
+[1758995380.519] [4656:4658] [TOO] }
+```
+
+#### Read SetpointChangeSource
+
+```shell
+chip-tool-x86-64 thermostat read setpoint-change-source <nodeID> 1 | grep TOO
+[1758995390.221] [4662:4664] [TOO] Sending command to node 0x1e
+[1758995390.511] [4662:4664] [TOO] Sending ReadAttribute to:
+[1758995390.511] [4662:4664] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0030, endpoint 1
+[1758995390.519] [4662:4664] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0030 DataVersion: 1113257474
+[1758995390.519] [4662:4664] [TOO]   SetpointChangeSource: 0
+```
+
+#### Read SetpointChangeAmount
+
+Delta (`new - old`, in 0.01°C) of the setpoint write above:
+
+```shell
+chip-tool-x86-64 thermostat read setpoint-change-amount <nodeID> 1 | grep TOO
+[1758995400.221] [4668:4670] [TOO] Sending command to node 0x1e
+[1758995400.511] [4668:4670] [TOO] Sending ReadAttribute to:
+[1758995400.511] [4668:4670] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0031, endpoint 1
+[1758995400.519] [4668:4670] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0031 DataVersion: 1113257474
+[1758995400.519] [4668:4670] [TOO]   SetpointChangeAmount: 50
+```
+
+#### Read SetpointChangeSourceTimestamp
+
+`epoch_s` timestamp of the write; requires Matter time to be synchronized, or
+this attribute won't have been updated:
+
+```shell
+chip-tool-x86-64 thermostat read setpoint-change-source-timestamp <nodeID> 1 | grep TOO
+[1758995410.221] [4674:4676] [TOO] Sending command to node 0x1e
+[1758995410.511] [4674:4676] [TOO] Sending ReadAttribute to:
+[1758995410.511] [4674:4676] [TOO]      cluster 0x0000_0201, attribute: 0x0000_0032, endpoint 1
+[1758995410.519] [4674:4676] [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0032 DataVersion: 1113257474
+[1758995410.519] [4674:4676] [TOO]   SetpointChangeSourceTimestamp: 1758995380
+```
+
+### ThermostatSuggestions
 
 `AddThermostatSuggestion` requires `PresetHandle` to already exist in the
 `Presets` attribute (see [Write presets](#write-presets)), so run that section
 first.
 
-### Read MaxThermostatSuggestions
+#### Read MaxThermostatSuggestions
 
 ```shell
 chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TOO
@@ -215,7 +279,7 @@ chip-tool-x86-64 thermostat read max-thermostat-suggestions <nodeID> 1 | grep TO
 [1758995320.406] [4620:4622] [TOO]   MaxThermostatSuggestions: 5
 ```
 
-### Add a thermostat suggestion
+#### Add a thermostat suggestion
 
 `AddThermostatSuggestion` can fail with (non-exhaustive):
 
@@ -242,7 +306,7 @@ chip-tool-x86-64 thermostat add-thermostat-suggestion hex:01 null 60 <nodeID> 1 
 [1758995330.810] [4626:4628] [TOO] }
 ```
 
-### Read ThermostatSuggestions
+#### Read ThermostatSuggestions
 
 ```shell
 chip-tool-x86-64 thermostat read thermostat-suggestions <nodeID> 1 | grep TOO
@@ -259,7 +323,7 @@ chip-tool-x86-64 thermostat read thermostat-suggestions <nodeID> 1 | grep TOO
 [1758995340.519] [4632:4634] [TOO]      }
 ```
 
-### Read CurrentThermostatSuggestion
+#### Read CurrentThermostatSuggestion
 
 ```shell
 chip-tool-x86-64 thermostat read current-thermostat-suggestion <nodeID> 1 | grep TOO
@@ -275,7 +339,7 @@ chip-tool-x86-64 thermostat read current-thermostat-suggestion <nodeID> 1 | grep
 [1758995350.519] [4638:4640] [TOO]   }
 ```
 
-### Read ThermostatSuggestionNotFollowingReason
+#### Read ThermostatSuggestionNotFollowingReason
 
 `null` while the current suggestion's setpoints are being followed, otherwise a
 `ThermostatSuggestionNotFollowingReasonBitmap` value describing why it isn't
@@ -294,7 +358,7 @@ chip-tool-x86-64 thermostat read thermostat-suggestion-not-following-reason <nod
 [1758995360.519] [4644:4646] [TOO]   ThermostatSuggestionNotFollowingReason: null
 ```
 
-### Remove a thermostat suggestion
+#### Remove a thermostat suggestion
 
 ```shell
 chip-tool-x86-64 thermostat remove-thermostat-suggestion UniqueID destination-id endpoint-id-ignored-for-group-commands
