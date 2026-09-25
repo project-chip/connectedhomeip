@@ -174,6 +174,11 @@ MTR_DIRECT_MEMBERS
     // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
+- (void)_interestedPathsChanged
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+}
+
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
 {
     std::lock_guard lock(_lock);
@@ -203,6 +208,54 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_lock);
     return [self _delegateExists];
+}
+
+- (nullable NSArray *)_unionOfDelegateInterestedPaths:(NSArray * _Nullable (^)(MTRDeviceDelegateInfo * delegateInfo))pathsForDelegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    NSMutableOrderedSet * unionOfPaths = [NSMutableOrderedSet orderedSet];
+    __block BOOL wantsEverything = NO;
+
+    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
+        NSArray * interestedPaths = pathsForDelegate(delegateInfo);
+        if (interestedPaths == nil) {
+            wantsEverything = YES;
+        } else if (!wantsEverything) {
+            [unionOfPaths addObjectsFromArray:interestedPaths];
+        }
+    }];
+
+    return wantsEverything ? nil : [unionOfPaths.array sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        return [[a description] compare:[b description]];
+    }];
+}
+
+- (nullable NSArray *)unionOfInterestedPathsForAttributes
+{
+    std::lock_guard lock(_lock);
+    NSArray * delegateUnion = [self _unionOfDelegateInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
+        return delegateInfo.interestedPathsForAttributes;
+    }];
+    if (delegateUnion == nil) {
+        return nil;
+    }
+
+    NSMutableOrderedSet * unionOfPaths = [NSMutableOrderedSet orderedSetWithArray:delegateUnion];
+    for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
+        [unionOfPaths addObjectsFromArray:attributeValueWaiter.attributePaths];
+    }
+    return [unionOfPaths.array sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+        return [[a description] compare:[b description]];
+    }];
+}
+
+- (nullable NSArray *)unionOfInterestedPathsForEvents
+{
+    std::lock_guard lock(_lock);
+    return [self _unionOfDelegateInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
+        return delegateInfo.interestedPathsForEvents;
+    }];
 }
 
 - (BOOL)_delegateExists
@@ -732,6 +785,7 @@ MTR_DIRECT_MEMBERS
             self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
         }
         [self.attributeValueWaiters addObject:attributeWaiter];
+        [self _interestedPathsChanged];
     }
 
     MTR_LOG("%@ waitForAttributeValues will wait up to %f seconds for %@", self, timeout, values);
@@ -764,6 +818,7 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_lock);
     [self.attributeValueWaiters removeObject:attributeValueWaiter];
+    [self _interestedPathsChanged];
 }
 
 - (void)_cancelAllAttributeValueWaiters

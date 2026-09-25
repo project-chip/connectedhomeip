@@ -52,6 +52,11 @@ MTR_DIRECT_MEMBERS
     os_unfair_lock _lock;
 }
 
+- (NSArray<MTRAttributePath *> *)attributePaths
+{
+    return self.valueExpectations.allKeys;
+}
+
 - (instancetype)initWithDevice:(MTRDevice *)device values:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
 {
     if (self = [super init]) {

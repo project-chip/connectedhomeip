@@ -134,6 +134,12 @@ MTR_DIRECT_MEMBERS
 // For device controller or other objects to call
 - (BOOL)delegateExists;
 
+- (nullable NSArray *)unionOfInterestedPathsForAttributes;
+- (nullable NSArray *)unionOfInterestedPathsForEvents;
+
+// Lock held. The union changed other than by a delegate add/remove; re-publish it if you cache it.
+- (void)_interestedPathsChanged;
+
 // Must be called by subclasses or MTRDevice implementation only.
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
