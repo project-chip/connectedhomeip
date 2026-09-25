@@ -86,6 +86,42 @@ public:
     using CASESession::ParseSigma3TBEData;
 };
 
+class CASEServerAccess
+{
+public:
+    static CHIP_ERROR PeekSigma1Params(CASEServer & server, const System::PacketBufferHandle & payload,
+                                       MutableByteSpan & outInitiatorRandom, MutableByteSpan & outDestinationId)
+    {
+        return server.PeekSigma1Params(payload, outInitiatorRandom, outDestinationId);
+    }
+
+    static bool ValidateDestinationId(const CASEServer & server, const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
+    {
+        return server.ValidateDestinationId(destinationId, initiatorRandom);
+    }
+
+    static bool CanPreemptSession(CASEServer & server, Messaging::ExchangeContext * ec, const ByteSpan & incomingInitiatorRandom,
+                                  const ByteSpan & incomingDestinationId)
+    {
+        return server.CanPreemptSession(ec, incomingInitiatorRandom, incomingDestinationId);
+    }
+
+    static CHIP_ERROR HandleMRPRetry(CASEServer & server, Messaging::ExchangeContext * ec) { return server.HandleMRPRetry(ec); }
+
+    static void PreemptExistingSession(CASEServer & server) { server.PreemptExistingSession(); }
+
+    static System::Clock::Milliseconds16 ComputeDynamicBusyDelay(CASEServer & server) { return server.ComputeDynamicBusyDelay(); }
+
+    static void SetStateEnteredTimestamp(CASEServer & server, System::Clock::Timestamp ts) { server.mStateEnteredTimestamp = ts; }
+
+    static bool HasPinnedSecureSession(const CASEServer & server) { return server.mPinnedSecureSession.HasValue(); }
+
+    static void SetCryptoOperationInProgress(CASEServer & server, bool inProgress)
+    {
+        server.mPairingSession.mState = inProgress ? CASESession::State::kHandleSigma3Pending : CASESession::State::kInitialized;
+    }
+};
+
 class TestCASESession : public chip::Testing::LoopbackMessagingContext
 {
 public:
@@ -2415,6 +2451,180 @@ TEST_F(TestCASESession, ParseSigma3TBEData)
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBETooShortSignature);
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElement);
     TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElementNoStructEnd);
+}
+
+TEST_F(TestCASESession, CASEServerPeekSigma1Params)
+{
+    constexpr size_t bufferSize = 1024;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
+    EXPECT_TRUE(mem.Calloc(bufferSize));
+
+    MutableByteSpan buf(mem.Get(), bufferSize);
+    EXPECT_EQ(EncodeSigma1Helper<Sigma1Params>(buf), CHIP_NO_ERROR);
+
+    System::PacketBufferHandle msg = System::PacketBufferHandle::NewWithData(buf.data(), buf.size());
+    EXPECT_FALSE(msg.IsNull());
+
+    uint8_t initiatorRandom[Sigma1Params::kInitiatorRandomLen];
+    uint8_t destinationId[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan outRandom(initiatorRandom);
+    MutableByteSpan outDest(destinationId);
+
+    EXPECT_EQ(CASEServerAccess::PeekSigma1Params(gPairingServer, msg, outRandom, outDest), CHIP_NO_ERROR);
+    EXPECT_EQ(outRandom.size(), sizeof(initiatorRandom));
+    EXPECT_EQ(outDest.size(), sizeof(destinationId));
+
+    // Verify parsed contents match Sigma1Params
+    EXPECT_EQ(initiatorRandom[0], 1);
+    EXPECT_EQ(destinationId[0], 2);
+
+    // Test with truncated buffer (invalid TLV)
+    uint8_t badData[]                 = { 0x15, 0x25, 0x01 };
+    System::PacketBufferHandle badMsg = System::PacketBufferHandle::NewWithData(badData, sizeof(badData));
+    EXPECT_NE(CASEServerAccess::PeekSigma1Params(gPairingServer, badMsg, outRandom, outDest), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCASESession, CASEServerValidateDestinationId)
+{
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    const FabricInfo * deviceFabric = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
+    ASSERT_NE(deviceFabric, nullptr);
+    FabricId fabricId = deviceFabric->GetFabricId();
+    NodeId nodeId     = deviceFabric->GetNodeId();
+
+    Crypto::P256PublicKey rootPubKey;
+    ASSERT_EQ(gDeviceFabrics.FetchRootPubkey(deviceFabric->GetFabricIndex(), rootPubKey), CHIP_NO_ERROR);
+    Credentials::P256PublicKeySpan rootPubKeySpan{ rootPubKey.ConstBytes() };
+
+    GroupDataProvider::KeySet ipkKeySet;
+    ASSERT_EQ(gDeviceGroupDataProvider.GetIpkKeySet(deviceFabric->GetFabricIndex(), ipkKeySet), CHIP_NO_ERROR);
+    ASSERT_GT(ipkKeySet.num_keys_used, 0u);
+
+    uint8_t randomBytes[Sigma1Params::kInitiatorRandomLen] = { 0x5A };
+    ByteSpan randomSpan(randomBytes);
+    uint8_t validDestId[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan validDestIdSpan(validDestId);
+    ByteSpan ipkSpan(ipkKeySet.epoch_keys[0].key);
+
+    ASSERT_EQ(GenerateCaseDestinationId(ipkSpan, randomSpan, rootPubKeySpan, fabricId, nodeId, validDestIdSpan), CHIP_NO_ERROR);
+
+    // Valid destination ID matches
+    EXPECT_TRUE(CASEServerAccess::ValidateDestinationId(gPairingServer, validDestIdSpan, randomSpan));
+
+    // Mismatched destination ID fails
+    uint8_t invalidDestId[Crypto::kSHA256_Hash_Length];
+    memcpy(invalidDestId, validDestId, sizeof(invalidDestId));
+    invalidDestId[0] ^= 0xFF;
+    EXPECT_FALSE(CASEServerAccess::ValidateDestinationId(gPairingServer, ByteSpan(invalidDestId), randomSpan));
+
+    // Mismatched random fails
+    uint8_t wrongRandomBytes[Sigma1Params::kInitiatorRandomLen] = { 0xA5 };
+    EXPECT_FALSE(CASEServerAccess::ValidateDestinationId(gPairingServer, validDestIdSpan, ByteSpan(wrongRandomBytes)));
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, CASEServerQuadrupleGuardPreemption)
+{
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    const FabricInfo * deviceFabric = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
+    ASSERT_NE(deviceFabric, nullptr);
+
+    Crypto::P256PublicKey rootPubKey;
+    ASSERT_EQ(gDeviceFabrics.FetchRootPubkey(deviceFabric->GetFabricIndex(), rootPubKey), CHIP_NO_ERROR);
+    GroupDataProvider::KeySet ipkKeySet;
+    ASSERT_EQ(gDeviceGroupDataProvider.GetIpkKeySet(deviceFabric->GetFabricIndex(), ipkKeySet), CHIP_NO_ERROR);
+
+    uint8_t randomBytes[Sigma1Params::kInitiatorRandomLen] = { 0x33 };
+    ByteSpan randomSpan(randomBytes);
+    uint8_t validDestId[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan validDestIdSpan(validDestId);
+
+    ASSERT_EQ(GenerateCaseDestinationId(ByteSpan(ipkKeySet.epoch_keys[0].key), randomSpan,
+                                        Credentials::P256PublicKeySpan{ rootPubKey.ConstBytes() }, deviceFabric->GetFabricId(),
+                                        deviceFabric->GetNodeId(), validDestIdSpan),
+              CHIP_NO_ERROR);
+
+    // Guard 2: Crypto in progress blocks preemption
+    CASEServerAccess::SetCryptoOperationInProgress(gPairingServer, true);
+    EXPECT_FALSE(CASEServerAccess::CanPreemptSession(gPairingServer, nullptr, randomSpan, validDestIdSpan));
+    CASEServerAccess::SetCryptoOperationInProgress(gPairingServer, false);
+
+    // Guard 3: In-flight grace window (<1.5s) blocks preemption
+    System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+    CASEServerAccess::SetStateEnteredTimestamp(gPairingServer, now);
+    EXPECT_FALSE(CASEServerAccess::CanPreemptSession(gPairingServer, nullptr, randomSpan, validDestIdSpan));
+
+    // Advance elapsed time past grace window (2000ms elapsed)
+    CASEServerAccess::SetStateEnteredTimestamp(gPairingServer, now - System::Clock::Milliseconds64(2000));
+
+    // Guard 4: Invalid destination ID blocks preemption
+    uint8_t bogusDestId[Crypto::kSHA256_Hash_Length] = { 0xDE, 0xAD };
+    EXPECT_FALSE(CASEServerAccess::CanPreemptSession(gPairingServer, nullptr, randomSpan, ByteSpan(bogusDestId)));
+
+    // All guards pass: Preemption is allowed!
+    EXPECT_TRUE(CASEServerAccess::CanPreemptSession(gPairingServer, nullptr, randomSpan, validDestIdSpan));
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, CASEServerComputeDynamicBusyDelay)
+{
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+    CASEServerAccess::SetStateEnteredTimestamp(gPairingServer, now);
+
+    // Default state with 0 elapsed: expected 2000ms + [50, 250)ms jitter -> within [2050, 2250] ms
+    System::Clock::Milliseconds16 delay = CASEServerAccess::ComputeDynamicBusyDelay(gPairingServer);
+    EXPECT_GE(delay.count(), 2050);
+    EXPECT_LE(delay.count(), 2250);
+
+    // When crypto is in progress: expected 250ms floor + [50, 250)ms jitter -> within [300, 500] ms
+    CASEServerAccess::SetCryptoOperationInProgress(gPairingServer, true);
+    delay = CASEServerAccess::ComputeDynamicBusyDelay(gPairingServer);
+    EXPECT_GE(delay.count(), 300);
+    EXPECT_LE(delay.count(), 500);
+    CASEServerAccess::SetCryptoOperationInProgress(gPairingServer, false);
+
+    // When past timeout (60s elapsed): floor 250ms + [50, 250)ms jitter -> within [300, 500] ms
+    CASEServerAccess::SetStateEnteredTimestamp(gPairingServer, now - System::Clock::Seconds64(60));
+    delay = CASEServerAccess::ComputeDynamicBusyDelay(gPairingServer);
+    EXPECT_GE(delay.count(), 300);
+    EXPECT_LE(delay.count(), 500);
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, CASEServerPreemptExistingSession)
+{
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    EXPECT_TRUE(CASEServerAccess::HasPinnedSecureSession(gPairingServer));
+
+    CASEServerAccess::PreemptExistingSession(gPairingServer);
+
+    // Session is reset and re-prepared for a new handshake
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+    EXPECT_TRUE(CASEServerAccess::HasPinnedSecureSession(gPairingServer));
+
+    gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, CASEServerHandleMRPRetry)
+{
+    // HandleMRPRetry with null exchange context safely returns CHIP_NO_ERROR
+    EXPECT_EQ(CASEServerAccess::HandleMRPRetry(gPairingServer, nullptr), CHIP_NO_ERROR);
 }
 
 } // namespace chip
