@@ -105,3 +105,6 @@ imgui.ini
 
 # Joint Fabric test harness output file
 admin_storage.json
+# Runner state kept between runs: keyed KVS registry and per-app KVS files (scripts/tests/run_python_test.py)
+admin_storage.json.kvs
+kvs1*

@@ -1085,6 +1085,10 @@ jobs:
             matrix:
                 # This list is empirically created to have a reasonable time split of ~30 minutes each.
                 filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
+                # BRANCH-ONLY, REVERT BEFORE MERGE: run every shard twice, once reusing the
+                # commissioned DUT and once resetting it, so the two can be timed against each
+                # other inside one job instead of across runs on different machines.
+                reuse: ["1", "0"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
@@ -1224,6 +1228,8 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetection.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestCommissioningStatusDetectionIntegration.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestResolveNodeAddress.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestSkipCommissioningWhenCommissioned.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCreateNewController.py'
@@ -1239,6 +1245,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestStepExtractor.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestTestMetadata.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestRunnerDutStateReuse.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestFactoryResetRequests.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
 
@@ -1259,6 +1266,8 @@ jobs:
               if: ${{matrix.filter != ''}}
               env:
                   KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
+                  # BRANCH-ONLY: read by --reuse-commissioned-dut in scripts/tests/run_python_test.py
+                  CHIP_REUSE_COMMISSIONED_DUT: ${{ matrix.reuse }}
               run: |
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
@@ -1274,7 +1283,7 @@ jobs:
               uses: actions/upload-artifact@v7
               if: ${{ matrix.filter != '' && always() }}
               with:
-                  name: test-summaries-python-${{ matrix.filter }}
+                  name: test-summaries-python-${{ matrix.filter }}-reuse${{ matrix.reuse }}
                   path: test-summaries/python-tests.json
                   retention-days: 30
 
@@ -1282,7 +1291,7 @@ jobs:
               if: always() && matrix.filter != ''
               uses: actions/upload-artifact@v7
               with:
-                  name: junit-results-repl-${{ matrix.filter }}
+                  name: junit-results-repl-${{ matrix.filter }}-reuse${{ matrix.reuse }}
                   path: ${{matrix.junitxml}}
                   retention-days: 30
                   if-no-files-found: warn

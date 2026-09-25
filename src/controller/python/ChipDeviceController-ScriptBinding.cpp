@@ -56,6 +56,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <controller/SetUpCodePairer.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <lib/address_resolve/AddressResolve.h>
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
@@ -100,6 +101,8 @@ extern "C" {
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 typedef void (*DeviceAvailableFunc)(chip::Controller::Python::PyObject * context, DeviceProxy * device, PyChipError err);
+typedef void (*NodeResolvedFunc)(chip::Controller::Python::PyObject * context, PyChipError err, const char * address,
+                                 uint16_t port);
 typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, PyChipError error);
 }
@@ -414,6 +417,9 @@ PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::Dev
                                                            chip::Controller::ScriptDevicePairingDelegate * pairingDelegate);
 PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                       char * outAddress, uint64_t maxAddressLen, uint16_t * outPort);
+PyChipError pychip_DeviceController_ResolveNodeAddress(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                       uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
+                                                       NodeResolvedFunc callback);
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetRootPublicKeyBytes(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * buf,
@@ -674,6 +680,66 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                         ToPyChipError(CHIP_ERROR_BUFFER_TOO_SMALL));
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+namespace {
+
+// One DNS-SD lookup for a Python caller; reports once, then frees itself. Safe because the
+// resolver drops the handle from its list before calling the listener.
+struct ResolveNodeCallbacks : public AddressResolve::NodeListener
+{
+    ResolveNodeCallbacks(chip::Controller::Python::PyObject * context, NodeResolvedFunc callback) :
+        mContext(context), mCallback(callback)
+    {
+        mHandle.SetListener(this);
+    }
+
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override
+    {
+        // Bare IP string, same shape as GetAddressAndPort.
+        char address[Inet::IPAddress::kMaxStringLength];
+        result.address.GetIPAddress().ToString(address, sizeof(address));
+        mCallback(mContext, ToPyChipError(CHIP_NO_ERROR), address, result.address.GetPort());
+        delete this;
+    }
+
+    void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override
+    {
+        mCallback(mContext, ToPyChipError(reason), nullptr, 0);
+        delete this;
+    }
+
+    AddressResolve::NodeLookupHandle mHandle;
+    chip::Controller::Python::PyObject * const mContext;
+    NodeResolvedFunc mCallback;
+};
+
+} // anonymous namespace
+
+PyChipError pychip_DeviceController_ResolveNodeAddress(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                       uint32_t timeoutMs, chip::Controller::Python::PyObject * context,
+                                                       NodeResolvedFunc callback)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(callback != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(IsOperationalNodeId(nodeId), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    // Without a fabric there is nothing to resolve against.
+    VerifyOrReturnError(devCtrl->GetCompressedFabricId() != kUndefinedCompressedFabricId,
+                        ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+
+    AddressResolve::NodeLookupRequest request(PeerId(devCtrl->GetCompressedFabricId(), nodeId));
+    // First answer wins: the caller wants to know whether the node is there, not the best of
+    // several addresses, so do not wait out the default minimum lookup time.
+    request.SetMinLookupTime(System::Clock::Milliseconds32(0));
+    request.SetMaxLookupTime(System::Clock::Milliseconds32(timeoutMs));
+
+    auto * callbacks = new ResolveNodeCallbacks(context, callback);
+    CHIP_ERROR err   = AddressResolve::Resolver::Instance().LookupNode(request, callbacks->mHandle);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete callbacks;
+    }
+    return ToPyChipError(err);
 }
 
 PyChipError pychip_DeviceController_GetLastThreadMeshcopDiscoveryDiagnosticJson(chip::Controller::DeviceCommissioner * devCtrl,

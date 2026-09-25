@@ -83,7 +83,7 @@ import queue
 import time
 
 from mobly import asserts
-from support_modules.compro_support import COMPROBaseTest, commission_if_needed
+from support_modules.compro_support import COMPROBaseTest
 
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
@@ -541,5 +541,4 @@ class TC_COMPRO_2_3(MatterTestCommissionedDevice, COMPROBaseTest):
 
 
 if __name__ == "__main__":
-    commission_if_needed()
     default_matter_test_main()

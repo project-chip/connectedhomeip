@@ -81,7 +81,7 @@ import logging
 import time
 
 from mobly import asserts
-from support_modules.compro_support import COMPROBaseTest, commission_if_needed
+from support_modules.compro_support import COMPROBaseTest
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -432,5 +432,4 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
 
 
 if __name__ == "__main__":
-    commission_if_needed()
     default_matter_test_main()
