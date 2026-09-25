@@ -78,6 +78,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 #ifdef DEBUG
 @interface MTRDeviceController (TestDebug)
+@property (nonatomic, assign) BOOL unitTestSuppressGetSessionConnectivityMonitorFire;
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 @end
@@ -85,6 +86,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+- (void)invalidateCASESession;
 @end
 
 @interface MTRDevice (TestDebug)
