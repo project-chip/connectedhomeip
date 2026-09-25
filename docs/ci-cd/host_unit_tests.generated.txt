@@ -58,6 +58,10 @@ examples-nrfconnect.yaml / nRF Connect SDK / Run unit tests for Zephyr native_po
   on:     push[master,v*-branch], pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
   if:     github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true' || steps.changed_paths.outputs.pigweed == 'true' || steps.changed_paths.outputs.crypto == 'true'
+  filter: changed_paths.crypto = src/crypto/**
+  filter: changed_paths.nrfconnect = **/nrfconnect/**, **/Zephyr/**, **/zephyr/**
+  filter: changed_paths.pigweed = src/pw_backends/**, third_party/pigweed/**
+  filter: changed_paths.tests = **/tests/**
   targets: nrf-native-sim-tests
 
 nightly.yaml / Nightly ASAN Testing across Crypto Backends / ASAN unit tests - BoringSSL
@@ -106,10 +110,12 @@ unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build an
   on:     push[master,v*-branch], pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
   if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+  filter: changed_paths.crypto = src/credentials/**, src/crypto/**, src/pw_backends/**, third_party/pigweed/**, third_party/mbedtls/**, .github/workflows/unit_integration_test.yaml
   targets: linux-x64-tests-psa-asan-clang
 
 unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run mbedTLS unit tests (ASan)
   on:     push[master,v*-branch], pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
   if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+  filter: changed_paths.crypto = src/credentials/**, src/crypto/**, src/pw_backends/**, third_party/pigweed/**, third_party/mbedtls/**, .github/workflows/unit_integration_test.yaml
   targets: linux-x64-tests-mbedtls-asan-clang
