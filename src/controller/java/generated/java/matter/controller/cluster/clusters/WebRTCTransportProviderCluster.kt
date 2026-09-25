@@ -69,6 +69,18 @@ class WebRTCTransportProviderCluster(
     object SubscriptionEstablished : CurrentSessionsAttributeSubscriptionState()
   }
 
+  class SupportedSFrameCipherSuitesAttribute(val value: List<UShort>)
+
+  sealed class SupportedSFrameCipherSuitesAttributeSubscriptionState {
+    data class Success(val value: List<UShort>) :
+      SupportedSFrameCipherSuitesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      SupportedSFrameCipherSuitesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedSFrameCipherSuitesAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -261,8 +273,8 @@ class WebRTCTransportProviderCluster(
   suspend fun provideOffer(
     webRTCSessionID: UShort?,
     sdp: String,
-    streamUsage: UByte,
-    originatingEndpointID: UShort,
+    streamUsage: UByte?,
+    originatingEndpointID: UShort?,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -287,10 +299,12 @@ class WebRTCTransportProviderCluster(
     tlvWriter.put(ContextSpecificTag(TAG_SDP_REQ), sdp)
 
     val TAG_STREAM_USAGE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
+    streamUsage?.let { tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage) }
 
     val TAG_ORIGINATING_ENDPOINT_ID_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+    originatingEndpointID?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+    }
 
     val TAG_VIDEO_STREAM_ID_REQ: Int = 4
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }
@@ -505,6 +519,56 @@ class WebRTCTransportProviderCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
+  suspend fun updateSession(
+    webRTCSessionID: UShort,
+    SFrameSenderKey: WebRTCTransportProviderClusterSFrameKeyStruct?,
+    SFrameReceiveKeysToAdd: List<WebRTCTransportProviderClusterSFrameKeyStruct>?,
+    SFrameReceiveKIDsToRemove: List<ByteArray>?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 7u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_WEB_RTC_SESSION_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_WEB_RTC_SESSION_ID_REQ), webRTCSessionID)
+
+    val TAG_S_FRAME_SENDER_KEY_REQ: Int = 1
+    SFrameSenderKey?.let {
+      SFrameSenderKey.toTlv(ContextSpecificTag(TAG_S_FRAME_SENDER_KEY_REQ), tlvWriter)
+    }
+
+    val TAG_S_FRAME_RECEIVE_KEYS_TO_ADD_REQ: Int = 2
+    SFrameReceiveKeysToAdd?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_S_FRAME_RECEIVE_KEYS_TO_ADD_REQ))
+      for (item in SFrameReceiveKeysToAdd.iterator()) {
+        item.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endArray()
+    }
+
+    val TAG_S_FRAME_RECEIVE_KI_DS_TO_REMOVE_REQ: Int = 3
+    SFrameReceiveKIDsToRemove?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_S_FRAME_RECEIVE_KI_DS_TO_REMOVE_REQ))
+      for (item in SFrameReceiveKIDsToRemove.iterator()) {
+        tlvWriter.put(AnonymousTag, item)
+      }
+      tlvWriter.endArray()
+    }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
   suspend fun readCurrentSessionsAttribute(): CurrentSessionsAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
@@ -599,6 +663,103 @@ class WebRTCTransportProviderCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(CurrentSessionsAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSupportedSFrameCipherSuitesAttribute(): SupportedSFrameCipherSuitesAttribute {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Supportedsframeciphersuites attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UShort> =
+      buildList<UShort> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUShort(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return SupportedSFrameCipherSuitesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSupportedSFrameCipherSuitesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SupportedSFrameCipherSuitesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 1u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SupportedSFrameCipherSuitesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Supportedsframeciphersuites attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UShort> =
+            buildList<UShort> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUShort(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(SupportedSFrameCipherSuitesAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SupportedSFrameCipherSuitesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

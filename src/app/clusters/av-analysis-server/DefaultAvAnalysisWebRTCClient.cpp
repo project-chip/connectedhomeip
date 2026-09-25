@@ -382,11 +382,11 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::BuildProvideOffer(WebRTCTransportProvi
     aVideoStream = mRequest.VideoStreamId();
 
     aRequest.webRTCSessionID.SetNull(); // a new session, to be assigned by the camera
-    aRequest.sdp         = CharSpan(mOfferSdp.data(), mOfferSdp.size());
-    aRequest.streamUsage = Globals::StreamUsageEnum::kAnalysis;
+    aRequest.sdp = CharSpan(mOfferSdp.data(), mOfferSdp.size());
+    aRequest.streamUsage.SetValue(Globals::StreamUsageEnum::kAnalysis);
     // The requestor cluster's registered path is where the camera's answering commands must land
-    aRequest.originatingEndpointID = mRequestorCluster->GetPaths().front().mEndpointId;
-    aRequest.videoStreams          = MakeOptional(DataModel::List<const uint16_t>(&aVideoStream, 1));
+    aRequest.originatingEndpointID.SetValue(mRequestorCluster->GetPaths().front().mEndpointId);
+    aRequest.videoStreams = MakeOptional(DataModel::List<const uint16_t>(&aVideoStream, 1));
     // No audio for analysis; ICE servers and transport policy are the camera's defaults
     return CHIP_NO_ERROR;
 }
@@ -581,8 +581,8 @@ CHIP_ERROR DefaultAvAnalysisWebRTCClient::RegisterSession(uint16_t aWebRTCSessio
     session.peerEndpointID = mRequest.WebRTCEndpoint();
     session.streamUsage    = Globals::StreamUsageEnum::kAnalysis;
     session.videoStreams   = MakeOptional(DataModel::List<const uint16_t>(&slot->videoStreamId, 1));
-    session.videoStreamID  = DataModel::MakeNullable(slot->videoStreamId);
-    session.audioStreamID.SetNull();
+    session.videoStreamID  = MakeOptional(DataModel::MakeNullable(slot->videoStreamId));
+    session.audioStreamID  = MakeOptional(DataModel::NullNullable);
     mRequestorCluster->UpsertSession(session);
     return CHIP_NO_ERROR;
 }

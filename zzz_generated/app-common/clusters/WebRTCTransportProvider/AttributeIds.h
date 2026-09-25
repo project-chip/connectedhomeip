@@ -14,11 +14,15 @@ namespace WebRTCTransportProvider {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 6;
+inline constexpr uint32_t kAttributesCount = 7;
 
 namespace CurrentSessions {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CurrentSessions
+
+namespace SupportedSFrameCipherSuites {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedSFrameCipherSuites
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

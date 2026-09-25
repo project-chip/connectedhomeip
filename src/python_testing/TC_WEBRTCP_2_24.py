@@ -116,10 +116,17 @@ class TC_WEBRTCP_2_24(MatterTestCommissionedDevice, WEBRTCPTestBase):
         # Test: SolicitOffer with unsupported cipher suite
         log.info("Testing SolicitOffer with unsupported cipher suite")
 
-        unsupported_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_UNSUPPORTED,
-            baseKey=b'\x00' * 16,  # 16 bytes key
-            kid=b'\x01' * 2
+        unsupported_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
+            baseKey=b'\x00' * 16  # 16 bytes key
+        )
+
+        unsupported_sframe_config = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_UNSUPPORTED,
+            videoCipherSuite=CIPHER_SUITE_UNSUPPORTED,
+            senderKey=unsupported_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         try:
@@ -143,10 +150,17 @@ class TC_WEBRTCP_2_24(MatterTestCommissionedDevice, WEBRTCPTestBase):
         # Test: SolicitOffer with incorrect key length for AES-128-GCM (should be 16 bytes)
         log.info("Testing SolicitOffer with incorrect key length for AES-128-GCM")
 
-        wrong_length_sframe_config = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_128_GCM,
-            baseKey=b'\x00' * 32,  # Wrong: 32 bytes instead of 16
-            kid=b'\x01' * 2
+        wrong_length_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
+            baseKey=b'\x00' * 32  # Wrong: 32 bytes instead of 16
+        )
+
+        wrong_length_sframe_config = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            videoCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            senderKey=wrong_length_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         try:
@@ -176,10 +190,17 @@ class TC_WEBRTCP_2_24(MatterTestCommissionedDevice, WEBRTCPTestBase):
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
-        valid_sframe_config_128 = Clusters.WebRTCTransportProvider.Structs.SFrameStruct(
-            cipherSuite=CIPHER_SUITE_AES_128_GCM,
-            baseKey=b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f',  # 16 bytes
-            kid=b'\x01' * 2
+        valid_sframe_sender_key = Clusters.Globals.Structs.SFrameKeyStruct(
+            kid=b'\x01' * 2,
+            baseKey=b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f'  # 16 bytes
+        )
+
+        valid_sframe_config_128 = Clusters.Globals.Structs.SFrameStruct(
+            audioCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            videoCipherSuite=CIPHER_SUITE_AES_128_GCM,
+            senderKey=valid_sframe_sender_key,
+            receiveKeys=[],
+            ratchetBits=0
         )
 
         resp: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
