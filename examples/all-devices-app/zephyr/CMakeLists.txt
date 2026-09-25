@@ -27,10 +27,17 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/board_files.cmake)
 if(DEFINED BOARD)
     all_devices_board_name(${BOARD} ALL_DEVICES_BOARD_NAME)
 
-    all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.overlay
-                                 ALL_DEVICES_NESTED_BOARD_OVERLAY EXCLUDE_FLAT)
-    if(ALL_DEVICES_NESTED_BOARD_OVERLAY)
-        list(APPEND DTC_OVERLAY_FILE ${ALL_DEVICES_NESTED_BOARD_OVERLAY})
+    if(NOT SYSBUILD)
+        all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.overlay
+                                     ALL_DEVICES_NESTED_BOARD_OVERLAY EXCLUDE_FLAT)
+        if(ALL_DEVICES_NESTED_BOARD_OVERLAY)
+            list(APPEND DTC_OVERLAY_FILE ${ALL_DEVICES_NESTED_BOARD_OVERLAY})
+            set(DTC_OVERLAY_FILE "${DTC_OVERLAY_FILE}" CACHE STRING "Application devicetree overlays" FORCE)
+        endif()
+    else()
+        all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.overlay
+                                     ALL_DEVICES_NESTED_BOARD_OVERLAY EXCLUDE_FLAT)
+        list(REMOVE_ITEM DTC_OVERLAY_FILE ${ALL_DEVICES_NESTED_BOARD_OVERLAY})
         set(DTC_OVERLAY_FILE "${DTC_OVERLAY_FILE}" CACHE STRING "Application devicetree overlays" FORCE)
     endif()
     message(VERBOSE "BOARD=${BOARD} ALL_DEVICES_BOARD_NAME=${ALL_DEVICES_BOARD_NAME} ALL_DEVICES_NESTED_BOARD_OVERLAY=${ALL_DEVICES_NESTED_BOARD_OVERLAY} EXTRA_DTC_OVERLAY_FILE=${EXTRA_DTC_OVERLAY_FILE}")

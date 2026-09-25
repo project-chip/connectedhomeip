@@ -40,7 +40,7 @@ config CHIP_OTA_REQUESTOR
 	imply STREAM_FLASH_ERASE
 
 config IMG_MANAGER
-	default y
+	default y if CHIP_OTA_REQUESTOR
 
 config STREAM_FLASH
 	default n
@@ -49,7 +49,7 @@ config STREAM_FLASH_ERASE
 	default n
 
 config BOOTLOADER_MCUBOOT
-	default y
+	default y if CHIP_OTA_REQUESTOR
 
 config BT
 	default y

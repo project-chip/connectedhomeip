@@ -41,6 +41,9 @@ config ALL_DEVICES_DEVICE_BRIDGED_NODE
 config ALL_DEVICES_DEVICE_CHIME
 	bool "Chime"
 
+config ALL_DEVICES_DEVICE_COLOR_TEMPERATURE_LIGHT
+	bool "Color temperature light"
+
 config ALL_DEVICES_DEVICE_CONTACT_SENSOR
 	bool "Contact sensor"
 
@@ -58,6 +61,12 @@ config ALL_DEVICES_DEVICE_DIMMABLE_PLUG_IN_UNIT
 
 config ALL_DEVICES_DEVICE_DISHWASHER
 	bool "Dishwasher"
+
+config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
+	bool "Electrical sensor"
+
+config ALL_DEVICES_DEVICE_EXTENDED_COLOR_LIGHT
+	bool "Extended color light"
 
 config ALL_DEVICES_DEVICE_EXTRACTOR_HOOD
 	bool "Extractor hood"
@@ -85,6 +94,9 @@ config ALL_DEVICES_DEVICE_LIGHT_SENSOR
 
 config ALL_DEVICES_DEVICE_MICROWAVE_OVEN
 	bool "Microwave oven"
+
+config ALL_DEVICES_DEVICE_MODE_SELECT
+	bool "Mode select"
 
 config ALL_DEVICES_DEVICE_MOUNTED_DIMMABLE_LOAD_CONTROL
 	bool "Mounted dimmable load control"
@@ -128,6 +140,9 @@ config ALL_DEVICES_DEVICE_REFRIGERATOR
 
 config ALL_DEVICES_DEVICE_ROBOTIC_VACUUM_CLEANER
 	bool "Robotic vacuum cleaner"
+
+config ALL_DEVICES_DEVICE_ROOM_AIR_CONDITIONER
+	bool "Room air conditioner"
 
 config ALL_DEVICES_DEVICE_SMOKE_CO_ALARM
 	bool "Smoke/CO alarm"
