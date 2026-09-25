@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Lists the CI steps that run host unit tests, with their triggers and conditions.
+
+The output is checked in as docs/ci-cd/host_unit_tests.steps.txt (--update
+rewrites it). --check fails when the workflows no longer match it, so
+docs/ci-cd/host_unit_tests.md gets revisited whenever what runs when changes.
+"""
+
+import argparse
+import difflib
+import re
+import sys
+from pathlib import Path
+
+import yaml
+
+TEST_STEP = re.compile(r"gn_tests\.sh|build_coverage\.sh|--target\s+\S*tests")
+GN_ARGS = re.compile(r"""(?:gn_gen\.sh[^\n]*--args=|GN_ARGS=)(["'])(.*?)\1""")
+TARGET = re.compile(r"--target\s+(\S+)")
+BUILD_CMD = re.compile(r"\sbuild\b")  # build_examples.py "build", not "gen"
+
+
+def one_line(value) -> str:
+    return " ".join(str(value).split()) if value is not None else "-"
+
+
+def triggers(workflow: dict) -> str:
+    on = workflow.get(True, workflow.get("on", {}))
+    if isinstance(on, (str, list)):
+        return one_line(on)
+    parts = []
+    for event, config in on.items():
+        branches = (config or {}).get("branches") if isinstance(config, dict) else None
+        parts.append(f"{event}[{','.join(branches)}]" if branches else str(event))
+    return ", ".join(parts)
+
+
+def list_steps(workflows_dir: Path) -> str:
+    blocks = []
+    for path in sorted(workflows_dir.glob("*.y*ml")):
+        workflow = yaml.safe_load(path.read_text())
+        for job in workflow.get("jobs", {}).values():
+            gn_args = []  # args of the most recent gn gen in this job
+            for step in job.get("steps", []):
+                run = step.get("run") or ""
+                step_args = [m.group(2) for m in GN_ARGS.finditer(run) if not m.group(2).startswith("$")]
+                gn_args = step_args or gn_args
+                if not TEST_STEP.search(run):
+                    continue
+                targets = [t for t in TARGET.findall(run) if "tests" in t and "fuzz" not in t]
+                if TARGET.search(run) and "gn_tests.sh" not in run and not (targets and BUILD_CMD.search(run)):
+                    continue
+                config = f"targets: {' '.join(targets)}" if targets else f"gn: {' | '.join(gn_args) or '-'}"
+                blocks.append("\n".join([
+                    f"{path.name} / {job.get('name', '?')} / {step.get('name', '?')}",
+                    f"  on:     {triggers(workflow)}",
+                    f"  job-if: {one_line(job.get('if'))}",
+                    f"  if:     {one_line(step.get('if'))}",
+                    f"  {config}",
+                ]))
+    return "\n\n".join(blocks) + "\n"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--workflows-dir", type=Path, default=Path(".github/workflows"))
+    parser.add_argument("--snapshot", type=Path, default=Path("docs/ci-cd/host_unit_tests.steps.txt"))
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="fail if the snapshot differs from the workflows")
+    mode.add_argument("--update", action="store_true", help="rewrite the snapshot from the workflows")
+    args = parser.parse_args()
+
+    current = list_steps(args.workflows_dir)
+    if args.update:
+        args.snapshot.write_text(current)
+        print(f"Updated {args.snapshot}; review docs/ci-cd/host_unit_tests.md against it.")
+        return 0
+    if not args.check:
+        sys.stdout.write(current)
+        return 0
+
+    diff = list(difflib.unified_diff(args.snapshot.read_text().splitlines(), current.splitlines(),
+                                     str(args.snapshot), "workflows", lineterm=""))
+    if diff:
+        print("\n".join(diff))
+        print("\nUnit-test steps changed. Regenerate the snapshot and update docs/ci-cd/host_unit_tests.md:")
+        print(f"    python3 {sys.argv[0]} --update")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

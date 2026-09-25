@@ -1,0 +1,95 @@
+build.yaml / Build on Linux (gcc_debug) / Run Tests
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     github.event.pull_request.number == null
+  gn: chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_build_all_platform_tests=true
+
+build.yaml / Build on Linux (gcc_debug) / Run Tests Without Logging
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     inputs.run-codeql != true && github.event.pull_request.number != null
+  gn: chip_logging=false chip_build_all_platform_tests=true
+
+build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Setup Build, Run Build and Run Tests (gcc_release)
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     github.event.pull_request.number == null
+  gn: is_debug=false
+
+build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Build and run AddressSanitizer (ASAN) unit tests (Pull Requests only)
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     github.event_name == 'pull_request'
+  targets: linux-x64-tests-asan-clang
+
+build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Run Tests with sanitizers
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     github.event.pull_request.number == null
+  gn: is_clang=true is_asan=true | is_clang=true is_msan=true | is_clang=true is_tsan=true chip_enable_wifi=false | is_clang=true is_ubsan=true
+
+build.yaml / Build on Linux (fake, gcc_release, clang, simulated) / Run fake linux tests with build_examples
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     -
+  targets: linux-fake-tests
+
+build.yaml / Build on Linux (python_lib) / Setup Build, Run Build and Run Tests
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     -
+  gn: enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false
+
+build.yaml / Build on Darwin (clang, simulated) / Setup Build, Run Build and Run Tests (asan + target_os=all)
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+  if:     -
+  gn: target_os="all" is_asan=true enable_host_clang_build=false
+
+build.yaml / Build on Linux (coverage) / Run Build Coverage
+  on:     push[master,v*-branch], pull_request, merge_group, workflow_dispatch, workflow_call
+  job-if: github.actor != 'restyled-io[bot]' && github.actor != 'dependabot[bot]' && inputs.run-codeql != true
+  if:     -
+  gn: -
+
+examples-nrfconnect.yaml / nRF Connect SDK / Run unit tests for Zephyr native_posix_64 platform
+  on:     push[master,v*-branch], pull_request, merge_group
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true' || steps.changed_paths.outputs.pigweed == 'true' || steps.changed_paths.outputs.crypto == 'true'
+  targets: nrf-native-sim-tests
+
+nightly.yaml / Nightly MSAN Tests - Linux / Build and Run MSAN unit tests
+  on:     schedule, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     -
+  targets: linux-x64-tests-msan-clang
+
+nightly.yaml / Nightly Unit Tests - Linux (various features) / Run Tests
+  on:     schedule, workflow_dispatch
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     -
+  gn: is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true
+
+qemu.yaml / ESP32_QEMU / Build ESP32 QEMU test images
+  on:     push[master,v*-branch], pull_request, merge_group
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     -
+  targets: esp32-qemu-tests
+
+qemu.yaml / Tizen / Build and run tests
+  on:     push[master,v*-branch], pull_request, merge_group
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     -
+  targets: tizen-arm-tests-no-ble-no-thread
+
+unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run PSA unit tests (ASan)
+  on:     push[master,v*-branch], pull_request, merge_group
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+  targets: linux-x64-tests-psa-asan-clang
+
+unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run mbedTLS unit tests (ASan)
+  on:     push[master,v*-branch], pull_request, merge_group
+  job-if: github.actor != 'restyled-io[bot]'
+  if:     !cancelled() && steps.bootstrap.outcome == 'success' && (github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true')
+  targets: linux-x64-tests-mbedtls-asan-clang
