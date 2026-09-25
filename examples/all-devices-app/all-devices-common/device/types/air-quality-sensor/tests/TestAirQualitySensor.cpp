@@ -191,4 +191,20 @@ TEST_F(TestAirQualitySensor, TestCleanTeardown)
     sensor.Unregister(mProvider);
 }
 
+TEST_F(TestAirQualitySensor, TestDuplicateConcentrationClusterConfig)
+{
+    AirQualitySensor::Config config;
+    config.WithCarbonDioxide(400.0f, 2000.0f)
+        .WithCarbonDioxide(500.0f, 3000.0f);
+
+    EXPECT_EQ(config.numConcentrationConfigs, 1u);
+    EXPECT_FLOAT_EQ(config.concentrationConfigs[0].minMeasured.Value(), 500.0f);
+    EXPECT_FLOAT_EQ(config.concentrationConfigs[0].maxMeasured.Value(), 3000.0f);
+
+    AirQualitySensor sensor(mTimerDelegate, config);
+    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
+    EXPECT_NE(sensor.CO2Cluster(), nullptr);
+    sensor.Unregister(mProvider);
+}
+
 } // namespace

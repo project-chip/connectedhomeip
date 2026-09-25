@@ -70,6 +70,14 @@ AirQualitySensor::Config & AirQualitySensor::Config::WithRelativeHumidity(uint16
 
 AirQualitySensor::Config & AirQualitySensor::Config::WithConcentration(const ConcentrationCluster::Config & customConfig)
 {
+    for (size_t i = 0; i < numConcentrationConfigs; ++i)
+    {
+        if (concentrationConfigs[i].clusterId == customConfig.clusterId)
+        {
+            concentrationConfigs[i] = customConfig;
+            return *this;
+        }
+    }
     VerifyOrDie(numConcentrationConfigs < kMaxConcentrationClusters);
     concentrationConfigs[numConcentrationConfigs++] = customConfig;
     return *this;

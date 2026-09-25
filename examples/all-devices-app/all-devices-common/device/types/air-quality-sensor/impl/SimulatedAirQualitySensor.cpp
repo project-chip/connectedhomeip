@@ -17,6 +17,7 @@
 
 #include "SimulatedAirQualitySensor.h"
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -79,7 +80,11 @@ void SimulatedAirQualitySensor::TimerFired()
         aqValue = AirQuality::AirQualityEnum::kModerate;
         break;
     }
-    AirQualityCluster().SetAirQuality(aqValue);
+    Protocols::InteractionModel::Status aqStatus = AirQualityCluster().SetAirQuality(aqValue);
+    if (aqStatus != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(AppServer, "Failed to set air quality: %u", to_underlying(aqStatus));
+    }
 
     // 2. Oscillate Temperature (~21.5°C ± 1.0°C)
     int16_t tempVal = static_cast<int16_t>(2150 + ((static_cast<int>(mTickCount) % 5) - 2) * 50);
