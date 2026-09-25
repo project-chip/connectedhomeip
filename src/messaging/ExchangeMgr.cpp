@@ -311,6 +311,27 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             return;
         }
+
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && session->IsUnauthenticatedSession() &&
+            IsUnsolicitedCaseSigma2(payloadHeader))
+        {
+            // Filter duplicates so legitimate retransmissions of a previously processed Sigma2
+            // fall through to SendStandaloneAckIfNeeded without triggering an unauthenticated failure StatusReport.
+            if (packetHeader.GetDestinationNodeId().HasValue() && mSessionManager != nullptr)
+            {
+                // The StatusReport carries the piggybacked ack so no
+                // StandaloneAck is needed on success.
+                auto * unauthSession = session->AsUnauthenticatedSession();
+                CHIP_ERROR err       = mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader,
+                                                                                             unauthSession->GetPeerAddress());
+                if (err == CHIP_NO_ERROR)
+                {
+                    return;
+                }
+                LogErrorOnFailure(err);
+            }
+            // Otherwise we fall through so MRP still acks as before.
+        }
     }
     else
     {
