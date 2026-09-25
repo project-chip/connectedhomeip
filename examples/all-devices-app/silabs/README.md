@@ -98,9 +98,9 @@ matterCli> reboot
 ## Low-power build (ICD, MTD, no shell/LEDs)
 
 To reproduce a low-power / battery-operated sample-app configuration, add the
-`--low-power` flag (LCD and shell), select the
-`power-source` device type in addition to the sensor(s) you want on the endpoint
-topology, enable the ICD server, and switch the OpenThread stack to MTD:
+`--low-power` flag (LCD and shell), select the `power-source` device type in
+addition to the sensor(s) you want on the endpoint topology, enable the ICD
+server, and switch the OpenThread stack to MTD:
 
 ```bash
 ./scripts/examples/gn_silabs_example.sh \
