@@ -56,6 +56,9 @@ log = logging.getLogger(__name__)
 
 
 class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+    # Steps 6 and 11 reboot the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
+
     def desc_TC_PAVST_2_14(self) -> str:
         """Test case description."""
         return "[TC-PAVST-2.14] Validate persistence of CurrentConnections attribute - PROVISIONAL"

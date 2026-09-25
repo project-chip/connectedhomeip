@@ -170,14 +170,17 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         current_streams = await self.read_avanaly_attribute_expect_success(endpoint, attributes.CurrentAnalysisStreamCount)
         log.info("CurrentAnalysisStreamCount: %d", current_streams)
 
-        self.step(4)
         invalid_camera_node_id = self.user_params.get("invalid_camera_node_id")
         if invalid_camera_node_id is not None:
+            self.step(4)
             await self.send_establish_analysis_stream_cmd(
                 endpoint, node_id=int(invalid_camera_node_id), expected_status=Status.NotFound
             )
+        elif self.is_ci:
+            self.skip_step(4)
+            log.info("CI mode: skipping invalid NodeID check (use --user-params invalid_camera_node_id:<id> to execute)")
         else:
-            log.info("Test environment has single DUT node; skipping invalid NodeID check (use --user-params invalid_camera_node_id:<id> to execute)")
+            self.skip_step(4)
 
         self.step(5)
         node_id = self.dut_node_id
@@ -208,7 +211,7 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         self.step(9)
         # Activate with unknown stream ID -> expect NOT_FOUND
         existing_stream_ids = {s.analysisStreamID for s in analysis_streams}
-        unknown_stream_id = next(i for i in range(0xFFEE, 0xFFFF) if i not in existing_stream_ids)
+        unknown_stream_id = next(i for i in range(0xFFFF) if i not in existing_stream_ids)
         await self.send_activate_analysis_stream_cmd(
             endpoint, analysis_stream_id=unknown_stream_id, expected_status=Status.NotFound
         )
@@ -249,35 +252,13 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
 
         self.step(10)
         # Activate with invalid endpoint ID -> expect NOT_FOUND per test plan
-        if not self.is_ci:
-            await self.send_activate_analysis_stream_cmd(
-                endpoint,
-                analysis_stream_id=stream_id,
-                webrtc_endpoint_id=invalid_endpoint if selected_transport == "webrtc" else None,
-                pushav_endpoint_id=invalid_endpoint if selected_transport == "pushav" else None,
-                expected_status=Status.NotFound,
-            )
-        else:
-            cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
-                analysisStreamID=stream_id,
-                webRTCEndpointID=invalid_endpoint if selected_transport == "webrtc" else None,
-                pushAVEndpointID=invalid_endpoint if selected_transport == "pushav" else None,
-            )
-            try:
-                await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-                log.warning(
-                    "CI reference app does not yet validate transport endpoint ID; returned Success instead of NOT_FOUND"
-                )
-                # Deactivate stream back to PendingInitiation so step 11 can activate it
-                await self.send_deactivate_analysis_stream_cmd(
-                    endpoint, analysis_stream_id=stream_id, expected_status=Status.Success
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status,
-                    Status.NotFound,
-                    f"Expected NOT_FOUND for invalid transport endpoint ID, got {e.status}",
-                )
+        await self.send_activate_analysis_stream_cmd(
+            endpoint,
+            analysis_stream_id=stream_id,
+            webrtc_endpoint_id=invalid_endpoint if selected_transport == "webrtc" else None,
+            pushav_endpoint_id=invalid_endpoint if selected_transport == "pushav" else None,
+            expected_status=Status.NotFound,
+        )
 
         self.step(11)
         # Activate with valid endpoint ID -> expect SUCCESS

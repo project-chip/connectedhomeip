@@ -37,7 +37,7 @@ using namespace AmbientSensingUnion::Attributes;
 
 AmbientSensingUnionCluster::AmbientSensingUnionCluster(const Config & config, ContributorEntry * storage, size_t capacity) :
     DefaultServerCluster({ config.mEndpointId, AmbientSensingUnion::Id }), mDelegate(config.mDelegate), mUnionNameLength(0),
-    mUnionHealth(UnionHealthEnum::kNonFunctional), mContributors(storage), mCapacity(capacity), mContributorCount(0)
+    mUnionHealth(config.mUnionHealth), mContributors(storage), mCapacity(capacity), mContributorCount(0)
 {
     mUnionNameBuffer[0] = '\0';
 
@@ -74,9 +74,6 @@ CHIP_ERROR AmbientSensingUnionCluster::Startup(ServerClusterContext & context)
                             mUnionNameBuffer);
         }
     }
-
-    // Recalculate union health based on current contributor state
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -180,6 +177,28 @@ CharSpan AmbientSensingUnionCluster::GetUnionName() const
     return CharSpan(mUnionNameBuffer, mUnionNameLength);
 }
 
+CHIP_ERROR AmbientSensingUnionCluster::SetUnionHealth(AmbientSensingUnion::UnionHealthEnum health)
+{
+    VerifyOrReturnError(health == UnionHealthEnum::kFullyFunctional || health == UnionHealthEnum::kLimitedDegraded ||
+                            health == UnionHealthEnum::kNonFunctional,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mUnionHealth == health)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    mUnionHealth = health;
+    NotifyAttributeChanged(UnionHealth::Id);
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnUnionHealthChanged(mUnionHealth);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 // =============================================================================
 // Contributor Lookup Methods
 // =============================================================================
@@ -268,7 +287,6 @@ CHIP_ERROR AmbientSensingUnionCluster::AddMatterContributor(NodeId nodeId, Endpo
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorAddedEvent(*entry);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -284,7 +302,6 @@ CHIP_ERROR AmbientSensingUnionCluster::RemoveMatterContributor(NodeId nodeId, En
     mContributorCount--;
 
     NotifyAttributeChanged(UnionContributorList::Id);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -306,7 +323,6 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateMatterContributorStatus(NodeId node
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorStatusChangedEvent(*entry, previousStatus);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -346,7 +362,6 @@ CHIP_ERROR AmbientSensingUnionCluster::AddNonMatterContributor(const CharSpan & 
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorAddedEvent(*entry);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -362,7 +377,6 @@ CHIP_ERROR AmbientSensingUnionCluster::RemoveNonMatterContributor(const CharSpan
     mContributorCount--;
 
     NotifyAttributeChanged(UnionContributorList::Id);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -384,7 +398,6 @@ CHIP_ERROR AmbientSensingUnionCluster::UpdateNonMatterContributorStatus(const Ch
 
     NotifyAttributeChanged(UnionContributorList::Id);
     EmitContributorStatusChangedEvent(*entry, previousStatus);
-    RecalculateUnionHealth();
 
     return CHIP_NO_ERROR;
 }
@@ -486,52 +499,6 @@ CHIP_ERROR AmbientSensingUnionCluster::EncodeContributorList(AttributeValueEncod
         }
         return CHIP_NO_ERROR;
     });
-}
-
-// =============================================================================
-// Health Recalculation
-// =============================================================================
-
-void AmbientSensingUnionCluster::RecalculateUnionHealth()
-{
-    size_t onlineCount = 0;
-
-    for (size_t i = 0; i < mCapacity; i++)
-    {
-        if (mContributors[i].active && mContributors[i].status == UnionContributorStatusEnum::kUnionContributorOnline)
-        {
-            onlineCount++;
-        }
-    }
-
-    UnionHealthEnum newHealth;
-    if (mContributorCount == 0)
-    {
-        newHealth = UnionHealthEnum::kNonFunctional;
-    }
-    else if (onlineCount == mContributorCount)
-    {
-        newHealth = UnionHealthEnum::kFullyFunctional;
-    }
-    else if (onlineCount == 0)
-    {
-        newHealth = UnionHealthEnum::kNonFunctional;
-    }
-    else
-    {
-        newHealth = UnionHealthEnum::kLimitedDegraded;
-    }
-
-    if (mUnionHealth != newHealth)
-    {
-        mUnionHealth = newHealth;
-        NotifyAttributeChanged(UnionHealth::Id);
-
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnUnionHealthChanged(mUnionHealth);
-        }
-    }
 }
 
 // =============================================================================
