@@ -529,9 +529,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
-    // The command is one of the ‘without On/Off’ commands: ... Stop."
-    VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    // Spec 1.6.6.9: "Command execution SHALL NOT continue beyond the Options processing if ...
+    // The command is one of the 'without On/Off' commands: Move, Move to Level, Step, or Stop."
+    // StopWithOnOff is not on that list, so only the plain Stop is gated.
+    VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.

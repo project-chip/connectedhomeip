@@ -4096,6 +4096,64 @@ PICS:
     - label: "Does the device implement receiving the ResetCondition command?"
       id: ACFREMON.S.C00.Rsp
 
+    # Humidistat Cluster Test Plan
+    - label: "Does the device implement the Humidistat cluster as a server?"
+      id: HSTAT.S
+
+    - label: "Does the device implement the Humidistat cluster as a client?"
+      id: HSTAT.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Humidifier feature?"
+      id: HSTAT.S.F00
+
+    - label: "Does the device support the Dehumidifier feature?"
+      id: HSTAT.S.F01
+
+    - label: "Does the device support the Continuous feature?"
+      id: HSTAT.S.F02
+
+    - label: "Does the device support the Sensor feature?"
+      id: HSTAT.S.F03
+
+    - label: "Does the device support the Auto feature?"
+      id: HSTAT.S.F04
+
+    - label: "Does the device support the FanOnly feature?"
+      id: HSTAT.S.F05
+
+    - label: "Does the device support the Optimal feature?"
+      id: HSTAT.S.F06
+
+    - label: "Does the device support the WarmMist feature?"
+      id: HSTAT.S.F07
+
+    - label: "Does the device support the ColdMist feature?"
+      id: HSTAT.S.F08
+
+    - label: "Does the device support the CondPump feature?"
+      id: HSTAT.S.F09
+
+    #
+    # server / Manual controllable
+    #
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Continuous while disallowed by a test event trigger?"
+      id: HSTAT.S.M.ContinuousError
+
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Sleep while disallowed by a test event trigger?"
+      id: HSTAT.S.M.SleepError
+
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Optimal while disallowed by a test event trigger?"
+      id: HSTAT.S.M.OptimalError
+
     # Identify Cluster Test Plan
     - label: "Does the device implement the Identify cluster as a server?"
       id: I.S
