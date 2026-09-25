@@ -74,7 +74,7 @@ ClosurePanel::Config RotatingPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                            ClosureDimension::OverflowEnum::kTopInside },
+                                                        ClosureDimension::OverflowEnum::kTopInside },
             },
     };
 }
