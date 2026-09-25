@@ -39,6 +39,8 @@ executable("matter-network-manager-app") {
   if (matter_enable_ubus) {
     defines += [ "MATTER_ENABLE_UBUS=1" ]
     sources += [
+      "MatterUbusService.cpp",
+      "MatterUbusService.h",
       "ThreadBROpenThreadUbus.cpp",
       "ThreadBROpenThreadUbus.h",
       "UboxUtils.cpp",
