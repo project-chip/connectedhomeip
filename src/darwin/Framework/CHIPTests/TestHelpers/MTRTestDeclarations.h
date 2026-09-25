@@ -90,6 +90,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)unitTestNoteTimeSynchronizationRepairScheduled;
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
