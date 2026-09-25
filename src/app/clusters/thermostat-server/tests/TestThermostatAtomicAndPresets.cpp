@@ -272,6 +272,100 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteRollback)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+constexpr GroupId kTestGroupId = 0x0101;
+
+void SetSubject(ClusterTester & tester, Access::AuthMode authMode, NodeId subject, FabricIndex fabricIndex)
+{
+    Access::SubjectDescriptor subjectDescriptor;
+    subjectDescriptor.fabricIndex = fabricIndex;
+    subjectDescriptor.authMode    = authMode;
+    subjectDescriptor.subject     = subject;
+    tester.SetSubjectDescriptor(subjectDescriptor);
+    tester.SetFabricIndex(fabricIndex);
+}
+
+void SetGroupSubject(ClusterTester & tester)
+{
+    SetSubject(tester, Access::AuthMode::kGroup, NodeIdFromGroupId(kTestGroupId), Thermostat::kTestFabricIndex);
+}
+
+TEST_F(ThermostatTestFixture, TestAtomicRequestBeginWriteRejectedWithoutCaseSession)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type req;
+    req.requestType             = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Presets::Id };
+    req.attributeRequests       = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    // A groupcast session context has no valid Atomic Writer ID.
+    SetGroupSubject(tester);
+    EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+
+    // A PASE session has no accessing fabric.
+    SetSubject(tester, Access::AuthMode::kPase, NodeIdFromPAKEKeyId(0), kUndefinedFabricIndex);
+    EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+
+    // No atomic write was opened, so a CASE client can still begin one on the same attribute.
+    SetupTesterSubject(tester);
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestAtomicRequestCommitAndRollbackRejectedFromGroup)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::AtomicRequest::Type req;
+    req.requestType             = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Presets::Id };
+    req.attributeRequests       = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(result.response.has_value() && result.response->statusCode == to_underlying(Status::Success));
+
+    SetGroupSubject(tester);
+    req.timeout     = NullOptional;
+    req.requestType = AtomicRequestTypeEnum::kCommitWrite;
+    EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+    req.requestType = AtomicRequestTypeEnum::kRollbackWrite;
+    EXPECT_EQ(tester.Invoke(req).GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
+
+    // The owner's session must still be open.
+    SetupTesterSubject(tester);
+    EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestAtomicWriteTimerExpiration)
 {
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);

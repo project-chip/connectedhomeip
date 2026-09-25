@@ -54,10 +54,6 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
         {
             return sessionHandle->AsSecureSession()->GetPeer();
         }
-        if (sessionHandle->IsGroupSession())
-        {
-            return sessionHandle->AsIncomingGroupSession()->GetPeer();
-        }
         return ScopedNodeId();
     }
 
@@ -491,6 +487,11 @@ std::optional<DataModel::ActionReturnStatus> AtomicWriteSession::InvokeCommand(c
     {
     case Commands::AtomicRequest::Id: {
         handled = true;
+        // Only a CASE session provides both an accessing fabric and a valid Atomic Writer ID.
+        if (handler->GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+        {
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
         Commands::AtomicRequest::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
 
