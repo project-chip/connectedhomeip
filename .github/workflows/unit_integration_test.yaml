@@ -63,7 +63,7 @@ jobs:
               if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux unit_tests
+                platform: linux
                 bootstrap-log-name: bootstrap-logs-unittest-crypto-backends
             - name: Build and run PSA unit tests (ASan)
               if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
