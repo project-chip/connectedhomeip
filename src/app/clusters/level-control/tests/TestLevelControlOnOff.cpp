@@ -647,3 +647,32 @@ TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)
     // mOn should be FALSE at the end because we moved to MinLevel.
     EXPECT_FALSE(onOffCluster.GetOnOff());
 }
+
+// StopWithOnOff is not gated while off, so it must also cope with a CurrentLevel that was never set.
+TEST_F(TestLevelControlOnOff, TestStopWithOnOffWhileOffWithNullCurrentLevel)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> currentLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    ASSERT_TRUE(currentLevel.IsNull());
+
+    Commands::StopWithOnOff::Type stop;
+    stop.optionsMask.ClearAll();
+    stop.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::StopWithOnOff::Id, stop).IsSuccess());
+
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    EXPECT_TRUE(currentLevel.IsNull());
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+}
