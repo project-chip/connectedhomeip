@@ -3300,3 +3300,6 @@ PROXR.S.C01.Tx=1   # StartRangingResponse
 # Events
 PROXR.S.E00=1      # RangingResult
 PROXR.S.E01=1      # RangingSessionStatus
+
+# Client role (DUT-as-client tests TC-PROXR-3.1/3.2)
+PROXR.C=1
