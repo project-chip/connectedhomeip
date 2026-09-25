@@ -37,10 +37,7 @@ COUNT_FAIL=0
 
 # If some tests are known to fail and the root cause is not yet identified,
 # they can be added to the SKIP array to unblock failing CI runs.
-SKIP=(
-    "TestPDCCommissioning"
-    "TestCertificateChainRequestTracker"
-)
+SKIP=()
 
 # Run all executables in the /mnt/chip directory except the runner.sh script
 while IFS= read -r TEST; do
