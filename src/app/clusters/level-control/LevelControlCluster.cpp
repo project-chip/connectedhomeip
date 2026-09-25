@@ -535,7 +535,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId command
     VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
-    // CurrentLevel stays null until a level is first set; Stop leaves it as it is.
+    // mCurrentLevel has a value here unless it was never set:
+    // - If we were transitioning, it had a value.
+    // - If we weren't transitioning, it maintains its last state.
+    // - Startup leaves it null when nothing is persisted and no initial level or StartUpCurrentLevel applies.
     VerifyOrReturnValue(!mCurrentLevel.value().IsNull(), Status::Success);
     return SetCurrentLevel(mCurrentLevel.value().Value(), ReportingMode::kForceReport);
 }
