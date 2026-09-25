@@ -46,6 +46,13 @@ public:
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+#if SL_MATTER_DISPLAY_ENABLED
+    // Forwards a press of the action button (button 1) to the delegate whose device page is
+    // currently displayed on the LCD. A no-op when the current LCD page is a built-in
+    // screen or when the current device page did not register a button callback.
+    static void ActionButtonEventHandler(AppEvent * aEvent);
+#endif
+
     // Code-driven data model initialization hooks required by MatterConfig.cpp
     static CHIP_ERROR InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
                                               chip::Credentials::GroupDataProvider * groupDataProvider);
