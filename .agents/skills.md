@@ -73,6 +73,24 @@ etc.) to assist with development and code review in the Matter repository.
     Pull Request descriptions.
 -   **Triggers**: Use when preparing or writing descriptions for pull requests.
 
+### Matter PR Triage
+
+-   **Location**: `.agents/skills/matter-pr-triage/`
+-   **Purpose**: Works through a backlog of old pull requests and says which can
+    safely be closed because their goal already landed, which the code has moved
+    on from, and which still stand, each with its reason.
+-   **Triggers**: Use on a backlog of old pull requests, for example those
+    opened over a year ago, to decide which to close and which to keep.
+
+### Matter PR Triage Issues
+
+-   **Location**: `.agents/skills/matter-pr-triage-issues/`
+-   **Purpose**: For any pull request, lists the related issues, linked or not
+    linked on GitHub, each with what it asks for; for one the triage found safe
+    to close, also which of them can safely be closed with it.
+-   **Triggers**: Use on any pull request to see the issues related to it, and
+    on one the triage marked safe to close to find which issues close with it.
+
 ### Matter Specification Access
 
 -   **Location**: `.agents/skills/matter-specification-access/`
