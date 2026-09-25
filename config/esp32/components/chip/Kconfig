@@ -624,6 +624,17 @@ menu "CHIP Device Layer"
             help
                 Enables WiFi station for CHIP.
 
+        config ENABLE_WIFI_PDC
+            bool "Enable WiFi Per-Device Credentials"
+            default n
+            depends on ENABLE_WIFI_STATION
+            help
+                Enables the Per-Device Credentials feature of the Network Commissioning
+                cluster. Associating with a PDC network uses EAP-TLS over WPA3-Enterprise,
+                so ESP_WIFI_ENTERPRISE_SUPPORT is required as well. Matter mandates
+                EAP-TLS 1.3, which additionally requires ESP_WIFI_EAP_TLS1_3 (an
+                experimental ESP-IDF feature).
+
         config DEFAULT_WIFI_SSID
             string "Default WiFi SSID"
             default ""
