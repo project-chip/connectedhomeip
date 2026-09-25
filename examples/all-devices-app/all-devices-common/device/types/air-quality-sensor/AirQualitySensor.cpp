@@ -17,6 +17,7 @@
 
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
 #include <devices/Types.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -29,9 +30,14 @@ AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config &
     mConfig(config)
 {}
 
+AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate) : AirQualitySensor(timerDelegate, Config{}) {}
+
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                       EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -40,20 +46,19 @@ CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
     ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
 
-    mCO2Cluster.Create(endpoint, mConfig.co2Config);
-    ReturnErrorOnFailure(provider.AddCluster(mCO2Cluster.Registration()));
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void AirQualitySensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    UnregisterAdditionalClusters(provider);
+
     UnregisterDescriptor(provider);
-    if (mCO2Cluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mCO2Cluster.Cluster()));
-        mCO2Cluster.Destroy();
-    }
+
     if (mAirQualityCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mAirQualityCluster.Cluster()));
@@ -72,10 +77,10 @@ Clusters::AirQualityCluster & AirQualitySensor::AirQualityCluster()
     return mAirQualityCluster.Cluster();
 }
 
-AirQualitySensor::ConcentrationCluster & AirQualitySensor::CO2Cluster()
+Clusters::IdentifyCluster & AirQualitySensor::IdentifyCluster()
 {
-    VerifyOrDie(mCO2Cluster.IsConstructed());
-    return mCO2Cluster.Cluster();
+    VerifyOrDie(mIdentifyCluster.IsConstructed());
+    return mIdentifyCluster.Cluster();
 }
 
 } // namespace app

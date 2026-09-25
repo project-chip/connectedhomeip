@@ -18,43 +18,66 @@
 #pragma once
 
 #include <app/clusters/air-quality-server/AirQualityCluster.h>
-#include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
 
+/// Base Matter Air Quality Sensor device type (spec section 2.6).
+/// Owns only mandatory clusters (Identify, Air Quality).
+/// Optional clusters (Temperature, Relative Humidity, Concentration measurements)
+/// belong to subclasses via RegisterAdditionalClusters / UnregisterAdditionalClusters.
 class AirQualitySensor : public SingleEndpoint
 {
 public:
-    using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-
     struct Config
     {
-        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures;
-        ConcentrationCluster::Config co2Config;
+        BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{ Clusters::AirQuality::Feature::kFair,
+                                                                    Clusters::AirQuality::Feature::kModerate,
+                                                                    Clusters::AirQuality::Feature::kVeryPoor,
+                                                                    Clusters::AirQuality::Feature::kExtremelyPoor };
+
+        constexpr Config() = default;
+
+        Config & WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features)
+        {
+            airQualityFeatures = features;
+            return *this;
+        }
     };
 
     AirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
+    explicit AirQualitySensor(TimerDelegate & timerDelegate);
     ~AirQualitySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    // Public cluster accessors for mandatory clusters
     Clusters::AirQualityCluster & AirQualityCluster();
-    ConcentrationCluster & CO2Cluster();
+    Clusters::IdentifyCluster & IdentifyCluster();
 
 protected:
+    /// Called before the endpoint is added, within the registration transaction.
+    /// Subclasses in impl/ override this to attach optional clusters.
+    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    /// Called after the endpoint is removed, also on partial registration failure.
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
+
     TimerDelegate & mTimerDelegate;
     Config mConfig;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AirQualityCluster> mAirQualityCluster;
-    LazyRegisteredServerCluster<ConcentrationCluster> mCO2Cluster;
 };
 
 } // namespace app
