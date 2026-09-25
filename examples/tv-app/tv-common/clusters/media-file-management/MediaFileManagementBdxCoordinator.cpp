@@ -63,18 +63,37 @@ CHIP_ERROR MediaFileManagementBdxCoordinator::ShareFileWithClient(ScopedNodeId p
 
     // Allocate a ResponseID the client will use in GetSharedFile.
     const uint16_t responseID = mNextResponseID++;
-    mShared[responseID]       = SharedEntry{ peer, fileID };
+    mShared[responseID]       = SharedEntry{ peer, fileID, designator, false };
 
     mCluster.GenerateSharedFilesAddedEvent(requestID, responseID);
     return CHIP_NO_ERROR;
 }
 
-bool MediaFileManagementBdxCoordinator::LookupSharedFile(ScopedNodeId peer, uint16_t responseID, uint64_t & fileID)
+SharedFileLookupResult MediaFileManagementBdxCoordinator::LookupSharedFile(ScopedNodeId peer, uint16_t responseID,
+                                                                           uint64_t & fileID)
 {
     const auto entry = mShared.find(responseID);
-    VerifyOrReturnValue(entry != mShared.cend() && entry->second.peer == peer, false);
+    // A ResponseID that was never handed out, or was handed out to someone else,
+    // is indistinguishable from a fabricated one.
+    VerifyOrReturnValue(entry != mShared.cend() && entry->second.peer == peer, SharedFileLookupResult::kUnknown);
+    VerifyOrReturnValue(!entry->second.retrieved, SharedFileLookupResult::kRetrieved);
+
     fileID = entry->second.fileID;
-    return true;
+    return SharedFileLookupResult::kAvailable;
+}
+
+void MediaFileManagementBdxCoordinator::OnSharedFileRetrieved(ScopedNodeId peer, const char * designator)
+{
+    // The bytes are delivered, so the ResponseID that authorized this pull is spent.
+    for (auto & kv : mShared)
+    {
+        if (kv.second.peer == peer && kv.second.designator == designator)
+        {
+            kv.second.retrieved = true;
+            ChipLogProgress(Zcl, "MediaFileManagementBdxCoordinator: responseID %u retired after retrieval", kv.first);
+            return;
+        }
+    }
 }
 
 CHIP_ERROR MediaFileManagementBdxCoordinator::MakeSelfBdxUri(uint64_t fileID, CharSpan designator, MutableCharSpan & out)
