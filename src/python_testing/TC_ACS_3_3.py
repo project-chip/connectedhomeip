@@ -53,7 +53,7 @@ from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -80,7 +80,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --float-arg PIXIT.ACS.Holdtime:10"
 
 
-class TC_ACS_3_3(MatterBaseTest):
+class TC_ACS_3_3(MatterTestCommissionedDevice):
 
     def pics_TC_ACS_3_3(self):
         return ['ACS.S']

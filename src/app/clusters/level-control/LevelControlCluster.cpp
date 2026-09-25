@@ -405,49 +405,49 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 {
     VerifyOrReturnError(rate.IsNull() || rate.Value() != 0, Status::InvalidCommand);
     VerifyOrReturnError(!mCurrentLevel.value().IsNull(), Status::Failure);
-    VerifyOrReturnError(!rate.IsNull() || !mDefaultMoveRate.IsNull(), Status::Success); // No movement if rate is unspecified
 
-    // If rate is null, use default move rate (one of the two is guaranteed to be non-null here because of the earlier check)
-    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
-    VerifyOrReturnError(currentRate != 0, Status::ConstraintError);
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null, then the value of the DefaultMoveRate
+    // attribute SHALL be used if that attribute is supported and its value is not null."
+    // A null result means no rate is available; that case is handled once the target is known.
+    const DataModel::Nullable<uint8_t> effectiveRate =
+        (rate.IsNull() && mOptionalAttributes.IsSet(Attributes::DefaultMoveRate::Id)) ? mDefaultMoveRate : rate;
+    VerifyOrReturnError(effectiveRate.IsNull() || effectiveRate.Value() != 0, Status::ConstraintError);
 
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
         ReturnErrorOnFailure(SetOnOff(true));
     }
-    else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
+    else if (!IsWithOnOffCommand(commandId) && !ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
     }
 
     mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
-    // Determine Direction first
-    bool increasing = (moveMode == MoveModeEnum::kUp);
-    uint8_t targetLevel;
-
-    // Now determine Target and Check Constraints (safe from clobbering)
-    if (increasing)
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel < targetLevel, Status::Success);
-    }
-    else
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel > targetLevel, Status::Success);
-    }
+    bool increasing      = (moveMode == MoveModeEnum::kUp);
+    uint8_t currentLevel = mCurrentLevel.value().Value();
+    uint8_t targetLevel  = increasing ? (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel)
+                                      : (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0);
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
-    uint8_t currentLevel = mCurrentLevel.value().Value();
-    uint8_t difference   = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+    uint8_t difference = increasing ? (currentLevel < targetLevel ? static_cast<uint8_t>(targetLevel - currentLevel) : 0)
+                                    : (currentLevel > targetLevel ? static_cast<uint8_t>(currentLevel - targetLevel) : 0);
 
-    // currentRate is known not to be 0 (ConstraintError check above)
-    uint32_t tickDurationMs = 1000 / currentRate;
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is
+    // either not supported or set to null, then the device SHOULD move as fast as it is able."
+    // Nothing paces the transition in that case (or when already at the target), so go straight to the target.
+    if (effectiveRate.IsNull() || difference == 0)
+    {
+        ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+        if (IsWithOnOffCommand(commandId) && targetLevel == mMinLevel)
+        {
+            ReturnErrorOnFailure(SetOnOff(false));
+        }
+        return Status::Success;
+    }
+
+    // effectiveRate is known not to be 0 (ConstraintError check above)
+    uint32_t tickDurationMs = 1000 / effectiveRate.Value();
     if (tickDurationMs == 0)
     {
         tickDurationMs = 1;
@@ -722,6 +722,11 @@ void LevelControlCluster::TransitionHandler::StopTransition()
     mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport);
 }
 
+bool LevelControlCluster::TransitionHandler::IsInternalOffTransitionActive()
+{
+    return (mCurrentCommandId == kInternalOffTransition) && mCluster.mTimerDelegate.IsTimerActive(this);
+}
+
 void LevelControlCluster::TransitionHandler::TimerFired()
 {
     VerifyOrReturn(!mCluster.mCurrentLevel.value().IsNull());
@@ -817,7 +822,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
     {
         // On Transition
         // 2. Determine Target Level (Capture before setting to Min)
-        const uint8_t target = mOnLevel.ValueOr(mLevelBeforeTurnedOff.ValueOr(kMaxLevel));
+        // Spec stores CurrentLevel on receipt of On. If the Off fade is still running, the level stored
+        // by that Off is kept instead, so the level from before the Off is restored.
+        uint8_t storedLevel = mCurrentLevel.value().Value();
+        if (mTransitionHandler.IsInternalOffTransitionActive())
+        {
+            storedLevel = mLevelBeforeTurnedOff.ValueOr(storedLevel);
+        }
+        const uint8_t target = mOnLevel.ValueOr(storedLevel);
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
@@ -834,9 +846,10 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
             transitionTime.SetNonNull(mOnOffTransitionTime);
         }
 
-        // 4. Move
-        BitMask<OptionsBitmap> options;
-        MoveToLevelCommand(Commands::MoveToLevelWithOnOff::Id, target, transitionTime, options, options);
+        // 4. Move. OnOff is already true here; use MoveToLevel so reaching MinLevel does not
+        // turn OnOff back off.
+        BitMask<OptionsBitmap> executeIfOff(OptionsBitmap::kExecuteIfOff);
+        MoveToLevelCommand(Commands::MoveToLevel::Id, target, transitionTime, executeIfOff, executeIfOff);
     }
     else
     {

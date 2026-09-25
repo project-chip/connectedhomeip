@@ -62,7 +62,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ log = logging.getLogger(__name__)
 _MIN_SCENE_TABLE_SIZE = 16
 
 
-class TC_S_2_5(MatterBaseTest):
+class TC_S_2_5(MatterTestCommissionedDevice):
     # Established in Step 4b and kept alive for the remainder of the test.
     _scene_info_subscription: typing.Any
     _scene_info_cb: AttributeSubscriptionHandler

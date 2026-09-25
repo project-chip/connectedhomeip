@@ -43,7 +43,7 @@ from test_plan_support import commission_if_required, read_attribute, send_comma
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
@@ -88,7 +88,7 @@ def verify_invalid_command() -> str:
     return ("Verify that the DUT responds with INVALID_COMMAND")
 
 
-class TC_OPCREDS_3_4(MatterBaseTest):
+class TC_OPCREDS_3_4(MatterTestCommissionedDevice):
     def desc_TC_OPCREDS_3_4(self):
         return " UpdateNOC-Error Condition [DUT-Server]"
 

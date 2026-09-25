@@ -131,6 +131,10 @@ _available_devices = [
     "GENERIC_SWITCH",
   ],
   [
+    "humidity-conditioner",
+    "HUMIDITY_CONDITIONER",
+  ],
+  [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
   ],
@@ -211,6 +215,10 @@ _available_devices = [
     "ROBOTIC_VACUUM_CLEANER",
   ],
   [
+    "room-air-conditioner",
+    "ROOM_AIR_CONDITIONER",
+  ],
+  [
     "smoke-co-alarm",
     "SMOKE_CO_ALARM",
   ],
@@ -225,6 +233,10 @@ _available_devices = [
   [
     "temperature-sensor",
     "TEMPERATURE_SENSOR",
+  ],
+  [
+    "thread-border-router",
+    "THREAD_BORDER_ROUTER",
   ],
   [
     "water-freeze-detector",

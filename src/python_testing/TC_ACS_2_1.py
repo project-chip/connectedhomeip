@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 # --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo_2_1 --bool-arg simulate_ambientsensing:True"
 
 
-class TC_ACS_2_1(MatterBaseTest):
+class TC_ACS_2_1(MatterTestCommissionedDevice):
 
     def setup_test(self):
         super().setup_test()

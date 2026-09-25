@@ -214,6 +214,55 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 }
 
+// Without a Rate and without DefaultMoveRate the move is immediate, so MoveWithOnOff Down has to reach
+// MinLevel and turn the device off within the invocation, with no transition left running.
+TEST_F(TestLevelControlOnOff, TestMoveWithOnOffDownNullRateTurnsOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // DefaultMoveRate is not configured, so a null Rate leaves no rate at all.
+    Commands::MoveWithOnOff::Type data;
+    data.moveMode = MoveModeEnum::kDown;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    // When OnOff is true and CurrentLevel is already at MinLevel, MoveWithOnOff(kDown) must still set OnOff to false.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(cluster.GetMinLevel(), DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(0), BitMask<LevelControl::OptionsBitmap>(0))
+                    .IsSuccess());
+    EXPECT_TRUE(onOffCluster.GetOnOff());
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), cluster.GetMinLevel());
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
+    EXPECT_FALSE(onOffCluster.GetOnOff());
+}
+
 // Spec 1.6.6.9 gates only Move, MoveToLevel, Step and Stop. StopWithOnOff is not on that list, so
 // it must terminate an in-flight transition even while the device is off with ExecuteIfOff clear.
 TEST_F(TestLevelControlOnOff, TestStopWithOnOffTerminatesTransitionWhileOff)
@@ -420,12 +469,13 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
     EXPECT_EQ(readLevel.Value(), 200u);
 }
 
-TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
+TEST_F(TestLevelControlOnOff, TestOnWithoutOnLevelUsesCurrentLevel)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    // Test that if OnLevel is null and StoredLevel is unknown (null or 0?), it defaults to MaxLevel.
+    // Spec (Effect of On/Off Commands table): On stores CurrentLevel and moves to OnLevel, or to the
+    // stored level if OnLevel is not defined. There is no MaxLevel default.
     LevelControlCluster cluster{
         kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(0)
     }; // Immediate
@@ -441,13 +491,13 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
                                  BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
                     .IsSuccess());
 
-    // Turn ON. No OnLevel set. No StoredLevel (as we haven't turned off from a high level).
-    // Should default to MaxLevel (254).
+    // Turn ON. OnLevel is null, so the target is the stored CurrentLevel (0).
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
 
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
-    EXPECT_EQ(readLevel.Value(), 254u);
+    EXPECT_EQ(readLevel.Value(), 0u);
+    EXPECT_TRUE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
@@ -539,7 +589,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     EXPECT_EQ(readLevel.Value(), 254u);
 }
 
-TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
+TEST_F(TestLevelControlOnOff, TestOnAfterMoveToLevelWithOnOffToMinLevel)
 {
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
@@ -575,8 +625,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 200u);
 
-    // 2. MoveToLevelWithOnOff(MinLevel, time=10s).
-    // This should NOT overwrite mLevelBeforeTurnedOff (200) with MinLevel (0/1).
+    // 2. MoveToLevelWithOnOff(MinLevel, time=10s). This turns OnOff off at MinLevel.
     uint8_t minLevel = cluster.GetMinLevel();
     Commands::MoveToLevelWithOnOff::Type data;
     data.level = minLevel;
@@ -595,8 +644,9 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
 
     EXPECT_FALSE(onOffCluster.GetOnOff());
 
-    // 4. Turn On (Simulate OnOff Cluster On command)
-    // Should restore 200 (from mLevelBeforeTurnedOff) NOT MinLevel (0/1).
+    // 4. Turn On (Simulate OnOff Cluster On command).
+    // Spec: On stores CurrentLevel (MinLevel) and, with OnLevel null, moves to that stored level.
+    // The level stored by the earlier Off (200) is not used.
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
 
     while (mockTimer.IsTimerActive(nullptr))
@@ -606,7 +656,86 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
 
     // 5. Check Level.
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), minLevel);
+    EXPECT_TRUE(onOffCluster.GetOnOff());
+}
+
+TEST_F(TestLevelControlOnOff, TestOnUsesLevelSetWhileOff)
+{
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{
+        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(0)
+    };
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto executeIfOff = BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff);
+
+    // Level 200, On, then Off. OnLevel is null, so the Off restores CurrentLevel to 200.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(
+        cluster.MoveToLevel(200, DataModel::MakeNullable(static_cast<uint16_t>(0)), executeIfOff, executeIfOff).IsSuccess());
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+
+    // Set the level while off (ExecuteIfOff).
+    EXPECT_TRUE(cluster.MoveToLevel(50, DataModel::MakeNullable(static_cast<uint16_t>(0)), executeIfOff, executeIfOff).IsSuccess());
+
+    // Spec: On stores CurrentLevel (50) and, with OnLevel null, moves to it.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 50u);
+}
+
+TEST_F(TestLevelControlOnOff, TestOnDuringOffFadeRestoresLevelBeforeOff)
+{
+    // Separate timer: TimerDelegateMock has a single slot and ignores the context, and
+    // OnOffCluster::SetOnOff cancels its scene timer, which would also cancel the level fade.
+    chip::TimerDelegateMock onOffTimer;
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ onOffTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{
+        kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(100)
+    }; // 10s
+    onOffCluster.AddDelegate(&cluster);
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto executeIfOff = BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff);
+
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+    EXPECT_TRUE(
+        cluster.MoveToLevel(200, DataModel::MakeNullable(static_cast<uint16_t>(0)), executeIfOff, executeIfOff).IsSuccess());
+
+    // Off: stores 200 and starts a 10s fade to MinLevel. Interrupt it after 3s.
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
+    AdvanceClock(System::Clock::Milliseconds64(3000));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_LT(readLevel.Value(), 200u);
+    EXPECT_GT(readLevel.Value(), cluster.GetMinLevel());
+
+    // Spec: if another On/Off command arrives before the transition completes, the originally
+    // stored level SHALL be preserved and restored.
+    EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
+
+    int limit = 200;
+    while (mockTimer.IsTimerActive(nullptr) && limit-- > 0)
+    {
+        AdvanceClock(System::Clock::Milliseconds64(1000));
+    }
+
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 200u);
+    EXPECT_TRUE(onOffCluster.GetOnOff());
 }
 
 TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)

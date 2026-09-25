@@ -98,6 +98,7 @@ void ICDManager::Shutdown()
 {
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+    DeviceLayer::SystemLayer().CancelTimer(OnNetworkAttachSettleTimerDone, this);
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     ICDNotifier::GetInstance().Unsubscribe(this);
 
@@ -110,6 +111,8 @@ void ICDManager::Shutdown()
     mOperationalState = OperationalState::ActiveMode;
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
     mPendingActiveModeOnNetworkAttach = false;
+    mIsServerReady                    = false;
+    mNetworkAttachSettleDelay         = kDefaultNetworkAttachSettleDelay;
 #if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
     mPendingCheckInType          = PendingCheckInType::kNone;
     mPendingCheckInSubjectsCount = 0;
@@ -153,6 +156,12 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject)
 {
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
+    {
+        return;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
     VerifyOrDie(SupportsFeature(Feature::kCheckInProtocolSupport));
     VerifyOrDie(mStorage != nullptr);
@@ -375,7 +384,8 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier)
+void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier,
+                                        CheckInTriggerReason reason)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
@@ -385,6 +395,17 @@ void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeS
 
     // If we don't have any Check-In messages to send, do nothing
     VerifyOrReturn(CheckInMessagesWouldBeSent(verifier));
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && reason == CheckInTriggerReason::kColdBoot)
+    {
+        // On cold boot, enter ActiveMode immediately below for its threshold duration and
+        // latch mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the settle timer
+        // once both Thread attachment and kServerReady complete.
+        mPendingActiveModeOnNetworkAttach = true;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
     UpdateOperationState(OperationalState::ActiveMode);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -439,7 +460,7 @@ void ICDManager::UpdateICDMode()
     }
 }
 
-void ICDManager::UpdateOperationState(OperationalState state)
+void ICDManager::UpdateOperationState(OperationalState state, bool sendCheckInMsgs)
 {
     assertChipStackLockedByCurrentThread();
     // Active mode can be re-triggered.
@@ -522,7 +543,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
             }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            SendCheckInMsgs();
+            if (sendCheckInMsgs)
+            {
+                SendCheckInMsgs();
+            }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
@@ -796,35 +820,118 @@ void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, int
     reinterpret_cast<ICDManager *>(arg)->HandlePlatformEvent(event);
 }
 
+// Deferred-action gate. "Flush" = enter/extend ActiveMode + replay queued Check-Ins.
+//
+//   event                            attached  serverReady  action
+//   -------------------------------  --------  -----------  ---------------------------------------
+//   kThreadStateChange               no        -            stop the settle timer
+//   kThreadConnectivityChange        no        -            stop the settle timer
+//   kThreadConnectivityChange (Est)  yes       no           ActiveMode without Check-In, then wait
+//   kThreadConnectivityChange (Est)  yes       yes          ActiveMode without Check-In, start timer
+//   kServerReady                     yes       -            ActiveMode without Check-In, start timer
+//   kServerReady                     no        -            only remember that the server is ready
+//   anything else                    -         -            nothing
+//
+// Rows 3 to 5 apply only when work is pending. With a settle delay of 0 the flush runs at once.
+// Settle timer: registered clients' operational DNS-SD records need time to republish after a
+// BR/controller reboot. A Check-In to an unresolvable client is lost (unacked one-way UDP).
 void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
+    // Cannot send Check-In messages before the server is ready, so track this. The server sends
+    // kServerReady once at boot, so keep it as member state.
+    const bool serverBecameReady = (event->Type == DeviceLayer::DeviceEventType::kServerReady);
+    if (serverBecameReady)
+    {
+        mIsServerReady = true;
+    }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    const bool threadNewConnectionEstablished = (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
-                                                 event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established);
-    const bool threadRoleChanged =
-        (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged);
-    const bool threadEstablished =
-        (threadNewConnectionEstablished || threadRoleChanged) && DeviceLayer::ConnectivityMgr().IsThreadAttached();
+    const bool threadAttached = DeviceLayer::ConnectivityMgr().IsThreadAttached();
+    if ((event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange ||
+         event->Type == DeviceLayer::DeviceEventType::kThreadStateChange) &&
+        !threadAttached)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(OnNetworkAttachSettleTimerDone, this);
+    }
+    // Only react when the device attaches or detaches. When a role change attaches or detaches the
+    // device, the platform code sends kThreadConnectivityChange for it, so we do not need to also
+    // look at kThreadStateChange. That would only add role changes that keep the device attached
+    // (child to router), and an ICD sleeps, so it is always a minimal device and never a router.
+    // The event was queued, so check here if Thread is still attached.
+    const bool threadEstablished = (event->Type == DeviceLayer::DeviceEventType::kThreadConnectivityChange &&
+                                    event->ThreadConnectivityChange.Result == DeviceLayer::kConnectivity_Established) &&
+        threadAttached;
 #else
+    const bool threadAttached    = false;
     const bool threadEstablished = false;
 #endif
 
-    // Early return if Thread connectivity is not established
-    VerifyOrReturn(threadEstablished);
+    VerifyOrReturn(threadEstablished || (serverBecameReady && threadAttached));
+
+#if !(CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
+    const bool hasPendingAction = mPendingActiveModeOnNetworkAttach;
+#else
+    const bool hasPendingAction  = (mPendingActiveModeOnNetworkAttach || mPendingCheckInType != PendingCheckInType::kNone);
+#endif
+    VerifyOrReturn(hasPendingAction);
+
+    if (!mIsServerReady || mNetworkAttachSettleDelay > System::Clock::Milliseconds32(0))
+    {
+        // Enter or extend ActiveMode without sending Check-In messages right away so the Thread radio
+        // fast-polls to receive Thread Network Data and complete SRP registration/renewal while waiting
+        // for kServerReady or the settle delay.
+        ChipLogProgress(AppServer,
+                        "ICDManager: Entering/Extending ActiveMode for SRP before flushing deferred network attach actions.");
+        UpdateOperationState(OperationalState::ActiveMode, false /* sendCheckInMsgs */);
+    }
+
+    // On cold boot, wait for kServerReady (emitted after initial SRP host clearance) before starting the settle timer.
+    VerifyOrReturn(mIsServerReady);
+
+    if (mNetworkAttachSettleDelay > System::Clock::Milliseconds32(0))
+    {
+        // StartTimer replaces a timer with the same callback and context, so a new event restarts
+        // the delay from the last attach.
+        ChipLogProgress(AppServer, "ICDManager: Scheduling deferred network attach actions in %" PRIu32 " ms.",
+                        mNetworkAttachSettleDelay.count());
+        CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(mNetworkAttachSettleDelay, OnNetworkAttachSettleTimerDone, this);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ICDManager: Failed to schedule deferred network attach actions: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            FlushPendingNetworkAttachActions();
+        }
+    }
+    else
+    {
+        FlushPendingNetworkAttachActions();
+    }
+}
+
+void ICDManager::OnNetworkAttachSettleTimerDone(System::Layer * aLayer, void * appState)
+{
+    reinterpret_cast<ICDManager *>(appState)->FlushPendingNetworkAttachActions();
+}
+
+void ICDManager::FlushPendingNetworkAttachActions()
+{
+    VerifyOrReturn(mIsServerReady);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    VerifyOrReturn(DeviceLayer::ConnectivityMgr().IsThreadAttached());
+#endif
 
     const bool wasPendingActiveMode   = mPendingActiveModeOnNetworkAttach;
     mPendingActiveModeOnNetworkAttach = false;
 
 #if !(CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
-    if (wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode)
+    if (wasPendingActiveMode)
     {
         ChipLogProgress(AppServer, "ICDManager: Thread network connectivity established. Triggering/Extending ActiveMode.");
         UpdateOperationState(OperationalState::ActiveMode);
     }
 #else
     // Early return if there is no pending action
-    VerifyOrReturn(wasPendingActiveMode || mOperationalState == OperationalState::ActiveMode ||
-                   mPendingCheckInType != PendingCheckInType::kNone);
+    VerifyOrReturn(wasPendingActiveMode || mPendingCheckInType != PendingCheckInType::kNone);
 
     auto deferCleanup = MakeDefer([this] {
         mPendingCheckInType          = PendingCheckInType::kNone;
@@ -842,7 +949,14 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     VerifyOrReturn(!wasInIdleMode);
 
     // If the device was already in ActiveMode, UpdateOperationState() only extended active duration, so replay pending check-ins.
-    if (mPendingCheckInType == PendingCheckInType::kTargeted)
+    // Check wasPendingActiveMode (which requires a broadcast Check-In across all fabrics) before kTargeted so queued
+    // targeted subjects do not shadow a full broadcast.
+    if (mPendingCheckInType == PendingCheckInType::kBroadcast || wasPendingActiveMode)
+    {
+        ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
+        SendCheckInMsgs(NullOptional);
+    }
+    else if (mPendingCheckInType == PendingCheckInType::kTargeted)
     {
         for (size_t i = 0; i < mPendingCheckInSubjectsCount; ++i)
         {
@@ -850,11 +964,6 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
                             ChipLogValueX64(mPendingCheckInSubjects[i].subject));
             SendCheckInMsgs(MakeOptional(mPendingCheckInSubjects[i]));
         }
-    }
-    else if (mPendingCheckInType == PendingCheckInType::kBroadcast)
-    {
-        ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");
-        SendCheckInMsgs(NullOptional);
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 }

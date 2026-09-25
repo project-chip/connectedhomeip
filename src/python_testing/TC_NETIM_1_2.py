@@ -49,7 +49,7 @@ from matter import ChipUtility
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ class _RemoveClientNoTimedInvoke(Clusters.NetworkIdentityManagement.Commands.Rem
         return False
 
 
-class TC_NETIM_1_2(MatterBaseTest):
+class TC_NETIM_1_2(MatterTestCommissionedDevice):
 
     # Step 9 fills the Client Table to capacity, one AddClient at a time. A background wildcard
     # subscription would report the Clients attribute after every one of those hundreds of writes,

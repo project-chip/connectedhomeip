@@ -56,7 +56,7 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 
 log = logging.getLogger(__name__)
 
@@ -95,8 +95,13 @@ _COMMISSIONING_WINDOW_TIMEOUT_SECONDS = 900
 _COMMISSIONING_WINDOW_ITERATIONS = 10000
 
 
-class NetworkIdentityTHServerTest(MatterBaseTest):
-    """Base class that owns the TH-side Network Identity Management server."""
+class NetworkIdentityTHServerTest(MatterTestCommissioner):
+    """Base class that owns the TH-side Network Identity Management server.
+
+    MatterTestCommissioner because the DUT drives commissioning of the TH server rather than
+    arriving on a harness fabric itself -- the same DUT-as-commissioner shape as TC_SC_3_5.
+    Every test on this base has that requirement, so the marker lives here.
+    """
 
     # The harness never opens a Matter session to the DUT: the DUT originates every command
     # in these tests and is driven through its own interface, while all of the harness's

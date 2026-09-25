@@ -47,12 +47,13 @@ from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityMetering
 
 
-class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
+class TC_COMMTR_3_1(MatterTestCommissionedDevice, CommodityMeteringTestBaseHelper):
     """Implementation of test case TC_COMMTR_3_1."""
 
     def desc_TC_COMMTR_3_1(self) -> str:

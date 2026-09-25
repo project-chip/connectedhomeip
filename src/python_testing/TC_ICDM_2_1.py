@@ -41,7 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 kRootEndpointId = 0
@@ -66,7 +66,7 @@ kUatNumberInstructionBitMask = uat.kActuateSensorSeconds | uat.kActuateSensorTim
 kUatColorInstructionBitMask = uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kSetupButtonLightsBlink
 
 
-class TC_ICDM_2_1(MatterBaseTest):
+class TC_ICDM_2_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
