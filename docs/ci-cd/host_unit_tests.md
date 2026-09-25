@@ -6,7 +6,7 @@ Which configurations of the host unit-test suite (`ninja check` / `gn_tests.sh`
 **Keep this file in sync:** `scripts/tools/list_unit_test_steps.py` lists every
 CI step that runs unit tests into `host_unit_tests.steps.txt`. When a workflow
 change alters that list, run it with `--update` and update the tables below in
-the same PR.
+the same PR. The `code-lints` job in `lint.yml` runs it with `--check`.
 
 Release branches (`v*-branch`) run their own copy of each workflow. On push they
 behave like a master push; scheduled (nightly) workflows do not run on them.
