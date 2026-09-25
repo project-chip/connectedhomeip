@@ -727,3 +727,24 @@ TEST_F(TestLevelControlBase, TestCurrentLevelPersistence)
     EXPECT_EQ(span.size(), 1u);
     EXPECT_EQ(buffer[0], 123u);
 }
+
+// CurrentLevel defaults to null. Stop on a cluster that never had a level set must leave it null.
+TEST_F(TestLevelControlBase, TestStopWithNullCurrentLevel)
+{
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> currentLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    ASSERT_TRUE(currentLevel.IsNull());
+
+    Commands::Stop::Type stopData;
+    stopData.optionsMask.ClearAll();
+    stopData.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stopData).IsSuccess());
+
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    EXPECT_TRUE(currentLevel.IsNull());
+}
