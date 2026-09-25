@@ -303,8 +303,8 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32, currentVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+                     currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
