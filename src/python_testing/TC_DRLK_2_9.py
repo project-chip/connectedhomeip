@@ -46,7 +46,7 @@ import matter.testing.matchers as matchers
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ log = logging.getLogger(__name__)
 drlkcluster = Clusters.DoorLock
 
 
-class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
+class TC_DRLK_2_9(MatterTestCommissionedDevice, DRLK_COMMON):
 
     def steps_TC_DRLK_2_9(self) -> list[TestStep]:
         return [

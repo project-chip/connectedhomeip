@@ -45,13 +45,13 @@ from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_3(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_3(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_3(self) -> str:
         return "[TC-AVANALY-2.3] EnableContextTriggers and DisableContextTriggers functionality with local context."

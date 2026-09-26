@@ -49,13 +49,13 @@ from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_11(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_11(self) -> str:
         return "[TC-PAVST-2.11] Allocate PushAV Transport with Server as DUT-Release 1.5.1 and later"
 

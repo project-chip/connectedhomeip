@@ -46,13 +46,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_8(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_8(self) -> str:
         return "[TC-AVANALY-2.8] Validate IdentifiedContextID consistency when tracking is enabled with Server as DUT"

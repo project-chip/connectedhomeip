@@ -43,7 +43,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -54,7 +54,7 @@ _FALLBACK_MIME_TYPE = "video/mp4"
 _UINT64_MAX = 0xFFFFFFFFFFFFFFFF
 
 
-class TC_MEDIAFILEMANAGEMENT_2_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_2_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_2_1(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-2.1] Add File Verification - PROVISIONAL"

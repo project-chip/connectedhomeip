@@ -25,6 +25,9 @@ namespace app {
 class DimmableLight : public DimmableLoad
 {
 public:
+    using Context = DimmableLoad::Context;
+    using Config  = DimmableLoad::Config;
+
     DimmableLight(const Context & context, const Delegates & delegates, const Config & config = {});
     ~DimmableLight() override = default;
 };
