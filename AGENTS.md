@@ -153,10 +153,10 @@ Alternatively, you can activate the environment in your shell:
     -   Compile and run can be separated (e.g. if running under some memory
         debugger or needing to set other options):
 
-            ```bash
-            scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
-            ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
-            ```
+                    ```bash
+                    scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang src/app/clusters/occupancy-sensor-server/tests:TestOccupancySensingCluster"`
+                    ./out/linux-x64-tests-clang/tests/TestOccupancySensingCluster
+                    ```
 
 ### Building Common Apps
 
@@ -166,6 +166,88 @@ Alternatively, you can activate the environment in your shell:
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-clang --quiet build"`
 -   **all-devices-app** (Alternative feature-rich simulator):
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-clang --quiet build"`
+
+### Joint Fabric Python Tests – Local
+
+TC*JFDS*_ and TC*JF*_ tests start a JFA app and a JFC app on the same machine
+and commission them over the network using mDNS/DNS-SD discovery. They require
+three one-time setup steps before the first run.
+
+#### Step 1 – Fix mDNS on the loopback interface (pick one option)
+
+mDNS uses multicast UDP (`224.0.0.251`). In some environments (UTM NAT mode,
+minimal Docker images) multicast does not reach the loopback interface and
+commissioning times out after 3 s.
+
+**Option A – Install avahi-daemon (recommended for UTM)**
+
+```bash
+sudo apt install avahi-daemon
+sudo systemctl enable --now avahi-daemon
+```
+
+Verify that avahi reflects mDNS on loopback:
+
+```bash
+avahi-browse -a --terminate 2>/dev/null | head
+```
+
+**Option B – Switch UTM VM NIC to Bridged mode**
+
+In UTM → VM settings → Network → Mode: change from _Shared Network_ to _Bridged
+(advanced)_ and select the host Wi-Fi or Ethernet adapter. Bridged adapters pass
+multicast packets through directly; no software change is required.
+
+**Option C – Rebuild the Python venv with IPv4 enabled**
+
+The default `build_python.sh` invocation may omit `--enable_ipv4`, which forces
+IPv6-only mDNS and breaks same-host discovery when the loopback does not carry
+IPv6 multicast.
+
+```bash
+scripts/build_python.sh -i out/venv --enable_ipv4 true
+```
+
+This takes ~5–10 minutes. It also fixes the venv for all other Python tests that
+rely on on-network commissioning.
+
+#### Step 2 – Build the JFA and JFC apps (arm64, one time)
+
+```bash
+scripts/run_in_build_env.sh \
+  "./scripts/build/build_examples.py --target linux-arm64-jf-admin-app-clang build"
+
+scripts/run_in_build_env.sh \
+  "./scripts/build/build_examples.py --target linux-arm64-jf-control-app-clang build"
+```
+
+Binaries land at:
+
+-   `out/linux-arm64-jf-admin-app-clang/jfa-app`
+-   `out/linux-arm64-jf-control-app-clang/jfc-app`
+
+#### Step 3 – Run the tests
+
+Use the provided wrapper script, which handles the venv activation, binary-path
+overrides, and a one-shot sync of the `matter.testing` package from source
+(needed when the venv is older than the source tree):
+
+```bash
+# Run a single test
+scripts/tests/run_jf_tests_local.sh --test-filter TC_JFDS_2_3
+
+# Run all JF datastore tests
+scripts/tests/run_jf_tests_local.sh --test-filter "TC_JFDS_*"
+```
+
+#### Troubleshooting
+
+| Symptom                                                     | Likely cause                               | Fix                                                              |
+| ----------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| `Timeout` after 3 s in JFC pairing                          | mDNS multicast not working                 | Apply Step 1 option A, B, or C                                   |
+| `ImportError: cannot import name 'matter_test_args_parser'` | Stale venv                                 | Run the wrapper script – it syncs `matter.testing` automatically |
+| `The path … does not exist` in `setup_class`                | Wrong binary paths                         | Check Step 2 build targets completed successfully                |
+| `AttributeError: fabric_a_admin` in `teardown_class`        | `setup_class` failed before attribute init | Fixed in source; update venv sync                                |
 
 ## Development Resources
 

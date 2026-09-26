@@ -33,6 +33,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
@@ -62,6 +63,7 @@ class TC_JFDS_2_3(MatterTestCommissioner):
         super().setup_class()
 
         self.fabric_a_ctrl = None
+        self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
         self.devCtrlEcoA = None
@@ -97,7 +99,7 @@ class TC_JFDS_2_3(MatterTestCommissioner):
         self.fabric_a_admin = None
         # If test is executed in CI environment, start JFA app for Fabric B
         if self.is_pics_sdk_ci_only:
-            self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+            self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
             self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
             self.dut_rpc_server_ip = "127.0.0.1"
             self.dut_rpc_server_port = str(self.get_random_port())
@@ -141,10 +143,14 @@ class TC_JFDS_2_3(MatterTestCommissioner):
             timeout=10)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
+        # Wait for the JFC's post-CommissioningComplete log. This message is emitted
+        # after the full CommissioningComplete command/response round-trip, so by the
+        # time it appears, HandleCommissioningCompleteEvent on the JFA has already
+        # populated the Admin/Anchor CAT entries in GroupList.
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} --anchor true",
             expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -241,6 +247,8 @@ class TC_JFDS_2_3(MatterTestCommissioner):
             catTags=[int(self.ecoACATs, 16)])
 
         # Discover endpoint with JointFabricDatastore cluster via Descriptor
+        # Note: mDNS discovery may timeout in some environments. If this fails,
+        # the test infrastructure may need network configuration adjustments.
         descriptor_response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=self.jfadmin_fabric_a_node_id, attributes=[(Clusters.Descriptor)],
             returnClusterObject=True)
@@ -255,43 +263,42 @@ class TC_JFDS_2_3(MatterTestCommissioner):
         asserts.assert_is_not_none(jfds_endpoint, "JointFabricDatastore cluster not found on any endpoint")
 
         self.step("1")
-        # Read GroupList attribute from DUT
-        response = await self.devCtrlEcoA.ReadAttribute(
-            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
-            returnClusterObject=True)
-        groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
-
-        # Note the number of entries returned
-        num_entries = len(groupList)
-        log.info("GroupList contains %s entries", num_entries)
-
-        # Variables to track found entries
+        # Poll GroupList until HandleCommissioningCompleteEvent on the JFA has
+        # populated both the Admin CAT (0xFFFF) and Anchor CAT (0xFFFE) entries.
+        # The JFC's commissioning-complete log is NOT a reliable barrier: the JFA
+        # processes kCommissioningComplete via PostEvent, which may be queued and
+        # dispatched after the JFC has already printed its success message.
+        kPollIntervalSec = 0.5
+        kPollTimeoutSec = 15.0
+        deadline = asyncio.get_event_loop().time() + kPollTimeoutSec
         admin_cat_group_id = None
         anchor_cat_group_id = None
-
-        # Look for entries matching Admin CAT and Anchor CAT
-        for entry in groupList:
-            log.info("GroupList entry: GroupID=%s, CAT=%s", entry.groupID, entry.groupCAT)
-
-            # Check if this entry's CAT matches our controller's CAT tags
-            # Admin CAT should be present (commissioned with --anchor true)
-            # We need to check both Admin and Anchor CAT presence
-            if entry.groupCAT is not None:
-                # If CAT matches and we haven't found admin yet, consider it admin
-                if admin_cat_group_id is None and entry.groupCAT == 0xFFFF:
+        groupList = []
+        while True:
+            response = await self.devCtrlEcoA.ReadAttribute(
+                nodeId=self.jfadmin_fabric_a_node_id,
+                attributes=[(jfds_endpoint, Clusters.JointFabricDatastore.Attributes.GroupList)],
+                returnClusterObject=True)
+            groupList = response[jfds_endpoint][Clusters.JointFabricDatastore].groupList
+            admin_cat_group_id = None
+            anchor_cat_group_id = None
+            for entry in groupList:
+                if entry.groupCAT == 0xFFFF and admin_cat_group_id is None:
                     admin_cat_group_id = entry.groupID
-                    log.info("Found Admin CAT entry with GroupID: %s", admin_cat_group_id)
-                # If CAT matches and admin already found, consider it anchor
-                elif anchor_cat_group_id is None and entry.groupCAT == 0xFFFE:
+                elif entry.groupCAT == 0xFFFE and anchor_cat_group_id is None:
                     anchor_cat_group_id = entry.groupID
-                    log.info("Found Anchor CAT entry with GroupID: %s", anchor_cat_group_id)
+            if admin_cat_group_id is not None and anchor_cat_group_id is not None:
+                break
+            if asyncio.get_event_loop().time() >= deadline:
+                asserts.fail(
+                    f"Timeout after {kPollTimeoutSec}s waiting for Admin/Anchor CAT entries in GroupList "
+                    f"(admin={'found' if admin_cat_group_id else 'missing'}, "
+                    f"anchor={'found' if anchor_cat_group_id else 'missing'})")
+            await asyncio.sleep(kPollIntervalSec)
 
-        # Verify that both Admin CAT and Anchor CAT entries were found
-        asserts.assert_is_not_none(admin_cat_group_id, "Admin CAT entry must exist in GroupList")
-        asserts.assert_is_not_none(anchor_cat_group_id, "Anchor CAT entry must exist in GroupList")
-
-        log.info("Admin CAT GroupID: %s", admin_cat_group_id)
-        log.info("Anchor CAT GroupID: %s", anchor_cat_group_id)
+        num_entries = len(groupList)
+        log.info("GroupList contains %s entries; Admin CAT GroupID=%s, Anchor CAT GroupID=%s",
+                 num_entries, admin_cat_group_id, anchor_cat_group_id)
 
         # Store these for potential use in future steps
         self.admin_cat_group_id = admin_cat_group_id
@@ -411,12 +418,13 @@ class TC_JFDS_2_3(MatterTestCommissioner):
         asserts.assert_false(found_entry, "Entry with GroupID=0x000A should not exist in GroupList after removal")
 
         self.step("8")
-        # Try to add a group with Admin CAT (0xFFFF_0001) - should fail with CONSTRAINT_ERROR
+        # Admin CAT entries are datastore-managed and cannot be created through AddGroup;
+        # the command must reject the reserved Admin CAT (0xFFFF_0001) with CONSTRAINT_ERROR.
         step8_cmd = Clusters.JointFabricDatastore.Commands.AddGroup(
             groupID=0x000A,
             friendlyName="tc-jf-2.3",
             groupKeySetID=0x000B,
-            groupCAT=0xFFFE,  # SDK fails to decode 0xFFFF CAT, so using 0xFFFE here to simulate Admin CAT
+            groupCAT=0xFFFF,
             groupCATVersion=0x0001,
             groupPermission=Clusters.JointFabricDatastore.Enums.DatastoreAccessControlEntryPrivilegeEnum.kView)
 
