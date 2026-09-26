@@ -69,7 +69,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                # unit_tests pulls the submodules that chip_build_all_platform_tests needs
+                platform: linux unit_tests
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
               uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
@@ -81,9 +82,10 @@ jobs:
                   # codeql.yml runs nightly on master only, so re-enable this if
                   # the push/pull_request triggers are ever restored.
                   trap-caching: false
+            # chip_build_all_platform_tests adds host-buildable platform unit tests (e.g. silabs)
             - name: Setup Build
               if: github.event.pull_request.number == null
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false chip_build_all_platform_tests=true"
             - name: Run Build
               if: github.event.pull_request.number == null
               run: scripts/run_in_build_env.sh "ninja -C ./out"
@@ -122,12 +124,16 @@ jobs:
             - name: Clean out build output
               if: inputs.run-codeql != true && github.event.pull_request.number == null
               run: rm -rf ./out
+            # PR-only: master pushes build and test the memory-debug-checks configuration above.
             - name: Set up Build Without Logging
-              if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_logging=false"
+              if: inputs.run-codeql != true && github.event.pull_request.number != null
+              run: scripts/build/gn_gen.sh --args="chip_logging=false chip_build_all_platform_tests=true"
             - name: Run Build Without Logging
-              if: inputs.run-codeql != true
+              if: inputs.run-codeql != true && github.event.pull_request.number != null
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Run Tests Without Logging
+              if: inputs.run-codeql != true && github.event.pull_request.number != null
+              run: scripts/tests/gn_tests.sh
             - name: Uploading core files
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
               if: ${{ failure() && !env.ACT }}
@@ -269,7 +275,6 @@ jobs:
                   for BUILD_TYPE in asan tsan ubsan; do
                       case $BUILD_TYPE in
                           "asan") GN_ARGS='is_clang=true is_asan=true';;
-                          "msan") GN_ARGS='is_clang=true is_msan=true';;
                           "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
                           "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
                       esac

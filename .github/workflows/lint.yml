@@ -59,6 +59,11 @@ jobs:
                   fi
                   echo "codeql-action pinned consistently: ${shas:-<none>}"
 
+            - name: Check unit-test steps snapshot is up to date
+              if: always()
+              # Keeps docs/ci-cd/host_unit_tests.md reviewed when workflows change which unit tests run.
+              run: scripts/tools/list_unit_test_steps.py --check
+
             - name: Check for orphaned gn files
               if: always()
               # We should enforce that ALL new files are referenced in our build scripts.
