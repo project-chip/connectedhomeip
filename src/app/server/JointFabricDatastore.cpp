@@ -548,9 +548,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
             ReturnErrorOnFailure(mDelegate->FetchEndpointBindingList(
                 mRefreshingNodeId, currentEndpointId,
-                [this](CHIP_ERROR err,
-                       const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &
-                           endpointBindings) {
+                [this, currentEndpointId](
+                    CHIP_ERROR err,
+                    const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &
+                        endpointBindings) {
                     if (err == CHIP_NO_ERROR)
                     {
                         // Convert endpointBindings to mEndpointBindingEntries
@@ -587,7 +588,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                             std::remove_if(
                                 mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
                                 [&](const auto & entry) {
-                                    if (entry.nodeID != mRefreshingNodeId)
+                                    if (entry.nodeID != mRefreshingNodeId || entry.endpointID != currentEndpointId)
                                     {
                                         return false;
                                     }

@@ -1821,6 +1821,38 @@ TEST(JointFabricDatastoreTest, UpdateGroupKeySetChangeSendsRemovalOfOldKeySet)
     EXPECT_EQ(store.GetNodeKeySetList()[0].groupKeySetID, 6u);
 }
 
+// Each endpoint's fetched binding list only replaces that endpoint's bindings.
+TEST(JointFabricDatastoreTest, RefreshKeepsBindingsOnOtherEndpoints)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    for (EndpointId endpointId : { EndpointId(1), EndpointId(2) })
+    {
+        ASSERT_EQ(store.TestAddEndpointEntry(endpointId, 123, "ep"_span), CHIP_NO_ERROR);
+        EndpointEntryType endpoint;
+        endpoint.nodeID     = 123;
+        endpoint.endpointID = endpointId;
+        delegate.endpointsToFetch.push_back(endpoint);
+
+        JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type binding;
+        binding.group.SetValue(static_cast<GroupId>(10 + endpointId));
+        ASSERT_EQ(store.AddBindingToEndpointForNode(123, endpointId, binding), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
+    const uint16_t listId1   = store.GetEndpointBindingList()[0].listID;
+    const uint16_t listId2   = store.GetEndpointBindingList()[1].listID;
+    delegate.bindingsToFetch = store.GetEndpointBindingList();
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
+    EXPECT_EQ(store.GetEndpointBindingList()[0].listID, listId1);
+    EXPECT_EQ(store.GetEndpointBindingList()[1].listID, listId2);
+    EXPECT_EQ(delegate.bindingListSyncs.back().second.size(), 2u);
+}
+
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
 {
     JointFabricDatastore store;
