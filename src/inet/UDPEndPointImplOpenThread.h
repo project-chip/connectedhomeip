@@ -61,9 +61,17 @@ private:
 
     static void handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo);
 
+    // Registered once with OpenThread; finds the sending endpoint via OpenThread's own socket list.
+    static void HandleIcmp6Receive(void * aContext, otMessage * aMsg, const otMessageInfo * aInfo,
+                                   const otIcmp6Header * aIcmpHeader);
+
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
     otUdpSocket mSocket;
+
+    // Links this endpoint into the file-static bound list used by HandleIcmp6Receive.
+    UDPEndPointImplOT * mNextBoundEndPoint = nullptr;
+    bool mIsBoundEndPointLinked            = false;
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

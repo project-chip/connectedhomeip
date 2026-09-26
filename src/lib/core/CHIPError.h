@@ -1023,7 +1023,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME               CHIP_CORE_ERROR(0x34)
 
-// AVAILABLE: 0x35
+/**
+ *  @def CHIP_ERROR_PEER_PORT_UNREACHABLE
+ *
+ *  @brief
+ *    An ICMPv6 port-unreachable error arrived for a UDP datagram we sent: the peer is not bound to
+ *    that port, so sessions to it can be retired without waiting for MRP to exhaust.
+ */
+#define CHIP_ERROR_PEER_PORT_UNREACHABLE                       CHIP_CORE_ERROR(0x35)
+
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37
 

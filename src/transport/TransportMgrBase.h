@@ -62,6 +62,8 @@ public:
     void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                Transport::MessageTransportContext * ctxt = nullptr) override;
 
+    void OnConnectionExpired(const Transport::PeerAddress & peer) override;
+
 private:
     TransportMgrDelegate * mSessionManager = nullptr;
     Transport::Base * mTransport           = nullptr;

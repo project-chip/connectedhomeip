@@ -122,6 +122,14 @@ public:
     bool IsEstablishing() const { return mState == State::kEstablishing; }
     bool IsPendingEviction() const { return mState == State::kPendingEviction; }
     bool IsDefunct() const { return mState == State::kDefunct; }
+
+    /// Defunct because the peer reported itself unreachable, not because a caller suspected trouble.
+    bool PeerReportedUnreachable() const { return mPeerReportedUnreachable; }
+    void MarkPeerUnreachable()
+    {
+        mPeerReportedUnreachable = true;
+        MarkAsDefunct();
+    }
     const char * GetStateStr() const { return StateToString(mState); }
 
     /*
@@ -238,11 +246,21 @@ public:
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
+
+    /// Distinct from MarkActive because MarkActiveRx feeds into that too, so it cannot tell traffic
+    /// we sent from traffic we received.
+    void MarkActiveTx()
+    {
+        mLastTxTime = System::SystemClock().GetMonotonicTimestamp();
+        MarkActive();
+    }
+    System::Clock::Timestamp GetLastTxTime() const { return mLastTxTime; }
     void MarkActiveRx()
     {
         mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
         MarkActive();
 
+        mPeerReportedUnreachable = false;
         if (mState == State::kDefunct)
         {
             MoveToState(State::kActive);
@@ -334,6 +352,7 @@ private:
     State mState;
     const Type mSecureSessionType;
     bool mIsCaseCommissioningSession = false;
+    bool mPeerReportedUnreachable    = false;
     NodeId mLocalNodeId              = kUndefinedNodeId;
     NodeId mPeerNodeId               = kUndefinedNodeId;
     CATValues mPeerCATs              = CATValues{};
@@ -344,6 +363,9 @@ private:
 
     /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
     System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();
+
+    /// Timestamp of last tx only.
+    System::Clock::Timestamp mLastTxTime = System::Clock::kZero;
 
     /// Timestamp of last rx. @see ActiveTimestamp in the spec
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();

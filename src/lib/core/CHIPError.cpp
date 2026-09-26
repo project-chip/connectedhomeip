@@ -478,6 +478,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_HANDLER_NOT_SET.AsInteger():
         desc = "Callback function or callable object is not set";
         break;
+    case CHIP_ERROR_PEER_PORT_UNREACHABLE.AsInteger():
+        desc = "Peer UDP port unreachable";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

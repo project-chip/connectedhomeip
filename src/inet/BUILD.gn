@@ -122,6 +122,8 @@ static_library("inet") {
     "IPPacketInfo.h",
     "IPPrefix.cpp",
     "IPPrefix.h",
+    "IcmpV6Parser.cpp",
+    "IcmpV6Parser.h",
     "Inet.h",
     "InetError.cpp",
     "InetError.h",

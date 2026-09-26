@@ -183,6 +183,31 @@ void ReliableMessageMgr::ExecuteActions()
         }
 #endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
+        // Only a peer that reported itself unreachable. Defunct alone is not enough: most callers of
+        // MarkAsDefunct act on suspicion and their exchanges may still complete.
+        if (session->IsSecureSession() && session->AsSecureSession()->PeerReportedUnreachable())
+        {
+            ExchangeHandle ec(entry->ec);
+
+            ChipLogProgress(ExchangeManager,
+                            "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
+                            "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " abandoned (peer unreachable)",
+                            entry->sendCount + 1, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(),
+                            messageCounter, Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
+
+#if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+            NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
+            if (!ec->IsResponseExpected())
+            {
+                session->NotifySessionHang();
+            }
+
+            mRetransTable.ReleaseObject(entry);
+            return Loop::Continue;
+        }
+
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             // Make sure our exchange stays alive until we are done working with it.

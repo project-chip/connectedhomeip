@@ -39,6 +39,15 @@
 #include <sys/ioctl.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
+// INET_CONFIG_ENABLE_UDP_ERRQUEUE (InetConfig.h, via the header above) is the single source of
+// truth, shared with the test that covers this path. IPV6_RECVERR and sock_extended_err come from
+// the headers below, pulled in only where the capability is enabled.
+#if INET_CONFIG_ENABLE_UDP_ERRQUEUE
+#include <inet/IcmpV6Parser.h>
+#include <linux/errqueue.h>
+#include <netinet/in.h>
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE
+
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 #include "ZephyrSocket.h" // nogncheck
 #endif
@@ -411,7 +420,16 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 
     // Send IP packet.
     // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
-    const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
+    ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
+#if INET_CONFIG_ENABLE_UDP_ERRQUEUE
+    // IPV6_RECVERR makes the kernel report an earlier ICMP error on the next send, to any
+    // destination. That failed call consumes it; the report itself stays queued for DrainErrorQueue.
+    if (lenSent == -1 && errno == ECONNREFUSED)
+    {
+        // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
+        lenSent = sendmsg(mSocket, &msgHeader, 0);
+    }
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE
     if (lenSent == -1)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -550,6 +568,18 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
             }
         }
 #endif // defined(SO_NOSIGPIPE)
+
+#if INET_CONFIG_ENABLE_UDP_ERRQUEUE
+        // Without this the kernel discards ICMPv6 errors for an unconnected UDP socket. Linux only.
+        if (addressType == IPAddressType::kIPv6)
+        {
+            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVERR, &one, sizeof(one));
+            if (res != 0)
+            {
+                ChipLogDetail(Inet, "IPV6_RECVERR failed: %d (continuing without peer-unreachable detection)", errno);
+            }
+        }
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE
     }
     else if (mAddrType != addressType)
     {
@@ -569,13 +599,18 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr
 
 void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 {
+    // Prevent the endpoint from being freed while in the middle of a callback.
+    UDPEndPointHandle ref(this);
+
+    // Reported alongside or instead of readability, with no datagram to receive, so drain before
+    // the readability check returns early.
+    DrainErrorQueue();
+
     if (mState != State::kListening || OnMessageReceived == nullptr || !events.Has(System::SocketEventFlags::kRead))
     {
         return;
     }
 
-    // Prevent the endpoint from being freed while in the middle of a callback.
-    UDPEndPointHandle ref(this);
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
     IPPacketInfo lPacketInfo;
     System::PacketBufferHandle lBuffer;
@@ -895,6 +930,113 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
+
+#if INET_CONFIG_ENABLE_UDP_ERRQUEUE
+
+void UDPEndPointImplSockets::DrainErrorQueue()
+{
+    // Drained even with no error callback: an undrained queue leaves the descriptor permanently
+    // error-readable, spinning the event loop.
+    if (mState == State::kClosed || mSocket == kInvalidSocketFd)
+    {
+        return;
+    }
+
+    for (;;)
+    {
+        // The body is the offending datagram's payload with its headers already stripped, so it
+        // identifies nothing; msg_name carries the original destination. One byte drains the entry.
+        uint8_t discard[1];
+        // Room for every control message the kernel may attach, not just the error: IPV6_RECVPKTINFO
+        // is enabled on this socket, so an error-queue message carries an IPV6_PKTINFO cmsg as well
+        // and a buffer sized for IPV6_RECVERR alone truncates it. Matches the receive path's size.
+        uint8_t cmsgBuf[256];
+        struct iovec iov   = { discard, sizeof(discard) };
+        SockAddr from      = {};
+        struct msghdr msg  = {};
+        msg.msg_name       = &from;
+        msg.msg_namelen    = sizeof(from);
+        msg.msg_iov        = &iov;
+        msg.msg_iovlen     = 1;
+        msg.msg_control    = cmsgBuf;
+        msg.msg_controllen = sizeof(cmsgBuf);
+
+        ssize_t n = recvmsg(mSocket, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
+        if (n < 0)
+        {
+            if (errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
+            {
+                ChipLogDetail(Inet, "recvmsg(MSG_ERRQUEUE) failed: %d", errno);
+            }
+            return;
+        }
+
+        // Truncated control data means the kernel wrote less than it wanted to; the entry is still
+        // drained, but nothing in it can be trusted enough to retire a session over.
+        if ((msg.msg_flags & MSG_CTRUNC) != 0)
+        {
+            ChipLogDetail(Inet, "Truncated MSG_ERRQUEUE control data; ignoring entry");
+            continue;
+        }
+
+        for (struct cmsghdr * cm = CMSG_FIRSTHDR(&msg); cm != nullptr; cm = CMSG_NXTHDR(&msg, cm))
+        {
+            if (cm->cmsg_level != IPPROTO_IPV6 || cm->cmsg_type != IPV6_RECVERR)
+            {
+                continue;
+            }
+
+            // Guards the cast below against a short cmsg: cmsg_len covers the header too.
+            if (cm->cmsg_len < CMSG_LEN(sizeof(sock_extended_err)))
+            {
+                continue;
+            }
+
+            auto * extendedErr = reinterpret_cast<sock_extended_err *>(CMSG_DATA(cm));
+            if (extendedErr->ee_origin != SO_EE_ORIGIN_ICMP6 || extendedErr->ee_type != kIcmp6TypeDestUnreachable ||
+                extendedErr->ee_code != kIcmp6CodePortUnreachable)
+            {
+                continue;
+            }
+
+            if (from.any.sa_family != AF_INET6)
+            {
+                continue;
+            }
+
+            IPPacketInfo info;
+            info.Clear();
+            info.DestAddress = IPAddress(from.in6.sin6_addr);
+            info.DestPort    = ntohs(from.in6.sin6_port);
+            info.SrcPort     = mBoundPort;
+
+#if CHIP_DETAIL_LOGGING
+            {
+                char peerStr[Inet::IPAddress::kMaxStringLength];
+                info.DestAddress.ToString(peerStr, sizeof(peerStr));
+                ChipLogDetail(Inet, "ICMPv6 port unreachable from [%s]:%u (sent from local port %u)", peerStr, info.DestPort,
+                              info.SrcPort);
+            }
+#endif // CHIP_DETAIL_LOGGING
+
+            if (mState == State::kClosed)
+            {
+                return;
+            }
+            if (OnReceiveError != nullptr)
+            {
+                OnReceiveError(this, CHIP_ERROR_PEER_PORT_UNREACHABLE, &info);
+            }
+        }
+    }
+}
+
+#else // INET_CONFIG_ENABLE_UDP_ERRQUEUE
+
+// No per-socket ICMP error queue here; the no-op keeps the call site unconditional.
+void UDPEndPointImplSockets::DrainErrorQueue() {}
+
+#endif // INET_CONFIG_ENABLE_UDP_ERRQUEUE
 
 } // namespace Inet
 } // namespace chip

@@ -27,7 +27,10 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <inet/IcmpV6Parser.h>
 #include <openthread/error.h>
+#include <openthread/icmp6.h>
+#include <openthread/message.h>
 #include <openthread/udp.h>
 
 namespace chip {
@@ -46,7 +49,95 @@ namespace {
 // buffer.
 constexpr size_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
 constexpr size_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
+
+otIcmp6Handler sIcmp6Handler;
+
+// OT threads the handler onto an intrusive per-instance list via its mNext, so it is registered
+// exactly once; re-registering would rewrite a live list node.
+otInstance * sIcmp6HandlerInstance = nullptr;
+
+// Held here, not per endpoint, so the endpoint pool carries no ICMPv6 state.
+struct PendingUnreachable
+{
+    UDPEndPointImplOT * endPoint;
+    IPPacketInfo info;
+    bool valid;
+};
+PendingUnreachable sPending = {};
+
+// Bound endpoints, threaded through the endpoints themselves: one pointer each, versus an array
+// sized for the whole pool. otUdpGetSockets would avoid even that, but a port that supplies its own
+// otUdp* implementation (STM32WB) then collides with OpenThread's at link time.
+UDPEndPointImplOT * sBoundEndPoints = nullptr;
+
 } // namespace
+
+void UDPEndPointImplOT::HandleIcmp6Receive(void * aContext, otMessage * aMsg, const otMessageInfo * /*aInfo*/,
+                                           const otIcmp6Header * aIcmpHeader)
+{
+    if (aIcmpHeader->mType != kIcmp6TypeDestUnreachable || aIcmpHeader->mCode != kIcmp6CodePortUnreachable)
+    {
+        return;
+    }
+
+    // The offset is already past the ICMPv6 header.
+    uint8_t inner[kMinInnerDatagramLen];
+    uint16_t bytes = otMessageRead(aMsg, otMessageGetOffset(aMsg), inner, sizeof(inner));
+
+    IPPacketInfo info;
+    info.Clear();
+    if (ParseIcmpV6PortUnreachInnerDatagram(inner, bytes, info) != CHIP_NO_ERROR)
+    {
+        return;
+    }
+
+    UDPEndPointImplOT * ep = nullptr;
+    for (UDPEndPointImplOT * candidate = sBoundEndPoints; candidate != nullptr; candidate = candidate->mNextBoundEndPoint)
+    {
+        if (candidate->GetBoundPort() == info.SrcPort)
+        {
+            ep = candidate;
+            break;
+        }
+    }
+    if (ep == nullptr)
+    {
+        return;
+    }
+
+    // A second report before the dispatch replaces the first.
+    // One dispatch is in flight at a time. A later report for the same endpoint supersedes the
+    // pending one; one for a different endpoint is dropped rather than clobbering a dispatch that is
+    // already scheduled against the first.
+    if (sPending.valid)
+    {
+        if (sPending.endPoint == ep)
+        {
+            sPending.info = info;
+        }
+        return;
+    }
+    sPending = { ep, info, true };
+
+    ep->Ref();
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep] {
+        ep->LockOpenThread();
+        PendingUnreachable pending = sPending;
+        sPending.valid             = false;
+        ep->UnlockOpenThread();
+
+        if (pending.valid && pending.endPoint == ep && ep->mState != State::kClosed && ep->OnReceiveError != nullptr)
+        {
+            ep->OnReceiveError(ep, CHIP_ERROR_PEER_PORT_UNREACHABLE, &pending.info);
+        }
+        ep->Unref();
+    });
+    if (err != CHIP_NO_ERROR)
+    {
+        sPending.valid = false;
+        ep->Unref();
+    }
+}
 
 void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo)
 {
@@ -150,6 +241,35 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
         if (closeErr != OT_ERROR_NONE)
         {
             ChipLogError(Inet, "Failed to close socket: %s", chip::ErrorStr(MapOpenThreadError(closeErr)));
+        }
+    }
+
+    if (err == OT_ERROR_NONE)
+    {
+        if (sIcmp6HandlerInstance == nullptr)
+        {
+            sIcmp6Handler.mReceiveCallback = HandleIcmp6Receive;
+            sIcmp6Handler.mContext         = nullptr;
+            otError icmpErr                = otIcmp6RegisterHandler(mOTInstance, &sIcmp6Handler);
+            if (icmpErr == OT_ERROR_NONE || icmpErr == OT_ERROR_ALREADY)
+            {
+                sIcmp6HandlerInstance = mOTInstance;
+            }
+            else
+            {
+                ChipLogError(Inet, "otIcmp6RegisterHandler failed; peer-unreachable detection unavailable");
+            }
+        }
+        else if (sIcmp6HandlerInstance != mOTInstance)
+        {
+            ChipLogError(Inet, "Peer-unreachable detection is limited to the first OpenThread instance");
+        }
+
+        if (!mIsBoundEndPointLinked)
+        {
+            mNextBoundEndPoint     = sBoundEndPoints;
+            sBoundEndPoints        = this;
+            mIsBoundEndPointLinked = true;
         }
     }
 
@@ -296,6 +416,23 @@ void UDPEndPointImplOT::CloseImpl()
         {
             ChipLogError(Inet, "Failed to close socket: %s", chip::ErrorStr(MapOpenThreadError(err)));
         }
+    }
+    if (sPending.valid && sPending.endPoint == this)
+    {
+        sPending.valid = false;
+    }
+    if (mIsBoundEndPointLinked)
+    {
+        for (UDPEndPointImplOT ** link = &sBoundEndPoints; *link != nullptr; link = &(*link)->mNextBoundEndPoint)
+        {
+            if (*link == this)
+            {
+                *link = mNextBoundEndPoint;
+                break;
+            }
+        }
+        mNextBoundEndPoint     = nullptr;
+        mIsBoundEndPointLinked = false;
     }
     UnlockOpenThread();
 }

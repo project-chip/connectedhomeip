@@ -51,6 +51,9 @@ public:
     virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                        MessageTransportContext * ctxt = nullptr) = 0;
 
+    /// A peer's transport endpoint reported itself unreachable. No-op unless a transport detects it.
+    virtual void OnConnectionExpired(const Transport::PeerAddress & peer) {}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
     virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr){};
@@ -125,6 +128,15 @@ protected:
                                MessageTransportContext * ctxt = nullptr)
     {
         mDelegate->HandleMessageReceived(source, std::move(buffer), ctxt);
+    }
+
+    /// Used by subclasses to report a peer's transport endpoint as unreachable.
+    void HandleConnectionExpired(const PeerAddress & peer)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnConnectionExpired(peer);
+        }
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

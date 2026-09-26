@@ -129,6 +129,22 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
 
 void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
+    if (err == CHIP_ERROR_PEER_PORT_UNREACHABLE && pktInfo != nullptr)
+    {
+        // We sent the offending datagram, so Dest* is the peer that is not listening.
+        UDP * udp                   = reinterpret_cast<UDP *>(endPoint->mAppState);
+        Transport::PeerAddress peer = Transport::PeerAddress::UDP(pktInfo->DestAddress, pktInfo->DestPort);
+
+#if CHIP_DETAIL_LOGGING
+        char peerStr[Transport::PeerAddress::kMaxToStringSize];
+        peer.ToString(peerStr, sizeof(peerStr));
+        ChipLogDetail(Inet, "Peer %s reported its port unreachable; retiring sessions to it", peerStr);
+#endif // CHIP_DETAIL_LOGGING
+
+        udp->HandleConnectionExpired(peer);
+        return;
+    }
+
     ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
 }
 

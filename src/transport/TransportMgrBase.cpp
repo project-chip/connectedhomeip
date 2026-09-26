@@ -88,6 +88,14 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
     }
 }
 
+void TransportMgrBase::OnConnectionExpired(const Transport::PeerAddress & peer)
+{
+    if (mSessionManager != nullptr)
+    {
+        mSessionManager->OnConnectionExpired(peer);
+    }
+}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn)
 {

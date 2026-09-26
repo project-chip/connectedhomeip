@@ -57,6 +57,10 @@ private:
     void HandlePendingIO(System::SocketEvents events);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
+    /// Drain queued ICMPv6 errors (Linux MSG_ERRQUEUE), reporting port-unreachable through
+    /// OnReceiveError. No-op where there is no per-socket error queue.
+    void DrainErrorQueue();
+
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
 
