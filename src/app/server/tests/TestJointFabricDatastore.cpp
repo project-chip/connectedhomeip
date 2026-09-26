@@ -213,7 +213,17 @@ public:
     CHIP_ERROR FetchEndpointGroupList(NodeId nodeId, EndpointId endpointId,
                                       std::function<void(CHIP_ERROR, const std::vector<GroupInfoEntryType> &)> onSuccess) override
     {
-        onSuccess(CHIP_NO_ERROR, {});
+        std::vector<GroupInfoEntryType> groups;
+        if (auto it = groupsToFetch.find(endpointId); it != groupsToFetch.end())
+        {
+            for (const auto groupId : it->second)
+            {
+                GroupInfoEntryType group;
+                group.groupID = groupId;
+                groups.push_back(group);
+            }
+        }
+        onSuccess(CHIP_NO_ERROR, groups);
         return CHIP_NO_ERROR;
     }
 
@@ -296,6 +306,7 @@ public:
     std::vector<BindingEntryType> bindingsToFetch;
     CHIP_ERROR fetchAclListResult = CHIP_NO_ERROR;
     std::vector<datastore::ACLEntryStruct> aclListToFetch;
+    std::map<EndpointId, std::vector<GroupId>> groupsToFetch;
     std::vector<EndpointEntryType> endpointsToFetch;
     std::vector<uint16_t> fetchedGroupKeySetIDs;
     GroupKeySetType fetchedGroupKeySet;
@@ -1622,6 +1633,192 @@ TEST(JointFabricDatastoreTest, RefreshKeepsRemovalTheNodeStillHolds)
 
     delegate.RunDeferred();
     EXPECT_TRUE(store.GetNodeACLList().empty());
+}
+
+void AddEndpointOneToRefresh(JointFabricDatastore & store, TrackingDelegate & delegate)
+{
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "ep"_span), CHIP_NO_ERROR);
+    EndpointEntryType endpoint;
+    endpoint.nodeID     = 123;
+    endpoint.endpointID = 1;
+    delegate.endpointsToFetch.push_back(endpoint);
+}
+
+void AddGroupTen(JointFabricDatastore & store, std::optional<uint16_t> groupKeySetId)
+{
+    JointFabricCluster::Commands::AddGroup::DecodableType addGroup;
+    addGroup.groupID      = 10;
+    addGroup.friendlyName = "group-a"_span;
+    if (groupKeySetId.has_value())
+    {
+        addGroup.groupKeySetID.SetNonNull(*groupKeySetId);
+    }
+    addGroup.groupPermission = Privilege::kView;
+    ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
+}
+
+EndpointGroupIdEntryType MakeEndpointGroupEntry(State state, uint32_t failureCode = 0)
+{
+    EndpointGroupIdEntryType entry;
+    entry.nodeID                  = 123;
+    entry.endpointID              = 1;
+    entry.groupID                 = 10;
+    entry.statusEntry.state       = state;
+    entry.statusEntry.failureCode = failureCode;
+    return entry;
+}
+
+// A failed group removal is retried by RefreshNode as a removal of the real entry.
+TEST(JointFabricDatastoreTest, RefreshRetriesFailedEndpointGroupRemovalAsRemoval)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, std::nullopt);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    delegate.completeWith[SyncKind::kEndpointGroup] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitFailed);
+
+    delegate.groupsToFetch[1] = { 10 };
+    delegate.ResetCapturedSyncs();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastEndpointGroupSync);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.groupID, 10u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.endpointID, 1u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.statusEntry.state, State::kDeletePending);
+    EXPECT_TRUE(store.GetEndpointGroupIDList().empty());
+}
+
+TEST(JointFabricDatastoreTest, RefreshRetriesRecoverableEndpointGroupAdd)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    store.GetEndpointGroupIDList().push_back(
+        MakeEndpointGroupEntry(State::kCommitFailed, to_underlying(Protocols::InteractionModel::Status::Timeout)));
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastEndpointGroupSync);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.groupID, 10u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.statusEntry.state, State::kPending);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+TEST(JointFabricDatastoreTest, RefreshDropsUnrecoverableEndpointGroupFailure)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    store.GetEndpointGroupIDList().push_back(
+        MakeEndpointGroupEntry(State::kCommitFailed, to_underlying(Protocols::InteractionModel::Status::ConstraintError)));
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(delegate.hasLastEndpointGroupSync);
+    EXPECT_TRUE(store.GetEndpointGroupIDList().empty());
+}
+
+// A DeletePending group entry the node still holds is sent as a removal of that entry.
+TEST(JointFabricDatastoreTest, RefreshRetriesEndpointGroupRemovalAsRemoval)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    store.GetEndpointGroupIDList().push_back(MakeEndpointGroupEntry(State::kDeletePending));
+    delegate.groupsToFetch[1] = { 10 };
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastEndpointGroupSync);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.groupID, 10u);
+    EXPECT_EQ(delegate.lastEndpointGroupSync.statusEntry.state, State::kDeletePending);
+    EXPECT_TRUE(store.GetEndpointGroupIDList().empty());
+}
+
+// A failed key set removal is retried by RefreshNode as a removal of the real entry.
+TEST(JointFabricDatastoreTest, RefreshRetriesFailedKeySetRemovalAsRemoval)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, 55);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+
+    delegate.completeWith[SyncKind::kNodeKeySet] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    ASSERT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitFailed);
+
+    delegate.fetchedGroupKeySetIDs = { 55 };
+    delegate.ResetCapturedSyncs();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 55u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kDeletePending);
+    EXPECT_TRUE(store.GetNodeKeySetList().empty());
+}
+
+TEST(JointFabricDatastoreTest, RefreshRetriesKeySetRemovalAsRemoval)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    NodeKeySetEntryType keySetEntry;
+    keySetEntry.nodeID            = 123;
+    keySetEntry.groupKeySetID     = 55;
+    keySetEntry.statusEntry.state = State::kDeletePending;
+    store.GetNodeKeySetList().push_back(keySetEntry);
+    delegate.fetchedGroupKeySetIDs = { 55 };
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.nodeID, 123u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 55u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kDeletePending);
+    EXPECT_TRUE(store.GetNodeKeySetList().empty());
+}
+
+// Changing a group's key set removes the old key set from the group's nodes.
+TEST(JointFabricDatastoreTest, UpdateGroupKeySetChangeSendsRemovalOfOldKeySet)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    AddGroupTen(store, 5);
+    store.GetEndpointGroupIDList().push_back(MakeEndpointGroupEntry(State::kCommitted));
+    ASSERT_EQ(store.TestAddNodeKeySetEntry(10, 5, 123), CHIP_NO_ERROR);
+
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.groupKeySetID.SetNonNull(static_cast<uint16_t>(6));
+    ASSERT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.nodeID, 123u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 5u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kDeletePending);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].groupKeySetID, 6u);
 }
 
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
