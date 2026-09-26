@@ -4673,9 +4673,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
     delegate.skipSetupSubscription = YES;
     [device addDelegate:delegate
-                  queue:queue
-                  interestedPathsForAttributes:@[ clusterPath, attributePath, endpointID ]
-                      interestedPathsForEvents:@[ clusterPath ]];
+                               queue:queue
+        interestedPathsForAttributes:@[ clusterPath, attributePath, endpointID ]
+            interestedPathsForEvents:@[ clusterPath ]];
 
     NSArray * attributeUnion = [device unionOfInterestedPathsForAttributes];
     XCTAssertEqual(attributeUnion.count, 3);
@@ -4713,8 +4713,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * waiter = [device waitForAttributeValues:@{ waitedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
                                                   timeout:60
                                                     queue:queue
-                                               completion:^(NSError * _Nullable waitError) {
-                                               }];
+                                               completion:^(NSError * _Nullable waitError) {}];
     XCTAssertNotNil(waiter);
 
     NSArray * attributeUnion = [device unionOfInterestedPathsForAttributes];
