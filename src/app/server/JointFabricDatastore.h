@@ -28,8 +28,12 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TypeTraits.h>
 #include <map>
 #include <optional>
+#include <protocols/interaction_model/StatusCode.h>
+#include <set>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -64,6 +68,10 @@ struct ACLEntryStruct
     // Value the node is believed to hold while an update is Pending. Refresh must not re-adopt it, and
     // the delegate must replace it. Kept at the last committed value across back-to-back updates.
     std::optional<AccessControlEntryStruct> supersededValue;
+
+    // Set while this entry is being removed from the node. Survives a failure recorded as CommitFailed,
+    // which the cluster reports identically for adds and removals.
+    bool pendingRemoval = false;
 };
 
 } // namespace datastore
@@ -86,6 +94,32 @@ void MarkEntryCommittedIfFound(std::vector<T> & vec, Pred pred)
     {
         it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
     }
+}
+
+/**
+ * Records a failed sync on `entry`, as CommitFailed with the IM status of `err`.
+ */
+template <typename T>
+void MarkEntrySyncFailed(T & entry, CHIP_ERROR err)
+{
+    entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
+    entry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::ClusterStatusCode(err).GetStatus());
+}
+
+/**
+ * Records a failed sync on the first entry matching `pred`, as CommitFailed with the IM status of `err`.
+ * Adds and removals are recorded identically, as the specification requires; whether the entry is
+ * being removed is tracked separately (JointFabricDatastore::HasRemovalIntent).
+ */
+template <typename T, typename Pred>
+void MarkEntrySyncFailedIfFound(std::vector<T> & vec, Pred pred, CHIP_ERROR err)
+{
+    auto it = std::find_if(vec.begin(), vec.end(), pred);
+    if (it == vec.end())
+    {
+        return;
+    }
+    MarkEntrySyncFailed(*it, err);
 }
 
 /**
@@ -214,6 +248,15 @@ public:
         return sInstance;
     }
 
+    /**
+     * Pushes datastore changes to nodes and reads their current state.
+     *
+     * - If a SyncNode or Fetch* call returns CHIP_NO_ERROR, its callback is invoked exactly once, with
+     *   the result of the operation. If the call returns an error, the callback is never invoked.
+     * - Span-backed data in the arguments is valid only until the call returns; copy what is kept.
+     * - Vectors passed to a Fetch* callback are valid only during the callback.
+     * - Delegates do not modify the vectors they are given.
+     */
     class Delegate
     {
     public:
@@ -598,6 +641,9 @@ private:
         mNodeKeySetEntries.clear();
         mACLEntries.clear();
         mEndpointEntries.clear();
+        mBindingRemovalIntents.clear();
+        mEndpointGroupRemovalIntents.clear();
+        mNodeKeySetRemovalIntents.clear();
 
         // Reset anchor identity: with the joint fabric gone, the datastore no longer describes a fabric.
         memset(mAnchorRootCA, 0, sizeof(mAnchorRootCA));
@@ -621,6 +667,12 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
+    // Removal intent for entries stored as generated cluster types, which have no field for it. Keyed
+    // by each entry's stable identity.
+    std::set<std::tuple<NodeId, EndpointId, uint16_t>> mBindingRemovalIntents;      // (node, endpoint, listID)
+    std::set<std::tuple<NodeId, EndpointId, GroupId>> mEndpointGroupRemovalIntents; // (node, endpoint, group)
+    std::set<std::pair<NodeId, uint16_t>> mNodeKeySetRemovalIntents;                // (node, keySetID)
+
     std::vector<std::pair<NodeId, uint16_t>> mRefreshingNodeKeySetDeletions;
     size_t mRefreshingNodeKeySetDeletionIndex = 0;
     std::vector<datastore::ACLEntryStruct> mACLEntries;
@@ -650,6 +702,31 @@ private:
                     const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2);
     bool ACLTargetMatches(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
                           const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
+
+    /**
+     * Marks `entry` DeletePending and records that it is being removed from its node. A failed sync
+     * leaves the entry CommitFailed, which does not say whether an add or a removal failed, and
+     * RefreshNode re-writes recoverable CommitFailed entries. The recorded intent makes RefreshNode
+     * retry the removal instead. It is cleared when the entry is erased, and by any add for the same key.
+     */
+    void MarkRemovalRequested(datastore::ACLEntryStruct & entry);
+    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
+    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
+    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+
+    // True if `entry` is DeletePending or has recorded removal intent.
+    bool HasRemovalIntent(const datastore::ACLEntryStruct & entry) const;
+    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry) const;
+    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry) const;
+    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry) const;
+
+    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
+    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
+    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+
+    // Records a failed refresh write on every entry of the refreshing node that is not Committed.
+    void MarkRefreshingBindingsSyncFailed(CHIP_ERROR err);
+    void MarkRefreshingAclsSyncFailed(CHIP_ERROR err);
 
     // The result views the subject and target storage of `entry`, so it is valid only while `entry` is
     // unchanged.
