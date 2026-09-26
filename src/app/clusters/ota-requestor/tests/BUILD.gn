@@ -26,14 +26,17 @@ chip_test_suite("tests") {
     "TestOTARequestorCluster.cpp",
   ]
 
-  sources = []
+  # BDXDownloader.cpp is provided by the :default-ota-requestor source_set
+  # below. It is intentionally not duplicated here.
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/ota-requestor",
+    "${chip_root}/src/app/clusters/ota-requestor:default-ota-requestor",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/bdx",
   ]
 }
