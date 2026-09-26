@@ -324,10 +324,9 @@ CHIP_ERROR WbsConnection::UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT co
     CHIP_ERROR result = CHIP_ERROR_INTERNAL;
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
-    VerifyOrExit(!connection->mIsServerRole, {
-        result = CHIP_ERROR_NOT_IMPLEMENTED;
-        ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() is not valid on a server-role connection");
-    });
+    VerifyOrExit(!connection->mIsServerRole,
+                 { result = CHIP_ERROR_NOT_IMPLEMENTED;
+                   ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() is not valid on a server-role connection"); });
 
     VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken) == true,
                  ChipLogError(DeviceLayer, "lsCallCancel failed"));
@@ -399,16 +398,15 @@ void WbsConnection::EndpointCleanup(WbsEndpoint * apEndpoint)
         if (apEndpoint->mConnectionMap != nullptr)
         {
             GHashTableIter iter;
-            gpointer key;
-            gpointer value;
+            gpointer value = nullptr;
             g_hash_table_iter_init(&iter, apEndpoint->mConnectionMap);
-            while (g_hash_table_iter_next(&iter, &key, &value))
+            while (g_hash_table_iter_next(&iter, nullptr, &value))
             {
-                auto * connection = static_cast<WbsConnection *>(value);
-                if (connection->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
+                auto * conn = static_cast<WbsConnection *>(value);
+                if (conn != nullptr && conn->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
                 {
-                    LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken);
-                    connection->mMonitorToken = LSMESSAGE_TOKEN_INVALID;
+                    LsRequester::getInstance()->lsCallCancel(conn->mMonitorToken);
+                    conn->mMonitorToken = LSMESSAGE_TOKEN_INVALID;
                 }
             }
 

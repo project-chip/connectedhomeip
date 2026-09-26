@@ -55,6 +55,7 @@ public:
 private:
     static CHIP_ERROR InitImpl(WbsGattServer * self);
     static CHIP_ERROR ShutdownImpl(WbsGattServer * self);
+    static void RollbackInitImpl(WbsGattServer * self);
 
     static bool OnRxCharacteristicChanged(LSHandle * sh, LSMessage * message, void * ctx);
 

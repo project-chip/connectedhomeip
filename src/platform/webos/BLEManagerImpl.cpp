@@ -33,6 +33,7 @@
 #include "platform/internal/BLEManager.h"
 
 #include <cassert>
+#include <thread>
 #include <type_traits>
 #include <utility>
 
@@ -261,7 +262,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
-            mAdvertising.Stop();
             ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available
@@ -875,10 +875,18 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
     // Stop scanning and then start connecting timer
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    CHIP_ERROR err = mConnection.ConnectDevice(mBLEScanConfig.mAddress, mEndpoint);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
-
-    ChipLogProgress(Ble, "New device connected: %s", mBLEScanConfig.mAddress.c_str());
+    // OnDeviceScanned() runs inside the LsRequester loop thread's scan-result callback. ConnectDevice()
+    // blocks on synchronous LS2 calls (gatt/connect, ...) whose replies are dispatched by that same
+    // loop thread, so calling it inline deadlocks until every call times out. Run it on its own thread.
+    std::thread([this, address = mBLEScanConfig.mAddress]() {
+        CHIP_ERROR err = mConnection.ConnectDevice(address, mEndpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        ChipLogProgress(Ble, "New device connected: %s", address.c_str());
+    }).detach();
 }
 
 void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)

@@ -84,7 +84,8 @@ bool WbsAdvertising::OnAdvertisingStatusChanged(LSHandle * sh, LSMessage * messa
 
     if (!responsePayload["returnValue"].asBool())
     {
-        ChipLogError(DeviceLayer, "le/startAdvertising subscription error: %s", responsePayload["errorText"].asString().c_str());
+        ChipLogError(DeviceLayer, "le/startAdvertising subscription error: %s",
+                     responsePayload["errorText"].asString().c_str());
         self->mIsAdvertising = false;
         BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR_INTERNAL);
         return true;
@@ -115,8 +116,7 @@ bool WbsAdvertising::OnAdvertisingStatusChanged(LSHandle * sh, LSMessage * messa
 
 CHIP_ERROR WbsAdvertising::Stop()
 {
-    VerifyOrReturnValue(mIsAdvertising || mSubscribeToken != LSMESSAGE_TOKEN_INVALID, CHIP_NO_ERROR,
-                        ChipLogDetail(DeviceLayer, "BLE advertising already stopped"));
+    VerifyOrReturnValue(mIsAdvertising, CHIP_NO_ERROR, ChipLogDetail(DeviceLayer, "BLE advertising already stopped"));
     return PlatformMgrImpl().GLibMatterContextInvokeSync(StopImpl, this);
 }
 

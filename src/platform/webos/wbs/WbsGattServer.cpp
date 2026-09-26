@@ -114,14 +114,11 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
     addServiceParam.put("characteristics", characteristics);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_ADDSERVICE, addServiceParam.stringify().c_str(), responsePayload);
-    if (!ret || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
-    {
-        ChipLogError(DeviceLayer, "gatt/addService failed");
-        // gatt/openServer above already opened a server (self->mServerId) - close it instead of
-        // leaking it. ShutdownImpl() doesn't depend on mIsOpen, which is still false here.
-        ShutdownImpl(self);
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(ret && responsePayload.hasKey(STR_RETURN_VALUE) && responsePayload[STR_RETURN_VALUE].asBool(),
+                        CHIP_ERROR_INTERNAL, {
+                            ChipLogError(DeviceLayer, "gatt/addService failed");
+                            RollbackInitImpl(self);
+                        });
 
     self->mIsOpen = true;
     ChipLogDetail(DeviceLayer, "WbsGattServer: CHIPoBLE service registered (serverId=%s)", self->mServerId.c_str());
@@ -140,15 +137,12 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
         monitorParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
         monitorParam.put("subscribe", true);
 
-        bool subscribed = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHARACTERISTIC, monitorParam.stringify().c_str(), self,
-                                                   OnRxCharacteristicChanged, &self->mRxMonitorToken);
+        bool subscribed = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHARACTERISTIC, monitorParam.stringify().c_str(),
+                                                    self, OnRxCharacteristicChanged, &self->mRxMonitorToken);
         if (!subscribed)
         {
             ChipLogError(DeviceLayer, "WbsGattServer: failed to subscribe RX characteristic monitor");
-            // Undo the already-registered CHIPoBLE service (openServer/addService above), not just
-            // mPeerConnection, so a later retry does not find it still registered on the daemon
-            // side. ShutdownImpl() doesn't depend on mIsOpen, which is still false here.
-            ShutdownImpl(self);
+            RollbackInitImpl(self);
             return CHIP_ERROR_INTERNAL;
         }
     }
@@ -166,7 +160,8 @@ bool WbsGattServer::OnRxCharacteristicChanged(LSHandle * sh, LSMessage * message
     pbnjson::JValue responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
 
     VerifyOrExit(responsePayload["returnValue"].asBool() == true,
-                 ChipLogError(DeviceLayer, "WbsGattServer: RX monitor error: %s", responsePayload["errorText"].asString().c_str()));
+                 ChipLogError(DeviceLayer, "WbsGattServer: RX monitor error: %s",
+                              responsePayload["errorText"].asString().c_str()));
 
     if (responsePayload.hasKey("changed"))
     {
@@ -235,7 +230,8 @@ CHIP_ERROR WbsGattServer::PollCccdImpl(WbsGattServer * self)
     {
         self->mCccdIndicateEnabled = indicateEnabled;
         self->mPeerConnection->SetNotifyAcquired(indicateEnabled);
-        ChipLogProgress(DeviceLayer, "WbsGattServer: remote %s indications on TX", indicateEnabled ? "enabled" : "disabled");
+        ChipLogProgress(DeviceLayer, "WbsGattServer: remote %s indications on TX",
+                        indicateEnabled ? "enabled" : "disabled");
         BLEManagerImpl::HandleTXCharCCCDWrite(self->mPeerConnection);
     }
 
@@ -252,6 +248,15 @@ void WbsGattServer::Shutdown()
     mIsOpen = false;
     DeviceLayer::SystemLayer().CancelTimer(HandleCccdPollTimer, this);
     PlatformMgrImpl().GLibMatterContextInvokeSync(ShutdownImpl, this);
+}
+
+// Undo a partially completed InitImpl() once gatt/openServer has succeeded. Deliberately does not
+// depend on mIsOpen or Shutdown(): ShutdownImpl() already releases every resource InitImpl() may
+// have acquired (RX monitor token, CHIPoBLE service, serverId, mPeerConnection) and tolerates the
+// ones that were never acquired (removeService on an unregistered service is simply rejected).
+void WbsGattServer::RollbackInitImpl(WbsGattServer * self)
+{
+    ShutdownImpl(self);
 }
 
 CHIP_ERROR WbsGattServer::ShutdownImpl(WbsGattServer * self)

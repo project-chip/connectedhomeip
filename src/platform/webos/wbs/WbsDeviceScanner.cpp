@@ -108,6 +108,8 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
     return true;
 }
 
+} // namespace
+
 CHIP_ERROR WbsDeviceScanner::Init(WbsDeviceScannerDelegate * delegate)
 {
     // Make this function idempotent by shutting down previously initialized state if any.
