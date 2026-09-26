@@ -644,6 +644,10 @@ private:
         mBindingRemovalIntents.clear();
         mEndpointGroupRemovalIntents.clear();
         mNodeKeySetRemovalIntents.clear();
+        mAclTombstones.clear();
+        mBindingTombstones.clear();
+        mEndpointGroupTombstones.clear();
+        mNodeKeySetTombstones.clear();
 
         // Reset anchor identity: with the joint fabric gone, the datastore no longer describes a fabric.
         memset(mAnchorRootCA, 0, sizeof(mAnchorRootCA));
@@ -672,6 +676,22 @@ private:
     std::set<std::tuple<NodeId, EndpointId, uint16_t>> mBindingRemovalIntents;      // (node, endpoint, listID)
     std::set<std::tuple<NodeId, EndpointId, GroupId>> mEndpointGroupRemovalIntents; // (node, endpoint, group)
     std::set<std::pair<NodeId, uint16_t>> mNodeKeySetRemovalIntents;                // (node, keySetID)
+
+    // Values whose removal failed with an unrecoverable status. RefreshNode drops such an entry, as the
+    // specification requires, and would then adopt the node's copy as a new entry. A tombstoned value that
+    // a later refresh finds on the node is added back as DeletePending and removed instead. A tombstone is
+    // dropped when the node no longer holds its value, or when an add for the same value cancels it.
+    struct AclTombstone
+    {
+        NodeId nodeId = kUndefinedNodeId;
+        datastore::AccessControlEntryStruct value;
+        std::optional<datastore::AccessControlEntryStruct> supersededValue;
+    };
+    std::vector<AclTombstone> mAclTombstones;
+    // Generated types without span members, so they can be stored directly.
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mBindingTombstones;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupTombstones;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetTombstones;
 
     std::vector<std::pair<NodeId, uint16_t>> mRefreshingNodeKeySetDeletions;
     size_t mRefreshingNodeKeySetDeletionIndex = 0;
@@ -723,6 +743,15 @@ private:
     void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
     void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
     void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+
+    // Called when the refresh triage drops an entry with an unrecoverable failure. If the entry was being
+    // removed, records a tombstone for its value.
+    void RecordTombstoneIfRemoving(const datastore::ACLEntryStruct & entry);
+    void
+    RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
+    void
+    RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
+    void RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
 
     // Records a failed refresh write on `nodeId`'s entries that were in the write and not Committed, and
     // on its entries being removed, which keep their removal intent.
