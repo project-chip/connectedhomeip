@@ -17,6 +17,7 @@
 
 #include <app/server/JointFabricDatastore.h>
 
+#include <lib/core/CASEAuthTag.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
@@ -1690,6 +1691,10 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    // A CAT version of 0 is not a valid CASE Authenticated Tag.
+    VerifyOrReturnError(commandData.groupCATVersion.IsNull() || commandData.groupCATVersion.Value() != 0,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
     const GroupId updatedGroupId = commandData.groupID;
     const bool friendlyNameChanged =
         !commandData.friendlyName.IsNull() && !group.friendlyName.data_equal(commandData.friendlyName.Value());
@@ -1698,19 +1703,86 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     const bool permissionSet = !commandData.groupPermission.IsNull() &&
         commandData.groupPermission.Value() !=
             Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue;
+    const bool permissionChanged = permissionSet && commandData.groupPermission.Value() != group.groupPermission;
     const bool anyGroupCATFieldUpdated =
         (!commandData.groupCAT.IsNull() && (group.groupCAT.IsNull() || group.groupCAT.Value() != commandData.groupCAT.Value())) ||
         (!commandData.groupCATVersion.IsNull() &&
          (group.groupCATVersion.IsNull() || group.groupCATVersion.Value() != commandData.groupCATVersion.Value())) ||
-        (permissionSet && group.groupPermission != commandData.groupPermission.Value());
+        permissionChanged;
 
-    auto aclReferencesGroup = [updatedGroupId](const datastore::ACLEntryStruct & acl) {
-        return std::find(acl.ACLEntry.subjects.begin(), acl.ACLEntry.subjects.end(), static_cast<uint64_t>(updatedGroupId)) !=
-            acl.ACLEntry.subjects.end();
+    // The group's CAT and version before and after the update, and its new permission.
+    const auto previousCat     = group.groupCAT;
+    const auto previousVersion = group.groupCATVersion;
+    const auto newCat          = commandData.groupCAT.IsNull() ? previousCat : commandData.groupCAT;
+    const auto newVersion      = commandData.groupCATVersion.IsNull() ? previousVersion : commandData.groupCATVersion;
+    const bool catChanged =
+        !newCat.IsNull() && !newVersion.IsNull() && (!(previousCat == newCat) || !(previousVersion == newVersion));
+    const NodeId newCatSubject = catChanged
+        ? NodeIdFromCASEAuthTag((static_cast<CASEAuthTag>(newCat.Value()) << kTagIdentifierShift) | newVersion.Value())
+        : kUndefinedNodeId;
+    const auto newPermission   = permissionSet ? commandData.groupPermission.Value() : group.groupPermission;
+
+    // Indices of the subjects in `acl` that name this group: its GroupID in a Group-auth entry, or its CAT, at any
+    // version, in a CASE entry.
+    auto groupSubjectIndices = [&](const datastore::ACLEntryStruct & acl) {
+        std::vector<size_t> indices;
+        for (size_t i = 0; i < acl.ACLEntry.subjects.size(); ++i)
+        {
+            const NodeId subject = acl.ACLEntry.subjects[i];
+            if (acl.ACLEntry.authMode == Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum::kGroup &&
+                subject == static_cast<NodeId>(updatedGroupId))
+            {
+                indices.push_back(i);
+            }
+            else if (acl.ACLEntry.authMode == Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum::kCase &&
+                     !previousCat.IsNull() && IsCASEAuthTag(subject) &&
+                     GetCASEAuthTagIdentifier(CASEAuthTagFromNodeId(subject)) == previousCat.Value())
+            {
+                indices.push_back(i);
+            }
+        }
+        return indices;
     };
 
+    // What updating `acl` for this command involves.
+    struct AclChange
+    {
+        std::vector<size_t> groupSubjects;
+        bool rewrite         = false; // CAT subjects are rewritten to the new CAT and version
+        bool changePrivilege = false; // the group's subjects get the new permission
+        bool Needed() const { return rewrite || changePrivilege; }
+        // Other subjects keep their privilege, so the group's subjects move to a new entry.
+        bool Splits(const datastore::ACLEntryStruct & acl) const
+        {
+            return changePrivilege && groupSubjects.size() < acl.ACLEntry.subjects.size();
+        }
+    };
+    auto aclChangeFor = [&](const datastore::ACLEntryStruct & acl) {
+        AclChange change;
+        change.groupSubjects = groupSubjectIndices(acl);
+        if (!change.groupSubjects.empty())
+        {
+            change.rewrite = catChanged &&
+                acl.ACLEntry.authMode == Clusters::JointFabricDatastore::DatastoreAccessControlEntryAuthModeEnum::kCase;
+            change.changePrivilege = permissionChanged && acl.ACLEntry.privilege != newPermission;
+        }
+        return change;
+    };
+
+    // Checked before any change. A split adds an ACL entry, so the list must have room for every split.
+    size_t splits = 0;
+    for (const auto & acl : mACLEntries)
+    {
+        if (aclChangeFor(acl).Splits(acl))
+        {
+            ++splits;
+        }
+    }
+    VerifyOrReturnError(splits == 0 || mACLEntries.size() + splits <= kMaxACLs, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
     // Checked before any change, so that a BUSY rejection leaves the datastore as it was. Key set changes are counted
-    // as an add and a removal on every node in the group, which is at least what they queue.
+    // as an add and a removal on every node in the group, which is at least what they queue. A split entry is synced
+    // twice: the original, then the new entry.
     std::map<NodeId, size_t> syncsPerNode;
     for (const auto & epGroupEntry : mEndpointGroupIDEntries)
     {
@@ -1728,9 +1800,10 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     }
     for (const auto & acl : mACLEntries)
     {
-        if (anyGroupCATFieldUpdated && aclReferencesGroup(acl))
+        const auto change = aclChangeFor(acl);
+        if (anyGroupCATFieldUpdated && change.Needed())
         {
-            ++syncsPerNode[acl.nodeID];
+            syncsPerNode[acl.nodeID] += change.Splits(acl) ? 2 : 1;
         }
     }
     VerifyOrReturnError(HasNodeSyncCapacity(syncsPerNode), CHIP_IM_GLOBAL_STATUS(Busy));
@@ -1799,23 +1872,91 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 
     if (anyGroupCATFieldUpdated)
     {
+        // Removes repeated subjects, keeping the first of each. Rewriting several versions of one CAT yields repeats.
+        auto removeRepeatedSubjects = [](std::vector<uint64_t> & subjects) {
+            std::vector<uint64_t> unique;
+            for (const auto subject : subjects)
+            {
+                if (std::find(unique.begin(), unique.end(), subject) == unique.end())
+                {
+                    unique.push_back(subject);
+                }
+            }
+            subjects = std::move(unique);
+        };
+
         std::vector<std::pair<NodeId, uint16_t>> updatedAcls;
-        for (auto & acl : mACLEntries)
+
+        // Iterate by index over the entries present before the loop: a split appends to mACLEntries. Subjects are
+        // selected by the CAT the group had before this update.
+        const size_t aclCount = mACLEntries.size();
+        for (size_t i = 0; i < aclCount; ++i)
         {
-            if (!aclReferencesGroup(acl))
+            const auto change = aclChangeFor(mACLEntries[i]);
+            if (!change.Needed())
             {
                 continue;
             }
 
-            // Update the ACL entry in the datastore to reflect the new group permission and mark Pending. The node
-            // holds the last committed value until the update reaches it; keep that value so the update replaces it.
+            auto & acl = mACLEntries[i];
+            // The node holds the last committed value until the update reaches it; keep that value so the update
+            // replaces it.
             if (!acl.supersededValue.has_value())
             {
                 acl.supersededValue = acl.ACLEntry;
             }
-            acl.ACLEntry.privilege = group.groupPermission;
-            acl.statusEntry.state  = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+            if (change.rewrite)
+            {
+                for (const auto subjectIndex : change.groupSubjects)
+                {
+                    acl.ACLEntry.subjects[subjectIndex] = newCatSubject;
+                }
+            }
+
+            std::optional<datastore::ACLEntryStruct> groupEntry;
+            if (change.Splits(acl))
+            {
+                // The entry also names other subjects, which keep their privilege. The group's subjects move to a new
+                // entry with the new privilege.
+                groupEntry.emplace();
+                groupEntry->nodeID             = acl.nodeID;
+                groupEntry->ACLEntry.authMode  = acl.ACLEntry.authMode;
+                groupEntry->ACLEntry.privilege = newPermission;
+                groupEntry->ACLEntry.targets   = acl.ACLEntry.targets;
+                groupEntry->statusEntry.state  = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+                std::vector<uint64_t> otherSubjects;
+                for (size_t subjectIndex = 0; subjectIndex < acl.ACLEntry.subjects.size(); ++subjectIndex)
+                {
+                    const auto & groupSubjects = change.groupSubjects;
+                    if (std::find(groupSubjects.begin(), groupSubjects.end(), subjectIndex) != groupSubjects.end())
+                    {
+                        groupEntry->ACLEntry.subjects.push_back(acl.ACLEntry.subjects[subjectIndex]);
+                    }
+                    else
+                    {
+                        otherSubjects.push_back(acl.ACLEntry.subjects[subjectIndex]);
+                    }
+                }
+                acl.ACLEntry.subjects = std::move(otherSubjects);
+                removeRepeatedSubjects(groupEntry->ACLEntry.subjects);
+            }
+            else if (change.changePrivilege)
+            {
+                acl.ACLEntry.privilege = newPermission;
+            }
+            removeRepeatedSubjects(acl.ACLEntry.subjects);
+            acl.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+            // The original entry is replaced before the new one is added, so the node never grants more than before.
             updatedAcls.emplace_back(acl.nodeID, acl.listID);
+            if (groupEntry.has_value())
+            {
+                ReturnErrorOnFailure(GenerateAndAssignAUniqueListID(groupEntry->listID));
+                updatedAcls.emplace_back(groupEntry->nodeID, groupEntry->listID);
+                mACLEntries.push_back(std::move(*groupEntry));
+            }
         }
 
         // Sync after the loop: a sync that completes synchronously can erase entries.
