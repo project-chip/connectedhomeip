@@ -28,12 +28,12 @@ constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
 constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
 
 class SimulatedWaterHeater
-    : public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>,
-      public Clusters::WaterHeaterManagement::Delegate,
+    : public Clusters::WaterHeaterManagement::Delegate,
       public Clusters::Thermostat::Delegate,
       public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
+      public Clusters::ModeBase::AppDelegate,
       public TimerContext,
-      public Clusters::ModeBase::AppDelegate
+      public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>
 {
 public:
     explicit SimulatedWaterHeater(const Config & config);

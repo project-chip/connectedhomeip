@@ -66,7 +66,6 @@ SimulatedWaterHeater::~SimulatedWaterHeater()
 CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                           EndpointComposition composition)
 {
-    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
     // Setup initial values
     mTemperature        = kInitialTemperature;
     mHeatingEnabled     = true;
@@ -81,6 +80,8 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
 
     ReturnErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+
+    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
     return CHIP_NO_ERROR;
 }
 
