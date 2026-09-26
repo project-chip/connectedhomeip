@@ -51,6 +51,8 @@ NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDevic
 NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
 NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
 NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey = @"MTRDeviceControllerRegistrationControllerCompressedFabricID";
+NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey = @"MTRDeviceControllerRegistrationInterestedPathsForAttributes";
+NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey = @"MTRDeviceControllerRegistrationInterestedPathsForEvents";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -85,9 +87,18 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
         MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-        if ([device delegateExists]) {
+        NSArray * interestedPathsForAttributes = [device unionOfInterestedPathsForAttributes];
+        NSArray * interestedPathsForEvents = [device unionOfInterestedPathsForEvents];
+        if ([device delegateExists] || interestedPathsForAttributes.count > 0) {
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+
+            if (interestedPathsForAttributes != nil) {
+                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForAttributesKey] = interestedPathsForAttributes;
+            }
+            if (interestedPathsForEvents != nil) {
+                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForEventsKey] = interestedPathsForEvents;
+            }
 
             [nodeIDs addObject:nodeDictionary];
         }
@@ -202,6 +213,15 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
               forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
             argumentIndex:0
                   ofReply:YES];
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRClusterPath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:updateControllerConfiguration:)
+            argumentIndex:1
+                  ofReply:NO];
 
     return interface;
 }

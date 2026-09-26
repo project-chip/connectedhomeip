@@ -26,6 +26,10 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+// Per-node NSArray<MTRAttributePath *> / NSArray<MTREventPath *>; absent means report every path.
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_NEWLY_AVAILABLE;
+
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
