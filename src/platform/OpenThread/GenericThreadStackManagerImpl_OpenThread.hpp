@@ -471,6 +471,16 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
                                                 _OnNetworkScanFinished, this));
 
 exit:
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (error != CHIP_NO_ERROR && mTemporaryRxOnWhenIdle)
+    {
+        linkMode               = otThreadGetLinkMode(mOTInst);
+        linkMode.mRxOnWhenIdle = false;
+        mTemporaryRxOnWhenIdle = false;
+        RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
+    }
+#endif
+
     Impl()->UnlockThreadStack();
 
     if (error != CHIP_NO_ERROR)

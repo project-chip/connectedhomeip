@@ -18,6 +18,7 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -287,6 +288,13 @@ if (chip_build_tests) {
 
     if (chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
+    }
+
+    # Defines the host ThreadStackManagerImpl itself, so it needs a device layer
+    # without a Thread stack of its own.
+    if (chip_enable_icd_server && !chip_enable_thread &&
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+      tests += [ "${chip_root}/src/platform/OpenThread/tests" ]
     }
 
     if (chip_config_network_layer_ble) {
