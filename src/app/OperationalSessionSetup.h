@@ -330,6 +330,9 @@ private:
 
     bool mPerformingAddressUpdate = false;
 
+    // A Sigma1 the peer never answered says nothing about whether it still holds the record.
+    bool mSkipSessionResumption = false;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
     System::Clock::Milliseconds16 mRequestedBusyDelay = System::Clock::kZero;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP

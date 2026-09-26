@@ -343,8 +343,14 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
     mCASEClient = mClientPool->Allocate();
     VerifyOrReturnError(mCASEClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    CASEClientInitParams initParams = mInitParams;
+    if (mSkipSessionResumption)
+    {
+        initParams.sessionResumptionStorage = nullptr;
+    }
+
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
-    CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(initParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
         MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
@@ -465,6 +471,16 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
     // error in UpdateDeviceData.
     if (CHIP_ERROR_TIMEOUT == error || CHIP_ERROR_BUSY == error)
     {
+        if (CHIP_ERROR_TIMEOUT == error && SessionEstablishmentStage::kSentSigma1 == stage && !mSkipSessionResumption &&
+            mInitParams.sessionResumptionStorage != nullptr)
+        {
+            ChipLogProgress(Discovery,
+                            "OperationalSessionSetup[%u:" ChipLogFormatX64
+                            "]: Sigma1 went unanswered; dropping the session resumption offer for the next attempt",
+                            mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
+            mSkipSessionResumption = true;
+        }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         // Make a copy of the ReliableMessageProtocolConfig, since our
         // mCaseClient is about to go away once we change state.
