@@ -318,9 +318,19 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
                                const char * serviceName, const char * regtype, const char * replyDomain, void * context)
 {
     DnssdBrowseCallback ChipBrowseHandler = (DnssdBrowseCallback) context;
-    DnssdService service;
+    // Value-initialize so that fields not filled here (e.g. mType, which the discovery layer
+    // compares for every browse result) are empty instead of leftover stack contents.
+    DnssdService service{};
 
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", StringOrNullMarker(serviceName));
+
+    // The remaining arguments are not valid when the resolver reports an error.
+    if (kDNSServiceErr_NoError != errorCode || serviceName == nullptr)
+    {
+        ChipLogError(ServiceProvisioning, "Browse reply failed: %s", Error::ToString(errorCode));
+        ChipBrowseHandler(NULL, NULL, 0, true, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
 
     chip::StringBuilderBase nameBuilder(service.mName, sizeof(service.mName));
     nameBuilder.Add(serviceName);
