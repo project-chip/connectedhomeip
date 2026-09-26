@@ -35,6 +35,21 @@ bool EpochKeyFitsStorage(const DataModel::Nullable<ByteSpan> & key)
     using EpochKeyStorage = Crypto::SensitiveDataBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
     return key.IsNull() || key.Value().size() <= EpochKeyStorage::Capacity();
 }
+
+/**
+ * Returns a view of `value` in the cluster's type. The view is valid only while `value` is unchanged.
+ */
+Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type
+EncodeAccessControlEntry(const datastore::AccessControlEntryStruct & value)
+{
+    Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type encoded;
+    encoded.authMode  = value.authMode;
+    encoded.privilege = value.privilege;
+    encoded.subjects  = DataModel::List<const uint64_t>(value.subjects.data(), value.subjects.size());
+    encoded.targets   = DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
+        value.targets.data(), value.targets.size());
+    return encoded;
+}
 } // namespace
 
 CHIP_ERROR JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
@@ -988,61 +1003,80 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                    const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & acls) {
                 if (err == CHIP_NO_ERROR)
                 {
-                    // Convert acls to mACLEntries
+                    // A node's ACL entries carry no listID, so fetched entries are matched to datastore
+                    // entries by value.
+                    std::vector<uint16_t> seenListIds;
                     for (const auto & acl : acls)
                     {
-                        auto it = std::find_if(mACLEntries.begin(), mACLEntries.end(),
-                                               [this, &acl](const datastore::ACLEntryStruct & entry) {
-                                                   return entry.nodeID == mRefreshingNodeId && entry.listID == acl.listID;
-                                               });
-
-                        if (it == mACLEntries.end())
+                        bool matched = false;
+                        for (const auto & entry : mACLEntries)
                         {
-                            datastore::ACLEntryStruct newEntry;
-                            newEntry.nodeID             = mRefreshingNodeId;
-                            newEntry.listID             = acl.listID;
-                            newEntry.ACLEntry.authMode  = acl.ACLEntry.authMode;
-                            newEntry.ACLEntry.privilege = acl.ACLEntry.privilege;
-
-                            if (!acl.ACLEntry.subjects.IsNull())
+                            if (entry.nodeID == mRefreshingNodeId &&
+                                detail::AclEntryValueEquals(acl.ACLEntry, EncodeAclEntryForSync(entry).ACLEntry))
                             {
-                                for (size_t subjectsIndex = 0; subjectsIndex < acl.ACLEntry.subjects.Value().size();
-                                     ++subjectsIndex)
-                                {
-                                    newEntry.ACLEntry.subjects.push_back(acl.ACLEntry.subjects.Value()[subjectsIndex]);
-                                }
+                                seenListIds.push_back(entry.listID);
+                                matched = true;
                             }
-
-                            if (!acl.ACLEntry.targets.IsNull())
-                            {
-                                for (size_t targetsIndex = 0; targetsIndex < acl.ACLEntry.targets.Value().size(); ++targetsIndex)
-                                {
-                                    newEntry.ACLEntry.targets.push_back(acl.ACLEntry.targets.Value()[targetsIndex]);
-                                }
-                            }
-
-                            newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                            mACLEntries.push_back(newEntry);
                         }
+                        if (matched)
+                        {
+                            continue;
+                        }
+
+                        // The value an entry had before its Pending update: the node has not applied the update
+                        // yet. Not adopted, so the write replaces it.
+                        if (std::any_of(mACLEntries.begin(), mACLEntries.end(), [this, &acl](const auto & entry) {
+                                return entry.nodeID == mRefreshingNodeId && entry.supersededValue.has_value() &&
+                                    detail::AclEntryValueEquals(acl.ACLEntry, EncodeAccessControlEntry(*entry.supersededValue));
+                            }))
+                        {
+                            continue;
+                        }
+
+                        // Added to the node outside the datastore: adopted as Committed, as RefreshNode specifies.
+                        if (mACLEntries.size() >= kMaxACLs)
+                        {
+                            ChipLogError(AppServer, "ACL list full; not adopting an ACL entry from node 0x" ChipLogFormatX64,
+                                         ChipLogValueX64(mRefreshingNodeId));
+                            continue;
+                        }
+
+                        datastore::ACLEntryStruct newEntry;
+                        if (GenerateAndAssignAUniqueListID(newEntry.listID) != CHIP_NO_ERROR)
+                        {
+                            continue;
+                        }
+                        newEntry.nodeID             = mRefreshingNodeId;
+                        newEntry.ACLEntry.authMode  = acl.ACLEntry.authMode;
+                        newEntry.ACLEntry.privilege = acl.ACLEntry.privilege;
+                        if (!acl.ACLEntry.subjects.IsNull())
+                        {
+                            newEntry.ACLEntry.subjects.assign(acl.ACLEntry.subjects.Value().begin(),
+                                                              acl.ACLEntry.subjects.Value().end());
+                        }
+                        if (!acl.ACLEntry.targets.IsNull())
+                        {
+                            newEntry.ACLEntry.targets.assign(acl.ACLEntry.targets.Value().begin(),
+                                                             acl.ACLEntry.targets.Value().end());
+                        }
+                        newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                        seenListIds.push_back(newEntry.listID);
+                        mACLEntries.push_back(std::move(newEntry));
                     }
 
-                    // Remove entries not in acls, but only if they are Committed or DeletePending
+                    // Entries the node does not hold: Committed ones were removed outside the datastore, and
+                    // removals have taken effect.
                     mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(),
                                                      [&](const auto & entry) {
-                                                         if (entry.nodeID != mRefreshingNodeId)
+                                                         if (entry.nodeID != mRefreshingNodeId ||
+                                                             std::find(seenListIds.begin(), seenListIds.end(), entry.listID) !=
+                                                                 seenListIds.end())
                                                          {
                                                              return false;
                                                          }
-                                                         if (entry.statusEntry.state !=
-                                                                 Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted &&
-                                                             entry.statusEntry.state !=
-                                                                 Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
-                                                         {
-                                                             return false;
-                                                         }
-                                                         return std::none_of(acls.begin(), acls.end(), [&](const auto & acl) {
-                                                             return entry.listID == acl.listID;
-                                                         });
+                                                         return entry.statusEntry.state ==
+                                                             Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted ||
+                                                             HasRemovalIntent(entry);
                                                      }),
                                       mACLEntries.end());
 
@@ -2259,14 +2293,9 @@ Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
 JointFabricDatastore::EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const
 {
     Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type encoded;
-    encoded.nodeID             = entry.nodeID;
-    encoded.listID             = entry.listID;
-    encoded.ACLEntry.authMode  = entry.ACLEntry.authMode;
-    encoded.ACLEntry.privilege = entry.ACLEntry.privilege;
-    encoded.ACLEntry.subjects  = DataModel::List<const uint64_t>(entry.ACLEntry.subjects.data(), entry.ACLEntry.subjects.size());
-    encoded.ACLEntry.targets =
-        DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
-            entry.ACLEntry.targets.data(), entry.ACLEntry.targets.size());
+    encoded.nodeID      = entry.nodeID;
+    encoded.listID      = entry.listID;
+    encoded.ACLEntry    = EncodeAccessControlEntry(entry.ACLEntry);
     encoded.statusEntry = entry.statusEntry;
     return encoded;
 }

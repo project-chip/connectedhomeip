@@ -256,7 +256,25 @@ public:
     CHIP_ERROR FetchACLList(NodeId nodeId, std::function<void(CHIP_ERROR, const std::vector<ACLEntryType> &)> onSuccess) override
     {
         ++fetchAclListCalls;
-        onSuccess(fetchAclListResult, {});
+        // Views over aclListToFetch. nodeID and listID stay 0: a node's ACL entries carry neither.
+        std::vector<ACLEntryType> acls;
+        for (const auto & held : aclListToFetch)
+        {
+            ACLEntryType acl;
+            acl.ACLEntry.privilege = held.ACLEntry.privilege;
+            acl.ACLEntry.authMode  = held.ACLEntry.authMode;
+            acl.ACLEntry.subjects.SetNonNull(held.ACLEntry.subjects.data(), held.ACLEntry.subjects.size());
+            if (held.ACLEntry.targets.empty())
+            {
+                acl.ACLEntry.targets.SetNull();
+            }
+            else
+            {
+                acl.ACLEntry.targets.SetNonNull(held.ACLEntry.targets.data(), held.ACLEntry.targets.size());
+            }
+            acls.push_back(acl);
+        }
+        onSuccess(fetchAclListResult, fetchAclListResult == CHIP_NO_ERROR ? acls : std::vector<ACLEntryType>());
         return CHIP_NO_ERROR;
     }
 
@@ -277,6 +295,7 @@ public:
     std::vector<std::pair<NodeId, std::vector<BindingEntryType>>> bindingListSyncs;
     std::vector<BindingEntryType> bindingsToFetch;
     CHIP_ERROR fetchAclListResult = CHIP_NO_ERROR;
+    std::vector<datastore::ACLEntryStruct> aclListToFetch;
     std::vector<EndpointEntryType> endpointsToFetch;
     std::vector<uint16_t> fetchedGroupKeySetIDs;
     GroupKeySetType fetchedGroupKeySet;
@@ -1325,6 +1344,7 @@ TEST(JointFabricDatastoreTest, FailedRemovalWhoseRefreshWriteFailsIsRetriedLater
     ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
     ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
     SeedAcl(store, 123, 7, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList(); // the node keeps the entry until a write removes it
 
     delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
     ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
@@ -1470,6 +1490,138 @@ TEST(JointFabricDatastoreTest, RefreshRetriesRecoverableCommitFailedBinding)
     EXPECT_EQ(delegate.bindingListSyncs.back().second[0].listID, 9u);
     ASSERT_EQ(store.GetEndpointBindingList().size(), 1u);
     EXPECT_EQ(store.GetEndpointBindingList()[0].statusEntry.state, State::kCommitted);
+}
+
+// ACL entries read from a node carry no listID, so the refresh matches them to datastore entries by
+// value.
+TEST(JointFabricDatastoreTest, RefreshMatchesFetchedAclsByValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kAdminister, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList(); // node holds exactly what the datastore holds
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetNodeACLList().size(), 2u);
+    EXPECT_NE(FindAcl(store, 123, 5), nullptr);
+    EXPECT_NE(FindAcl(store, 123, 6), nullptr);
+    EXPECT_EQ(delegate.aclListSyncs.back().second.size(), 2u);
+}
+
+// An entry on the node that the datastore does not hold is adopted as Committed, with a new listID.
+TEST(JointFabricDatastoreTest, RefreshAdoptsOutOfBandAclWithFreshListId)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kAdminister, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    datastore::ACLEntryStruct extra;
+    extra.ACLEntry.privilege = Privilege::kView;
+    extra.ACLEntry.authMode  = AuthMode::kCase;
+    extra.ACLEntry.subjects  = { 0x3333 };
+    delegate.aclListToFetch.push_back(extra);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetNodeACLList().size(), 2u);
+    const auto & adopted = store.GetNodeACLList()[1];
+    EXPECT_TRUE(adopted.ACLEntry.subjects == std::vector<uint64_t>{ 0x3333 });
+    EXPECT_NE(adopted.listID, 5u);
+    EXPECT_EQ(adopted.statusEntry.state, State::kCommitted);
+    EXPECT_EQ(delegate.aclListSyncs.back().second.size(), 2u);
+}
+
+// The node still holds the value an entry had before its Pending update. It is not adopted, so the
+// write replaces it.
+TEST(JointFabricDatastoreTest, RefreshDoesNotReadoptSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    auto & entry             = store.GetNodeACLList()[0];
+    entry.supersededValue    = entry.ACLEntry;
+    entry.ACLEntry.privilege = Privilege::kView;
+    entry.statusEntry.state  = State::kPending;
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    for (const auto & held : store.GetNodeACLList())
+    {
+        EXPECT_NE(held.ACLEntry.privilege, Privilege::kManage);
+    }
+    ASSERT_EQ(delegate.aclListSyncs.back().second.size(), 1u);
+    EXPECT_EQ(delegate.aclListSyncs.back().second[0].privilege, Privilege::kView);
+    EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
+    EXPECT_FALSE(FindAcl(store, 123, 5)->supersededValue.has_value());
+}
+
+TEST(JointFabricDatastoreTest, RefreshTreatsNullTargetsAsEmptyWhenMatching)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList(); // no targets: the mock reports them as null
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_EQ(store.GetNodeACLList().size(), 1u);
+    EXPECT_EQ(delegate.aclListSyncs.back().second.size(), 1u);
+}
+
+// The node no longer holds an entry whose removal failed earlier: the removal has taken effect.
+TEST(JointFabricDatastoreTest, RefreshErasesRemovalTheNodeAlreadyCompleted)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_TRUE(FindAcl(store, 123, 5)->pendingRemoval);
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    EXPECT_EQ(FindAcl(store, 123, 5), nullptr);
+    delegate.RunDeferred();
+}
+
+// The node still holds an entry whose removal failed earlier. It is matched, left out of the write,
+// and erased once the write succeeds.
+TEST(JointFabricDatastoreTest, RefreshKeepsRemovalTheNodeStillHolds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    EXPECT_TRUE(delegate.aclListSyncs.back().second.empty());
+
+    delegate.RunDeferred();
+    EXPECT_TRUE(store.GetNodeACLList().empty());
 }
 
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
