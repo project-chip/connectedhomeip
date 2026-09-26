@@ -637,7 +637,9 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
 
 CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), CHIP_NO_ERROR);
+    // Spec "'With On/Off' Commands" conditions the OnOff side effects on whether the On/Off cluster is
+    // implemented on the same endpoint, not on the OO feature bit.
+    VerifyOrReturnError(mOnOffCluster != nullptr, CHIP_NO_ERROR);
     VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
 
     // Prevent potential callback loops
@@ -649,7 +651,7 @@ CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 
 bool LevelControlCluster::GetOnOff()
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), false);
+    VerifyOrReturnError(mOnOffCluster != nullptr, false);
     return mOnOffCluster->GetOnOff();
 }
 
@@ -816,6 +818,7 @@ void LevelControlCluster::TransitionHandler::TimerFired()
 
 void LevelControlCluster::OnOnOffChanged(bool isOn)
 {
+    VerifyOrReturn(mFeatureMap.Has(Feature::kOnOff));
     VerifyOrReturn(!mCurrentLevel.value().IsNull() && !mTemporarilyIgnoreOnOffCallbacks);
 
     if (isOn)
@@ -885,9 +888,11 @@ bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask,
     // * The OnOff attribute of the On/Off cluster, on this endpoint, is FALSE.
     // * The value of the ExecuteIfOff bit is 0."
 
-    // 1. If On/Off feature is not supported, there is no dependency, so we execute.
+    // 1. If the On/Off cluster is not on this endpoint, there is no dependency, so we execute.
+    //    Spec "Effect of Level Control Commands Depends on OnOff": the dependency holds "Even if the
+    //    On/Off (OO) feature set bit is set to zero", so the check uses cluster presence, not the OO bit.
     // 2. If the OnOff state is On, we execute.
-    if (!mFeatureMap.Has(Feature::kOnOff) || GetOnOff())
+    if (mOnOffCluster == nullptr || GetOnOff())
     {
         return true;
     }
