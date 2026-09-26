@@ -26,13 +26,26 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.pics import (BASE_PICS_CODES_DERIVED, BasePicsFacts, base_pics_facts_to_pics_codes,
                                  derive_base_pics_facts_from_device_wildcard, generate_device_element_pics_from_device_wildcard,
-                                 read_pics_from_file)
+                                 parse_pics_xml, read_pics_from_file)
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 
 
-class TestPicsHelpers(CertificationUnitTestNoDevice):
+def _make_pics_xml(items: dict[str, bool]) -> str:
+    """
+    Build a minimal PICSGenerator-style clusterPICS XML document from a {pics_code: support} mapping.
+    """
+    rows = "\n".join(
+        f"    <picsItem>\n"
+        f"        <itemNumber>{code}</itemNumber>\n"
+        f"        <support>{str(supported).lower()}</support>\n"
+        f"    </picsItem>"
+        for code, supported in items.items()
+    )
+    return f"<?xml version='1.0' encoding='utf-8'?>\n<clusterPICS>\n{rows}\n</clusterPICS>\n"
 
+
+class TestPicsHelpers(CertificationUnitTestNoDevice):
     def test_pics_generation(self):
         xml_cluster, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
         # 0: opcreds with an attribute, an accepted command, a generated command
@@ -330,8 +343,206 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
                 os.makedirs(ep_dir)
                 with open(os.path.join(ep_dir, 'cluster.xml'), 'w') as f:
                     f.write(test_xml)
-                pics = read_pics_from_file(d, endpoint=0)
-                asserts.assert_true(pics.get('TEST.S'), f'Failed for subdir name: {subdir_name}')
+                pics = read_pics_from_file(d)
+                asserts.assert_true(pics.get(0, {}).get('TEST.S'), f'Failed for subdir name: {subdir_name}')
+
+    # ------------------------------------------------------------------
+    # parse_pics_xml: now returns an endpoint-keyed tree {endpoint: {code: bool}}
+    # ------------------------------------------------------------------
+
+    def test_parse_pics_xml_defaults_to_endpoint_0(self):
+        """
+        With no endpoint supplied, codes land under endpoint 0 (device-wide).
+        """
+        xml = _make_pics_xml({'BINFO.S': True, 'BINFO.S.A0000': False})
+        asserts.assert_equal(parse_pics_xml(xml), {0: {'BINFO.S': True, 'BINFO.S.A0000': False}})
+
+    def test_parse_pics_xml_uses_supplied_endpoint(self):
+        """
+        The caller-supplied endpoint becomes the tree key.
+        """
+        xml = _make_pics_xml({'SWTCH.S': True})
+        asserts.assert_equal(parse_pics_xml(xml, endpoint=3), {3: {'SWTCH.S': True}})
+
+    def test_parse_pics_xml_parses_support_true_false(self):
+        result = parse_pics_xml(_make_pics_xml({'A.S': True, 'B.S': False}))[0]
+        asserts.assert_true(result['A.S'], "support 'true' must parse as True")
+        asserts.assert_false(result['B.S'], "support 'false' must parse as False")
+
+    # A picsItem is a (code, value) pair, so both halves are required: the
+    # itemNumber holds the PICS code (e.g. BINFO.S) and the support element
+    # holds the declared value for it. See the PICS code format described in
+    # the PICS Guidelines, linked from docs/testing/pics_and_pixit.md. Neither
+    # half can be defaulted - a code with no value says nothing about the
+    # device, and a value with no code cannot be attributed to one - so a
+    # malformed item is rejected rather than skipped. Skipping would drop the
+    # item from the returned mapping, which every consumer reads as "this PICS
+    # was not declared", making a malformed file indistinguishable from one
+    # that deliberately declares the code as 0.
+
+    def test_parse_pics_xml_missing_item_number_raises(self):
+        """
+        A picsItem with a support value but no itemNumber declares a value that
+        belongs to no PICS code, so parsing must fail rather than discard it.
+        """
+        xml = "<clusterPICS><picsItem><support>true</support></picsItem></clusterPICS>"
+        with asserts.assert_raises(ValueError):
+            parse_pics_xml(xml)
+
+    def test_parse_pics_xml_missing_support_raises(self):
+        """
+        A picsItem naming a PICS code with no support element leaves that code
+        undeclared. Parsing must fail rather than assume a value: assuming
+        false would silently under-declare the device, and assuming true would
+        claim support that was never stated.
+        """
+        xml = "<clusterPICS><picsItem><itemNumber>X.S</itemNumber></picsItem></clusterPICS>"
+        with asserts.assert_raises(ValueError):
+            parse_pics_xml(xml)
+
+    # ------------------------------------------------------------------
+    # read_pics_from_file: builds the endpoint tree from a PICSGenerator dir
+    # ------------------------------------------------------------------
+
+    def test_read_pics_from_file_builds_endpoint_tree(self):
+        """
+        Top-level *.xml (Base.xml) -> EP0; endpointN subdirs -> EP N; the
+        EP0 subdir merges with the device-wide top-level codes.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'Base.xml'), 'w') as f:
+                f.write(_make_pics_xml({'MCORE.IDM.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint0'))
+            with open(os.path.join(d, 'endpoint0', 'desc.xml'), 'w') as f:
+                f.write(_make_pics_xml({'DESC.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+
+            tree = read_pics_from_file(d)
+
+        asserts.assert_equal(sorted(tree.keys()), [0, 1])
+        # Base.xml and the endpoint0/ slice both land under endpoint 0.
+        asserts.assert_true(tree[0]['MCORE.IDM.S'], "Base.xml device-wide code must be on endpoint 0")
+        asserts.assert_true(tree[0]['DESC.S'], "endpoint0/ cluster code must merge into endpoint 0")
+        asserts.assert_true(tree[1]['SWTCH.S'], "endpoint1/ cluster code must be on endpoint 1")
+        # Endpoint 0's codes must not bleed into endpoint 1's slice.
+        asserts.assert_not_in('DESC.S', tree[1], "endpoint 0 code leaked into endpoint 1")
+        asserts.assert_not_in('MCORE.IDM.S', tree[1], "device-wide code leaked into endpoint 1")
+
+    def test_read_pics_from_file_preserves_per_endpoint_divergence(self):
+        """
+        The same code may carry different values on different endpoints; the
+        tree must keep them separate (the old flat dict collapsed them).
+        """
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S.F00': True, 'SWTCH.S.F01': False}))
+            os.makedirs(os.path.join(d, 'endpoint3'))
+            with open(os.path.join(d, 'endpoint3', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S.F00': False, 'SWTCH.S.F01': True}))
+
+            tree = read_pics_from_file(d)
+
+        asserts.assert_true(tree[1]['SWTCH.S.F00'], "endpoint 1 F00 must stay True")
+        asserts.assert_false(tree[1]['SWTCH.S.F01'], "endpoint 1 F01 must stay False")
+        asserts.assert_false(tree[3]['SWTCH.S.F00'], "endpoint 3 F00 must stay False")
+        asserts.assert_true(tree[3]['SWTCH.S.F01'], "endpoint 3 F01 must stay True")
+
+    def test_read_pics_from_file_ignores_non_endpoint_subdirs(self):
+        """
+        Directories that don't resolve to an endpoint number are skipped.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, 'notanendpoint'))
+            with open(os.path.join(d, 'notanendpoint', 'x.xml'), 'w') as f:
+                f.write(_make_pics_xml({'X.S': True}))
+            asserts.assert_equal(read_pics_from_file(d), {})
+
+    def test_read_pics_from_file_ci_text_file_lands_on_endpoint_0(self):
+        """
+        A CI-format text file is not endpoint-scoped, so it all lands on EP0.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, 'pics.txt')
+            with open(path, 'w') as f:
+                f.write("TEST.S.A0000=1\nTEST.S.A0001=0\n")
+            asserts.assert_equal(read_pics_from_file(path),
+                                 {0: {'TEST.S.A0000': True, 'TEST.S.A0001': False}})
+
+    def test_read_pics_from_file_ci_text_file_uses_default_endpoint(self):
+        """
+        A CI-format text file carries no endpoint labels, so its codes are
+        attributed to the endpoint under test rather than always to EP0.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, 'pics.txt')
+            with open(path, 'w') as f:
+                f.write("TEST.S.A0000=1\n")
+            asserts.assert_equal(read_pics_from_file(path, default_endpoint=1),
+                                 {1: {'TEST.S.A0000': True}})
+
+    def test_read_pics_from_file_single_endpoint_dir_uses_default_endpoint(self):
+        """
+        A directory of XMLs for one endpoint (no endpoint subdirs) is a single
+        unlabelled slice, so it too is attributed to the endpoint under test.
+        This is the layout the PICS docs describe: point --PICS at the XML
+        directory for the endpoint being checked.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+            asserts.assert_equal(read_pics_from_file(d, default_endpoint=1), {1: {'SWTCH.S': True}})
+
+    def test_read_pics_from_file_default_endpoint_ignored_when_structured(self):
+        """
+        An endpoint-structured tree is labelled, so the labels win: top-level
+        files stay device-wide (EP0) and each subdir keeps its own endpoint,
+        regardless of which endpoint is under test.
+        """
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'Base.xml'), 'w') as f:
+                f.write(_make_pics_xml({'MCORE.IDM.S': True}))
+            os.makedirs(os.path.join(d, 'endpoint1'))
+            with open(os.path.join(d, 'endpoint1', 'switch.xml'), 'w') as f:
+                f.write(_make_pics_xml({'SWTCH.S': True}))
+
+            tree = read_pics_from_file(d, default_endpoint=1)
+
+        asserts.assert_equal(tree, {0: {'MCORE.IDM.S': True}, 1: {'SWTCH.S': True}})
+
+    # ------------------------------------------------------------------
+    # check_pics: endpoint-aware lookups over the endpoint-keyed tree
+    # ------------------------------------------------------------------
+
+    def test_check_pics_any_endpoint_when_endpoint_omitted(self):
+        """
+        With no endpoint, a code is enabled if it is true on ANY endpoint.
+        """
+        self.matter_test_config.pics = {0: {'MCORE.IDM.S': True}, 3: {'SWTCH.S': True}}
+        asserts.assert_true(self.check_pics('SWTCH.S'), "code true on endpoint 3 must satisfy unscoped check")
+        asserts.assert_true(self.check_pics('MCORE.IDM.S'), "code true on endpoint 0 must satisfy unscoped check")
+        asserts.assert_false(self.check_pics('NOT.PRESENT'), "absent code must be False")
+
+    def test_check_pics_scoped_to_endpoint(self):
+        """
+        With an endpoint, only that endpoint's slice is consulted.
+        """
+        self.matter_test_config.pics = {0: {'SWTCH.S': False}, 3: {'SWTCH.S': True}}
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 0 slice says False")
+        asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 slice says True")
+        # An endpoint with no slice at all returns False rather than raising.
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=9), "unknown endpoint must be False")
+
+    def test_check_pics_no_cross_endpoint_leak(self):
+        """
+        Regression: a code present only on endpoint 3 must not satisfy an
+        endpoint-0-scoped check.
+        """
+        self.matter_test_config.pics = {0: {}, 3: {'SWTCH.S': True}}
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 3 code must not leak into endpoint 0 check")
+        asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 code must be found on endpoint 3")
 
 
 if __name__ == "__main__":
