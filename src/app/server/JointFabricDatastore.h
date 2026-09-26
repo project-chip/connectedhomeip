@@ -724,9 +724,16 @@ private:
     void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
     void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
 
-    // Records a failed refresh write on every entry of the refreshing node that is not Committed.
-    void MarkRefreshingBindingsSyncFailed(CHIP_ERROR err);
-    void MarkRefreshingAclsSyncFailed(CHIP_ERROR err);
+    // Records a failed refresh write on `nodeId`'s entries that were in the write and not Committed, and
+    // on its entries being removed, which keep their removal intent.
+    void MarkRefreshBindingsSyncFailed(NodeId nodeId, CHIP_ERROR err);
+    void MarkRefreshAclsSyncFailed(NodeId nodeId, CHIP_ERROR err);
+
+    // Records that a stage of `nodeId`'s refresh failed, if that refresh is still active.
+    void MarkRefreshFailed(NodeId nodeId);
+
+    // Ends the active refresh, if any, and resets all refresh state. The only place a refresh ends.
+    void FinishRefresh(CHIP_ERROR err);
 
     // The result views the subject and target storage of `entry`, so it is valid only while `entry` is
     // unchanged.
@@ -776,6 +783,8 @@ private:
     RefreshState mRefreshState         = kIdle;
     size_t mRefreshingEndpointIndex    = 0;
     size_t mRefreshingGroupKeySetIndex = 0;
+    // Set when a stage of the active refresh fails without ending it; the node is then not marked Committed.
+    bool mRefreshHadFailure = false;
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mRefreshingEndpointsList;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mRefreshingBindingEntries;
