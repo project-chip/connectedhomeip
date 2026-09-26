@@ -108,6 +108,8 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
     return true;
 }
 
+} // namespace
+
 CHIP_ERROR WbsDeviceScanner::Init(WbsDeviceScannerDelegate * delegate)
 {
     // Make this function idempotent by shutting down previously initialized state if any.
@@ -195,8 +197,8 @@ CHIP_ERROR WbsDeviceScanner::StopScanImpl()
         ChipLogError(Ble, "ChipDeviceScanner StopScanImpl lsCallCancel Error");
         return CHIP_ERROR_INTERNAL;
     }
-    lsRequester->restart();
-    ChipLogError(Ble, "ChipDeviceScanner StopScanImpl Success");
+    mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
+    ChipLogDetail(Ble, "ChipDeviceScanner StopScanImpl Success");
     return CHIP_NO_ERROR;
 }
 

@@ -32,6 +32,12 @@ constexpr uint16_t kMaxConnectRetries = 4;
 
 WbsConnection::WbsConnection() {}
 
+void WbsConnection::ConfigureAsServerRole(const std::string & serverId)
+{
+    mIsServerRole = true;
+    mServerId     = serverId;
+}
+
 CHIP_ERROR WbsConnection::InitConnectionData(bool aIsCentral, WbsEndpoint *& apEndpoint)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
@@ -42,7 +48,7 @@ CHIP_ERROR WbsConnection::InitConnectionData(bool aIsCentral, WbsEndpoint *& apE
     endpoint = g_new0(WbsEndpoint, 1);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
-    endpoint->mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
+    endpoint->mConnectionMap = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, WbsOTConnectionDestroyNotify);
     endpoint->mIsCentral     = aIsCentral;
 
     retval = true;
@@ -75,10 +81,19 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
+    WbsConnection * conn = data->mConn;
 
-    lunaParam.put("clientId", data->mConn->mClientId);
+    if (conn->mIsServerRole)
+    {
+        lunaParam.put("serverId", conn->mServerId);
+        lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_READ));
+    }
+    else
+    {
+        lunaParam.put("clientId", conn->mClientId);
+        lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
+    }
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
-    lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
     pbnjson::JValue valueParam  = pbnjson::JObject();
     pbnjson::JValue bytesJArray = pbnjson::JArray();
     uint8_t * bytes             = data->buf->Start();
@@ -92,14 +107,17 @@ CHIP_ERROR WbsConnection::SendIndicationImpl(ConnectionDataBundle * data)
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
     if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
-        g_free(data);
+        delete data;
         ChipLogError(DeviceLayer, "SendIndicationImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
         return CHIP_ERROR_INTERNAL;
     }
 
-    BLEManagerImpl::HandleWriteComplete(data->mConn);
+    if (conn->mIsServerRole)
+        BLEManagerImpl::HandleTXComplete(conn);
+    else
+        BLEManagerImpl::HandleWriteComplete(conn);
     ChipLogDetail(DeviceLayer, "SendIndicationImpl success");
-    g_free(data);
+    delete data;
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR WbsConnection::SendWriteRequest(chip::System::PacketBufferHandle apBuf)
@@ -133,14 +151,14 @@ CHIP_ERROR WbsConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
     if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
-        g_free(data);
+        delete data;
         ChipLogError(DeviceLayer, "SendWriteRequestImpl API_BLUETOOTH_GATT_WRITECHRACTERISTIC Failed");
         return CHIP_ERROR_INTERNAL;
     }
 
     BLEManagerImpl::HandleWriteComplete(data->mConn);
     // ChipLogDetail(DeviceLayer, "SendWriteRequestImpl success");
-    g_free(data);
+    delete data;
     return CHIP_NO_ERROR;
 }
 
@@ -164,6 +182,14 @@ CHIP_ERROR WbsConnection::CloseConnectionImpl(WbsConnection * conn)
     pbnjson::JValue responsePayload;
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "conn is NULL in %s", __func__));
+
+    if (conn->mIsServerRole)
+    {
+        ChipLogDetail(DeviceLayer, "%s: server-role connection has no LS2 disconnect API - clearing local state only", __func__);
+        conn->mNotifyAcquired = false;
+        return CHIP_NO_ERROR;
+    }
+
     ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->mPeerAddress);
 
     lunaParam.put("clientId", conn->mClientId);
@@ -225,10 +251,7 @@ bool WbsConnection::GattGetServices(std::string address)
 
 ConnectionDataBundle * WbsConnection::MakeConnectionDataBundle(WbsConnection * aConn, chip::System::PacketBufferHandle aBuf)
 {
-    ConnectionDataBundle * bundle = g_new(ConnectionDataBundle, 1);
-    bundle->mConn                 = aConn;
-    bundle->buf                   = std::move(aBuf);
-    return bundle;
+    return new ConnectionDataBundle(aConn, std::move(aBuf));
 }
 
 CHIP_ERROR WbsConnection::SubscribeCharacteristic()
@@ -248,6 +271,10 @@ CHIP_ERROR WbsConnection::SubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT conn
     LSMessageToken ulToken = LSMESSAGE_TOKEN_INVALID;
 
     VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
+    // Only meaningful for a central-role connection subscribing to a remote peripheral's TX
+    // characteristic - see ConfigureAsServerRole()'s doc comment.
+    VerifyOrReturnError(!conn->mIsServerRole, CHIP_ERROR_NOT_IMPLEMENTED,
+                        ChipLogError(DeviceLayer, "SubscribeCharacteristic() is not valid on a server-role connection"));
 
     lunaParam.put("clientId", conn->mClientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
@@ -297,11 +324,17 @@ CHIP_ERROR WbsConnection::UnsubscribeCharacteristicImpl(BLE_CONNECTION_OBJECT co
     CHIP_ERROR result = CHIP_ERROR_INTERNAL;
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
+    VerifyOrExit(!connection->mIsServerRole, {
+        result = CHIP_ERROR_NOT_IMPLEMENTED;
+        ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() is not valid on a server-role connection");
+    });
 
     VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken) == true,
                  ChipLogError(DeviceLayer, "lsCallCancel failed"));
 
-    result = CHIP_NO_ERROR;
+    // Invalidate the token so a later unsubscribe/destroy cannot cancel it twice.
+    connection->mMonitorToken = LSMESSAGE_TOKEN_INVALID;
+    result                    = CHIP_NO_ERROR;
     BLEManagerImpl::HandleSubscribeOpComplete(connection, false);
 
 exit:
@@ -350,8 +383,13 @@ void WbsConnection::WbsOTConnectionDestroy(WbsConnection * aConn)
         if (aConn->mPeerAddress)
             g_free(aConn->mPeerAddress);
 
-        g_free(aConn);
+        delete aConn;
     }
+}
+
+void WbsConnection::WbsOTConnectionDestroyNotify(gpointer aConn)
+{
+    WbsOTConnectionDestroy(static_cast<WbsConnection *>(aConn));
 }
 
 void WbsConnection::EndpointCleanup(WbsEndpoint * apEndpoint)
@@ -360,6 +398,19 @@ void WbsConnection::EndpointCleanup(WbsEndpoint * apEndpoint)
     {
         if (apEndpoint->mConnectionMap != nullptr)
         {
+            GHashTableIter iter;
+            gpointer value = nullptr;
+            g_hash_table_iter_init(&iter, apEndpoint->mConnectionMap);
+            while (g_hash_table_iter_next(&iter, nullptr, &value))
+            {
+                auto * conn = static_cast<WbsConnection *>(value);
+                if (conn != nullptr && conn->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
+                {
+                    LsRequester::getInstance()->lsCallCancel(conn->mMonitorToken);
+                    conn->mMonitorToken = LSMESSAGE_TOKEN_INVALID;
+                }
+            }
+
             g_hash_table_destroy(apEndpoint->mConnectionMap);
             apEndpoint->mConnectionMap = nullptr;
         }
@@ -402,7 +453,7 @@ CHIP_ERROR WbsConnection::ConnectDeviceImpl(ConnectParams * apParams)
             serviceAvailable = true;
             break;
         }
-        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     if (serviceAvailable == false)
     {
@@ -484,8 +535,14 @@ void WbsConnection::UpdateConnectionTable(std::string remoteAddr, std::string cl
     if (connection != nullptr && !bConnected)
     {
         ChipLogDetail(DeviceLayer, "Wbs disconnected");
+        // Cancel any still-active characteristic monitor before freeing the connection below, so
+        if (connection->mMonitorToken != LSMESSAGE_TOKEN_INVALID)
+        {
+            LsRequester::getInstance()->lsCallCancel(connection->mMonitorToken);
+        }
         BLEManagerImpl::HandleConnectionClosed(connection);
-        WbsOTConnectionDestroy(connection);
+        // Removing the entry invokes the hash table's value-destroy func (WbsOTConnectionDestroyNotify),
+        // which frees mPeerAddress and deletes the WbsConnection - do not free it again here.
         g_hash_table_remove(aEndpoint.mConnectionMap, remoteAddr.c_str());
         return;
     }
@@ -497,7 +554,7 @@ void WbsConnection::UpdateConnectionTable(std::string remoteAddr, std::string cl
 
     if (connection == nullptr && bConnected && (!aEndpoint.mIsCentral || GattGetServices(remoteAddr)))
     {
-        connection               = g_new0(WbsConnection, 1);
+        connection               = new WbsConnection();
         connection->mPeerAddress = g_strdup(remoteAddr.c_str()); // mpPeerAddress -> mPeerAddress
         connection->mEndpoint    = &aEndpoint;                   // mpEndpoint -> mEndpoint
         connection->mClientId    = clientId;
