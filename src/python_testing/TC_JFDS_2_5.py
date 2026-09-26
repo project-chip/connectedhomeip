@@ -53,13 +53,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_JFDS_2_5(MatterBaseTest):
+class TC_JFDS_2_5(MatterTestCommissioner):
 
     @staticmethod
     def _enum_as_int(value):
