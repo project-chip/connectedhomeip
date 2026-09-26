@@ -24,9 +24,6 @@
 
 namespace chip::app {
 
-constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
-constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
-
 class SimulatedWaterHeater
     : public Clusters::WaterHeaterManagement::Delegate,
       public Clusters::Thermostat::Delegate,
@@ -36,6 +33,9 @@ class SimulatedWaterHeater
       public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>
 {
 public:
+    static constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
+    static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
+
     explicit SimulatedWaterHeater(const Config & config);
     ~SimulatedWaterHeater() override;
 
@@ -103,15 +103,18 @@ private:
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
     uint32_t mBoostRemainingTime                                = 0;
-    Clusters::Thermostat::temperature mTemperature              = kInitialTemperature;
-    bool mHeatingEnabled                                        = false;
+    // Simulated physical water temperature in 0.01 °C steps.
+    Clusters::Thermostat::temperature mTemperature = kInitialTemperature;
+    bool mHeatingEnabled                           = false;
 
     // Thermostat attributes
     Clusters::Thermostat::ControlSequenceOfOperationEnum mControlSequenceOfOperation =
-        Clusters::Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;
+        Clusters::Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly;
+    Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
+    // LocalTemperature attribute value reported to the Thermostat cluster, which may be Nullable (e.g. uncalibrated or sensor
+    // error).
     DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
-    Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = 2000;
+    Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = kFinalTemperature;
 };
 
 } // namespace chip::app
