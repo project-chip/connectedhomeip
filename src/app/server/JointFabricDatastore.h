@@ -797,7 +797,7 @@ private:
     CHIP_ERROR StartBindingEntrySync(NodeId nodeId, EndpointId endpointId, uint16_t listId);
 
     // Records that a stage of `nodeId`'s refresh failed, if that refresh is still active.
-    void MarkRefreshFailed(NodeId nodeId);
+    void MarkRefreshFailed(NodeId nodeId, CHIP_ERROR err);
 
     // Ends the active refresh, if any, and resets all refresh state. The only place a refresh ends.
     void FinishRefresh(CHIP_ERROR err);

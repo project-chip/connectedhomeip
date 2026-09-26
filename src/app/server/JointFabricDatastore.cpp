@@ -484,6 +484,13 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                             mEndpointGroupTombstones.end());
                     }
 
+                    else
+                    {
+                        // Endpoints without the Groups cluster also fail here; the merge is skipped.
+                        ChipLogProgress(AppServer, "Skipping groups of endpoint %u during refresh: %" CHIP_ERROR_FORMAT,
+                                        currentEndpointId, err.Format());
+                    }
+
                     // Move to the next endpoint
                     mRefreshingEndpointIndex++;
 
@@ -551,7 +558,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     if (innerErr != CHIP_NO_ERROR)
                     {
                         detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, match, innerErr);
-                        MarkRefreshFailed(entryToSync.nodeID);
+                        MarkRefreshFailed(entryToSync.nodeID, innerErr);
                         return;
                     }
                     if (removal)
@@ -674,6 +681,13 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                                  mBindingTombstones.end());
                     }
 
+                    else
+                    {
+                        // Endpoints without the Binding cluster also fail here; the merge is skipped.
+                        ChipLogProgress(AppServer, "Skipping bindings of endpoint %u during refresh: %" CHIP_ERROR_FORMAT,
+                                        currentEndpointId, err.Format());
+                    }
+
                     // Move to the next endpoint
                     mRefreshingEndpointIndex++;
 
@@ -725,7 +739,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                  "Failed syncing bindings during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                                  ChipLogValueX64(refreshingNodeId), syncErr.Format());
                     MarkRefreshBindingsSyncFailed(refreshingNodeId, syncErr);
-                    MarkRefreshFailed(refreshingNodeId);
+                    MarkRefreshFailed(refreshingNodeId, syncErr);
                 }
                 else
                 {
@@ -962,7 +976,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     else
                     {
                         detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
-                        MarkRefreshFailed(nodeIdToErase);
+                        MarkRefreshFailed(nodeIdToErase, innerErr);
                     }
 
                     ++mRefreshingNodeKeySetDeletionIndex;
@@ -1014,7 +1028,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                             if (innerErr != CHIP_NO_ERROR)
                             {
                                 detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
-                                MarkRefreshFailed(entryNodeId);
+                                MarkRefreshFailed(entryNodeId, innerErr);
                                 return;
                             }
                             detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, match);
@@ -1057,7 +1071,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                 if (innerErr != CHIP_NO_ERROR)
                                 {
                                     detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
-                                    MarkRefreshFailed(entryNodeId);
+                                    MarkRefreshFailed(entryNodeId, innerErr);
                                     return;
                                 }
                                 detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, match);
@@ -2712,10 +2726,12 @@ CHIP_ERROR JointFabricDatastore::StartBindingEntrySync(NodeId nodeId, EndpointId
     return startErr;
 }
 
-void JointFabricDatastore::MarkRefreshFailed(NodeId nodeId)
+void JointFabricDatastore::MarkRefreshFailed(NodeId nodeId, CHIP_ERROR err)
 {
     if (mRefreshingNodeId == nodeId)
     {
+        ChipLogError(AppServer, "Sync during refresh of node 0x" ChipLogFormatX64 " failed: %" CHIP_ERROR_FORMAT,
+                     ChipLogValueX64(nodeId), err.Format());
         mRefreshHadFailure = true;
     }
 }

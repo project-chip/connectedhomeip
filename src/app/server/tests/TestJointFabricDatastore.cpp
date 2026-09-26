@@ -231,7 +231,7 @@ public:
                 groups.push_back(group);
             }
         }
-        onSuccess(CHIP_NO_ERROR, groups);
+        onSuccess(fetchGroupListResult, fetchGroupListResult == CHIP_NO_ERROR ? groups : std::vector<GroupInfoEntryType>());
         return CHIP_NO_ERROR;
     }
 
@@ -312,7 +312,8 @@ public:
     std::vector<std::pair<NodeId, std::vector<datastore::AccessControlEntryStruct>>> aclListSyncs;
     std::vector<std::pair<NodeId, std::vector<BindingEntryType>>> bindingListSyncs;
     std::vector<BindingEntryType> bindingsToFetch;
-    CHIP_ERROR fetchAclListResult = CHIP_NO_ERROR;
+    CHIP_ERROR fetchAclListResult   = CHIP_NO_ERROR;
+    CHIP_ERROR fetchGroupListResult = CHIP_NO_ERROR;
     std::vector<datastore::ACLEntryStruct> aclListToFetch;
     std::map<EndpointId, std::vector<GroupId>> groupsToFetch;
     std::vector<EndpointEntryType> endpointsToFetch;
@@ -2417,6 +2418,24 @@ TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValu
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
     EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
     EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
+}
+
+// Endpoints without a Groups cluster fail the group fetch. The merge for that endpoint is skipped, and
+// the refresh still commits the node.
+TEST(JointFabricDatastoreTest, RefreshCommitsNodeWhenGroupFetchFails)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    store.GetEndpointGroupIDList().push_back(MakeEndpointGroupEntry(State::kCommitted));
+
+    delegate.fetchGroupListResult = CHIP_IM_GLOBAL_STATUS(UnsupportedCluster);
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+    EXPECT_EQ(store.GetEndpointGroupIDList().size(), 1u);
 }
 
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
