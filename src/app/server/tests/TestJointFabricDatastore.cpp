@@ -1,5 +1,6 @@
 #include "app/server/JointFabricDatastore.h"
 
+#include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -16,6 +17,34 @@ using NodeKeySetEntryType      = JointFabricCluster::Structs::DatastoreNodeKeySe
 using GroupInfoEntryType       = JointFabricCluster::Structs::DatastoreGroupInformationEntryStruct::Type;
 using BindingEntryType         = JointFabricCluster::Structs::DatastoreEndpointBindingEntryStruct::Type;
 using ACLEntryType             = JointFabricCluster::Structs::DatastoreACLEntryStruct::Type;
+using Privilege                = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum;
+using AuthMode                 = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum;
+using State                    = JointFabricCluster::DatastoreStateEnum;
+
+void SeedAcl(JointFabricDatastore & store, NodeId nodeId, uint16_t listId, Privilege privilege, AuthMode authMode,
+             std::vector<uint64_t> subjects, State state)
+{
+    datastore::ACLEntryStruct entry;
+    entry.nodeID             = nodeId;
+    entry.listID             = listId;
+    entry.ACLEntry.privilege = privilege;
+    entry.ACLEntry.authMode  = authMode;
+    entry.ACLEntry.subjects  = std::move(subjects);
+    entry.statusEntry.state  = state;
+    store.GetNodeACLList().push_back(std::move(entry));
+}
+
+const datastore::ACLEntryStruct * FindAcl(JointFabricDatastore & store, NodeId nodeId, uint16_t listId)
+{
+    for (const auto & entry : store.GetNodeACLList())
+    {
+        if (entry.nodeID == nodeId && entry.listID == listId)
+        {
+            return &entry;
+        }
+    }
+    return nullptr;
+}
 
 void ExpectCharSpanEquals(const CharSpan & actual, const char * expected)
 {
@@ -877,6 +906,65 @@ TEST(JointFabricDatastoreTest, AddBindingBackReferenceMarksWrongEntry)
 
 // When removing the anchor fabric, every record must be wiped and the anchor identity must be reset.
 // When other fabrics are removed, nothing should happen (the datastore holds no records owned by other fabrics.)
+// statusEntry.failureCode holds an IM status code, so the triage compares it as one. ConstraintError
+// is unrecoverable: the entry is dropped.
+TEST(JointFabricDatastoreTest, RefreshDropsUnrecoverableCommitFailedAcl)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    SeedAcl(store, 123, 7, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitFailed);
+    store.GetNodeACLList().back().statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
+}
+
+// TIMEOUT is recoverable: the entry survives the refresh and is retried.
+TEST(JointFabricDatastoreTest, RefreshRetriesRecoverableCommitFailedAcl)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    SeedAcl(store, 123, 7, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitFailed);
+    store.GetNodeACLList().back().statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::Timeout);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
+}
+
+// ResourceExhausted is unrecoverable: the binding entry is dropped.
+TEST(JointFabricDatastoreTest, RefreshDropsUnrecoverableCommitFailedBinding)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "ep"_span), CHIP_NO_ERROR);
+
+    EndpointEntryType endpoint;
+    endpoint.endpointID = 1;
+    endpoint.nodeID     = 123;
+    delegate.endpointsToFetch.push_back(endpoint);
+
+    BindingEntryType bindingEntry;
+    bindingEntry.nodeID     = 123;
+    bindingEntry.endpointID = 1;
+    bindingEntry.listID     = 9;
+    bindingEntry.binding.group.SetValue(10);
+    bindingEntry.statusEntry.state       = State::kCommitFailed;
+    bindingEntry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+    store.GetEndpointBindingList().push_back(bindingEntry);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    EXPECT_TRUE(store.GetEndpointBindingList().empty());
+}
+
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
 {
     JointFabricDatastore store;

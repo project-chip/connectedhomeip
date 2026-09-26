@@ -17,6 +17,8 @@
 
 #include <app/server/JointFabricDatastore.h>
 
+#include <protocols/interaction_model/StatusCode.h>
+
 #include <algorithm>
 #include <cstring>
 #include <unordered_set>
@@ -492,10 +494,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
                 else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
-                    CHIP_ERROR failureCode(it->statusEntry.failureCode);
+                    const auto failureStatus = static_cast<Protocols::InteractionModel::Status>(it->statusEntry.failureCode);
 
-                    if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
-                        failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                    if (failureStatus == Protocols::InteractionModel::Status::ConstraintError ||
+                        failureStatus == Protocols::InteractionModel::Status::ResourceExhausted)
                     {
                         ++it;
                         continue;
@@ -610,10 +612,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
                 else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
-                    CHIP_ERROR failureCode(it->statusEntry.failureCode);
+                    const auto failureStatus = static_cast<Protocols::InteractionModel::Status>(it->statusEntry.failureCode);
 
-                    if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
-                        failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                    if (failureStatus == Protocols::InteractionModel::Status::ConstraintError ||
+                        failureStatus == Protocols::InteractionModel::Status::ResourceExhausted)
                     {
                         // remove entry from the list
                         it = mEndpointBindingEntries.erase(it);
@@ -867,10 +869,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
                 else if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
-                    CHIP_ERROR failureCode(nkIt->statusEntry.failureCode);
+                    const auto failureStatus = static_cast<Protocols::InteractionModel::Status>(nkIt->statusEntry.failureCode);
 
-                    if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
-                        failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                    if (failureStatus == Protocols::InteractionModel::Status::ConstraintError ||
+                        failureStatus == Protocols::InteractionModel::Status::ResourceExhausted)
                     {
                         // remove entry from the list
                         nkIt = mNodeKeySetEntries.erase(nkIt);
@@ -1029,10 +1031,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
                 else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
-                    CHIP_ERROR failureCode(it->statusEntry.failureCode);
+                    const auto failureStatus = static_cast<Protocols::InteractionModel::Status>(it->statusEntry.failureCode);
 
-                    if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
-                        failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                    if (failureStatus == Protocols::InteractionModel::Status::ConstraintError ||
+                        failureStatus == Protocols::InteractionModel::Status::ResourceExhausted)
                     {
                         // remove entry from the list
                         it = mACLEntries.erase(it);
