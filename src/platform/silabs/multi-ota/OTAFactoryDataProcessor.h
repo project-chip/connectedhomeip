@@ -75,7 +75,6 @@ private:
     CHIP_ERROR UpdateValue(uint8_t tag, ByteSpan & newValue);
 
     OTAFactoryPayload mPayload;
-    uint8_t * mFactoryData = nullptr;
 
 protected:
     uint32_t GetAccumulatorLength() const override { return mLength; }
