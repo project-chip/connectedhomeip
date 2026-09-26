@@ -801,4 +801,39 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+class TCPCallbackRecorder : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(ExchangeContext *) override {}
+
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle &, CHIP_ERROR conErr) override
+    {
+        mAttemptCompleteCount++;
+        mLastAttemptError = conErr;
+    }
+
+    uint32_t mAttemptCompleteCount = 0;
+    CHIP_ERROR mLastAttemptError   = CHIP_NO_ERROR;
+};
+
+TEST_F(TestExchangeHolder, ForwardsConnectionAttemptCompleteToItsDelegate)
+{
+    TCPCallbackRecorder recorder;
+    ExchangeHolder holder(recorder);
+
+    ExchangeDelegate & holderAsDelegate = holder;
+    Transport::ActiveTCPConnectionHandle noConnection;
+
+    holderAsDelegate.HandleConnectionAttemptComplete(noConnection, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(recorder.mAttemptCompleteCount, 1u);
+    EXPECT_EQ(recorder.mLastAttemptError, CHIP_ERROR_TIMEOUT);
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 } // anonymous namespace

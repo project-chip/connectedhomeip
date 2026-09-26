@@ -55,6 +55,14 @@ struct TestExchange : public Testing::LoopbackMessagingContext
         Testing::LoopbackMessagingContext::SetUp();
     }
 
+    void TearDown() override
+    {
+        GetLoopback().mNumMessagesToAllowBeforeError = 0;
+        GetLoopback().mMessageSendError              = CHIP_NO_ERROR;
+
+        Testing::LoopbackMessagingContext::TearDown();
+    }
+
     template <typename AfterRequestChecker, typename AfterResponseChecker>
     void DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchangeDelegate & delegate2, uint8_t requestMessageType,
                          uint8_t responseMessageType, AfterRequestChecker && afterRequestChecker,
@@ -66,6 +74,8 @@ enum : uint8_t
     kMsgType_TEST1 = 0xf0,
     kMsgType_TEST2 = 0xf1,
 };
+
+constexpr CHIP_ERROR kFatalSendErrorNotRemappedToSuccessByMapSendError = CHIP_ERROR_BAD_REQUEST;
 
 class MockExchangeDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -222,6 +232,44 @@ TEST_F(TestExchange, CheckBasicExchangeMessageDispatch)
                 EXPECT_EQ(delegate2.mReceivedMessageCount, 1u);
             });
     }
+}
+
+TEST_F(TestExchange, CheckFailedReliableSendKeepsExchangeReferenceOnUnauthenticatedSession)
+{
+    MockExchangeDelegate delegate;
+
+    Optional<SessionHandle> session =
+        GetSecureSessionManager().CreateUnauthenticatedSession(GetBobAddress(), GetDefaultMRPConfig());
+    ASSERT_TRUE(session.HasValue());
+    Transport::UnauthenticatedSession * unauthenticated = session.Value()->AsUnauthenticatedSession();
+    ASSERT_NE(unauthenticated, nullptr);
+    ASSERT_TRUE(unauthenticated->AllowsMRP());
+    ASSERT_EQ(unauthenticated->GetReferenceCount(), 1u);
+
+    ExchangeContext * ec = GetExchangeManager().NewContext(session.Value(), &delegate, /* isInitiator = */ false);
+    ASSERT_NE(ec, nullptr);
+    ASSERT_EQ(unauthenticated->GetReferenceCount(), 2u);
+
+    ec->WillSendMessage();
+    ASSERT_TRUE(ec->AutoRequestAck());
+
+    GetLoopback().mNumMessagesToAllowBeforeError = 0;
+    GetLoopback().mMessageSendError              = kFatalSendErrorNotRemappedToSuccessByMapSendError;
+
+    ASSERT_EQ(ec->SendMessage(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                              System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize)),
+              kFatalSendErrorNotRemappedToSuccessByMapSendError);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
+    EXPECT_TRUE(ec->IsSendExpected());
+    EXPECT_EQ(unauthenticated->GetReferenceCount(), 2u);
+
+    ec->SetDelegate(nullptr);
+    ec->Abort();
+
+    EXPECT_EQ(unauthenticated->GetReferenceCount(), 1u);
 }
 
 // A crude test to exercise VerifyOrDieWithObject() in ObjectPool and

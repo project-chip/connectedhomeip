@@ -60,6 +60,39 @@ using namespace chip::Crypto;
 namespace chip {
 class TestCASESecurePairingDelegate;
 
+constexpr CHIP_ERROR kFatalSendErrorNotRemappedToSuccessByMapSendError = CHIP_ERROR_BAD_REQUEST;
+
+class FailTheFirstStatusReportSend : public Testing::LoopbackTransportDelegate
+{
+public:
+    FailTheFirstStatusReportSend(Testing::LoopbackTransport & loopback) : mLoopback(loopback) {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        VerifyOrReturn(!mArmed);
+
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport));
+
+        mArmed                                   = true;
+        mLoopback.mNumMessagesToAllowBeforeError = 0;
+        mLoopback.mMessageSendError              = kFatalSendErrorNotRemappedToSuccessByMapSendError;
+    }
+
+    bool IsArmed() const { return mArmed; }
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    bool mArmed = false;
+};
+
 // Exposing CASESession's Protected members in order to be able to call the protected methods, and instantiate protected structures.
 // Also to be able to instantiate New CASESessions repeatedly inside a single TestCase (which is not possible if we inherit
 // CASESession in the Test Fixture)
@@ -595,6 +628,59 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     chip::Platform::Delete(pairingCommissioner1);
 
     gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, Sigma3StatusReportSendFailureDoesNotLeakResponderExchange)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingAccessory;
+    CASESession pairingCommissioner;
+
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    FailTheFirstStatusReportSend failTheFirstStatusReportSend(loopback);
+    loopback.SetLoopbackTransportDelegate(&failTheFirstStatusReportSend);
+
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_TRUE(failTheFirstStatusReportSend.IsArmed());
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    pairingCommissioner.Clear();
+    ServiceEvents();
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetExchangeManager().CloseAllContextsForDelegate(nullptr);
 }
 
 TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)

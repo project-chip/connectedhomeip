@@ -37,14 +37,17 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
+#include <transport/raw/tests/TCPBaseTestAccess.h>
 
 using namespace chip;
 using namespace chip::Inet;
@@ -118,6 +121,7 @@ public:
 
     void TearDown() override
     {
+        mExchangeManager.Shutdown();
         mSessionManager.Shutdown();
         mTransportMgrBase.Close();
         mTCP.Close();
@@ -143,6 +147,7 @@ protected:
     TCPImpl mTCP;
     TransportMgrBase mTransportMgrBase;
     SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     chip::TestPersistentStorageDelegate mDeviceStorage;
     chip::Crypto::DefaultSessionKeystore mSessionKeystore;
@@ -172,12 +177,71 @@ protected:
 
         ReturnErrorOnFailure(mFabricTable.Init(initParams));
 
-        return mSessionManager.Init(&mIOContext->GetSystemLayer(), &mTransportMgrBase, &mMessageCounterManager, &mDeviceStorage,
-                                    &mFabricTable, mSessionKeystore);
+        ReturnErrorOnFailure(mSessionManager.Init(&mIOContext->GetSystemLayer(), &mTransportMgrBase, &mMessageCounterManager,
+                                                  &mDeviceStorage, &mFabricTable, mSessionKeystore));
+
+        return mExchangeManager.Init(&mSessionManager);
     }
 };
 
 IOContext * TestTCPConnection::mIOContext = nullptr;
+
+class PairingSessionUnderTest : public PairingSession
+{
+public:
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+    CATValues GetPeerCATs() const override { return CATValues(); }
+    CHIP_ERROR DeriveSecureSession(CryptoContext &) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+
+    using PairingSession::AdoptExchange;
+    using PairingSession::AllocateSecureSession;
+};
+
+TEST_F(TestTCPConnection, AdoptExchangeGivesTheSecureSessionTheTCPConnection)
+{
+    EXPECT_SUCCESS(InitSessionManager());
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    Transport::PeerAddress peerAddr = Transport::PeerAddress::TCP(addr, 5540);
+
+    Inet::TCPEndPointHandle endPoint;
+    EXPECT_SUCCESS(mIOContext->GetTCPEndPointManager()->NewEndPoint(endPoint));
+    ASSERT_FALSE(endPoint.IsNull());
+
+    auto connection = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>::AllocateConnection(
+        mTCP, endPoint, peerAddr, Transport::TCPState::kConnecting);
+    ASSERT_TRUE(connection);
+
+    Optional<SessionHandle> unauthenticated = mSessionManager.CreateUnauthenticatedSession(peerAddr, GetDefaultMRPConfig());
+    ASSERT_TRUE(unauthenticated.HasValue());
+    unauthenticated.Value()->AsUnauthenticatedSession()->SetTCPConnection(connection.Handle());
+
+    PairingSessionUnderTest pairingSession;
+    EXPECT_SUCCESS(pairingSession.AllocateSecureSession(mSessionManager));
+
+    Optional<SessionHandle> secure = pairingSession.CopySecureSession();
+    ASSERT_TRUE(secure.HasValue());
+    ASSERT_TRUE(secure.Value()->AsSecureSession()->GetTCPConnection().IsNull());
+
+    Messaging::ExchangeContext * exchange = mExchangeManager.NewContext(unauthenticated.Value(), &pairingSession, false);
+    ASSERT_NE(exchange, nullptr);
+
+    pairingSession.AdoptExchange(*exchange);
+
+    EXPECT_EQ(static_cast<const void *>(secure.Value()->AsSecureSession()->GetTCPConnection()),
+              static_cast<const void *>(connection.Handle()));
+
+    exchange->Close();
+}
 
 TEST_F(TestTCPConnection, TestUnauthenticatedSessionReleaseOnConnectionClose)
 {

@@ -108,6 +108,39 @@ public:
     bool mMessageDropped = false;
 };
 
+constexpr CHIP_ERROR kFatalSendErrorNotRemappedToSuccessByMapSendError = CHIP_ERROR_BAD_REQUEST;
+
+class FailTheFirstStatusReportSend : public Testing::LoopbackTransportDelegate
+{
+public:
+    FailTheFirstStatusReportSend(Testing::LoopbackTransport & loopback) : mLoopback(loopback) {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        VerifyOrReturn(!mArmed);
+
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport));
+
+        mArmed                                   = true;
+        mLoopback.mNumMessagesToAllowBeforeError = 0;
+        mLoopback.mMessageSendError              = kFatalSendErrorNotRemappedToSuccessByMapSendError;
+    }
+
+    bool IsArmed() const { return mArmed; }
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    bool mArmed = false;
+};
+
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
@@ -433,6 +466,102 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithPacketLossTest)
     EXPECT_EQ(loopback.mDroppedMessageCount, 2u);
     EXPECT_EQ(loopback.mNumMessagesToDrop, 0u);
 }
+
+TEST_F(TestPASESession, Msg3StatusReportSendFailureDoesNotLeakResponderExchange)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateCommissioner;
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingCommissioner;
+    PASESession pairingAccessory;
+
+    auto & loopback = GetLoopback();
+    loopback.Reset();
+    loopback.mSentMessageCount              = 0;
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                              ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
+                                              &delegateAccessory),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    FailTheFirstStatusReportSend failTheFirstStatusReportSend(loopback);
+    loopback.SetLoopbackTransportDelegate(&failTheFirstStatusReportSend);
+
+    EXPECT_EQ(pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                       contextCommissioner, &delegateCommissioner),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(failTheFirstStatusReportSend.IsArmed());
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    pairingCommissioner.Clear();
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest),
+              CHIP_NO_ERROR);
+}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+TEST_F(TestPASESession, PASEMessageArrivingOverTcpIsRejected)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    auto & loopback = GetLoopback();
+    loopback.Reset();
+
+    EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                              ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
+                                              &delegateAccessory),
+              CHIP_NO_ERROR);
+
+    const Transport::PeerAddress & udpPeer = GetAliceAddress();
+    Optional<SessionHandle> tcpSession     = GetSecureSessionManager().CreateUnauthenticatedSession(
+        Transport::PeerAddress::TCP(udpPeer.GetIPAddress(), udpPeer.GetPort()), GetDefaultMRPConfig());
+    ASSERT_TRUE(tcpSession.HasValue());
+    ASSERT_EQ(tcpSession.Value()->AsUnauthenticatedSession()->GetPeerAddress().GetTransportType(), Transport::Type::kTcp);
+
+    ExchangeContext * exchange = GetExchangeManager().NewContext(tcpSession.Value(), &pairingAccessory, false);
+    ASSERT_NE(exchange, nullptr);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+
+    ASSERT_EQ(pairingAccessory.OnMessageReceived(exchange, payloadHeader,
+                                                 System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize)),
+              CHIP_ERROR_INCORRECT_STATE);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_FALSE(pairingAccessory.CopySecureSession().HasValue());
+
+    exchange->Close();
+    DrainAndServiceIO();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 TEST_F(TestPASESession, SecurePairingHandshakeTCPParamsTest)
 {
