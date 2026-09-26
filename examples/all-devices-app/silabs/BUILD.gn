@@ -20,6 +20,7 @@ import("${build_root}/config/defaults.gni")
 import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 import(
@@ -78,11 +79,23 @@ efr32_sdk("sdk") {
   defines = []
 }
 
+source_set("silabs-battery-power-source") {
+  sources = [
+    "src/delegates/SilabsBatteryPowerSource.cpp",
+    "src/delegates/SilabsBatteryPowerSource.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
+  ]
+}
+
 silabs_executable("all_devices_app") {
   output_name = "matter-silabs-all-devices-example.out"
   defines = []
   include_dirs = [
     "include",
+    "src",
     "${chip_root}/examples/all-devices-app/all-devices-common",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers",
@@ -109,6 +122,7 @@ silabs_executable("all_devices_app") {
 
   deps = [
     ":sdk",
+    ":silabs-battery-power-source",
     "${chip_root}/src/platform/logging:default",
 
     # Code-driven data model providers
@@ -162,6 +176,10 @@ silabs_executable("all_devices_app") {
   # gated by the same flag.
   if (chip_enable_ota_requestor) {
     deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+  }
+
+  if (chip_enable_icd_server) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:icd" ]
   }
 
   # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
