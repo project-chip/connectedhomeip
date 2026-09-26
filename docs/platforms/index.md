@@ -18,6 +18,7 @@ silabs/index
 stm32/index
 telink/index
 ti/index
+tizen/index
 ```
 
 -   [Android](./android/index.md)
@@ -33,3 +34,4 @@ ti/index
 -   [STM32](./stm32/index.md)
 -   [Telink](./telink/index.md)
 -   [TI](./ti/index.md)
+-   [Tizen](./tizen/index.md)
