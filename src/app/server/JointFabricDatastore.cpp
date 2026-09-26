@@ -1767,7 +1767,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
                 continue;
             }
 
-            // Update the ACL entry in the datastore to reflect the new group permission and mark Pending.
+            // Update the ACL entry in the datastore to reflect the new group permission and mark Pending. The node
+            // holds the last committed value until the update reaches it; keep that value so the update replaces it.
+            if (!acl.supersededValue.has_value())
+            {
+                acl.supersededValue = acl.ACLEntry;
+            }
             acl.ACLEntry.privilege = mGroupInformationEntries[index].groupPermission;
             acl.statusEntry.state  = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
             updatedAcls.emplace_back(acl.nodeID, acl.listID);
@@ -2608,45 +2613,49 @@ CHIP_ERROR JointFabricDatastore::StartAclEntrySync(NodeId nodeId, uint16_t listI
         return CHIP_NO_ERROR;
     }
 
-    const bool removal = HasRemovalIntent(*it);
-    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type payload;
-    if (removal)
+    const bool removal        = HasRemovalIntent(*it);
+    auto payload              = EncodeAclEntryForSync(*it);
+    payload.statusEntry.state = removal ? Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending
+                                        : Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+    std::optional<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> superseded;
+    if (it->supersededValue.has_value())
     {
-        // Indicates the nodeID and listID, with status DeletePending, for the SyncNode call to delete the ACL entry
-        // on the node.
-        payload.nodeID            = nodeId;
-        payload.listID            = listId;
-        payload.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-    }
-    else
-    {
-        payload                   = EncodeAclEntryForSync(*it);
-        payload.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+        superseded = EncodeAccessControlEntry(*it->supersededValue);
     }
 
     // The result applies only if the entry is still being added or removed as when the sync started.
     auto sameOperation  = [this, match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
-    CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, payload, [this, nodeId, sameOperation, removal](CHIP_ERROR syncErr) {
-        if (syncErr != CHIP_NO_ERROR)
-        {
-            detail::MarkEntrySyncFailedIfFound(mACLEntries, sameOperation, syncErr);
-        }
-        else if (removal)
-        {
-            mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(), sameOperation), mACLEntries.end());
-        }
-        else
-        {
-            auto entry = std::find_if(mACLEntries.begin(), mACLEntries.end(), sameOperation);
-            if (entry != mACLEntries.end())
+    CHIP_ERROR startErr = mDelegate->SyncNode(
+        nodeId, payload, superseded, [this, nodeId, sameOperation, removal, sentValue = it->ACLEntry](CHIP_ERROR syncErr) {
+            if (syncErr != CHIP_NO_ERROR)
             {
-                entry->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                entry->statusEntry.failureCode = 0;
-                entry->supersededValue.reset();
+                detail::MarkEntrySyncFailedIfFound(mACLEntries, sameOperation, syncErr);
             }
-        }
-        FinishNodeSync(nodeId);
-    });
+            else if (removal)
+            {
+                mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(), sameOperation), mACLEntries.end());
+            }
+            else
+            {
+                auto entry = std::find_if(mACLEntries.begin(), mACLEntries.end(), sameOperation);
+                if (entry != mACLEntries.end())
+                {
+                    if (detail::AclEntryValueEquals(EncodeAccessControlEntry(entry->ACLEntry), EncodeAccessControlEntry(sentValue)))
+                    {
+                        entry->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                        entry->statusEntry.failureCode = 0;
+                        entry->supersededValue.reset();
+                    }
+                    else
+                    {
+                        // Updated again while this sync was in flight: the node now holds the value sent
+                        // here, which the queued sync replaces.
+                        entry->supersededValue = sentValue;
+                    }
+                }
+            }
+            FinishNodeSync(nodeId);
+        });
     if (startErr != CHIP_NO_ERROR)
     {
         detail::MarkEntrySyncFailedIfFound(mACLEntries, sameOperation, startErr);

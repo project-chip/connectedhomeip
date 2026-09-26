@@ -304,9 +304,20 @@ public:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
 
-        virtual CHIP_ERROR SyncNode(NodeId nodeId,
-                                    const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
-                                    std::function<void(CHIP_ERROR)> onSuccess)
+        /**
+         * Edits one entry of the node's ACL. The node's entries carry no nodeID or listID, so the edit matches them by value
+         * (see detail::ApplyAclEdit):
+         *
+         * - If `aclEntry` is DeletePending, every entry equal to it, or to `superseded` if set, is removed.
+         * - Otherwise every entry equal to `superseded`, if set, is removed, and `aclEntry` is added unless an equal entry
+         *   is present. `superseded` is the value the entry had before an update.
+         *
+         * Removing a value the node does not hold succeeds.
+         */
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId, const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
+                 const std::optional<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> & superseded,
+                 std::function<void(CHIP_ERROR)> onSuccess)
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }

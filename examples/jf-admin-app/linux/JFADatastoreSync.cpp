@@ -1711,7 +1711,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
     NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
     std::function<void(CHIP_ERROR)> onSuccess)
 {
-    ChipLogProgress(DeviceLayer, "Appending binding entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(DeviceLayer, "Syncing binding entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
     app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type bindingEntryOwned = bindingEntry;
     EndpointId endpointId = bindingEntry.endpointID;
@@ -1724,7 +1724,7 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
                         currentBindings) {
             if (fetchErr != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to fetch binding list before append: %s", ErrorStr(fetchErr));
+                ChipLogError(DeviceLayer, "Failed to fetch binding list before sync: %s", ErrorStr(fetchErr));
                 if (onSuccess)
                 {
                     onSuccess(fetchErr);
@@ -1732,30 +1732,13 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
                 return;
             }
 
-            std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mergedBindings =
-                currentBindings;
-
-            if (bindingEntryOwned.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
-            {
-                // TH2 TargetStruct entries have no listID; match by binding target fields instead.
-                mergedBindings.erase(std::remove_if(mergedBindings.begin(), mergedBindings.end(),
-                                                    [&bindingEntryOwned](const auto & entry) {
-                                                        return entry.binding.node == bindingEntryOwned.binding.node &&
-                                                            entry.binding.group == bindingEntryOwned.binding.group &&
-                                                            entry.binding.endpoint == bindingEntryOwned.binding.endpoint &&
-                                                            entry.binding.cluster == bindingEntryOwned.binding.cluster;
-                                                    }),
-                                     mergedBindings.end());
-            }
-            else
-            {
-                mergedBindings.push_back(bindingEntryOwned);
-            }
+            // Binding targets carry no listID, so the entry is matched by value.
+            auto mergedBindings = app::detail::ApplyBindingEdit(currentBindings, bindingEntryOwned);
 
             CHIP_ERROR writeErr = SyncNode(nodeId, bindingEntryOwned.endpointID, mergedBindings, onSuccess);
             if (writeErr != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to write appended binding list: %s", ErrorStr(writeErr));
+                ChipLogError(DeviceLayer, "Failed to write binding list: %s", ErrorStr(writeErr));
                 if (onSuccess)
                 {
                     onSuccess(writeErr);
@@ -1814,12 +1797,12 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
     return err;
 }
 
-CHIP_ERROR
-JFADatastoreSync::SyncNode(NodeId nodeId,
-                           const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
-                           std::function<void(CHIP_ERROR)> onSuccess)
+CHIP_ERROR JFADatastoreSync::SyncNode(
+    NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
+    const std::optional<app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> & superseded,
+    std::function<void(CHIP_ERROR)> onSuccess)
 {
-    ChipLogProgress(DeviceLayer, "Appending ACL entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(DeviceLayer, "Syncing ACL entry for node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
 
     app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type aclEntryOwned = aclEntry;
     auto aclSubjectsStorage = std::make_shared<std::vector<uint64_t>>();
@@ -1857,17 +1840,43 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
             aclTargetsStorage->data(), static_cast<uint32_t>(aclTargetsStorage->size()));
     }
 
+    // The superseded value's spans, like the entry's, must outlive the fetch.
+    std::optional<app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> supersededOwned;
+    auto supersededSubjectsStorage = std::make_shared<std::vector<uint64_t>>();
+    auto supersededTargetsStorage =
+        std::make_shared<std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>>();
+    if (superseded.has_value())
+    {
+        supersededOwned = superseded;
+        if (!superseded->subjects.IsNull())
+        {
+            supersededSubjectsStorage->assign(superseded->subjects.Value().begin(), superseded->subjects.Value().end());
+            supersededOwned->subjects = chip::app::DataModel::List<const uint64_t>(
+                supersededSubjectsStorage->data(), static_cast<uint32_t>(supersededSubjectsStorage->size()));
+        }
+        if (!superseded->targets.IsNull())
+        {
+            supersededTargetsStorage->assign(superseded->targets.Value().begin(), superseded->targets.Value().end());
+            supersededOwned->targets = chip::app::DataModel::List<
+                const app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
+                supersededTargetsStorage->data(), static_cast<uint32_t>(supersededTargetsStorage->size()));
+        }
+    }
+
     return FetchACLList(
         nodeId,
-        [this, nodeId, aclEntryOwned, aclSubjectsStorage, aclTargetsStorage,
+        [this, nodeId, aclEntryOwned, aclSubjectsStorage, aclTargetsStorage, supersededOwned, supersededSubjectsStorage,
+         supersededTargetsStorage,
          onSuccess](CHIP_ERROR fetchErr,
                     const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & currentAcl) {
             static_cast<void>(aclSubjectsStorage);
             static_cast<void>(aclTargetsStorage);
+            static_cast<void>(supersededSubjectsStorage);
+            static_cast<void>(supersededTargetsStorage);
 
             if (fetchErr != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to fetch ACL list before append: %s", ErrorStr(fetchErr));
+                ChipLogError(DeviceLayer, "Failed to fetch ACL list before sync: %s", ErrorStr(fetchErr));
                 if (onSuccess)
                 {
                     onSuccess(fetchErr);
@@ -1875,27 +1884,13 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
                 return;
             }
 
-            std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> mergedAcl = currentAcl;
-
-            if (aclEntryOwned.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
-            {
-                // If the new entry is marked for deletion, remove any existing entry with the same ID instead of adding it
-                mergedAcl.erase(std::remove_if(mergedAcl.begin(), mergedAcl.end(),
-                                               [&aclEntryOwned](const auto & entry) {
-                                                   return entry.nodeID == aclEntryOwned.nodeID &&
-                                                       entry.listID == aclEntryOwned.listID;
-                                               }),
-                                mergedAcl.end());
-            }
-            else
-            {
-                mergedAcl.push_back(aclEntryOwned);
-            }
+            // ACL entries carry no listID, so the entry and its superseded value are matched by value.
+            const auto mergedAcl = app::detail::ApplyAclEdit(currentAcl, aclEntryOwned, supersededOwned);
 
             CHIP_ERROR writeErr = SyncNode(nodeId, mergedAcl, onSuccess);
             if (writeErr != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to write appended ACL list: %s", ErrorStr(writeErr));
+                ChipLogError(DeviceLayer, "Failed to write ACL list: %s", ErrorStr(writeErr));
                 if (onSuccess)
                 {
                     onSuccess(writeErr);

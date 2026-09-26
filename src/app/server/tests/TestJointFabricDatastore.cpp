@@ -144,10 +144,18 @@ public:
         return Dispatch(nodeId, SyncKind::kBindingList, std::move(onSuccess));
     }
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, const std::optional<AclType> & superseded,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
-        lastAclSync    = aclEntry;
-        hasLastAclSync = true;
+        lastAclSync      = aclEntry;
+        hasLastAclSync   = true;
+        lastAclSyncOwned = ToOwned(aclEntry.ACLEntry);
+        lastAclSyncState = aclEntry.statusEntry.state;
+        lastAclSuperseded.reset();
+        if (superseded.has_value())
+        {
+            lastAclSuperseded = ToOwned(*superseded);
+        }
         return Dispatch(nodeId, SyncKind::kAcl, std::move(onSuccess));
     }
 
@@ -319,7 +327,10 @@ public:
     EndpointGroupIdEntryType lastEndpointGroupSync;
     NodeKeySetEntryType lastNodeKeySetSync;
     BindingEntryType lastBindingSync;
-    ACLEntryType lastAclSync;
+    ACLEntryType lastAclSync; // views the datastore's storage; valid only until the datastore changes
+    std::optional<datastore::AccessControlEntryStruct> lastAclSyncOwned;
+    std::optional<datastore::AccessControlEntryStruct> lastAclSuperseded;
+    State lastAclSyncState        = State::kUnknownEnumValue;
     bool hasLastEndpointGroupSync = false;
     bool hasLastNodeKeySetSync    = false;
     bool hasLastBindingSync       = false;
@@ -888,7 +899,8 @@ public:
     bool hasDeferred = false;
     std::function<void(CHIP_ERROR)> deferred;
 
-    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, std::function<void(CHIP_ERROR)> onSuccess) override
+    CHIP_ERROR SyncNode(NodeId nodeId, const ACLEntryType & aclEntry, const std::optional<AclType> & superseded,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
     {
         if (deferNext)
         {
@@ -2258,6 +2270,153 @@ TEST(JointFabricDatastoreTest, AddDuringInFlightAclRemovalKeepsEntry)
     ASSERT_EQ(delegate.deferred.size(), 1u);
     delegate.RunDeferred(); // the add
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
+}
+
+// A removal sends the full stored value: entries read from the node carry no nodeID or listID to
+// match on.
+TEST(JointFabricDatastoreTest, AclRemovalSendsFullEntryValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 7, Privilege::kOperate, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kOperate);
+    EXPECT_TRUE(delegate.lastAclSyncOwned->subjects == std::vector<uint64_t>{ 0x1111 });
+    EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
+    EXPECT_FALSE(delegate.lastAclSuperseded.has_value());
+}
+
+TEST(JointFabricDatastoreTest, AclAddSendsNoSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = Privilege::kView;
+    aclEntry.authMode  = AuthMode::kCase;
+    ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kView);
+    EXPECT_EQ(delegate.lastAclSyncState, State::kPending);
+    EXPECT_FALSE(delegate.lastAclSuperseded.has_value());
+}
+
+// Group 10 with View permission, and a Group-auth ACL entry on node 123 for it.
+void SetUpGroupAcl(JointFabricDatastore & store, TrackingDelegate & delegate)
+{
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddGroupTen(store, std::nullopt);
+    SeedAcl(store, 123, 7, Privilege::kView, AuthMode::kGroup, { 10 }, State::kCommitted);
+}
+
+CHIP_ERROR SetGroupTenPermission(JointFabricDatastore & store, Privilege privilege)
+{
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.groupPermission.SetNonNull(privilege);
+    return store.UpdateGroup(updateGroup);
+}
+
+// A permission change replaces the value the node holds: the sync carries the old value as superseded.
+TEST(JointFabricDatastoreTest, AclUpdateSendsSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_TRUE(delegate.lastAclSuperseded->subjects == std::vector<uint64_t>{ 10 });
+}
+
+// The first of two permission changes fails: the node still holds the original value, so the second
+// change replaces that one.
+TEST(JointFabricDatastoreTest, BackToBackUpdatesKeepOldestSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kAdminister), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout));
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kAdminister);
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+}
+
+// The first of two permission changes succeeds: the node now holds the intermediate value, so the second
+// change replaces that one.
+TEST(JointFabricDatastoreTest, BackToBackUpdatesReplaceTheValueTheNodeHolds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kAdminister), CHIP_NO_ERROR);
+
+    delegate.RunDeferred();
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kAdminister);
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kManage);
+
+    delegate.RunDeferred();
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(FindAcl(store, 123, 7)->ACLEntry.privilege, Privilege::kAdminister);
+}
+
+TEST(JointFabricDatastoreTest, CommitClearsSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
+    EXPECT_FALSE(FindAcl(store, 123, 7)->supersededValue.has_value());
+}
+
+// An entry removed while its update has not reached the node: the removal removes the old value too.
+TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
+
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+
+    EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
 }
 
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
