@@ -1,1 +1,1 @@
-214 : [Telink] Update Docker image (Zephyr update, switch into branch: dev-tlk_v4.1)
+215 : [NXP] Remove pre-installed NXP ZSDK from Zephyr docker image
