@@ -15,11 +15,10 @@
  *    limitations under the License.
  */
 
-#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/thread-border-router/ThreadBorderRouter.h>
 
 #include <device/api/Interface.h>
 #include <devices/Types.h>
-#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -27,15 +26,14 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-NetworkInfrastructureManager::NetworkInfrastructureManager(const Context & context) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kNetworkInfrastructureManager, 1)),
-    mDelegate(context.delegate), mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
-    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider),
-    mThreadNetworkDirectoryStorage(context.storage)
+ThreadBorderRouter::ThreadBorderRouter(const Context & context) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThreadBorderRouter, 1)), mDelegate(context.delegate),
+    mFailSafeContext(context.failSafeContext), mPlatformManager(context.platformManager),
+    mBreadCrumbTracker(context.breadcrumbTracker), mDiagnosticsProvider(context.diagnosticsProvider)
 {}
 
-CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                                  EndpointComposition composition)
+CHIP_ERROR ThreadBorderRouter::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -47,41 +45,28 @@ CHIP_ERROR NetworkInfrastructureManager::Register(chip::EndpointId endpoint, Cod
     mThreadBorderRouterManagementCluster.Create(endpoint, tbrConfig);
     ReturnErrorOnFailure(provider.AddCluster(mThreadBorderRouterManagementCluster.Registration()));
 
-    // 2. WiFi Network Management (mandatory)
-    mWiFiNetworkManagementCluster.Create(endpoint);
-    ReturnErrorOnFailure(provider.AddCluster(mWiFiNetworkManagementCluster.Registration()));
-
-    // 3. Thread Network Diagnostics (mandatory)
+    // 2. Thread Network Diagnostics (mandatory)
     mThreadNetworkDiagnosticsCluster.Create(endpoint, ThreadNetworkDiagnosticsCluster::ClusterType::kFull, mDiagnosticsProvider);
     ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDiagnosticsCluster.Registration()));
 
-    // 4. Thread Network Directory (mandatory)
-    mThreadNetworkDirectoryCluster.Create(endpoint, mThreadNetworkDirectoryStorage);
-    ReturnErrorOnFailure(provider.AddCluster(mThreadNetworkDirectoryCluster.Registration()));
+    // 3. Optional clusters (e.g. Thread Network Directory)
+    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
-void NetworkInfrastructureManager::Unregister(CodeDrivenDataModelProvider & provider)
+void ThreadBorderRouter::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
 
-    if (mThreadNetworkDirectoryCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDirectoryCluster.Cluster()));
-        mThreadNetworkDirectoryCluster.Destroy();
-    }
+    UnregisterOptionalClusters(provider);
+
     if (mThreadNetworkDiagnosticsCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThreadNetworkDiagnosticsCluster.Cluster()));
         mThreadNetworkDiagnosticsCluster.Destroy();
-    }
-    if (mWiFiNetworkManagementCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mWiFiNetworkManagementCluster.Cluster()));
-        mWiFiNetworkManagementCluster.Destroy();
     }
     if (mThreadBorderRouterManagementCluster.IsConstructed())
     {
