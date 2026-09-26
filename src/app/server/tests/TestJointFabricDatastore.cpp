@@ -2105,6 +2105,161 @@ TEST(JointFabricDatastoreTest, RefreshKeepsBindingsOnOtherEndpoints)
     EXPECT_EQ(delegate.bindingListSyncs.back().second.size(), 2u);
 }
 
+// Single-entry syncs rewrite the whole attribute on the node, so the datastore issues them one at a
+// time per node.
+TEST(JointFabricDatastoreTest, SecondAclSyncOnSameNodeWaitsForFirst)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(6, 123), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred();
+    EXPECT_EQ(delegate.deferred.size(), 1u); // the second one has now started
+
+    delegate.RunDeferred();
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+}
+
+TEST(JointFabricDatastoreTest, AclSyncsOnDifferentNodesRunConcurrently)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(0xA, "node-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(0xB, "node-b"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 0xA, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    SeedAcl(store, 0xB, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 0xA), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(6, 0xB), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.deferred.size(), 2u);
+
+    delegate.RunDeferred();
+    delegate.RunDeferred();
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+}
+
+TEST(JointFabricDatastoreTest, RefreshNodeIsBusyWhileSyncQueued)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    EXPECT_EQ(store.RefreshNode(123), CHIP_IM_GLOBAL_STATUS(Busy));
+
+    delegate.RunDeferred();
+    EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+}
+
+TEST(JointFabricDatastoreTest, SyncQueuedDuringRefreshRunsAfterIt)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+
+    auto aclSyncCount = [&delegate]() {
+        return std::count_if(delegate.syncCalls.begin(), delegate.syncCalls.end(),
+                             [](const auto & call) { return call.second == SyncKind::kAcl; });
+    };
+    EXPECT_EQ(aclSyncCount(), 0);
+
+    delegate.RunDeferred();
+    EXPECT_EQ(aclSyncCount(), 1);
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+}
+
+TEST(JointFabricDatastoreTest, QueuedSyncForErasedEntryFinishesQuietly)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(6, 123), CHIP_NO_ERROR);
+    auto & acls = store.GetNodeACLList();
+    acls.erase(std::remove_if(acls.begin(), acls.end(), [](const auto & entry) { return entry.listID == 6; }), acls.end());
+
+    delegate.RunDeferred();
+    EXPECT_TRUE(delegate.deferred.empty());
+    EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+}
+
+TEST(JointFabricDatastoreTest, BindingSyncsSerializedPerNode)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "ep"_span), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type first;
+    first.group.SetValue(10);
+    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type second;
+    second.group.SetValue(11);
+
+    delegate.deferKind = SyncKind::kBinding;
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, first), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, second), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred();
+    EXPECT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred();
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
+    EXPECT_EQ(store.GetEndpointBindingList()[0].statusEntry.state, State::kCommitted);
+    EXPECT_EQ(store.GetEndpointBindingList()[1].statusEntry.state, State::kCommitted);
+}
+
+// An add of an entry whose removal is in flight cancels the removal: the removal's completion does not
+// erase it, and the add runs next.
+TEST(JointFabricDatastoreTest, AddDuringInFlightAclRemovalKeepsEntry)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, {}, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = Privilege::kView;
+    aclEntry.authMode  = AuthMode::kCase;
+    ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+
+    delegate.RunDeferred(); // the removal
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    delegate.RunDeferred(); // the add
+    EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
+}
+
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
 {
     JointFabricDatastore store;

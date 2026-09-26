@@ -22,6 +22,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <deque>
 #include <functional>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -644,6 +645,7 @@ private:
         mBindingRemovalIntents.clear();
         mEndpointGroupRemovalIntents.clear();
         mNodeKeySetRemovalIntents.clear();
+        mNodeSyncQueues.clear();
         mAclTombstones.clear();
         mBindingTombstones.clear();
         mEndpointGroupTombstones.clear();
@@ -671,6 +673,14 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
+    struct NodeSyncQueue
+    {
+        bool inFlight = false;
+        std::deque<std::function<CHIP_ERROR()>> waiting;
+    };
+    // Present only for nodes with an operation in flight.
+    std::map<NodeId, NodeSyncQueue> mNodeSyncQueues;
+
     // Removal intent for entries stored as generated cluster types, which have no field for it. Keyed
     // by each entry's stable identity.
     std::set<std::tuple<NodeId, EndpointId, uint16_t>> mBindingRemovalIntents;      // (node, endpoint, listID)
@@ -757,6 +767,23 @@ private:
     // on its entries being removed, which keep their removal intent.
     void MarkRefreshBindingsSyncFailed(NodeId nodeId, CHIP_ERROR err);
     void MarkRefreshAclsSyncFailed(NodeId nodeId, CHIP_ERROR err);
+
+    /**
+     * Single-entry ACL and binding syncs read the node's whole list, edit it and write it back, so the datastore runs
+     * at most one of them per node at a time. RefreshNode also holds the node's slot until it finishes.
+     *
+     * Starts `start` now if `nodeId` has nothing in flight and returns its result; otherwise queues it and returns
+     * CHIP_NO_ERROR. `start` must end in exactly one FinishNodeSync(nodeId), synchronously or from a completion. At
+     * most kMaxACLs operations wait per node.
+     */
+    CHIP_ERROR RunOrQueueNodeSync(NodeId nodeId, std::function<CHIP_ERROR()> start);
+    void FinishNodeSync(NodeId nodeId);
+    bool IsNodeSyncIdle(NodeId nodeId) const;
+
+    // Queued operations. Each looks its entry up by key when it starts, and syncs a removal if the entry is being
+    // removed, or an add of its current value if it is not Committed. Each ends with FinishNodeSync(nodeId).
+    CHIP_ERROR StartAclEntrySync(NodeId nodeId, uint16_t listId);
+    CHIP_ERROR StartBindingEntrySync(NodeId nodeId, EndpointId endpointId, uint16_t listId);
 
     // Records that a stage of `nodeId`'s refresh failed, if that refresh is still active.
     void MarkRefreshFailed(NodeId nodeId);

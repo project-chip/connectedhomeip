@@ -286,8 +286,10 @@ CHIP_ERROR JointFabricDatastore::RefreshNode(NodeId nodeId)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mRefreshingNodeId == kUndefinedNodeId, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mRefreshState == kIdle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsNodeSyncIdle(nodeId), CHIP_IM_GLOBAL_STATUS(Busy));
 
-    mRefreshingNodeId = nodeId;
+    mNodeSyncQueues[nodeId].inFlight = true;
+    mRefreshingNodeId                = nodeId;
 
     CHIP_ERROR err = ContinueRefresh();
     if (err != CHIP_NO_ERROR)
@@ -745,18 +747,24 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         }
                     }
 
-                    // The write left out every entry being removed, so the node no longer holds them.
-                    mEndpointBindingEntries.erase(std::remove_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
-                                                                 [this, refreshingNodeId](const auto & entry) {
-                                                                     if (entry.nodeID != refreshingNodeId ||
-                                                                         !HasRemovalIntent(entry))
-                                                                     {
-                                                                         return false;
-                                                                     }
-                                                                     ClearRemovalIntent(entry);
-                                                                     return true;
-                                                                 }),
-                                                  mEndpointBindingEntries.end());
+                    // The node no longer holds the entries being removed that the write left out. A removal
+                    // requested while the write was in flight is still queued and runs after the refresh.
+                    mEndpointBindingEntries.erase(
+                        std::remove_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
+                                       [this, refreshingNodeId](const auto & entry) {
+                                           if (entry.nodeID != refreshingNodeId || !HasRemovalIntent(entry) ||
+                                               std::any_of(mRefreshingBindingEntries.begin(), mRefreshingBindingEntries.end(),
+                                                           [&entry](const auto & written) {
+                                                               return written.endpointID == entry.endpointID &&
+                                                                   written.listID == entry.listID;
+                                                           }))
+                                           {
+                                               return false;
+                                           }
+                                           ClearRemovalIntent(entry);
+                                           return true;
+                                       }),
+                        mEndpointBindingEntries.end());
                 }
 
                 if (mRefreshingNodeId != refreshingNodeId)
@@ -1280,12 +1288,16 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     }
                 }
 
-                // The write left out every entry being removed, so the node no longer holds them.
-                mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(),
-                                                 [this, refreshingNodeId](const auto & entry) {
-                                                     return entry.nodeID == refreshingNodeId && HasRemovalIntent(entry);
-                                                 }),
-                                  mACLEntries.end());
+                // The node no longer holds the entries being removed that the write left out. A removal requested
+                // while the write was in flight is still queued and runs after the refresh.
+                mACLEntries.erase(
+                    std::remove_if(mACLEntries.begin(), mACLEntries.end(),
+                                   [this, refreshingNodeId](const auto & entry) {
+                                       return entry.nodeID == refreshingNodeId && HasRemovalIntent(entry) &&
+                                           std::none_of(mRefreshingACLEntries.begin(), mRefreshingACLEntries.end(),
+                                                        [&entry](const auto & written) { return written.listID == entry.listID; });
+                                   }),
+                    mACLEntries.end());
 
                 if (mRefreshingNodeId != refreshingNodeId)
                 {
@@ -1731,6 +1743,7 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     if (anyGroupCATFieldUpdated)
     {
         const GroupId updatedGroupId = commandData.groupID;
+        std::vector<std::pair<NodeId, uint16_t>> updatedAcls;
 
         for (size_t i = 0; i < mACLEntries.size(); ++i)
         {
@@ -1757,40 +1770,21 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
             // Update the ACL entry in the datastore to reflect the new group permission and mark Pending.
             acl.ACLEntry.privilege = mGroupInformationEntries[index].groupPermission;
             acl.statusEntry.state  = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+            updatedAcls.emplace_back(acl.nodeID, acl.listID);
+        }
 
-            // Prepare an encoded entry to send to the node.
-            Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type entryToEncode;
-            entryToEncode.nodeID             = acl.nodeID;
-            entryToEncode.listID             = acl.listID;
-            entryToEncode.ACLEntry.authMode  = acl.ACLEntry.authMode;
-            entryToEncode.ACLEntry.privilege = acl.ACLEntry.privilege;
-            entryToEncode.ACLEntry.subjects =
-                DataModel::List<const uint64_t>(acl.ACLEntry.subjects.data(), acl.ACLEntry.subjects.size());
-            entryToEncode.ACLEntry.targets =
-                DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
-                    acl.ACLEntry.targets.data(), acl.ACLEntry.targets.size());
-            entryToEncode.statusEntry = acl.statusEntry;
-
-            // Attempt to update the ACL on the node. On success, mark the ACL entry as Committed.
-            // Re-resolve by stable key (nodeID + listID) inside the completion; capturing the loop
-            // index would mark the wrong/invalid slot if an interleaved Invoke mutated the vector.
-            const NodeId entryNodeId   = acl.nodeID;
-            const uint16_t entryListId = acl.listID;
-            auto match = [entryNodeId, entryListId](const auto & e) { return e.nodeID == entryNodeId && e.listID == entryListId; };
-            CHIP_ERROR startErr = mDelegate->SyncNode(acl.nodeID, entryToEncode, [this, match](CHIP_ERROR syncErr) {
-                if (syncErr != CHIP_NO_ERROR)
-                {
-                    detail::MarkEntrySyncFailedIfFound(mACLEntries, match, syncErr);
-                    return;
-                }
-                detail::MarkEntryCommittedIfFound(mACLEntries, match);
-            });
-            if (startErr != CHIP_NO_ERROR)
+        // Sync after the loop: a sync that completes synchronously can erase entries.
+        CHIP_ERROR firstErr = CHIP_NO_ERROR;
+        for (const auto & [aclNodeId, aclListId] : updatedAcls)
+        {
+            CHIP_ERROR err = RunOrQueueNodeSync(
+                aclNodeId, [this, nodeId = aclNodeId, listId = aclListId]() { return StartAclEntrySync(nodeId, listId); });
+            if (firstErr == CHIP_NO_ERROR)
             {
-                detail::MarkEntrySyncFailedIfFound(mACLEntries, match, startErr);
-                return startErr;
+                firstErr = err;
             }
         }
+        ReturnErrorOnFailure(firstErr);
     }
 
     return CHIP_NO_ERROR;
@@ -2257,23 +2251,9 @@ JointFabricDatastore::AddBindingToEndpointForNode(
                                             }),
                              mBindingTombstones.end());
 
-    const uint16_t syncedListId = newBindingEntry.listID;
-    auto match                  = [nodeId, endpointId, syncedListId](const auto & entry) {
-        return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == syncedListId;
-    };
-    CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, newBindingEntry, [this, match](CHIP_ERROR syncErr) {
-        if (syncErr != CHIP_NO_ERROR)
-        {
-            detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, match, syncErr);
-            return;
-        }
-        detail::MarkEntryCommittedIfFound(mEndpointBindingEntries, match);
-    });
-    if (startErr != CHIP_NO_ERROR)
-    {
-        detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, match, startErr);
-    }
-    return startErr;
+    const uint16_t listId = newBindingEntry.listID;
+    return RunOrQueueNodeSync(nodeId,
+                              [this, nodeId, endpointId, listId]() { return StartBindingEntrySync(nodeId, endpointId, listId); });
 }
 
 CHIP_ERROR
@@ -2289,29 +2269,8 @@ JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId n
         if (it->nodeID == nodeId && it->listID == listId && it->endpointID == endpointId)
         {
             MarkRemovalRequested(*it);
-            // Re-resolve by stable key inside the async completion instead of capturing the raw
-            // iterator (which dangles if an interleaved Add*/Remove* reallocates the vector).
-            auto match = [listId, nodeId, endpointId](const auto & entry) {
-                return entry.nodeID == nodeId && entry.listID == listId && entry.endpointID == endpointId;
-            };
-            CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, *it, [this, match](CHIP_ERROR syncErr) {
-                if (syncErr != CHIP_NO_ERROR)
-                {
-                    detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, match, syncErr);
-                    return;
-                }
-                auto eraseIt = std::find_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(), match);
-                if (eraseIt != mEndpointBindingEntries.end())
-                {
-                    ClearRemovalIntent(*eraseIt);
-                    mEndpointBindingEntries.erase(eraseIt);
-                }
-            });
-            if (startErr != CHIP_NO_ERROR)
-            {
-                detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, match, startErr);
-            }
-            return startErr;
+            return RunOrQueueNodeSync(
+                nodeId, [this, nodeId, endpointId, listId]() { return StartBindingEntrySync(nodeId, endpointId, listId); });
         }
     }
 
@@ -2602,6 +2561,148 @@ void JointFabricDatastore::MarkRefreshAclsSyncFailed(NodeId nodeId, CHIP_ERROR e
     }
 }
 
+CHIP_ERROR JointFabricDatastore::RunOrQueueNodeSync(NodeId nodeId, std::function<CHIP_ERROR()> start)
+{
+    auto & queue = mNodeSyncQueues[nodeId];
+    if (queue.inFlight)
+    {
+        VerifyOrReturnError(queue.waiting.size() < kMaxACLs, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+        queue.waiting.push_back(std::move(start));
+        return CHIP_NO_ERROR;
+    }
+    queue.inFlight = true;
+    return start();
+}
+
+void JointFabricDatastore::FinishNodeSync(NodeId nodeId)
+{
+    auto it = mNodeSyncQueues.find(nodeId);
+    if (it == mNodeSyncQueues.end())
+    {
+        return;
+    }
+    if (it->second.waiting.empty())
+    {
+        mNodeSyncQueues.erase(it);
+        return;
+    }
+    auto next = std::move(it->second.waiting.front());
+    it->second.waiting.pop_front();
+    // A failure to start is recorded on the entry by the operation itself.
+    LogErrorOnFailure(next());
+}
+
+bool JointFabricDatastore::IsNodeSyncIdle(NodeId nodeId) const
+{
+    return mNodeSyncQueues.find(nodeId) == mNodeSyncQueues.end();
+}
+
+CHIP_ERROR JointFabricDatastore::StartAclEntrySync(NodeId nodeId, uint16_t listId)
+{
+    auto match = [nodeId, listId](const auto & entry) { return entry.nodeID == nodeId && entry.listID == listId; };
+    auto it    = std::find_if(mACLEntries.begin(), mACLEntries.end(), match);
+    if (it == mACLEntries.end() ||
+        (!HasRemovalIntent(*it) && it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted))
+    {
+        FinishNodeSync(nodeId);
+        return CHIP_NO_ERROR;
+    }
+
+    const bool removal = HasRemovalIntent(*it);
+    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type payload;
+    if (removal)
+    {
+        // Indicates the nodeID and listID, with status DeletePending, for the SyncNode call to delete the ACL entry
+        // on the node.
+        payload.nodeID            = nodeId;
+        payload.listID            = listId;
+        payload.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
+    }
+    else
+    {
+        payload                   = EncodeAclEntryForSync(*it);
+        payload.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+    }
+
+    // The result applies only if the entry is still being added or removed as when the sync started.
+    auto sameOperation  = [this, match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
+    CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, payload, [this, nodeId, sameOperation, removal](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            detail::MarkEntrySyncFailedIfFound(mACLEntries, sameOperation, syncErr);
+        }
+        else if (removal)
+        {
+            mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(), sameOperation), mACLEntries.end());
+        }
+        else
+        {
+            auto entry = std::find_if(mACLEntries.begin(), mACLEntries.end(), sameOperation);
+            if (entry != mACLEntries.end())
+            {
+                entry->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                entry->statusEntry.failureCode = 0;
+                entry->supersededValue.reset();
+            }
+        }
+        FinishNodeSync(nodeId);
+    });
+    if (startErr != CHIP_NO_ERROR)
+    {
+        detail::MarkEntrySyncFailedIfFound(mACLEntries, sameOperation, startErr);
+        FinishNodeSync(nodeId);
+    }
+    return startErr;
+}
+
+CHIP_ERROR JointFabricDatastore::StartBindingEntrySync(NodeId nodeId, EndpointId endpointId, uint16_t listId)
+{
+    auto match = [nodeId, endpointId, listId](const auto & entry) {
+        return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == listId;
+    };
+    auto it = std::find_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(), match);
+    if (it == mEndpointBindingEntries.end() ||
+        (!HasRemovalIntent(*it) && it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted))
+    {
+        FinishNodeSync(nodeId);
+        return CHIP_NO_ERROR;
+    }
+
+    const bool removal        = HasRemovalIntent(*it);
+    auto payload              = *it;
+    payload.statusEntry.state = removal ? Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending
+                                        : Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+    // The result applies only if the entry is still being added or removed as when the sync started.
+    auto sameOperation  = [this, match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
+    CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, payload, [this, nodeId, sameOperation, removal](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, sameOperation, syncErr);
+        }
+        else if (removal)
+        {
+            auto entry = std::find_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(), sameOperation);
+            if (entry != mEndpointBindingEntries.end())
+            {
+                ClearRemovalIntent(*entry);
+                mEndpointBindingEntries.erase(entry);
+            }
+        }
+        else
+        {
+            detail::MarkEntryCommittedIfFound(mEndpointBindingEntries, sameOperation);
+        }
+        FinishNodeSync(nodeId);
+    });
+    if (startErr != CHIP_NO_ERROR)
+    {
+        detail::MarkEntrySyncFailedIfFound(mEndpointBindingEntries, sameOperation, startErr);
+        FinishNodeSync(nodeId);
+    }
+    return startErr;
+}
+
 void JointFabricDatastore::MarkRefreshFailed(NodeId nodeId)
 {
     if (mRefreshingNodeId == nodeId)
@@ -2623,6 +2724,7 @@ void JointFabricDatastore::FinishRefresh(CHIP_ERROR err)
                      ChipLogValueX64(mRefreshingNodeId), err.Format());
     }
 
+    const NodeId finishedNodeId = mRefreshingNodeId;
     mRefreshingNodeId           = kUndefinedNodeId;
     mRefreshState               = kIdle;
     mRefreshingEndpointIndex    = 0;
@@ -2634,6 +2736,9 @@ void JointFabricDatastore::FinishRefresh(CHIP_ERROR err)
     mRefreshingGroupKeySetIDs.clear();
     mRefreshingNodeKeySetDeletions.clear();
     mRefreshingNodeKeySetDeletionIndex = 0;
+
+    // Operations queued behind the refresh start now.
+    FinishNodeSync(finishedNodeId);
 }
 
 bool JointFabricDatastore::ACLMatches(
@@ -2784,27 +2889,8 @@ JointFabricDatastore::AddACLToNode(
                        }),
         mAclTombstones.end());
 
-    const auto entryToEncode = EncodeAclEntryForSync(*storedEntry);
-
-    const auto committedNodeId = storedEntry->nodeID;
-    const auto committedListId = storedEntry->listID;
-    auto match                 = [committedNodeId, committedListId](const auto & entry) {
-        return entry.nodeID == committedNodeId && entry.listID == committedListId;
-    };
-
-    CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, entryToEncode, [this, match](CHIP_ERROR syncErr) {
-        if (syncErr != CHIP_NO_ERROR)
-        {
-            detail::MarkEntrySyncFailedIfFound(mACLEntries, match, syncErr);
-            return;
-        }
-        detail::MarkEntryCommittedIfFound(mACLEntries, match);
-    });
-    if (startErr != CHIP_NO_ERROR)
-    {
-        detail::MarkEntrySyncFailedIfFound(mACLEntries, match, startErr);
-    }
-    return startErr;
+    const uint16_t listId = storedEntry->listID;
+    return RunOrQueueNodeSync(nodeId, [this, nodeId, listId]() { return StartAclEntrySync(nodeId, listId); });
 }
 
 CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeId)
@@ -2819,29 +2905,7 @@ CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeI
         if (it->nodeID == nodeId && it->listID == listId)
         {
             MarkRemovalRequested(*it);
-
-            // initialize struct to indicate nodeid/listid and status set to DeletePending for the SyncNode call to delete the ACL
-            // entry on the node
-            Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type entryToDelete{ 0 };
-            entryToDelete.nodeID            = it->nodeID;
-            entryToDelete.listID            = it->listID;
-            entryToDelete.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-            // Re-resolve by stable key inside the async completion instead of capturing the raw
-            // iterator (which dangles if an interleaved Add*/Remove* reallocates the vector).
-            auto match          = [listId, nodeId](const auto & entry) { return entry.nodeID == nodeId && entry.listID == listId; };
-            CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, entryToDelete, [this, match](CHIP_ERROR syncErr) {
-                if (syncErr != CHIP_NO_ERROR)
-                {
-                    detail::MarkEntrySyncFailedIfFound(mACLEntries, match, syncErr);
-                    return;
-                }
-                mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(), match), mACLEntries.end());
-            });
-            if (startErr != CHIP_NO_ERROR)
-            {
-                detail::MarkEntrySyncFailedIfFound(mACLEntries, match, startErr);
-            }
-            return startErr;
+            return RunOrQueueNodeSync(nodeId, [this, nodeId, listId]() { return StartAclEntrySync(nodeId, listId); });
         }
     }
 
