@@ -137,8 +137,8 @@ CHIP_ERROR WbsGattServer::InitImpl(WbsGattServer * self)
         monitorParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
         monitorParam.put("subscribe", true);
 
-        bool subscribed = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHARACTERISTIC, monitorParam.stringify().c_str(),
-                                                    self, OnRxCharacteristicChanged, &self->mRxMonitorToken);
+        bool subscribed = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHARACTERISTIC, monitorParam.stringify().c_str(), self,
+                                                   OnRxCharacteristicChanged, &self->mRxMonitorToken);
         if (!subscribed)
         {
             ChipLogError(DeviceLayer, "WbsGattServer: failed to subscribe RX characteristic monitor");
@@ -160,8 +160,7 @@ bool WbsGattServer::OnRxCharacteristicChanged(LSHandle * sh, LSMessage * message
     pbnjson::JValue responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
 
     VerifyOrExit(responsePayload["returnValue"].asBool() == true,
-                 ChipLogError(DeviceLayer, "WbsGattServer: RX monitor error: %s",
-                              responsePayload["errorText"].asString().c_str()));
+                 ChipLogError(DeviceLayer, "WbsGattServer: RX monitor error: %s", responsePayload["errorText"].asString().c_str()));
 
     if (responsePayload.hasKey("changed"))
     {
@@ -230,8 +229,7 @@ CHIP_ERROR WbsGattServer::PollCccdImpl(WbsGattServer * self)
     {
         self->mCccdIndicateEnabled = indicateEnabled;
         self->mPeerConnection->SetNotifyAcquired(indicateEnabled);
-        ChipLogProgress(DeviceLayer, "WbsGattServer: remote %s indications on TX",
-                        indicateEnabled ? "enabled" : "disabled");
+        ChipLogProgress(DeviceLayer, "WbsGattServer: remote %s indications on TX", indicateEnabled ? "enabled" : "disabled");
         BLEManagerImpl::HandleTXCharCCCDWrite(self->mPeerConnection);
     }
 
