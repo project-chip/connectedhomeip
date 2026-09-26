@@ -1852,9 +1852,10 @@ CHIP_ERROR JointFabricDatastore::GenerateAndAssignAUniqueListID(uint16_t & listI
     return CHIP_NO_ERROR;
 }
 
-bool JointFabricDatastore::BindingMatches(
-    const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
-    const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2)
+namespace detail {
+
+bool BindingTargetValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
+                              const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2)
 {
     if (binding1.node.HasValue() && binding2.node.HasValue())
     {
@@ -1905,6 +1906,41 @@ bool JointFabricDatastore::BindingMatches(
     }
 
     return true;
+}
+
+bool BindingEntryValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & a,
+                             const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & b)
+{
+    return a.endpointID == b.endpointID && BindingTargetValueEquals(a.binding, b.binding);
+}
+
+std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>
+ApplyBindingEdit(const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & current,
+                 const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry)
+{
+    auto result        = current;
+    const auto matches = [&entry](const auto & candidate) { return BindingEntryValueEquals(candidate, entry); };
+
+    if (entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+    {
+        result.erase(std::remove_if(result.begin(), result.end(), matches), result.end());
+        return result;
+    }
+
+    if (std::none_of(result.begin(), result.end(), matches))
+    {
+        result.push_back(entry);
+    }
+    return result;
+}
+
+} // namespace detail
+
+bool JointFabricDatastore::BindingMatches(
+    const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
+    const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2)
+{
+    return detail::BindingTargetValueEquals(binding1, binding2);
 }
 
 CHIP_ERROR
@@ -1987,9 +2023,10 @@ JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId n
     return CHIP_ERROR_NOT_FOUND;
 }
 
-bool JointFabricDatastore::ACLTargetMatches(
-    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
-    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2)
+namespace detail {
+
+bool AclTargetValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
+                          const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2)
 {
     if (!target1.cluster.IsNull() && !target2.cluster.IsNull())
     {
@@ -2028,6 +2065,95 @@ bool JointFabricDatastore::ACLTargetMatches(
     }
 
     return true;
+}
+
+namespace {
+
+template <typename T>
+Span<const T> ListOrEmpty(const DataModel::Nullable<DataModel::List<const T>> & list)
+{
+    return list.IsNull() ? Span<const T>() : Span<const T>(list.Value().data(), list.Value().size());
+}
+
+} // namespace
+
+bool AclEntryValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type & a,
+                         const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type & b)
+{
+    if (a.privilege != b.privilege || a.authMode != b.authMode)
+    {
+        return false;
+    }
+
+    const auto subjectsA = ListOrEmpty(a.subjects);
+    const auto subjectsB = ListOrEmpty(b.subjects);
+    if (!std::is_permutation(subjectsA.begin(), subjectsA.end(), subjectsB.begin(), subjectsB.end()))
+    {
+        return false;
+    }
+
+    const auto targetsA = ListOrEmpty(a.targets);
+    const auto targetsB = ListOrEmpty(b.targets);
+    return std::is_permutation(targetsA.begin(), targetsA.end(), targetsB.begin(), targetsB.end(), AclTargetValueEquals);
+}
+
+std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>
+ApplyAclEdit(const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & current,
+             const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & entry,
+             const std::optional<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> & superseded)
+{
+    using AccessControlEntryType = Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type;
+
+    auto result = current;
+
+    const auto eraseEqual = [&result](const AccessControlEntryType & value) {
+        result.erase(std::remove_if(result.begin(), result.end(),
+                                    [&value](const auto & candidate) { return AclEntryValueEquals(candidate.ACLEntry, value); }),
+                     result.end());
+    };
+
+    if (superseded.has_value())
+    {
+        eraseEqual(superseded.value());
+    }
+
+    if (entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+    {
+        eraseEqual(entry.ACLEntry);
+        return result;
+    }
+
+    if (std::none_of(result.begin(), result.end(),
+                     [&entry](const auto & candidate) { return AclEntryValueEquals(candidate.ACLEntry, entry.ACLEntry); }))
+    {
+        result.push_back(entry);
+    }
+    return result;
+}
+
+} // namespace detail
+
+bool JointFabricDatastore::ACLTargetMatches(
+    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
+    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2)
+{
+    return detail::AclTargetValueEquals(target1, target2);
+}
+
+Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
+JointFabricDatastore::EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const
+{
+    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type encoded;
+    encoded.nodeID             = entry.nodeID;
+    encoded.listID             = entry.listID;
+    encoded.ACLEntry.authMode  = entry.ACLEntry.authMode;
+    encoded.ACLEntry.privilege = entry.ACLEntry.privilege;
+    encoded.ACLEntry.subjects  = DataModel::List<const uint64_t>(entry.ACLEntry.subjects.data(), entry.ACLEntry.subjects.size());
+    encoded.ACLEntry.targets =
+        DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
+            entry.ACLEntry.targets.data(), entry.ACLEntry.targets.size());
+    encoded.statusEntry = entry.statusEntry;
+    return encoded;
 }
 
 bool JointFabricDatastore::ACLMatches(

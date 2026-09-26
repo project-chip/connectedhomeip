@@ -17,6 +17,8 @@ using NodeKeySetEntryType      = JointFabricCluster::Structs::DatastoreNodeKeySe
 using GroupInfoEntryType       = JointFabricCluster::Structs::DatastoreGroupInformationEntryStruct::Type;
 using BindingEntryType         = JointFabricCluster::Structs::DatastoreEndpointBindingEntryStruct::Type;
 using ACLEntryType             = JointFabricCluster::Structs::DatastoreACLEntryStruct::Type;
+using AclType                  = JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::Type;
+using TargetType               = JointFabricCluster::Structs::DatastoreAccessControlTargetStruct::Type;
 using Privilege                = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum;
 using AuthMode                 = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum;
 using State                    = JointFabricCluster::DatastoreStateEnum;
@@ -1105,6 +1107,272 @@ TEST(MarkEntryCommittedIfFoundTest, MarksOnlyFirstMatch)
 
     EXPECT_EQ(entries[0].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kCommitted);
     EXPECT_EQ(entries[1].statusEntry.state, JointFabricCluster::DatastoreStateEnum::kPending);
+}
+
+// Nodes report an empty subject or target list as null (AclStorage.cpp); the datastore sends an
+// empty non-null list. The two compare equal.
+TEST(AclEntryValueEqualsTest, NullListEqualsEmptyList)
+{
+    AclType a;
+    a.privilege = Privilege::kView;
+    a.authMode  = AuthMode::kCase;
+    a.subjects.SetNull();
+    a.targets.SetNull();
+
+    AclType b = a;
+    b.subjects.SetNonNull();
+    b.targets.SetNonNull();
+
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(a, b));
+}
+
+TEST(AclEntryValueEqualsTest, SubjectOrderDoesNotMatter)
+{
+    const uint64_t s1[] = { 0x1111, 0x2222 };
+    const uint64_t s2[] = { 0x2222, 0x1111 };
+    AclType a;
+    a.privilege = Privilege::kView;
+    a.authMode  = AuthMode::kCase;
+    a.subjects.SetNonNull(s1);
+    a.targets.SetNull();
+    AclType b = a;
+    b.subjects.SetNonNull(s2);
+
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(a, b));
+}
+
+TEST(AclEntryValueEqualsTest, TargetOrderDoesNotMatter)
+{
+    TargetType t1[2];
+    t1[0].cluster.SetNonNull(6u);
+    t1[0].endpoint.SetNull();
+    t1[0].deviceType.SetNull();
+    t1[1].cluster.SetNull();
+    t1[1].endpoint.SetNonNull(1);
+    t1[1].deviceType.SetNull();
+    const TargetType t2[] = { t1[1], t1[0] };
+
+    AclType a;
+    a.privilege = Privilege::kView;
+    a.authMode  = AuthMode::kCase;
+    a.subjects.SetNull();
+    a.targets.SetNonNull(t1);
+    AclType b = a;
+    b.targets.SetNonNull(t2);
+
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(a, b));
+
+    b.targets.SetNonNull(Span<const TargetType>(t2, 1));
+    EXPECT_FALSE(chip::app::detail::AclEntryValueEquals(a, b));
+}
+
+TEST(AclEntryValueEqualsTest, PrivilegeMatters)
+{
+    AclType a;
+    a.privilege = Privilege::kManage;
+    a.authMode  = AuthMode::kCase;
+    a.subjects.SetNull();
+    a.targets.SetNull();
+    AclType b   = a;
+    b.privilege = Privilege::kView;
+
+    EXPECT_FALSE(chip::app::detail::AclEntryValueEquals(a, b));
+}
+
+TEST(AclEntryValueEqualsTest, SubjectsMatter)
+{
+    const uint64_t s1[] = { 0x1111 };
+    const uint64_t s2[] = { 0x1111, 0x2222 };
+    AclType a;
+    a.privilege = Privilege::kView;
+    a.authMode  = AuthMode::kCase;
+    a.subjects.SetNonNull(s1);
+    a.targets.SetNull();
+    AclType b = a;
+    b.subjects.SetNonNull(s2);
+
+    EXPECT_FALSE(chip::app::detail::AclEntryValueEquals(a, b));
+}
+
+const uint64_t kSubjectX[] = { 0x1111 };
+const uint64_t kSubjectY[] = { 0x2222 };
+const Span<const uint64_t> kSubjectsX(kSubjectX);
+const Span<const uint64_t> kSubjectsY(kSubjectY);
+
+// Builds an ACL entry as the datastore sends it: an empty target list is non-null.
+ACLEntryType MakeAclEntry(Privilege privilege, Span<const uint64_t> subjects, State state = State::kPending)
+{
+    ACLEntryType entry;
+    entry.nodeID             = 123;
+    entry.ACLEntry.privilege = privilege;
+    entry.ACLEntry.authMode  = AuthMode::kCase;
+    entry.ACLEntry.subjects.SetNonNull(subjects);
+    entry.ACLEntry.targets.SetNonNull();
+    entry.statusEntry.state = state;
+    return entry;
+}
+
+AclType MakeAcl(Privilege privilege, Span<const uint64_t> subjects)
+{
+    return MakeAclEntry(privilege, subjects).ACLEntry;
+}
+
+TEST(ApplyAclEditTest, AddAppendsWhenAbsent)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsX) };
+
+    const auto result = chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kManage, kSubjectsY), std::nullopt);
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kView, kSubjectsX)));
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[1].ACLEntry, MakeAcl(Privilege::kManage, kSubjectsY)));
+}
+
+TEST(ApplyAclEditTest, AddIsIdempotent)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsX) };
+
+    const auto result = chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX), std::nullopt);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kView, kSubjectsX)));
+}
+
+TEST(ApplyAclEditTest, ReplaceSwapsSupersededForNew)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kManage, kSubjectsX) };
+
+    const auto result = chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX),
+                                                        std::make_optional(MakeAcl(Privilege::kManage, kSubjectsX)));
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kView, kSubjectsX)));
+}
+
+TEST(ApplyAclEditTest, ReplaceWithSupersededAbsentStillEnsuresNew)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsY) };
+
+    const auto result = chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX),
+                                                        std::make_optional(MakeAcl(Privilege::kManage, kSubjectsX)));
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kView, kSubjectsY)));
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[1].ACLEntry, MakeAcl(Privilege::kView, kSubjectsX)));
+}
+
+TEST(ApplyAclEditTest, RemoveErasesAllEqualEntries)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsX),
+                                             MakeAclEntry(Privilege::kView, kSubjectsX) };
+
+    const auto result =
+        chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX, State::kDeletePending), std::nullopt);
+
+    EXPECT_TRUE(result.empty());
+}
+
+TEST(ApplyAclEditTest, RemoveOfAbsentEntryIsNoOp)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsY) };
+
+    const auto result =
+        chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX, State::kDeletePending), std::nullopt);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kView, kSubjectsY)));
+}
+
+TEST(ApplyAclEditTest, RemoveMatchesNullTargetsAgainstEmpty)
+{
+    auto fetched = MakeAclEntry(Privilege::kView, kSubjectsX);
+    fetched.ACLEntry.targets.SetNull();
+    const std::vector<ACLEntryType> current{ fetched };
+
+    const auto result =
+        chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX, State::kDeletePending), std::nullopt);
+
+    EXPECT_TRUE(result.empty());
+}
+
+TEST(ApplyAclEditTest, RemoveLeavesUnrelatedEntries)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kView, kSubjectsX),
+                                             MakeAclEntry(Privilege::kManage, kSubjectsY),
+                                             MakeAclEntry(Privilege::kView, kSubjectsY) };
+
+    const auto result =
+        chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX, State::kDeletePending), std::nullopt);
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[0].ACLEntry, MakeAcl(Privilege::kManage, kSubjectsY)));
+    EXPECT_TRUE(chip::app::detail::AclEntryValueEquals(result[1].ACLEntry, MakeAcl(Privilege::kView, kSubjectsY)));
+}
+
+// An entry removed while an update was Pending: the node may still hold the superseded value.
+TEST(ApplyAclEditTest, RemoveAlsoErasesSupersededValue)
+{
+    const std::vector<ACLEntryType> current{ MakeAclEntry(Privilege::kManage, kSubjectsX) };
+
+    const auto result = chip::app::detail::ApplyAclEdit(current, MakeAclEntry(Privilege::kView, kSubjectsX, State::kDeletePending),
+                                                        std::make_optional(MakeAcl(Privilege::kManage, kSubjectsX)));
+
+    EXPECT_TRUE(result.empty());
+}
+
+BindingEntryType MakeBindingEntry(EndpointId endpointId, GroupId groupId, State state = State::kPending)
+{
+    BindingEntryType entry;
+    entry.nodeID     = 123;
+    entry.endpointID = endpointId;
+    entry.binding.group.SetValue(groupId);
+    entry.statusEntry.state = state;
+    return entry;
+}
+
+TEST(ApplyBindingEditTest, AddAppendsWhenAbsent)
+{
+    const std::vector<BindingEntryType> current{ MakeBindingEntry(1, 10) };
+
+    const auto result = chip::app::detail::ApplyBindingEdit(current, MakeBindingEntry(1, 11));
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_TRUE(chip::app::detail::BindingEntryValueEquals(result[1], MakeBindingEntry(1, 11)));
+}
+
+TEST(ApplyBindingEditTest, AddIsIdempotent)
+{
+    const std::vector<BindingEntryType> current{ MakeBindingEntry(1, 10) };
+
+    const auto result = chip::app::detail::ApplyBindingEdit(current, MakeBindingEntry(1, 10));
+
+    EXPECT_EQ(result.size(), 1u);
+}
+
+// listID does not survive the wire, so removal matches on endpointID and the binding target only.
+TEST(ApplyBindingEditTest, RemoveMatchesByValue)
+{
+    auto fetched   = MakeBindingEntry(1, 10);
+    fetched.listID = 5;
+    const std::vector<BindingEntryType> current{ fetched, MakeBindingEntry(2, 10), MakeBindingEntry(1, 11) };
+
+    auto removal      = MakeBindingEntry(1, 10, State::kDeletePending);
+    removal.listID    = 9;
+    const auto result = chip::app::detail::ApplyBindingEdit(current, removal);
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_TRUE(chip::app::detail::BindingEntryValueEquals(result[0], MakeBindingEntry(2, 10)));
+    EXPECT_TRUE(chip::app::detail::BindingEntryValueEquals(result[1], MakeBindingEntry(1, 11)));
+}
+
+TEST(ApplyBindingEditTest, RemoveOfAbsentEntryIsNoOp)
+{
+    const std::vector<BindingEntryType> current{ MakeBindingEntry(1, 10) };
+
+    const auto result = chip::app::detail::ApplyBindingEdit(current, MakeBindingEntry(1, 11, State::kDeletePending));
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_TRUE(chip::app::detail::BindingEntryValueEquals(result[0], MakeBindingEntry(1, 10)));
 }
 
 } // namespace

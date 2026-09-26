@@ -29,6 +29,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <map>
+#include <optional>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -59,6 +60,10 @@ struct ACLEntryStruct
     uint16_t listID     = static_cast<uint16_t>(0);
     AccessControlEntryStruct ACLEntry;
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type statusEntry;
+
+    // Value the node is believed to hold while an update is Pending. Refresh must not re-adopt it, and
+    // the delegate must replace it. Kept at the last committed value across back-to-back updates.
+    std::optional<AccessControlEntryStruct> supersededValue;
 };
 
 } // namespace datastore
@@ -82,6 +87,52 @@ void MarkEntryCommittedIfFound(std::vector<T> & vec, Pred pred)
         it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
     }
 }
+
+/**
+ * The Acl and Binding attributes carry no per-entry identity on the wire, so entries on a node are
+ * matched by value. A null list and an empty list compare equal: nodes report an empty subject or
+ * target list as null, while the datastore sends an empty non-null list.
+ */
+bool AclTargetValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
+                          const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
+
+/**
+ * Compares privilege, authMode, subjects and targets. Subjects and targets are compared as multisets.
+ */
+bool AclEntryValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type & a,
+                         const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type & b);
+
+/**
+ * Returns the ACL list that results from applying `entry` to `current`, a node's fetched ACL list.
+ *
+ * - If `entry` is DeletePending, erases every entry equal to `entry`, or to `superseded` if given.
+ * - Otherwise, erases every entry equal to `superseded` if given, then appends `entry` unless an equal
+ *   entry is already present.
+ *
+ * The returned entries view the subject and target storage of `current` and `entry`.
+ */
+std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>
+ApplyAclEdit(const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & current,
+             const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & entry,
+             const std::optional<Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> & superseded);
+
+bool BindingTargetValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
+                              const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2);
+
+/**
+ * Compares endpointID and the binding target.
+ */
+bool BindingEntryValueEquals(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & a,
+                             const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & b);
+
+/**
+ * Returns the binding list that results from applying `entry` to `current`, a node's fetched binding
+ * list. If `entry` is DeletePending, erases every entry equal to it; otherwise appends `entry` unless
+ * an equal entry is already present.
+ */
+std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>
+ApplyBindingEdit(const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & current,
+                 const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
 
 } // namespace detail
 
@@ -599,6 +650,11 @@ private:
                     const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2);
     bool ACLTargetMatches(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
                           const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
+
+    // The result views the subject and target storage of `entry`, so it is valid only while `entry` is
+    // unchanged.
+    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
+    EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const;
 
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
