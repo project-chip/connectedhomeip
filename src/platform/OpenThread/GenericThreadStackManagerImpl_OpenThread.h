@@ -162,6 +162,8 @@ protected:
 private:
     // ===== Private members for use by this class only.
 
+    void RestoreStateAfterScan(bool disableIp6);
+
     otInstance * mOTInst;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
@@ -176,6 +178,7 @@ private:
     uint64_t mOverrunCount      = 0;
     bool mIsAttached            = false;
     bool mTemporaryRxOnWhenIdle = false;
+    bool mTemporaryIp6Enabled   = false;
 
     chip::Transport::PeerAddress mRendezvousPeerAddr;
 
