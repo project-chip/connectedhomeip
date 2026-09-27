@@ -1494,7 +1494,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         #   establish a new session.
         # - 0.5s when there is no evidence: the call is expected to fail regardless of
         #   the wait, so the short deadline just keeps that failure cheap.
-        commissioning_configured = self.matter_test_config.commissioning_method is not None
+        self._dut_confirmed_available = (self._dut_confirmed_available or
+                                         self.matter_test_config._pre_test_commissioning_complete)
+        commissioning_configured = (self.matter_test_config.commissioning_method is not None or
+                                    self.matter_test_config.in_test_commissioning_method is not None)
         if commissioning_configured and not self._dut_confirmed_available:
             # A configured commissioning method means this test is expected to commission
             # the DUT. Before that happens, probing the configured/default node ID starts an
