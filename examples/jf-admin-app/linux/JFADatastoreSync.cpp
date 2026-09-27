@@ -138,7 +138,8 @@ public:
 
         CallbackContext(chip::NodeId nId, EndpointId eId, const std::vector<T> & objects,
                         std::function<void(CHIP_ERROR)> onSuccessFn) :
-            nodeId(nId), endpointId(eId), objectToWrite(), objectsToWrite(), onSuccess(onSuccessFn)
+            nodeId(nId),
+            endpointId(eId), objectToWrite(), objectsToWrite(), onSuccess(onSuccessFn)
         {
             objectsToWrite = MakeOptional(objects);
         }
