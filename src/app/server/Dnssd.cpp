@@ -83,10 +83,10 @@ void LogThreadOperationalAdvertisingContext()
     uint16_t panId                                 = 0;
     uint64_t extendedPanId                         = 0;
 
-    CHIP_ERROR nameErr = dataset.GetNetworkName(networkName);
+    CHIP_ERROR nameErr    = dataset.GetNetworkName(networkName);
     CHIP_ERROR channelErr = dataset.GetChannel(channel);
-    CHIP_ERROR panErr = dataset.GetPanId(panId);
-    CHIP_ERROR extPanErr = dataset.GetExtendedPanId(extendedPanId);
+    CHIP_ERROR panErr     = dataset.GetPanId(panId);
+    CHIP_ERROR extPanErr  = dataset.GetExtendedPanId(extendedPanId);
 
     if (nameErr == CHIP_NO_ERROR && channelErr == CHIP_NO_ERROR && panErr == CHIP_NO_ERROR && extPanErr == CHIP_NO_ERROR)
     {
