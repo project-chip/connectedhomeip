@@ -440,8 +440,9 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             featureMapBitString = f"{featureMapValue:08b}".lstrip("0")
             for bitLocation in range(len(featureMapBitString)):
                 if featureMapValue >> bitLocation & 1 == 1:
-                    # console.print(f"{clusterPICS}{featureTag}{bitLocation:02x}")
-                    featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02x}")
+                    # PICS feature codes number the bit in decimal (F00..F31), so a
+                    # hex conversion here silently mismatches every bit above 9.
+                    featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02d}")
 
             console.print("Collected feature PICS:")
             console.print(featurePicsList)
