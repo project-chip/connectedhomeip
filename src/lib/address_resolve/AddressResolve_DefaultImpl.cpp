@@ -406,9 +406,6 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
 
         Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
 
-        ChipLogError(Discovery, "Operational discovery backend failed for " ChipLogFormatPeerId ": %" CHIP_ERROR_FORMAT,
-                     ChipLogValuePeerId(peerId), error.Format());
-
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
         // contain the active lookup data as a member (intrusive lists members)
