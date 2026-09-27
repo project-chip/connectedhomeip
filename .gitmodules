@@ -300,11 +300,11 @@
 	url = https://github.com/abseil/abseil-cpp.git
 	platforms = linux,darwin
 [submodule "third_party/fuzztest"]
-	path = third_party/fuzztest
+	path = third_party/fuzztest/repo
 	url = https://github.com/google/fuzztest.git
 	platforms = linux,darwin
 [submodule "third_party/googletest"]
-	path = third_party/googletest
+	path = third_party/googletest/repo
 	url = https://github.com/google/googletest
 	platforms = linux,android,darwin,tizen
 [submodule "third_party/libdatachannel/repo"]

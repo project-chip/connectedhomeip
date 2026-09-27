@@ -14,5 +14,5 @@
 
 declare_args() {
   # Location of the GoogleTest repository.
-  dir_googletest = "//third_party/googletest"
+  dir_googletest = "//third_party/googletest/repo"
 }
