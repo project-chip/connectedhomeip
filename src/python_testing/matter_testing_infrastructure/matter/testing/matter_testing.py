@@ -1495,11 +1495,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         # - 0.5s when there is no evidence: the call is expected to fail regardless of
         #   the wait, so the short deadline just keeps that failure cheap.
         commissioning_configured = self.matter_test_config.commissioning_method is not None
-        dut_evidence = commissioning_configured or self._dut_confirmed_available
+        if commissioning_configured and not self._dut_confirmed_available:
+            # A configured commissioning method means this test is expected to commission
+            # the DUT. Before that happens, probing the configured/default node ID starts an
+            # operational DNS-SD lookup for a node that is not on this fabric yet. The Python
+            # GetConnectedDevice deadline can expire before the native resolver is cancelled,
+            # leaving a later, misleading AddressResolve timeout in the test log.
+            LOGGER.info("[CLN] Commissioning is configured but no DUT has been confirmed on this fabric; "
+                        "skipping pre-test ACL/fabric baseline capture")
+            return
+
+        dut_evidence = self._dut_confirmed_available
         case_timeout_ms = 5000 if dut_evidence else 500
 
-        evidence = "" if not dut_evidence else (", commissioning was configured" if commissioning_configured
-                                                else ", commissioned by framework during this run")
+        evidence = ", commissioned by framework during this run" if dut_evidence else ""
         LOGGER.info("[CLN] DUT evidence found: %s%s. CASE timeout set to %dms",
                     dut_evidence, evidence, case_timeout_ms)
 
