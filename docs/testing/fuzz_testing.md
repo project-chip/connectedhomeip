@@ -122,8 +122,8 @@ for an example of a simple fuzz test.
 ## `Google's FuzzTest`
 
 -   Google FuzzTest is integrated through Pigweed
-    [pw_fuzzer](https://pigweed.dev/pw_fuzzer/concepts.html); the GN build
-    of FuzzTest itself lives in `third_party/fuzztest/`.
+    [pw_fuzzer](https://pigweed.dev/pw_fuzzer/concepts.html); the GN build of
+    FuzzTest itself lives in `third_party/fuzztest/`.
 
 ### Use cases
 
@@ -375,12 +375,11 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
     (`third_party/fuzztest/repo` and `third_party/abseil-cpp/src`).
 -   Since FuzzTest and Abseil only support the `bazel` and `CMake` build systems
     and do not support GN, their GN files are generated from the Bazel build
-    with Pigweed's `bazel_to_gn.py`. Pigweed no longer ships these GN files,
-    so Matter keeps them in `third_party/fuzztest/` and
-    `third_party/abseil-cpp/`.
+    with Pigweed's `bazel_to_gn.py`. Pigweed no longer ships these GN files, so
+    Matter keeps them in `third_party/fuzztest/` and `third_party/abseil-cpp/`.
 -   The GN files list source files explicitly, so they only work with the
-    FuzzTest and Abseil revisions they were generated for. Bump both
-    submodules together with a regeneration of the GN files.
+    FuzzTest and Abseil revisions they were generated for. Bump both submodules
+    together with a regeneration of the GN files.
 
 #### TO ADD:
 
