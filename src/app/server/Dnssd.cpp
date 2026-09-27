@@ -26,10 +26,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceConfig.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <lib/support/ThreadOperationalDataset.h>
-#include <platform/ThreadStackManager.h>
-#endif
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
@@ -57,47 +53,12 @@ namespace app {
 namespace {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-void LogThreadOperationalAdvertisingContext()
+void LogThreadOperationalAdvertisingState()
 {
     const bool provisioned = ConnectivityMgr().IsThreadProvisioned();
     const bool attached    = ConnectivityMgr().IsThreadAttached();
 
     ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d", provisioned, attached);
-
-    if (!provisioned)
-    {
-        return;
-    }
-
-    Thread::OperationalDataset dataset;
-    CHIP_ERROR err = ThreadStackMgr().GetThreadProvision(dataset);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Unable to read active Thread dataset context: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
-    char networkName[Thread::kSizeNetworkName + 1] = {};
-    uint16_t channel                               = 0;
-    uint16_t panId                                 = 0;
-    uint64_t extendedPanId                         = 0;
-
-    CHIP_ERROR nameErr    = dataset.GetNetworkName(networkName);
-    CHIP_ERROR channelErr = dataset.GetChannel(channel);
-    CHIP_ERROR panErr     = dataset.GetPanId(panId);
-    CHIP_ERROR extPanErr  = dataset.GetExtendedPanId(extendedPanId);
-
-    if (nameErr == CHIP_NO_ERROR && channelErr == CHIP_NO_ERROR && panErr == CHIP_NO_ERROR && extPanErr == CHIP_NO_ERROR)
-    {
-        ChipLogError(
-            Discovery,
-            "Thread network at operational advertising failure: name=%s channel=%u panid=0x%04x extpanid=0x" ChipLogFormatX64,
-            networkName, static_cast<unsigned>(channel), static_cast<unsigned>(panId), ChipLogValueX64(extendedPanId));
-    }
-    else
-    {
-        ChipLogError(Discovery, "Active Thread dataset was available, but non-secret identity fields could not all be decoded");
-    }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
@@ -295,7 +256,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-            LogThreadOperationalAdvertisingContext();
+            LogThreadOperationalAdvertisingState();
 #endif
             return err;
         }
