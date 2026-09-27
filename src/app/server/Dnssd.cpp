@@ -24,12 +24,12 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/ThreadStackManager.h>
 #endif
-#include <messaging/ReliableMessageProtocolConfig.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
