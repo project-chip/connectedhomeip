@@ -1435,7 +1435,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries))
+        // This method can be called while a previous removal of the same service is still in
+        // progress, that is, already requested from OpenThread but not yet acknowledged by the
+        // SRP server. Such an entry remains in the array and matches, yet OpenThread will go on
+        // to unregister the service, so reporting success here would leave the device
+        // unadvertised with nothing to retry. Fall through instead and register it from scratch.
+        if (service.Matches(aInstanceName, aName, aPort, aSubTypes, aTxtEntries) && !service.IsPendingRemoval())
         {
             // Re-adding existing service without any changes
             service.mIsInvalid = false;
