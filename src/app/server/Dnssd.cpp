@@ -62,8 +62,7 @@ void LogThreadOperationalAdvertisingContext()
     const bool provisioned = ConnectivityMgr().IsThreadProvisioned();
     const bool attached    = ConnectivityMgr().IsThreadAttached();
 
-    ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d",
-                 provisioned, attached);
+    ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d", provisioned, attached);
 
     if (!provisioned)
     {
@@ -90,16 +89,14 @@ void LogThreadOperationalAdvertisingContext()
 
     if (nameErr == CHIP_NO_ERROR && channelErr == CHIP_NO_ERROR && panErr == CHIP_NO_ERROR && extPanErr == CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery,
-                     "Thread network at operational advertising failure: name=%s channel=%u panid=0x%04x extpanid=0x"
-                     ChipLogFormatX64,
-                     networkName, static_cast<unsigned>(channel), static_cast<unsigned>(panId),
-                     ChipLogValueX64(extendedPanId));
+        ChipLogError(
+            Discovery,
+            "Thread network at operational advertising failure: name=%s channel=%u panid=0x%04x extpanid=0x" ChipLogFormatX64,
+            networkName, static_cast<unsigned>(channel), static_cast<unsigned>(panId), ChipLogValueX64(extendedPanId));
     }
     else
     {
-        ChipLogError(Discovery,
-                     "Active Thread dataset was available, but non-secret identity fields could not all be decoded");
+        ChipLogError(Discovery, "Active Thread dataset was available, but non-secret identity fields could not all be decoded");
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
