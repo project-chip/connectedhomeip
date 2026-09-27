@@ -121,9 +121,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     // Give up if the maximum search time has been reached
     if (elapsed >= mRequest.GetMaxLookupTime())
     {
-        ChipLogError(Discovery,
-                     "Operational discovery timed out for " ChipLogFormatPeerId
-                     " after %lu ms with no usable address",
+        ChipLogError(Discovery, "Operational discovery timed out for " ChipLogFormatPeerId " after %lu ms with no usable address",
                      ChipLogValuePeerId(mRequest.GetPeerId()), static_cast<unsigned long>(elapsed.count()));
         return NodeLookupAction::Error(CHIP_ERROR_TIMEOUT);
     }
