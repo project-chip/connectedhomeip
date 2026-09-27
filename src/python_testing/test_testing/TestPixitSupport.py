@@ -25,6 +25,7 @@ matter_testing_infrastructure/matter/testing/test_pixit.py.
 """
 
 import unittest
+from unittest import mock
 
 from mobly import signals
 
@@ -140,6 +141,29 @@ class TestMatterBaseTestSetupValidation(unittest.TestCase):
         self.assertIn("PIXIT parameter type error", msg)
         self.assertIn("smoke_timeout", msg)
         self.assertNotIn("AccessControl", msg)
+
+
+class TestMatterBaseTestBaselineCapture(unittest.TestCase):
+    """Regression coverage for pre-test DUT baseline probing."""
+
+    def test_configured_commissioning_skips_unconfirmed_default_node_lookup(self):
+        """Do not start CASE discovery before a configured commissioning flow runs."""
+        class _CommissioningTest(MatterBaseTest):
+            pass
+
+        instance = _CommissioningTest.__new__(_CommissioningTest)
+        instance.is_commissioning = False
+        instance._original_acl = None
+        instance._original_fabrics = None
+        instance._dut_confirmed_available = False
+        instance.event_loop = mock.Mock()
+
+        config = MatterTestConfig(commissioning_method="ble-thread", dut_node_ids=[0x12344321])
+        instance.user_params = {"matter_test_config": global_stash.stash_globally(config)}
+
+        instance._capture_dut_baseline()
+
+        instance.event_loop.run_until_complete.assert_not_called()
 
 
 if __name__ == "__main__":
