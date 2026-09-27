@@ -440,9 +440,16 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             featureMapBitString = f"{featureMapValue:08b}".lstrip("0")
             for bitLocation in range(len(featureMapBitString)):
                 if featureMapValue >> bitLocation & 1 == 1:
-                    # PICS feature codes number the bit in decimal (F00..F31), so a
-                    # hex conversion here silently mismatches every bit above 9.
-                    featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02d}")
+                    # PICS Guidelines spell the feature bit in hex, "in range
+                    # [0x00..0x1f]", e.g. DRLK.S.F0b for bit 11. Not every test
+                    # plan follows that: ESALM, EPALM, RVCRUNM and BRBINFO all
+                    # number theirs in decimal, so the published PICS templates
+                    # carry both spellings. Offer both and let the template
+                    # decide; an item number no template defines matches nothing
+                    # and is ignored.
+                    featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02x}")
+                    if bitLocation > 9:
+                        featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02d}")
 
             console.print("Collected feature PICS:")
             console.print(featurePicsList)
