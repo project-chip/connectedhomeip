@@ -54,11 +54,15 @@
 #ifndef CHIP_SYSTEM_CONFIG_TYPED_MALLOC
 #if defined(__APPLE__) && defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED
 #define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 1
-#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos) _MALLOC_TYPED(override, type_param_pos)
 #else
 #define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 0
-#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos)
 #endif
+#endif
+
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos) _MALLOC_TYPED(override, type_param_pos)
+#else
+#define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos)
 #endif
 
 // Macros to turn off warnings for typed malloc wrappers. These can be enabled
