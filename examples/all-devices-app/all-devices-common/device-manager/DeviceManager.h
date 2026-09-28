@@ -17,14 +17,11 @@
 
 #pragma once
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CodeUtils.h>
+#include <device/api/Interface.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <algorithm>
-#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>

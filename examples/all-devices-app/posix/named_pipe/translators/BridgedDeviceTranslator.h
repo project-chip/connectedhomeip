@@ -22,9 +22,9 @@ namespace chip::app::NamedPipe {
 
 /**
  * Named pipe usage (json):
+ * AddBridgedDevice:
  * {
- *    "Name": String
- *        Must be "AddBridgedDevice"
+ *    "Name": "AddBridgedDevice"
  *    "EndpointId" | "ParentEndpointId": EndpointId (uint16_t)
  *        Optional. An endpoint id of an existing device.
  *        If the device is `Bridged Node`, the new device will be added as a child of that device.
@@ -42,15 +42,25 @@ namespace chip::app::NamedPipe {
  * types.
  * }
  *
- * Example: echo '{"Name": "AddBridgedDevice", "ParentEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
+ * RemoveBridgedDevice:
+ * {
+ *    "Name": String
+ *        Must be "RemoveBridgedDevice"
+ *    "EndpointId" : EndpointId (uint16_t)
+ *        The endpointId of the bridged device to be removed. Must be a `Bridged Node` or a descendant of one.
+ * }
+ *
+ * Examples:
+ *  echo '{"Name": "AddBridgedDevice", "ParentEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
+ *  echo '{"Name": "RemoveBridgedDevice", "EndpointId": 5}'> /tmp/acs_fifo
  */
 
-class AddBridgedDeviceTranslator : public CommandTranslator
+class BridgedDeviceTranslator : public CommandTranslator
 {
 public:
     static Span<const CharSpan> GetActionNames()
     {
-        static constexpr CharSpan kNames[] = { "AddBridgedDevice"_span };
+        static constexpr CharSpan kNames[] = { "AddBridgedDevice"_span, "RemoveBridgedDevice"_span };
         return Span<const CharSpan>(kNames);
     }
 

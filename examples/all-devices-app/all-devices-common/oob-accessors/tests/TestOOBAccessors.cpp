@@ -24,6 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <device-manager/DeviceManager.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
@@ -36,6 +37,8 @@
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
+#include <oob-accessors/device-manager/AddBridgedDeviceOOBAccessor.h>
+#include <oob-accessors/device-manager/RemoveBridgedDeviceOOBAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -697,10 +700,12 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
 struct MockDeviceInterface : public DeviceInterface
 {
 public:
+    MockDeviceInterface() : DeviceInterface({}) {}
     EndpointId GetEndpointId() const override
     {
         return endpointId;
     }
+
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                 EndpointComposition comp = {}) override
     {
@@ -721,7 +726,7 @@ public:
 
     EndpointId endpointId = kInvalidEndpointId;
     EndpointComposition composition = {};
-}
+};
 
 class MockDeviceFactory
 {
@@ -736,7 +741,7 @@ public:
     {
         if (deviceTypeArg == "fail-device-type")
         {
-            return DeviceRegistrationEntry{ nullptr, nullptr, "", "" };
+            return DeviceRegistrationEntry{ nullptr, nullptr };
         }
         return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(), nullptr};
     }
@@ -745,6 +750,7 @@ public:
 class MockEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
+    MockEndpointIdAllocator(EndpointId testStart = 1) : mNext(testStart), mAllocated(testStart) {}
     EndpointId Allocate() override
     {
         return mNext++;
@@ -777,19 +783,19 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
     // Parent is not an aggregator or bridged-node
     {
         CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
-        provider.Startup(mClusterContext.ImContext());
+        EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
         DeviceManager deviceManager(deviceFactory, provider);
         deviceManager.SetEndpointIdAllocator(allocator);
 
         InMemoryOOBAccessorRegistry registry;
-        registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager));
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
         writer.Init(buffer);
         TLV::TLVType outer;
+        // skip encoding a endpoint id at tag 1 so that by default the parent will be chosen to be the root endpoint id.
         EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kInvalidEndpointId), CHIP_NO_ERROR);
         EXPECT_EQ(writer.PutString(TLV::ContextTag(2), "test-device-type"), CHIP_NO_ERROR);
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
@@ -800,23 +806,23 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EndpointId aggregatorEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(aggregatorEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->name, "aggregator");
-        EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->bridged, false);
+        EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->isBridged, false);
 
         EndpointId bridgedNodeEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->name, "bridged-node");
-        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->isBridged, true);
 
         EndpointId testDeviceEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(testDeviceEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->name, "test-device-type");
-        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->isBridged, true);
     }
 
     // Parent is an aggregator
     {
         CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
-        provider.Startup(mClusterContext.ImContext());
+        EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
         DeviceManager deviceManager(deviceFactory, provider);
         deviceManager.SetEndpointIdAllocator(allocator);
 
@@ -826,10 +832,10 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EndpointId aggregatorEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(aggregatorEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->name, "aggregator");
-        EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->bridged, false);
+        EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->isBridged, false);
 
         InMemoryOOBAccessorRegistry registry;
-        registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager));
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -848,18 +854,18 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EndpointId bridgedNodeEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->name, "bridged-node");
-        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->isBridged, true);
 
         EndpointId testDeviceEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(testDeviceEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->name, "test-device-type");
-        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->isBridged, true);
     }
 
     // Parent is a bridged-node
     {
         CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
-        provider.Startup(mClusterContext.ImContext());
+        EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
         DeviceManager deviceManager(deviceFactory, provider);
         deviceManager.SetEndpointIdAllocator(allocator);
 
@@ -869,10 +875,10 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EndpointId bridgedNodeEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->name, "bridged-node");
-        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->isBridged, true);
 
         InMemoryOOBAccessorRegistry registry;
-        registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager));
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -891,18 +897,18 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EndpointId testDeviceEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(testDeviceEndpoint).has_value());
         EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->name, "test-device-type");
-        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->bridged, true);
+        EXPECT_EQ(deviceManager.GetDevice(testDeviceEndpoint)->isBridged, true);
     }
 
     // Device creation failed
     {
         CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
-        provider.Startup(mClusterContext.ImContext());
+        EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
         DeviceManager deviceManager(deviceFactory, provider);
         deviceManager.SetEndpointIdAllocator(allocator);
 
         InMemoryOOBAccessorRegistry registry;
-        registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager));
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -910,7 +916,6 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         TLV::TLVType outer;
         EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
         // specify the bridged-node endpoint as the parent
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kInvalidEndpointId), CHIP_NO_ERROR);
         EXPECT_EQ(writer.PutString(TLV::ContextTag(2), "fail-device-type"), CHIP_NO_ERROR);
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
@@ -926,12 +931,12 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     MockDeviceFactory deviceFactory;
 
     CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
-    provider.Startup(mClusterContext.ImContext());
+    EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
     DeviceManager deviceManager(deviceFactory, provider);
     deviceManager.SetEndpointIdAllocator(allocator);
 
     InMemoryOOBAccessorRegistry registry;
-    registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(deviceManager));
+    EXPECT_EQ(registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
 
     // Add a bridged-node device
     auto bridgedNodeDevice = deviceManager.AddDevice("bridged-node");
@@ -939,7 +944,7 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     EndpointId bridgedNodeEndpoint = allocator.NextAllocatedEndpoint();
     EXPECT_TRUE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
     EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->name, "bridged-node");
-    EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->bridged, true);
+    EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->isBridged, true);
 
     // Remove the bridged-node device
     uint8_t buffer[64];

@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <app_options/DeviceTypeParser.h>
-#include <device-factory/DeviceManager.h>
-#include <device/api/allocator/DynamicEndpointIdAllocator.h>
+#include <device-manager/DeviceManager.h>
 #include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
@@ -95,20 +93,20 @@ public:
         ReturnErrorOnFailure(reader.ExitContainer(outerType));
         VerifyOrReturnError(hasDeviceType, CHIP_ERROR_INVALID_ARGUMENT);
 
-        auto VerifyDeviceWasAddedSuccessfully = [](const auto & device, const char * deviceType,
-                                                   EndpointId parentEndpointId = kInvalidEndpointId) -> CHIP_ERROR {
+        auto VerifyDeviceWasAddedSuccessfully = [](const auto & device, const char * deviceTypeName,
+                                                   EndpointId parentId = kInvalidEndpointId) -> CHIP_ERROR {
             if (!device.has_value())
             {
-                ChipLogError(AppServer, "Failed to add device %s", deviceType);
+                ChipLogError(AppServer, "Failed to add device %s", deviceTypeName);
                 return CHIP_ERROR_INCORRECT_STATE;
             }
             if (device->device.GetEndpointId() == kInvalidEndpointId)
             {
-                ChipLogError(AppServer, "Possibly failed to register the device %s", deviceType);
+                ChipLogError(AppServer, "Possibly failed to register the device %s", deviceTypeName);
                 return CHIP_ERROR_INCORRECT_STATE;
             }
-            ChipLogProgress(AppServer, "Device %s added successfully, endpoint: 0x%04X, parent: 0x%04X", deviceType,
-                            device->device.GetEndpointId(), parentEndpointId);
+            ChipLogProgress(AppServer, "Device %s added successfully, endpoint: 0x%04X, parent: 0x%04X", deviceTypeName,
+                            device->device.GetEndpointId(), parentId);
             return CHIP_NO_ERROR;
         };
 

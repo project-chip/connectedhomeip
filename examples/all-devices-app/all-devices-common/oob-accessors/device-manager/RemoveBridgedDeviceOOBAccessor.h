@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <device-factory/DeviceManager.h>
+#include <device-manager/DeviceManager.h>
 #include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>

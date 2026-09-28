@@ -43,7 +43,7 @@
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
 #include <device-factory/DeviceFactory.h>
-#include <device-factory/DeviceManager.h>
+#include <device-manager/DeviceManager.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <oob-accessors/OOBAccessorHook.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
