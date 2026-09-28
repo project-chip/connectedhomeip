@@ -1004,14 +1004,29 @@ TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
 }
 
 // Records the notifications a loop start sends: the loop supersedes a running transition, so its own start
-// notification is the replacement and no OnTransitionStopped is expected.
+// notification is the replacement and no OnTransitionStopped is expected. Also tracks what hardware rotating
+// the hue itself would do: a false hue frame is an instruction to stop moving, so it must not arrive while the
+// loop runs.
 struct LoopStartDelegate : public ColorControlDelegate
 {
     void OnTransitionStopped() override { transitionStopped++; }
-    void OnColorLoopStarted(uint16_t, uint16_t, bool) override { loopStarted++; }
+    void OnColorLoopStarted(uint16_t, uint16_t, bool) override
+    {
+        loopStarted++;
+        hardwareLoopRunning = true;
+    }
+    void OnColorLoopStopped() override { hardwareLoopRunning = false; }
+    void OnEnhancedHueChanged(uint16_t, bool transitionActive) override
+    {
+        if (!transitionActive)
+        {
+            hardwareLoopRunning = false;
+        }
+    }
 
-    int transitionStopped = 0;
-    int loopStarted       = 0;
+    int transitionStopped    = 0;
+    int loopStarted          = 0;
+    bool hardwareLoopRunning = false;
 };
 
 ColorControlCluster::Config LoopWithXyCtConfig(ColorControlDelegate & delegate, TimerDelegateMock & timer)
@@ -1055,6 +1070,7 @@ TEST_F(TestColorControlCommands, ColorLoopStartReplacesXYTransition)
     EXPECT_EQ(c.ColorLoopActive(), 1);
     EXPECT_EQ(loopDelegate.loopStarted, 1);
     EXPECT_EQ(loopDelegate.transitionStopped, 0);
+    EXPECT_TRUE(loopDelegate.hardwareLoopRunning);
 }
 
 TEST_F(TestColorControlCommands, ColorLoopStartReplacesCTTransition)
@@ -1076,6 +1092,7 @@ TEST_F(TestColorControlCommands, ColorLoopStartReplacesCTTransition)
     EXPECT_EQ(c.ColorLoopActive(), 1);
     EXPECT_EQ(loopDelegate.loopStarted, 1);
     EXPECT_EQ(loopDelegate.transitionStopped, 0);
+    EXPECT_TRUE(loopDelegate.hardwareLoopRunning);
 }
 
 // Saturation is independent of the hue axis the loop takes over (§3.2.5.2), so its transition keeps running.
@@ -1093,11 +1110,13 @@ TEST_F(TestColorControlCommands, ColorLoopStartKeepsSaturationTransition)
     const uint16_t hueAtStart = c.EnhancedHue();
     Tick(1000);
     EXPECT_NE(c.EnhancedHue(), hueAtStart);
+    EXPECT_TRUE(loopDelegate.hardwareLoopRunning);
 
     Tick(20000);
     EXPECT_EQ(c.Saturation(), 200);
     EXPECT_EQ(c.ColorLoopActive(), 1);
     EXPECT_EQ(loopDelegate.transitionStopped, 0);
+    EXPECT_TRUE(loopDelegate.hardwareLoopRunning);
 }
 
 } // namespace
