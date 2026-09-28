@@ -326,7 +326,18 @@ private:
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
                 AirQualitySensor::Config config;
-                config.WithTemperature().WithRelativeHumidity().WithAllConcentrationClusters();
+                config.WithTemperature()
+                    .WithRelativeHumidity()
+                    .WithCarbonDioxide()
+                    .WithPm25()
+                    .WithTotalVolatileOrganicCompounds()
+                    .WithCarbonMonoxide()
+                    .WithNitrogenDioxide()
+                    .WithOzone()
+                    .WithFormaldehyde()
+                    .WithPm1()
+                    .WithPm10()
+                    .WithRadon();
                 return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
             });
         }

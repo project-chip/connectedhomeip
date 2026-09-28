@@ -89,7 +89,6 @@ public:
         Config & WithRadon(float min = 0.0f, float max = 10000.0f);
 
         Config & WithConcentration(const ConcentrationCluster::Config & customConfig);
-        Config & WithAllConcentrationClusters();
     };
 
     AirQualitySensor(TimerDelegate & timerDelegate, const Config & config);

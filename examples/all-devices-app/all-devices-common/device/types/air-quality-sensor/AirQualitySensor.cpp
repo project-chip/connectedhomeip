@@ -163,21 +163,6 @@ AirQualitySensor::Config & AirQualitySensor::Config::WithRadon(float min, float 
     return WithConcentration(MakeGasConfig(RadonConcentrationMeasurement::Id, MeasurementUnitEnum::kBqm3, min, max));
 }
 
-AirQualitySensor::Config & AirQualitySensor::Config::WithAllConcentrationClusters()
-{
-    WithCarbonDioxide();
-    WithPm25();
-    WithTotalVolatileOrganicCompounds();
-    WithCarbonMonoxide();
-    WithNitrogenDioxide();
-    WithOzone();
-    WithFormaldehyde();
-    WithPm1();
-    WithPm10();
-    WithRadon();
-    return *this;
-}
-
 AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
     mConfig(config)
