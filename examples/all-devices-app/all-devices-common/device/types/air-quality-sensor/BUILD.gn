@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 source_set("air-quality-sensor") {
   sources = [
+    "AirQualityOptionalClusters.h",
     "AirQualitySensor.cpp",
     "AirQualitySensor.h",
     "impl/SimulatedAirQualitySensor.cpp",
