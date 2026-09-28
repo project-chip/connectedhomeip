@@ -159,8 +159,8 @@ public:
      */
     AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {},
                      std::optional<EndpointComposition::SemanticTag> tag = std::nullopt) :
-        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
-        mConfig(config), mTag(tag)
+        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)),
+        mTimerDelegate(timerDelegate), mConfig(config), mTag(tag)
     {}
 
     ~AirQualitySensor() override = default;
