@@ -18,8 +18,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-
 #include <array>
 
 #include <app/clusters/icd-management-server/ICDManagementCluster.h>
@@ -70,5 +68,3 @@ private:
 
 } // namespace app
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER

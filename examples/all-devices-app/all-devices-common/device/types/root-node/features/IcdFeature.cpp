@@ -16,8 +16,6 @@
  */
 #include <device/types/root-node/features/IcdFeature.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-
 #include <app/icd/server/ICDConfigurationData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -60,5 +58,3 @@ void IcdFeature::UnregisterFeatureClusters(CodeDrivenDataModelProvider & provide
 
 } // namespace app
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER

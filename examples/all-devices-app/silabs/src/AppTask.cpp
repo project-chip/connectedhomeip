@@ -60,12 +60,12 @@
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <device/types/root-node/features/IcdFeature.h>
+#include <device/types/root-node/features/IcdFeature.h> // nogncheck
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <device/types/root-node/features/ThreadFeature.h>
-#include <platform/NetworkCommissioning.h>
+#include <device/types/root-node/features/ThreadFeature.h> // nogncheck
+#include <platform/NetworkCommissioning.h> // nogncheck
 #endif
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -102,11 +102,12 @@ std::unique_ptr<chip::app::DeviceInterface> sRootNode;
 // container itself and enforces the bound at compile time, which is important
 // on RAM-constrained embedded platforms.
 //
+constexpr std::size_t kMaxConstructedDevices = 
+    ((ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-constexpr std::size_t kMaxConstructedDevices = (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT + 1 : 2;
-#else
-constexpr std::size_t kMaxConstructedDevices = (ALL_DEVICES_DEFAULT_DEVICES_COUNT > 0) ? ALL_DEVICES_DEFAULT_DEVICES_COUNT : 1;
+  + 1
 #endif
+
 std::array<std::unique_ptr<chip::app::DeviceInterface>, kMaxConstructedDevices> sConstructedDevices;
 std::size_t sConstructedDeviceCount = 0;
 
