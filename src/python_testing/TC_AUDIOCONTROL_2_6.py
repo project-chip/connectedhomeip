@@ -17,12 +17,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${TV_APP}
+#     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 2
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -38,13 +38,13 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AUDIOCONTROL_2_6(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_6(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     # This test reboots the DUT three times (steps 5, 10, 16). Disable the background
     # wildcard subscription so reads after each reboot are not cross-checked against a

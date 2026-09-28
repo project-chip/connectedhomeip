@@ -109,10 +109,64 @@ else()
     set(TELINK_HAL_LOCAL_STATUS "")
 endif()
 
+# OpenThread info
+if(CONFIG_OPENTHREAD_TELINK_LIBRARY)
+  set(OPENTHREAD_PATH "${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib")
+else()
+  set(OPENTHREAD_PATH "${ZEPHYR_BASE}/../modules/lib/openthread")
+endif()
+
+execute_process(
+    COMMAND git -C ${OPENTHREAD_PATH} rev-parse HEAD
+    OUTPUT_VARIABLE OT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+execute_process(
+    COMMAND git -C ${OPENTHREAD_PATH} rev-parse --abbrev-ref HEAD
+    OUTPUT_VARIABLE OT_BRANCH_NAME
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+execute_process(
+    COMMAND git -C ${OPENTHREAD_PATH} show -s --format=%cd --date=format:%Y-%m-%d HEAD
+    OUTPUT_VARIABLE OT_COMMIT_DATE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+execute_process(
+    COMMAND bash -c "git -C ${OPENTHREAD_PATH} remote get-url \$(git -C ${OPENTHREAD_PATH} remote | head -n 1)"
+    OUTPUT_VARIABLE OT_REMOTE_URL
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+execute_process(
+    COMMAND git -C ${OPENTHREAD_PATH} diff --quiet
+    RESULT_VARIABLE OT_LOCAL_STATUS
+    ERROR_QUIET
+)
+
+if(OT_LOCAL_STATUS)
+    set(OT_LOCAL_STATUS "-dirty")
+else()
+    set(OT_LOCAL_STATUS "")
+endif()
+
 execute_process(
     COMMAND git -C ${ZEPHYR_BASE}/../modules/hal/telink show -s --format=%cd --date=format:%Y-%m-%d
     OUTPUT_VARIABLE TELINK_HAL_COMMIT_DATE
     OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND git -C ${OPENTHREAD_PATH} describe --tags --exact-match
+    OUTPUT_VARIABLE OT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
 )
 
 target_compile_definitions(app PRIVATE
@@ -132,6 +186,14 @@ target_compile_definitions(app PRIVATE
   TELINK_HAL_COMMIT_HASH="${TELINK_HAL_COMMIT_HASH}"
   TELINK_HAL_LOCAL_STATUS="${TELINK_HAL_LOCAL_STATUS}"
   TELINK_HAL_COMMIT_DATE="${TELINK_HAL_COMMIT_DATE}"
+
+  OPENTHREAD_PATH="${OPENTHREAD_PATH}"
+  OT_COMMIT_HASH="${OT_COMMIT_HASH}"
+  OT_BRANCH="${OT_BRANCH_NAME}"
+  OT_COMMIT_DATE="${OT_COMMIT_DATE}"
+  OT_REMOTE_URL="${OT_REMOTE_URL}"
+  OT_LOCAL_STATUS="${OT_LOCAL_STATUS}"
+  OT_TAG="${OT_TAG}"
 )
 
 message(STATUS "Matter revision:")
@@ -146,3 +208,11 @@ message(STATUS "      remote: ${ZEPHYR_REMOTE_URL}")
 
 message(STATUS "HAL revision:")
 message(STATUS "      commit: ${TELINK_HAL_COMMIT_HASH} ${TELINK_HAL_COMMIT_DATE}")
+
+message(STATUS "OpenThread revision:")
+message(STATUS "      path: ${OPENTHREAD_PATH}")
+message(STATUS "      branch: ${OT_BRANCH_NAME} ${OT_COMMIT_HASH} ${OT_COMMIT_DATE}")
+if(OT_TAG)
+  message(STATUS "      tag: ${OT_TAG}")
+endif()
+message(STATUS "      remote: ${OT_REMOTE_URL}")

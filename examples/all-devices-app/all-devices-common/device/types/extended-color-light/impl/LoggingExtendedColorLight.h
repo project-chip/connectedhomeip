@@ -18,16 +18,16 @@
 #pragma once
 
 #include <device/capabilities/color-light/impl/LoggingLightDriver.h>
+#include <device/types/extended-color-light/ExtendedColorLight.h>
 
 namespace chip {
 namespace app {
 
 /**
  * Extended Color Light (device type 0x010D) whose output side only logs, so the device can be
- * exercised without anything behind it. See LoggingLightDriver for the delegate implementations;
- * this class only supplies the device type and its Conformance.
+ * exercised without anything behind it.
  */
-class LoggingExtendedColorLight : public LoggingLightDriver
+class LoggingExtendedColorLight : private LoggingLightDriver, public ExtendedColorLight
 {
 public:
     explicit LoggingExtendedColorLight(const Context & context);

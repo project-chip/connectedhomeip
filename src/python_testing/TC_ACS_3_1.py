@@ -51,7 +51,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
 
-class TC_ACS_3_1(MatterBaseTest):
+class TC_ACS_3_1(MatterTestCommissionedDevice):
 
     def pics_TC_ACS_3_1(self):
         return ['ACS.S']
