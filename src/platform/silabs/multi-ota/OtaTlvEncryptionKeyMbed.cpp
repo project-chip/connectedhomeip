@@ -17,8 +17,7 @@
  */
 
 #include "OtaTlvEncryptionKey.h"
-
-#include "mbedtls/aes.h"
+#include "psa/crypto.h"
 
 #include <string.h>
 
@@ -29,8 +28,6 @@ namespace Silabs {
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & block, uint32_t & mIVOffset)
 {
     uint8_t iv[16]           = { AU8IV_INIT_VALUE };
-    uint8_t stream_block[16] = { 0 };
-    size_t nc_off            = 0;
 
     // Set IV based on mIVOffset
     uint32_t counter = ((uint32_t) iv[12] << 24) | ((uint32_t) iv[13] << 16) | ((uint32_t) iv[14] << 8) | (uint32_t) iv[15];
@@ -41,28 +38,70 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & 
     iv[14] = (counter >> 8) & 0xFF;
     iv[15] = counter & 0xFF;
 
-    mbedtls_aes_context aes_ctx;
-    mbedtls_aes_init(&aes_ctx);
+    if (psa_crypto_init() != PSA_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize PSA Crypto");
+        return CHIP_ERROR_INTERNAL;
+    }
+    // Key attributes
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+    psa_set_key_bits(&attributes, key.size() * 8);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+    psa_set_key_algorithm(&attributes, PSA_ALG_CTR);
 
-    if (mbedtls_aes_setkey_enc(&aes_ctx, key.data(), (key.size() * 8)) != 0)
+    // Load key
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    psa_status_t status = psa_import_key(&attributes, key.data(), key.size(), &key_id);
+    if (PSA_SUCCESS != status)
     {
         ChipLogError(DeviceLayer, "Failed to set AES key");
-        mbedtls_aes_free(&aes_ctx);
         return CHIP_ERROR_INTERNAL;
     }
 
-    // Decrypt
-    if (mbedtls_aes_crypt_ctr(&aes_ctx, block.size(), &nc_off, iv, stream_block, block.data(), block.data()) != 0)
+    // Operation
+    psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
+    status = psa_cipher_encrypt_setup(&operation, key_id, PSA_ALG_CTR);
+    if (PSA_SUCCESS != status)
     {
-        ChipLogError(DeviceLayer, "AES-CTR decryption failed");
-        mbedtls_aes_free(&aes_ctx);
+        ChipLogError(DeviceLayer, "Failed to setup AES-CTR operation");
+        psa_destroy_key(key_id);
         return CHIP_ERROR_INTERNAL;
     }
+
+    // IV
+    status = psa_cipher_set_iv(&operation, iv, 16);
+    if (PSA_SUCCESS != status)
+    {
+        ChipLogError(DeviceLayer, "Failed to set AES-CTR IV");
+        psa_cipher_abort(&operation);
+        psa_destroy_key(key_id);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Encrypt
+    size_t output_len = 0;
+    status = psa_cipher_update(&operation, 
+                            block.data(), block.size(), 
+                            block.data(), block.size(), 
+                            &output_len);
+    if (PSA_SUCCESS != status)
+    {
+        ChipLogError(DeviceLayer, "AES-CTR decryption failed");
+        psa_cipher_abort(&operation);
+        psa_destroy_key(key_id);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Finalize
+    size_t final_len = 0;
+    psa_cipher_finish(&operation, block.data() + output_len, block.size() - output_len, &final_len);
+    psa_destroy_key(key_id);    
+
 
     mIVOffset += block.size();
 
     ChipLogProgress(DeviceLayer, "Decryption complete");
-    mbedtls_aes_free(&aes_ctx);
     return CHIP_NO_ERROR;
 }
 } // namespace Silabs
