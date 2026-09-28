@@ -279,6 +279,16 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnabled(bool val)
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
+
+    std::optional<PendingAttach> abortedAttach;
+    if (!val && mPendingAttach.has_value())
+    {
+        ChipLogProgress(DeviceLayer, "Thread disabled while attach pending; aborting graceful detach");
+        DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+        abortedAttach = std::move(mPendingAttach);
+        mPendingAttach.reset();
+    }
+
     otError otErr = OT_ERROR_NONE;
 
     Impl()->LockThreadStack();
@@ -306,6 +316,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
 
 exit:
     Impl()->UnlockThreadStack();
+
+    // Notify only once Thread is actually down. The callback is free to start a new attach, which the teardown above
+    // would otherwise undo.
+    if (abortedAttach.has_value() && abortedAttach->callback != nullptr)
+    {
+        abortedAttach->callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+    }
 
     return MapOpenThreadError(otErr);
 }
@@ -383,9 +400,79 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached()
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_FinishGracefulDetach()
+{
+    // NOTE: This callback is triggered by both the timeout and otThreadDetachGracefully.
+    VerifyOrReturn(mPendingAttach.has_value());
+    DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+    // Take ownership of the pending state and clear it before touching the Thread stack below: SetThreadEnabled(false)
+    // makes OpenThread invoke the detach callback synchronously, which schedules another call to this function. That call
+    // is harmless only as long as mPendingAttach has already been cleared here.
+    PendingAttach pending = std::move(*mPendingAttach);
+    mPendingAttach.reset();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "Graceful detach finished, applying new configuration");
+
+    // Thread must be disabled while the new dataset provision is applied, and then re-enabled to initiate attachment to the
+    // new network.
+    SuccessOrExit(error = Impl()->SetThreadEnabled(false));
+    SuccessOrExit(error = Impl()->SetThreadProvision(pending.dataset.AsByteSpan()));
+
+    if (pending.dataset.IsCommissioned())
+    {
+        SuccessOrExit(error = Impl()->SetThreadEnabled(true));
+        mpConnectCallback = pending.callback;
+    }
+    else if (pending.callback != nullptr)
+    {
+        // Uncommissioned (e.g. provision cleared). Detach & clear succeeded.
+        pending.callback->OnResult(NetworkCommissioning::Status::kSuccess, ""_span, 0);
+    }
+    return;
+
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to apply Thread configuration after detach: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+    if (pending.callback != nullptr)
+    {
+        pending.callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnGracefulDetachTimeout(System::Layer * aLayer, void * aAppState)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(aAppState);
+    ChipLogProgress(DeviceLayer, "Graceful detach timed out, forcing transition");
+    self->_FinishGracefulDetach();
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
     const Thread::OperationalDataset & dataset, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
+    // Handle this before comparing against the current provision: while an attach is pending the provision still holds the old
+    // dataset, so a request to attach to that dataset would look like a no-op and leave the pending one to be applied instead.
+    if (mPendingAttach.has_value())
+    {
+        // The detach already in flight is only a goodbye to the current parent; it is independent of the network we attach to
+        // next. Leave it running and retarget it, so the most recent request always wins. This keeps Fail-Safe reverts and
+        // disconnects from being rejected while a ConnectNetwork is pending; the reverse is equally safe, because the revert
+        // target is held by the driver in mStagingNetwork and re-backed-up by AddOrUpdateNetwork, not by this pending state.
+        ChipLogProgress(DeviceLayer, "Retargeting pending attach to the new dataset");
+        auto * stale             = mPendingAttach->callback;
+        mPendingAttach->dataset  = dataset;
+        mPendingAttach->callback = callback;
+        if (stale != nullptr && stale != callback)
+        {
+            stale->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+        }
+        return CHIP_NO_ERROR;
+    }
+
     Thread::OperationalDataset current_dataset;
     // Validate the dataset change with the current state
     TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(current_dataset);
@@ -394,8 +481,47 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         return CHIP_NO_ERROR;
     }
 
-    // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
+    // A new operation starts here, so any result still queued for the previous one by _OnThreadAttachFinished() is void.
+    // Keep this above the branch below: it is what guarantees mpConnectCallback stays null for the whole graceful-detach
+    // window, so _FinishGracefulDetach() only ever has to set it, never clear it.
     mpConnectCallback = nullptr;
+
+    if (Impl()->IsThreadAttached())
+    {
+        // Send a detach request to the current parent before switching networks, this ensures we can reattach if fallback timer
+        // triggers.
+        ChipLogProgress(DeviceLayer, "Detaching gracefully before switching networks");
+        mPendingAttach.emplace(PendingAttach{ dataset, callback });
+
+        CHIP_ERROR timerErr = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kGracefulDetachTimeoutMs),
+                                                                    _OnGracefulDetachTimeout, this);
+        if (timerErr != CHIP_NO_ERROR)
+        {
+            mPendingAttach.reset();
+            return timerErr;
+        }
+
+        Impl()->LockThreadStack();
+        otError otErr = otThreadDetachGracefully(
+            mOTInst,
+            [](void * context) {
+                auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(context);
+                if (DeviceLayer::SystemLayer().ScheduleLambda([self]() { self->_FinishGracefulDetach(); }) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Failed to schedule graceful detach finish; relying on timeout");
+                }
+            },
+            this);
+        Impl()->UnlockThreadStack();
+
+        if (otErr != OT_ERROR_NONE)
+        {
+            DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+            mPendingAttach.reset();
+            return MapOpenThreadError(otErr);
+        }
+        return CHIP_NO_ERROR;
+    }
 
 #if defined(CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH) && CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
     if (callback == nullptr && dataset.IsCommissioned() && current_dataset.IsCommissioned() &&
@@ -878,6 +1004,16 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
 {
     VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
+
+    std::optional<PendingAttach> abortedAttach;
+    if (mPendingAttach.has_value())
+    {
+        ChipLogProgress(DeviceLayer, "Erasing persistent info while attach pending; aborting graceful detach");
+        DeviceLayer::SystemLayer().CancelTimer(_OnGracefulDetachTimeout, this);
+        abortedAttach = std::move(mPendingAttach);
+        mPendingAttach.reset();
+    }
+
     Impl()->LockThreadStack();
     std::ignore = otThreadSetEnabled(mOTInst, false);
     std::ignore = otIp6SetEnabled(mOTInst, false);
@@ -889,6 +1025,13 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     }
 
     Impl()->UnlockThreadStack();
+
+    // Notify only once the erase has completed. The callback is free to start a new attach, which the erase above would
+    // otherwise wipe.
+    if (abortedAttach.has_value() && abortedAttach->callback != nullptr)
+    {
+        abortedAttach->callback->OnResult(NetworkCommissioning::Status::kUnknownError, ""_span, 0);
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
