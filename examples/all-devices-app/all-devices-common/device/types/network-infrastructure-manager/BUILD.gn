@@ -41,7 +41,5 @@ source_set("simulated") {
     "impl/SimulatedNetworkInfrastructureManager.h",
   ]
 
-  public_deps = [
-    ":network-infrastructure-manager",
-  ]
+  public_deps = [ ":network-infrastructure-manager" ]
 }
