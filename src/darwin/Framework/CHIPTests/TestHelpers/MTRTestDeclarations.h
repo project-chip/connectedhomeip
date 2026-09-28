@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceController (Test)
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
+- (void)invalidateCASESessionForNode:(NSNumber *)nodeID;
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
