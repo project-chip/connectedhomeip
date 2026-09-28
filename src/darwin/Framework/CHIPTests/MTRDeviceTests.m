@@ -6239,11 +6239,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type expectSubscriptionEstablished = ^(NSString * description) {
         XCTestExpectation * expectation = [self expectationWithDescription:description];
         weakDelegate.onInternalStateChanged = ^{
-            MTRInternalDeviceState state = [device _getInternalState];
-            if (state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished) {
-                weakDelegate.onInternalStateChanged = nil;
-                [expectation fulfill];
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                MTRInternalDeviceState state = [device _getInternalState];
+                if (state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished) {
+                    weakDelegate.onInternalStateChanged = nil;
+                    [expectation fulfill];
+                }
+            });
         };
         return expectation;
     };
