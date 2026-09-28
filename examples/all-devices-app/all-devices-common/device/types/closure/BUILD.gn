@@ -34,8 +34,8 @@ source_set("closure") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingClosure.cpp",
-    "impl/LoggingClosure.h",
+    "impl/SimulatedClosure.cpp",
+    "impl/SimulatedClosure.h",
     "impl/ThreePanelDoorClosure.cpp",
   ]
 

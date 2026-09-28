@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingClosure.h"
+#include "SimulatedClosure.h"
 
 namespace {
 
@@ -46,25 +46,24 @@ MapToCurrentPosition(chip::app::Clusters::ClosureControl::TargetPositionEnum tar
 namespace chip {
 namespace app {
 
-LoggingClosure::LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
-                               Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
-                               TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(config.closure, Tdelegate, Idelegate, *this),
-    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(config.panels)),
-    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+SimulatedClosure::SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
+                                   Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
+                                   TestEventTriggerDelegate & testEventTriggerDelegate) :
+    Closure(config.closure, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
+    mPanelList(std::move(config.panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
-LoggingClosure::~LoggingClosure()
+SimulatedClosure::~SimulatedClosure()
 {
     CancelTimer();
 }
 
-Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
+Protocols::InteractionModel::Status SimulatedClosure::HandleStopCommand()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::HandleStopCommand()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleStopCommand()");
     CancelTimer();
     mPendingCurrentState.reset();
-    for (auto & panel : mLoggingClosurePanel)
+    for (auto & panel : mSimulatedClosurePanel)
     {
         panel->CancelTimer();
     }
@@ -72,10 +71,10 @@ Protocols::InteractionModel::Status LoggingClosure::HandleStopCommand()
 }
 
 Protocols::InteractionModel::Status
-LoggingClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::TargetPositionEnum> & position,
-                                    const Optional<bool> & latch, const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed)
+SimulatedClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::TargetPositionEnum> & position,
+                                      const Optional<bool> & latch, const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::HandleMoveToCommand() -> position=%u latch=%d speed=%u",
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleMoveToCommand() -> position=%u latch=%d speed=%u",
                     to_underlying(position.ValueOr(Clusters::ClosureControl::TargetPositionEnum::kUnknownEnumValue)),
                     latch.ValueOr(false), to_underlying(speed.ValueOr(Clusters::Globals::ThreeLevelAutoEnum::kAuto)));
     DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> overallCurrentState =
@@ -104,49 +103,49 @@ LoggingClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::Tar
         newPosition, newLatch, speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed, DataModel::MakeNullable(isSecure));
     CancelTimer();
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "SimulatedClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status LoggingClosure::HandleCalibrateCommand()
+Protocols::InteractionModel::Status SimulatedClosure::HandleCalibrateCommand()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::HandleCalibrateCommand()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleCalibrateCommand()");
     mPendingCurrentState.reset();
     CancelTimer();
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosure: failed to start Calibrate timer : %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "SimulatedClosure: failed to start Calibrate timer : %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
-bool LoggingClosure::IsReadyToMove()
+bool SimulatedClosure::IsReadyToMove()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::IsReadyToMove()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::IsReadyToMove()");
     return true;
 }
 
-ElapsedS LoggingClosure::GetCalibrationCountdownTime()
+ElapsedS SimulatedClosure::GetCalibrationCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::GetCalibrationCountdownTime()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::GetCalibrationCountdownTime()");
     return kTimeoutDurationSec;
 }
 
-ElapsedS LoggingClosure::GetMovingCountdownTime()
+ElapsedS SimulatedClosure::GetMovingCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::GetMovingCountdownTime()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::GetMovingCountdownTime()");
     return kTimeoutDurationSec;
 }
 
-ElapsedS LoggingClosure::GetWaitingForMotionCountdownTime()
+ElapsedS SimulatedClosure::GetWaitingForMotionCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::GetWaitingForMotionCountdownTime()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::GetWaitingForMotionCountdownTime()");
     return kTimeoutDurationSec;
 }
 
-bool LoggingClosure::RegistersAccessDevicePanel() const
+bool SimulatedClosure::RegistersAccessDevicePanel() const
 {
     for (const auto & panel : mPanelList)
     {
@@ -158,9 +157,9 @@ bool LoggingClosure::RegistersAccessDevicePanel() const
     return false;
 }
 
-void LoggingClosure::TimerFired()
+void SimulatedClosure::TimerFired()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosure::TimerFired()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosure::TimerFired()");
     if (mPendingCurrentState.has_value())
     {
         Clusters::ClosureControl::GenericOverallCurrentState pendingState = *mPendingCurrentState;
@@ -171,7 +170,7 @@ void LoggingClosure::TimerFired()
     LogErrorOnFailure(ClosureControlCluster().GenerateMovementCompletedEvent());
 }
 
-CHIP_ERROR LoggingClosure::HandleEventTrigger(uint64_t eventTrigger)
+CHIP_ERROR SimulatedClosure::HandleEventTrigger(uint64_t eventTrigger)
 {
     const auto triggerEndpoint = static_cast<EndpointId>((eventTrigger >> 32) & 0xFFFF);
     VerifyOrReturnError(triggerEndpoint == kRootEndpointId || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -180,43 +179,43 @@ CHIP_ERROR LoggingClosure::HandleEventTrigger(uint64_t eventTrigger)
     switch (eventTrigger)
     {
     case kTriggerError:
-        ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Error");
+        ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleEventTrigger() -> Error");
         ReturnErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kError));
         return ClosureControlCluster().AddErrorToCurrentErrorList(Clusters::ClosureControl::ClosureErrorEnum::kBlockedBySensor);
     case kTriggerProtected:
-        ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Protected");
+        ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleEventTrigger() -> Protected");
         return Closure::ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kProtected);
     case kTriggerDisengaged:
-        ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Disengaged");
+        ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleEventTrigger() -> Disengaged");
         return Closure::ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kDisengaged);
     case kTriggerClear:
-        ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> Clear");
+        ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleEventTrigger() -> Clear");
         ReturnErrorOnFailure(ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kStopped));
         ClosureControlCluster().ClearCurrentErrorList();
         return CHIP_NO_ERROR;
     case kTriggerSetupRequired:
-        ChipLogProgress(DeviceLayer, "LoggingClosure::HandleEventTrigger() -> SetupRequired");
+        ChipLogProgress(DeviceLayer, "SimulatedClosure::HandleEventTrigger() -> SetupRequired");
         return ClosureControlCluster().SetMainState(Clusters::ClosureControl::MainStateEnum::kSetupRequired);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT; // not ours — lets any other registered handler try instead
     }
 }
 
-void LoggingClosure::CancelTimer()
+void SimulatedClosure::CancelTimer()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                         EndpointComposition composition)
+CHIP_ERROR SimulatedClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                           EndpointComposition composition)
 {
     for (const auto & panel : mPanelList)
     {
-        auto ClosurePanel = std::make_unique<LoggingClosurePanel>(panel.config, mTimerDelegate);
+        auto ClosurePanel = std::make_unique<SimulatedClosurePanel>(panel.config, mTimerDelegate);
         // Each panel is a part of this closure endpoint and carries its own tags.
         EndpointComposition panelComposition(GetEndpointId(), composition.pattern, panel.tags);
         ReturnErrorOnFailure(ClosurePanel->Register(allocator, provider, panelComposition));
-        mLoggingClosurePanel.push_back(std::move(ClosurePanel));
+        mSimulatedClosurePanel.push_back(std::move(ClosurePanel));
     }
 
     auto onOffLights    = std::make_unique<LoggingOnOffLight>(OnOffContext);
@@ -228,20 +227,20 @@ CHIP_ERROR LoggingClosure::RegisterParts(EndpointIdAllocator & allocator, CodeDr
     return CHIP_NO_ERROR;
 }
 
-void LoggingClosure::UnregisterParts(CodeDrivenDataModelProvider & provider)
+void SimulatedClosure::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
     mTestEventTriggerDelegate.RemoveHandler(this);
 
     // Parts whose registration was rolled back already have an invalid endpoint id: skip them,
     // unregistering them a second time would fail in RemoveEndpoint().
-    for (size_t i = 0; i < mLoggingClosurePanel.size(); i++)
+    for (size_t i = 0; i < mSimulatedClosurePanel.size(); i++)
     {
-        if (mLoggingClosurePanel[i]->GetEndpointId() != kInvalidEndpointId)
+        if (mSimulatedClosurePanel[i]->GetEndpointId() != kInvalidEndpointId)
         {
-            mLoggingClosurePanel[i]->Unregister(provider);
+            mSimulatedClosurePanel[i]->Unregister(provider);
         }
     }
-    mLoggingClosurePanel.clear();
+    mSimulatedClosurePanel.clear();
 
     if (mOnOffLightPart != nullptr && mOnOffLightPart->GetEndpointId() != kInvalidEndpointId)
     {

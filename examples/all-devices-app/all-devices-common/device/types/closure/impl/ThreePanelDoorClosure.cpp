@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingClosure.h"
+#include "SimulatedClosure.h"
 
 #include <clusters/shared/Enums.h>
 
@@ -74,14 +74,14 @@ ClosurePanel::Config RotatingPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                        ClosureDimension::OverflowEnum::kTopInside },
+                                                            ClosureDimension::OverflowEnum::kTopInside },
             },
     };
 }
 
 } // namespace
 
-LoggingClosure::Config LoggingClosure::ThreePanelDoorClosureConfig()
+SimulatedClosure::Config SimulatedClosure::ThreePanelDoorClosureConfig()
 {
     return {
         .closure = Closure::Config{

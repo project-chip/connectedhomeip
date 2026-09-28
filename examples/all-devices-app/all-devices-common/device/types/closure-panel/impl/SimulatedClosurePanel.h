@@ -21,17 +21,17 @@
 
 namespace chip::app {
 
-/// One panel of a LoggingClosure : it reaches its commanded position, latch
+/// One panel of a SimulatedClosure : it reaches its commanded position, latch
 /// and speed after a fixed delay, without passing through intermediate positions. A Step lands on
 /// the end position in one go rather than travelling step by step. A new command supersedes one
 /// still in flight, and the owning closure abandons the movement when it handles Stop.
-class LoggingClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate,
-                            public ClosurePanel,
-                            public TimerContext
+class SimulatedClosurePanel : public Clusters::ClosureDimension::ClosureDimensionClusterDelegate,
+                              public ClosurePanel,
+                              public TimerContext
 {
 public:
-    explicit LoggingClosurePanel(Config config, TimerDelegate & delegate);
-    ~LoggingClosurePanel() override;
+    explicit SimulatedClosurePanel(Config config, TimerDelegate & delegate);
+    ~SimulatedClosurePanel() override;
 
     Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position, const Optional<bool> & latch,
                                                         const Optional<Clusters::Globals::ThreeLevelAutoEnum> & speed) override;

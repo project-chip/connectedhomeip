@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
-#include <device/types/closure-panel/impl/LoggingClosurePanel.h>
+#include <device/types/closure-panel/impl/SimulatedClosurePanel.h>
 #include <device/types/closure/Closure.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <lib/support/TimerDelegate.h>
@@ -38,12 +38,12 @@ namespace app {
 /// error, protected, disengaged, setup required — are unreachable by command here and are driven
 /// by test event triggers addressed to this endpoint or to the root endpoint.
 ///
-/// Composed of one LoggingClosurePanel per Config::panels entry, each on its own endpoint, plus a
+/// Composed of one SimulatedClosurePanel per Config::panels entry, each on its own endpoint, plus a
 /// LoggingOnOffLight.
-class LoggingClosure : public Clusters::ClosureControl::ClosureControlClusterDelegate,
-                       public Closure,
-                       public TimerContext,
-                       public TestEventTriggerHandler
+class SimulatedClosure : public Clusters::ClosureControl::ClosureControlClusterDelegate,
+                         public Closure,
+                         public TimerContext,
+                         public TestEventTriggerHandler
 {
 public:
     struct PanelList
@@ -65,10 +65,10 @@ public:
     /// latching rotating panel. The semantic tags it references have static storage duration.
     static Config ThreePanelDoorClosureConfig();
 
-    LoggingClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
-                   Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
-                   TestEventTriggerDelegate & testEventTriggerDelegate);
-    ~LoggingClosure() override;
+    SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
+                     Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
+                     TestEventTriggerDelegate & testEventTriggerDelegate);
+    ~SimulatedClosure() override;
     Protocols::InteractionModel::Status HandleStopCommand() override;
 
     Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<Clusters::ClosureControl::TargetPositionEnum> & position,
@@ -98,7 +98,7 @@ private:
                              EndpointComposition composition) override;
     void UnregisterParts(CodeDrivenDataModelProvider & provide) override;
     // TODO add LoggingDoorLock after migration
-    std::vector<std::unique_ptr<LoggingClosurePanel>> mLoggingClosurePanel;
+    std::vector<std::unique_ptr<SimulatedClosurePanel>> mSimulatedClosurePanel;
     // Held by base-class handle: OnOffLoad hides the SingleEndpoint Register/Unregister names,
     // while DeviceInterface declares both publicly.
     std::unique_ptr<DeviceInterface> mLoggingOnOffLights;

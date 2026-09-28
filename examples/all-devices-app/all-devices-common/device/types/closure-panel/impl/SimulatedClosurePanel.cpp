@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingClosurePanel.h"
+#include "SimulatedClosurePanel.h"
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -22,48 +22,48 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-LoggingClosurePanel::LoggingClosurePanel(Config config, TimerDelegate & delegate) :
+SimulatedClosurePanel::SimulatedClosurePanel(Config config, TimerDelegate & delegate) :
     ClosurePanel(*this, config), mTimerDelegate(delegate)
 {}
 
-LoggingClosurePanel::~LoggingClosurePanel()
+SimulatedClosurePanel::~SimulatedClosurePanel()
 {
     mTimerDelegate.CancelTimer(this);
 }
 
-Protocols::InteractionModel::Status LoggingClosurePanel::HandleSetTarget(const Optional<Percent100ths> & position,
-                                                                         const Optional<bool> & latch,
-                                                                         const Optional<Globals::ThreeLevelAutoEnum> & speed)
+Protocols::InteractionModel::Status SimulatedClosurePanel::HandleSetTarget(const Optional<Percent100ths> & position,
+                                                                           const Optional<bool> & latch,
+                                                                           const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleSetTarget() -> position=%u latch=%d speed=%u", position.ValueOr(0),
+    ChipLogProgress(DeviceLayer, "SimulatedClosurePanel::HandleSetTarget() -> position=%u latch=%d speed=%u", position.ValueOr(0),
                     latch.ValueOr(false), to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
 
     mTimerDelegate.CancelTimer(this);
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosurePanel: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "SimulatedClosurePanel: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status LoggingClosurePanel::HandleStep(const ClosureDimension::StepDirectionEnum & direction,
-                                                                    const uint16_t & numberOfSteps,
-                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
+Protocols::InteractionModel::Status SimulatedClosurePanel::HandleStep(const ClosureDimension::StepDirectionEnum & direction,
+                                                                      const uint16_t & numberOfSteps,
+                                                                      const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::HandleStep() -> direction=%u numberOfSteps=%u speed=%u",
+    ChipLogProgress(DeviceLayer, "SimulatedClosurePanel::HandleStep() -> direction=%u numberOfSteps=%u speed=%u",
                     to_underlying(direction), numberOfSteps, to_underlying(speed.ValueOr(Globals::ThreeLevelAutoEnum::kAuto)));
     mTimerDelegate.CancelTimer(this);
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kMotionDurationSec)).Handle([](CHIP_ERROR err) {
-        ChipLogError(DeviceLayer, "LoggingClosurePanel: failed to start step timer: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "SimulatedClosurePanel: failed to start step timer: %" CHIP_ERROR_FORMAT, err.Format());
     }),
                         Protocols::InteractionModel::Status::Failure);
 
     return Protocols::InteractionModel::Status::Success;
 }
 
-void LoggingClosurePanel::TimerFired()
+void SimulatedClosurePanel::TimerFired()
 {
-    ChipLogProgress(DeviceLayer, "LoggingClosurePanel::TimerFired()");
+    ChipLogProgress(DeviceLayer, "SimulatedClosurePanel::TimerFired()");
     auto target = ClosureDimensionCluster().GetTargetState();
     VerifyOrReturn(!target.IsNull());
 

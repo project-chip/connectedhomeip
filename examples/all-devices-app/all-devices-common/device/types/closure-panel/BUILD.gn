@@ -32,8 +32,8 @@ source_set("closure-panel") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingClosurePanel.cpp",
-    "impl/LoggingClosurePanel.h",
+    "impl/SimulatedClosurePanel.cpp",
+    "impl/SimulatedClosurePanel.h",
   ]
 
   public_deps = [ ":closure-panel" ]
