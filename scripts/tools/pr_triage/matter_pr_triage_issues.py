@@ -30,6 +30,8 @@ Three tiers, each with a different worker:
 Like its sibling it never posts, comments, closes, labels or changes anything on GitHub.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import math
@@ -39,6 +41,7 @@ import shutil
 import subprocess
 import sys
 import time
+from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -369,7 +372,7 @@ def compact_issue(node, owner, name):
     }
 
 
-def cache_is_fresh(fetched_at):
+def cache_is_fresh(fetched_at: str | None) -> bool:
     """A cached issue record is reused only while its state can be trusted."""
     try:
         age = datetime.now(timezone.utc) - datetime.fromisoformat(str(fetched_at).replace("Z", "+00:00"))
@@ -614,26 +617,31 @@ def save_corpus(root, records, meta):
     triage.write_json(corpus_dir(root) / "meta.json", meta)
 
 
-def sibling_repos(root, extra=()):
+def resolve_sibling(item: str) -> str | None:
+    """owner/name for one sibling named the same two ways as the main repository, a clone you have
+    or owner/name; None when it names nothing."""
+    try:
+        path = Path(str(item)).expanduser()
+        o, n = triage.infer_repo(path.resolve()) if path.is_dir() else triage.split_repo(item)
+    except RuntimeError:
+        return None
+    return f"{o}/{n}"
+
+
+def sibling_repos(root: Path, extra: Iterable[str] = ()) -> list[str]:
     """Repositories whose issue corpora are consulted as context: the ones recorded by an earlier
     sync, the ones named in MATTER_PR_TRIAGE_SIBLINGS, and any given now."""
     listed = triage.read_json(root / "siblings.json", []) or []
     env = [x for x in os.environ.get("MATTER_PR_TRIAGE_SIBLINGS", "").split(":") if x]
     out = []
     for item in list(listed) + env + list(extra):
-        # The same two ways the main repository is named: a clone you have, or owner/name.
-        try:
-            path = Path(str(item)).expanduser()
-            o, n = triage.infer_repo(path.resolve()) if path.is_dir() else triage.split_repo(item)
-        except RuntimeError:
-            continue
-        full = f"{o}/{n}"
-        if full not in out:
+        full = resolve_sibling(item)
+        if full and full not in out:
             out.append(full)
     return out
 
 
-def sync_corpus(owner, name, full, closed_months):
+def sync_corpus(owner: str, name: str, full: bool, closed_months: int) -> dict:
     """Pull every open issue and the recently closed ones of one repository into its corpus,
     incrementally. Pages come newest-updated first, so a page older than the last sync ends the
     incremental pass, and for closed issues a page older than the window ends the full pass."""
@@ -671,13 +679,13 @@ def sync_corpus(owner, name, full, closed_months):
             "issues": len(records), "open": meta["open"], "pages": pages}
 
 
-def sync(checkout, repo, full, closed_months, siblings=()):
+def sync(checkout: str, repo: str | None, full: bool, closed_months: int, siblings: Iterable[str] = ()) -> None:
     """The repository's corpus, then the corpora of its sibling repositories, such as the one that
     holds its test plans, so that their issues surface as context on every pull request."""
     owner, name = resolve_repo(checkout, repo, [])
     root = issues_root(owner, name)
     # A sibling that names nothing must not vanish quietly: the user would wait for matches that never come.
-    bad = [item for item in siblings if not sibling_repos(issues_root("none", "none"), [item])]
+    bad = [item for item in siblings if resolve_sibling(item) is None]
     if bad:
         print(json.dumps({"error": "bad_sibling", "given": bad,
                           "fix": "name each sibling as owner/name, a github.com repository URL, or the path of a clone"}, indent=2))
@@ -789,7 +797,8 @@ def graph_hops(records, seeds, max_hops=2):
     return dist
 
 
-def score_candidates(index, pr, seeds, exclude, longlist=LONGLIST, cross_repo=False):
+def score_candidates(index: Index, pr: dict, seeds: set[int], exclude: set[int], longlist: int = LONGLIST,
+                     cross_repo: bool = False) -> list[dict]:
     """Every corpus issue scored against the pull request; the top of the list is what the judge
     sees. Each entry says which signals fired, so a reader can weigh the lead the way its finder
     would have to."""
@@ -1324,7 +1333,12 @@ def validate_issue_judgment(judgment, dossier):
         if not isinstance(u, dict) or triage.as_number(u.get("issue")) is None or not (u.get("reason") or "").strip():
             problems.append(f"unassessed entry {u!r} must be an object with an issue number and a reason")
             continue
-        unassessed.add(triage.as_number(u["issue"]))
+        n = triage.as_number(u["issue"])
+        if n in seen:
+            problems.append(f"#{n}: cannot be both judged and unassessed")
+        elif n in unassessed:
+            problems.append(f"#{n}: appears more than once in unassessed")
+        unassessed.add(n)
     for n in sorted(set(wanted) - seen - unassessed):
         problems.append(f"#{n}: in the dossier but has no verdict and is not listed unassessed")
     return problems
