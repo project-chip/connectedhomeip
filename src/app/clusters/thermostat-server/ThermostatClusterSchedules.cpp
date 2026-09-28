@@ -328,8 +328,7 @@ CHIP_ERROR ValidateScheduleTransitions(ThermostatClusterBase & cluster, const Sc
         for (size_t prevIdx = 0; prevIdx < i; prevIdx++)
         {
             const auto & prevTransition = transitions[prevIdx];
-            if (prevTransition.transitionTime == transition.transitionTime &&
-                prevTransition.dayOfWeek.HasAny(transition.dayOfWeek))
+            if (prevTransition.transitionTime == transition.transitionTime && prevTransition.dayOfWeek.HasAny(transition.dayOfWeek))
             {
                 return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
