@@ -21,7 +21,7 @@
 
 namespace chip::app {
 
-/// One panel of a LoggingClosure, behaving the same way: it reaches its commanded position, latch
+/// One panel of a LoggingClosure : it reaches its commanded position, latch
 /// and speed after a fixed delay, without passing through intermediate positions. A Step lands on
 /// the end position in one go rather than travelling step by step. A new command supersedes one
 /// still in flight, and the owning closure abandons the movement when it handles Stop.

@@ -100,7 +100,7 @@ LoggingClosure::Config LoggingClosure::ThreePanelDoorClosureConfig()
             .withAccess                 = true,
             .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(
                 MakeOptional(DataModel::MakeNullable(ClosureControl::CurrentPositionEnum::kFullyClosed)),
-                MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto),DataModel::MakeNullable(false))),
+                MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto))),
         },
         .panels = {
             PanelList{ LiftPanel(), Span<const EndpointComposition::SemanticTag>(kLiftTag) },
