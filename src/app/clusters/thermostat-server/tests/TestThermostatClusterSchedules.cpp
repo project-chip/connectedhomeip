@@ -42,9 +42,17 @@ constexpr uint8_t kTestMaxPerDay      = 2;
 ScheduleTransitionStruct::Type MakeScheduleTransition(uint16_t transitionTime, ScheduleDayOfWeekBitmap day)
 {
     ScheduleTransitionStruct::Type transition;
-    transition.transitionTime = transitionTime;
-    transition.dayOfWeek      = BitMask<ScheduleDayOfWeekBitmap>(day);
+    transition.transitionTime  = transitionTime;
+    transition.dayOfWeek       = BitMask<ScheduleDayOfWeekBitmap>(day);
+    transition.heatingSetpoint = MakeOptional(static_cast<int16_t>(2000));
     return transition;
+}
+
+DataModel::List<const ScheduleTransitionStruct::Type> DefaultScheduleTransitions()
+{
+    static const ScheduleTransitionStruct::Type kDefaultTransition =
+        MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
+    return DataModel::List<const ScheduleTransitionStruct::Type>(&kDefaultTransition, 1);
 }
 
 ScheduleStruct::Type MakeSchedule(DataModel::Nullable<ByteSpan> handle, DataModel::Nullable<bool> builtIn, Optional<CharSpan> name,
@@ -56,7 +64,7 @@ ScheduleStruct::Type MakeSchedule(DataModel::Nullable<ByteSpan> handle, DataMode
     schedule.name           = name;
     schedule.presetHandle   = NullOptional;
     schedule.builtIn        = builtIn;
-    schedule.transitions    = transitions;
+    schedule.transitions    = transitions.empty() ? DefaultScheduleTransitions() : transitions;
     return schedule;
 }
 
@@ -876,6 +884,117 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleReportsDelegateError
     auto writeStatus =
         tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
     EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsEmptyTransitions)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleStruct::Type schedule = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>());
+    schedule.transitions          = DataModel::List<const ScheduleTransitionStruct::Type>();
+    ScheduleStruct::Type list[]   = { schedule };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsInvalidDayOfWeek)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type transition = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
+    transition.dayOfWeek.Set(ScheduleDayOfWeekBitmap::kAway);
+    ScheduleTransitionStruct::Type transitions[] = { transition };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsInvalidTransitionTime)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type transitions[] = { MakeScheduleTransition(1440, ScheduleDayOfWeekBitmap::kMonday) };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsDuplicateTransitions)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type t1 = MakeScheduleTransition(480, ScheduleDayOfWeekBitmap::kMonday);
+    t1.dayOfWeek.Set(ScheduleDayOfWeekBitmap::kTuesday);
+    ScheduleTransitionStruct::Type t2 = MakeScheduleTransition(480, ScheduleDayOfWeekBitmap::kTuesday);
+    t2.dayOfWeek.Set(ScheduleDayOfWeekBitmap::kWednesday);
+    ScheduleTransitionStruct::Type transitions[] = { t1, t2 };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsMissingOrOutOfRangeSetpoint)
+{
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type missingSetpoint = MakeScheduleTransition(360, ScheduleDayOfWeekBitmap::kMonday);
+    missingSetpoint.heatingSetpoint                = NullOptional;
+    ScheduleTransitionStruct::Type transitions1[]  = { missingSetpoint };
+    ScheduleStruct::Type list1[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                  DataModel::List<const ScheduleTransitionStruct::Type>(transitions1)) };
+    EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list1), ListWritingPattern::ReplaceAll),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    ScheduleTransitionStruct::Type outOfRangeSetpoint = MakeScheduleTransition(360, ScheduleDayOfWeekBitmap::kMonday);
+    outOfRangeSetpoint.heatingSetpoint                = MakeOptional(static_cast<int16_t>(5000));
+    ScheduleTransitionStruct::Type transitions2[]     = { outOfRangeSetpoint };
+    ScheduleStruct::Type list2[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                  DataModel::List<const ScheduleTransitionStruct::Type>(transitions2)) };
+    EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list2), ListWritingPattern::ReplaceAll),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
