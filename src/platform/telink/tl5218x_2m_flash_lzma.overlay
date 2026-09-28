@@ -1,0 +1,79 @@
+&flash {
+	reg = <0x20000000 0x200000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+// reserve 20k for software bootloader , 64k for mcuboot,need to disable log for mcuboot；		
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x15000>; 
+		};
+// currently the reset flash is 0x1e0000- 0x15000() = 0x1cb000 = 1836k (the total of slot0,and slot1)
+// tralor = 20k
+// slot0_fw = (1836-20)/1.6/4*4 = 1132 (suppose as LZMA:60%)
+// slot0 area = 1132+20 = 1152(0x120000)
+		slot0_partition: partition@15000 {
+			label = "image-0";
+			reg = <0x15000 0x120000>; // total slot0 is 1152k
+		};
+// add information , increase part for matter & zigbee
+// suppose the matter application layer is 30k, zigbee is 60k
+// currently , basic matter fw is 813k, zigbee is 140k , so just suppose matter is 916k, and zigbee is 216, reserve 20k for matter ota trailor
+		slot0_matter_partition: partition@15000_1 {
+			label = "image-0-matter";
+			reg = <0x15000 0xe5000>; // suppose matter is 916k (0xe5000)
+		};
+		slot0_zb_partition: partition@fa000 {
+			label = "image-0-zb";
+			reg = <0xfa000 0x36000>; // suppose zigbee is 216k (0x36000)
+		};
+		slot0_trailor_partition: partition@130000 {
+			label = "image-0-trailor";
+			reg = <0x130000 0x5000>; // suppose trailor is 20k
+		};
+// the total fw area is 1836k, and slot0 cost 1152, so the value is 1836 - 1152 = 684k (0xac000) */
+		slot1_partition: partition@135000 {
+			label = "image-1";
+			reg = <0x135000 0xab000>; 
+		};
+		user_rfu_partition: partition@1e0000 {
+ 			label = "user_rfu";
+			reg = <0x1e0000 0x4000>;
+ 		};
+        storage_partition: partition@1e4000 {
+			label = "matter-nvs";
+			reg = <0x1e4000 0x8000>; // matter nvs part , total is 32k.
+		};
+        zigbee_nvs_partition: partition@1ec000 {
+			label = "zigbee-nvs";
+			reg = <0x1ec000 0xc000>; // zigbee nvs part , total is 48k.
+		};
+		secure_partition: partition@1f8000 {
+ 			label = "secure";
+			reg = <0x1f8000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
+ 		};
+		user_config_partition: partition@1f9000 {
+ 			label = "user_config";
+			reg = <0x1f9000 0x1000>; // user_config ,for the secure-boot sign logic changes ,it can release for user .
+ 		};
+		dual_mode_partition: partition@1fa000 {
+ 			label = "dual-mode";
+			reg = <0x1fa000 0x2000>; // user:store the mode info and the key info part.same as public area for dual mode
+ 		};
+		dac_keypair_partition: partition@1fc000 {
+			label = "dac-keypair";
+			reg = <0x1fc000 0x1000>; // store dac and key pair.
+		};
+		factory_partition: partition@1fd000 {
+			label = "factory-data";
+			reg = <0x1fd000 0x1000>; // factory data info 
+		};
+		vendor_partition: partition@1fe000 {
+			label = "vendor-data";
+			reg = <0x1fe000 0x2000>; // mac and rf info.
+		};
+	};
+};

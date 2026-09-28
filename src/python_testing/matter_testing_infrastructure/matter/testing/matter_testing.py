@@ -538,6 +538,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
+      Required for tests that call request_device_reboot() or request_device_factory_reset(),
+      which fail while the subscription is active (the subscription does not survive a DUT reboot or factory reset).
+
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
@@ -3393,16 +3396,39 @@ class MatterBaseTest(base_test.BaseTestClass):
                         except ChipStackError as e:  # chipstack-ok
                             LOGGER.warning("Failed to expire sessions on controller %s: %s", controller.nodeId, e)
 
-    async def request_device_reboot(self):
+    def _fail_if_wildcard_subscription_active(self, operation: str) -> None:
+        """Fail the current test if the background wildcard subscription is still running.
+
+        The subscription runs with autoResubscribe=False, so a DUT reboot or factory-reset tears it down for
+        good: no further reports arrive and get_latest_value keeps returning pre-reboot
+        values. Reads after the reboot would then be verified against a stale cache, which
+        either passes wrongly or fails for the wrong reason.
+        """
+        if getattr(self, 'wildcard_subscription_handler', None) is None:
+            return
+
+        asserts.fail(
+            f"{operation} was called while the background wildcard subscription is active. "
+            "The subscription does not survive a DUT reboot or factory reset and its cache is left holding "
+            "pre-reboot or pre-reset values, so post-reboot and post-reset reads are verified against stale data. "
+            "Please set 'disable_wildcard_subscription = True' on the test class."
+        )
+
+    async def request_device_reboot(self) -> None:
         """Request a reboot of the Device Under Test (DUT).
 
         This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
         and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
         to the DUT after the reboot.
 
+        The test class must set disable_wildcard_subscription = True; a reboot with the
+        background wildcard subscription running fails the test.
+
         Returns:
             None
         """
+        self._fail_if_wildcard_subscription_active("request_device_reboot()")
+
         # Check if restart flag file is available (indicates test runner supports app restart)
         restart_flag_file = self.get_restart_flag_file()
 
@@ -3441,6 +3467,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         testing scenarios (via user input). It expires existing sessions to allow for controllers
         to reconnect to the DUT after the factory reset.
 
+        The test class must set disable_wildcard_subscription = True; a factory reset with the
+        background wildcard subscription running fails the test.
+
         Args:
             reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
                                If False, removes app and REPL configs but keeps controller config.
@@ -3449,6 +3478,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             None
         """
+        self._fail_if_wildcard_subscription_active("request_device_factory_reset()")
+
         # Check if restart flag file is available (indicates test runner supports app factory reset)
         restart_flag_file = self.get_restart_flag_file()
 

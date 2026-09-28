@@ -23,12 +23,12 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.ClusterObjects import ClusterAttributeDescriptor
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
 
-class HSTATBase(MatterBaseTest):
+class HSTATBase(MatterTestCommissionedDevice):
     """Base class for Humidistat cluster test cases.
 
     Provides common setup logic, feature support detection, attribute read/write

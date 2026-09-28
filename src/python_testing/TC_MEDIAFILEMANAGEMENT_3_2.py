@@ -39,7 +39,7 @@ from TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -50,7 +50,7 @@ _FILE_NAME = "MatterTestHarnessOfferedFile"
 _FALLBACK_MIME_TYPE = "video/mp4"
 
 
-class TC_MEDIAFILEMANAGEMENT_3_2(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_3_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_3_2(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-3.2] Offer File Verification - PROVISIONAL"
