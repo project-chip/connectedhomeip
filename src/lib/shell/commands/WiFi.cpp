@@ -183,6 +183,105 @@ static CHIP_ERROR WiFiDisconnectHandler(int argc, char ** argv)
     return ConnectivityMgr().DisconnectNetwork();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+static bool IsValidPAFFrequency(uint16_t freq)
+{
+    // 2.4 GHz: ch1-13 (2412-2472 MHz, 5 MHz spacing) and ch14 (2484 MHz)
+    if (freq == 2484 || (freq >= 2412 && freq <= 2472 && (freq - 2412) % 5 == 0))
+        return true;
+    // 5 GHz: 20 MHz channels only (per Matter spec Section 5.4.2.6.2)
+    // UNII-1:  5180-5320 MHz (ch36-64)
+    // UNII-2e: 5500-5720 MHz (ch100-144)
+    // UNII-3:  5745-5885 MHz (ch149-177)
+    if ((freq >= 5180 && freq <= 5320 && (freq - 5000) % 20 == 0) || (freq >= 5500 && freq <= 5720 && (freq - 5000) % 20 == 0) ||
+        (freq >= 5745 && freq <= 5885 && (freq - 5745) % 20 == 0))
+        return true;
+    return false;
+}
+
+static CHIP_ERROR WiFiPAFHandler(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    if (argc != 2 || strcmp(argv[0], "freq_list") != 0)
+    {
+        streamer_printf(sout, "Usage: wifi paf freq_list <freq1[,freq2,...]>\r\n");
+        streamer_printf(sout, "  e.g. wifi paf freq_list 5220        (5G ch44)\r\n");
+        streamer_printf(sout, "  e.g. wifi paf freq_list 5745        (5G ch149)\r\n");
+        streamer_printf(sout, "  e.g. wifi paf freq_list 5220,5745\r\n");
+        streamer_printf(sout, "  The default publish channel is always used in addition to this list\r\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    constexpr size_t kMaxFreqEntries = 10;
+    uint16_t freqs[kMaxFreqEntries];
+    uint16_t count = 0;
+
+    char buf[128];
+    if (strlen(argv[1]) >= sizeof(buf))
+    {
+        streamer_printf(sout, "WiFi-PAF: frequency list is too long\r\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    strcpy(buf, argv[1]);
+
+    char * token = strtok(buf, ",");
+    while (token != nullptr)
+    {
+        if (count >= kMaxFreqEntries)
+        {
+            streamer_printf(sout, "WiFi-PAF: too many frequencies (max %u)\r\n", static_cast<unsigned>(kMaxFreqEntries));
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        char * end           = nullptr;
+        unsigned long parsed = strtoul(token, &end, 10);
+        if (end == token || *end != '\0')
+        {
+            streamer_printf(sout, "WiFi-PAF: invalid freq value: %s\r\n", token);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (parsed == 0 || parsed > UINT16_MAX)
+        {
+            streamer_printf(sout, "WiFi-PAF: freq value out of range (1-%u): %s\r\n", UINT16_MAX, token);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (!IsValidPAFFrequency(static_cast<uint16_t>(parsed)))
+        {
+            streamer_printf(sout, "WiFi-PAF: invalid Wi-Fi frequency: %s\r\n", token);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        freqs[count++] = static_cast<uint16_t>(parsed);
+        token          = strtok(nullptr, ",");
+    }
+
+    if (count == 0)
+    {
+        streamer_printf(sout, "WiFi-PAF: no valid frequencies parsed\r\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Save the frequency list; it will take effect on the next opencommissioningwindow.
+    DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam params;
+    params.freq_list_len = count;
+    params.freq_list     = std::make_unique<uint16_t[]>(count);
+    for (uint16_t i = 0; i < count; i++)
+    {
+        params.freq_list[i] = freqs[i];
+    }
+    ConnectivityMgr().WiFiPAFSetParam(params);
+
+    streamer_printf(sout, "WiFi-PAF: freq_list saved: ");
+    for (uint16_t i = 0; i < count; i++)
+    {
+        streamer_printf(sout, "%u%s", freqs[i], (i < count - 1) ? "," : "");
+    }
+    streamer_printf(sout, "\r\n");
+    streamer_printf(sout, "WiFi-PAF: Close and reopen commissioning window to apply\r\n");
+
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 void SetWiFiDriver(WiFiDriver * driver)
 {
     sDriver = driver;
@@ -200,6 +299,9 @@ void RegisterWiFiCommands()
         { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> [<psk>]" },
         { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
         { &WiFiScanHandler, "scan", "Scan networks (concurrent scans are not suported). Usage: wifi scan" },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        { &WiFiPAFHandler, "paf", "Add Wi-Fi PAF publish channels. Usage: wifi paf freq_list <freq1[,freq2,...]>" },
+#endif
     };
 
     static constexpr Command wifiCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "wifi",

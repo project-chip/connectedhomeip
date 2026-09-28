@@ -50,13 +50,13 @@ from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCr
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DA_1_10(MatterBaseTest):
+class TC_DA_1_10(MatterTestCommissionedDevice):
     """Validate CertificateChainRequest with PQC Profiles [DUT-Commissionee]."""
 
     def desc_TC_DA_1_10(self) -> str:
