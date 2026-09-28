@@ -740,7 +740,7 @@ tests:
     - label: "Step 52: TH reads the AvailableSensors attribute from the DUT"
       PICS: TSTAT.S.F0b
       command: "readAttribute"
-      attribute: "AvailableSensors"
+      attribute: "AvailableSensorHandles"
       response:
           constraints:
               type: list
@@ -748,7 +748,7 @@ tests:
     - label: "Step 53: TH reads the EnabledSensors attribute from the DUT"
       PICS: TSTAT.S.F0b
       command: "readAttribute"
-      attribute: "EnabledSensors"
+      attribute: "EnabledSensorHandles"
       response:
           constraints:
               type: list
