@@ -25,7 +25,7 @@ import inspect
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, get_args, get_origin
+from typing import Any, get_args
 
 from mobly import asserts
 
@@ -39,12 +39,12 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.conformance import is_disallowed
+from matter.testing.conformance import is_disallowed, is_obsolete
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
-from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation
+from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlCluster, XmlDataTypeComponent
 from matter.tlv import uint
 
@@ -324,31 +324,30 @@ def spec_enum_values(xml_cluster: XmlCluster, datatype: str) -> frozenset[int]:
     have to be looked up by type name. Enums defined in the global data types are not
     parsed into XmlCluster and come back empty here; the generated Python enum is then
     the only source of legal values, which undefined_enum_values also consults.
+
+    Obsolete items are left out: the spec still lists them, but they are not legal values
+    for a DUT declaring that spec (JointFabricDatastore's
+    DatastoreAccessControlEntryPrivilegeEnum keeps an obsolete ProxyView = 2). Deprecated
+    items remain legal and are kept.
     """
     enum_definition = xml_cluster.enums.get(datatype)
     if enum_definition is None:
         return frozenset()
-    return frozenset(int(component.value) for component in enum_definition.components.values())
+    return frozenset(int(component.value) for component in enum_definition.components.values()
+                     if not is_obsolete(component.conformance))
 
 
 def enum_in_type(generated_type: Any) -> type[MatterIntEnum] | None:
     """The enum a generated Python type encodes as, or None if it does not encode one.
 
-    Read from the generated type, which unlike the spec type name is also what the value
-    must be encoded as. Nullable and optional values are generated as a union, so the
-    enum is picked out of the union's members.
-
-    A list is generated as List[element], whose type argument reads exactly like a
-    union member, so a list of enums would otherwise be reported as an enum and be sent
-    a bare enum value in place of an array. Lists are rejected up front instead:
-    CameraAvStreamManagement.SetStreamPriorities.StreamPriorities is a list[StreamUsageEnum]
-    and reaches here on the command path.
+    Unwraps a nullable or optional union with the same helper the TLV encoder uses, so
+    the enum found is the one the encoder converts the value to. A list is not a union
+    and is not an enum class, so a list of enums is rejected rather than sent a bare
+    enum value in place of an array.
     """
-    if get_origin(generated_type) is list:
-        return None
-    for candidate in get_args(generated_type) or (generated_type,):
-        if isinstance(candidate, type) and issubclass(candidate, MatterIntEnum):
-            return candidate
+    element_type = ClusterObjects.GetUnionUnderlyingType(generated_type) or generated_type
+    if isinstance(element_type, type) and issubclass(element_type, MatterIntEnum):
+        return element_type
     return None
 
 
@@ -362,9 +361,13 @@ def _codegen_enum_values(enum_type: type[MatterIntEnum]) -> frozenset[int]:
 
     kUnknownEnumValue is codegen's placeholder for "not a real member", and any
     kUnknownPlaceholder* member was grafted on by undefined_enum_values. Neither is a
-    value the enum defines.
+    value the enum defines. Both are matched by name exactly rather than by a bare
+    kUnknown prefix, which real members also use (Globals.WebRTCEndReasonEnum.kUnknownReason,
+    Thermostat.ACTypeEnum.kUnknown). A global enum has no spec values to fall back on, so
+    dropping such a member would send a legal value as a violation.
     """
-    return frozenset(member.value for member in enum_type if not member.name.startswith('kUnknown'))
+    return frozenset(member.value for member in enum_type
+                     if member.name != 'kUnknownEnumValue' and not member.name.startswith('kUnknownPlaceholder'))
 
 
 def smallest_legal_enum_value(enum_type: type[MatterIntEnum], spec_values: frozenset[int]) -> MatterIntEnum | None:
@@ -375,11 +378,10 @@ def smallest_legal_enum_value(enum_type: type[MatterIntEnum], spec_values: froze
     legal value for every enum (ColorControl.StepModeEnum defines {1, 3}), so a payload
     left at the default can carry a violation of its own.
 
-    Only values the spec and codegen agree on are considered legal, which is the
-    conservative direction here: a value defined by just one of the two could be
-    rejected by a DUT built against the other.
+    The legal values for a DUT are the ones its declared spec defines. The generated enum
+    is consulted only when the spec parser has none, as for a global enum.
     """
-    legal = spec_values & _codegen_enum_values(enum_type) if spec_values else _codegen_enum_values(enum_type)
+    legal = spec_values or _codegen_enum_values(enum_type)
     if not legal:
         return None
     return enum_type(min(legal))
@@ -420,7 +422,9 @@ def undefined_enum_values(enum_type: type[MatterIntEnum], spec_values: frozenset
     Values defined by either the spec XML or the generated Python enum are excluded, since
     the two can disagree when the DUT reports a Matter release older than the one this SDK
     generates for, and a value defined by either one is a value the DUT may legitimately
-    accept.
+    accept. Codegen also keeps some items the spec has made obsolete, such as
+    FanControl.FanModeEnum's On and Smart, which servers still accept for backwards
+    compatibility; the union keeps those out of the probe as well.
 
     Enum items whose conformance excludes them on this DUT would be violations too, but
     an undefined value is one regardless of feature map or attribute values, so no
@@ -445,9 +449,11 @@ def undefined_enum_values(enum_type: type[MatterIntEnum], spec_values: frozenset
         gap = range(lower + 1, upper)
         values.extend(gap if len(gap) <= _SHORT_GAP_WIDTH else gap[:1])
 
-    # The generated enum maps any value it does not recognize to kUnknownEnumValue on
-    # construction, so an undefined value has to be grafted onto the enum first or the
-    # write would silently carry kUnknownEnumValue instead of the value under test.
+    # The encoder converts every value to the field's generated type before writing it
+    # (ClusterObjectFieldDescriptor._PutSingleElementToTLV), and the generated enum maps a
+    # value it does not define to kUnknownEnumValue. A plain int or uint would therefore
+    # go out as kUnknownEnumValue, not as the value under test, so the value is grafted
+    # onto the enum first; that is what extend_enum_if_value_doesnt_exist exists for.
     return [enum_type.extend_enum_if_value_doesnt_exist(value) for value in values]
 
 
@@ -963,6 +969,16 @@ class IDMBaseTest(BasicCompositionTests):
         """
         return self.dut_spec_version() >= SPEC_VERSION_1_7
 
+    def record_accepted_violation(self, location: ProblemLocation, problem: str) -> None:
+        """Record a violating value the DUT accepted, at the severity its era calls for.
+
+        A DUT held to strict enforcement fails the step on any accepted violation (see
+        enforce_constraint_policy), so each one is recorded as an error to match. An
+        earlier DUT is held to the weaker bar, under which it is only a warning.
+        """
+        record = self.record_error if self.enforces_constraints_strictly() else self.record_warning
+        record(test_name=self.current_test_info.name, location=location, problem=problem)
+
     def enforce_constraint_policy(self, subject: str, accepted_paths: list[str], rejected_count: int,
                                   probed_count: int) -> None:
         """Fail or pass one step according to the DUT's era. See enforces_constraints_strictly.
@@ -993,11 +1009,12 @@ class IDMBaseTest(BasicCompositionTests):
                                          constraints: Constraints | None) -> ConstraintProbeResult:
         """Write each out-of-bounds value an attribute admits and classify the DUT's answers.
 
-        Records a warning for every violation the DUT did not answer with
-        CONSTRAINT_ERROR so the report enumerates them in both eras, and restores the
-        attribute's original value if the DUT stored the violating one. Deciding
-        whether an accepted violation fails the test is left to the caller, which
-        applies enforces_constraints_strictly.
+        Records every violation the DUT did not answer with CONSTRAINT_ERROR so the
+        report enumerates them in both eras: an accepted one through
+        record_accepted_violation, and one rejected with another status as a warning.
+        Restores the attribute's original value if the DUT stored the violating one.
+        Deciding whether an accepted violation fails the test is left to the caller,
+        which applies enforces_constraints_strictly.
 
         An attribute with no <constraint> element still reaches here: an enum-typed one
         is bounded by its enum definition instead. Attributes for which no violating
@@ -1105,8 +1122,7 @@ class IDMBaseTest(BasicCompositionTests):
                 # the other accepted violations. Reachable on any enum-typed attribute
                 # whose cluster decodes an unknown value without an EnsureKnownEnumValue
                 # guard.
-                self.record_warning(
-                    test_name=self.current_test_info.name,
+                self.record_accepted_violation(
                     location=location,
                     problem=(f"{attribute_path} answered {status_name} for out-of-bounds value "
                              f"{test_value} and then could not be read back ({stored_value.Reason}), "
@@ -1124,8 +1140,7 @@ class IDMBaseTest(BasicCompositionTests):
                 # The DUT reported the write as rejected but stored the violating value
                 # anyway, so the constraint was not enforced regardless of the status it
                 # returned.
-                self.record_warning(
-                    test_name=self.current_test_info.name,
+                self.record_accepted_violation(
                     location=location,
                     problem=(f"{attribute_path} was set to out-of-bounds value {test_value} "
                              f"despite returning CONSTRAINT_ERROR"))
@@ -1145,8 +1160,7 @@ class IDMBaseTest(BasicCompositionTests):
 
             log.warning("%s got %s (%s) instead of CONSTRAINT_ERROR for value %s; attribute now reads %s",
                         attribute_path, status_name, int(result_status), test_value, stored_value)
-            self.record_warning(
-                test_name=self.current_test_info.name,
+            self.record_accepted_violation(
                 location=location,
                 problem=f"{attribute_path} accepted out-of-bounds value {test_value}")
             result.accepted += 1
@@ -1422,10 +1436,11 @@ class IDMBaseTest(BasicCompositionTests):
 
         Sends one Invoke per violated bound, with all sibling fields set to in-range
         values so a CONSTRAINT_ERROR can only be attributed to the field under test.
-        Records a warning for every violation the DUT did not answer with
-        CONSTRAINT_ERROR so the report enumerates them in both eras; deciding whether
-        an accepted violation fails the test is left to the caller, which applies
-        enforces_constraints_strictly. A result with `probed == 0` means the field
+        Records every violation the DUT did not answer with CONSTRAINT_ERROR so the
+        report enumerates them in both eras: an accepted one through
+        record_accepted_violation, and one rejected with another status as a warning.
+        Deciding whether an accepted violation fails the test is left to the caller,
+        which applies enforces_constraints_strictly. A result with `probed == 0` means the field
         could not be tested: no violation could be generated for it, or a constrained
         required sibling could not be given a valid value (which would make a
         CONSTRAINT_ERROR ambiguous).
@@ -1515,8 +1530,7 @@ class IDMBaseTest(BasicCompositionTests):
             # here with a None response, which is the ordinary Invoke success case.
             result.accepted += 1
             log.warning("%s accepted violating payload (%s)", info.path_str, description)
-            self.record_warning(
-                test_name=self.current_test_info.name,
+            self.record_accepted_violation(
                 location=location,
                 problem=f"{info.path_str} accepted violating payload ({description})")
         return result
