@@ -16,6 +16,9 @@
 #
 
 # This test requires a TH2_SERVER application. Please specify with --string-arg th2_server_app:<path_to_app>
+#
+# TH2 must expose the legacy Groups cluster (revision 4). The JF Administrator syncs group membership
+# through Groups commands, which a groupcast-enabled build stubs out with InvalidInState.
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
@@ -26,7 +29,7 @@
 #     script-args: >
 #       --string-arg jfa_server_app:${JF_ADMIN_APP}
 #       --string-arg jfc_server_app:${JF_CONTROL_APP}
-#       --string-arg th2_server_app:${ALL_CLUSTERS_APP}
+#       --string-arg th2_server_app:${ALL_CLUSTERS_NO_GROUPCAST_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -50,13 +53,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_JFDS_2_5(MatterBaseTest):
+class TC_JFDS_2_5(MatterTestCommissioner):
 
     @staticmethod
     def _enum_as_int(value):
