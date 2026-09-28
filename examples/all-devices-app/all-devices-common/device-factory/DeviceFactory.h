@@ -324,17 +324,12 @@ private:
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedAirQualitySensor<
-                    Clusters::TemperatureMeasurement::Id,
-                    Clusters::RelativeHumidityMeasurement::Id,
-                    Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                    Clusters::Pm25ConcentrationMeasurement::Id,
+                    Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                    Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,
                     Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
-                    Clusters::CarbonMonoxideConcentrationMeasurement::Id,
-                    Clusters::NitrogenDioxideConcentrationMeasurement::Id,
-                    Clusters::OzoneConcentrationMeasurement::Id,
-                    Clusters::FormaldehydeConcentrationMeasurement::Id,
-                    Clusters::Pm1ConcentrationMeasurement::Id,
-                    Clusters::Pm10ConcentrationMeasurement::Id,
+                    Clusters::CarbonMonoxideConcentrationMeasurement::Id, Clusters::NitrogenDioxideConcentrationMeasurement::Id,
+                    Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
+                    Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
                     Clusters::RadonConcentrationMeasurement::Id>>(mContext->timerDelegate);
             });
         }

@@ -33,8 +33,7 @@ public:
 
     ~SimulatedAirQualitySensor() override { this->mTimerDelegate.CancelTimer(this); }
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
         ReturnErrorOnFailure(Base::Register(endpoint, provider, composition));
         return this->mTimerDelegate.StartTimer(this, kDefaultUpdateInterval);
@@ -87,7 +86,7 @@ public:
 
         // 4. Oscillate all configured concentration measurement clusters
         auto oscillateConcentration = [this](auto & clusterWrapper, auto clusterIdTag) {
-            using TagType = decltype(clusterIdTag);
+            using TagType                 = decltype(clusterIdTag);
             constexpr ClusterId clusterId = TagType::value;
             if constexpr (clusterId != Clusters::TemperatureMeasurement::Id &&
                           clusterId != Clusters::RelativeHumidityMeasurement::Id)
@@ -106,9 +105,8 @@ public:
 
         if constexpr (sizeof...(OptionalClusters) > 0)
         {
-            (oscillateConcentration(
-                std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(this->mOptionalClusters),
-                std::integral_constant<ClusterId, OptionalClusters>{}),
+            (oscillateConcentration(std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(this->mOptionalClusters),
+                                    std::integral_constant<ClusterId, OptionalClusters>{}),
              ...);
         }
     }
@@ -117,10 +115,9 @@ private:
     uint32_t mTickCount = 0;
 };
 
-using DefaultSimulatedAirQualitySensor = SimulatedAirQualitySensor<
-    Clusters::TemperatureMeasurement::Id,
-    Clusters::RelativeHumidityMeasurement::Id,
-    Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+using DefaultSimulatedAirQualitySensor =
+    SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                              Clusters::CarbonDioxideConcentrationMeasurement::Id>;
 
 } // namespace app
 } // namespace chip

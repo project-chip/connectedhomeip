@@ -233,9 +233,9 @@ public:
         mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err       = CHIP_NO_ERROR;
         auto registerCluster = [&](auto & clusterWrapper, auto clusterIdTag) {
-            using TagType = decltype(clusterIdTag);
+            using TagType                 = decltype(clusterIdTag);
             constexpr ClusterId clusterId = TagType::value;
             if (err != CHIP_NO_ERROR)
             {

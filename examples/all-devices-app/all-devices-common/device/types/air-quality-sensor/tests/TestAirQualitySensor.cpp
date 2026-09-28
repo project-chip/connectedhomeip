@@ -91,10 +91,8 @@ TEST_F(TestAirQualitySensor, TestExtensionHooks)
 
 TEST_F(TestAirQualitySensor, TestTemplatedClusters)
 {
-    using ConfiguredSensor = AirQualitySensor<
-        TemperatureMeasurement::Id,
-        RelativeHumidityMeasurement::Id,
-        CarbonDioxideConcentrationMeasurement::Id>;
+    using ConfiguredSensor =
+        AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
     ConfiguredSensor::Config config;
     config.temperature.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000));
@@ -126,10 +124,8 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
 
 TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 {
-    AirQualitySensor<
-        TemperatureMeasurement::Id,
-        RelativeHumidityMeasurement::Id,
-        CarbonDioxideConcentrationMeasurement::Id> sensor(mTimerDelegate);
+    AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id> sensor(
+        mTimerDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
@@ -197,19 +193,12 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
 
 TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 {
-    using FullSensor = AirQualitySensor<
-        TemperatureMeasurement::Id,
-        RelativeHumidityMeasurement::Id,
-        CarbonDioxideConcentrationMeasurement::Id,
-        Pm25ConcentrationMeasurement::Id,
-        TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
-        CarbonMonoxideConcentrationMeasurement::Id,
-        NitrogenDioxideConcentrationMeasurement::Id,
-        OzoneConcentrationMeasurement::Id,
-        FormaldehydeConcentrationMeasurement::Id,
-        Pm1ConcentrationMeasurement::Id,
-        Pm10ConcentrationMeasurement::Id,
-        RadonConcentrationMeasurement::Id>;
+    using FullSensor =
+        AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id,
+                         Pm25ConcentrationMeasurement::Id, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                         CarbonMonoxideConcentrationMeasurement::Id, NitrogenDioxideConcentrationMeasurement::Id,
+                         OzoneConcentrationMeasurement::Id, FormaldehydeConcentrationMeasurement::Id,
+                         Pm1ConcentrationMeasurement::Id, Pm10ConcentrationMeasurement::Id, RadonConcentrationMeasurement::Id>;
 
     FullSensor sensor(mTimerDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
@@ -232,10 +221,8 @@ TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 
 TEST_F(TestAirQualitySensor, TestCleanTeardown)
 {
-    using TestSensor = AirQualitySensor<
-        TemperatureMeasurement::Id,
-        RelativeHumidityMeasurement::Id,
-        CarbonDioxideConcentrationMeasurement::Id>;
+    using TestSensor =
+        AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
     TestSensor sensor(mTimerDelegate);
 
