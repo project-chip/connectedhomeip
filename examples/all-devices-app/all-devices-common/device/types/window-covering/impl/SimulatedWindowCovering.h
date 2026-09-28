@@ -21,6 +21,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
 
+#include <variant>
+
 namespace chip {
 namespace app {
 
@@ -58,9 +60,19 @@ protected:
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    bool mMovingLift  = false;
-    bool mMovingTilt  = false;
-    bool mCalibrating = false;
+    // Lift and tilt can move independently and simultaneously, but neither can be in progress
+    // while calibrating (motion is locked - see GetMotionLockStatus()). MovementState and
+    // CalibratingState are kept as a variant rather than three independent bools so that
+    // invariant is structural: it is impossible to be calibrating and moving at once.
+    struct MovementState
+    {
+        bool movingLift = false;
+        bool movingTilt = false;
+    };
+    struct CalibratingState
+    {
+    };
+    std::variant<MovementState, CalibratingState> mState = MovementState{};
 
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };

@@ -115,13 +115,18 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleMovement type=%" PRIu16, static_cast<uint16_t>(type));
     auto & cluster = WindowCoveringCluster();
 
+    // GetMotionLockStatus() rejects movement commands while calibrating, so mState must already
+    // hold MovementState here.
+    auto * movement = std::get_if<MovementState>(&mState);
+    VerifyOrReturnError(movement != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     if (type == Clusters::WindowCovering::WindowCoveringType::Lift)
     {
         auto target  = cluster.GetTargetPositionLiftPercent100ths();
         auto current = cluster.GetCurrentPositionLiftPercent100ths();
         if (!target.IsNull() && !current.IsNull() && target != current)
         {
-            mMovingLift = true;
+            movement->movingLift = true;
         }
     }
     else if (type == Clusters::WindowCovering::WindowCoveringType::Tilt)
@@ -130,11 +135,11 @@ CHIP_ERROR SimulatedWindowCovering::HandleMovement(Clusters::WindowCovering::Win
         auto current = cluster.GetCurrentPositionTiltPercent100ths();
         if (!target.IsNull() && !current.IsNull() && target.Value() != current.Value())
         {
-            mMovingTilt = true;
+            movement->movingTilt = true;
         }
     }
 
-    if (mMovingLift || mMovingTilt)
+    if (movement->movingLift || movement->movingTilt)
     {
         mContext.timerDelegate.CancelTimer(this);
         ReturnErrorOnFailure(mContext.timerDelegate.StartTimer(this, kTransitionInterval));
@@ -148,8 +153,11 @@ CHIP_ERROR SimulatedWindowCovering::HandleStopMotion()
     ChipLogProgress(DeviceLayer, "WindowCovering: HandleStopMotion");
 
     mContext.timerDelegate.CancelTimer(this);
-    mMovingLift = false;
-    mMovingTilt = false;
+    if (auto * movement = std::get_if<MovementState>(&mState))
+    {
+        movement->movingLift = false;
+        movement->movingTilt = false;
+    }
 
     auto & cluster = WindowCoveringCluster();
 
@@ -206,17 +214,15 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
     // Per spec 9.3.6.14.2, calibration mode is entered as soon as the bit is set (movement
     // commands are rejected by WindowCoveringCluster's own motion lock while calibrating, so
     // that can't be the trigger point - see HandleMovement()/GetMotionLockStatus()).
-    if (!newMode.Has(Mode::kCalibrationMode) || mCalibrating)
+    if (!newMode.Has(Mode::kCalibrationMode) || std::holds_alternative<CalibratingState>(mState))
     {
         return;
     }
 
     ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%" PRIu32 " ms)", kCalibrationDuration.count());
-    mCalibrating = true;
-    // No movement can be in progress while calibrating (motion is locked), so drop any stale
-    // moving flags; a client must send a fresh movement command after calibration completes.
-    mMovingLift    = false;
-    mMovingTilt    = false;
+    // Replaces whatever MovementState was active - no movement flags to remember to clear
+    // separately; a client must send a fresh movement command after calibration completes.
+    mState = CalibratingState{};
     auto & cluster = WindowCoveringCluster();
     cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
     cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
@@ -228,13 +234,13 @@ void SimulatedWindowCovering::TimerFired()
 {
     auto & cluster = WindowCoveringCluster();
 
-    if (mCalibrating)
+    if (std::holds_alternative<CalibratingState>(mState))
     {
         // Fake calibration finished: resolve to a known position and leave calibration mode by
         // completing the routine, per spec 9.3.6.14.2. No move was ever accepted by the cluster
         // while calibrating (see OnModeChanged()), so there's nothing deferred to resume here -
         // a client must send a fresh movement command now that the device is operational again.
-        mCalibrating = false;
+        mState = MovementState{};
         cluster.SetCurrentPositionLiftPercent100ths(
             DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
         cluster.SetCurrentPositionTiltPercent100ths(
@@ -262,7 +268,10 @@ void SimulatedWindowCovering::TimerFired()
         return;
     }
 
-    if (mMovingLift)
+    // Calibration was ruled out above, so this must be MovementState.
+    auto & movement = std::get<MovementState>(mState);
+
+    if (movement.movingLift)
     {
         // Current positions are always non-null while moving (calibration locks motion), so read
         // them directly; the target is null unless a client commanded a movement, in which case it
@@ -279,10 +288,10 @@ void SimulatedWindowCovering::TimerFired()
                         nextVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kLift));
 
-        mMovingLift = (nextVal != targetVal);
+        movement.movingLift = (nextVal != targetVal);
     }
 
-    if (mMovingTilt)
+    if (movement.movingTilt)
     {
         Percent100ths currentVal = cluster.GetCurrentPositionTiltPercent100ths().Value();
         Percent100ths targetVal  = cluster.GetTargetPositionTiltPercent100ths().ValueOr(currentVal);
@@ -296,10 +305,10 @@ void SimulatedWindowCovering::TimerFired()
                         nextVal, targetVal, opStatus.Raw(), opStatus.GetField(OperationalStatus::kGlobal),
                         opStatus.GetField(OperationalStatus::kTilt));
 
-        mMovingTilt = (nextVal != targetVal);
+        movement.movingTilt = (nextVal != targetVal);
     }
 
-    if (mMovingLift || mMovingTilt)
+    if (movement.movingLift || movement.movingTilt)
     {
         LogErrorOnFailure(mContext.timerDelegate.StartTimer(this, kTransitionInterval));
     }
