@@ -331,7 +331,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tl3228x_retention-smoke-co-alarm' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3228x retention smoke-co-alarm-app \
+                    telink tl3228x_retention smoke-co-alarm-app \
                     out/telink-tl3228x_retention-smoke-co-alarm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
