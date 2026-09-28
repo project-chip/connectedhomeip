@@ -701,13 +701,10 @@ struct MockDeviceInterface : public DeviceInterface
 {
 public:
     MockDeviceInterface() : DeviceInterface({}) {}
-    EndpointId GetEndpointId() const override
-    {
-        return endpointId;
-    }
+    EndpointId GetEndpointId() const override { return endpointId; }
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition comp = {}) override
+                        EndpointComposition comp = {}) override
     {
         VerifyOrReturnError(endpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
 
@@ -719,12 +716,9 @@ public:
         composition = comp;
         return CHIP_NO_ERROR;
     }
-    void Unregister(CodeDrivenDataModelProvider & provider) override
-    {
-        endpointId = kInvalidEndpointId;
-    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override { endpointId = kInvalidEndpointId; }
 
-    EndpointId endpointId = kInvalidEndpointId;
+    EndpointId endpointId           = kInvalidEndpointId;
     EndpointComposition composition = {};
 };
 
@@ -743,7 +737,7 @@ public:
         {
             return DeviceRegistrationEntry{ nullptr, nullptr };
         }
-        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(), nullptr};
+        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(), nullptr };
     }
 };
 
@@ -751,10 +745,7 @@ class MockEndpointIdAllocator : public EndpointIdAllocator
 {
 public:
     MockEndpointIdAllocator(EndpointId testStart = 1) : mNext(testStart), mAllocated(testStart) {}
-    EndpointId Allocate() override
-    {
-        return mNext++;
-    }
+    EndpointId Allocate() override { return mNext++; }
 
     // This will return the endpoint Ids that were allocated in the order they were allocated.
     EndpointId NextAllocatedEndpoint()
@@ -773,7 +764,6 @@ private:
     EndpointId mAllocated;
 };
 
-
 TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
 {
     // These are the objects that will not hold a state between test cases that can have side effects.
@@ -788,7 +778,8 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         deviceManager.SetEndpointIdAllocator(allocator);
 
         InMemoryOOBAccessorRegistry registry;
-        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)),
+                  CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -800,8 +791,7 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         EndpointId aggregatorEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(aggregatorEndpoint).has_value());
@@ -835,7 +825,8 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EXPECT_EQ(deviceManager.GetDevice(aggregatorEndpoint)->isBridged, false);
 
         InMemoryOOBAccessorRegistry registry;
-        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)),
+                  CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -848,8 +839,7 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         EndpointId bridgedNodeEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
@@ -878,7 +868,8 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EXPECT_EQ(deviceManager.GetDevice(bridgedNodeEndpoint)->isBridged, true);
 
         InMemoryOOBAccessorRegistry registry;
-        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)),
+                  CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -891,8 +882,7 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-                  CHIP_NO_ERROR);
+        EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         EndpointId testDeviceEndpoint = allocator.NextAllocatedEndpoint();
         EXPECT_TRUE(deviceManager.GetDevice(testDeviceEndpoint).has_value());
@@ -908,7 +898,8 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
         deviceManager.SetEndpointIdAllocator(allocator);
 
         InMemoryOOBAccessorRegistry registry;
-        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor<MockDeviceFactory>>(deviceManager)),
+                  CHIP_NO_ERROR);
 
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -956,13 +947,11 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(registry.HandleAction("RemoveBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(registry.HandleAction("RemoveBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
     // Verify that the device has been removed
     EXPECT_FALSE(deviceManager.GetDevice(bridgedNodeEndpoint).has_value());
 }
-
 
 TEST_F(TestOOBAccessors, NoopRegistryLifecycle)
 {

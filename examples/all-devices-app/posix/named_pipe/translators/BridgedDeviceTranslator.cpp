@@ -19,7 +19,7 @@
 namespace chip::app::NamedPipe {
 
 CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, const Json::Value & json,
-                                                           OOBAccessorRegistry & registry) const
+                                                        OOBAccessorRegistry & registry) const
 {
     std::string action = json["Name"].asString();
     if (action == "AddBridgedDevice")

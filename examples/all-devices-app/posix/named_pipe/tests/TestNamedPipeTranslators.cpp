@@ -20,10 +20,10 @@
 #include <oob-accessors/OOBAccessor.h>
 #include <posix/named_pipe/CommandTranslator.h>
 #include <posix/named_pipe/Dispatcher.h>
-#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 #include <posix/named_pipe/translators/AmbientContextTranslator.h>
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
+#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>

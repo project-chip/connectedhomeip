@@ -17,8 +17,8 @@
 
 #pragma once
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/api/allocator/EndpointIdAllocator.h>
 #include <device/api/Interface.h>
+#include <device/api/allocator/EndpointIdAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <algorithm>
