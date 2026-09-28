@@ -39,13 +39,13 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AUDIOCONTROL_2_5(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_5(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_5(self) -> str:
         return "[TC-AUDIOCONTROL-2.5] IncreaseVolume and DecreaseVolume commands with DUT as Server"
