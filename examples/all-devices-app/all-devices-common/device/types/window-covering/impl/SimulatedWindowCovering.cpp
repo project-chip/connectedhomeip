@@ -222,7 +222,7 @@ void SimulatedWindowCovering::OnModeChanged(chip::BitMask<Mode> newMode)
     ChipLogProgress(DeviceLayer, "WindowCovering: Starting fake calibration (%" PRIu32 " ms)", kCalibrationDuration.count());
     // Replaces whatever MovementState was active - no movement flags to remember to clear
     // separately; a client must send a fresh movement command after calibration completes.
-    mState = CalibratingState{};
+    mState         = CalibratingState{};
     auto & cluster = WindowCoveringCluster();
     cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>());
     cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>());
