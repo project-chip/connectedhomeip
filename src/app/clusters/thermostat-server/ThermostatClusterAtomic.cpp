@@ -98,7 +98,7 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
     }
 
     auto entry = DataModel::ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>::EntryFor(attributeId);
-    if (!entry.has_value() || !entry->GetWritePrivilege().has_value())
+    if (!entry.has_value())
     {
         return Status::UnsupportedAccess;
     }
@@ -110,7 +110,13 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
         .entityId    = attributeId,
     };
 
-    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *entry->GetWritePrivilege()) !=
+    auto writePrivilege = entry->GetWritePrivilege();
+    if (!writePrivilege.has_value())
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) !=
         CHIP_NO_ERROR)
     {
         return Status::UnsupportedAccess;
