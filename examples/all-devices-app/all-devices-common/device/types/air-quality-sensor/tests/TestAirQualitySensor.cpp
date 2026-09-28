@@ -95,10 +95,10 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
         AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
     ConfiguredSensor::Config config;
-    config.Get<TemperatureMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000));
-    config.Get<TemperatureMeasurement::Id>().maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(6000));
-    config.Get<RelativeHumidityMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(1000));
-    config.Get<RelativeHumidityMeasurement::Id>().maxMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(9000));
+    config.Get<TemperatureMeasurement::Id>().minMeasuredValue           = DataModel::MakeNullable(static_cast<int16_t>(-2000));
+    config.Get<TemperatureMeasurement::Id>().maxMeasuredValue           = DataModel::MakeNullable(static_cast<int16_t>(6000));
+    config.Get<RelativeHumidityMeasurement::Id>().minMeasuredValue      = DataModel::MakeNullable(static_cast<uint16_t>(1000));
+    config.Get<RelativeHumidityMeasurement::Id>().maxMeasuredValue      = DataModel::MakeNullable(static_cast<uint16_t>(9000));
     config.Get<CarbonDioxideConcentrationMeasurement::Id>().minMeasured = DataModel::MakeNullable(400.0f);
     config.Get<CarbonDioxideConcentrationMeasurement::Id>().maxMeasured = DataModel::MakeNullable(2000.0f);
 

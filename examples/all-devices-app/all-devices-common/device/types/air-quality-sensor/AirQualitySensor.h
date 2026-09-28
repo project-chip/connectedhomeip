@@ -168,22 +168,59 @@ template <ClusterId CID>
 struct ConcentrationConfigTraits
 {
     using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config;
-    static Type Default()
-    {
-        return DefaultConcentrationConfig(CID);
-    }
+    static Type Default() { return DefaultConcentrationConfig(CID); }
 };
 
-template <> struct ClusterConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::OzoneConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::OzoneConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id> {};
-template <> struct ClusterConfigTraits<Clusters::RadonConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::RadonConcentrationMeasurement::Id> {};
+template <>
+struct ClusterConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::OzoneConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::OzoneConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id>
+{
+};
+template <>
+struct ClusterConfigTraits<Clusters::RadonConcentrationMeasurement::Id>
+    : ConcentrationConfigTraits<Clusters::RadonConcentrationMeasurement::Id>
+{
+};
 
 template <ClusterId CID>
 using ClusterConfigType = typename ClusterConfigTraits<CID>::Type;
@@ -317,8 +354,7 @@ public:
 
             if constexpr (clusterId == Clusters::TemperatureMeasurement::Id)
             {
-                clusterWrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(),
-                                      clusterConfig);
+                clusterWrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(), clusterConfig);
             }
             else
             {
