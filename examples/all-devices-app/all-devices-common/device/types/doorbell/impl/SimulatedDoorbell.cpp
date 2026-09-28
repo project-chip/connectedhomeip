@@ -28,8 +28,11 @@ CHIP_ERROR SimulatedDoorbell::HandleShortPress()
     // A basic doorbell short press simulates pressing the momentary switch (position 1),
     // triggering the chime, and then returning it to its idle released state (position 0).
     ReturnErrorOnFailure(SetSwitchPosition(1));
+    RETURN_SAFELY_IGNORED mSwitchCluster.Cluster().OnInitialPress(1);
     // Chime trigger should happen here.
-    return SetSwitchPosition(0);
+    ReturnErrorOnFailure(SetSwitchPosition(0));
+    RETURN_SAFELY_IGNORED mSwitchCluster.Cluster().OnShortRelease(1);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SimulatedDoorbell::HandleSetCurrentPosition(uint8_t currentPosition)
