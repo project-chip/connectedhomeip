@@ -30,9 +30,7 @@ CHIP_ERROR SimulatedDoorbell::HandleShortPress()
     ReturnErrorOnFailure(SetSwitchPosition(1));
     RETURN_SAFELY_IGNORED mSwitchCluster.Cluster().OnInitialPress(1);
     // Chime trigger should happen here.
-    ReturnErrorOnFailure(SetSwitchPosition(0));
-    RETURN_SAFELY_IGNORED mSwitchCluster.Cluster().OnShortRelease(1);
-    return CHIP_NO_ERROR;
+    return SetSwitchPosition(0);
 }
 
 CHIP_ERROR SimulatedDoorbell::HandleSetCurrentPosition(uint8_t currentPosition)
