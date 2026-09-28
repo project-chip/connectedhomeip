@@ -49,8 +49,9 @@ namespace app {
 SimulatedClosure::SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                                    Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,
                                    TestEventTriggerDelegate & testEventTriggerDelegate) :
-    Closure(config.closure, Tdelegate, Idelegate, *this), OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }),
-    mPanelList(std::move(config.panels)), mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+    Closure(config.closure, Tdelegate, Idelegate, *this),
+    OnOffContext({ groupDataProvider, fabricTable, Tdelegate, Idelegate }), mPanelList(std::move(config.panels)),
+    mTimerDelegate(Tdelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
 SimulatedClosure::~SimulatedClosure()
