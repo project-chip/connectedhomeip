@@ -2248,22 +2248,29 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Check if a PICS (Protocol Implementation Conformance Statement) key is enabled.
 
         PICS are stored as an endpoint-keyed tree {endpoint: {code: bool}}.
+        The key is looked up in the endpoint's slice, falling back to endpoint 0
+        for codes that slice does not define: device-wide codes such as MCORE.*
+        live on endpoint 0, and a PICS input with no endpoint structure is
+        placed there when no --endpoint is given. Other endpoints are never
+        consulted.
 
         Args:
             pics_key: The PICS key to check.
-            endpoint: If supplied, only that endpoint's PICS are consulted. If
-                omitted (the default), the key is considered enabled when it is
-                enabled on any endpoint - device-wide codes such as MCORE.*
-                live on endpoint 0, so this keeps the historical flat lookup
-                behavior for callers that don't care about the endpoint.
+            endpoint: The endpoint whose PICS to consult. Defaults to the
+                endpoint under test (get_endpoint()), matching the flat lookup
+                from before the tree, where the PICS supplied were those of the
+                endpoint being tested.
 
         Returns:
             True if the PICS key is enabled, False otherwise.
         """
         key = pics_key.strip()
-        if endpoint is not None:
-            return self.matter_test_config.pics.get(endpoint, {}).get(key, False)
-        return any(codes.get(key, False) for codes in self.matter_test_config.pics.values())
+        if endpoint is None:
+            endpoint = self.get_endpoint()
+        codes = self.matter_test_config.pics.get(endpoint, {})
+        if key in codes:
+            return codes[key]
+        return self.matter_test_config.pics.get(0, {}).get(key, False)
 
     def pics_guard(self, pics_condition: bool):
         """Checks a condition and if False marks the test step as skipped and

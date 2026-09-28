@@ -516,24 +516,34 @@ class TestPicsHelpers(CertificationUnitTestNoDevice):
     # check_pics: endpoint-aware lookups over the endpoint-keyed tree
     # ------------------------------------------------------------------
 
-    def test_check_pics_any_endpoint_when_endpoint_omitted(self):
+    def test_check_pics_endpoint_under_test_when_endpoint_omitted(self):
         """
-        With no endpoint, a code is enabled if it is true on ANY endpoint.
+        With no endpoint, the endpoint under test is consulted, falling back to
+        endpoint 0 for device-wide codes. Other endpoints' codes do not count.
         """
-        self.matter_test_config.pics = {0: {'MCORE.IDM.S': True}, 3: {'SWTCH.S': True}}
-        asserts.assert_true(self.check_pics('SWTCH.S'), "code true on endpoint 3 must satisfy unscoped check")
-        asserts.assert_true(self.check_pics('MCORE.IDM.S'), "code true on endpoint 0 must satisfy unscoped check")
-        asserts.assert_false(self.check_pics('NOT.PRESENT'), "absent code must be False")
+        self.matter_test_config.pics = {0: {'MCORE.IDM.S': True}, 3: {'SWTCH.S': True}, 5: {'LVL.S': True}}
+        saved_endpoint = self.matter_test_config.endpoint
+        self.matter_test_config.endpoint = 3
+        try:
+            asserts.assert_true(self.check_pics('SWTCH.S'), "code true on the endpoint under test must be found")
+            asserts.assert_true(self.check_pics('MCORE.IDM.S'), "device-wide code on endpoint 0 must be found")
+            asserts.assert_false(self.check_pics('LVL.S'), "code true only on another endpoint must be False")
+            asserts.assert_false(self.check_pics('NOT.PRESENT'), "absent code must be False")
+        finally:
+            self.matter_test_config.endpoint = saved_endpoint
 
     def test_check_pics_scoped_to_endpoint(self):
         """
-        With an endpoint, only that endpoint's slice is consulted.
+        With an endpoint, that endpoint's slice is consulted, and it overrides
+        endpoint 0 for codes it defines.
         """
-        self.matter_test_config.pics = {0: {'SWTCH.S': False}, 3: {'SWTCH.S': True}}
+        self.matter_test_config.pics = {0: {'SWTCH.S': False, 'MCORE.IDM.S': True}, 3: {'SWTCH.S': True, 'MCORE.IDM.S': False}}
         asserts.assert_false(self.check_pics('SWTCH.S', endpoint=0), "endpoint 0 slice says False")
         asserts.assert_true(self.check_pics('SWTCH.S', endpoint=3), "endpoint 3 slice says True")
-        # An endpoint with no slice at all returns False rather than raising.
-        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=9), "unknown endpoint must be False")
+        asserts.assert_false(self.check_pics('MCORE.IDM.S', endpoint=3), "endpoint 3 slice overrides endpoint 0")
+        # An endpoint with no slice at all only sees endpoint 0's codes.
+        asserts.assert_true(self.check_pics('MCORE.IDM.S', endpoint=9), "unknown endpoint falls back to endpoint 0")
+        asserts.assert_false(self.check_pics('SWTCH.S', endpoint=9), "endpoint 3 code must not leak into endpoint 9")
 
     def test_check_pics_no_cross_endpoint_leak(self):
         """
