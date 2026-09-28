@@ -66,7 +66,7 @@ _AGGREGATOR_DEVICE_TYPE_ID = 0x000E
 
 # Local-only fact extension. Inherits everything BasePicsFacts derives from
 # the wildcard (commissionee, server, bridge, OTA, multi-endpoint groups,
-# Wi-Fi bands, mandatory events). Adds the MCORE.COM.WIFI/THR/ETH/WIRELESS
+# Wi-Fi bands, mandatory events). Adds the MCORE.COM.WIFI/THR/ETH
 # transport bits that the shared helper deliberately does not derive while
 # GRL stress-test feedback is outstanding. Once the test-plans cleanup PRs
 # land, this extension can be deleted and the generator can use
@@ -121,12 +121,6 @@ def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
 
     if facts.supports_ethernet:
         auto_marked["MCORE.COM.ETH"] = True
-
-    # MCORE.COM.WIRELESS conformance requires at least one of WIFI / THR to
-    # be set; mirror what we marked above so we don't leave the file
-    # internally inconsistent.
-    if facts.supports_wifi or facts.supports_thread:
-        auto_marked["MCORE.COM.WIRELESS"] = True
 
     if facts.is_server:
         auto_marked["MCORE.IDM.S"] = True

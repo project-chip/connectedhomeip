@@ -43,12 +43,12 @@ import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
-class TC_TIMESYNC_2_4(MatterBaseTest):
+class TC_TIMESYNC_2_4(MatterTestCommissionedDevice):
     async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)

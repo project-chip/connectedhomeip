@@ -184,6 +184,7 @@ chip_test_suite("tests") {
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFabricSensitiveAttributeRead.cpp",
     "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",

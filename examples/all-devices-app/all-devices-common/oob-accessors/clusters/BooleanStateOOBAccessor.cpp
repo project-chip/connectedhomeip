@@ -16,64 +16,52 @@
 
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
 
+#include <app/data-model/Decode.h>
+#include <clusters/BooleanState/AttributeIds.h>
+#include <clusters/BooleanState/ClusterId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <oob-accessors/OOBDataSerializer.h>
 
 namespace chip::app {
 
 std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    if (!action.data_equal("SetBooleanState"_span))
+    if (action.data_equal(OOBDataSerializer::kSetAttributeAction))
     {
+        return HandleSetAttribute(tlvData);
+    }
+
+    return std::nullopt;
+}
+
+std::optional<CHIP_ERROR> BooleanStateOOBAccessor::HandleSetAttribute(ByteSpan tlvData) const
+{
+    auto parseResult = OOBDataSerializer::ParseAttributeRequest(tlvData);
+    if (std::holds_alternative<CHIP_ERROR>(parseResult))
+    {
+        CHIP_ERROR err = std::get<CHIP_ERROR>(parseResult);
+        ChipLogError(Support, "Failed to parse OOB attribute request: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
+    VerifyOrReturnValue(request.path.mEndpointId == mEndpointId, std::nullopt);
+    VerifyOrReturnValue(request.path.mClusterId == Clusters::BooleanState::Id, std::nullopt);
+
+    switch (request.path.mAttributeId)
+    {
+    case Clusters::BooleanState::Attributes::StateValue::Id: {
+        // StateValue is read-only per spec; only the cluster API can set it.
+        bool stateValue = false;
+        ReturnErrorOnFailure(DataModel::Decode(request.value, stateValue));
+        mCluster.SetStateValue(stateValue);
+        return CHIP_NO_ERROR;
+    }
+    default:
         return std::nullopt;
     }
-
-    TLV::TLVReader reader;
-    reader.Init(tlvData);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-    EndpointId endpointId = kInvalidEndpointId;
-    bool newState         = false;
-    bool hasEndpointId    = false;
-    bool hasNewState      = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        TLV::Tag tag = reader.GetTag();
-        if (!TLV::IsContextTag(tag))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(tag))
-        {
-        case 1:
-            ReturnErrorOnFailure(reader.Get(endpointId));
-            hasEndpointId = true;
-            break;
-        case 2:
-            ReturnErrorOnFailure(reader.Get(newState));
-            hasNewState = true;
-            break;
-        default:
-            break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-    VerifyOrReturnError(hasEndpointId && hasNewState, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (endpointId != mEndpointId)
-    {
-        return std::nullopt;
-    }
-
-    mCluster.SetStateValue(newState);
-    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app

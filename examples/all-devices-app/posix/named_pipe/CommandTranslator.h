@@ -21,6 +21,7 @@
 #include <optional>
 #include <type_traits>
 
+#include <app/ConcreteAttributePath.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -28,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/OOBDataSerializer.h>
 
 namespace chip::app::NamedPipe {
 
@@ -171,6 +173,19 @@ public:
         ByteSpan payload;
         ReturnErrorOnFailure(message.Finalize(payload));
         return registry.HandleAction(actionName, payload);
+    }
+
+    template <typename T>
+    static CHIP_ERROR DispatchSetAttribute(OOBAccessorRegistry & registry, const ConcreteAttributePath & path, const T & value)
+    {
+        auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, value);
+        if (std::holds_alternative<CHIP_ERROR>(buildResult))
+        {
+            return std::get<CHIP_ERROR>(buildResult);
+        }
+
+        auto & buffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+        return registry.HandleAction(OOBDataSerializer::kSetAttributeAction, buffer);
     }
 };
 

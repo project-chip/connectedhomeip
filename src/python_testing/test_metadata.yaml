@@ -1,42 +1,6 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
-    - name: TC_COMPRO_2_1.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_2.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_3.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_4.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_5.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_6.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_7.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_8.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
-    - name: TC_COMPRO_2_9.py
-      reason:
-          Requires commissioning-proxy-app and WiFi-PAF/BLE hardware; not
-          runnable in the CI container.
     - name: TC_DD_3_23.py
       reason:
           NFC Reader needed for running this test-case and CI does not support
@@ -244,6 +208,8 @@ not_automated:
       reason: Shared code for TC_GC, not a standalone test.
     - name: TC_S_common.py
       reason: Shared helper code for TC_S, not a standalone test.
+    - name: TC_DA_PQC_common.py
+      reason: Shared code for the TC_DA PQC tests, not a standalone test.
     - name: TC_NETIM_1_5.py
       reason:
           The DUT is a Matter commissioner that originates the commands under
@@ -268,6 +234,16 @@ not_automated:
           Needs a DUT started with a PQC-capable DAC provider whose DAC
           documents share one attestation key, plus a PAA trust store holding
           the matching ML-DSA PAA, which the generic CI harness does not set up.
+    - name: TC_DA_1_11.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
+    - name: TC_DA_1_13.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
     - name: TC_AUDIOCONTROLTestBase.py
       reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
     - name: TC_MEDIAPLAYBACKTestBase.py
@@ -276,20 +252,6 @@ not_automated:
       reason: Shared code for TC_MESS, not a standalone test.
     - name: TC_MEDIAFILEMANAGEMENTTestBase.py
       reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
-    - name: TC_AUDIOCONTROL_2_1.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_2.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_3.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_4.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_5.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_6.py
-      reason: Pending tv-app in CI
-    - name: TC_AUDIOCONTROL_2_7.py
-      reason: Pending tv-app in CI
     - name: TC_AUDIOCONTROL_2_8.py
       reason: Pending tv-app in CI
     - name: TC_MEDIAPLAYBACK_6_11.py
@@ -333,6 +295,47 @@ not_automated:
       reason:
           CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
+
+# Tests whose `app` is a script that brings up a mocked topology. CI runs them
+# like any other test. `local.py python-tests` skips them, because they need
+# root and applications built with BLE and Wi-Fi.
+dedicated_runner:
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

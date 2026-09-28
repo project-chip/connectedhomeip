@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
+
 #include <platform/CHIPDeviceConfig.h>
 
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
@@ -52,7 +54,7 @@ public:
     AppRootNode(const RootNode::Context & context, BitFlags<EnabledFeatures> features = {}) :
         mEnabledFeatures(features),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mWiFiRootNode(context, { .wifiDriver = mWiFiDriver }),
+        mWiFiRootNode(context, WifiFeature::Context{ .wifiDriver = mWiFiDriver }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mRootNode(context)
     {
@@ -86,7 +88,6 @@ private:
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
     WifiRootNode mWiFiRootNode;
-#else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     RootNode mRootNode;

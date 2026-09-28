@@ -68,6 +68,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperatio
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -78,7 +79,7 @@ commands = cluster.Commands
 modes = cluster.Enums.OperatingModeEnum
 
 
-class TC_ICDB_3_2(ICDBaseTest):
+class TC_ICDB_3_2(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_3_2(self) -> str:
         return "[TC-ICDB-3.2] ICD Dynamic SIT/LIT - Verify OperatingMode does not transition between LIT and SIT when there is no client registration [DUT as Server]"

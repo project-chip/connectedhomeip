@@ -48,7 +48,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -230,7 +230,7 @@ def _check_surge_protection_ratings_struct(s) -> None:
         _check_uint_min_one(s.responseTime, 'ResponseTime')
 
 
-class TC_EPALM_2_1(MatterBaseTest):
+class TC_EPALM_2_1(MatterTestCommissionedDevice):
 
     @pics('EPALM.S')
     @async_test_body

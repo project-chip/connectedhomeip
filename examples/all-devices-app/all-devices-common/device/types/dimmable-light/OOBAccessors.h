@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
+#include <device/types/dimmable-light/DimmableLight.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
-void RegisterOOBAccessors(DimmableLoad & device, OOBAccessorRegistry & registry);
+void RegisterOOBAccessors(DimmableLight & device, OOBAccessorRegistry & registry);
 
 } // namespace chip::app
