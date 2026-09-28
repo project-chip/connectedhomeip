@@ -75,6 +75,7 @@ public:
     }
 
     RootNode & GetRootNode() { return RootDevice(); }
+    Clusters::BreadCrumbTracker & BreadCrumbTracker() { return RootDevice().BreadCrumbTracker(); }
 
 private:
     BitFlags<EnabledFeatures> mEnabledFeatures;

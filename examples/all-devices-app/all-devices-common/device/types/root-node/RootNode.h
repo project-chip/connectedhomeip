@@ -98,6 +98,9 @@ public:
 
     Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
 
+    /// Returns the BreadCrumbTracker provided by GeneralCommissioning.
+    Clusters::BreadCrumbTracker & BreadCrumbTracker() { return GeneralCommissioning(); }
+
 protected:
     /// Accessible to `RootNodeWith` so feature policies can wire themselves in
     /// against the shared root-node clusters (e.g., NetworkCommissioning needs

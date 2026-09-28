@@ -43,6 +43,5 @@ source_set("simulated") {
 
   public_deps = [
     ":network-infrastructure-manager",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/breadcrumb",
   ]
 }

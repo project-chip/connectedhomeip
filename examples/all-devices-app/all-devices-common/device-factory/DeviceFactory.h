@@ -20,6 +20,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
@@ -244,6 +245,13 @@ public:
 
     void Init(const Context & context) { mContext.emplace(context); }
 
+    void SetBreadCrumbTracker(Clusters::BreadCrumbTracker * tracker) { mBreadCrumbTracker = tracker; }
+    Clusters::BreadCrumbTracker & GetBreadCrumbTracker() const
+    {
+        VerifyOrDie(mBreadCrumbTracker != nullptr);
+        return *mBreadCrumbTracker;
+    }
+
     void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator && creator)
     {
         if (mDefaultDevice.empty())
@@ -290,6 +298,7 @@ private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
+    Clusters::BreadCrumbTracker * mBreadCrumbTracker = nullptr;
 
     DeviceFactory()
     {
@@ -494,11 +503,12 @@ private:
             RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                    .nodeLabel       = nodeLabel,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = GetBreadCrumbTracker(),
+                    .nodeLabel         = nodeLabel,
                 });
             });
         }
@@ -637,11 +647,12 @@ private:
             RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                    .nodeLabel       = nodeLabel,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = GetBreadCrumbTracker(),
+                    .nodeLabel         = nodeLabel,
                 });
             });
         }

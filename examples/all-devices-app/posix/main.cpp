@@ -199,6 +199,8 @@ public:
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
         PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
+        PosixDeviceFactory::GetInstance().SetBreadCrumbTracker(&mRootNode.RootDevice().BreadCrumbTracker());
+
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
             auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
@@ -224,6 +226,7 @@ public:
 
     void Shutdown()
     {
+        PosixDeviceFactory::GetInstance().SetBreadCrumbTracker(nullptr);
         OOBAccessorRegistry::Instance().Clear();
         for (auto & device : mConstructedDevices)
         {
