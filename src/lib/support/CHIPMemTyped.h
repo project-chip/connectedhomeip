@@ -19,7 +19,11 @@
 #pragma once
 
 #include <stdlib.h>
+
+// SystemConfig.h pulls in C++-only platform config headers; CHIPPlatformMemory.h is also included from C.
+#ifdef __cplusplus
 #include <system/SystemConfig.h>
+#endif
 
 // If type-aware malloc is available and enabled, then we'll try to use it.
 // We define CHIP_SYSTEM_CONFIG_TYPED_MALLOC to 1 in that case (0 if disabled).
