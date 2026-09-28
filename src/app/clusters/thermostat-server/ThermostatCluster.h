@@ -138,6 +138,24 @@ public:
         return ThermostatClusterBase::IsOccupied();
     }
 
+    bool IsPresetHandlePresent(const ByteSpan & presetHandle) override
+    {
+        if constexpr (kHasPresets)
+        {
+            return mPresets.IsPresetHandlePresentInPresetsOrPending(presetHandle);
+        }
+        return false;
+    }
+
+    bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) override
+    {
+        if constexpr (kHasSchedules)
+        {
+            return mSchedules.IsPresetHandleInUse(presetHandle);
+        }
+        return false;
+    }
+
     template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>
     Protocols::InteractionModel::Status SetOccupancy(BitMask<OccupancyBitmap> occupied)
     {

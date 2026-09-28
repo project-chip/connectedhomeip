@@ -96,6 +96,8 @@ public:
 
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
+    virtual bool IsPresetHandlePresent(const ByteSpan & presetHandle) { return false; }
+    virtual bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) { return false; }
 
 protected:
     ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
