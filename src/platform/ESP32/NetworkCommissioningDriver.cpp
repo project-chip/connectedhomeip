@@ -62,21 +62,27 @@ constexpr PDCStorageKeys kPDCCommittedKeys{ "pdc-ssid", "pdc-ni", "pdc-ci", "pdc
 void DeletePDCNetwork(const PDCStorageKeys & keys)
 {
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
-    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.networkIdentity);
-    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.clientIdentity);
-    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.clientIdentityKeypair);
     if (keys.ssid != nullptr)
     {
         TEMPORARY_RETURN_IGNORED kvs.Delete(keys.ssid);
     }
+    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.networkIdentity);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.clientIdentity);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(keys.clientIdentityKeypair);
 }
 
-// Writes the identities and the key they attest to. The SSID, where this key set has one, is
-// written last so that its presence marks the stored network as complete.
+// Writes the identities and the key they attest to. The SSID, where this key set has one, marks
+// the stored network as complete: it is removed first and written last, so that an interrupted
+// overwrite can't leave the previous SSID vouching for a mix of old and new identities.
 CHIP_ERROR StorePDCNetwork(const PDCStorageKeys & keys, const ESPWiFiDriver::WiFiNetwork & network,
                            const Crypto::P256Keypair & keypair)
 {
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
+    if (keys.ssid != nullptr)
+    {
+        CHIP_ERROR err = kvs.Delete(keys.ssid);
+        VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+    }
     ReturnErrorOnFailure(kvs.Put(keys.networkIdentity, network.networkIdentity, network.networkIdentityLen));
     ReturnErrorOnFailure(kvs.Put(keys.clientIdentity, network.clientIdentity, network.clientIdentityLen));
 
@@ -251,9 +257,10 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
-    // If a fail-safe backup exists the device was rebooted with the fail-safe armed, and the backup
-    // takes precedence over anything loaded above: esp_wifi persists credential changes eagerly, so
-    // the pre-change network has to be put back. RevertConfiguration() reconnects when it restores.
+    // If a fail-safe backup exists the device was rebooted with the fail-safe armed or before a
+    // commit completed, and the backup takes precedence over anything loaded above: esp_wifi
+    // persists credential changes eagerly, so the pre-change network has to be put back.
+    // RevertConfiguration() reconnects when it restores.
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     bool backupExists =
         (PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, nullptr, 0) != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -284,32 +291,43 @@ void ESPWiFiDriver::Shutdown()
 
 CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // The backup has to outlive the committed record being written: removing kWiFiSSIDKeyName is
+    // what actually commits. If that point isn't reached, the backup is restored at the next boot,
+    // and RevertConfiguration() rewrites the committed record to match it.
+    ReturnErrorOnFailure(StoreCommittedPDCNetwork());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
     TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     DeletePDCNetwork(kPDCBackupKeys);
-
-    // esp_wifi has already persisted a passphrase network by this point, but knows nothing about a
-    // PDC one, so that is stored here instead. Committing anything else clears it, which covers
-    // both replacing a PDC network with a passphrase one and removing it outright.
-    if (mStagingNetwork.UsingPDC())
-    {
-        ReturnErrorOnFailure(StorePDCNetwork(kPDCCommittedKeys, mStagingNetwork, mClientIdentityKeypair));
-    }
-    else
-    {
-        DeletePDCNetwork(kPDCCommittedKeys);
-    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     return CHIP_NO_ERROR;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+CHIP_ERROR ESPWiFiDriver::StoreCommittedPDCNetwork()
+{
+    // esp_wifi persists a passphrase network by itself, but knows nothing about a PDC one, so that
+    // is stored here instead. Anything else clears it, which covers both replacing a PDC network
+    // with a passphrase one and removing it outright.
+    if (mStagingNetwork.UsingPDC())
+    {
+        return StorePDCNetwork(kPDCCommittedKeys, mStagingNetwork, mClientIdentityKeypair);
+    }
+    DeletePDCNetwork(kPDCCommittedKeys);
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 {
     WiFiNetwork network;
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
+    bool keepBackup       = false;
 
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, network.ssid, sizeof(network.ssid), &ssidLen);
     VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
@@ -333,6 +351,21 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 
     mStagingNetwork = network;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    {
+        // A commit that didn't complete may have left the committed record describing a network
+        // other than the one being restored. (A passphrase network needs no equivalent, as
+        // ConnectWiFiNetwork() rewrites esp_wifi's persisted config.) If this fails, keep the
+        // backup so the next boot can try again.
+        CHIP_ERROR storeError = StoreCommittedPDCNetwork();
+        if (storeError != CHIP_NO_ERROR)
+        {
+            ChipLogFailure(storeError, DeviceLayer, "Failed to store restored network, keeping backup");
+            keepBackup = true;
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     VerifyOrExit(!IsAssociatedWithStagingNetwork(), error = CHIP_NO_ERROR);
 
     if (error == CHIP_NO_ERROR)
@@ -352,6 +385,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     }
 
 exit:
+    VerifyOrReturnError(!keepBackup, error);
 
     // Remove the backup.
     TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
