@@ -61,12 +61,10 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         AbsMaxHeatSetpointLimitValue = 3000
         AbsMinCoolSetpointLimitValue = 1600
         AbsMinHeatSetpointLimitValue = 700
-        MinSetpointDeadBandValue = 200
 
-        # Thermostat is capable of managing a cooling device
-        self.has_cooling = self.check_pics("TSTAT.S.F01")
-        # Thermostat is capable of managing a heating device
-        self.has_heating = self.check_pics("TSTAT.S.F00")
+        # AUTO (TSTAT.S.F05) requires both cooling (F01) and heating (F00)
+        self.has_cooling = True
+        self.has_heating = True
         # Supports Occupied and Unoccupied setpoints
         self.hasOccupancy = self.check_pics("TSTAT.S.F02")
 
@@ -86,21 +84,9 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.has_min_cool_limit = self.check_pics("TSTAT.S.A0017")
         # Does the device implement the MinHeatSetpointLimit attribute?
         self.has_min_heat_limit = self.check_pics("TSTAT.S.A0015")
-        # Does the device implement the MinSetpointDeadBand attribute?
-        hasMinSetpointDeadBandAttribute = self.check_pics("TSTAT.S.A0019")
-        # Does the device implement the OccupiedCoolingSetpoint attribute?
-        hasOccupiedCoolingSetpointAttribute = self.check_pics("TSTAT.S.A0011")
-        # Does the device implement the OccupiedHeatingSetpoint attribute?
-        hasOccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0012")
-        # Does the device implement the UnoccupiedCoolingSetpoint attribute?
-        hasUnoccupiedCoolingSetpointAttribute = self.check_pics("TSTAT.S.A0013")
-        # Does the device implement the UnoccupiedHeatingSetpoint attribute?
-        hasUnoccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0014")
 
         self.step("1", "Commission DUT to TH", is_commissioning=True)
 
-        OccupiedHeatingSetpointValue = None
-        OccupiedCoolingSetpointValue = None
         UnoccupiedHeatingSetpointValue = None
         UnoccupiedCoolingSetpointValue = None
 
@@ -120,22 +106,19 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
             "Test Harness Client reads AbsMinHeatSetpointLimit, MinHeatSetpointLimit, AbsMaxCoolSetpointLimit, "
             "MaxCoolSetpointLimit, DeadBand, OccupiedCoolingSetpoint, OccupiedHeatingSetpoint attributes from Server DUT",
         )
-        if hasMinSetpointDeadBandAttribute:
-            MinSetpointDeadBandValue = (
-                await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand
-                )
-            ) * 10
-
-        if hasOccupiedHeatingSetpointAttribute:
-            OccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint
+        MinSetpointDeadBandValue = (
+            await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand
             )
+        ) * 10
 
-        if hasOccupiedCoolingSetpointAttribute:
-            OccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint
-            )
+        OccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint
+        )
+
+        OccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint
+        )
 
         if hasAbsMinHeatSetpointLimitAttribute:
             AbsMinHeatSetpointLimitValue = await self.read_single_attribute_check_success(
@@ -190,15 +173,13 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
             "Test Harness Client reads UnoccupiedCoolingSetpoint, UnoccupiedHeatingSetpoint attributes from Server DUT",
         )
         if self.pics_guard(self.hasOccupancy):
-            if hasUnoccupiedHeatingSetpointAttribute:
-                UnoccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint
-                )
+            UnoccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint
+            )
 
-            if hasUnoccupiedCoolingSetpointAttribute:
-                UnoccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint
-                )
+            UnoccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint
+            )
 
         # Initialize simulator and state
         self.simulator = ThermostatSimulator()
