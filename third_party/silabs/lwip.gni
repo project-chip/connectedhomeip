@@ -26,7 +26,7 @@ declare_args() {
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
   if (sl_use_sisdk_lwip) {
-    _lwip_root = "${wifi_sdk_root}/netstack_silabs_lwip/lwip"
+    _lwip_root = "${efr32_sdk_root}/network_stack/silabs_lwip/lwip"
   } else {
     _lwip_root = "${matter_support_root}/sdk-copies/lwip"
   }
@@ -171,7 +171,6 @@ template("lwip_target") {
 
     if (lwip_ipv6) {
       sources += [
-        "${_lwip_root}/src/core/ipv6/dhcp6.c",
         "${_lwip_root}/src/core/ipv6/ethip6.c",
         "${_lwip_root}/src/core/ipv6/icmp6.c",
         "${_lwip_root}/src/core/ipv6/inet6.c",

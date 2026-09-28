@@ -18,6 +18,15 @@
 
 #pragma once
 
+// Allow use of legacy mbedtls_* crypto primitives under mbedtls/private/.
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+
+// mbedTLS 4 includes tf-psa-crypto/build_info.h before MBEDTLS_CONFIG_FILE.
+// Pull Silabs mbedtls autogen so TF-PSA finalize (and tinycrypt builtin
+// modules) see MBEDTLS_*_C / MBEDTLS_PLATFORM_*. PSA_CRYPTO_C remains
+// disabled for tinycrypt via the guard inside the autogen header.
+#include "sli_mbedtls_config_autogen.h"
+
 // MATTER AWS Specific Configurations
 #ifdef SL_MATTER_ENABLE_AWS
 #define MBEDTLS_PSA_BUILTIN_ALG_TLS12_PRF
