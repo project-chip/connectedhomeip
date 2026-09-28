@@ -44,6 +44,7 @@ public:
         std::vector<std::string> traceTo;
 
         std::optional<uint16_t> discriminator;
+        std::optional<uint32_t> passcode;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
         std::optional<uint32_t> interfaceId;

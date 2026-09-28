@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,9 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <device/types/root-node/features/ThreadFeature.h>
 
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <device/types/root-node/ThreadRootNode.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -26,16 +24,16 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-CHIP_ERROR ThreadRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR ThreadFeature::RegisterFeatureClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                                  RootNode::Context & rootContext,
+                                                  Clusters::GeneralCommissioningCluster & generalCommissioning)
 {
-    ReturnErrorOnFailure(RootNode::Register(endpointId, provider, composition));
-
-    mNetworkCommissioningCluster.Create(endpointId, &mThreadContext.threadDriver,
+    mNetworkCommissioningCluster.Create(endpointId, &mContext.threadDriver,
                                         NetworkCommissioningCluster::Context{
-                                            .breadcrumbTracker   = mGeneralCommissioningCluster.Cluster(),
-                                            .failSafeContext     = mContext.failSafeContext,
-                                            .platformManager     = mContext.platformManager,
-                                            .deviceControlServer = mContext.deviceControlServer,
+                                            .breadcrumbTracker   = generalCommissioning,
+                                            .failSafeContext     = rootContext.failSafeContext,
+                                            .platformManager     = rootContext.platformManager,
+                                            .deviceControlServer = rootContext.deviceControlServer,
                                         });
 
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
@@ -44,10 +42,8 @@ CHIP_ERROR ThreadRootNode::Register(EndpointId endpointId, CodeDrivenDataModelPr
     return CHIP_NO_ERROR;
 }
 
-void ThreadRootNode::Unregister(CodeDrivenDataModelProvider & provider)
+void ThreadFeature::UnregisterFeatureClusters(CodeDrivenDataModelProvider & provider)
 {
-    RootNode::Unregister(provider);
-
     if (mNetworkCommissioningCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));

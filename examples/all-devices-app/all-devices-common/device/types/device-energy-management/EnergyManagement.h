@@ -27,6 +27,8 @@ namespace chip::app {
 class EnergyManagement : public SingleEndpoint, public Clusters::DeviceEnergyManagement::Delegate
 {
 public:
+    using SingleEndpoint::GetEndpointId;
+
     explicit EnergyManagement(TimerDelegate & timerDelegate);
     ~EnergyManagement() override = default;
 

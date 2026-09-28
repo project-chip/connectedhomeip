@@ -57,13 +57,13 @@ from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster_lwm_mode = Clusters.LaundryWasherMode
 
 
-class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
+class TC_LWM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)

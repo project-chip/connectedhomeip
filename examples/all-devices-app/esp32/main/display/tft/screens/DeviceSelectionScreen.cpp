@@ -30,8 +30,8 @@ DeviceSelectionListModel::DeviceSelectionListModel()
 {
     mItems.push_back({ "< Back", []() { ScreenManager::PopScreen(); } });
 
-    const std::string & activeDev = GetActiveDeviceType();
-    bool isAllBridged             = (activeDev == "*" || activeDev == "aggregator");
+    const std::string activeDev = GetActiveDeviceType();
+    bool isAllBridged           = (activeDev == "*" || activeDev == "aggregator");
 
     // Put current active device first so user sees it immediately
     if (isAllBridged)

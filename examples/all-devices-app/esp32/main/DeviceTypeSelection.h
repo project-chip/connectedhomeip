@@ -22,4 +22,7 @@
 #include <string>
 
 CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType);
-const std::string & GetActiveDeviceType();
+
+/// The device type this boot runs as. Returns a copy: the value is settled on the CHIP thread
+/// while the display task reads it.
+std::string GetActiveDeviceType();

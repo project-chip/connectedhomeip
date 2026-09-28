@@ -63,6 +63,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'fan',
     'flow-sensor',
     'generic-switch',
+    'humidity-conditioner',
     'humidity-sensor',
     'laundry-dryer',
     'laundry-washer',
@@ -82,9 +83,11 @@ _ALL_DEVICES_APP_DEVICES = [
     'rain-sensor',
     'refrigerator',
     'robotic-vacuum-cleaner',
+    'room-air-conditioner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'thread-border-router',
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',
@@ -304,6 +307,7 @@ def BuildEsp32Target():
     # boards
     target.AppendFixedTargets([
         TargetPart('m5stack', board=Esp32Board.M5Stack),
+        TargetPart('m5stack-cores3', board=Esp32Board.M5StackCoreS3),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),

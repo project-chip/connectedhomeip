@@ -16,6 +16,7 @@
  */
 
 #pragma once
+#include <atomic>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <rtc/rtc.hpp>
@@ -62,6 +63,18 @@ public:
     const char * GetPeerConnectionState();
     void Disconnect();
 
+    uint32_t GetVideoFrameCount() const { return mVideoFramesReceived.load(); }
+    uint64_t GetVideoBytesCount() const { return mVideoBytesReceived.load(); }
+    uint32_t GetAudioPacketCount() const { return mAudioPacketsReceived.load(); }
+    uint64_t GetAudioBytesCount() const { return mAudioBytesReceived.load(); }
+    void ResetMediaCounters()
+    {
+        mVideoFramesReceived.store(0);
+        mVideoBytesReceived.store(0);
+        mAudioPacketsReceived.store(0);
+        mAudioBytesReceived.store(0);
+    }
+
 private:
     rtc::PeerConnection * mPeerConnection;
     std::function<void(const std::string &, const std::string &)> mLocalDescriptionCallback;
@@ -80,6 +93,11 @@ private:
     // UDP socket for stream forwarding
     int mVideoRTPSocket = -1;
     int mAudioRTPSocket = -1;
+
+    std::atomic<uint32_t> mVideoFramesReceived{ 0 };
+    std::atomic<uint64_t> mVideoBytesReceived{ 0 };
+    std::atomic<uint32_t> mAudioPacketsReceived{ 0 };
+    std::atomic<uint64_t> mAudioBytesReceived{ 0 };
 
     void addVideoTrack(std::string mid = kVideoMid, int payloadType = kVideoH264PayloadType);
     void addAudioTrack(std::string mid = kAudioMid, int payloadType = kOpusPayloadType);

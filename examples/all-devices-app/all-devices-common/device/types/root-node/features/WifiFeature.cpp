@@ -14,32 +14,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "WifiRootNode.h"
+#include <device/types/root-node/features/WifiFeature.h>
 
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
-#include <platform/NetworkCommissioning.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR WifiRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR WifiFeature::RegisterFeatureClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                                                RootNode::Context & rootContext,
+                                                Clusters::GeneralCommissioningCluster & generalCommissioning)
 {
-    ReturnErrorOnFailure(RootNode::Register(endpointId, provider, composition));
-
-    mWifiDiagnosticsCluster.Create(endpointId, mContext.diagnosticDataProvider,
+    mWifiDiagnosticsCluster.Create(endpointId, rootContext.diagnosticDataProvider,
                                    WiFiDiagnosticsServerCluster::OptionalAttributeSet{},
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver,
+    mNetworkCommissioningCluster.Create(endpointId, &mContext.wifiDriver,
                                         NetworkCommissioningCluster::Context{
-                                            .breadcrumbTracker   = mGeneralCommissioningCluster.Cluster(),
-                                            .failSafeContext     = mContext.failSafeContext,
-                                            .platformManager     = mContext.platformManager,
-                                            .deviceControlServer = mContext.deviceControlServer,
+                                            .breadcrumbTracker   = generalCommissioning,
+                                            .failSafeContext     = rootContext.failSafeContext,
+                                            .platformManager     = rootContext.platformManager,
+                                            .deviceControlServer = rootContext.deviceControlServer,
                                         });
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
@@ -47,9 +45,8 @@ CHIP_ERROR WifiRootNode::Register(EndpointId endpointId, CodeDrivenDataModelProv
     return CHIP_NO_ERROR;
 }
 
-void WifiRootNode::Unregister(CodeDrivenDataModelProvider & provider)
+void WifiFeature::UnregisterFeatureClusters(CodeDrivenDataModelProvider & provider)
 {
-    RootNode::Unregister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
