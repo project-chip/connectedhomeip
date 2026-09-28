@@ -14,10 +14,6 @@
 #    limitations under the License.
 #
 
-# Matter build defaults for the ESP32 Zephyr samples. A trimmed copy of
-# config/zephyr/chip-module/Kconfig.defaults without the NXP defaults, whose
-# classic mbedTLS 3.x symbols do not exist in Zephyr 4.4's mbedTLS 4.x module.
-
 if CHIP
 
 config PRINTK_SYNC
