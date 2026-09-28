@@ -16,13 +16,18 @@
 
 #include "OOBAccessors.h"
 #include <lib/support/CodeUtils.h>
-#include <oob-accessors/clusters/SwitchOOBAccessor.h>
+#include <oob-accessors/clusters/DoorbellOOBAccessor.h>
 
 namespace chip::app {
 
 void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
 {
-    LogErrorOnFailure(registry.Register(std::make_unique<SwitchOOBAccessor>(device.SwitchCluster(), device.GetEndpointId())));
+    // Base Doorbell does not provide simulation hooks.
+}
+
+void RegisterOOBAccessors(SimulatedDoorbell & device, OOBAccessorRegistry & registry)
+{
+    LogErrorOnFailure(registry.Register(std::make_unique<DoorbellOOBAccessor>(device, device.GetEndpointId())));
 }
 
 } // namespace chip::app

@@ -17,6 +17,8 @@
 #include <clusters/Chime/Ids.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <devices/Types.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -46,7 +48,9 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mSwitchCluster.Create(endpoint, mConfig.features,
-                          SwitchCluster::StartupConfiguration{ .numberOfPositions = mConfig.numberOfSwitchPositions });
+                          SwitchCluster::StartupConfiguration{
+                              .numberOfPositions = mConfig.numberOfSwitchPositions,
+                          });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
     mBindingCluster.Create(
@@ -105,6 +109,13 @@ Clusters::BindingCluster & Doorbell::BindingCluster()
 {
     VerifyOrDie(mBindingCluster.IsConstructed());
     return mBindingCluster.Cluster();
+}
+
+CHIP_ERROR Doorbell::SetSwitchPosition(uint8_t newPosition)
+{
+    VerifyOrReturnError(mSwitchCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(AppServer, "Doorbell: Switch position changed on endpoint %u to %u", mEndpointId, newPosition);
+    return mSwitchCluster.Cluster().SetCurrentPosition(newPosition);
 }
 
 } // namespace app

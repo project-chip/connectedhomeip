@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +15,29 @@
  *    limitations under the License.
  */
 
-#include "NamedPipeTranslators.h"
-#include <device/types/doorbell/Doorbell.h>
 #include <device/types/doorbell/impl/SimulatedDoorbell.h>
 #include <lib/support/CodeUtils.h>
-#include <posix/named_pipe/translators/DoorbellTranslator.h>
 
-namespace chip::app {
+namespace chip {
+namespace app {
 
-void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher)
+SimulatedDoorbell::SimulatedDoorbell(const Config & config) : Doorbell(config) {}
+
+CHIP_ERROR SimulatedDoorbell::HandleShortPress()
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::DoorbellTranslator>());
+    // A basic doorbell short press simulates pressing the momentary switch (position 1),
+    // triggering the chime, and then returning it to its idle released state (position 0).
+    ReturnErrorOnFailure(SetSwitchPosition(1));
+    // Chime trigger should happen here.
+    return SetSwitchPosition(0);
 }
 
-void RegisterNamedPipeTranslators(SimulatedDoorbell & device, NamedPipe::Dispatcher & dispatcher)
+CHIP_ERROR SimulatedDoorbell::HandleSetCurrentPosition(uint8_t currentPosition)
 {
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::DoorbellTranslator>());
+    ReturnErrorOnFailure(SetSwitchPosition(currentPosition));
+    // Chime should be triggered according to the position.
+    return CHIP_NO_ERROR;
 }
 
-} // namespace chip::app
+} // namespace app
+} // namespace chip

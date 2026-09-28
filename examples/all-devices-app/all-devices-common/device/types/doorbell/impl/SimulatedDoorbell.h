@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,26 +14,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <string>
-#include <vector>
+#include <device/types/doorbell/Doorbell.h>
+#include <oob-accessors/clusters/DoorbellOOBAccessor.h>
 
-#include <posix/named_pipe/CommandTranslator.h>
+namespace chip {
+namespace app {
 
-namespace chip::app::NamedPipe {
-
-class SwitchTranslator : public CommandTranslator
+class SimulatedDoorbell : public Doorbell, public DoorbellSimulationDelegate
 {
 public:
-    static Span<const CharSpan> GetActionNames()
-    {
-        static constexpr CharSpan kNames[] = { "SetCurrentPosition"_span };
-        return Span<const CharSpan>(kNames);
-    }
+    explicit SimulatedDoorbell(const Config & config);
+    ~SimulatedDoorbell() override = default;
 
-    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
+    // DoorbellSimulationDelegate implementation
+    CHIP_ERROR HandleShortPress() override;
+    CHIP_ERROR HandleSetCurrentPosition(uint8_t currentPosition) override;
 };
 
-} // namespace chip::app::NamedPipe
+} // namespace app
+} // namespace chip

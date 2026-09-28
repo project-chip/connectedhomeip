@@ -16,11 +16,14 @@
 
 #pragma once
 
-#include <device/types/doorbell/Doorbell.h>
 #include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
+class Doorbell;
+class SimulatedDoorbell;
+
 void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher);
+void RegisterNamedPipeTranslators(SimulatedDoorbell & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

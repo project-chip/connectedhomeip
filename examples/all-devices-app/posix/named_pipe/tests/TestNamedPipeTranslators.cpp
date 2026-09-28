@@ -23,12 +23,12 @@
 #include <posix/named_pipe/translators/AmbientContextTranslator.h>
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
+#include <posix/named_pipe/translators/DoorbellTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 #include <posix/named_pipe/translators/RvcTranslator.h>
-#include <posix/named_pipe/translators/SwitchTranslator.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
@@ -378,17 +378,29 @@ TEST_F(TestNamedPipeTranslators, RvcTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
-TEST_F(TestNamedPipeTranslators, SwitchTranslator)
+TEST_F(TestNamedPipeTranslators, DoorbellTranslator)
 {
-    SwitchTranslator translator;
+    DoorbellTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 3U);
+
+    // ShortPress
+    Json::Value json1 = ParseJson(R"({"Name": "ShortPress"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
+
+    // Press (alias)
+    Json::Value json2 = ParseJson(R"({"Name": "Press"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
 
     // SetCurrentPosition with CurrentPosition
-    Json::Value json1 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    Json::Value json3 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json3, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
-    Json::Value json2 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 0})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    Json::Value json4 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 0})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json4, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
 
     // Missing field
@@ -400,7 +412,7 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
 {
     Dispatcher dispatcher(mRegistry);
     EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>(), CHIP_NO_ERROR);
-    EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<SwitchTranslator>(), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<DoorbellTranslator>(), CHIP_NO_ERROR);
 
     // Valid action on explicit endpoint
     Json::Value valid = ParseJson(R"({"Name": "SetOnOff", "EndpointId": 1, "OnOff": true})");
@@ -411,7 +423,7 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     Json::Value defEp = ParseJson(R"({"Name": "SetOnOff", "OnOff": false})");
     EXPECT_EQ(dispatcher.DispatchJson(defEp), CHIP_NO_ERROR);
 
-    // Valid SwitchTranslator action
+    // Valid DoorbellTranslator action (SetCurrentPosition)
     Json::Value switchCmd = ParseJson(R"({"Name": "SetCurrentPosition", "EndpointId": 1, "CurrentPosition": 2})");
     EXPECT_EQ(dispatcher.DispatchJson(switchCmd), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");

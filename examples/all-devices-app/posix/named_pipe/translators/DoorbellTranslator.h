@@ -16,22 +16,20 @@
 
 #pragma once
 
-#include <app/clusters/switch-server/SwitchCluster.h>
-#include <lib/core/DataModelTypes.h>
-#include <oob-accessors/OOBAccessor.h>
+#include <posix/named_pipe/CommandTranslator.h>
 
-namespace chip::app {
+namespace chip::app::NamedPipe {
 
-class SwitchOOBAccessor : public OOBAccessor
+class DoorbellTranslator : public CommandTranslator
 {
 public:
-    SwitchOOBAccessor(Clusters::SwitchCluster & cluster, EndpointId endpointId) : mCluster(cluster), mEndpointId(endpointId) {}
+    static Span<const CharSpan> GetActionNames()
+    {
+        static constexpr CharSpan kNames[] = { "ShortPress"_span, "Press"_span, "SetCurrentPosition"_span };
+        return Span<const CharSpan>(kNames);
+    }
 
-    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
-
-private:
-    Clusters::SwitchCluster & mCluster;
-    EndpointId mEndpointId;
+    CHIP_ERROR TranslateAndExecute(EndpointId endpointId, const Json::Value & json, OOBAccessorRegistry & registry) const override;
 };
 
-} // namespace chip::app
+} // namespace chip::app::NamedPipe

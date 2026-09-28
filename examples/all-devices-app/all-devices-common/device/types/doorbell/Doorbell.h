@@ -55,6 +55,8 @@ public:
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
+    CHIP_ERROR SetSwitchPosition(uint8_t newPosition);
+
     Clusters::IdentifyCluster & IdentifyCluster();
     Clusters::SwitchCluster & SwitchCluster();
     Clusters::BindingCluster & BindingCluster();
