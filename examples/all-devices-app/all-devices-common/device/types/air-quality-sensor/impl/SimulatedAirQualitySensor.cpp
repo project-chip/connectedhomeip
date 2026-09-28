@@ -328,7 +328,7 @@ void SimulatedAirQualitySensor::TimerFired()
     }
 
     // 4. Oscillate CO2 (450 ppm to 850 ppm)
-    float co2Val = 450.0f + static_cast<float>((mTickCount % 9) * 50);
+    float co2Val      = 450.0f + static_cast<float>((mTickCount % 9) * 50);
     auto * co2Cluster = GetConcentrationCluster(ConcentrationType::kCarbonDioxide);
     if (co2Cluster != nullptr)
     {
