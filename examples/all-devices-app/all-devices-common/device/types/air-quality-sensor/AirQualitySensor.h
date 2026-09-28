@@ -171,7 +171,6 @@ public:
      *   2. Identify cluster (mandatory)
      *   3. Air Quality cluster (mandatory)
      *   4. Statically declared optional clusters in `OptionalClusters...`
-     *   5. Subclass additional clusters via `RegisterAdditionalClusters()`
      *
      * @param endpoint Endpoint ID to bind to.
      * @param provider The CodeDrivenDataModelProvider to register clusters and endpoint with.
