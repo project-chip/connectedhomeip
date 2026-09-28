@@ -26,9 +26,7 @@ enabled_devices_buildconfig_header("enabled_devices_buildconfig") {
 }
 
 source_set("device-factory") {
-  sources = [
-    "DeviceFactory.h",
-  ]
+  sources = [ "DeviceFactory.h" ]
 
   public_deps = [
     ":enabled_devices_buildconfig",
@@ -63,8 +61,8 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor:logging",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",

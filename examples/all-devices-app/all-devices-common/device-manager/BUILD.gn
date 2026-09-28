@@ -16,13 +16,11 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 source_set("device-manager") {
-  sources = [
-    "DeviceManager.h",
-  ]
+  sources = [ "DeviceManager.h" ]
 
   public_deps = [
-    "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/support",
   ]
 }
