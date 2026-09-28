@@ -85,6 +85,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+
++ (void)unitTestResetInvokeRequestMessageCount;
++ (NSUInteger)unitTestInvokeRequestMessageCount;
+
+// Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
++ (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
 @end
 
 @interface MTRDevice (TestDebug)
