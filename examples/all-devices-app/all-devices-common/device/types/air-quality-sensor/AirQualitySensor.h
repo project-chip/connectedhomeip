@@ -238,6 +238,8 @@ public:
      */
     void Unregister(CodeDrivenDataModelProvider & provider) override
     {
+        UnregisterDescriptor(provider);
+
         auto unregisterCluster = [&](auto & clusterWrapper) {
             if (clusterWrapper.IsConstructed())
             {
@@ -258,8 +260,6 @@ public:
             LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
             mIdentifyCluster.Destroy();
         }
-
-        UnregisterDescriptor(provider);
     }
 
     /**

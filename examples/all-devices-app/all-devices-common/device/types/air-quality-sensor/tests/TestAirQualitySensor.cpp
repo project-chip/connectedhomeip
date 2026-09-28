@@ -218,4 +218,18 @@ TEST_F(TestAirQualitySensor, TestCleanTeardown)
     sensor.Unregister(mProvider);
 }
 
+TEST_F(TestAirQualitySensor, TestCleanTeardownStartedProvider)
+{
+    using TestSensor =
+        AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
+
+    TestSensor sensor(mTimerDelegate);
+
+    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
+    EXPECT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
+
+    sensor.Unregister(mProvider);
+    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+}
+
 } // namespace
