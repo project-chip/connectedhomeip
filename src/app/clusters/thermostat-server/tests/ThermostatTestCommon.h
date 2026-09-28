@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -774,10 +776,27 @@ inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)
                        [attrId](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attrId; });
 }
 
+class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+};
+
+inline TestDeviceTypeResolver gTestDeviceTypeResolver;
+
 struct ThermostatTestFixture : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        Access::AccessControl::Delegate * delegate = Access::Examples::GetAccessControlDelegate();
+        ASSERT_EQ(Access::GetAccessControl().Init(delegate, gTestDeviceTypeResolver), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        Access::GetAccessControl().Finish();
+        Platform::MemoryShutdown();
+    }
 
     ::chip::Testing::TestServerClusterContext mTestContext;
     ::chip::Testing::FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
@@ -799,10 +818,25 @@ struct ThermostatTestFixture : public ::testing::Test
         mThermostatDelegate.SetFabricTable(&mFabricHelper.GetFabricTable());
         FabricIndex fabricIndex = kTestFabricIndex;
         ASSERT_EQ(mFabricHelper.SetUpTestFabric(fabricIndex), CHIP_NO_ERROR);
+
+        Access::AccessControl::Entry entry;
+        ASSERT_EQ(Access::GetAccessControl().PrepareEntry(entry), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetFabricIndex(kTestFabricIndex), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetPrivilege(Access::Privilege::kAdminister), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+        ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, entry), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
+        size_t count = 0;
+        if (Access::GetAccessControl().GetEntryCount(kTestFabricIndex, count) == CHIP_NO_ERROR)
+        {
+            for (size_t i = 0; i < count; ++i)
+            {
+                EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &kTestFabricIndex), CHIP_NO_ERROR);
+            }
+        }
         mSensorsDelegate.Reset();
         FabricIndex fabricIndex = kTestFabricIndex;
         EXPECT_EQ(mFabricHelper.TearDownTestFabric(fabricIndex), CHIP_NO_ERROR);
