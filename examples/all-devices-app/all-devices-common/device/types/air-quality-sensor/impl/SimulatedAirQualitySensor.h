@@ -86,14 +86,14 @@ public:
         // 2. Oscillate Temperature (~21.5°C ± 1.0°C) if configured
         if (auto * temp = this->template GetCluster<Clusters::TemperatureMeasurement::Id>())
         {
-            int16_t tempVal = static_cast<int16_t>(2150 + ((static_cast<int>(mTickCount) % 5) - 2) * 50);
+            int16_t tempVal = static_cast<int16_t>(2150 + (static_cast<int>(mTickCount % 5) - 2) * 50);
             LogErrorOnFailure(temp->SetMeasuredValue(DataModel::MakeNullable(tempVal)));
         }
 
         // 3. Oscillate Relative Humidity (~45% ± 3.0%) if configured
         if (auto * hum = this->template GetCluster<Clusters::RelativeHumidityMeasurement::Id>())
         {
-            uint16_t humidityVal = static_cast<uint16_t>(4500 + ((static_cast<int>(mTickCount) % 5) - 2) * 150);
+            uint16_t humidityVal = static_cast<uint16_t>(4500 + (static_cast<int>(mTickCount % 5) - 2) * 150);
             LogErrorOnFailure(hum->SetMeasuredValue(DataModel::MakeNullable(humidityVal)));
         }
 
