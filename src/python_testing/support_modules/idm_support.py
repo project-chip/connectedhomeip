@@ -222,7 +222,7 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # returns SUCCESS for an EffectIdentifier or EffectVariant its enum does not define.
     # The spec requires EffectIdentifier to contain one of the non-reserved values in
     # EffectIdentifierEnum and EffectVariant one of the values in EffectVariantEnum, so
-    # both need CONSTRAINT_ERROR. 
+    # both need CONSTRAINT_ERROR.
     (Clusters.Identify.id, Clusters.Identify.Commands.TriggerEffect.command_id),
     # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
     # or spec clarification): the data model constraint (maxLength 32) is
