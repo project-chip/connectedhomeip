@@ -1,7 +1,7 @@
 |                                |   Pass Rate |
 |:-------------------------------|------------:|
-| tests                          |           0 |
 | delete-old-artifacts           |           0 |
+| chef-ci-all-chef-devices       |          50 |
 | chef-ci                        |         100 |
 | pr-checker-bot                 |         100 |
 | build-example-linux-arm        |         100 |
@@ -11,6 +11,7 @@
 | darwin-tests                   |         100 |
 | build-example-linux-standalone |         100 |
 | lint-code-base                 |         100 |
+| cirque                         |         100 |
 | daily-run-for-slow-tests       |         100 |
 | build-example-ti-cc13xx-26xx   |         100 |
 | build-example-tizen            |         100 |
@@ -22,19 +23,19 @@
 | build-example-efr32            |         100 |
 | build-example-esp32            |         100 |
 | builds                         |         100 |
-| cirque                         |         100 |
 | build-example-ameba            |         100 |
+| validate-gradle-wrapper        |         100 |
 | build-example-asr              |         100 |
 | qemu                           |         100 |
 | documentation-build            |         100 |
 | build-example-telink           |         100 |
-| chef-ci-all-chef-devices       |         100 |
 | unit-integration-tests         |         100 |
 | codeql                         |         100 |
 | build-example-bouffalolab      |         100 |
 | bloat-check                    |         100 |
 | build-example-nrf-connect-sdk  |         100 |
 | cancel-workflows-on-failing-ci |         100 |
+| issue-labeler                  |         100 |
 | build-example-i-mx-linux       |         100 |
 | tv-casting-example-darwin      |         100 |
 | process-stale-issues-and-prs   |         100 |
@@ -43,5 +44,5 @@
 | build-example-nxp              |         100 |
 | build-example-realtek          |         100 |
 | test-tv-casting-example        |         100 |
-| validate-gradle-wrapper        |         100 |
+| tests                          |         100 |
 | recent-fail-summary            |         100 |
