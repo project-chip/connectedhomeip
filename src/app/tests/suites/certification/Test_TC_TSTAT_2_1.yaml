@@ -753,7 +753,9 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 54: TH reads the NumberOfSensorScheduleTransitions attribute from the DUT"
+    - label:
+          "Step 54: TH reads the NumberOfSensorScheduleTransitions attribute
+          from the DUT"
       PICS: TSTAT.S.F0b
       command: "readAttribute"
       attribute: "NumberOfSensorScheduleTransitions"
