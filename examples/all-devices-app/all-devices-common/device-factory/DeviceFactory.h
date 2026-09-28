@@ -319,26 +319,23 @@ private:
         {
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                AirQualitySensor::Config config;
-                config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
-                return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
+                return MakeDevice<DefaultSimulatedAirQualitySensor>(mContext->timerDelegate);
             });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
-                AirQualitySensor::Config config;
-                config.WithTemperature()
-                    .WithRelativeHumidity()
-                    .WithCarbonDioxide()
-                    .WithPm25()
-                    .WithTotalVolatileOrganicCompounds()
-                    .WithCarbonMonoxide()
-                    .WithNitrogenDioxide()
-                    .WithOzone()
-                    .WithFormaldehyde()
-                    .WithPm1()
-                    .WithPm10()
-                    .WithRadon();
-                return MakeDevice<SimulatedAirQualitySensor>(mContext->timerDelegate, config);
+                return MakeDevice<SimulatedAirQualitySensor<
+                    Clusters::TemperatureMeasurement::Id,
+                    Clusters::RelativeHumidityMeasurement::Id,
+                    Clusters::CarbonDioxideConcentrationMeasurement::Id,
+                    Clusters::Pm25ConcentrationMeasurement::Id,
+                    Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                    Clusters::CarbonMonoxideConcentrationMeasurement::Id,
+                    Clusters::NitrogenDioxideConcentrationMeasurement::Id,
+                    Clusters::OzoneConcentrationMeasurement::Id,
+                    Clusters::FormaldehydeConcentrationMeasurement::Id,
+                    Clusters::Pm1ConcentrationMeasurement::Id,
+                    Clusters::Pm10ConcentrationMeasurement::Id,
+                    Clusters::RadonConcentrationMeasurement::Id>>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)

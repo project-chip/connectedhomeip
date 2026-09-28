@@ -25,39 +25,174 @@
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
+#include <devices/Types.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Compiler.h>
 #include <lib/support/TimerDelegate.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
-#include <optional>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
 namespace chip {
 namespace app {
 
-/// Base Matter Air Quality Sensor device type (spec section 2.6).
-/// Owns mandatory clusters (Identify, Air Quality) and configurable optional clusters
-/// (Temperature, Relative Humidity, and Concentration measurements).
+namespace Detail {
+
+template <ClusterId CID>
+struct ClusterTypeTraits;
+
+template <>
+struct ClusterTypeTraits<Clusters::Identify::Id>
+{
+    using Type = Clusters::IdentifyCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::AirQuality::Id>
+{
+    using Type = Clusters::AirQualityCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::TemperatureMeasurement::Id>
+{
+    using Type = Clusters::TemperatureMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::RelativeHumidityMeasurement::Id>
+{
+    using Type = Clusters::RelativeHumidityMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::Pm25ConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::OzoneConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::Pm1ConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::Pm10ConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::RadonConcentrationMeasurement::Id>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
+};
+
+template <ClusterId CID>
+using ClusterType = typename ClusterTypeTraits<CID>::Type;
+
+template <ClusterId Target, ClusterId... List>
+constexpr size_t IndexOf()
+{
+    if constexpr (sizeof...(List) == 0)
+    {
+        return static_cast<size_t>(-1);
+    }
+    else
+    {
+        constexpr ClusterId arr[] = { List... };
+        for (size_t i = 0; i < sizeof...(List); ++i)
+        {
+            if (arr[i] == Target)
+            {
+                return i;
+            }
+        }
+        return static_cast<size_t>(-1);
+    }
+}
+
+template <ClusterId Target, ClusterId... List>
+constexpr size_t CountOf()
+{
+    if constexpr (sizeof...(List) == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        constexpr ClusterId arr[] = { List... };
+        size_t count              = 0;
+        for (size_t i = 0; i < sizeof...(List); ++i)
+        {
+            if (arr[i] == Target)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+}
+
+Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
+
+} // namespace Detail
+
+/// Matter Air Quality Sensor device type (spec section 2.6).
+/// Owns mandatory clusters (Identify, Air Quality) and statically declared optional clusters.
+/// Storage for optional clusters is exact and allocates zero unused memory.
+template <ClusterId... OptionalClusters>
 class AirQualitySensor : public SingleEndpoint
 {
-public:
-    using ConcentrationCluster                        = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-    static constexpr size_t kMaxConcentrationClusters = 10;
+    static_assert(((Detail::CountOf<OptionalClusters, OptionalClusters...>() == 1) && ...),
+                  "Optional cluster IDs must not be duplicated");
 
-    enum class ConcentrationType : uint8_t
-    {
-        kCarbonDioxide,
-        kPm25,
-        kTotalVolatileOrganicCompounds,
-        kCarbonMonoxide,
-        kNitrogenDioxide,
-        kOzone,
-        kFormaldehyde,
-        kPm1,
-        kPm10,
-        kRadon,
-    };
+public:
+    template <ClusterId CID>
+    static constexpr bool HasCluster =
+        ((OptionalClusters == CID) || ... || false) || (CID == Clusters::Identify::Id) || (CID == Clusters::AirQuality::Id);
 
     struct Config
     {
@@ -65,71 +200,148 @@ public:
                                                                     Clusters::AirQuality::Feature::kModerate,
                                                                     Clusters::AirQuality::Feature::kVeryPoor,
                                                                     Clusters::AirQuality::Feature::kExtremelyPoor };
-        std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> temperature;
-        std::optional<Clusters::RelativeHumidityMeasurementCluster::Config> humidity;
-        std::array<ConcentrationCluster::Config, kMaxConcentrationClusters> concentrationConfigs;
-        size_t numConcentrationConfigs = 0;
+        Clusters::TemperatureMeasurementCluster::StartupConfiguration temperature;
+        Clusters::RelativeHumidityMeasurementCluster::Config humidity;
 
-        constexpr Config() = default;
-
-        Config & WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features);
-        Config & WithTemperature(int16_t min = -4000, int16_t max = 8000);     // 0.01 deg C
-        Config & WithRelativeHumidity(uint16_t min = 0, uint16_t max = 10000); // 0.01 %
-
-        // Standard spec-compliant gases:
-        Config & WithCarbonDioxide(float min = 0.0f, float max = 5000.0f);
-        Config & WithPm25(float min = 0.0f, float max = 1000.0f);
-        Config & WithTotalVolatileOrganicCompounds(float min = 0.0f, float max = 10000.0f);
-        Config & WithCarbonMonoxide(float min = 0.0f, float max = 1000.0f);
-        Config & WithNitrogenDioxide(float min = 0.0f, float max = 1000.0f);
-        Config & WithOzone(float min = 0.0f, float max = 1000.0f);
-        Config & WithFormaldehyde(float min = 0.0f, float max = 1000.0f);
-        Config & WithPm1(float min = 0.0f, float max = 1000.0f);
-        Config & WithPm10(float min = 0.0f, float max = 1000.0f);
-        Config & WithRadon(float min = 0.0f, float max = 10000.0f);
-
-        Config & WithConcentration(const ConcentrationCluster::Config & customConfig);
+        Config()
+        {
+            temperature.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-4000));
+            temperature.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(8000));
+            humidity.minMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(0));
+            humidity.maxMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(10000));
+        }
     };
 
-    AirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
-    explicit AirQualitySensor(TimerDelegate & timerDelegate);
+    explicit AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {}) :
+        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
+        mConfig(config)
+    {}
+
     ~AirQualitySensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
+                        EndpointComposition composition = {}) override
+    {
+        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+        DeviceRegistrationTransaction transaction(*this, provider);
 
-    // Public cluster accessors for mandatory clusters
-    Clusters::AirQualityCluster & AirQualityCluster();
-    Clusters::IdentifyCluster & IdentifyCluster();
+        ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    // Public cluster accessors for optional clusters (returns nullptr if not configured)
-    Clusters::TemperatureMeasurementCluster * TemperatureCluster();
-    Clusters::RelativeHumidityMeasurementCluster * HumidityCluster();
-    ConcentrationCluster * GetConcentrationCluster(ConcentrationType type);
+        mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
+        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
+        mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
+        ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        auto registerCluster = [&](auto & clusterWrapper, auto clusterIdTag) {
+            using TagType = decltype(clusterIdTag);
+            constexpr ClusterId clusterId = TagType::value;
+            if (err != CHIP_NO_ERROR)
+            {
+                return;
+            }
+            if constexpr (clusterId == Clusters::TemperatureMeasurement::Id)
+            {
+                clusterWrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(),
+                                      mConfig.temperature);
+            }
+            else if constexpr (clusterId == Clusters::RelativeHumidityMeasurement::Id)
+            {
+                clusterWrapper.Create(endpoint, mConfig.humidity);
+            }
+            else
+            {
+                clusterWrapper.Create(endpoint, Detail::DefaultConcentrationConfig(clusterId));
+            }
+            err = provider.AddCluster(clusterWrapper.Registration());
+        };
+
+        if constexpr (sizeof...(OptionalClusters) > 0)
+        {
+            (registerCluster(std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
+                             std::integral_constant<ClusterId, OptionalClusters>{}),
+             ...);
+            ReturnErrorOnFailure(err);
+        }
+
+        ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
+
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+        transaction.Commit();
+        return CHIP_NO_ERROR;
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        UnregisterAdditionalClusters(provider);
+
+        auto unregisterCluster = [&](auto & clusterWrapper) {
+            if (clusterWrapper.IsConstructed())
+            {
+                LogErrorOnFailure(provider.RemoveCluster(&clusterWrapper.Cluster()));
+                clusterWrapper.Destroy();
+            }
+        };
+
+        std::apply([&](auto &... clusters) { (unregisterCluster(clusters), ...); }, mOptionalClusters);
+
+        if (mAirQualityCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mAirQualityCluster.Cluster()));
+            mAirQualityCluster.Destroy();
+        }
+        if (mIdentifyCluster.IsConstructed())
+        {
+            LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+            mIdentifyCluster.Destroy();
+        }
+
+        UnregisterDescriptor(provider);
+    }
+
+    // Unified generic cluster accessor. Returns concrete pointer or nullptr if not configured.
+    template <ClusterId CID>
+    Detail::ClusterType<CID> * GetCluster()
+    {
+        if constexpr (CID == Clusters::Identify::Id)
+        {
+            return &mIdentifyCluster.Cluster();
+        }
+        else if constexpr (CID == Clusters::AirQuality::Id)
+        {
+            return &mAirQualityCluster.Cluster();
+        }
+        else if constexpr (((OptionalClusters == CID) || ... || false))
+        {
+            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            return &std::get<kIdx>(mOptionalClusters).Cluster();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    // Convenience accessors for mandatory clusters
+    Clusters::AirQualityCluster & AirQualityCluster() { return *GetCluster<Clusters::AirQuality::Id>(); }
+    Clusters::IdentifyCluster & IdentifyCluster() { return *GetCluster<Clusters::Identify::Id>(); }
 
 protected:
-    /// Called before the endpoint is added, within the registration transaction.
-    /// Subclasses in impl/ override this to attach additional custom/vendor clusters.
     virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
         return CHIP_NO_ERROR;
     }
 
-    /// Called after the endpoint is removed, also on partial registration failure.
     virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
-
-    ConcentrationCluster * GetConcentrationCluster(ClusterId clusterId);
 
     TimerDelegate & mTimerDelegate;
     Config mConfig;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AirQualityCluster> mAirQualityCluster;
-    LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureCluster;
-    LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mHumidityCluster;
-    std::array<LazyRegisteredServerCluster<ConcentrationCluster>, kMaxConcentrationClusters> mConcentrationClusters;
-    size_t mNumConcentrationClusters = 0;
+
+    std::tuple<LazyRegisteredServerCluster<Detail::ClusterType<OptionalClusters>>...> mOptionalClusters;
 };
 
 } // namespace app

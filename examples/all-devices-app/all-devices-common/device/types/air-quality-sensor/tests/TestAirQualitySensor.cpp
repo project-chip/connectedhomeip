@@ -33,8 +33,6 @@ using chip::Testing::ClusterTester;
 
 namespace {
 
-using ConcentrationType = AirQualitySensor::ConcentrationType;
-
 class TestAirQualitySensor : public ::testing::Test
 {
 public:
@@ -49,18 +47,20 @@ protected:
 
 TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
 {
-    AirQualitySensor::Config config;
-    AirQualitySensor sensor(mTimerDelegate, config);
+    AirQualitySensor<> sensor(mTimerDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_EQ(sensor.GetEndpointId(), 1);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
+    EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
+    EXPECT_EQ(sensor.GetCluster<RelativeHumidityMeasurement::Id>(), nullptr);
+    EXPECT_EQ(sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>(), nullptr);
 
     sensor.Unregister(mProvider);
 }
 
-class CustomAirQualitySensor : public AirQualitySensor
+class CustomAirQualitySensor : public AirQualitySensor<>
 {
 public:
     using AirQualitySensor::AirQualitySensor;
@@ -89,51 +89,64 @@ TEST_F(TestAirQualitySensor, TestExtensionHooks)
     EXPECT_TRUE(sensor.unregisteredAdditionalCalled);
 }
 
-TEST_F(TestAirQualitySensor, TestFluentBuilder)
+TEST_F(TestAirQualitySensor, TestTemplatedClusters)
 {
-    AirQualitySensor::Config config;
-    config.WithTemperature(-2000, 6000).WithRelativeHumidity(1000, 9000).WithCarbonDioxide(400.0f, 2000.0f);
+    using ConfiguredSensor = AirQualitySensor<
+        TemperatureMeasurement::Id,
+        RelativeHumidityMeasurement::Id,
+        CarbonDioxideConcentrationMeasurement::Id>;
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    ConfiguredSensor::Config config;
+    config.temperature.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000));
+    config.temperature.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(6000));
+    config.humidity.minMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(1000));
+    config.humidity.maxMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(9000));
+
+    ConfiguredSensor sensor(mTimerDelegate, config);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
-    EXPECT_NE(sensor.TemperatureCluster(), nullptr);
-    EXPECT_NE(sensor.HumidityCluster(), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide), nullptr);
-    EXPECT_EQ(sensor.GetConcentrationCluster(ConcentrationType::kPm25), nullptr);
+    EXPECT_NE(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<RelativeHumidityMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_EQ(sensor.GetCluster<Pm25ConcentrationMeasurement::Id>(), nullptr);
 
     {
-        ClusterTester co2Tester(*sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide));
+        ClusterTester co2Tester(*sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>());
         DataModel::Nullable<float> co2Val;
         EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MeasuredValue::Id, co2Val), CHIP_NO_ERROR);
         EXPECT_TRUE(co2Val.IsNull());
     }
-    EXPECT_EQ(sensor.TemperatureCluster()->GetMinMeasuredValue().Value(), -2000);
-    EXPECT_EQ(sensor.TemperatureCluster()->GetMaxMeasuredValue().Value(), 6000);
-    EXPECT_EQ(sensor.HumidityCluster()->GetMinMeasuredValue().Value(), 1000);
-    EXPECT_EQ(sensor.HumidityCluster()->GetMaxMeasuredValue().Value(), 9000);
+    EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMinMeasuredValue().Value(), -2000);
+    EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMaxMeasuredValue().Value(), 6000);
+    EXPECT_EQ(sensor.GetCluster<RelativeHumidityMeasurement::Id>()->GetMinMeasuredValue().Value(), 1000);
+    EXPECT_EQ(sensor.GetCluster<RelativeHumidityMeasurement::Id>()->GetMaxMeasuredValue().Value(), 9000);
 
     sensor.Unregister(mProvider);
 }
 
 TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 {
-    AirQualitySensor::Config config;
-    config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
+    AirQualitySensor<
+        TemperatureMeasurement::Id,
+        RelativeHumidityMeasurement::Id,
+        CarbonDioxideConcentrationMeasurement::Id> sensor(mTimerDelegate);
 
-    AirQualitySensor sensor(mTimerDelegate, config);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().SetAirQuality(AirQualityEnum::kFair), Protocols::InteractionModel::Status::Success);
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kFair);
 
-    EXPECT_EQ(sensor.TemperatureCluster()->SetMeasuredValue(DataModel::MakeNullable<int16_t>(2150)), CHIP_NO_ERROR);
-    EXPECT_EQ(sensor.TemperatureCluster()->GetMeasuredValue().Value(), 2150);
+    auto * temp = sensor.GetCluster<TemperatureMeasurement::Id>();
+    ASSERT_NE(temp, nullptr);
+    EXPECT_EQ(temp->SetMeasuredValue(DataModel::MakeNullable<int16_t>(2150)), CHIP_NO_ERROR);
+    EXPECT_EQ(temp->GetMeasuredValue().Value(), 2150);
 
-    EXPECT_EQ(sensor.HumidityCluster()->SetMeasuredValue(DataModel::MakeNullable<uint16_t>(4500)), CHIP_NO_ERROR);
-    EXPECT_EQ(sensor.HumidityCluster()->GetMeasuredValue().Value(), 4500);
+    auto * hum = sensor.GetCluster<RelativeHumidityMeasurement::Id>();
+    ASSERT_NE(hum, nullptr);
+    EXPECT_EQ(hum->SetMeasuredValue(DataModel::MakeNullable<uint16_t>(4500)), CHIP_NO_ERROR);
+    EXPECT_EQ(hum->GetMeasuredValue().Value(), 4500);
 
-    auto * co2Cluster = sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide);
+    auto * co2Cluster = sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>();
     ASSERT_NE(co2Cluster, nullptr);
     EXPECT_EQ(co2Cluster->SetMeasuredValue(DataModel::MakeNullable<float>(550.0f)), CHIP_NO_ERROR);
     {
@@ -149,14 +162,14 @@ TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 
 TEST_F(TestAirQualitySensor, TestSimulationTick)
 {
-    SimulatedAirQualitySensor sensor(mTimerDelegate);
+    DefaultSimulatedAirQualitySensor sensor(mTimerDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
-    EXPECT_TRUE(sensor.TemperatureCluster()->GetMeasuredValue().IsNull());
-    EXPECT_TRUE(sensor.HumidityCluster()->GetMeasuredValue().IsNull());
+    EXPECT_TRUE(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMeasuredValue().IsNull());
+    EXPECT_TRUE(sensor.GetCluster<RelativeHumidityMeasurement::Id>()->GetMeasuredValue().IsNull());
     {
-        ClusterTester co2Tester(*sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide));
+        ClusterTester co2Tester(*sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>());
         DataModel::Nullable<float> co2Val;
         EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MeasuredValue::Id, co2Val), CHIP_NO_ERROR);
         EXPECT_TRUE(co2Val.IsNull());
@@ -166,10 +179,10 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
     sensor.TimerFired();
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kGood);
-    EXPECT_FALSE(sensor.TemperatureCluster()->GetMeasuredValue().IsNull());
-    EXPECT_FALSE(sensor.HumidityCluster()->GetMeasuredValue().IsNull());
+    EXPECT_FALSE(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMeasuredValue().IsNull());
+    EXPECT_FALSE(sensor.GetCluster<RelativeHumidityMeasurement::Id>()->GetMeasuredValue().IsNull());
     {
-        ClusterTester co2Tester(*sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide));
+        ClusterTester co2Tester(*sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>());
         DataModel::Nullable<float> co2Val;
         EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MeasuredValue::Id, co2Val), CHIP_NO_ERROR);
         EXPECT_FALSE(co2Val.IsNull());
@@ -184,65 +197,52 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
 
 TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 {
-    AirQualitySensor::Config config;
-    config.WithTemperature()
-        .WithRelativeHumidity()
-        .WithCarbonDioxide()
-        .WithPm25()
-        .WithTotalVolatileOrganicCompounds()
-        .WithCarbonMonoxide()
-        .WithNitrogenDioxide()
-        .WithOzone()
-        .WithFormaldehyde()
-        .WithPm1()
-        .WithPm10()
-        .WithRadon();
+    using FullSensor = AirQualitySensor<
+        TemperatureMeasurement::Id,
+        RelativeHumidityMeasurement::Id,
+        CarbonDioxideConcentrationMeasurement::Id,
+        Pm25ConcentrationMeasurement::Id,
+        TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+        CarbonMonoxideConcentrationMeasurement::Id,
+        NitrogenDioxideConcentrationMeasurement::Id,
+        OzoneConcentrationMeasurement::Id,
+        FormaldehydeConcentrationMeasurement::Id,
+        Pm1ConcentrationMeasurement::Id,
+        Pm10ConcentrationMeasurement::Id,
+        RadonConcentrationMeasurement::Id>;
 
-    AirQualitySensor sensor(mTimerDelegate, config);
+    FullSensor sensor(mTimerDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
-    EXPECT_NE(sensor.TemperatureCluster(), nullptr);
-    EXPECT_NE(sensor.HumidityCluster(), nullptr);
-
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kPm25), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kTotalVolatileOrganicCompounds), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kCarbonMonoxide), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kNitrogenDioxide), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kOzone), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kFormaldehyde), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kPm1), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kPm10), nullptr);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kRadon), nullptr);
+    EXPECT_NE(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<RelativeHumidityMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<Pm25ConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<CarbonMonoxideConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<NitrogenDioxideConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<OzoneConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<FormaldehydeConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<Pm1ConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<Pm10ConcentrationMeasurement::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<RadonConcentrationMeasurement::Id>(), nullptr);
 
     sensor.Unregister(mProvider);
 }
 
 TEST_F(TestAirQualitySensor, TestCleanTeardown)
 {
-    AirQualitySensor::Config config;
-    config.WithTemperature().WithRelativeHumidity().WithCarbonDioxide();
-    AirQualitySensor sensor(mTimerDelegate, config);
+    using TestSensor = AirQualitySensor<
+        TemperatureMeasurement::Id,
+        RelativeHumidityMeasurement::Id,
+        CarbonDioxideConcentrationMeasurement::Id>;
+
+    TestSensor sensor(mTimerDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     sensor.Unregister(mProvider);
 
     EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
-    sensor.Unregister(mProvider);
-}
-
-TEST_F(TestAirQualitySensor, TestDuplicateConcentrationClusterConfig)
-{
-    AirQualitySensor::Config config;
-    config.WithCarbonDioxide(400.0f, 2000.0f).WithCarbonDioxide(500.0f, 3000.0f);
-
-    EXPECT_EQ(config.numConcentrationConfigs, 1u);
-    EXPECT_FLOAT_EQ(config.concentrationConfigs[0].minMeasured.Value(), 500.0f);
-    EXPECT_FLOAT_EQ(config.concentrationConfigs[0].maxMeasured.Value(), 3000.0f);
-
-    AirQualitySensor sensor(mTimerDelegate, config);
-    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
-    EXPECT_NE(sensor.GetConcentrationCluster(ConcentrationType::kCarbonDioxide), nullptr);
     sensor.Unregister(mProvider);
 }
 

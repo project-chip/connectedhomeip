@@ -22,25 +22,105 @@
 namespace chip {
 namespace app {
 
-class SimulatedAirQualitySensor : public AirQualitySensor, public TimerContext
+template <ClusterId... OptionalClusters>
+class SimulatedAirQualitySensor : public AirQualitySensor<OptionalClusters...>, public TimerContext
 {
 public:
     static constexpr System::Clock::Seconds16 kDefaultUpdateInterval = System::Clock::Seconds16(10);
-    static Config DefaultSimulatedConfig();
 
-    SimulatedAirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
-    explicit SimulatedAirQualitySensor(TimerDelegate & timerDelegate);
-    ~SimulatedAirQualitySensor() override;
+    using Base = AirQualitySensor<OptionalClusters...>;
+    using Base::AirQualitySensor;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
+    ~SimulatedAirQualitySensor() override { this->mTimerDelegate.CancelTimer(this); }
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
+    {
+        ReturnErrorOnFailure(Base::Register(endpoint, provider, composition));
+        return this->mTimerDelegate.StartTimer(this, kDefaultUpdateInterval);
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider) override
+    {
+        this->mTimerDelegate.CancelTimer(this);
+        Base::Unregister(provider);
+    }
 
     // TimerContext
-    void TimerFired() override;
+    void TimerFired() override
+    {
+        mTickCount++;
+
+        // 1. Advance Air Quality enum
+        Clusters::AirQuality::AirQualityEnum aqValue;
+        switch (mTickCount % 3)
+        {
+        case 1:
+            aqValue = Clusters::AirQuality::AirQualityEnum::kGood;
+            break;
+        case 2:
+            aqValue = Clusters::AirQuality::AirQualityEnum::kFair;
+            break;
+        default:
+            aqValue = Clusters::AirQuality::AirQualityEnum::kModerate;
+            break;
+        }
+        Protocols::InteractionModel::Status aqStatus = this->AirQualityCluster().SetAirQuality(aqValue);
+        if (aqStatus != Protocols::InteractionModel::Status::Success)
+        {
+            ChipLogError(AppServer, "Failed to set air quality: %u", to_underlying(aqStatus));
+        }
+
+        // 2. Oscillate Temperature (~21.5°C ± 1.0°C) if configured
+        if (auto * temp = this->template GetCluster<Clusters::TemperatureMeasurement::Id>())
+        {
+            int16_t tempVal = static_cast<int16_t>(2150 + ((static_cast<int>(mTickCount) % 5) - 2) * 50);
+            LogErrorOnFailure(temp->SetMeasuredValue(DataModel::MakeNullable(tempVal)));
+        }
+
+        // 3. Oscillate Relative Humidity (~45% ± 3.0%) if configured
+        if (auto * hum = this->template GetCluster<Clusters::RelativeHumidityMeasurement::Id>())
+        {
+            uint16_t humidityVal = static_cast<uint16_t>(4500 + ((static_cast<int>(mTickCount) % 5) - 2) * 150);
+            LogErrorOnFailure(hum->SetMeasuredValue(DataModel::MakeNullable(humidityVal)));
+        }
+
+        // 4. Oscillate all configured concentration measurement clusters
+        auto oscillateConcentration = [this](auto & clusterWrapper, auto clusterIdTag) {
+            using TagType = decltype(clusterIdTag);
+            constexpr ClusterId clusterId = TagType::value;
+            if constexpr (clusterId != Clusters::TemperatureMeasurement::Id &&
+                          clusterId != Clusters::RelativeHumidityMeasurement::Id)
+            {
+                if (clusterWrapper.IsConstructed())
+                {
+                    float val = 20.0f + static_cast<float>((mTickCount % 10) * 5);
+                    if (clusterId == Clusters::CarbonDioxideConcentrationMeasurement::Id)
+                    {
+                        val = 450.0f + static_cast<float>((mTickCount % 9) * 50);
+                    }
+                    LogErrorOnFailure(clusterWrapper.Cluster().SetMeasuredValue(DataModel::MakeNullable(val)));
+                }
+            }
+        };
+
+        if constexpr (sizeof...(OptionalClusters) > 0)
+        {
+            (oscillateConcentration(
+                std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(this->mOptionalClusters),
+                std::integral_constant<ClusterId, OptionalClusters>{}),
+             ...);
+        }
+    }
 
 private:
     uint32_t mTickCount = 0;
 };
+
+using DefaultSimulatedAirQualitySensor = SimulatedAirQualitySensor<
+    Clusters::TemperatureMeasurement::Id,
+    Clusters::RelativeHumidityMeasurement::Id,
+    Clusters::CarbonDioxideConcentrationMeasurement::Id>;
 
 } // namespace app
 } // namespace chip
