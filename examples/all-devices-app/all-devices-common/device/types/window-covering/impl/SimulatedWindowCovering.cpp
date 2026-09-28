@@ -25,7 +25,7 @@ namespace app {
 
 namespace {
 
-constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(500);
+constexpr System::Clock::Milliseconds32 kTransitionInterval  = System::Clock::Milliseconds32(125);
 constexpr System::Clock::Milliseconds32 kCalibrationDuration = System::Clock::Milliseconds32(3000);
 constexpr Percent100ths kPositionStep                        = 500; // 5% step
 
@@ -81,8 +81,10 @@ CHIP_ERROR SimulatedWindowCovering::Register(EndpointId endpoint, CodeDrivenData
     // the real value once it runs. A client can still enter calibration mode at any time by writing
     // Mode.CalibrationMode; see OnModeChanged()/TimerFired().
     auto & cluster = WindowCoveringCluster();
-    cluster.SetCurrentPositionLiftPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
-    cluster.SetCurrentPositionTiltPercent100ths(DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    cluster.SetCurrentPositionLiftPercent100ths(
+        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+    cluster.SetCurrentPositionTiltPercent100ths(
+        DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
     return CHIP_NO_ERROR;
 }
@@ -236,6 +238,16 @@ void SimulatedWindowCovering::TimerFired()
         cluster.SetCurrentPositionLiftPercent100ths(
             DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
         cluster.SetCurrentPositionTiltPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+
+        // Also reset targets to match: calibration overrides any movement that was in progress
+        // when it started (see OnModeChanged()), and the cluster only clears OperationalStatus back
+        // to Stall when current == target. Without this, a calibration that interrupts a move would
+        // leave OperationalStatus permanently reporting the old direction, since current (now the
+        // resolved calibration position) would otherwise never match the stale target.
+        cluster.SetTargetPositionLiftPercent100ths(
+            DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
+        cluster.SetTargetPositionTiltPercent100ths(
             DataModel::Nullable<Percent100ths>(Clusters::WindowCovering::kWcPercent100thsMinOpen));
 
         // NOTE: WindowCoveringCluster::WriteAttribute() does not currently reject a client write
