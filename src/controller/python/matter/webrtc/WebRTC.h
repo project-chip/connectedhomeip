@@ -166,6 +166,12 @@ void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, Ga
  */
 void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb);
 
+PyChipError webrtc_get_video_frame_count(WebRTCClientHandle handle, uint32_t * out_count);
+PyChipError webrtc_get_video_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes);
+PyChipError webrtc_get_audio_packet_count(WebRTCClientHandle handle, uint32_t * out_count);
+PyChipError webrtc_get_audio_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes);
+PyChipError webrtc_reset_media_counters(WebRTCClientHandle handle);
+
 /**
  * @brief Creates a new WebRTC provider client instance.
  *

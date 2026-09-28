@@ -24,6 +24,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdlib>
+#include <limits>
+#include <optional>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -33,6 +37,27 @@ using chip::Protocols::InteractionModel::Status;
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace {
+
+// Per the Scenes Management cluster (AttributeValuePairStruct Value* fields), an invalid value in an
+// extension field set SHALL be treated as the valid value closest to the provided one, and when a
+// value is equidistant between two valid values, the lowest one is used. Returns std::nullopt when
+// no modes are supported.
+std::optional<uint8_t> ClosestSupportedMode(Span<const ModeSelect::Structs::ModeOptionStruct::Type> supportedModes,
+                                            uint8_t requestedMode)
+{
+    std::optional<uint8_t> closest;
+    int closestDistance = std::numeric_limits<int>::max();
+    for (const auto & option : supportedModes)
+    {
+        const int distance = std::abs(static_cast<int>(option.mode) - static_cast<int>(requestedMode));
+        if (!closest.has_value() || distance < closestDistance || (distance == closestDistance && option.mode < *closest))
+        {
+            closest         = option.mode;
+            closestDistance = distance;
+        }
+    }
+    return closest;
+}
 
 class ModeSelectSceneValidator : public scenes::AttributeValuePairValidator
 {
@@ -326,8 +351,16 @@ CHIP_ERROR ModeSelectCluster::ApplyScene(EndpointId endpoint, ClusterId cluster,
         VerifyOrReturnError(decodePair.attributeID == CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        Status status = UpdateCurrentMode(decodePair.valueUnsigned8.Value());
-        VerifyOrReturnError(status == Status::Success, StatusIB(status).ToChipError());
+        // Invalid values in a scene extension field set are clamped to the closest supported value
+        // (see ClosestSupportedMode), so an out-of-range mode must not fail the recall. With no
+        // supported modes at all there is nothing to apply.
+        if (std::optional<uint8_t> closestMode =
+                ClosestSupportedMode(mDelegate.GetSupportedModes(), decodePair.valueUnsigned8.Value());
+            closestMode.has_value())
+        {
+            Status status = UpdateCurrentMode(*closestMode);
+            VerifyOrReturnError(status == Status::Success, StatusIB(status).ToChipError());
+        }
     }
     return pair_iterator.GetStatus();
 }
