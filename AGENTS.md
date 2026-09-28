@@ -166,8 +166,7 @@ Alternatively, you can activate the environment in your shell:
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-clusters-clang --quiet build"`
 -   **all-devices-app** (Alternative feature-rich simulator):
     `scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-x64-all-devices-clang --quiet build"`
-<<<<<<< HEAD
-=======
+    <<<<<<< HEAD =======
 
 ### Joint Fabric Python Tests – Local
 
@@ -250,7 +249,8 @@ scripts/tests/run_jf_tests_local.sh --test-filter "TC_JFDS_*"
 | `ImportError: cannot import name 'matter_test_args_parser'` | Stale venv                                 | Run the wrapper script – it syncs `matter.testing` automatically |
 | `The path … does not exist` in `setup_class`                | Wrong binary paths                         | Check Step 2 build targets completed successfully                |
 | `AttributeError: fabric_a_admin` in `teardown_class`        | `setup_class` failed before attribute init | Fixed in source; update venv sync                                |
->>>>>>> f2804f9821945f08d8e41b611a1165cd1975f5cb
+
+> > > > > > > f2804f9821945f08d8e41b611a1165cd1975f5cb
 
 ## Development Resources
 
