@@ -488,95 +488,103 @@ class TC_SC_5_2(MatterBaseTest):
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
 
-            # Step 16c: Update GroupKeyMap to map 0x0102 to 0x01a4, maintaining 0x0300 to 0x01a3
-            self.step("16c")
-            mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
-            ]
-            result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
-            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
+            # Step 16c-16k: Update GroupKeyMap and test Group Session ID collisions
+            # Direct GroupKeyMap updates are disallowed when Groupcast cluster is present per Matter spec.
+            if groupcast_enabled:
+                logger.warning(
+                    "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast cluster is present. Tracked for test plan update."
+                )
+                self.mark_step_range_skipped("16c", "16k")
+            else:
+                # Step 16c: Update GroupKeyMap to map 0x0102 to 0x01a4, maintaining 0x0300 to 0x01a3
+                self.step("16c")
+                mapping = [
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
+                ]
+                result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
+                asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
-            # Step 16d: Send the operate-only command as a group command to GroupID 0x0101.
-            self.step("16d")
-            dev_ctrl.SendGroupCommand(groupId0101, operate_only_command.command_object())
+                # Step 16d: Send the operate-only command as a group command to GroupID 0x0101.
+                self.step("16d")
+                dev_ctrl.SendGroupCommand(groupId0101, operate_only_command.command_object())
 
-            # Step 16e: Validate the DUT rejected the group command via the GroupcastTesting event.
-            self.step("16e")
-            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
-            # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
-            # the DUT and controller.
-            event_data = event_sub.wait_for_event_report_with_duplication(
-                Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
-                timeout_sec=30
-            )
-            asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
-                                f"Expected GroupID to be null, got {event_data.groupID}")
-            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
-                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                                 "GroupcastTesting event should report FailedAuth")
+                # Step 16e: Validate the DUT rejected the group command via the GroupcastTesting event.
+                self.step("16e")
+                # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
+                # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
+                # the DUT and controller.
+                event_data = event_sub.wait_for_event_report_with_duplication(
+                    Clusters.Groupcast.Events.GroupcastTesting,
+                    current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                    previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                    timeout_sec=30
+                )
+                asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
+                                    f"Expected GroupID to be null, got {event_data.groupID}")
+                asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                    f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                     "GroupcastTesting event should report FailedAuth")
 
-            # Step 16f: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
-            self.step("16f")
-            mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
-            ]
-            result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
-            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
+                # Step 16f: Update GroupKeyMap to include 0x0101->0x01a4, 0x0102->0x01a4, 0x0300->0x01a3
+                self.step("16f")
+                mapping = [
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0102, groupKeySetID=keySetId01a4),
+                ]
+                result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
+                asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
-            # Step 16g: Send the operate-only command as a group command to GroupID 0x0102.
-            self.step("16g")
-            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
+                # Step 16g: Send the operate-only command as a group command to GroupID 0x0102.
+                self.step("16g")
+                dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
 
-            # Step 16h: Validate the DUT received the group command via the GroupcastTesting event.
-            self.step("16h")
-            event_data = event_sub.wait_for_event_report_with_duplication(
-                Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
-                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                timeout_sec=30
-            )
-            asserts.assert_equal(event_data.groupID, groupId0102, "Incorrect group ID in GroupcastTesting event")
-            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
-                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
-                                 "GroupcastTesting event should report Success")
+                # Step 16h: Validate the DUT received the group command via the GroupcastTesting event.
+                self.step("16h")
+                event_data = event_sub.wait_for_event_report_with_duplication(
+                    Clusters.Groupcast.Events.GroupcastTesting,
+                    current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                    previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                    timeout_sec=30
+                )
+                asserts.assert_equal(event_data.groupID, groupId0102, "Incorrect group ID in GroupcastTesting event")
+                asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                    f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                                     "GroupcastTesting event should report Success")
 
-            # Step 16i: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
-            self.step("16i")
-            mapping = [
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
-            ]
-            result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
-            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
+                # Step 16i: Update GroupKeyMap to map 0x0101 to 0x01a4, maintaining 0x0300 to 0x01a3
+                self.step("16i")
+                mapping = [
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0300, groupKeySetID=keySetId01a3),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupId0101, groupKeySetID=keySetId01a4),
+                ]
+                result = await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap(mapping))])
+                asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
-            # Step 16j: Send the operate-only command as a group command to GroupID 0x0102.
-            self.step("16j")
-            dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
+                # Step 16j: Send the operate-only command as a group command to GroupID 0x0102.
+                self.step("16j")
+                dev_ctrl.SendGroupCommand(groupId0102, operate_only_command.command_object())
 
-            # Step 16k: Validate the DUT rejected the group command via the GroupcastTesting event.
-            self.step("16k")
-            event_data = event_sub.wait_for_event_report_with_duplication(
-                Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
-                timeout_sec=30
-            )
-            asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
-                                f"Expected GroupID to be null, got {event_data.groupID}")
-            asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
-                                f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
-                                 "GroupcastTesting event should report FailedAuth")
+                # Step 16k: Validate the DUT rejected the group command via the GroupcastTesting event.
+                self.step("16k")
+                event_data = event_sub.wait_for_event_report_with_duplication(
+                    Clusters.Groupcast.Events.GroupcastTesting,
+                    current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                    previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                    timeout_sec=30
+                )
+                asserts.assert_true(event_data.groupID is None or event_data.groupID == NullValue,
+                                    f"Expected GroupID to be null, got {event_data.groupID}")
+                asserts.assert_true(event_data.accessAllowed is None or event_data.accessAllowed == NullValue,
+                                    f"Expected AccessAllowed to be null, got {event_data.accessAllowed}")
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kFailedAuth,
+                                     "GroupcastTesting event should report FailedAuth")
 
             # Step 16l: Disable GroupcastTesting to restore normal operation.
             self.step("16l")

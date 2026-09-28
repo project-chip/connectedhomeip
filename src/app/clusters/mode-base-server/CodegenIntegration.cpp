@@ -237,7 +237,10 @@ void Instance::RegisterThisInstance()
 
 void Instance::UnregisterThisInstance()
 {
-    GetModeBaseInstanceList().Remove(this);
+    if (GetModeBaseInstanceList().Contains(this))
+    {
+        GetModeBaseInstanceList().Remove(this);
+    }
 }
 
 void Instance::Shutdown()

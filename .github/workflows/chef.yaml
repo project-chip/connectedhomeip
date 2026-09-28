@@ -30,11 +30,11 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
-    chef_linux_all_devices:
-        name: Chef - Linux CI Examples (All chef devices)
+    chef_linux_reduced:
+        name: Chef - Linux CI Examples (Reduced chef devices)
         timeout-minutes: 120
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'push'
 
         container:
             image: ghcr.io/project-chip/chip-build:211
@@ -49,10 +49,10 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: CI Examples Linux
+            - name: CI Examples Linux (Reduced)
               shell: bash
               run: |
-                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux_reduced"
 
             - name: Notify Slack on Failure
               if: failure()
@@ -137,7 +137,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:200
+            image: ghcr.io/project-chip/chip-build-nrf-platform:211
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -165,7 +165,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:211
+            image: ghcr.io/project-chip/chip-build-telink:214
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
@@ -179,7 +179,7 @@ jobs:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 9f6d24607560e3cd8197775d159f9bceaea2a865"
             - name: CI Examples Telink
               shell: bash
               run: |

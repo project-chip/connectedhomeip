@@ -172,6 +172,19 @@ class TC_GC_2_8(MatterBaseTest):
             logger.info("Using %s.%s on endpoint %d as the group command",
                         operate_command.cluster_object.__name__, operate_command.command_object.__name__, operate_ep)
 
+            groups_cluster_rev = 0
+            for ep in sorted(operate_only_commands_dict.keys()):
+                try:
+                    groups_cluster_rev = await self.read_single_attribute_check_success(
+                        cluster=Clusters.Groups,
+                        attribute=Clusters.Groups.Attributes.ClusterRevision,
+                        endpoint=ep
+                    )
+                    if groups_cluster_rev > 0:
+                        break
+                except Exception:
+                    continue
+
             dev_ctrl.InitGroupTestingData()
 
             # Remove any pre-existing groups on this fabric to start from a clean state.
@@ -306,20 +319,24 @@ class TC_GC_2_8(MatterBaseTest):
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect DestinationIpAddress in GroupcastTesting event")
 
-            self.step(15)
-            await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
-            event_sub.reset()
-            dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
-            await asyncio.sleep(3)
+            # Step 15-16: Clear GroupKeyMap and verify NoAvailableKey event (only applicable when Groupcast is not adopted, i.e. Groups cluster revision <= 4)
+            if groups_cluster_rev <= 4:
+                self.step(15)
+                await dev_ctrl.WriteAttribute(node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
+                event_sub.reset()
+                dev_ctrl.SendGroupCommand(GROUPID_G1, operate_command.command_object())
+                await asyncio.sleep(3)
 
-            self.step(16)
-            event_data = event_sub.wait_for_event_report_with_duplication(
-                groupcastTesting_event, current_event_filter_func=is_no_available_key, timeout_sec=30)
-            asserts.assert_equal(event_data.groupcastTestResult,
-                                 Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
-                                 "GroupcastTesting event after clearing the key should report NoAvailableKey")
-            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
-                                 "Incorrect DestinationIpAddress in GroupcastTesting event")
+                self.step(16)
+                event_data = event_sub.wait_for_event_report_with_duplication(
+                    groupcastTesting_event, current_event_filter_func=is_no_available_key, timeout_sec=30)
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
+                                     "GroupcastTesting event after clearing the key should report NoAvailableKey")
+                asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                     "Incorrect DestinationIpAddress in GroupcastTesting event")
+            else:
+                self.mark_step_range_skipped(15, 16)
         else:
             self.mark_step_range_skipped(5, 16)
 

@@ -1,1 +1,1 @@
-211 : [nrfconnect] Update nRF Connect SDK version in Docker to 3.4.0
+214 : [Telink] Update Docker image (Zephyr update, switch into branch: dev-tlk_v4.1)

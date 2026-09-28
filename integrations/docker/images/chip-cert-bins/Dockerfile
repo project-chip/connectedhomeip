@@ -124,6 +124,7 @@ RUN set -x \
     && : # last line
 
 # Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
+# Build once per image; CI jobs reuse these static and shared libraries.
 ARG OPENSSL_VERSION=3.5.0
 ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
 RUN set -x \
@@ -132,12 +133,26 @@ RUN set -x \
     && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
     && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && cd openssl-${OPENSSL_VERSION} \
-    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && ./Configure --prefix=/opt/matter/openssl --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
-    && ldconfig \
+    && test "$(PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR=/opt/matter/openssl/lib/pkgconfig pkg-config --modversion openssl)" = "$OPENSSL_VERSION" \
+    && test -f /opt/matter/openssl/lib/libssl.a \
+    && test -f /opt/matter/openssl/lib/libcrypto.a \
+    && test -f /opt/matter/openssl/lib/libssl.so \
+    && test -f /opt/matter/openssl/lib/libcrypto.so \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
+
+# Unset uses host OpenSSL. Explicit true/false selects private OpenSSL with
+# static/dynamic linkage. Only the SDK's OpenSSL GN configuration consumes these.
+ARG OPENSSL_STATIC=
+RUN case "$OPENSSL_STATIC" in \
+        ''|true|false) ;; \
+        *) echo "OPENSSL_STATIC must be empty (host), true (static), or false (dynamic)" >&2; exit 1 ;; \
+    esac
+ENV CHIP_OPENSSL_ROOT=${OPENSSL_STATIC:+/opt/matter/openssl}
+ENV CHIP_OPENSSL_STATIC=${OPENSSL_STATIC}
 
 # Stage 1.5: Bootstrap Matter.
 RUN echo "Cloning at commit: ${COMMITHASH}" \
@@ -271,16 +286,10 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/* \
     && : # last line
 
-# The apps below are linked against the OpenSSL 3.5 built from source in
-# Stage 1 (for ML-DSA / ML-KEM support), not the system 3.0.x that libcurl4
-# etc. pull in above. /usr/local/lib is scanned by ldconfig ahead of the
-# multiarch system library dirs (see /etc/ld.so.conf.d/libc.conf), so
-# dropping the 3.5 build there and refreshing the cache makes the dynamic
-# linker prefer it for libssl.so.3/libcrypto.so.3 without needing to remove
-# the apt-installed libssl3.
-COPY --from=chip-build-cert-bins /usr/local/lib/libssl.so* /usr/local/lib/
-COPY --from=chip-build-cert-bins /usr/local/lib/libcrypto.so* /usr/local/lib/
-RUN ldconfig
+# Dynamic SDK binaries have a RUNPATH to this private installation. System
+# tools continue to load Ubuntu's OpenSSL; do not register these with ldconfig.
+COPY --from=chip-build-cert-bins /opt/matter/openssl/lib/libssl.so* /opt/matter/openssl/lib/
+COPY --from=chip-build-cert-bins /opt/matter/openssl/lib/libcrypto.so* /opt/matter/openssl/lib/
 
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version

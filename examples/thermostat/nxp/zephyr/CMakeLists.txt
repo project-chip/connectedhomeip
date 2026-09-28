@@ -121,13 +121,23 @@ if (CONFIG_CHIP_FACTORY_DATA)
     endif()
 endif()
 
-if(CONFIG_CHIP_WIFI)
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+    chip_configure_data_model(app
+        ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_br.zap
+    )
+elseif(CONFIG_CHIP_WIFI)
     chip_configure_data_model(app
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_wifi.zap
     )
 elseif(CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_thread.zap
+    )
+endif()
+
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+    target_compile_definitions(app PRIVATE
+        CHIP_DEVICE_CONFIG_ENABLE_TBR=1
     )
 endif()
 

@@ -51,9 +51,20 @@ public:
     CHIP_ERROR SetEnabledSensors(const DataModel::DecodableList<ByteSpan> & newEnabledSensors);
     CHIP_ERROR SetEnabledSensors(Span<const ByteSpan> newEnabledSensors);
 
+    CHIP_ERROR SetEnabledSensorHandles(const DataModel::List<const ByteSpan> & newEnabledSensors)
+    {
+        return SetEnabledSensors(newEnabledSensors);
+    }
+    CHIP_ERROR SetEnabledSensorHandles(const DataModel::DecodableList<ByteSpan> & newEnabledSensors)
+    {
+        return SetEnabledSensors(newEnabledSensors);
+    }
+    CHIP_ERROR SetEnabledSensorHandles(Span<const ByteSpan> newEnabledSensors) { return SetEnabledSensors(newEnabledSensors); }
+
     BitMask<ScheduleDayOfWeekBitmap> GetDayOfWeek() const;
     uint16_t GetTransitionTime() const;
     DataModel::List<const ByteSpan> GetEnabledSensors() const;
+    DataModel::List<const ByteSpan> GetEnabledSensorHandles() const { return GetEnabledSensors(); }
 
     using Structs::SensorScheduleTransitionStruct::Type::Encode;
     using Structs::SensorScheduleTransitionStruct::Type::kIsFabricScoped;

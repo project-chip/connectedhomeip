@@ -390,8 +390,8 @@ bool ThermostatClusterBase::HasAttribute(AttributeId attributeId)
     case ThermostatSuggestionNotFollowingReason::Id:
         return mFeatures.Has(Feature::kThermostatSuggestions);
     case Sensors::Id:
-    case AvailableSensors::Id:
-    case EnabledSensors::Id:
+    case AvailableSensorHandles::Id:
+    case EnabledSensorHandles::Id:
     case NumberOfSensorScheduleTransitions::Id:
     case SensorSchedule::Id:
         return mFeatures.Has(Feature::kThermostatSensors);

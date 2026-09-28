@@ -40,7 +40,7 @@ SensorScheduleTransitionStructWithOwnedMembers::operator=(const Structs::SensorS
 {
     SetDayOfWeek(other.dayOfWeek);
     SetTransitionTime(other.transitionTime);
-    if (SetEnabledSensors(other.enabledSensors) != CHIP_NO_ERROR)
+    if (SetEnabledSensors(other.enabledSensorHandles) != CHIP_NO_ERROR)
     {
         mNumEnabledSensors = 0;
         RefreshEnabledSensorsList();
@@ -53,7 +53,7 @@ SensorScheduleTransitionStructWithOwnedMembers::operator=(const Structs::SensorS
 {
     SetDayOfWeek(other.dayOfWeek);
     SetTransitionTime(other.transitionTime);
-    if (SetEnabledSensors(other.enabledSensors) != CHIP_NO_ERROR)
+    if (SetEnabledSensors(other.enabledSensorHandles) != CHIP_NO_ERROR)
     {
         mNumEnabledSensors = 0;
         RefreshEnabledSensorsList();
@@ -88,7 +88,7 @@ void SensorScheduleTransitionStructWithOwnedMembers::RefreshEnabledSensorsList()
     {
         mSensorHandles[i] = ByteSpan(mSensorHandlesData[i], mSensorHandles[i].size());
     }
-    enabledSensors = DataModel::List<const ByteSpan>(mSensorHandles, mNumEnabledSensors);
+    enabledSensorHandles = DataModel::List<const ByteSpan>(mSensorHandles, mNumEnabledSensors);
 }
 
 CHIP_ERROR
@@ -173,7 +173,7 @@ uint16_t SensorScheduleTransitionStructWithOwnedMembers::GetTransitionTime() con
 
 DataModel::List<const ByteSpan> SensorScheduleTransitionStructWithOwnedMembers::GetEnabledSensors() const
 {
-    return enabledSensors;
+    return enabledSensorHandles;
 }
 
 } // namespace Thermostat

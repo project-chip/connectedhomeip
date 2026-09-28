@@ -125,18 +125,18 @@ bouffalolab:
      - "config/bouffalolab/**"
      - "third_party/bouffalolab/**"
 
-# --- Proposals / Opt-In Templates ---
+nrfconnect:
+  maintainers:
+    - ArekBalysNordic
+    - adigie
+    - kkasperczyk-no
+  paths:
+    - "src/platform/nrfconnect/**"
+    - "examples/platform/nrfconnect/**"
+    - "examples/**/nrfconnect/**"
+    - "config/nrfconnect/**"
 
-# nrfconnect:
-#   maintainers:
-#     - ArekBalysNordic
-#     - adigie
-#     - kkasperczyk-no
-#   paths:
-#     - "src/platform/nrfconnect/**"
-#     - "examples/platform/nrfconnect/**"
-#     - "examples/**/nrfconnect/**"
-#     - "config/nrfconnect/**"
+# --- Proposals / Opt-In Templates ---
 # 
 # 
 # asr:

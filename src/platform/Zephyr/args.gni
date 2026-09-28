@@ -2,4 +2,12 @@ chip_device_platform = "zephyr"
 
 declare_args() {
   chip_malloc_sys_heap = false
+
+  # Optional alternate OTA image processor sources (paths relative to // or
+  # absolute GN paths). Empty uses the built-in Zephyr MCUboot
+  # OTAImageProcessorImpl. Sources are compiled into the Zephyr platform
+  # library (not a separate source_set) so they may include CHIPDeviceLayer.h
+  # via allow_circular_includes_from on //src/platform:platform.
+  # Platform integrations may set this from CMake.
+  chip_zephyr_ota_image_processor_sources = []
 }

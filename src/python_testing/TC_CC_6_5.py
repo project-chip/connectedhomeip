@@ -82,6 +82,9 @@ MAX_STARTUP_COLOR_TEMP = 0xFEFF
 
 
 class TC_CC_6_5(MatterBaseTest):
+    # Steps 3a/3b reboot the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
+
     def desc_TC_CC_6_5(self) -> str:
         return (
             "4.2.18.[TC_CC_6_5] This test case verifies Color Temperature "

@@ -51,6 +51,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_21(MatterBaseTest, AVSMTestBase):
+    # Step 7 reboots the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
 
     def desc_TC_AVSM_2_21(self) -> str:
         return "[TC-AVSM-2.21] Validate persistence of stream usage priorities with DUT"

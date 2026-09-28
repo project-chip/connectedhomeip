@@ -58,7 +58,7 @@ fi
 
 if [[ ! -f "$JFC_APP" ]]; then
     echo "ERROR: JFC app not found at ${JFC_APP}"
-    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-control-app build\""
+    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-control-app-clang build\""
     exit 1
 fi
 

@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 
-inline constexpr uint32_t kRevision = 6;
+inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
 
