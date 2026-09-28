@@ -128,9 +128,5 @@ private:
     uint32_t mTickCount = 0;
 };
 
-using DefaultSimulatedAirQualitySensor =
-    SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
-                              Clusters::CarbonDioxideConcentrationMeasurement::Id>;
-
 } // namespace app
 } // namespace chip

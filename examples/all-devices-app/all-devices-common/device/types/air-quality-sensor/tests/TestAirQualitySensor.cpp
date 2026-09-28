@@ -141,7 +141,8 @@ TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 
 TEST_F(TestAirQualitySensor, TestSimulationTick)
 {
-    DefaultSimulatedAirQualitySensor sensor(mTimerDelegate);
+    SimulatedAirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>
+        sensor(mTimerDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);

@@ -319,7 +319,9 @@ private:
         {
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<DefaultSimulatedAirQualitySensor>(mContext->timerDelegate);
+                return MakeDevice<SimulatedAirQualitySensor<
+                    Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                    Clusters::CarbonDioxideConcentrationMeasurement::Id>>(mContext->timerDelegate);
             });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
