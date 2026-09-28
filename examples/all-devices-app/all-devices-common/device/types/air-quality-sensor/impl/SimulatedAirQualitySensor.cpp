@@ -50,6 +50,35 @@ SimulatedAirQualitySensor::Config DefaultSimulatedConfig()
     return config;
 }
 
+ClusterId ClusterIdForConcentrationType(SimulatedAirQualitySensor::ConcentrationType type)
+{
+    using ConcentrationType = SimulatedAirQualitySensor::ConcentrationType;
+    switch (type)
+    {
+    case ConcentrationType::kCarbonDioxide:
+        return CarbonDioxideConcentrationMeasurement::Id;
+    case ConcentrationType::kPm25:
+        return Pm25ConcentrationMeasurement::Id;
+    case ConcentrationType::kTotalVolatileOrganicCompounds:
+        return TotalVolatileOrganicCompoundsConcentrationMeasurement::Id;
+    case ConcentrationType::kCarbonMonoxide:
+        return CarbonMonoxideConcentrationMeasurement::Id;
+    case ConcentrationType::kNitrogenDioxide:
+        return NitrogenDioxideConcentrationMeasurement::Id;
+    case ConcentrationType::kOzone:
+        return OzoneConcentrationMeasurement::Id;
+    case ConcentrationType::kFormaldehyde:
+        return FormaldehydeConcentrationMeasurement::Id;
+    case ConcentrationType::kPm1:
+        return Pm1ConcentrationMeasurement::Id;
+    case ConcentrationType::kPm10:
+        return Pm10ConcentrationMeasurement::Id;
+    case ConcentrationType::kRadon:
+        return RadonConcentrationMeasurement::Id;
+    }
+    return kInvalidClusterId;
+}
+
 } // namespace
 
 SimulatedAirQualitySensor::Config &
@@ -243,6 +272,11 @@ Clusters::RelativeHumidityMeasurementCluster * SimulatedAirQualitySensor::Humidi
     return mHumidityCluster.IsConstructed() ? &mHumidityCluster.Cluster() : nullptr;
 }
 
+SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::GetConcentrationCluster(ConcentrationType type)
+{
+    return GetConcentrationCluster(ClusterIdForConcentrationType(type));
+}
+
 SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::GetConcentrationCluster(ClusterId clusterId)
 {
     for (size_t i = 0; i < mNumConcentrationClusters; ++i)
@@ -253,11 +287,6 @@ SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::Get
         }
     }
     return nullptr;
-}
-
-SimulatedAirQualitySensor::ConcentrationCluster * SimulatedAirQualitySensor::CO2Cluster()
-{
-    return GetConcentrationCluster(CarbonDioxideConcentrationMeasurement::Id);
 }
 
 void SimulatedAirQualitySensor::TimerFired()
@@ -300,9 +329,10 @@ void SimulatedAirQualitySensor::TimerFired()
 
     // 4. Oscillate CO2 (450 ppm to 850 ppm)
     float co2Val = 450.0f + static_cast<float>((mTickCount % 9) * 50);
-    if (CO2Cluster() != nullptr)
+    auto * co2Cluster = GetConcentrationCluster(ConcentrationType::kCarbonDioxide);
+    if (co2Cluster != nullptr)
     {
-        LogErrorOnFailure(CO2Cluster()->SetMeasuredValue(DataModel::MakeNullable(co2Val)));
+        LogErrorOnFailure(co2Cluster->SetMeasuredValue(DataModel::MakeNullable(co2Val)));
     }
 
     // 5. Update any other concentration clusters configured

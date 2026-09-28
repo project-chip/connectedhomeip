@@ -40,6 +40,20 @@ public:
     static constexpr size_t kMaxConcentrationClusters = 10;
     static constexpr System::Clock::Seconds16 kDefaultUpdateInterval = System::Clock::Seconds16(10);
 
+    enum class ConcentrationType : uint8_t
+    {
+        kCarbonDioxide,
+        kPm25,
+        kTotalVolatileOrganicCompounds,
+        kCarbonMonoxide,
+        kNitrogenDioxide,
+        kOzone,
+        kFormaldehyde,
+        kPm1,
+        kPm10,
+        kRadon,
+    };
+
     struct Config
     {
         AirQualitySensor::Config baseConfig;
@@ -81,14 +95,15 @@ public:
     // Public cluster accessors for optional clusters
     Clusters::TemperatureMeasurementCluster * TemperatureCluster();
     Clusters::RelativeHumidityMeasurementCluster * HumidityCluster();
-    ConcentrationCluster * GetConcentrationCluster(ClusterId clusterId);
-    ConcentrationCluster * CO2Cluster();
+    ConcentrationCluster * GetConcentrationCluster(ConcentrationType type);
 
 protected:
     CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
     void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
+    ConcentrationCluster * GetConcentrationCluster(ClusterId clusterId);
+
     Config mConfig;
     uint32_t mTickCount = 0;
 
