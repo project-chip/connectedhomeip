@@ -185,11 +185,11 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
     auto pair = mProcessorMap.find(static_cast<OTAProcessorTag>(header.tag));
     if (pair == mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %lu", header.tag);
+        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %" PRIu32, header.tag);
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Selected processor with tag: %lu", static_cast<uint32_t>(pair->first));
+    ChipLogProgress(SoftwareUpdate, "Selected processor with tag: %" PRIu32, static_cast<uint32_t>(pair->first));
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -200,11 +200,11 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(OTAProcessorTag tag, OTATlvProcessor * processor)
 {
     VerifyOrReturnError(processor->IsValidTag(tag), CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", static_cast<uint32_t>(tag)));
+                        ChipLogError(SoftwareUpdate, "Invalid processor tag: %" PRIu32, static_cast<uint32_t>(tag)));
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", static_cast<uint32_t>(tag));
+        ChipLogError(SoftwareUpdate, "A processor for tag %" PRIu32 " is already registered.", static_cast<uint32_t>(tag));
         return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
@@ -303,8 +303,8 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu", currentVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate, "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+                     currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 

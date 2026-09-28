@@ -566,6 +566,73 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
+// Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is either
+// not supported or set to null, then the device SHOULD move as fast as it is able."
+TEST_F(TestLevelControlBase, TestMoveWithNullRateMovesImmediately)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate).WithMinLevel(0).WithMaxLevel(254) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // DefaultMoveRate is not supported on this configuration, so no rate is available at all.
+    Commands::Move::Type data;
+    data.moveMode = MoveModeEnum::kUp;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 254u);
+}
+
+// A null Rate still falls back to DefaultMoveRate when that attribute holds a value.
+TEST_F(TestLevelControlBase, TestMoveWithNullRateUsesDefaultMoveRate)
+{
+    LevelControlCluster cluster{ kTestEndpointId,
+                                 LevelControlCluster::Config(mockTimer, mockDelegate)
+                                     .WithMinLevel(0)
+                                     .WithMaxLevel(254)
+                                     .WithDefaultMoveRate(DataModel::MakeNullable<uint8_t>(10)) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    Commands::Move::Type data;
+    data.moveMode = MoveModeEnum::kUp;
+    data.rate.SetNull();
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
+
+    // 10 units/s
+    for (int i = 0; i < 10; i++)
+    {
+        AdvanceClock(System::Clock::Milliseconds64(100));
+    }
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 10u);
+}
+
 TEST_F(TestLevelControlBase, TestStepCommand)
 {
     LevelControlCluster cluster{ kTestEndpointId,
@@ -726,4 +793,25 @@ TEST_F(TestLevelControlBase, TestCurrentLevelPersistence)
               CHIP_NO_ERROR);
     EXPECT_EQ(span.size(), 1u);
     EXPECT_EQ(buffer[0], 123u);
+}
+
+// CurrentLevel defaults to null. Stop on a cluster that never had a level set must leave it null.
+TEST_F(TestLevelControlBase, TestStopWithNullCurrentLevel)
+{
+    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> currentLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    ASSERT_TRUE(currentLevel.IsNull());
+
+    Commands::Stop::Type stopData;
+    stopData.optionsMask.ClearAll();
+    stopData.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stopData).IsSuccess());
+
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+    EXPECT_TRUE(currentLevel.IsNull());
 }

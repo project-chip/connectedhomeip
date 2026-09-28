@@ -42,13 +42,13 @@ from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_12(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_12(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_12(self) -> str:
         return "[TC-AVANALY-2.12] Validate Remote Analysis Node specific constraints and independent zone management with Server as DUT"
