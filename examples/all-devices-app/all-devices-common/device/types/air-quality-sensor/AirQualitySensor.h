@@ -225,8 +225,6 @@ public:
             ReturnErrorOnFailure(err);
         }
 
-        ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
-
         ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
         transaction.Commit();
         return CHIP_NO_ERROR;
@@ -241,8 +239,6 @@ public:
      */
     void Unregister(CodeDrivenDataModelProvider & provider) override
     {
-        UnregisterAdditionalClusters(provider);
-
         auto unregisterCluster = [&](auto & clusterWrapper) {
             if (clusterWrapper.IsConstructed())
             {
@@ -313,19 +309,6 @@ public:
     Clusters::IdentifyCluster & IdentifyCluster() { return *GetCluster<Clusters::Identify::Id>(); }
 
 protected:
-    /**
-     * @brief Extension hook for subclasses to register additional clusters.
-     */
-    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * @brief Extension hook for subclasses to unregister additional clusters.
-     */
-    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
-
     TimerDelegate & mTimerDelegate;
     Config mConfig;
 

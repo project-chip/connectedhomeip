@@ -60,35 +60,6 @@ TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
     sensor.Unregister(mProvider);
 }
 
-class CustomAirQualitySensor : public AirQualitySensor<>
-{
-public:
-    using AirQualitySensor::AirQualitySensor;
-
-    bool registeredAdditionalCalled   = false;
-    bool unregisteredAdditionalCalled = false;
-
-protected:
-    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override
-    {
-        registeredAdditionalCalled = true;
-        return CHIP_NO_ERROR;
-    }
-
-    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override { unregisteredAdditionalCalled = true; }
-};
-
-TEST_F(TestAirQualitySensor, TestExtensionHooks)
-{
-    CustomAirQualitySensor sensor(mTimerDelegate);
-
-    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
-    EXPECT_TRUE(sensor.registeredAdditionalCalled);
-
-    sensor.Unregister(mProvider);
-    EXPECT_TRUE(sensor.unregisteredAdditionalCalled);
-}
-
 TEST_F(TestAirQualitySensor, TestTemplatedClusters)
 {
     using ConfiguredSensor =
