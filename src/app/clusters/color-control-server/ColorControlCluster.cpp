@@ -818,10 +818,9 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
         // That re-assert describes the HUE axis, so it carries the hue axis's own liveness, not this
         // axis's `done`: hardware fading the hue must not be snapped to the software position just
         // because saturation arrived first. OnTick ticks hue before saturation and clears a finished
-        // axis right after its Tick* returns, so hsx->hue reads post-completion here. A driving color loop
-        // also owns the hue axis, and its frames are never a stop.
+        // axis right after its Tick* returns, so hsx->hue reads post-completion here.
         const auto * hsx     = std::get_if<HueSatTransition>(&mTransition);
-        const bool hueMoving = ((hsx != nullptr) && hsx->hue.has_value()) || LoopIsDriving();
+        const bool hueMoving = (hsx != nullptr) && hsx->hue.has_value();
         mDelegate.OnColorHSChanged(ehs->hue8(), ehs->saturation, !done);
         mDelegate.OnEnhancedHueChanged(ehs->enhancedHue, hueMoving);
     }
