@@ -6415,8 +6415,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
         [controller syncRunOnWorkQueue:^{
         } error:nil];
-        [device unitTestSyncRunOnDeviceQueue:^{
-        }];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
 
         // A repair is only scheduled for a detected loss, so there is no need to wait to prove a
         // repair did not happen.
