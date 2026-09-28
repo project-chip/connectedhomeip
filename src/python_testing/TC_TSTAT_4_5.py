@@ -505,7 +505,8 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             scheduleHandle=schedule_handle,
             systemMode=schedule_type.systemMode,
             name=name,
-            presetHandle=preset_handle if not (schedule_type.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints) else None,
+            presetHandle=preset_handle if not (schedule_type.scheduleTypeFeatures &
+                                               cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints) else None,
             transitions=transitions,
             builtIn=built_in,
         )
