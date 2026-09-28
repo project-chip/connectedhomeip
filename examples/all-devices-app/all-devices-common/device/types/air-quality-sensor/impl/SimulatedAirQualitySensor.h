@@ -17,18 +17,7 @@
 #pragma once
 
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
-
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
-#include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
-#include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
-#include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
-
-#include <array>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
 
 namespace chip {
 namespace app {
@@ -36,51 +25,8 @@ namespace app {
 class SimulatedAirQualitySensor : public AirQualitySensor, public TimerContext
 {
 public:
-    using ConcentrationCluster                        = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-    static constexpr size_t kMaxConcentrationClusters = 10;
     static constexpr System::Clock::Seconds16 kDefaultUpdateInterval = System::Clock::Seconds16(10);
-
-    enum class ConcentrationType : uint8_t
-    {
-        kCarbonDioxide,
-        kPm25,
-        kTotalVolatileOrganicCompounds,
-        kCarbonMonoxide,
-        kNitrogenDioxide,
-        kOzone,
-        kFormaldehyde,
-        kPm1,
-        kPm10,
-        kRadon,
-    };
-
-    struct Config
-    {
-        AirQualitySensor::Config baseConfig;
-        std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> temperature;
-        std::optional<Clusters::RelativeHumidityMeasurementCluster::Config> humidity;
-        std::array<ConcentrationCluster::Config, kMaxConcentrationClusters> concentrationConfigs;
-        size_t numConcentrationConfigs = 0;
-
-        Config & WithAirQuality(BitFlags<Clusters::AirQuality::Feature> features);
-        Config & WithTemperature(int16_t min = -4000, int16_t max = 8000);     // 0.01 deg C
-        Config & WithRelativeHumidity(uint16_t min = 0, uint16_t max = 10000); // 0.01 %
-
-        // Standard spec-compliant gases:
-        Config & WithCarbonDioxide(float min = 0.0f, float max = 5000.0f);
-        Config & WithPm25(float min = 0.0f, float max = 1000.0f);
-        Config & WithTotalVolatileOrganicCompounds(float min = 0.0f, float max = 10000.0f);
-        Config & WithCarbonMonoxide(float min = 0.0f, float max = 1000.0f);
-        Config & WithNitrogenDioxide(float min = 0.0f, float max = 1000.0f);
-        Config & WithOzone(float min = 0.0f, float max = 1000.0f);
-        Config & WithFormaldehyde(float min = 0.0f, float max = 1000.0f);
-        Config & WithPm1(float min = 0.0f, float max = 1000.0f);
-        Config & WithPm10(float min = 0.0f, float max = 1000.0f);
-        Config & WithRadon(float min = 0.0f, float max = 10000.0f);
-
-        Config & WithConcentration(const ConcentrationCluster::Config & customConfig);
-        Config & WithAllConcentrationClusters();
-    };
+    static Config DefaultSimulatedConfig();
 
     SimulatedAirQualitySensor(TimerDelegate & timerDelegate, const Config & config);
     explicit SimulatedAirQualitySensor(TimerDelegate & timerDelegate);
@@ -92,25 +38,8 @@ public:
     // TimerContext
     void TimerFired() override;
 
-    // Public cluster accessors for optional clusters
-    Clusters::TemperatureMeasurementCluster * TemperatureCluster();
-    Clusters::RelativeHumidityMeasurementCluster * HumidityCluster();
-    ConcentrationCluster * GetConcentrationCluster(ConcentrationType type);
-
-protected:
-    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
-    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
-
 private:
-    ConcentrationCluster * GetConcentrationCluster(ClusterId clusterId);
-
-    Config mConfig;
     uint32_t mTickCount = 0;
-
-    LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureCluster;
-    LazyRegisteredServerCluster<Clusters::RelativeHumidityMeasurementCluster> mHumidityCluster;
-    std::array<LazyRegisteredServerCluster<ConcentrationCluster>, kMaxConcentrationClusters> mConcentrationClusters;
-    size_t mNumConcentrationClusters = 0;
 };
 
 } // namespace app
