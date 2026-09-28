@@ -155,10 +155,12 @@ public:
      *
      * @param timerDelegate Reference to platform TimerDelegate (used by IdentifyCluster and simulation).
      * @param config Device and optional cluster configuration.
+     * @param tag Optional semantic tag for endpoint disambiguation under wildcard allocation (*).
      */
-    explicit AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {}) :
+    AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {},
+                     std::optional<EndpointComposition::SemanticTag> tag = std::nullopt) :
         SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
-        mConfig(config)
+        mConfig(config), mTag(tag)
     {}
 
     ~AirQualitySensor() override = default;
@@ -182,6 +184,11 @@ public:
     {
         VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
         DeviceRegistrationTransaction transaction(*this, provider);
+
+        if (composition.tagList.empty() && mTag.has_value())
+        {
+            composition.tagList = Span(&mTag.value(), 1);
+        }
 
         ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
@@ -310,6 +317,7 @@ public:
 protected:
     TimerDelegate & mTimerDelegate;
     Config mConfig;
+    std::optional<EndpointComposition::SemanticTag> mTag;
 
     /// Mandatory clusters
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

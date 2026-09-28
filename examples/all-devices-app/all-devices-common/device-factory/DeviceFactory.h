@@ -319,12 +319,28 @@ private:
         {
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
                 return MakeDevice<
                     SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
-                                              Clusters::CarbonDioxideConcentrationMeasurement::Id>>(mContext->timerDelegate);
+                                              Clusters::CarbonDioxideConcentrationMeasurement::Id>>(
+                    mContext->timerDelegate,
+                    SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                              Clusters::CarbonDioxideConcentrationMeasurement::Id>::Config{},
+                    kAirQualityTag);
             });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from air-quality-sensor (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
                 return MakeDevice<SimulatedAirQualitySensor<
                     Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                     Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,
@@ -332,7 +348,17 @@ private:
                     Clusters::CarbonMonoxideConcentrationMeasurement::Id, Clusters::NitrogenDioxideConcentrationMeasurement::Id,
                     Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
                     Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
-                    Clusters::RadonConcentrationMeasurement::Id>>(mContext->timerDelegate);
+                    Clusters::RadonConcentrationMeasurement::Id>>(
+                    mContext->timerDelegate,
+                    SimulatedAirQualitySensor<
+                        Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                        Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,
+                        Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                        Clusters::CarbonMonoxideConcentrationMeasurement::Id, Clusters::NitrogenDioxideConcentrationMeasurement::Id,
+                        Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
+                        Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
+                        Clusters::RadonConcentrationMeasurement::Id>::Config{},
+                    kAirQualityFullTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
