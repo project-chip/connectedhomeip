@@ -31,7 +31,7 @@ from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 
 UpdateState = Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
@@ -63,9 +63,9 @@ def _cluster_wide_handler() -> AttributeSubscriptionHandler:
         expected_attribute=None)
 
 
-class TestAttributeSubscriptionLiveness(MatterBaseTest):
-    # Pure unit test, no DUT: never attempt the framework's background subscription.
-    disable_wildcard_subscription = True
+class TestAttributeSubscriptionLiveness(CertificationUnitTestNoDevice):
+    # Pure unit test, no DUT: the marker's requires_dut = False keeps the framework's
+    # background subscription from being attempted.
 
     def _expect_failure(self, fn, expected_substring: str):
         try:

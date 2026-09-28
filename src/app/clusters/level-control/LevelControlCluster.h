@@ -264,6 +264,9 @@ private:
 
         uint32_t GetTransitionTimeMs() const { return mTransitionTimeMs; }
 
+        // True while the fade to MinLevel started by an On/Off cluster Off is still running.
+        bool IsInternalOffTransitionActive();
+
         // TimerContext
         void TimerFired() override;
 

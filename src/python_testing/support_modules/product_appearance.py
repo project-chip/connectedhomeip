@@ -18,11 +18,11 @@
 from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep
 
 
-class ProductAppearanceBase(MatterBaseTest):
+class ProductAppearanceBase(MatterTestCommissionedDevice):
     def steps(self) -> list[TestStep]:
         return [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),

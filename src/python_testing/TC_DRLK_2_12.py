@@ -38,7 +38,7 @@
 from drlk_2_x_common import DRLK_COMMON
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 # Configurable parameters:
@@ -54,7 +54,7 @@ from matter.testing.runner import default_matter_test_main
 #     defaults to 60 seconds. Add `--int-arg auto_relock_time:<value>` to command line to override
 
 
-class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
+class TC_DRLK_2_12(MatterTestCommissionedDevice, DRLK_COMMON):
 
     @async_test_body
     async def teardown_test(self):

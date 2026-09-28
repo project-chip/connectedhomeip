@@ -65,6 +65,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
@@ -80,6 +82,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OnOffLight.cpp"
@@ -100,6 +103,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/RoomAirConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
@@ -111,6 +117,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/ThreadBorderRouter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/impl/SimulatedThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     # keep-sorted: end
 
@@ -179,6 +187,7 @@ foreach(_key
         fan
         flow-sensor
         generic-switch
+        humidity-conditioner
         humidity-sensor
         laundry-dryer
         laundry-washer
@@ -199,10 +208,12 @@ foreach(_key
         rain-sensor
         refrigerator
         robotic-vacuum-cleaner
+        room-air-conditioner
         smoke-co-alarm
         soil-sensor
         speaker
         temperature-sensor
+        thread-border-router
         water-freeze-detector
         water-leak-detector
         water-valve
