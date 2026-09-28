@@ -101,9 +101,6 @@ declare_args() {
   # Defaults ARC configs.
   default_configs_arc = [ "${build_root}/config/compiler:arc_default" ]
 
-  # Default ICF configs.
-  default_configs_icf = [ "${build_root}/config/compiler:icf_default" ]
-
   # Extra default configs.
   default_configs_extra = []
 }
@@ -131,7 +128,6 @@ default_configs += default_configs_target
 default_configs += default_configs_dead_code
 default_configs += default_configs_prefix_mappings
 default_configs += default_configs_arc
-default_configs += default_configs_icf
 default_configs += default_configs_extra
 
 executable_default_configs = []
