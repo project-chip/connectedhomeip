@@ -95,10 +95,12 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
         AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
     ConfiguredSensor::Config config;
-    config.temperature.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000));
-    config.temperature.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(6000));
-    config.humidity.minMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(1000));
-    config.humidity.maxMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(9000));
+    config.Get<TemperatureMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000));
+    config.Get<TemperatureMeasurement::Id>().maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(6000));
+    config.Get<RelativeHumidityMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(1000));
+    config.Get<RelativeHumidityMeasurement::Id>().maxMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(9000));
+    config.Get<CarbonDioxideConcentrationMeasurement::Id>().minMeasured = DataModel::MakeNullable(400.0f);
+    config.Get<CarbonDioxideConcentrationMeasurement::Id>().maxMeasured = DataModel::MakeNullable(2000.0f);
 
     ConfiguredSensor sensor(mTimerDelegate, config);
 
@@ -113,6 +115,16 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
         DataModel::Nullable<float> co2Val;
         EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MeasuredValue::Id, co2Val), CHIP_NO_ERROR);
         EXPECT_TRUE(co2Val.IsNull());
+
+        DataModel::Nullable<float> minVal;
+        EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MinMeasuredValue::Id, minVal), CHIP_NO_ERROR);
+        EXPECT_FALSE(minVal.IsNull());
+        EXPECT_FLOAT_EQ(minVal.Value(), 400.0f);
+
+        DataModel::Nullable<float> maxVal;
+        EXPECT_EQ(co2Tester.ReadAttribute(ConcentrationMeasurement::Attributes::MaxMeasuredValue::Id, maxVal), CHIP_NO_ERROR);
+        EXPECT_FALSE(maxVal.IsNull());
+        EXPECT_FLOAT_EQ(maxVal.Value(), 2000.0f);
     }
     EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMinMeasuredValue().Value(), -2000);
     EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>()->GetMaxMeasuredValue().Value(), 6000);

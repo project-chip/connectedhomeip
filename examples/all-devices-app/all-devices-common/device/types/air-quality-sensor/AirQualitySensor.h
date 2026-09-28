@@ -133,6 +133,67 @@ struct ClusterTypeTraits<Clusters::RadonConcentrationMeasurement::Id>
 template <ClusterId CID>
 using ClusterType = typename ClusterTypeTraits<CID>::Type;
 
+template <ClusterId CID>
+struct ClusterConfigTraits;
+
+template <>
+struct ClusterConfigTraits<Clusters::TemperatureMeasurement::Id>
+{
+    using Type = Clusters::TemperatureMeasurementCluster::StartupConfiguration;
+    static Type Default()
+    {
+        Type config;
+        config.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-4000));
+        config.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(8000));
+        return config;
+    }
+};
+
+template <>
+struct ClusterConfigTraits<Clusters::RelativeHumidityMeasurement::Id>
+{
+    using Type = Clusters::RelativeHumidityMeasurementCluster::Config;
+    static Type Default()
+    {
+        Type config;
+        config.minMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(0));
+        config.maxMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(10000));
+        return config;
+    }
+};
+
+Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
+
+template <ClusterId CID>
+struct ConcentrationConfigTraits
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config;
+    static Type Default()
+    {
+        return DefaultConcentrationConfig(CID);
+    }
+};
+
+template <> struct ClusterConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::OzoneConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::OzoneConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id> {};
+template <> struct ClusterConfigTraits<Clusters::RadonConcentrationMeasurement::Id> : ConcentrationConfigTraits<Clusters::RadonConcentrationMeasurement::Id> {};
+
+template <ClusterId CID>
+using ClusterConfigType = typename ClusterConfigTraits<CID>::Type;
+
+template <ClusterId CID>
+ClusterConfigType<CID> DefaultClusterConfig()
+{
+    return ClusterConfigTraits<CID>::Default();
+}
+
 template <ClusterId Target, ClusterId... List>
 constexpr size_t IndexOf()
 {
@@ -176,8 +237,6 @@ constexpr size_t CountOf()
     }
 }
 
-Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
-
 } // namespace Detail
 
 /// Matter Air Quality Sensor device type (spec section 2.6).
@@ -200,15 +259,27 @@ public:
                                                                     Clusters::AirQuality::Feature::kModerate,
                                                                     Clusters::AirQuality::Feature::kVeryPoor,
                                                                     Clusters::AirQuality::Feature::kExtremelyPoor };
-        Clusters::TemperatureMeasurementCluster::StartupConfiguration temperature;
-        Clusters::RelativeHumidityMeasurementCluster::Config humidity;
 
-        Config()
+        std::tuple<Detail::ClusterConfigType<OptionalClusters>...> clusterConfigs{
+            Detail::DefaultClusterConfig<OptionalClusters>()...
+        };
+
+        Config() = default;
+
+        template <ClusterId CID>
+        Detail::ClusterConfigType<CID> & Get()
         {
-            temperature.minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-4000));
-            temperature.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(8000));
-            humidity.minMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(0));
-            humidity.maxMeasuredValue    = DataModel::MakeNullable(static_cast<uint16_t>(10000));
+            static_assert(((OptionalClusters == CID) || ...), "Cluster not configured on this sensor");
+            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            return std::get<kIdx>(clusterConfigs);
+        }
+
+        template <ClusterId CID>
+        const Detail::ClusterConfigType<CID> & Get() const
+        {
+            static_assert(((OptionalClusters == CID) || ...), "Cluster not configured on this sensor");
+            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            return std::get<kIdx>(clusterConfigs);
         }
     };
 
@@ -241,18 +312,17 @@ public:
             {
                 return;
             }
+            constexpr size_t kIdx = Detail::IndexOf<clusterId, OptionalClusters...>();
+            auto & clusterConfig  = std::get<kIdx>(mConfig.clusterConfigs);
+
             if constexpr (clusterId == Clusters::TemperatureMeasurement::Id)
             {
                 clusterWrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(),
-                                      mConfig.temperature);
-            }
-            else if constexpr (clusterId == Clusters::RelativeHumidityMeasurement::Id)
-            {
-                clusterWrapper.Create(endpoint, mConfig.humidity);
+                                      clusterConfig);
             }
             else
             {
-                clusterWrapper.Create(endpoint, Detail::DefaultConcentrationConfig(clusterId));
+                clusterWrapper.Create(endpoint, clusterConfig);
             }
             err = provider.AddCluster(clusterWrapper.Registration());
         };
