@@ -192,7 +192,11 @@ public:
         mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
 
-        CHIP_ERROR err       = CHIP_NO_ERROR;
+        // 3. Register all statically declared optional clusters (Temperature, Relative Humidity, Concentrations)
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        // Helper lambda to instantiate and register an individual optional cluster from mOptionalClusters.
+        // Takes a compile-time tag std::integral_constant<ClusterId, CID> to extract constexpr ClusterId.
         auto registerCluster = [&](auto & clusterWrapper, auto clusterIdTag) {
             using TagType                 = decltype(clusterIdTag);
             constexpr ClusterId clusterId = TagType::value;
@@ -200,22 +204,21 @@ public:
             {
                 return;
             }
+
+            // Retrieve the cluster's configuration from mConfig.clusterConfigs tuple
             constexpr size_t kIdx = Detail::IndexOf<clusterId, OptionalClusters...>();
             auto & clusterConfig  = std::get<kIdx>(mConfig.clusterConfigs);
 
-            if constexpr (clusterId == Clusters::TemperatureMeasurement::Id)
-            {
-                clusterWrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(), clusterConfig);
-            }
-            else
-            {
-                clusterWrapper.Create(endpoint, clusterConfig);
-            }
+            // Instantiate cluster in-place with its specific config signature (handled by ClusterConfigTraits)
+            Detail::ClusterConfigTraits<clusterId>::CreateCluster(clusterWrapper, endpoint, clusterConfig);
+
+            // Register cluster with data model provider
             err = provider.AddCluster(clusterWrapper.Registration());
         };
 
         if constexpr (sizeof...(OptionalClusters) > 0)
         {
+            // Expand fold expression across all OptionalClusters to instantiate each declared cluster
             (registerCluster(std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
                              std::integral_constant<ClusterId, OptionalClusters>{}),
              ...);

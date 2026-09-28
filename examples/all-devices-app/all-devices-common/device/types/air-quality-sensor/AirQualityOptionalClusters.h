@@ -143,6 +143,12 @@ struct ClusterConfigTraits<Clusters::TemperatureMeasurement::Id>
         config.maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(8000));
         return config;
     }
+
+    template <typename ClusterWrapper>
+    static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
+    {
+        wrapper.Create(endpoint, Clusters::TemperatureMeasurementCluster::OptionalAttributeSet(), config);
+    }
 };
 
 template <>
@@ -160,6 +166,12 @@ struct ClusterConfigTraits<Clusters::RelativeHumidityMeasurement::Id>
         config.maxMeasuredValue = DataModel::MakeNullable(static_cast<uint16_t>(10000));
         return config;
     }
+
+    template <typename ClusterWrapper>
+    static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
+    {
+        wrapper.Create(endpoint, config);
+    }
 };
 
 /**
@@ -176,6 +188,12 @@ struct ConcentrationConfigTraits
 {
     using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config;
     static Type Default() { return DefaultConcentrationConfig(CID); }
+
+    template <typename ClusterWrapper>
+    static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
+    {
+        wrapper.Create(endpoint, config);
+    }
 };
 
 template <>
