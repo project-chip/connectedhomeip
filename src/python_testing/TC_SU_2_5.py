@@ -119,7 +119,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                 "Test timeout parameter must be defined and greater than 0. A good timeout can be 1800 seconds or 30 minutes [ --timeout 1800 ]")
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
-        self.requestor_passcode = self.matter_test_config.setup_passcodes[0]
         self.controller = self.default_controller
 
         # pipe out arguments
