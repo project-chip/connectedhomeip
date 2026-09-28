@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-# Builds an ESP32 Zephyr example (examples/<application>/esp32/zephyr) with west.
+# Builds an ESP32 Zephyr example (examples/<application>/esp32_zephyr) with west.
 #
 # Usage: scripts/examples/esp32_zephyr_example.sh <application> <board> [west build args...]
 #
@@ -31,7 +31,7 @@
 # The Matter environment (scripts/activate.sh) is sourced for gn and the
 # Pigweed environment; the venv is then put ahead of it on PATH.
 #
-# The output lands in examples/<application>/esp32/zephyr/build.
+# The output lands in examples/<application>/esp32_zephyr/build.
 
 set -e
 
@@ -41,10 +41,10 @@ APP="$1"
 BOARD="$2"
 shift 2 || true
 
-if [[ ! -f "examples/$APP/esp32/zephyr/CMakeLists.txt" || -z "$BOARD" ]]; then
+if [[ ! -f "examples/$APP/esp32_zephyr/CMakeLists.txt" || -z "$BOARD" ]]; then
     echo "Usage: $0 <application> <board> [west build args...]" >&2
     echo "Applications:" >&2
-    ls examples/*/esp32/zephyr/CMakeLists.txt | awk -F/ '{print "  "$2}' >&2
+    ls examples/*/esp32_zephyr/CMakeLists.txt | awk -F/ '{print "  "$2}' >&2
     echo "Boards: esp32c6_devkitc/esp32c6/hpcore" >&2
     exit 1
 fi
@@ -68,4 +68,4 @@ if [[ -x "$VENV/bin/west" ]]; then
 fi
 
 set -x
-west build -p auto -b "$BOARD" -d "examples/$APP/esp32/zephyr/build" "examples/$APP/esp32/zephyr" "$@"
+west build -p auto -b "$BOARD" -d "examples/$APP/esp32_zephyr/build" "examples/$APP/esp32_zephyr" "$@"

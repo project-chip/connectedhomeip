@@ -13,11 +13,11 @@ The light output is GPIO2 (`led0` alias in the board overlay).
 
 ## Prerequisites
 
--   Follow [BUILDING.md](../../../../docs/guides/BUILDING.md) to set up the
+-   Follow [BUILDING.md](../../../docs/guides/BUILDING.md) to set up the
     Matter environment.
 -   Install the Zephyr SDK (1.0.1 or newer) as described in the
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
--   Build [chip-tool](../../../chip-tool/README.md).
+-   Build [chip-tool](../../chip-tool/README.md).
 
 Zephyr **v4.4.2** requires Python 3.12 or newer, so it uses its own venv.
 
@@ -61,7 +61,7 @@ source "$ZEPHYR_WORKSPACE/zephyr/zephyr-env.sh"
 ## Building the example
 
 ```shell
-cd "$CHIP/examples/lighting-app/esp32/zephyr"
+cd "$CHIP/examples/lighting-app/esp32_zephyr"
 west build -b esp32c6_devkitc/esp32c6/hpcore
 ```
 

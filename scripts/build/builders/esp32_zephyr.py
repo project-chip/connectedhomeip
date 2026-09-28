@@ -48,7 +48,7 @@ class Esp32ZephyrBoard(Enum):
 
 
 class Esp32ZephyrBuilder(Builder):
-    """Builds the ESP32 Zephyr examples (examples/<app>/esp32/zephyr) with west.
+    """Builds the ESP32 Zephyr examples (examples/<app>/esp32_zephyr) with west.
 
     Required environment:
       ESP32_ZEPHYR_BASE      Zephyr tree of a west workspace with hal_espressif
@@ -101,7 +101,7 @@ class Esp32ZephyrBuilder(Builder):
         cmd += 'west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}'.format(
             outdir=shlex.quote(self.output_dir),
             board=self.board.ZephyrBoardName(),
-            sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'esp32', 'zephyr')),
+            sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'esp32_zephyr')),
             build_flags=build_flags)
 
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
