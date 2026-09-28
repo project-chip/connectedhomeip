@@ -120,8 +120,7 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
         return Status::UnsupportedAccess;
     }
 
-    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) !=
-        CHIP_NO_ERROR)
+    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) != CHIP_NO_ERROR)
     {
         return Status::UnsupportedAccess;
     }
