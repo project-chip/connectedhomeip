@@ -37,8 +37,7 @@ public:
 class DoorbellOOBAccessor : public OOBAccessor
 {
 public:
-    DoorbellOOBAccessor(DoorbellSimulationDelegate & delegate, EndpointId endpointId) :
-        mDelegate(delegate), mEndpointId(endpointId)
+    DoorbellOOBAccessor(DoorbellSimulationDelegate & delegate, EndpointId endpointId) : mDelegate(delegate), mEndpointId(endpointId)
     {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;

@@ -710,9 +710,9 @@ public:
         return mResultToReturn;
     }
 
-    bool mShortPressCalled             = false;
+    bool mShortPressCalled = false;
     std::optional<uint8_t> mLastPosition;
-    CHIP_ERROR mResultToReturn         = CHIP_NO_ERROR;
+    CHIP_ERROR mResultToReturn = CHIP_NO_ERROR;
 };
 
 TEST_F(TestOOBAccessors, DoorbellOOBAccessor)
