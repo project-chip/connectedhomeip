@@ -115,6 +115,7 @@ The application supports the following device types (specified via the
 - `water-freeze-detector`
 - `water-leak-detector`
 - `water-valve`
+- `window-covering`
 
 You can run the application with `--help` to see the list of valid device types.
 
