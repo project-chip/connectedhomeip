@@ -263,9 +263,14 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     // Nothing else will bring a committed PDC network up: esp_wifi has no config for it, so
     // ConnectivityManagerImpl sees an unprovisioned station and leaves it alone.
+    // A failure here must not fail Init(), or the cluster needed to fix the network won't come up.
     if (loadedPDCNetwork && !backupExists)
     {
-        ReturnErrorOnFailure(ConnectWiFiNetworkWithPDC());
+        CHIP_ERROR err = ConnectWiFiNetworkWithPDC();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogFailure(err, DeviceLayer, "Failed to connect committed PDC network");
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
@@ -303,7 +308,6 @@ CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
 CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 {
     WiFiNetwork network;
-    Network configuredNetwork;
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
 
@@ -329,13 +333,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 
     mStagingNetwork = network;
 
-    // Note this compares SSIDs only, so it cannot tell a PDC association from a passphrase one to
-    // the same SSID, and will wrongly skip the reconnect needed to switch between them.
-    if (GetConfiguredNetwork(configuredNetwork) == CHIP_NO_ERROR)
-    {
-        VerifyOrExit(!NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
-                     error = CHIP_NO_ERROR);
-    }
+    VerifyOrExit(!IsAssociatedWithStagingNetwork(), error = CHIP_NO_ERROR);
 
     if (error == CHIP_NO_ERROR)
     {
@@ -368,6 +366,20 @@ exit:
 bool ESPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
+}
+
+bool ESPWiFiDriver::IsAssociatedWithStagingNetwork()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // The AP record only carries the SSID, which can't tell an EAP-TLS association from a
+    // passphrase one to the same SSID, or one set of PDC credentials from another. Treat any
+    // EAP-TLS involvement, on either side, as a mismatch.
+    VerifyOrReturnValue(!mStagingNetwork.UsingPDC() && !mEapTlsCredentials, false);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    Network configuredNetwork;
+    return GetConfiguredNetwork(configuredNetwork) == CHIP_NO_ERROR &&
+        NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen));
 }
 
 Status ESPWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
@@ -537,9 +549,8 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, voi
 
 void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    Status networkingStatus = Status::kSuccess;
-    Network configuredNetwork;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    Status networkingStatus     = Status::kSuccess;
     const uint32_t secToMiliSec = 1000;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     const bool usingPDC = mStagingNetwork.UsingPDC();
@@ -553,18 +564,13 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %.*s%s", static_cast<int>(networkId.size()),
                     networkId.data(), usingPDC ? " (PDC)" : "");
 
-    // The AP record only carries the SSID, which says nothing about whether the current
-    // association is the EAP-TLS one a PDC network calls for. Always re-associate for those.
-    if (!usingPDC && CHIP_NO_ERROR == GetConfiguredNetwork(configuredNetwork))
+    if (IsAssociatedWithStagingNetwork())
     {
-        if (NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))
+        if (callback)
         {
-            if (callback)
-            {
-                callback->OnResult(Status::kSuccess, CharSpan(), 0);
-            }
-            return;
+            callback->OnResult(Status::kSuccess, CharSpan(), 0);
         }
+        return;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -847,8 +853,8 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetworkWithPDC()
 
     // PDC uses similar settings to WPA3-Enterprise: WPA-EAP-SHA256 (00-0f-ac-5) with MFP, however
     // PDC allows MFPC=1 MFPR=0 so long as PDC STAs actually negotiate MFP; WPA3-Enterprise requires
-    // MFPR=1. Tis maps to WIFI_AUTH_WPA2_WPA3_ENTERPRISE for the purposes of the auth mode
-    // threshold, which correct rejects APs advertising only WPA-EAP (00-0f-ac-1). Note that the
+    // MFPR=1. This maps to WIFI_AUTH_WPA2_WPA3_ENTERPRISE for the purposes of the auth mode
+    // threshold, which correctly rejects APs advertising only WPA-EAP (00-0f-ac-1). Note that the
     // "strength" comparison applied by the threshold logic is not a straight numeric comparison,
     // (see roaming_app_authmode_strength_rank() in ESP-IDF's roaming_app.c).
     wifiConfig.sta.threshold.authmode = WIFI_AUTH_WPA2_WPA3_ENTERPRISE;

@@ -187,6 +187,9 @@ public:
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
+    // Whether the station is already associated with mStagingNetwork, so that connecting to it
+    // again can be skipped. Errs towards false where the association can't be checked.
+    bool IsAssociatedWithStagingNetwork();
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
     CHIP_ERROR BackupConfiguration();
 
