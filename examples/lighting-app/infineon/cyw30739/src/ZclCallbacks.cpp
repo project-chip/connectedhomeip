@@ -18,7 +18,6 @@
  */
 
 #include "LightingManager.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -27,6 +26,9 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
+// Invoked only for attribute writes that go through the ember attribute table. Clusters migrated to
+// the code-driven model handle writes themselves and never reach here, so a cluster listed below may
+// already be unreachable; prefer a cluster-specific delegate for new code.
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 
@@ -48,18 +50,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
             printf("ZCL CurrentLevel -> %u\n", *value);
             LightMgr().InitiateAction(LightingManager::ACTOR_ZCL_CMD, LightingManager::LEVEL_ACTION, *value);
             return;
-        }
-        break;
-    case Identify::Id:
-        if (attributePath.mAttributeId == Identify::Attributes::IdentifyTime::Id)
-        {
-            uint16_t identifyTime;
-            if (Protocols::InteractionModel::Status::Success ==
-                Identify::Attributes::IdentifyTime::GetDefault(attributePath.mEndpointId, &identifyTime))
-            {
-                ChipLogProgress(Zcl, "IdentifyTime %u", identifyTime);
-                return;
-            }
         }
         break;
     default:

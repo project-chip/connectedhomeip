@@ -18,10 +18,61 @@
 /**
  *    @file
  *          Provides an implementation of the ConfigurationManager object
- *          for nRF Connect SDK platforms, by including Zephyr platform
+ *          for nRF Connect SDK platforms, by extending the Zephyr platform
  *          implementation.
  */
 
 #pragma once
 
 #include <platform/Zephyr/ConfigurationManagerImpl.h>
+
+#include <system/SystemClock.h>
+
+namespace chip {
+namespace DeviceLayer {
+
+struct ChipDeviceEvent;
+
+/**
+ * Concrete implementation of the ConfigurationManager singleton object for the nRF Connect SDK
+ * platform.
+ *
+ * It reuses the Zephyr implementation and overrides only the factory reset handling, which on
+ * nRF devices additionally routes the reset through the Matter server, suspends MPSL to speed up
+ * the flash operations and optionally reports how long the reset took.
+ */
+class ConfigurationManagerImplNrf : public ConfigurationManagerImpl
+{
+public:
+    static ConfigurationManagerImplNrf & GetDefaultInstance();
+
+protected:
+    ConfigurationManagerImplNrf() = default;
+
+private:
+    // ===== Members that implement the ConfigurationManager public interface.
+
+    CHIP_ERROR Init() override;
+    void InitiateFactoryReset() override;
+
+    // NOTE: All the remaining methods are implemented by ConfigurationManagerImpl<>.
+
+    // ===== Private members reserved for use by this class only.
+
+    static void FactoryResetEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+    static void DoFactoryReset(intptr_t arg);
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_TIME_MEASUREMENT
+    System::Clock::Milliseconds64 GetFactoryResetDuration() const;
+
+    System::Clock::Timestamp mFactoryResetStartTime;
+#endif // CONFIG_CHIP_FACTORY_RESET_TIME_MEASUREMENT
+
+    // Tells whether the Matter server has already deleted all the fabrics and emitted the Leave
+    // event for this reset. Until it does, InitiateFactoryReset() delegates the work to the server
+    // so that every factory reset source behaves in the same way.
+    bool mFactoryResetScheduled = false;
+};
+
+} // namespace DeviceLayer
+} // namespace chip

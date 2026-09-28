@@ -23,6 +23,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/AudioControl/Commands.h>
+#include <clusters/ScenesManagement/Structs.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace {
@@ -3488,6 +3489,445 @@ TEST_F(TestAudioControlCluster, StartUpVolumeOverridePersistsAcrossReboot)
         EXPECT_EQ(cluster.GetVolume(), 75u);
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
+}
+
+// ---------- Scene handler (scenes::SceneHandler) ----------
+
+namespace {
+
+using ScenePair      = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+using SceneDecodable = ScenesManagement::Structs::AttributeValuePairStruct::DecodableType;
+
+// Encodes a list of {attributeID, value} pairs into a scene EFS blob, as the scene table would.
+CHIP_ERROR EncodePairs(AudioControlCluster & cluster, const app::DataModel::List<ScenePair> & pairs, MutableByteSpan & out)
+{
+    return cluster.EncodeAttributeValueList(pairs, out);
+}
+
+// Builds the decodable extension field set that ScenesServer hands to SerializeAdd (the AddScene
+// path), round-tripping the given cluster id and pairs through TLV.
+CHIP_ERROR MakeDecodableEfs(ClusterId clusterId, chip::Span<const ScenePair> pairs, MutableByteSpan & backing,
+                            ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & out)
+{
+    ScenesManagement::Structs::ExtensionFieldSetStruct::Type in;
+    in.clusterID          = clusterId;
+    in.attributeValueList = app::DataModel::List<const ScenePair>(pairs.data(), pairs.size());
+
+    TLV::TLVWriter writer;
+    writer.Init(backing);
+    ReturnErrorOnFailure(in.Encode(writer, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(writer.Finalize());
+    backing.reduce_size(writer.GetLengthWritten());
+
+    TLV::TLVReader reader;
+    reader.Init(backing);
+    ReturnErrorOnFailure(reader.Next());
+    return out.Decode(reader);
+}
+
+} // namespace
+
+TEST_F(TestAudioControlCluster, SceneSupportsClusterOnlyOwnEndpointAndCluster)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.SupportsCluster(kRootEndpointId, AudioControl::Id));
+    EXPECT_FALSE(cluster.SupportsCluster(kRootEndpointId + 1, AudioControl::Id));
+    EXPECT_FALSE(cluster.SupportsCluster(kRootEndpointId, OnOff::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneSerializeMandatoryAttributesOnly)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig().WithInitialSoftMuted(true).WithInitialVolume(42));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan serialized(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, serialized), CHIP_NO_ERROR);
+
+    app::DataModel::DecodableList<SceneDecodable> list;
+    ASSERT_EQ(cluster.DecodeAttributeValueList(serialized, list), CHIP_NO_ERROR);
+
+    bool sawSoftMuted = false, sawVolume = false;
+    auto it = list.begin();
+    while (it.Next())
+    {
+        const auto & p = it.GetValue();
+        if (p.attributeID == Attributes::SoftMuted::Id)
+        {
+            sawSoftMuted = true;
+            EXPECT_EQ(p.valueUnsigned8.Value(), 1u);
+        }
+        else if (p.attributeID == Attributes::Volume::Id)
+        {
+            sawVolume = true;
+            EXPECT_EQ(p.valueUnsigned16.Value(), 42u);
+        }
+        else
+        {
+            ADD_FAILURE() << "unexpected attribute in non-BEQ scene: " << p.attributeID;
+        }
+    }
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_TRUE(sawSoftMuted);
+    EXPECT_TRUE(sawVolume);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneSerializeIncludesEnabledEqualizerBands)
+{
+    auto cfg = BEQAllBandsConfig(mMockDelegate).WithInitialBass(-3).WithInitialMid(1).WithInitialTreble(4);
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan serialized(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, serialized), CHIP_NO_ERROR);
+
+    app::DataModel::DecodableList<SceneDecodable> list;
+    ASSERT_EQ(cluster.DecodeAttributeValueList(serialized, list), CHIP_NO_ERROR);
+
+    int16_t bass = 0, mid = 0, treble = 0;
+    bool sawBass = false, sawMid = false, sawTreble = false;
+    auto it = list.begin();
+    while (it.Next())
+    {
+        const auto & p = it.GetValue();
+        if (p.attributeID == Attributes::Bass::Id)
+        {
+            sawBass = true;
+            bass    = p.valueSigned16.Value();
+        }
+        else if (p.attributeID == Attributes::Mid::Id)
+        {
+            sawMid = true;
+            mid    = p.valueSigned16.Value();
+        }
+        else if (p.attributeID == Attributes::Treble::Id)
+        {
+            sawTreble = true;
+            treble    = p.valueSigned16.Value();
+        }
+    }
+    EXPECT_TRUE(sawBass && sawMid && sawTreble);
+    EXPECT_EQ(bass, -3);
+    EXPECT_EQ(mid, 1);
+    EXPECT_EQ(treble, 4);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneApplyRoundTrip)
+{
+    auto cfg = BEQAllBandsConfig(mMockDelegate).WithInitialSoftMuted(false).WithInitialVolume(20).WithInitialBass(0);
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, cfg);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // State A -> save.
+    ASSERT_EQ(cluster.SetSoftMuted(true), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetVolume(80), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetBass(5), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetMid(-5), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetTreble(2), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan saved(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, saved), CHIP_NO_ERROR);
+
+    // Move to state B.
+    ASSERT_EQ(cluster.SetSoftMuted(false), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetVolume(10), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetBass(0), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetMid(0), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetTreble(0), CHIP_NO_ERROR);
+
+    // Recall -> back to state A, transition time ignored.
+    ASSERT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, saved, 1000), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.GetSoftMuted());
+    EXPECT_EQ(cluster.GetVolume(), 80u);
+    EXPECT_EQ(cluster.GetBass(), 5);
+    EXPECT_EQ(cluster.GetMid(), -5);
+    EXPECT_EQ(cluster.GetTreble(), 2);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneApplyRejectsUnsupportedAttribute)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ScenePair pairs[1];
+    pairs[0].attributeID = Attributes::MaxUserVolume::Id; // not scene-able
+    pairs[0].valueUnsigned16.SetValue(50);
+    app::DataModel::List<ScenePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan blob(buffer);
+    ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_ERROR_INVALID_ARGUMENT);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneApplyWrongClusterFails)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan saved(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, saved), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, OnOff::Id, saved, 0), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SerializeSave(kRootEndpointId, OnOff::Id, saved), CHIP_ERROR_INVALID_ARGUMENT);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A scene captured while Volume was legal must still recall after MaxUserVolume shrinks: the
+// stored value is saturated to the current EffectiveMaxVolume rather than rejected.
+TEST_F(TestAudioControlCluster, SceneApplyClampsVolumeToReducedMaxUserVolume)
+{
+    AudioControlCluster::OptionalAttributeSet optionalSet;
+    optionalSet.Set<MaxUserVolume::Id>();
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate,
+                                BasicConfig().WithOptionalAttributes(optionalSet).WithInitialMaxUserVolume(100));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.SetVolume(80), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan saved(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, saved), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.SetMaxUserVolume(60), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetVolume(30), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, saved, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetVolume(), 60u);
+    EXPECT_EQ(mMockDelegate.lastNewVolume, 60u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Likewise for an equalizer band whose stored value falls outside a correction range that
+// narrowed since capture.
+TEST_F(TestAudioControlCluster, SceneApplyClampsEqualizerBandToCorrectionRange)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate)); // range [-5, 5]
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ScenePair pairs[3];
+    pairs[0].attributeID = Attributes::SoftMuted::Id;
+    pairs[0].valueUnsigned8.SetValue(0);
+    pairs[1].attributeID = Attributes::Volume::Id;
+    pairs[1].valueUnsigned16.SetValue(50);
+    pairs[2].attributeID = Attributes::Bass::Id;
+    pairs[2].valueSigned16.SetValue(100); // far above mMaxCorrection
+    app::DataModel::List<ScenePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan blob(buffer);
+    ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetBass(), 5);
+    EXPECT_EQ(mMockDelegate.lastBass, 5);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A band that is not enabled on this instance is silently skipped, not treated as an error.
+TEST_F(TestAudioControlCluster, SceneApplySkipsDisabledEqualizerBand)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig()); // no BasicEqualizer feature
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ScenePair pairs[3];
+    pairs[0].attributeID = Attributes::SoftMuted::Id;
+    pairs[0].valueUnsigned8.SetValue(0);
+    pairs[1].attributeID = Attributes::Volume::Id;
+    pairs[1].valueUnsigned16.SetValue(50);
+    pairs[2].attributeID = Attributes::Bass::Id;
+    pairs[2].valueSigned16.SetValue(3);
+    app::DataModel::List<ScenePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan blob(buffer);
+    ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockDelegate.bassChangedCalls, 0);
+    EXPECT_EQ(cluster.GetBass(), 0); // unchanged
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A scene carrying only an equalizer band must not notify HandleVolumeAndMuteChange.
+TEST_F(TestAudioControlCluster, SceneApplyBandOnlySceneDoesNotNotifyVolumeMute)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ScenePair pairs[1];
+    pairs[0].attributeID = Attributes::Bass::Id;
+    pairs[0].valueSigned16.SetValue(3);
+    app::DataModel::List<ScenePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan blob(buffer);
+    ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockDelegate.volumeAndMuteCalls, 0);
+    EXPECT_EQ(mMockDelegate.bassChangedCalls, 1);
+    EXPECT_EQ(cluster.GetBass(), 3);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The delegate is notified before any commit, so a rejection leaves every attribute untouched.
+TEST_F(TestAudioControlCluster, SceneApplyDelegateRejectionLeavesAttributesUnchanged)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // State A -> save.
+    ASSERT_EQ(cluster.SetSoftMuted(true), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetVolume(80), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetBass(5), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetMid(-5), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetTreble(4), CHIP_NO_ERROR);
+
+    uint8_t buffer[128];
+    MutableByteSpan saved(buffer);
+    ASSERT_EQ(cluster.SerializeSave(kRootEndpointId, AudioControl::Id, saved), CHIP_NO_ERROR);
+
+    // Move to state B, then make the delegate reject the recall.
+    ASSERT_EQ(cluster.SetSoftMuted(false), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetVolume(25), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetBass(1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetMid(2), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetTreble(3), CHIP_NO_ERROR);
+
+    mMockDelegate.nextStatus = Status::Busy;
+    EXPECT_NE(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, saved, 0), CHIP_NO_ERROR);
+
+    // Everything stays at state B.
+    EXPECT_FALSE(cluster.GetSoftMuted());
+    EXPECT_EQ(cluster.GetVolume(), 25u);
+    EXPECT_EQ(cluster.GetBass(), 1);
+    EXPECT_EQ(cluster.GetMid(), 2);
+    EXPECT_EQ(cluster.GetTreble(), 3);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A band delegate rejecting a recall propagates the error and leaves that band unchanged (a
+// band-only scene skips the Volume/SoftMuted delegate call, so its status alone decides the result).
+TEST_F(TestAudioControlCluster, SceneApplyBandDelegateRejectionPropagates)
+{
+    struct BandCase
+    {
+        AttributeId id;
+        int16_t (AudioControlCluster::*get)() const;
+    };
+    const BandCase cases[] = {
+        { Attributes::Bass::Id, &AudioControlCluster::GetBass },
+        { Attributes::Mid::Id, &AudioControlCluster::GetMid },
+        { Attributes::Treble::Id, &AudioControlCluster::GetTreble },
+    };
+
+    for (const auto & c : cases)
+    {
+        AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        ScenePair pairs[1];
+        pairs[0].attributeID = c.id;
+        pairs[0].valueSigned16.SetValue(3); // differs from the initial 0
+        app::DataModel::List<ScenePair> list(pairs);
+
+        uint8_t buffer[128];
+        MutableByteSpan blob(buffer);
+        ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+        mMockDelegate.nextStatus = Status::Busy;
+        EXPECT_NE(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+        EXPECT_EQ((cluster.*c.get)(), 0); // band unchanged
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+// The AddScene path (SerializeAdd) runs every pair through AudioControlSceneValidator: the five
+// scene-able attributes on the AudioControl cluster are accepted, and anything else - a
+// non-scene-able attribute or a foreign cluster id - is rejected.
+TEST_F(TestAudioControlCluster, SceneSerializeAddValidatesAttributesAndCluster)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BEQAllBandsConfig(mMockDelegate));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    uint8_t backing[192];
+    uint8_t out[192];
+
+    // All five scene-able attributes, correct cluster -> accepted.
+    {
+        ScenePair pairs[5];
+        pairs[0].attributeID = Attributes::SoftMuted::Id;
+        pairs[0].valueUnsigned8.SetValue(1);
+        pairs[1].attributeID = Attributes::Volume::Id;
+        pairs[1].valueUnsigned16.SetValue(40);
+        pairs[2].attributeID = Attributes::Bass::Id;
+        pairs[2].valueSigned16.SetValue(1);
+        pairs[3].attributeID = Attributes::Mid::Id;
+        pairs[3].valueSigned16.SetValue(-1);
+        pairs[4].attributeID = Attributes::Treble::Id;
+        pairs[4].valueSigned16.SetValue(2);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(AudioControl::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_NO_ERROR);
+    }
+
+    // A non-scene-able AudioControl attribute -> rejected.
+    {
+        ScenePair pairs[1];
+        pairs[0].attributeID = Attributes::MaxUserVolume::Id;
+        pairs[0].valueUnsigned16.SetValue(50);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(AudioControl::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // A scene-able attribute id but a foreign cluster id -> rejected.
+    {
+        ScenePair pairs[1];
+        pairs[0].attributeID = Attributes::Volume::Id;
+        pairs[0].valueUnsigned16.SetValue(40);
+
+        MutableByteSpan backingSpan(backing);
+        ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType efs;
+        ASSERT_EQ(MakeDecodableEfs(OnOff::Id, chip::Span<const ScenePair>(pairs), backingSpan, efs), CHIP_NO_ERROR);
+
+        MutableByteSpan outSpan(out);
+        EXPECT_EQ(cluster.SerializeAdd(kRootEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

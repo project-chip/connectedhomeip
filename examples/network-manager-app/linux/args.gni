@@ -29,3 +29,7 @@ chip_enable_thread = false
 
 chip_enable_access_restrictions = true
 matter_enable_tracing_support = true
+
+# Enable the Network Identity Management test event trigger (used by TC-NETIM-1.4 to authenticate
+# clients against Network Identities so they are not retired between ImportAdminSecret calls).
+chip_enable_network_identity_management_trigger = true

@@ -58,13 +58,10 @@ TEST(TestUpdateBuilder, BeginSetsOpcodeUpdate)
 TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
 {
     uint8_t buffer[512];
-    uint8_t rawKey[kP256RawPublicKeySize];
     uint8_t signature[kP256RawSignatureSize] = {};
 
-    for (size_t i = 0; i < sizeof(rawKey); i++)
-    {
-        rawKey[i] = static_cast<uint8_t>(i + 1);
-    }
+    Crypto::P256Keypair keypair;
+    ASSERT_EQ(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
     UpdateBuilder builder(buffer, sizeof(buffer));
     builder.Begin(0xABCD);
@@ -72,7 +69,7 @@ TEST(TestUpdateBuilder, MinimalUpdateWithZoneDeleteAddOptAndSig)
     DeleteRrsetRecord delAny(kHost, QType::ANY);
     PtrResourceRecord ptr(kService, kInstance);
     SrvResourceRecord srv(kInstance, kHost, 5540);
-    KeyResourceRecord key(kHost, ByteSpan(rawKey));
+    KeyResourceRecord key(kHost, keypair.Pubkey());
     OptLeaseRecord opt(/*udpPayloadSize=*/1232, /*leaseSeconds=*/7200, /*keyLeaseSeconds=*/86400);
     Sig0ResourceRecord sig(kHost, ByteSpan(signature));
 

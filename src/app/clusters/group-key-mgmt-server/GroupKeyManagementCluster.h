@@ -35,10 +35,9 @@ public:
         chip::Credentials::GroupDataProvider & groupDataProvider;
     };
 
-    // New constructor using Context
-    GroupKeyManagementCluster(Context && context) :
-        DefaultServerCluster({ kRootEndpointId, GroupKeyManagement::Id }), mContext(std::move(context))
-    {}
+    GroupKeyManagementCluster(Context && context);
+
+    GroupKeyManagementCluster(Context && context, BitFlags<GroupKeyManagement::Feature> features);
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
@@ -59,6 +58,8 @@ public:
 
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
+
+    static bool IsGroupcastAdopted();
 
 private:
     Context mContext;

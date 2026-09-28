@@ -48,15 +48,10 @@ public:
 
         PressureMeasurementCluster::Config config;
 
-        if (MinMeasuredValue::GetDefault(endpointId, config.minMeasuredValue) != Status::Success)
-        {
-            config.minMeasuredValue.SetNull();
-        }
-
-        if (MaxMeasuredValue::GetDefault(endpointId, config.maxMeasuredValue) != Status::Success)
-        {
-            config.maxMeasuredValue.SetNull();
-        }
+        // Read default values from the Ember attribute store. Not all apps set
+        // defaults, so a missing default yields null.
+        MinMeasuredValue::GetDefaultOr(endpointId, config.minMeasuredValue, DataModel::NullNullable);
+        MaxMeasuredValue::GetDefaultOr(endpointId, config.maxMeasuredValue, DataModel::NullNullable);
 
         // If both values are non-null but form an invalid range, treat both as null
         if (!config.minMeasuredValue.IsNull() && !config.maxMeasuredValue.IsNull() &&
@@ -70,7 +65,7 @@ public:
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             uint16_t tolerance{};
-            VerifyOrDie(Tolerance::GetDefault(endpointId, &tolerance) == Status::Success);
+            Tolerance::GetDefaultOr(endpointId, tolerance, 0);
             config.WithTolerance(tolerance);
         }
 
@@ -84,14 +79,14 @@ public:
 
             VerifyOrDie(MinScaledValue::GetDefault(endpointId, minScaledValue) == Status::Success);
             VerifyOrDie(MaxScaledValue::GetDefault(endpointId, maxScaledValue) == Status::Success);
-            VerifyOrDie(Scale::GetDefault(endpointId, &scale) == Status::Success);
+            VerifyOrDie(Scale::GetDefault(endpointId, scale) == Status::Success);
 
             config.WithExtendedFeature(minScaledValue, maxScaledValue, scale);
 
             if (optionalAttributeSet.IsSet(ScaledTolerance::Id))
             {
                 uint16_t scaledTolerance{};
-                VerifyOrDie(ScaledTolerance::GetDefault(endpointId, &scaledTolerance) == Status::Success);
+                ScaledTolerance::GetDefaultOr(endpointId, scaledTolerance, 0);
                 config.WithScaledTolerance(scaledTolerance);
             }
         }

@@ -100,7 +100,7 @@ TEST(TestParser, ParsesQuestion)
     };
 
     PacketCapture capture;
-    ASSERT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    ASSERT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
 
     EXPECT_EQ(capture.mMessageId, 0x1234);
     EXPECT_TRUE(capture.mResources.empty());
@@ -130,7 +130,7 @@ TEST(TestParser, QuestionUnicastFlagIsSplitFromClass)
     };
 
     PacketCapture capture;
-    ASSERT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    ASSERT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
     ASSERT_EQ(capture.mQueries.size(), 1u);
 
     // The unicast bit is reported separately and must not leak into the class.
@@ -174,7 +174,7 @@ TEST(TestParser, ReportsEachSectionSeparately)
     };
 
     PacketCapture capture;
-    ASSERT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    ASSERT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
     ASSERT_EQ(capture.mResources.size(), 3u);
 
     EXPECT_EQ(capture.mResources[0].section, ResourceType::kAnswer);
@@ -249,7 +249,7 @@ TEST(TestParser, ResolvesCompressedRecordName)
     };
 
     PacketCapture capture;
-    ASSERT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    ASSERT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
     ASSERT_EQ(capture.mResources.size(), 1u);
 
     EXPECT_EQ(capture.mResources[0].name, (std::vector<std::string>{ "host", "local" }));
@@ -277,7 +277,7 @@ TEST(TestParser, UnknownRecordTypeKeepsDataOpaque)
     };
 
     PacketCapture capture;
-    ASSERT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    ASSERT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
 
     EXPECT_EQ(capture.mMessageId, 0x1234);
     EXPECT_TRUE(capture.mQueries.empty());
@@ -303,7 +303,7 @@ TEST(TestParser, AcceptsHeaderOnlyPacket)
     };
 
     PacketCapture capture;
-    EXPECT_TRUE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_TRUE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
     EXPECT_EQ(capture.mMessageId, 0x1234);
     EXPECT_TRUE(capture.mQueries.empty());
     EXPECT_TRUE(capture.mResources.empty());
@@ -312,11 +312,6 @@ TEST(TestParser, AcceptsHeaderOnlyPacket)
 TEST(TestParser, RejectsNonZeroOpcode)
 {
     // RFC 6762 section 18.3 requires mDNS receivers to ignore anything with a non-zero opcode.
-    // receivers to ignore anything with a non-zero opcode, so this entry point
-    // refuses to parse it.
-
-    // TODO: DNS Update carries an OpCode (5) and often non-zero return code.(RFC 2136)
-    // Update this test when we add ULD/SRP support.
     const uint8_t packet[] = {
         0x12, 0x34, // message id
         0x28, 0x00, // flags: opcode 5
@@ -327,7 +322,25 @@ TEST(TestParser, RejectsNonZeroOpcode)
     };
 
     PacketCapture capture;
-    EXPECT_FALSE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_FALSE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_TRUE(capture.mResources.empty());
+}
+
+TEST(TestParser, ParseDnsPacketAcceptsUpdateOpcode)
+{
+    const uint8_t packet[] = {
+        0x12, 0x34, // message id
+        0xA8, 0x05, // flags: response, opcode 5, rcode 5
+        0x00, 0x00, // no questions
+        0x00, 0x00, // no answers
+        0x00, 0x00, // no authority records
+        0x00, 0x00, // no additional records
+    };
+
+    PacketCapture capture;
+    ASSERT_TRUE(ParseDnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_EQ(capture.mMessageId, 0x1234);
+    EXPECT_TRUE(capture.mQueries.empty());
     EXPECT_TRUE(capture.mResources.empty());
 }
 
@@ -336,7 +349,7 @@ TEST(TestParser, RejectsTruncatedHeader)
     const uint8_t packet[] = { 0x12, 0x34, 0x00, 0x00, 0x00, 0x00 };
 
     PacketCapture capture;
-    EXPECT_FALSE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_FALSE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
 }
 
 TEST(TestParser, RejectsRecordDataPastEndOfPacket)
@@ -359,7 +372,7 @@ TEST(TestParser, RejectsRecordDataPastEndOfPacket)
     };
 
     PacketCapture capture;
-    EXPECT_FALSE(ParsePacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
+    EXPECT_FALSE(ParseMdnsPacket(BytesRange::BufferWithSize(packet, sizeof(packet)), &capture));
 }
 
 } // namespace

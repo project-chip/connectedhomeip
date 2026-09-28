@@ -28,9 +28,9 @@ namespace Clusters {
 namespace AvAnalysis {
 
 /**
- * A camera-bound command (EstablishAnalysisStream, RemoveAnalysisStream) cannot be answered until
- * the camera responds, so its CommandHandler is parked here and the interaction advances through
- * this state machine
+ * A camera-bound command (EstablishAnalysisStream, RemoveAnalysisStream, ActivateAnalysisStream,
+ * DeactivateAnalysisStream) cannot be answered until the camera responds, so its CommandHandler is
+ * parked here and the interaction advances through this state machine
  * Exactly one interaction exists at a time; a command arriving while InFlight() is answered Busy.
  */
 class CameraInteraction
@@ -41,6 +41,8 @@ public:
         kIdle,         // No camera interaction in flight
         kEstablishing, // VideoStreamAllocate awaiting the camera's answer
         kRemoving,     // VideoStreamDeallocate awaiting the camera's answer
+        kActivating,   // WebRTC session initiation awaiting the offer exchange's outcome
+        kDeactivating, // WebRTC EndSession awaiting the camera's answer
     };
 
     State GetState() const { return mState; }
@@ -57,16 +59,22 @@ public:
     uint16_t AnalysisStreamId() const { return mAnalysisStreamId; }
 
     /**
+     * The camera endpoint having WebRTCTransportProvider
+     */
+    EndpointId WebRTCEndpoint() const { return mWebRTCEndpoint; }
+
+    /**
      * Enters aState, parking the command so it can be answered when the camera responds.
      */
     void Begin(State aState, CommandHandler & aHandler, const ConcreteCommandPath & aPath, const ScopedNodeId & aCameraNode,
-               uint16_t aAnalysisStreamId = 0)
+               uint16_t aAnalysisStreamId = 0, EndpointId aWebRTCEndpoint = kInvalidEndpointId)
     {
         mState            = aState;
         mHandle           = CommandHandler::Handle(&aHandler);
         mPath             = aPath;
         mCameraNode       = aCameraNode;
         mAnalysisStreamId = aAnalysisStreamId;
+        mWebRTCEndpoint   = aWebRTCEndpoint;
         aHandler.FlushAcksRightAwayOnSlowCommand();
     }
 
@@ -96,12 +104,14 @@ private:
     void ClearInteractionState()
     {
         mAnalysisStreamId = 0;
+        mWebRTCEndpoint   = kInvalidEndpointId;
         mCameraNode       = ScopedNodeId();
         mPath             = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     }
 
     State mState               = State::kIdle;
     uint16_t mAnalysisStreamId = 0;
+    EndpointId mWebRTCEndpoint = kInvalidEndpointId;
     CommandHandler::Handle mHandle;
     ConcreteCommandPath mPath = ConcreteCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
     ScopedNodeId mCameraNode;

@@ -199,6 +199,14 @@ groups:
             teams: [reviewers-nxp]
         reviews:
             request: 0 # Do not auto-add
+    shared-reviewers-ohf:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-ohf]
+        reviews:
+            request: 0 # Do not auto-add
     shared-reviewers-samsung:
         type: optional
         conditions:

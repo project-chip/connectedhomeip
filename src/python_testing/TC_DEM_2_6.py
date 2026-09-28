@@ -52,13 +52,13 @@ from TC_DEMTestBase import DEMTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_6(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_6."""
 
     def desc_TC_DEM_2_6(self) -> str:
@@ -104,7 +104,7 @@ class TC_DEM_2_6(MatterBaseTest, DEMTestBase):
             TestStep("10a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("10b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("11", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("12", "TH sends command ModifyForecastRequest with ForecastID=Forecast.ForecastID, SlotAdjustments[0].{SlotIndex=0, Duration=Forecast.Slots[0].MaxDurationAdjustment}, Cause=GridOptimization",

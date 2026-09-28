@@ -25,12 +25,21 @@
 
 #include <type_traits>
 
+#include <mbedtls/version.h>
+// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+#include <mbedtls/private/bignum.h>
+#include <mbedtls/private/ecp.h>
+#else
 #include <mbedtls/bignum.h>
+#include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+
 #include <mbedtls/ccm.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
-#include <mbedtls/ecp.h>
 #include <mbedtls/entropy.h>
 #include <mbedtls/error.h>
 #include <mbedtls/hkdf.h>
@@ -38,7 +47,6 @@
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509_csr.h>
 
 #include <lib/core/CHIPSafeCasts.h>

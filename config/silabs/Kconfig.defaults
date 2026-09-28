@@ -8,6 +8,9 @@ config COMMON_LIBC_MALLOC_ARENA_SIZE
 config WIFI
 	default y if SOC_SERIES_SIWG917
 
+config NET_BUF_DATA_SIZE
+	default 512 if CHIP_WIFI
+
 # ==============================================================================
 # Logging configuration
 # ==============================================================================

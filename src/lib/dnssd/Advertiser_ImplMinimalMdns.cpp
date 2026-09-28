@@ -332,7 +332,7 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
 #endif
 
     mCurrentSource = info;
-    if (!ParsePacket(data, this))
+    if (!ParseMdnsPacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
 #if CHIP_MINMDNS_HIGH_VERBOSITY

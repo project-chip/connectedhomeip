@@ -131,14 +131,14 @@ public:
 
         AlarmBase::AlarmMap supported{};
         BitMask<DishwasherAlarm::AlarmBitmap> supportedDefault{};
-        if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
+        if (Supported::GetDefault(endpointId, supportedDefault) == Status::Success)
         {
             supported = AlarmBase::AlarmMap(supportedDefault.Raw());
         }
 
         AlarmBase::AlarmMap latch{};
         BitMask<DishwasherAlarm::AlarmBitmap> latchDefault{};
-        if (Latch::GetDefault(endpointId, &latchDefault) == Status::Success)
+        if (Latch::GetDefault(endpointId, latchDefault) == Status::Success)
         {
             latch = AlarmBase::AlarmMap(latchDefault.Raw());
         }
@@ -156,13 +156,13 @@ public:
         DishwasherAlarmCluster & cluster = gDishwasherAlarmClusters[clusterInstanceIndex].cluster.Cluster();
 
         BitMask<DishwasherAlarm::AlarmBitmap> maskDefault{};
-        if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
+        if (Mask::GetDefault(endpointId, maskDefault) == Status::Success)
         {
             cluster.SetMask(AlarmBase::AlarmMap(maskDefault.Raw()));
         }
 
         BitMask<DishwasherAlarm::AlarmBitmap> stateDefault{};
-        if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
+        if (State::GetDefault(endpointId, stateDefault) == Status::Success)
         {
             cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()));
         }

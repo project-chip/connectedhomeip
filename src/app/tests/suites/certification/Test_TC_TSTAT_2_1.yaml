@@ -709,3 +709,22 @@ tests:
       response:
           constraints:
               type: int32u
+
+    - label:
+          "Step 49: TH reads the CriticalFreezeProtection attribute from the DUT"
+      PICS: TSTAT.S.A0057
+      command: "readAttribute"
+      attribute: "CriticalFreezeProtection"
+      response:
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 50: TH reads the CriticalOverheatProtection attribute from the
+          DUT"
+      PICS: TSTAT.S.A0058
+      command: "readAttribute"
+      attribute: "CriticalOverheatProtection"
+      response:
+          constraints:
+              type: boolean

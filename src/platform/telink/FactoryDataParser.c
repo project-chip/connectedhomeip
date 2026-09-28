@@ -96,17 +96,29 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("date", (const char *) currentString.value, currentString.len) == 0)
         {
-            // Date format is YYYY-MM-DD, so format needs to be validated and string parse to integer parts.
-            struct zcbor_string date;
-            res = res && zcbor_bstr_decode(states, &date);
-            if (date.len == 10 && isdigit(date.value[0]) && isdigit(date.value[1]) && isdigit(date.value[2]) &&
-                isdigit(date.value[3]) && date.value[4] == '-' && isdigit(date.value[5]) && isdigit(date.value[6]) &&
-                date.value[7] == '-' && isdigit(date.value[8]) && isdigit(date.value[9]))
+            // Format needs to be validated and string parse to integer parts.
+            struct zcbor_string * date = (struct zcbor_string *) &factoryData->mfg_date_str;
+            res                        = res && zcbor_bstr_decode(states, date);
+
+            // First check for YYYY-MM-DD format (10 digits with hyphens)
+            if (date->len == 10 && isdigit(date->value[0]) && isdigit(date->value[1]) && isdigit(date->value[2]) &&
+                isdigit(date->value[3]) && date->value[4] == '-' && isdigit(date->value[5]) && isdigit(date->value[6]) &&
+                date->value[7] == '-' && isdigit(date->value[8]) && isdigit(date->value[9]))
             {
-                factoryData->date_year =
-                    1000 * (date.value[0] - '0') + 100 * (date.value[1] - '0') + 10 * (date.value[2] - '0') + date.value[3] - '0';
-                factoryData->date_month = 10 * (date.value[5] - '0') + date.value[6] - '0';
-                factoryData->date_day   = 10 * (date.value[8] - '0') + date.value[9] - '0';
+                factoryData->date_year = 1000 * (date->value[0] - '0') + 100 * (date->value[1] - '0') +
+                    10 * (date->value[2] - '0') + date->value[3] - '0';
+                factoryData->date_month = 10 * (date->value[5] - '0') + date->value[6] - '0';
+                factoryData->date_day   = 10 * (date->value[8] - '0') + date->value[9] - '0';
+            }
+            // Then check for YYYYMMDD or extended formats (8-16 digits)
+            else if ((date->len >= 8 && date->len <= 16) && isdigit(date->value[0]) && isdigit(date->value[1]) &&
+                     isdigit(date->value[2]) && isdigit(date->value[3]) && isdigit(date->value[4]) && isdigit(date->value[5]) &&
+                     isdigit(date->value[6]) && isdigit(date->value[7]))
+            {
+                factoryData->date_year = 1000 * (date->value[0] - '0') + 100 * (date->value[1] - '0') +
+                    10 * (date->value[2] - '0') + date->value[3] - '0';
+                factoryData->date_month = 10 * (date->value[4] - '0') + date->value[5] - '0';
+                factoryData->date_day   = 10 * (date->value[6] - '0') + date->value[7] - '0';
             }
             else
             {
@@ -124,10 +136,16 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         else if (strncmp("dac_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_cert);
+            // LOG_INF("DAC cert len=%u", currentString.len);
+            // LOG_HEXDUMP_INF(currentString.value,
+            //             currentString.len,
+            //             "DAC CERT");
         }
         else if (strncmp("dac_key", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
+            // LOG_INF("DAC priv key decrypted, len=%u", currentString.len);
+            // LOG_HEXDUMP_INF(currentString.value, currentString.len, "DAC PRIV KEY");
         }
         else if (strncmp("pai_cert", (const char *) currentString.value, currentString.len) == 0)
         {

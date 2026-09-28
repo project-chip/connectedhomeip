@@ -28,12 +28,14 @@
 #pragma once
 
 #include <cstdint>
+#include <inttypes.h>
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/TLV.h>
@@ -418,6 +420,31 @@ using MutableCertificateKeyId = FixedSpan<uint8_t, kKeyIdentifierLength>;
  *  @brief  A storage type for `CertificateKeyId` and `MutableCertificateKeyId`.
  */
 using CertificateKeyIdStorage = std::array<uint8_t, kKeyIdentifierLength>;
+
+/**
+ * @def ChipLogFormatKeyId
+ * @def ChipLogValueKeyId(id)
+ *
+ * @brief Logging format and value macros for a CertificateKeyId, rendered as a hexadecimal big
+ * endian value. Takes a CertificateKeyId or a value implicitly convertible to it, e.g. a
+ * uint8_t[20] or a CertificateKeyIdStorage.
+ *
+ * NOTE: The argument to ChipLogValueKeyId is evaluated multiple times.
+ *
+ * Usage:
+ *   ChipLogProgress(Zcl, "Identifier: " ChipLogFormatKeyId, ChipLogValueKeyId(id));
+ */
+#define ChipLogFormatKeyId "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32
+// clang-format off
+#define ChipLogValueKeyId(id)                                                              \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data()),      \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 4),  \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 8),  \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 12), \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 16)
+// clang-format on
+
+static_assert(CertificateKeyId::size() == 20); // ChipLog{Format,Value}KeyId hard-code the size
 
 /**
  *  @brief  A data structure for holding a P256 ECDSA signature, without the ownership of it.

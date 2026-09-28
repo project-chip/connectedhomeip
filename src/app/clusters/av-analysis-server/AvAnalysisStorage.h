@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <unordered_set>
 #include <vector>
 
 namespace chip {
@@ -29,13 +28,23 @@ namespace Clusters {
 namespace AvAnalysis {
 
 // Spec defined max values
-constexpr int8_t kMaxSupportedAmbientContexts     = 50;
-constexpr int8_t kMaxActiveAmbientContextTriggers = 50;
-constexpr int8_t kMaxContextTriggers              = 50;
+constexpr size_t kMaxSupportedAmbientContexts     = 50;
+constexpr size_t kMaxActiveAmbientContextTriggers = 50;
+constexpr size_t kMaxContextTriggers              = 50;
 
 // Max size for a TLV encoded Semantic Tag, this is used in calculating the buffer size for Context Triggers
 constexpr size_t kSemanticTagStructSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), static_cast<size_t>(64)); /* max label length */
+
+// Worst-case TLV size of one persisted ContextTriggerStruct: its Context and a ZoneIDs list of aMaxZones
+// entries, each an array element costing a control byte plus the value.
+constexpr size_t ContextTriggerSerializedSize(uint8_t aMaxZones)
+{
+    return TLV::EstimateStructOverhead(kSemanticTagStructSerializedSize, static_cast<size_t>((1 + sizeof(uint16_t)) * aMaxZones));
+}
+
+// TLV overhead of the array enclosing the persisted context triggers
+constexpr size_t kContextTriggerArrayOverhead = 4;
 
 /**
  * Helper Struct to provide memory backing for the stored contexts given that some attributes use
@@ -60,7 +69,6 @@ private:
     LabelState mLabelState;
 
 public:
-    virtual ~AmbientContextStorage() = default;
     AmbientContextStorage()
     {
         mZoneIDs.ClearValue();
@@ -135,18 +143,26 @@ struct ActiveAmbientContextSession
 {
 private:
     uint16_t mSessionId = 0;
-    Optional<NodeId> mSourceNodeId;
+    // With RemoteContextDetection: the camera the analyzed stream comes from and that stream's
+    // start timestamp. Recorded once at session start so every event of the session reports the
+    // same source, as the event definitions require.
+    NodeId mSourceNodeId             = kUndefinedNodeId;
+    uint64_t mSourceStartTimestampUs = 0;
     std::vector<Structs::TrackedContext::Type> mTrackedContexts;
 
 public:
-    virtual ~ActiveAmbientContextSession() = default;
-    ActiveAmbientContextSession()          = default;
+    ActiveAmbientContextSession() = default;
 
     void SetSessionId(uint16_t aSessionId) { mSessionId = aSessionId; }
     uint16_t GetSessionId() const { return mSessionId; }
 
-    void SetSourceNodeId(const Optional<NodeId> & aSourceNodeId) { mSourceNodeId = aSourceNodeId; }
-    const Optional<NodeId> & GetSourceNodeId() const { return mSourceNodeId; }
+    void SetSource(NodeId aSourceNodeId, uint64_t aSourceStartTimestampUs)
+    {
+        mSourceNodeId           = aSourceNodeId;
+        mSourceStartTimestampUs = aSourceStartTimestampUs;
+    }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
+    uint64_t GetSourceStartTimestampUs() const { return mSourceStartTimestampUs; }
 
     void AddTrackedContext(const std::vector<Structs::TrackedContext::Type> & aTrackedContext)
     {

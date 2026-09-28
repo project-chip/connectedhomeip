@@ -43,6 +43,7 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     ConcentrationCluster & GetCoConcentrationCluster();
+    ConcentrationCluster & GetSmokeConcentrationCluster();
     Clusters::SmokeCoAlarmCluster & GetSmokeCoAlarmCluster();
     Clusters::IdentifyCluster & GetIdentifyCluster();
 
@@ -50,9 +51,11 @@ protected:
     TimerDelegate & mTimerDelegate;
     Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
     ConcentrationCluster::Config mCoConfig;
+    ConcentrationCluster::Config mSmokeConcentrationConfig;
     Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;
 
     LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
+    LazyRegisteredServerCluster<ConcentrationCluster> mSmokeConcentrationCluster;
     LazyRegisteredServerCluster<Clusters::SmokeCoAlarmCluster> mSmokeCoAlarmCluster;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };

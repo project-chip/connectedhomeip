@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
@@ -56,8 +57,17 @@ chip_test_suite("tests") {
       "TestAutoCommissioner.cpp",
       "TestICDManagementResponses.cpp",
       "TestNetworkConfigResponses.cpp",
+      "TestNetworkIdentityManagementRegistrar.cpp",
+      "TestPDCCommissioning.cpp",
       "TestParseICDInfo.cpp",
     ]
+
+    if (chip_enable_read_client) {
+      test_sources += [
+        "TestCertificateChainRequestTracker.cpp",
+        "TestParseOperationalCredentialsInfo.cpp",
+      ]
+    }
   }
 
   test_sources += [ "TestCommissioningDelegate.cpp" ]
@@ -71,6 +81,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:constants",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",
