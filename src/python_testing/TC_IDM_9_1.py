@@ -39,7 +39,7 @@
 import logging
 
 from mobly import asserts
-from support_modules.idm_support import IDMBaseTest, WritableAttributeInfo, spec_enum_values
+from support_modules.idm_support import ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES, IDMBaseTest, WritableAttributeInfo, spec_enum_values
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
@@ -133,6 +133,10 @@ class TC_IDM_9_1(IDMBaseTest):
 
                     # Skip obsolete/disallowed attributes (e.g. obsolete in spec)
                     if is_disallowed(xml_attr.conformance):
+                        continue
+
+                    if (cluster_id, attribute_id) in ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES:
+                        log.info("Skipping %s.%s: excluded from constraint testing", xml_cluster.name, xml_attr.name)
                         continue
 
                     write_access = xml_attr.write_access

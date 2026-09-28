@@ -217,6 +217,13 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # (there is no plan to wire the code-driven version into ember apps), so the
     # ember code needs the direct fix tracked in the issue above.
     (Clusters.OnOff.id, Clusters.OnOff.Commands.OnWithTimedOff.command_id),
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/74288
+    # is fixed. IdentifyCluster does not validate TriggerEffect's enum-typed fields and
+    # returns SUCCESS for an EffectIdentifier or EffectVariant its enum does not define.
+    # The spec requires EffectIdentifier to contain one of the non-reserved values in
+    # EffectIdentifierEnum and EffectVariant one of the values in EffectVariantEnum, so
+    # both need CONSTRAINT_ERROR. 
+    (Clusters.Identify.id, Clusters.Identify.Commands.TriggerEffect.command_id),
     # TODO: Remove once TransferFileDesignator length handling is resolved (SDK fix
     # or spec clarification): the data model constraint (maxLength 32) is
     # unconditional, but DiagnosticLogsCluster only enforces it on the BDX path, so
@@ -248,6 +255,18 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # Joins a multicast group, changing which groupcast traffic the DUT accepts for the
     # remainder of the session.
     (Clusters.Groupcast.id, Clusters.Groupcast.Commands.JoinGroup.command_id),
+})
+
+# Individual (cluster_id, attribute_id) pairs to exclude from write constraint fuzzing.
+# Add entries here for writable attributes whose spec-mandated write behavior makes a
+# CONSTRAINT_ERROR unobservable, so an accepted out-of-bounds write is conformant.
+ATTRIBUTE_CONSTRAINT_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
+    # The Thermostat spec requires the server to silently ignore every write to this
+    # attribute and leave its value unchanged, for backwards compatibility with existing
+    # thermostats. An out-of-bounds write is therefore answered with SUCCESS and never
+    # stored, which is the conformant outcome rather than an unenforced constraint.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Thermostat.adoc#1121-controlsequenceofoperation-attribute
+    (Clusters.Thermostat.id, Clusters.Thermostat.Attributes.ControlSequenceOfOperation.attribute_id),
 })
 
 # Type-intrinsic value ranges for numeric spec datatypes. Used to skip constraint
