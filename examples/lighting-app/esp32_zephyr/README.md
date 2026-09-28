@@ -13,8 +13,8 @@ The light output is GPIO2 (`led0` alias in the board overlay).
 
 ## Prerequisites
 
--   Follow [BUILDING.md](../../../docs/guides/BUILDING.md) to set up the
-    Matter environment.
+-   Follow [BUILDING.md](../../../docs/guides/BUILDING.md) to set up the Matter
+    environment.
 -   Install the Zephyr SDK (1.0.1 or newer) as described in the
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 -   Build [chip-tool](../../chip-tool/README.md).
