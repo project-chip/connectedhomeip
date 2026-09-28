@@ -351,13 +351,16 @@ TEST_F(ThermostatTestFixture, TestAtomicWritePermissions)
     auto result = tester.Invoke(req);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Failure));
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Failure));
 
-    auto iter = result.response.value().attributeStatus.begin();
-    ASSERT_TRUE(iter.Next());
-    EXPECT_EQ(iter.GetValue().attributeID, Presets::Id);
-    EXPECT_EQ(iter.GetValue().statusCode, to_underlying(Status::UnsupportedAccess));
-    EXPECT_FALSE(iter.Next());
+        auto iter = result.response.value().attributeStatus.begin();
+        ASSERT_TRUE(iter.Next());
+        EXPECT_EQ(iter.GetValue().attributeID, Presets::Id);
+        EXPECT_EQ(iter.GetValue().statusCode, to_underlying(Status::UnsupportedAccess));
+        EXPECT_FALSE(iter.Next());
+    }
 
     // Atomic write should NOT have opened: writing a non-atomic attribute must succeed
     EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::Success);
@@ -378,20 +381,26 @@ TEST_F(ThermostatTestFixture, TestAtomicWritePermissions)
     result = tester.Invoke(req);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
 
-    auto successIter = result.response.value().attributeStatus.begin();
-    ASSERT_TRUE(successIter.Next());
-    EXPECT_EQ(successIter.GetValue().attributeID, Presets::Id);
-    EXPECT_EQ(successIter.GetValue().statusCode, to_underlying(Status::Success));
-    EXPECT_FALSE(successIter.Next());
+        auto successIter = result.response.value().attributeStatus.begin();
+        ASSERT_TRUE(successIter.Next());
+        EXPECT_EQ(successIter.GetValue().attributeID, Presets::Id);
+        EXPECT_EQ(successIter.GetValue().statusCode, to_underlying(Status::Success));
+        EXPECT_FALSE(successIter.Next());
+    }
 
     // Rollback atomic write
     req.requestType = AtomicRequestTypeEnum::kRollbackWrite;
     result          = tester.Invoke(req);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
