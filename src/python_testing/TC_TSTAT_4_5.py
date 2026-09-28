@@ -46,8 +46,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.decorators import async_test_body
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.decorators import async_test_body, pics
+from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -74,8 +74,9 @@ INDIVIDUAL_DAYS = [
 ]
 
 
+@pics("TSTAT.S", "TSTAT.S.F07")
 class TC_TSTAT_4_5(ThermostatBaseTest):
-    """Test case for Thermostat Schedules (MSCH) feature on Thermostat cluster."""
+    """[TC-TSTAT-4.5] Thermostat Schedules Test Cases with server as DUT"""
 
     def check_schedule_types_attribute(
         self,
@@ -633,271 +634,13 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             candidate = bytes([random.randint(0, 255) for _ in range(4)])
         return candidate
 
-    def desc_TC_TSTAT_4_5(self) -> str:
-        """Returns a description of this test."""
-        return "[TC-TSTAT-4.5] Thermostat Schedules Test Cases with server as DUT"
-
-    def pics_TC_TSTAT_4_5(self) -> list[str]:
-        """Returns a list of PICS for this test case that must be True for the test to be run."""
-        return ["TSTAT.S", "TSTAT.S.F07"]
-
-    def steps_TC_TSTAT_4_5(self) -> list[TestStep]:
-        """Returns the list of test steps for TC-TSTAT-4.5."""
-        return [
-            TestStep("1", "Commission DUT to TH", is_commissioning=True),
-            TestStep(
-                "2a",
-                "TH reads the FeatureMap attribute.",
-                "Verify that the MSCH bit is set in the FeatureMap value.",
-            ),
-            TestStep(
-                "2b",
-                "TH reads the NumberOfSchedules attribute.",
-                "Verify that the read returns a uint8 value >= 1. Save the value in a NumberOfSchedules variable.",
-            ),
-            TestStep(
-                "2c",
-                "TH reads the NumberOfScheduleTransitions attribute.",
-                "Verify that the read returns a uint8 value >= 1. Save the value in a NumberOfScheduleTransitions variable.",
-            ),
-            TestStep(
-                "2d",
-                "TH reads the NumberOfScheduleTransitionPerDay attribute.",
-                "Verify that the read returns either null or a uint8 value >= 1. Save the value in a NumberOfScheduleTransitionPerDay variable.",
-            ),
-            TestStep(
-                "2e",
-                "TH reads the ScheduleTypes attribute.",
-                "Verify that the read returns a list of ScheduleTypeStruct entries with at least one entry, with each entry having a unique SystemMode value that is supported by the DUT. "
-                "Verify SystemMode, NumberOfSchedules, and ScheduleTypeFeatures constraints. Save the list in a SupportedScheduleTypes variable.",
-            ),
-            TestStep(
-                "2f",
-                "TH reads the Schedules attribute (and Presets if PRES is supported).",
-                "Verify that the read returns a list of ScheduleStruct entries whose length is less than or equal to NumberOfSchedules, and that each ScheduleStruct and ScheduleTransitionStruct satisfies all specification constraints. "
-                "Save the list in a CurrentSchedules variable.",
-            ),
-            TestStep(
-                "2g",
-                "TH reads the ActiveScheduleHandle attribute.",
-                "Verify that the read returns either null or an octstr value (max 16 bytes) that matches the ScheduleHandle of an entry in CurrentSchedules. Save the value in a PreviousScheduleHandle variable.",
-            ),
-            TestStep(
-                "3a",
-                "TH selects a ScheduleHandle from CurrentSchedules (choosing one different from PreviousScheduleHandle if available) and sends the SetActiveScheduleRequest command with ScheduleHandle set to the chosen handle. "
-                "TH reads the ActiveScheduleHandle attribute and stores the value in a CurrentScheduleHandle variable.",
-                "Verify that the SetActiveScheduleRequest command returns SUCCESS and ActiveScheduleHandle is equal to the sent ScheduleHandle.",
-            ),
-            TestStep(
-                "3b",
-                "If the ScheduleHandle chosen in step 3a differed from PreviousScheduleHandle, TH reads the ActiveScheduleChange event from the DUT.",
-                "Verify that ActiveScheduleChange event has a new event record with the CurrentScheduleHandle field matching CurrentScheduleHandle and the PreviousScheduleHandle field matching PreviousScheduleHandle (or omitted if PreviousScheduleHandle was unavailable).",
-            ),
-            TestStep(
-                "3c",
-                "TH sends the SetActiveScheduleRequest command with ScheduleHandle set to a random octstr value that does not match any entry in Schedules. "
-                "TH reads the ActiveScheduleHandle attribute.",
-                "Verify that the SetActiveScheduleRequest command returns INVALID_COMMAND (0x85) and ActiveScheduleHandle remains equal to CurrentScheduleHandle.",
-            ),
-            TestStep(
-                "4a",
-                "TH writes to the Schedules attribute without calling the AtomicRequest command.",
-                "Verify that the write request returns INVALID_IN_STATE (0xcb) since the client did not start an atomic write by calling AtomicRequest with BeginWrite.",
-            ),
-            TestStep(
-                "4b",
-                "TH calls AtomicRequest with RequestType set to BeginWrite targeting the Schedules attribute. "
-                "TH writes to the Schedules attribute modifying a transition on an existing schedule with valid values, but does not call AtomicRequest with CommitWrite; instead TH calls AtomicRequest with RequestType set to RollbackWrite targeting the Schedules attribute. "
-                "TH reads the Schedules attribute.",
-                "Verify that the AtomicRequest commands return SUCCESS, the edit request is rolled back, and the Schedules attribute matches the original unmodified schedules.",
-            ),
-            TestStep(
-                "4c",
-                "TH calls AtomicRequest with RequestType set to BeginWrite targeting the Schedules attribute. "
-                "TH writes to the Schedules attribute modifying a transition on an existing schedule with different valid values (and setting the BuiltIn field on the modified schedule to null). "
-                "TH calls AtomicRequest with RequestType set to CommitWrite targeting the Schedules attribute. "
-                "TH reads the Schedules attribute.",
-                "Verify that the AtomicRequest commands return SUCCESS, the Schedules attribute is updated with the modified transition, and the BuiltIn field on the modified schedule retains its previous value.",
-            ),
-            TestStep(
-                "4d",
-                "If the number of entries in Schedules is less than NumberOfSchedules and there is a ScheduleTypeStruct in SupportedScheduleTypes whose NumberOfSchedules is greater than the current number of schedules with that SystemMode: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules appending a new ScheduleStruct with ScheduleHandle set to null, BuiltIn set to null (or false), SystemMode set to the chosen ScheduleTypeStruct's SystemMode, and valid Transitions, calls AtomicRequest (CommitWrite), and reads Schedules.",
-                "Verify that the AtomicRequest commands return SUCCESS, and the Schedules attribute contains the newly added schedule with a unique device-generated ScheduleHandle and BuiltIn set to false. Save the new handle as AddedScheduleHandle.",
-            ),
-            TestStep(
-                "4e",
-                "If step 4d added a schedule: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules removing the schedule with ScheduleHandle equal to AddedScheduleHandle, calls AtomicRequest (CommitWrite), and reads Schedules.",
-                "Verify that the AtomicRequest commands return SUCCESS and the schedule with AddedScheduleHandle is removed from Schedules.",
-            ),
-            TestStep(
-                "4f",
-                "If step 4e removed a schedule: "
-                "TH repeats the atomic write and commit from step 4d to add a new schedule with ScheduleHandle set to null, reads Schedules to inspect the newly assigned ScheduleHandle, and then removes the added schedule via an atomic write and commit.",
-                "Verify that the device assigns a unique ScheduleHandle to the new schedule and does not reuse the deleted AddedScheduleHandle.",
-            ),
-            TestStep(
-                "4g",
-                "TH starts an atomic write on Schedules by calling AtomicRequest (BeginWrite), and a second client TH2 attempts to open an atomic write on Schedules before TH is complete.",
-                "Verify that TH2's AtomicRequest is rejected.",
-            ),
-            TestStep(
-                "4h",
-                "While TH's atomic write on Schedules is open, TH2 attempts to write to the Schedules attribute. TH then calls AtomicRequest (RollbackWrite) to close its atomic write.",
-                "Verify that TH2's write request is rejected with INVALID_IN_STATE (0xcb).",
-            ),
-            TestStep(
-                "4i",
-                "TH starts an atomic write on Schedules, and before it is complete, TH2 removes TH's fabric; TH2 then opens an atomic write on Schedules and rolls it back (re-commissioning TH afterwards if needed).",
-                "Verify that TH2's AtomicRequest is successful.",
-            ),
-            TestStep(
-                "5a",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a new schedule (ScheduleHandle set to null) having BuiltIn set to true, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "5b",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule having a non-null ScheduleHandle that does not exist in Schedules, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns NOT_FOUND (0x8b).",
-            ),
-            TestStep(
-                "5c",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with duplicate schedules sharing the same ScheduleHandle, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "5d",
-                "TH selects a schedule in Schedules with BuiltIn set to false (adding one first if none exists), calls AtomicRequest (BeginWrite), writes to Schedules modifying that non-built-in schedule to have BuiltIn set to true, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "5e",
-                "TH selects a schedule in Schedules with BuiltIn set to true, calls AtomicRequest (BeginWrite), writes to Schedules modifying that built-in schedule to have BuiltIn set to false, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "5f",
-                "TH selects a schedule in Schedules with BuiltIn set to true, calls AtomicRequest (BeginWrite), writes to Schedules with that built-in schedule removed, and calls AtomicRequest (CommitWrite).",
-                "Verify that AtomicRequest (CommitWrite) returns CONSTRAINT_ERROR (0x87) and the built-in schedule is not removed from Schedules.",
-            ),
-            TestStep(
-                "5g",
-                "TH ensures ActiveScheduleHandle is set to a non-null schedule handle (creating a non-built-in schedule and activating it if needed), calls AtomicRequest (BeginWrite), writes to Schedules removing the schedule whose ScheduleHandle matches ActiveScheduleHandle, and calls AtomicRequest (CommitWrite).",
-                "Verify that AtomicRequest (CommitWrite) returns INVALID_IN_STATE (0xcb) and the active schedule is not removed from Schedules.",
-            ),
-            TestStep(
-                "5h",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule whose SystemMode is not present in ScheduleTypes (such as Off or an unsupported SystemMode), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "6a",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsNames bit set in ScheduleTypeFeatures: "
-                "TH writes a valid Name (<= 64 chars) and commits, then writes an invalid Name (> 64 chars) and rolls back.",
-                "Verify that setting a valid Name succeeds and Schedules reflects the updated Name, and setting a Name longer than 64 characters returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "6b",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsNames bit set in ScheduleTypeFeatures: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode having the Name field set, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "6c",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsPresets bit set in ScheduleTypeFeatures: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode having PresetHandle set on the ScheduleStruct or on a ScheduleTransitionStruct, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "6d",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsPresets bit set in ScheduleTypeFeatures: "
-                "TH tests valid PresetHandle references, non-existent ScheduleStruct.PresetHandle, non-existent ScheduleTransitionStruct.PresetHandle, and removing a Preset referenced by a ScheduleTransitionStruct.",
-                "Verify that writing a valid PresetHandle succeeds, non-existent PresetHandles return CONSTRAINT_ERROR (0x87), and committing the removal of a Preset referenced by a ScheduleTransitionStruct returns INVALID_IN_STATE (0xcb).",
-            ),
-            TestStep(
-                "6e",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsSetpoints bit set in ScheduleTypeFeatures: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode containing a transition that specifies SystemMode, HeatingSetpoint, or CoolingSetpoint, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "6f",
-                "For a ScheduleTypeStruct in SupportedScheduleTypes that has the SupportsSetpoints bit set in ScheduleTypeFeatures: "
-                "TH tests writing a transition with SystemMode set to Off.",
-                "If SupportsOff is not set, verify that the write request returns CONSTRAINT_ERROR (0x87). If SupportsOff is set, verify that the AtomicRequest commands return SUCCESS and Schedules reflects the transition with SystemMode set to Off.",
-            ),
-            TestStep(
-                "7a",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule whose Transitions list is empty (0 entries), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7b",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where DayOfWeek has the Away/Vacation bit (bit 7) set, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7c",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where TransitionTime is greater than 1439 (e.g. 1440), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7d",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing duplicate transitions (multiple transitions with the exact same TransitionTime and overlapping DayOfWeek bits), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7e",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsPresets bit set: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition on a schedule of that SystemMode that specifies both PresetHandle and at least one of SystemMode, CoolingSetpoint, or HeatingSetpoint, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7f",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where ScheduleTransitionStruct.SystemMode is set to the same value as the encompassing ScheduleStruct.SystemMode, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "7g",
-                "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
-                "TH tests omitting required setpoint and preset fields for the transition's effective SystemMode, and writing a transition setpoint outside the configured setpoint limits.",
-                "Verify that omitting required setpoint and preset fields returns CONSTRAINT_ERROR (0x87), and writing a transition setpoint outside configured setpoint limits returns CONSTRAINT_ERROR (0x87).",
-            ),
-            TestStep(
-                "8a",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing NumberOfScheduleTransitions + 1 transitions, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns RESOURCE_EXHAUSTED (0x89).",
-            ),
-            TestStep(
-                "8b",
-                "If NumberOfScheduleTransitionPerDay is not null and NumberOfScheduleTransitionPerDay < NumberOfScheduleTransitions: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing NumberOfScheduleTransitionPerDay + 1 transitions that have the same day-of-week bit set in DayOfWeek, and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns RESOURCE_EXHAUSTED (0x89).",
-            ),
-            TestStep(
-                "8c",
-                "If there is a ScheduleTypeStruct in SupportedScheduleTypes whose NumberOfSchedules field is less than the NumberOfSchedules attribute: "
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules adding valid schedules with that SystemMode such that the number of schedules with that SystemMode exceeds ScheduleTypeStruct.NumberOfSchedules (while total schedules <= NumberOfSchedules), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns RESOURCE_EXHAUSTED (0x89).",
-            ),
-            TestStep(
-                "8d",
-                "TH calls AtomicRequest (BeginWrite), writes to Schedules such that the total number of schedules exceeds the NumberOfSchedules attribute (NumberOfSchedules + 1), and calls AtomicRequest (RollbackWrite).",
-                "Verify that the write request returns RESOURCE_EXHAUSTED (0x89).",
-            ),
-        ]
-
     @async_test_body
     async def test_TC_TSTAT_4_5(self) -> None:
         endpoint = self.get_endpoint()
 
-        self.step("1")
-        # Commission DUT - already done
+        self.step("1", "Commission DUT to TH", is_commissioning=True)
 
-        self.step("2a")
+        self.step("2a", "TH reads the FeatureMap attribute.")
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap
         )
@@ -985,7 +728,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             if (cool_setpoint - heat_setpoint) < effective_deadband:
                 cool_setpoint = min(max_cool_limit, heat_setpoint + effective_deadband)
 
-        self.step("2b")
+        self.step("2b", "TH reads the NumberOfSchedules attribute.")
         number_of_schedules = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfSchedules
         )
@@ -994,7 +737,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         asserts.assert_greater_equal(number_of_schedules, 1, "NumberOfSchedules must be >= 1")
         asserts.assert_less_equal(number_of_schedules, 255, "NumberOfSchedules must fit in uint8")
 
-        self.step("2c")
+        self.step("2c", "TH reads the NumberOfScheduleTransitions attribute.")
         number_of_schedule_transitions = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfScheduleTransitions
         )
@@ -1010,7 +753,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             number_of_schedule_transitions, 255, "NumberOfScheduleTransitions must fit in uint8"
         )
 
-        self.step("2d")
+        self.step("2d", "TH reads the NumberOfScheduleTransitionPerDay attribute.")
         number_of_schedule_transition_per_day = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfScheduleTransitionPerDay
         )
@@ -1029,7 +772,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 "NumberOfScheduleTransitionPerDay must fit in uint8",
             )
 
-        self.step("2e")
+        self.step("2e", "TH reads the ScheduleTypes attribute.")
         supported_schedule_types = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ScheduleTypes
         )
@@ -1043,7 +786,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             has_presets=has_presets,
         )
 
-        self.step("2f")
+        self.step("2f", "TH reads the Schedules attribute (and Presets if PRES is supported).")
         current_presets: list[cluster.Structs.PresetStruct] = []
         preset_handles: set[bytes] = set()
         if has_presets:
@@ -1077,7 +820,7 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
 
         default_preset_handle = next(iter(preset_handles), None)
 
-        self.step("2g")
+        self.step("2g", "TH reads the ActiveScheduleHandle attribute.")
         previous_schedule_handle = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActiveScheduleHandle
         )
@@ -1117,7 +860,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             )
             schedule_handles = {s.scheduleHandle for s in current_schedules}
 
-        self.step("3a")
+        self.step(
+            "3a",
+            "TH selects a ScheduleHandle from CurrentSchedules (choosing one different from PreviousScheduleHandle if available) and sends the SetActiveScheduleRequest command with ScheduleHandle set to the chosen handle. "
+            "TH reads the ActiveScheduleHandle attribute and stores the value in a CurrentScheduleHandle variable.",
+        )
         existing_events = []
         if has_events:
             event_path = [(endpoint, cluster.Events.ActiveScheduleChange, 1)]
@@ -1147,7 +894,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             "ActiveScheduleHandle was not updated to the chosen ScheduleHandle",
         )
 
-        self.step("3b")
+        self.step(
+            "3b",
+            "If the ScheduleHandle chosen in step 3a differed from PreviousScheduleHandle, TH reads the ActiveScheduleChange event from the DUT.",
+        )
         if has_events and chosen_handle != previous_schedule_handle:
             event_path = [(endpoint, cluster.Events.ActiveScheduleChange, 1)]
             if existing_events:
@@ -1191,7 +941,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 chosen_handle != previous_schedule_handle,
             )
 
-        self.step("3c")
+        self.step(
+            "3c",
+            "TH sends the SetActiveScheduleRequest command with ScheduleHandle set to a random octstr value that does not match any entry in Schedules. "
+            "TH reads the ActiveScheduleHandle attribute.",
+        )
         invalid_schedule_handle = self.generate_unused_handle(schedule_handles)
         await self.send_set_active_schedule_request(
             endpoint=endpoint,
@@ -1207,14 +961,19 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             "ActiveScheduleHandle changed after failed SetActiveScheduleRequest",
         )
 
-        self.step("4a")
+        self.step("4a", "TH writes to the Schedules attribute without calling the AtomicRequest command.")
         await self.write_schedules(
             endpoint=endpoint,
             schedules=current_schedules,
             expected_status=Status.InvalidInState,
         )
 
-        self.step("4b")
+        self.step(
+            "4b",
+            "TH calls AtomicRequest with RequestType set to BeginWrite targeting the Schedules attribute. "
+            "TH writes to the Schedules attribute modifying a transition on an existing schedule with valid values, but does not call AtomicRequest with CommitWrite; instead TH calls AtomicRequest with RequestType set to RollbackWrite targeting the Schedules attribute. "
+            "TH reads the Schedules attribute.",
+        )
         await self.send_atomic_request_begin(
             {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint
         )
@@ -1237,7 +996,13 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             "Schedules attribute was modified despite RollbackWrite",
         )
 
-        self.step("4c")
+        self.step(
+            "4c",
+            "TH calls AtomicRequest with RequestType set to BeginWrite targeting the Schedules attribute. "
+            "TH writes to the Schedules attribute modifying a transition on an existing schedule with different valid values (and setting the BuiltIn field on the modified schedule to null). "
+            "TH calls AtomicRequest with RequestType set to CommitWrite targeting the Schedules attribute. "
+            "TH reads the Schedules attribute.",
+        )
         await self.send_atomic_request_begin(
             {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint
         )
@@ -1268,7 +1033,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         )
         schedule_handles = {s.scheduleHandle for s in current_schedules}
 
-        self.step("4d")
+        self.step(
+            "4d",
+            "If the number of entries in Schedules is less than NumberOfSchedules and there is a ScheduleTypeStruct in SupportedScheduleTypes whose NumberOfSchedules is greater than the current number of schedules with that SystemMode: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules appending a new ScheduleStruct with ScheduleHandle set to null, BuiltIn set to null (or false), SystemMode set to the chosen ScheduleTypeStruct's SystemMode, and valid Transitions, calls AtomicRequest (CommitWrite), and reads Schedules.",
+        )
         added_schedule_handle: bytes | None = None
         added_schedule_type: cluster.Structs.ScheduleTypeStruct | None = None
         mode_counts = {}
@@ -1333,7 +1102,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping schedule addition in step 4d because Schedules is at capacity")
 
-        self.step("4e")
+        self.step(
+            "4e",
+            "If step 4d added a schedule: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules removing the schedule with ScheduleHandle equal to AddedScheduleHandle, calls AtomicRequest (CommitWrite), and reads Schedules.",
+        )
         if added_schedule_handle is not None:
             schedules_without_added = [
                 s for s in current_schedules if s.scheduleHandle != added_schedule_handle
@@ -1355,7 +1128,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 "Removed schedule handle is still present in Schedules",
             )
 
-        self.step("4f")
+        self.step(
+            "4f",
+            "If step 4e removed a schedule: "
+            "TH repeats the atomic write and commit from step 4d to add a new schedule with ScheduleHandle set to null, reads Schedules to inspect the newly assigned ScheduleHandle, and then removes the added schedule via an atomic write and commit.",
+        )
         if added_schedule_handle is not None and added_schedule_type is not None:
             new_schedule_2 = self.make_valid_schedule(
                 schedule_type=added_schedule_type,
@@ -1404,7 +1181,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             )
             schedule_handles = {s.scheduleHandle for s in current_schedules}
 
-        self.step("4g")
+        self.step(
+            "4g",
+            "TH starts an atomic write on Schedules by calling AtomicRequest (BeginWrite), and a second client TH2 attempts to open an atomic write on Schedules before TH is complete.",
+        )
         log.info("Commissioning under second controller (TH2)")
         params = await self.default_controller.OpenCommissioningWindow(
             nodeId=self.dut_node_id,
@@ -1439,7 +1219,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_atomic_status=Status.Failure,
         )
 
-        self.step("4h")
+        self.step(
+            "4h",
+            "While TH's atomic write on Schedules is open, TH2 attempts to write to the Schedules attribute. TH then calls AtomicRequest (RollbackWrite) to close its atomic write.",
+        )
         await self.write_schedules(
             endpoint=endpoint,
             schedules=current_schedules,
@@ -1450,7 +1233,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint
         )
 
-        self.step("4i")
+        self.step(
+            "4i",
+            "TH starts an atomic write on Schedules, and before it is complete, TH2 removes TH's fabric; TH2 then opens an atomic write on Schedules and rolls it back (re-commissioning TH afterwards if needed).",
+        )
         # Swap TH and TH2 roles here so self.default_controller remains commissioned for subsequent test steps.
         await self.send_atomic_request_begin(
             {cluster.Attributes.Schedules.attribute_id: Status.Success},
@@ -1470,7 +1256,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint
         )
 
-        self.step("5a")
+        self.step(
+            "5a",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a new schedule (ScheduleHandle set to null) having BuiltIn set to true, and calls AtomicRequest (RollbackWrite).",
+        )
         first_st = supported_schedule_types[0]
         invalid_new_builtin = self.make_valid_schedule(
             schedule_type=first_st,
@@ -1491,7 +1280,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.ConstraintError,
         )
 
-        self.step("5b")
+        self.step(
+            "5b",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule having a non-null ScheduleHandle that does not exist in Schedules, and calls AtomicRequest (RollbackWrite).",
+        )
         non_existent_handle = self.generate_unused_handle(schedule_handles)
         invalid_handle_schedule = self.make_valid_schedule(
             schedule_type=first_st,
@@ -1512,7 +1304,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.NotFound,
         )
 
-        self.step("5c")
+        self.step(
+            "5c",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with duplicate schedules sharing the same ScheduleHandle, and calls AtomicRequest (RollbackWrite).",
+        )
         if len(current_schedules) > 0 and number_of_schedules >= 2:
             dup_schedule = copy.deepcopy(current_schedules[0])
             test_schedules_5c = copy.deepcopy(current_schedules)
@@ -1528,7 +1323,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 5c because NumberOfSchedules < 2")
 
-        self.step("5d")
+        self.step(
+            "5d",
+            "TH selects a schedule in Schedules with BuiltIn set to false (adding one first if none exists), calls AtomicRequest (BeginWrite), writes to Schedules modifying that non-built-in schedule to have BuiltIn set to true, and calls AtomicRequest (RollbackWrite).",
+        )
         temp_non_builtin_handle: bytes | None = None
         non_builtin_indices = [
             i for i, s in enumerate(current_schedules) if s.builtIn is False
@@ -1572,7 +1370,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 5d because no non-built-in schedule exists or could be added")
 
-        self.step("5e")
+        self.step(
+            "5e",
+            "TH selects a schedule in Schedules with BuiltIn set to true, calls AtomicRequest (BeginWrite), writes to Schedules modifying that built-in schedule to have BuiltIn set to false, and calls AtomicRequest (RollbackWrite).",
+        )
         builtin_indices = [i for i, s in enumerate(current_schedules) if s.builtIn is True]
         if len(builtin_indices) > 0:
             test_schedules_5e = copy.deepcopy(current_schedules)
@@ -1585,7 +1386,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 5e because no built-in schedule is present in Schedules")
 
-        self.step("5f")
+        self.step(
+            "5f",
+            "TH selects a schedule in Schedules with BuiltIn set to true, calls AtomicRequest (BeginWrite), writes to Schedules with that built-in schedule removed, and calls AtomicRequest (CommitWrite).",
+        )
         if len(builtin_indices) > 0:
             builtin_handle = current_schedules[builtin_indices[0]].scheduleHandle
             test_schedules_5f = [
@@ -1611,7 +1415,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 5f because no built-in schedule is present in Schedules")
 
-        self.step("5g")
+        self.step(
+            "5g",
+            "TH ensures ActiveScheduleHandle is set to a non-null schedule handle (creating a non-built-in schedule and activating it if needed), calls AtomicRequest (BeginWrite), writes to Schedules removing the schedule whose ScheduleHandle matches ActiveScheduleHandle, and calls AtomicRequest (CommitWrite).",
+        )
         if len(non_builtin_indices) > 0:
             active_non_builtin_handle = current_schedules[non_builtin_indices[0]].scheduleHandle
             await self.send_set_active_schedule_request(
@@ -1669,7 +1476,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 5g because no non-built-in schedule could be activated and removed")
 
-        self.step("5h")
+        self.step(
+            "5h",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule whose SystemMode is not present in ScheduleTypes (such as Off or an unsupported SystemMode), and calls AtomicRequest (RollbackWrite).",
+        )
         unsupported_modes = [
             mode
             for mode in (
@@ -1694,7 +1504,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 expected_status=Status.ConstraintError,
             )
 
-        self.step("6a")
+        self.step(
+            "6a",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsNames bit set in ScheduleTypeFeatures: "
+            "TH writes a valid Name (<= 64 chars) and commits, then writes an invalid Name (> 64 chars) and rolls back.",
+        )
         types_with_names = [
             st
             for st in supported_schedule_types
@@ -1777,7 +1591,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6a because no ScheduleTypeStruct has SupportsNames set")
 
-        self.step("6b")
+        self.step(
+            "6b",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsNames bit set in ScheduleTypeFeatures: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode having the Name field set, and calls AtomicRequest (RollbackWrite).",
+        )
         types_without_names = [
             st
             for st in supported_schedule_types
@@ -1812,7 +1630,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6b because all ScheduleTypeStructs support names")
 
-        self.step("6c")
+        self.step(
+            "6c",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsPresets bit set in ScheduleTypeFeatures: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode having PresetHandle set on the ScheduleStruct or on a ScheduleTransitionStruct, and calls AtomicRequest (RollbackWrite).",
+        )
         types_without_presets = [
             st
             for st in supported_schedule_types
@@ -1880,7 +1702,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6c because all ScheduleTypeStructs support presets")
 
-        self.step("6d")
+        self.step(
+            "6d",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsPresets bit set in ScheduleTypeFeatures: "
+            "TH tests valid PresetHandle references, non-existent ScheduleStruct.PresetHandle, non-existent ScheduleTransitionStruct.PresetHandle, and removing a Preset referenced by a ScheduleTransitionStruct.",
+        )
         types_with_presets = [
             st
             for st in supported_schedule_types
@@ -2065,7 +1891,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6d because no ScheduleTypeStruct supports presets")
 
-        self.step("6e")
+        self.step(
+            "6e",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes does not have the SupportsSetpoints bit set in ScheduleTypeFeatures: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule of that SystemMode containing a transition that specifies SystemMode, HeatingSetpoint, or CoolingSetpoint, and calls AtomicRequest (RollbackWrite).",
+        )
         types_without_setpoints = [
             st
             for st in supported_schedule_types
@@ -2105,7 +1935,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6e because all ScheduleTypeStructs support setpoints")
 
-        self.step("6f")
+        self.step(
+            "6f",
+            "For a ScheduleTypeStruct in SupportedScheduleTypes that has the SupportsSetpoints bit set in ScheduleTypeFeatures: "
+            "TH tests writing a transition with SystemMode set to Off.",
+        )
         types_with_setpoints = [
             st
             for st in supported_schedule_types
@@ -2165,7 +1999,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 6f because no ScheduleTypeStruct supports setpoints")
 
-        self.step("7a")
+        self.step(
+            "7a",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule whose Transitions list is empty (0 entries), and calls AtomicRequest (RollbackWrite).",
+        )
         test_schedules_7a = copy.deepcopy(current_schedules)
         test_schedules_7a[0].transitions = []
         await self.write_schedules_and_expect_error(
@@ -2174,7 +2011,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.ConstraintError,
         )
 
-        self.step("7b")
+        self.step(
+            "7b",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where DayOfWeek has the Away/Vacation bit (bit 7) set, and calls AtomicRequest (RollbackWrite).",
+        )
         test_schedules_7b = copy.deepcopy(current_schedules)
         test_schedules_7b[0].transitions[0].dayOfWeek = (
             cluster.Bitmaps.ScheduleDayOfWeekBitmap.kMonday
@@ -2186,7 +2026,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.ConstraintError,
         )
 
-        self.step("7c")
+        self.step(
+            "7c",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where TransitionTime is greater than 1439 (e.g. 1440), and calls AtomicRequest (RollbackWrite).",
+        )
         test_schedules_7c = copy.deepcopy(current_schedules)
         test_schedules_7c[0].transitions[0].transitionTime = 1440
         await self.write_schedules_and_expect_error(
@@ -2195,7 +2038,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.ConstraintError,
         )
 
-        self.step("7d")
+        self.step(
+            "7d",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing duplicate transitions (multiple transitions with the exact same TransitionTime and overlapping DayOfWeek bits), and calls AtomicRequest (RollbackWrite).",
+        )
         if number_of_schedule_transitions >= 2:
             test_schedules_7d = copy.deepcopy(current_schedules)
             t1 = copy.deepcopy(test_schedules_7d[0].transitions[0])
@@ -2219,7 +2065,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 7d because NumberOfScheduleTransitions < 2")
 
-        self.step("7e")
+        self.step(
+            "7e",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsPresets bit set: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition on a schedule of that SystemMode that specifies both PresetHandle and at least one of SystemMode, CoolingSetpoint, or HeatingSetpoint, and calls AtomicRequest (RollbackWrite).",
+        )
         if has_presets and len(types_with_presets) > 0 and default_preset_handle is not None:
             st_presets = types_with_presets[0]
             test_schedules_7e = copy.deepcopy(current_schedules)
@@ -2255,7 +2105,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 7e because no ScheduleTypeStruct supports presets")
 
-        self.step("7f")
+        self.step(
+            "7f",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where ScheduleTransitionStruct.SystemMode is set to the same value as the encompassing ScheduleStruct.SystemMode, and calls AtomicRequest (RollbackWrite).",
+        )
         if len(types_with_setpoints) > 0:
             st_setpoints = types_with_setpoints[0]
             test_schedules_7f = copy.deepcopy(current_schedules)
@@ -2274,7 +2128,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 7f because no ScheduleTypeStruct supports setpoints")
 
-        self.step("7g")
+        self.step(
+            "7g",
+            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
+            "TH tests omitting required setpoint and preset fields for the transition's effective SystemMode, and writing a transition setpoint outside the configured setpoint limits.",
+        )
         if len(types_with_setpoints) > 0:
             st_setpoints = types_with_setpoints[0]
             matching_idx = next(
@@ -2321,7 +2179,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
         else:
             log.info("Skipping step 7g because no ScheduleTypeStruct supports setpoints")
 
-        self.step("8a")
+        self.step(
+            "8a",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing NumberOfScheduleTransitions + 1 transitions, and calls AtomicRequest (RollbackWrite).",
+        )
         test_schedules_8a = copy.deepcopy(current_schedules)
         target_st_8a = schedule_type_by_mode[test_schedules_8a[0].systemMode]
         excess_transitions = []
@@ -2345,7 +2206,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
             expected_status=Status.ResourceExhausted,
         )
 
-        self.step("8b")
+        self.step(
+            "8b",
+            "If NumberOfScheduleTransitionPerDay is not null and NumberOfScheduleTransitionPerDay < NumberOfScheduleTransitions: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a schedule containing NumberOfScheduleTransitionPerDay + 1 transitions that have the same day-of-week bit set in DayOfWeek, and calls AtomicRequest (RollbackWrite).",
+        )
         if (
             number_of_schedule_transition_per_day is not NullValue
             and number_of_schedule_transition_per_day < number_of_schedule_transitions
@@ -2375,7 +2240,11 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 "Skipping step 8b because NumberOfScheduleTransitionPerDay is null or >= NumberOfScheduleTransitions"
             )
 
-        self.step("8c")
+        self.step(
+            "8c",
+            "If there is a ScheduleTypeStruct in SupportedScheduleTypes whose NumberOfSchedules field is less than the NumberOfSchedules attribute: "
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules adding valid schedules with that SystemMode such that the number of schedules with that SystemMode exceeds ScheduleTypeStruct.NumberOfSchedules (while total schedules <= NumberOfSchedules), and calls AtomicRequest (RollbackWrite).",
+        )
         constrained_types = [
             st for st in supported_schedule_types if st.numberOfSchedules < number_of_schedules
         ]
@@ -2417,7 +2286,10 @@ class TC_TSTAT_4_5(ThermostatBaseTest):
                 "Skipping step 8c because no ScheduleTypeStruct has NumberOfSchedules < NumberOfSchedules attribute"
             )
 
-        self.step("8d")
+        self.step(
+            "8d",
+            "TH calls AtomicRequest (BeginWrite), writes to Schedules such that the total number of schedules exceeds the NumberOfSchedules attribute (NumberOfSchedules + 1), and calls AtomicRequest (RollbackWrite).",
+        )
         test_schedules_8d = copy.deepcopy(current_schedules)
         mode_counts_8d: dict[int, int] = {}
         for s in test_schedules_8d:
