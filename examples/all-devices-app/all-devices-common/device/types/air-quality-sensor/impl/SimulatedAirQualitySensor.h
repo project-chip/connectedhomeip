@@ -22,10 +22,23 @@
 namespace chip {
 namespace app {
 
+/**
+ * @brief Simulation subclass of AirQualitySensor for testing and development.
+ *
+ * Implements `TimerContext` to periodically (default 10s):
+ *   1. Rotate through AirQualityEnum states (Good -> Fair -> Moderate).
+ *   2. Oscillate TemperatureMeasurement readings around ~21.5°C (if present).
+ *   3. Oscillate RelativeHumidityMeasurement readings around ~45.0% (if present).
+ *   4. Oscillate all configured concentration measurement clusters (CO2 around ~450-850 ppm,
+ *      others around ~20-65 ppm).
+ *
+ * @tparam OptionalClusters Cluster IDs of the optional clusters to instantiate and simulate.
+ */
 template <ClusterId... OptionalClusters>
 class SimulatedAirQualitySensor : public AirQualitySensor<OptionalClusters...>, public TimerContext
 {
 public:
+    /// Default period between simulated telemetry updates.
     static constexpr System::Clock::Seconds16 kDefaultUpdateInterval = System::Clock::Seconds16(10);
 
     using Base = AirQualitySensor<OptionalClusters...>;
@@ -45,7 +58,7 @@ public:
         Base::Unregister(provider);
     }
 
-    // TimerContext
+    // TimerContext: Periodic tick callback that updates sensor measurements
     void TimerFired() override
     {
         mTickCount++;

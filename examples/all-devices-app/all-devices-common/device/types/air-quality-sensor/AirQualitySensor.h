@@ -43,6 +43,12 @@ namespace app {
 
 namespace Detail {
 
+/**
+ * @brief Compile-time mapping from ClusterId to the concrete ServerCluster type.
+ *
+ * Specializations define `using Type = ...` mapping Matter cluster IDs to their
+ * corresponding code-driven cluster implementation classes.
+ */
 template <ClusterId CID>
 struct ClusterTypeTraits;
 
@@ -130,9 +136,19 @@ struct ClusterTypeTraits<Clusters::RadonConcentrationMeasurement::Id>
     using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 };
 
+/**
+ * @brief Alias helper to obtain the concrete cluster type for a given ClusterId.
+ */
 template <ClusterId CID>
 using ClusterType = typename ClusterTypeTraits<CID>::Type;
 
+/**
+ * @brief Compile-time traits mapping ClusterId to its configuration type and default initializer.
+ *
+ * Each supported cluster specializes this struct with:
+ *   - `Type`: The concrete configuration struct type passed to the cluster's `.Create()` method.
+ *   - `Default()`: Static method returning a spec-compliant default configuration.
+ */
 template <ClusterId CID>
 struct ClusterConfigTraits;
 
@@ -140,6 +156,10 @@ template <>
 struct ClusterConfigTraits<Clusters::TemperatureMeasurement::Id>
 {
     using Type = Clusters::TemperatureMeasurementCluster::StartupConfiguration;
+
+    /**
+     * @brief Spec default: -40.00°C (min) to +80.00°C (max) in 0.01°C steps.
+     */
     static Type Default()
     {
         Type config;
@@ -153,6 +173,10 @@ template <>
 struct ClusterConfigTraits<Clusters::RelativeHumidityMeasurement::Id>
 {
     using Type = Clusters::RelativeHumidityMeasurementCluster::Config;
+
+    /**
+     * @brief Spec default: 0.00% (min) to 100.00% (max) in 0.01% steps.
+     */
     static Type Default()
     {
         Type config;
@@ -162,8 +186,15 @@ struct ClusterConfigTraits<Clusters::RelativeHumidityMeasurement::Id>
     }
 };
 
+/**
+ * @brief Provides standard Matter spec concentration units, min, and max defaults
+ *        for standard gas measurement clusters. Implemented in AirQualitySensor.cpp.
+ */
 Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
 
+/**
+ * @brief Base traits helper for concentration measurement clusters.
+ */
 template <ClusterId CID>
 struct ConcentrationConfigTraits
 {
@@ -222,15 +253,25 @@ struct ClusterConfigTraits<Clusters::RadonConcentrationMeasurement::Id>
 {
 };
 
+/**
+ * @brief Helper alias to extract the config type for a given ClusterId.
+ */
 template <ClusterId CID>
 using ClusterConfigType = typename ClusterConfigTraits<CID>::Type;
 
+/**
+ * @brief Helper function to retrieve the spec default configuration for a given ClusterId.
+ */
 template <ClusterId CID>
 ClusterConfigType<CID> DefaultClusterConfig()
 {
     return ClusterConfigTraits<CID>::Default();
 }
 
+/**
+ * @brief Finds the 0-based index of `Target` in parameter pack `List...`.
+ *        Returns `static_cast<size_t>(-1)` if not found.
+ */
 template <ClusterId Target, ClusterId... List>
 constexpr size_t IndexOf()
 {
@@ -252,6 +293,9 @@ constexpr size_t IndexOf()
     }
 }
 
+/**
+ * @brief Counts the occurrences of `Target` in parameter pack `List...`.
+ */
 template <ClusterId Target, ClusterId... List>
 constexpr size_t CountOf()
 {
@@ -276,9 +320,53 @@ constexpr size_t CountOf()
 
 } // namespace Detail
 
-/// Matter Air Quality Sensor device type (spec section 2.6).
-/// Owns mandatory clusters (Identify, Air Quality) and statically declared optional clusters.
-/// Storage for optional clusters is exact and allocates zero unused memory.
+/**
+ * @brief Matter Air Quality Sensor device type (Matter Device Library specification section 2.6).
+ *
+ * Implements a code-driven Air Quality Sensor single-endpoint device.
+ *
+ * Required clusters:
+ *   - Identify (0x0003)
+ *   - Air Quality (0x005B)
+ *
+ * Optional clusters can be statically declared via the template parameter pack:
+ *   `AirQualitySensor<OptionalClusters...>`
+ *
+ * Supported optional clusters:
+ *   - TemperatureMeasurement (0x0402)
+ *   - RelativeHumidityMeasurement (0x0405)
+ *   - Concentration measurement clusters:
+ *       - CarbonDioxideConcentrationMeasurement (0x040D)
+ *       - Pm25ConcentrationMeasurement (0x042A)
+ *       - TotalVolatileOrganicCompoundsConcentrationMeasurement (0x042E)
+ *       - CarbonMonoxideConcentrationMeasurement (0x040C)
+ *       - NitrogenDioxideConcentrationMeasurement (0x0413)
+ *       - OzoneConcentrationMeasurement (0x0415)
+ *       - FormaldehydeConcentrationMeasurement (0x042B)
+ *       - Pm1ConcentrationMeasurement (0x042C)
+ *       - Pm10ConcentrationMeasurement (0x042D)
+ *       - RadonConcentrationMeasurement (0x042F)
+ *
+ * Storage for optional clusters is exact and allocates zero unused memory.
+ *
+ * Example:
+ * @code
+ *   using MySensor = AirQualitySensor<
+ *       Clusters::TemperatureMeasurement::Id,
+ *       Clusters::RelativeHumidityMeasurement::Id,
+ *       Clusters::CarbonDioxideConcentrationMeasurement::Id
+ *   >;
+ *
+ *   MySensor::Config config;
+ *   config.Get<Clusters::TemperatureMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-1000));
+ *   config.Get<Clusters::CarbonDioxideConcentrationMeasurement::Id>().minMeasured = DataModel::MakeNullable(400.0f);
+ *
+ *   MySensor sensor(timerDelegate, config);
+ *   sensor.Register(endpointId, provider);
+ * @endcode
+ *
+ * @tparam OptionalClusters Cluster IDs of the optional clusters to instantiate on this sensor.
+ */
 template <ClusterId... OptionalClusters>
 class AirQualitySensor : public SingleEndpoint
 {
@@ -286,23 +374,41 @@ class AirQualitySensor : public SingleEndpoint
                   "Optional cluster IDs must not be duplicated");
 
 public:
+    /**
+     * @brief Compile-time query to check if a specific cluster is supported by this sensor instance.
+     */
     template <ClusterId CID>
     static constexpr bool HasCluster =
         ((OptionalClusters == CID) || ... || false) || (CID == Clusters::Identify::Id) || (CID == Clusters::AirQuality::Id);
 
+    /**
+     * @brief Configuration for the AirQualitySensor and its optional clusters.
+     *
+     * Holds the feature map for the mandatory Air Quality cluster, as well as
+     * concrete configurations for each enabled optional cluster initialized with
+     * spec-compliant defaults.
+     */
     struct Config
     {
+        /// Feature flags for the Air Quality cluster (defaults: Fair, Moderate, VeryPoor, ExtremelyPoor).
         BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{ Clusters::AirQuality::Feature::kFair,
                                                                     Clusters::AirQuality::Feature::kModerate,
                                                                     Clusters::AirQuality::Feature::kVeryPoor,
                                                                     Clusters::AirQuality::Feature::kExtremelyPoor };
 
+        /// Exact storage for each configured optional cluster's configuration struct.
         std::tuple<Detail::ClusterConfigType<OptionalClusters>...> clusterConfigs{
             Detail::DefaultClusterConfig<OptionalClusters>()...
         };
 
         Config() = default;
 
+        /**
+         * @brief Access the mutable configuration for a specific optional cluster.
+         *
+         * @tparam CID The ClusterId to access. Must be one of `OptionalClusters...`.
+         * @return Mutable reference to the cluster's configuration struct.
+         */
         template <ClusterId CID>
         Detail::ClusterConfigType<CID> & Get()
         {
@@ -311,6 +417,12 @@ public:
             return std::get<kIdx>(clusterConfigs);
         }
 
+        /**
+         * @brief Access the read-only configuration for a specific optional cluster.
+         *
+         * @tparam CID The ClusterId to access. Must be one of `OptionalClusters...`.
+         * @return Const reference to the cluster's configuration struct.
+         */
         template <ClusterId CID>
         const Detail::ClusterConfigType<CID> & Get() const
         {
@@ -320,6 +432,12 @@ public:
         }
     };
 
+    /**
+     * @brief Constructs an AirQualitySensor device.
+     *
+     * @param timerDelegate Reference to platform TimerDelegate (used by IdentifyCluster and simulation).
+     * @param config Device and optional cluster configuration.
+     */
     explicit AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {}) :
         SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
         mConfig(config)
@@ -327,6 +445,21 @@ public:
 
     ~AirQualitySensor() override = default;
 
+    /**
+     * @brief Registers the Air Quality Sensor endpoint and all configured clusters with the data model provider.
+     *
+     * Registers:
+     *   1. Endpoint descriptor
+     *   2. Identify cluster (mandatory)
+     *   3. Air Quality cluster (mandatory)
+     *   4. Statically declared optional clusters in `OptionalClusters...`
+     *   5. Subclass additional clusters via `RegisterAdditionalClusters()`
+     *
+     * @param endpoint Endpoint ID to bind to.
+     * @param provider The CodeDrivenDataModelProvider to register clusters and endpoint with.
+     * @param composition Composition hierarchy metadata.
+     * @return CHIP_NO_ERROR on success, or an error code on failure.
+     */
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override
     {
@@ -378,6 +511,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Unregisters the endpoint and cleanly tears down all constructed clusters.
+     *
+     * Removes and destroys only the clusters that were constructed, ensuring safe cleanup.
+     *
+     * @param provider The CodeDrivenDataModelProvider to remove clusters and endpoint from.
+     */
     void Unregister(CodeDrivenDataModelProvider & provider) override
     {
         UnregisterAdditionalClusters(provider);
@@ -406,7 +546,23 @@ public:
         UnregisterDescriptor(provider);
     }
 
-    // Unified generic cluster accessor. Returns concrete pointer or nullptr if not configured.
+    /**
+     * @brief Unified generic cluster accessor.
+     *
+     * Returns a pointer to the concrete cluster instance if the cluster is supported
+     * and configured on this sensor, or `nullptr` otherwise.
+     *
+     * Example:
+     * @code
+     *   if (auto * co2 = sensor.GetCluster<Clusters::CarbonDioxideConcentrationMeasurement::Id>())
+     *   {
+     *       co2->SetMeasuredValue(DataModel::MakeNullable(450.0f));
+     *   }
+     * @endcode
+     *
+     * @tparam CID The ClusterId to retrieve.
+     * @return Pointer to concrete cluster instance, or nullptr if not configured.
+     */
     template <ClusterId CID>
     Detail::ClusterType<CID> * GetCluster()
     {
@@ -429,24 +585,34 @@ public:
         }
     }
 
-    // Convenience accessors for mandatory clusters
+    /// Convenience accessor for the mandatory Air Quality cluster.
     Clusters::AirQualityCluster & AirQualityCluster() { return *GetCluster<Clusters::AirQuality::Id>(); }
+
+    /// Convenience accessor for the mandatory Identify cluster.
     Clusters::IdentifyCluster & IdentifyCluster() { return *GetCluster<Clusters::Identify::Id>(); }
 
 protected:
+    /**
+     * @brief Extension hook for subclasses to register additional clusters.
+     */
     virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Extension hook for subclasses to unregister additional clusters.
+     */
     virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
 
     TimerDelegate & mTimerDelegate;
     Config mConfig;
 
+    /// Mandatory clusters
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::AirQualityCluster> mAirQualityCluster;
 
+    /// Statically sized tuple holding only declared optional clusters (zero overhead for unconfigured clusters)
     std::tuple<LazyRegisteredServerCluster<Detail::ClusterType<OptionalClusters>>...> mOptionalClusters;
 };
 
