@@ -55,10 +55,8 @@ namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void LogThreadOperationalAdvertisingState()
 {
-    const bool provisioned = ConnectivityMgr().IsThreadProvisioned();
-    const bool attached    = ConnectivityMgr().IsThreadAttached();
-
-    ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d", provisioned, attached);
+    ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d",
+                 ConnectivityMgr().IsThreadProvisioned(), ConnectivityMgr().IsThreadAttached());
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
