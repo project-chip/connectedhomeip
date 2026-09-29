@@ -48,15 +48,18 @@ from matter.clusters.Types import NullValue
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 JFDS = Clusters.JointFabricDatastore
 
+# The JF Administrator writes each datastore binding to the Binding cluster on the entry's EndpointID.
+TARGET_BINDING_ENDPOINT = 1
 
-class TC_JFDS_BindingSync(MatterBaseTest):
+
+class TC_JFDS_BindingSync(MatterTestCommissioner):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -182,7 +185,7 @@ class TC_JFDS_BindingSync(MatterBaseTest):
         for _ in range(int(timeout_s * 2)):
             self._assert_admin_running()
             bindings = await self.read_single_attribute(
-                dev_ctrl=self.devCtrlEcoA, node_id=self.target_node_id, endpoint=0,
+                dev_ctrl=self.devCtrlEcoA, node_id=self.target_node_id, endpoint=TARGET_BINDING_ENDPOINT,
                 attribute=Clusters.Binding.Attributes.Binding)
             if len(bindings) == count:
                 return
@@ -191,7 +194,8 @@ class TC_JFDS_BindingSync(MatterBaseTest):
 
     async def _add_binding(self, binding: JFDS.Structs.DatastoreBindingTargetStruct):
         await self.send_single_cmd(
-            cmd=JFDS.Commands.AddBindingToEndpointForNode(nodeID=self.target_node_id, endpointID=1, binding=binding),
+            cmd=JFDS.Commands.AddBindingToEndpointForNode(
+                nodeID=self.target_node_id, endpointID=TARGET_BINDING_ENDPOINT, binding=binding),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
 
     @async_test_body

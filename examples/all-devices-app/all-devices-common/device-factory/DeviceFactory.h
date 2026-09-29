@@ -29,6 +29,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -50,7 +51,7 @@
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
-#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
@@ -68,6 +69,7 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -353,23 +355,24 @@ private:
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
+        if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
-            RegisterCreator("color-temperature-light", [this]() {
+            RegisterCreator("chime", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                static const Chime::Sound kDefaultSounds[] = {
+                    { 0, "Ding Dong"_span },
+                    { 1, "Ring Ring"_span },
+                };
+                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("contact-sensor", [this]() {
+            RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                    SimulatedClosure::ThreePanelDoorClosureConfig(), mContext->groupDataProvider,
+                                                    mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -387,15 +390,23 @@ private:
                 return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CHIME)
+        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
         {
-            RegisterCreator("chime", [this]() {
+            RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Chime::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        {
+            RegisterCreator("contact-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)
@@ -490,10 +501,15 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this]() {
+            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                mContext->platformManager, mContext->failSafeContext);
+                return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
+                    .timerDelegate   = mContext->timerDelegate,
+                    .storage         = mContext->storageDelegate,
+                    .platformManager = mContext->platformManager,
+                    .failSafeContext = mContext->failSafeContext,
+                    .nodeLabel       = nodeLabel,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -625,6 +641,19 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
+        {
+            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
+                    .timerDelegate   = mContext->timerDelegate,
+                    .storage         = mContext->storageDelegate,
+                    .platformManager = mContext->platformManager,
+                    .failSafeContext = mContext->failSafeContext,
+                    .nodeLabel       = nodeLabel,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {

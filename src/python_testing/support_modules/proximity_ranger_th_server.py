@@ -63,7 +63,7 @@ import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestUncommissionedDevice
 from matter.testing.tasks import Subprocess
 
 log = logging.getLogger(__name__)
@@ -307,17 +307,15 @@ def is_session_id_increment(prev: int | None, current: int) -> bool:
     return (prev - current) > 127
 
 
-class ProximityRangerTHServerTest(MatterBaseTest):
+class ProximityRangerTHServerTest(MatterTestUncommissionedDevice):
     """Base class that owns the two TH-side Proximity Ranging servers.
 
-    Derives from ``MatterBaseTest`` (as the NETIM DUT-as-client base does), not
-    ``MatterTestCommissioner``: that marker is for tests in which the harness commissions the
-    DUT itself, which never happens here -- the harness only commissions the two TH servers and
-    never opens a Matter session to the DUT. ``requires_dut = False`` skips the background
-    wildcard subscription and the pre-test DUT-state capture, because all of the harness's
-    traffic goes to the two TH servers.
+    MatterTestUncommissionedDevice because the DUT never joins the harness fabric: it is a
+    Proximity Ranging client driven through its own interface, and the harness only
+    commissions the two TH servers onto its own fabric. ``requires_dut = False`` skips the
+    background wildcard subscription and the pre-test DUT-state capture, because all of the
+    harness's traffic goes to the two TH servers.
     """
-
     requires_dut = False
 
     @property

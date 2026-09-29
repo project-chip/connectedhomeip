@@ -399,9 +399,9 @@ void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeS
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && reason == CheckInTriggerReason::kColdBoot)
     {
-        // On cold boot, we enter ActiveMode immediately below (T+0s) for its threshold duration,
-        // and also set mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the T+60s
-        // settle fallback once both Thread attachment and kServerReady complete.
+        // On cold boot, enter ActiveMode immediately below for its threshold duration and
+        // latch mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the settle timer
+        // once both Thread attachment and kServerReady complete.
         mPendingActiveModeOnNetworkAttach = true;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -823,16 +823,16 @@ void ICDManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event, int
 // Deferred-action gate. "Flush" = enter/extend ActiveMode + replay queued Check-Ins.
 //
 //   event                            attached  serverReady  action
-//   -------------------------------  --------  -----------  --------------------------
-//   kThreadStateChange               no        -            cancel settle timer
-//   kThreadConnectivityChange        no        -            cancel settle timer
-//   kThreadConnectivityChange (Est)  yes       no           hold (no DNS-SD yet)
-//   kThreadConnectivityChange (Est)  yes       yes          (re)arm settle timer
-//   kServerReady                     yes       -            (re)arm settle timer
-//   kServerReady                     no        -            latch ready only
-//   anything else                    -         -            none
+//   -------------------------------  --------  -----------  ---------------------------------------
+//   kThreadStateChange               no        -            stop the settle timer
+//   kThreadConnectivityChange        no        -            stop the settle timer
+//   kThreadConnectivityChange (Est)  yes       no           ActiveMode without Check-In, then wait
+//   kThreadConnectivityChange (Est)  yes       yes          ActiveMode without Check-In, start timer
+//   kServerReady                     yes       -            ActiveMode without Check-In, start timer
+//   kServerReady                     no        -            only remember that the server is ready
+//   anything else                    -         -            nothing
 //
-// Arming additionally requires a pending reason; a settle delay of 0 flushes inline.
+// Rows 3 to 5 apply only when work is pending. With a settle delay of 0 the flush runs at once.
 // Settle timer: registered clients' operational DNS-SD records need time to republish after a
 // BR/controller reboot. A Check-In to an unresolvable client is lost (unacked one-way UDP).
 void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
@@ -878,8 +878,8 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     if (!mIsServerReady || mNetworkAttachSettleDelay > System::Clock::Milliseconds32(0))
     {
         // Enter or extend ActiveMode without sending Check-In messages right away so the Thread radio
-        // fast-polls to receive Thread Network Data and complete SRP registration/renewal — both on cold
-        // boot (before kServerReady) and when re-attaching to a rebooted border router/SRP server.
+        // fast-polls to receive Thread Network Data and complete SRP registration/renewal while waiting
+        // for kServerReady or the settle delay.
         ChipLogProgress(AppServer,
                         "ICDManager: Entering/Extending ActiveMode for SRP before flushing deferred network attach actions.");
         UpdateOperationState(OperationalState::ActiveMode, false /* sendCheckInMsgs */);
@@ -892,7 +892,6 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
         // StartTimer replaces a timer with the same callback and context, so a new event restarts
         // the delay from the last attach.
-        // TODO: replace the fixed delay with a per-client retry/backoff.
         ChipLogProgress(AppServer, "ICDManager: Scheduling deferred network attach actions in %" PRIu32 " ms.",
                         mNetworkAttachSettleDelay.count());
         CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(mNetworkAttachSettleDelay, OnNetworkAttachSettleTimerDone, this);
@@ -950,8 +949,8 @@ void ICDManager::FlushPendingNetworkAttachActions()
     VerifyOrReturn(!wasInIdleMode);
 
     // If the device was already in ActiveMode, UpdateOperationState() only extended active duration, so replay pending check-ins.
-    // Check broadcast / wasPendingActiveMode before kTargeted so a pending broadcast across all fabrics is never shadowed
-    // by a single-fabric targeted timeout.
+    // Check wasPendingActiveMode (which requires a broadcast Check-In across all fabrics) before kTargeted so queued
+    // targeted subjects do not shadow a full broadcast.
     if (mPendingCheckInType == PendingCheckInType::kBroadcast || wasPendingActiveMode)
     {
         ChipLogProgress(AppServer, "ICDManager: Replaying deferred broadcast Check-In message.");

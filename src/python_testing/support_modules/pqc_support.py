@@ -48,7 +48,7 @@ updated to match, and the unit tests in
 src/python_testing/test_testing/test_pqc_support.py check both implementations against the
 shared certificate vectors in src/crypto/tests/MlDsaAttestationChain_test_vectors.h.
 
-Requires a `cryptography` build providing `hazmat.primitives.asymmetric.mldsa` (46.0.0 or newer,
+Requires a `cryptography` build providing `hazmat.primitives.asymmetric.mldsa` (48.0.0 or newer,
 linked against OpenSSL 3.5 or newer) to validate ML-DSA chains. ECDSA-only chains work with any
 supported version.
 """
@@ -183,7 +183,7 @@ def assert_profile_supported_by_test_harness(profile: AttestationCryptoProfile) 
 
     asserts.assert_true(is_ml_dsa_supported(),
                         f"The TH cannot verify {profile.name}, which pre-condition 2 requires. Install a "
-                        "cryptography build providing hazmat.primitives.asymmetric.mldsa (46.0.0 or newer).")
+                        "cryptography build providing hazmat.primitives.asymmetric.mldsa (48.0.0 or newer).")
 
 
 def select_strongest_profile(supported_profiles: int, chain_element: str) -> AttestationCryptoProfile:
@@ -448,7 +448,7 @@ def verify_certificate_signature(subject: ParsedCertificate, issuer: ParsedCerti
             # context, which is what cryptography's verify() applies.
             asserts.assert_true(is_ml_dsa_supported(),
                                 f"Verifying the {subject.name} {profile.name} signature needs a cryptography "
-                                "build providing hazmat.primitives.asymmetric.mldsa (46.0.0 or newer).")
+                                "build providing hazmat.primitives.asymmetric.mldsa (48.0.0 or newer).")
             public_key.verify(signature, signed_data)
     except InvalidSignature:
         asserts.fail(f"The {subject.name} signature does not validate with the {issuer.name} public key "
