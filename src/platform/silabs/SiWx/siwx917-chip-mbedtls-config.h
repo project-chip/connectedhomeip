@@ -42,7 +42,6 @@
 // Added from autogen file for tinycrypt
 #define MBEDTLS_ECDH_C
 
-
 #if (!(SL_MATTER_ENABLE_AWS) || !defined(SL_MATTER_ENABLE_AWS))
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768
 #endif // !(SL_MATTER_ENABLE_AWS)

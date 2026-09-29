@@ -27,7 +27,7 @@ namespace Silabs {
 
 CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & block, uint32_t & mIVOffset)
 {
-    uint8_t iv[16]           = { AU8IV_INIT_VALUE };
+    uint8_t iv[16] = { AU8IV_INIT_VALUE };
 
     // Set IV based on mIVOffset
     uint32_t counter = ((uint32_t) iv[12] << 24) | ((uint32_t) iv[13] << 16) | ((uint32_t) iv[14] << 8) | (uint32_t) iv[15];
@@ -61,7 +61,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & 
 
     // Operation
     psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
-    status = psa_cipher_encrypt_setup(&operation, key_id, PSA_ALG_CTR);
+    status                           = psa_cipher_encrypt_setup(&operation, key_id, PSA_ALG_CTR);
     if (PSA_SUCCESS != status)
     {
         ChipLogError(DeviceLayer, "Failed to setup AES-CTR operation");
@@ -81,10 +81,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & 
 
     // Encrypt
     size_t output_len = 0;
-    status = psa_cipher_update(&operation, 
-                            block.data(), block.size(), 
-                            block.data(), block.size(), 
-                            &output_len);
+    status            = psa_cipher_update(&operation, block.data(), block.size(), block.data(), block.size(), &output_len);
     if (PSA_SUCCESS != status)
     {
         ChipLogError(DeviceLayer, "AES-CTR decryption failed");
@@ -96,8 +93,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(const ByteSpan & key, MutableByteSpan & 
     // Finalize
     size_t final_len = 0;
     psa_cipher_finish(&operation, block.data() + output_len, block.size() - output_len, &final_len);
-    psa_destroy_key(key_id);    
-
+    psa_destroy_key(key_id);
 
     mIVOffset += block.size();
 

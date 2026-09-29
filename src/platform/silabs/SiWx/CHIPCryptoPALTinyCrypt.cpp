@@ -860,8 +860,8 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     VerifyOrExit(csr.CHIP_CRYPTO_PAL_PRIVATE(sig_pk) == MBEDTLS_PK_SIGALG_ECDSA, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
     // Tinycrypt builds omit the PSA crypto core; export the raw EC point from PK pub_raw.
-    result = mbedtls_pk_write_pubkey_psa(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), Uint8::to_uchar(pubkey), pubkey.Length(),
-                                         &pubkey_size);
+    result =
+        mbedtls_pk_write_pubkey_psa(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), Uint8::to_uchar(pubkey), pubkey.Length(), &pubkey_size);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
 #else
@@ -869,8 +869,9 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
         mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
         VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
-        result = mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
-                                                MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
+        result =
+            mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                           MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey), pubkey.Length());
 
         VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
         VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
