@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -762,8 +763,11 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        std::string logfile = "--log-file=thread.log";
+        std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        // The OT simulation platform exit()s if it cannot open this file, and the
+        // process cwd is not guaranteed to be writable (it is not in CI), so place
+        // the log in /tmp instead of next to the binary.
+        std::string logfile = "--log-file=/tmp/chip_ot_node" + nodeid + ".log";
         char * args[]       = { argv[0], logfile.data(), nodeid.data() };
 
         otSysInit(MATTER_ARRAY_SIZE(args), args);
@@ -1015,6 +1019,8 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    ResolveDeviceAttestationCredentialsProvider();
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

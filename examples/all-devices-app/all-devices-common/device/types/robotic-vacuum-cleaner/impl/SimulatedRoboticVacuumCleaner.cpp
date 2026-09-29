@@ -17,7 +17,6 @@
 
 #include <clusters/RvcCleanMode/Enums.h>
 #include <clusters/RvcRunMode/Enums.h>
-#include <device/types/robotic-vacuum-cleaner/impl/RvcNamedPipeSimulation.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationLogic.h>
 #include <device/types/robotic-vacuum-cleaner/impl/RvcSimulationTopology.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
@@ -137,13 +136,11 @@ CHIP_ERROR SimulatedRoboticVacuumCleaner::RegisterOptionalClusters(EndpointId en
     ReturnErrorOnFailure(Init());
 
     mCleanModeCluster.Cluster().UpdateCurrentMode(kCleanModeQuick);
-    RegisterRvcNamedPipeSimulation(GetEndpointId(), this);
     return CHIP_NO_ERROR;
 }
 
 void SimulatedRoboticVacuumCleaner::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterRvcNamedPipeSimulation(GetEndpointId());
     if (mCleanModeCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mCleanModeCluster.Cluster()));
@@ -881,7 +878,7 @@ void SimulatedRoboticVacuumCleaner::HandleReset()
     ResetRvcSimulation(RunMode(), OperationalState(), CleanMode(), GetServiceAreaCluster());
 }
 
-void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
+bool SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
 {
     uint8_t errorStateId;
 
@@ -960,13 +957,69 @@ void SimulatedRoboticVacuumCleaner::HandleErrorEvent(const std::string & error)
     else
     {
         ChipLogError(Zcl, "Unhandled ErrorEvent 'Error' value: %s", error.c_str());
-        return;
+        return false;
     }
 
     CancelTimer();
     OperationalState::Structs::ErrorStateStruct::Type err;
     err.errorStateID = errorStateId;
     OperationalState().OnOperationalErrorDetected(err);
+    return true;
+}
+
+void SimulatedRoboticVacuumCleaner::HandleEmptyingDustBin()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleCleaningMop()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleFillingWaterTank()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank)));
+}
+
+void SimulatedRoboticVacuumCleaner::HandleUpdatingMaps()
+{
+    LogErrorOnFailure(
+        OperationalState().SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps)));
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleAddMap(uint32_t mapId, CharSpan mapName)
+{
+    return GetServiceAreaCluster().AddSupportedMap(mapId, mapName);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleRemoveMap(uint32_t mapId)
+{
+    return GetServiceAreaCluster().RemoveSupportedMap(mapId);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleAddArea(uint32_t areaId, std::optional<uint32_t> mapId,
+                                                  std::optional<CharSpan> locationName)
+{
+    Clusters::ServiceArea::AreaStructureWrapper area;
+    area.SetAreaId(areaId);
+    if (mapId.has_value())
+    {
+        area.SetMapId(mapId.value());
+    }
+    if (locationName.has_value())
+    {
+        area.SetLocationInfo(locationName.value(), DataModel::NullNullable, DataModel::NullNullable);
+    }
+    return GetServiceAreaCluster().AddSupportedArea(area);
+}
+
+bool SimulatedRoboticVacuumCleaner::HandleRemoveArea(uint32_t areaId)
+{
+    return GetServiceAreaCluster().RemoveSupportedArea(areaId);
 }
 
 } // namespace chip::app

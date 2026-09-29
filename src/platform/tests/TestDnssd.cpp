@@ -58,7 +58,7 @@ public:
     void OnQuery(const chip::Dnssd::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         mCurSrc = info;
-        chip::Dnssd::ParsePacket(data, this);
+        chip::Dnssd::ParseMdnsPacket(data, this);
         mCurSrc = nullptr;
     }
 

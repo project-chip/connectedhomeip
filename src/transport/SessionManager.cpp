@@ -963,13 +963,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         return;
     }
 
-    Transport::SecureSession * secureSession  = session.Value()->AsSecureSession();
-    Transport::PeerAddress mutablePeerAddress = peerAddress;
-    CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
-    }
+    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Associate the secure session with the connection, if not done already.
@@ -1070,6 +1064,17 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+
+        // Only a message with a new message counter may change the peer address: old messages can be
+        // captured and resent by anyone, and would otherwise let a third party choose where we send
+        // this session's traffic. If a peer changes its address, a retransmit from the new address
+        // therefore does not update it; its next new message does.
+        Transport::PeerAddress mutablePeerAddress = peerAddress;
+        CorrectPeerAddressInterfaceID(mutablePeerAddress);
+        if (secureSession->GetPeerAddress() != mutablePeerAddress)
+        {
+            secureSession->SetPeerAddress(mutablePeerAddress);
+        }
     }
 
     if (mCB != nullptr)

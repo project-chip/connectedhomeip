@@ -48,6 +48,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == ThermostatUserInterfaceConfiguration::Id)
     {
+        // TODO: Move this handling to ThermostatUserInterfaceConfiguration::Delegate::OnTemperatureDisplayModeChanged.
+        // The code-driven cluster no longer invokes MatterPostAttributeChangeCallback for attribute changes.
+        // See src/app/clusters/thermostat-user-interface-configuration-server/README.md for delegate registration.
         if (attributeId == ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id)
         {
             ChipLogDetail(Zcl, " set TemperatureDisplayMode: %u", *value);

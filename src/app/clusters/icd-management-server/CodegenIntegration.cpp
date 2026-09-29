@@ -57,23 +57,16 @@ public:
         constexpr ICDManagementCluster::OptionalCommandSet enabledCommands = kEnabledCommands();
 
         // Get UserActiveModeTriggerHint
-        BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefault(endpointId, &userActiveModeTriggerHint) !=
-            Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
-            userActiveModeTriggerHint.ClearAll();
-        }
+        BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+        Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefaultOr(
+            endpointId, userActiveModeTriggerHint, BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0));
 
         // Get UserActiveModeTriggerInstruction
-        char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
-        MutableCharSpan instructionSpan(instructionBuffer);
-
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefault(endpointId, instructionSpan) !=
-            Protocols::InteractionModel::Status::Success)
+        CharSpan instructionSpan;
+        if (optionalAttributeSet.IsSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id))
         {
-            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
-            instructionSpan = MutableCharSpan();
+            Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefaultOr(endpointId, instructionSpan,
+                                                                                                CharSpan());
         }
 
         gServer.Create(endpointId, *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(),

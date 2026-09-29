@@ -18,7 +18,24 @@ source_set("mounted-dimmable-load-control") {
   sources = [
     "MountedDimmableLoadControl.cpp",
     "MountedDimmableLoadControl.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
   ]
 
-  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load:logging" ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/dimmable-load:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+  ]
+}
+
+source_set("posix") {
+  sources = [
+    "NamedPipeTranslators.cpp",
+    "NamedPipeTranslators.h",
+  ]
+
+  public_deps = [
+    ":mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+  ]
 }

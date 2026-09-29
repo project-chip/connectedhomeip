@@ -16,11 +16,30 @@
  */
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
+#include <clusters/OperationalCredentials/Enums.h>
+#include <clusters/OperationalCredentials/Structs.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
 namespace chip {
 namespace Credentials {
+
+// Keep the provider's source-level names while sharing the generated enum definitions.
+// This changes ABI: profile bitmaps now use uint16_t, and document types use the
+// generated certificate values (DAC = 1, PAI = 2) instead of the former 0/1 values.
+using DeviceAttestationCertProfile       = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+using DeviceAttestationCertProfileBitmap = app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
+using DeviceAttestationDocumentType      = app::Clusters::OperationalCredentials::CertificateChainTypeEnum;
+
+// Each bitmap describes the corresponding certificate's subject public key capabilities,
+// not its issuer's signature algorithm or the profile of the chain containing it.
+// Phase 1 DAC keys (and device attestation signatures) remain ECDSA-P256.
+// Retain the provider type name; callers now use the generated PAA/PAI/DACSupportedProfiles field names.
+using DeviceAttestationProfileSupport = app::Clusters::OperationalCredentials::Structs::PQCDeviceAttestationProfileStruct::Type;
 
 class DeviceAttestationCredentialsProvider
 {
@@ -68,6 +87,14 @@ public:
     virtual CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) = 0;
 
     /**
+     * @brief Get the Device Attestation Certificate in DER format for a given stored chain profile.
+     *
+     * The default implementation serves the legacy Matter profile through
+     * GetDeviceAttestationCert() and reports unsupported profiles as not implemented.
+     */
+    virtual CHIP_ERROR GetDeviceAttestationCertForProfile(DeviceAttestationCertProfile profile, MutableByteSpan & out_dac_buffer);
+
+    /**
      * @brief Get the PAI Certificate in DER format. Updates `out_pai_buffer`'s
      *        size on success to match the data size. If no PAI certificate
      *        is available, sets `out_pai_buffer` to empty.
@@ -78,6 +105,55 @@ public:
      *          access fails.
      */
     virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) = 0;
+
+    /**
+     * @brief Get the PAI Certificate in DER format for a given stored chain profile.
+     *
+     * The default implementation serves the legacy Matter profile through
+     * GetProductAttestationIntermediateCert() and reports unsupported profiles as not implemented.
+     */
+    virtual CHIP_ERROR GetProductAttestationIntermediateCertForProfile(DeviceAttestationCertProfile profile,
+                                                                       MutableByteSpan & out_pai_buffer);
+
+    /**
+     * @brief Report which device attestation profiles are supported by this provider.
+     *
+     * The default implementation reports legacy Matter support for every attestation chain element.
+     */
+    virtual DeviceAttestationProfileSupport GetDeviceAttestationProfileSupport() const;
+
+    /**
+     * Select the strongest complete stored attestation chain for profile-aware requests.
+     * This is a storage selector, independent of each certificate's public key profile.
+     * Both PAI and DAC reads, including all segments, must use this same chain.
+     * Providers must keep the selection stable while commissioning is in progress.
+     *
+     * The legacy default preserves source compatibility for existing providers. Providers
+     * with multiple chains override this method based on their complete chain inventory.
+     */
+    virtual DeviceAttestationCertProfile GetPreferredDeviceAttestationChainProfile() const
+    {
+        return DeviceAttestationCertProfile::kEcdsaMatterLegacy;
+    }
+
+    /// Whether the provider reports a legacy chain and PQC PAA or PAI profiles, as required to enable PQC attestation.
+    bool HasRequiredPqcCredentials() const;
+
+    /**
+     * @brief Read one segment of a device attestation document for a given stored chain profile.
+     *
+     * `profile` selects a chain, not the requested certificate's public key algorithm.
+     * For example, an ML-DSA chain can contain an ECDSA PAI and DAC.
+     *
+     * On success, the implementation updates `out_document_buffer` to the bytes read starting at `offset` and sets
+     * `out_document_size` to the size of the complete document. Implementations backed by persistent storage should read only
+     * the requested segment into `out_document_buffer`.
+     *
+     * The default implementation supports legacy Matter documents at offset zero through the existing document getters.
+     */
+    virtual CHIP_ERROR GetDeviceAttestationDocumentSegment(DeviceAttestationDocumentType documentType,
+                                                           DeviceAttestationCertProfile profile, size_t offset,
+                                                           MutableByteSpan & out_document_buffer, size_t & out_document_size);
 
     /**
      * @brief Signs a message using the device attestation private key

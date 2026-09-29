@@ -40,6 +40,8 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -49,18 +51,29 @@
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
+#include <device/types/root-node/RootNodeWith.h>
+
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+#include <device/types/root-node/features/OtaFeature.h>
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <device/types/root-node/ThreadRootNode.h>
+#include <device/types/root-node/features/ThreadFeature.h>
 #include <platform/NetworkCommissioning.h>
 #endif
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <device/types/root-node/WifiRootNode.h>            // nogncheck
+#include <device/types/root-node/features/WifiFeature.h>    // nogncheck
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #endif
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+// gRequestorCore is defined in examples/platform/silabs/OTAConfig.cpp and drives the
+// OTA state machine that the OTARequestorCluster (composed by OtaFeature) forwards to.
+extern chip::DefaultOTARequestor gRequestorCore;
+#endif
 
 #define APP_FUNCTION_BUTTON 0
 
@@ -189,27 +202,46 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             chip::app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
+    // OTA Requestor is advertised on the silabs root endpoint when the OTA runtime is compiled in.
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+    chip::app::OtaFeature::Context otaContext{
+        .otaCommands = gRequestorCore,
+        .attributes  = chip::GetOTARequestorAttributes(),
+    };
 #if CHIP_ENABLE_OPENTHREAD
-    sRootNode = std::make_unique<chip::app::ThreadRootNode>(rootNodeContext,
-                                                            chip::app::ThreadRootNode::ThreadContext{
-                                                                .threadDriver = sThreadDriver,
-                                                            });
+    using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver },
+                                               otaContext);
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sRootNode = std::make_unique<chip::app::WifiRootNode>(
+    using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::OtaFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(
         rootNodeContext,
-        chip::app::WifiRootNode::WifiContext{
-            .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance(),
-        });
+        chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
+        otaContext);
+#else
+    using RootNodeType = chip::app::RootNodeWith<chip::app::OtaFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(rootNodeContext, otaContext);
+#endif
+#else // SILABS_OTA_ENABLED
+#if CHIP_ENABLE_OPENTHREAD
+    using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
+    sRootNode = std::make_unique<RootNodeType>(rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver });
+#elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature>;
+    sRootNode          = std::make_unique<RootNodeType>(
+        rootNodeContext,
+        chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() });
 #else
     sRootNode = std::make_unique<chip::app::RootNode>(rootNodeContext);
 #endif
+#endif // SILABS_OTA_ENABLED
 
     VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
     ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
 
-    chip::app::DeviceFactory::GetInstance().Init(chip::app::DeviceFactory::Context{
+    chip::app::NoHooksDeviceFactory::GetInstance().Init(chip::app::NoHooksDeviceFactory::Context{
         .groupDataProvider        = *groupDataProvider,
         .fabricTable              = chip::Server::GetInstance().GetFabricTable(),
         .timerDelegate            = sTimerDelegate,
@@ -223,7 +255,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .identifyDelegate         = sIdentifyDelegate,
     });
 
-    auto & deviceFactory = chip::app::DeviceFactory::GetInstance();
+    auto & deviceFactory = chip::app::NoHooksDeviceFactory::GetInstance();
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
 
@@ -234,11 +266,15 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         VerifyOrReturnError(sConstructedDeviceCount < sConstructedDevices.size(), CHIP_ERROR_NO_MEMORY);
-        auto device = deviceFactory.Create(type);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(device->Register(allocator, *sDataModelProvider));
+        auto created = deviceFactory.Create(type);
+        VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(created.device->Register(allocator, *sDataModelProvider));
+        if (created.onDeviceRegistered)
+        {
+            created.onDeviceRegistered();
+        }
         ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
-        sConstructedDevices[sConstructedDeviceCount++] = std::move(device);
+        sConstructedDevices[sConstructedDeviceCount++] = std::move(created.device);
         return CHIP_NO_ERROR;
     };
 

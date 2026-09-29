@@ -22,6 +22,7 @@ source_set("audio-control-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/AudioControl",

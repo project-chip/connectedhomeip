@@ -20,6 +20,13 @@
 #include <device/types/oven/Oven.h>
 #include <device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.h>
 
+#include <lib/support/CodeUtils.h>
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace chip::app {
 
 class LoggingOven : public Oven
@@ -28,13 +35,23 @@ public:
     struct Config
     {
         TemperatureControlledCabinetPart::Config cavityConfig;
+        uint8_t cavityCount = 1;
+        /// Semantic tags applied to the oven root endpoint descriptor (e.g. to
+        /// disambiguate variants under wildcard allocation). The tags are copied, so
+        /// the storage backing this span does not need to outlive the constructor call.
+        Span<const EndpointComposition::SemanticTag> tagList = {};
     };
 
     explicit LoggingOven(TimerDelegate & timerDelegate);
     LoggingOven(TimerDelegate & timerDelegate, Config config);
     ~LoggingOven() override = default;
 
-    LoggingTemperatureControlledCabinetPart & Cavity() { return mCavity; }
+    size_t GetCavityCount() const { return mCavities.size(); }
+    LoggingTemperatureControlledCabinetPart & GetCavity(size_t index)
+    {
+        VerifyOrDie(index < mCavities.size());
+        return *mCavities[index];
+    }
     LoggingCookSurfacePart & Surface() { return mSurface; }
 
 protected:
@@ -42,7 +59,12 @@ protected:
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    LoggingTemperatureControlledCabinetPart mCavity;
+    // Owned copy of Config::tagList: mTagList (consumed by the DescriptorCluster, which keeps
+    // only a view) points into it, so it must never be resized after the constructor.
+    std::vector<EndpointComposition::SemanticTag> mOwnedTags;
+    // Cavity names are owned here because the parts keep only a const char pointer to them.
+    std::vector<std::string> mCavityNames;
+    std::vector<std::unique_ptr<LoggingTemperatureControlledCabinetPart>> mCavities;
     LoggingCookSurfacePart mSurface;
 };
 
