@@ -278,6 +278,12 @@ public:
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
 
+    void UpdateOperationState(ICDManager::OperationalState state,
+                              ICDManager::CheckInMsgsPolicy policy = ICDManager::CheckInMsgsPolicy::kSendOnEnterActive)
+    {
+        mICDManager.UpdateOperationState(state, policy);
+    }
+
     TestSessionKeystoreImpl mKeystore;
     ICDManager mICDManager;
     TestSubscriptionsInfoProvider mSubInfoProvider;
@@ -2388,6 +2394,138 @@ TEST_F(TestICDManager, TestNetworkAttachSettleTimer_BroadcastSupersedesTargetedW
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+TEST_F(TestICDManager, TestColdBootImmediateCheckIn_ServerOrderSendsImmediatelyAndFlushesSettleTimer)
+{
+    // T1: Thread attaches before kServerReady. At kServerReady, TriggerCheckInMessages(kColdBoot)
+    // is called while already in ActiveMode (entered at attach for SRP clearance).
+    // Verify that kColdBoot sends exactly 1 Check-In immediately (via kForce) and keeps the 45s settle delay active.
+    mICDManager.Shutdown();
+    mICDManager.RegisterObserver(&mICDStateObserver);
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+    mICDManager.Init();
+    mICDStateObserver.ResetAll();
+    mICDManager.SetNetworkAttachSettleDelay(Seconds32(45));
+
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+    ICDMonitoringEntry entry(&(mKeystore));
+    entry.checkInNodeID    = kClientNodeId11;
+    entry.monitoredSubject = kClientNodeId11;
+    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
+
+    // Thread is detached initially, and work is pending
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+
+    // Thread attaches: enters ActiveMode with kSkip for SRP clearance
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+    DeviceLayer::ChipDeviceEvent attachEvent{ .Type                     = DeviceLayer::DeviceEventType::kThreadConnectivityChange,
+                                              .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
+    HandlePlatformEvent(&attachEvent);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 0u);
+
+    // kServerReady fires and invokes TriggerCheckInMessages(kColdBoot) while already in ActiveMode
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 1u);
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+
+    // SignalServerReady starts the 45s settle timer
+    SignalServerReady();
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+
+    // ActiveMode duration expires long before 45s settle timer
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() +
+                                ICDConfigurationData::GetInstance().GetActiveModeThreshold() + 1_ms32);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+
+    // Settle timer fires at 45s and flushes replay (second Check-In)
+    AdvanceClockAndRunEventLoop(Seconds32(45));
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 2u);
+
+    EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+}
+
+TEST_F(TestICDManager, TestColdBootImmediateCheckIn_AlreadyActiveSendsForcedCheckIn)
+{
+    // T2: Device is already in ActiveMode WITH a prior Check-In sent (e.g. from transition from IdleMode).
+    // Invoking TriggerCheckInMessages(kColdBoot) sends exactly one more (forced) Check-In (+1).
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+    ICDMonitoringEntry entry(&(mKeystore));
+    entry.checkInNodeID    = kClientNodeId11;
+    entry.monitoredSubject = kClientNodeId11;
+    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
+
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+
+    // Enter ActiveMode from IdleMode with default policy (kSendOnEnterActive), sending 1 Check-In
+    mICDManager.ResetCheckInMessagesSentCount();
+    UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 1u);
+
+    // Call TriggerCheckInMessages with kColdBoot while already Active -> forced Check-In (+1)
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 2u);
+
+    EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+}
+
+TEST_F(TestICDManager, TestRuntimeTriggerWhileActiveDoesNotSendCheckIn)
+{
+    // A non-kColdBoot (runtime) TriggerCheckInMessages while already in ActiveMode must respect
+    // the IdleMode guard and send nothing (0 extra Check-In messages).
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+    ICDMonitoringEntry entry(&(mKeystore));
+    entry.checkInNodeID    = kClientNodeId11;
+    entry.monitoredSubject = kClientNodeId11;
+    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
+
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+
+    // Enter ActiveMode with kSkip
+    mICDManager.ResetCheckInMessagesSentCount();
+    UpdateOperationState(ICDManager::OperationalState::ActiveMode, ICDManager::CheckInMsgsPolicy::kSkip);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 0u);
+
+    // Call TriggerCheckInMessages with kRuntime while already Active -> IdleMode guard rejects, sends nothing
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kRuntime);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 0u);
+
+    EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CONFIG_BUILD_FOR_HOST_UNIT_TEST &&
        // CHIP_DEVICE_CONFIG_ENABLE_THREAD

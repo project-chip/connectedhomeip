@@ -129,6 +129,9 @@ void ICDManager::Shutdown()
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     mIsBootUpResumeSubscriptionExecuted = false;
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    mCheckInMessagesSentCount = 0;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
@@ -237,6 +240,8 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
             }
         }
     }
+#else
+    mCheckInMessagesSentCount++;
 #endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
@@ -389,22 +394,27 @@ void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeS
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
-    // Only trigger Check-In messages when we are in IdleMode.
-    // If we are already in ActiveMode, Check-In messages have already been sent.
-    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
-
     // If we don't have any Check-In messages to send, do nothing
     VerifyOrReturn(CheckInMessagesWouldBeSent(verifier));
 
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && reason == CheckInTriggerReason::kColdBoot)
     {
-        // On cold boot, enter ActiveMode immediately below for its threshold duration and
-        // latch mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the settle timer
+        // On cold boot, latch mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the settle timer
         // once both Thread attachment and kServerReady complete.
         mPendingActiveModeOnNetworkAttach = true;
+
+        // At kServerReady, a Check-In sent earlier in this ActiveMode window was sent before DNS-SD was ready
+        // (or not at all, for the SRP entry), so re-sending once via kForce is correct. The cost is at most
+        // one extra Check-In per boot.
+        UpdateOperationState(OperationalState::ActiveMode, CheckInMsgsPolicy::kForce);
+        return;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    // Only trigger Check-In messages when we are in IdleMode.
+    // If we are already in ActiveMode, Check-In messages have already been sent.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
 
     UpdateOperationState(OperationalState::ActiveMode);
 }
@@ -460,8 +470,11 @@ void ICDManager::UpdateICDMode()
     }
 }
 
-void ICDManager::UpdateOperationState(OperationalState state, bool sendCheckInMsgs)
+void ICDManager::UpdateOperationState(OperationalState state, CheckInMsgsPolicy policy)
 {
+#if !CHIP_CONFIG_ENABLE_ICD_CIP
+    IgnoreUnusedVariable(policy);
+#endif // !CHIP_CONFIG_ENABLE_ICD_CIP
     assertChipStackLockedByCurrentThread();
     // Active mode can be re-triggered.
     VerifyOrReturn(mOperationalState != state || state == OperationalState::ActiveMode);
@@ -543,7 +556,7 @@ void ICDManager::UpdateOperationState(OperationalState state, bool sendCheckInMs
             }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            if (sendCheckInMsgs)
+            if (policy != CheckInMsgsPolicy::kSkip)
             {
                 SendCheckInMsgs();
             }
@@ -554,6 +567,12 @@ void ICDManager::UpdateOperationState(OperationalState state, bool sendCheckInMs
         else
         {
             ExtendActiveMode(configData.GetActiveModeThreshold());
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+            if (policy == CheckInMsgsPolicy::kForce)
+            {
+                SendCheckInMsgs();
+            }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
         }
     }
 }
@@ -882,7 +901,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
         // for kServerReady or the settle delay.
         ChipLogProgress(AppServer,
                         "ICDManager: Entering/Extending ActiveMode for SRP before flushing deferred network attach actions.");
-        UpdateOperationState(OperationalState::ActiveMode, false /* sendCheckInMsgs */);
+        UpdateOperationState(OperationalState::ActiveMode, CheckInMsgsPolicy::kSkip);
     }
 
     // On cold boot, wait for kServerReady (emitted after initial SRP host clearance) before starting the settle timer.
