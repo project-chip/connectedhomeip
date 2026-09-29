@@ -23,6 +23,7 @@ config("absl_public_config") {
   cflags = [
     "-Wno-gcc-compat",
     "-Wno-nullability-extension",
+    "-Wno-deprecated-attributes",
   ]
   if (chip_abseil_cpp_dir != "") {
     include_dirs = [ chip_abseil_cpp_dir ]
