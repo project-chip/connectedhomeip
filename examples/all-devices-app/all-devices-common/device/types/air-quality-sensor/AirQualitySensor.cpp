@@ -78,7 +78,7 @@ ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clu
     return ConcentrationMeasurementCluster::Config{
         .clusterId   = clusterId,
         .features    = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement, Feature::kAverageMeasurement,
-                                         Feature::kLevelIndication),
+                                      Feature::kLevelIndication),
         .medium      = MeasurementMediumEnum::kAir,
         .unit        = unit,
         .minMeasured = DataModel::MakeNullable(0.0f),
