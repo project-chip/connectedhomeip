@@ -124,7 +124,8 @@ void DimmableLoad::Unregister(CodeDrivenDataModelProvider & provider)
     //
     // Phase 1 (Disconnection): Remove all delegates and unregister from all shared lists/tables
     // while all cluster objects are still fully constructed and valid. This prevents any
-    // use-after-free or dangling pointer access (e.g. OnOff-Level coupling delegates) during destruction.
+    // use-after-free or dangling pointer access (e.g. scene handlers) during destruction.
+    // Level Control unlinks from On/Off in its own Shutdown().
     //
     // Phase 2 (Destruction): Once fully disconnected, the cluster objects can be safely destroyed
     // in any order.

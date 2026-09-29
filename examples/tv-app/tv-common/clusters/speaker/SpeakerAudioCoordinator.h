@@ -44,17 +44,16 @@ namespace chip::app::Clusters::Speaker {
 //   * PhysicallyMuted has no On/Off representation and is left alone.
 //
 // Ownership: the coordinator OWNS the three code-driven clusters -- it constructs them in its
-// constructor (from Config) and destroys them in its destructor, and is fully wired once the
-// constructor returns (every GetXxx()/XxxRegistration() accessor stays valid for its lifetime;
-// no further setup, no interior null state). The owner (tv-app: InitSpeaker() in
+// constructor (from Config) and destroys them in its destructor. Every GetXxx()/XxxRegistration()
+// accessor stays valid for its lifetime (no interior null state). The owner (tv-app: InitSpeaker() in
 // SpeakerEndpoint.cpp) only drives registration: pass XxxRegistration() to the registry after
 // construction and &GetXxx() to Unregister() before destruction, registering Audio Control
 // last so its Startup() -> OnStartup() reconcile sees the other two started.
 //
-// LevelControlCluster::Config::WithOnOffCluster links On/Off and registers Level Control as an
-// On/Off delegate on Startup(). On/Off/Toggle commands move CurrentLevel through MinLevel and
-// notify OnLevelChanged(), which updates AudioControl.Volume. OnLevel is NULL so CurrentLevel and
-// Volume return to their pre-off values after an Off transition.
+// LevelControlCluster::Config::WithOnOffCluster links On/Off. Level Control subscribes to On/Off
+// changes in its Startup() and unsubscribes in Shutdown(). On/Off/Toggle commands move CurrentLevel
+// through MinLevel and notify OnLevelChanged(), which updates AudioControl.Volume. OnLevel is NULL so
+// CurrentLevel and Volume return to their pre-off values after an Off transition.
 //
 // No On/Off or Level Control cluster code is changed: only their public methods are called,
 // and Volume is written back via AudioControl.SetVolume()/SetSoftMuted() (which report but

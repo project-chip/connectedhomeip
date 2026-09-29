@@ -45,7 +45,7 @@ namespace chip::app::Clusters {
  * - Scenes.
  * - RemainingTime reporting.
  */
-class LevelControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, public OnOffDelegate
+class LevelControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, private OnOffDelegate
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
@@ -61,10 +61,11 @@ public:
     constexpr static uint8_t kLightingMinLevel = 1;
     constexpr static uint8_t kMaxLevel         = 254;
 
-    enum class OnOffSetting : uint8_t
+    /// Selects the OnOff (OO) feature. Used by Config::WithOnOffCluster().
+    enum class OnOffFeature : uint8_t
     {
-        kAdvertiseFeature,      ///< FeatureMap has OO. OnOff changes move CurrentLevel through MinLevel.
-        kDoNotAdvertiseFeature, ///< FeatureMap lacks OO. OnOff changes do not change CurrentLevel.
+        kEnabled,  ///< FeatureMap has OO. On/Off commands fade CurrentLevel through MinLevel.
+        kDisabled, ///< FeatureMap lacks OO. On/Off commands do not change CurrentLevel.
     };
 
     struct Config
@@ -72,28 +73,37 @@ public:
         Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        /// Links the On/Off cluster on the same endpoint.
+        /// Links the On/Off cluster on the same endpoint. Call this whenever the endpoint has one.
+        /// A second call replaces the first.
         ///
-        /// Both modes:
-        /// - *WithOnOff commands set OnOff to TRUE when raising CurrentLevel and to FALSE when
-        ///   CurrentLevel reaches MinLevel.
-        /// - MoveToLevel/Move/Step/Stop do nothing while OnOff is FALSE unless ExecuteIfOff is set.
+        /// Both values:
+        /// - *WithOnOff commands set OnOff to TRUE before raising CurrentLevel above MinLevel, and
+        ///   to FALSE when CurrentLevel reaches MinLevel.
+        /// - MoveToLevel/Move/Step/Stop are ignored while OnOff is FALSE, unless ExecuteIfOff is set
+        ///   in Options (SetOptions(); starts at 0, not persisted) or in the command
+        ///   OptionsMask/OptionsOverride.
         ///
-        /// kAdvertiseFeature:
-        /// - Sets Feature::kOnOff and registers this cluster as an OnOffDelegate on Startup().
-        /// - Off moves CurrentLevel to MinLevel (and restores the pre-off level when OnLevel is null);
-        ///   On moves CurrentLevel from MinLevel to OnLevel (or the pre-off level).
-        /// - Examples: dimmable light (fades off/on); TV speaker with OnLevel null (ramps volume on
-        ///   mute/unmute while keeping the pre-mute level).
+        /// kEnabled (default):
+        /// - Startup() subscribes to On/Off changes; Shutdown() unsubscribes.
+        /// - Off: fade to MinLevel, then return to the pre-Off level if OnLevel is null.
+        /// - On: start at MinLevel, fade to OnLevel, or to CurrentLevel if OnLevel is null.
+        /// - Examples: dimmable light (device type requires OO); TV speaker with OnLevel null
+        ///   (volume ramps on mute/unmute, pre-mute level kept).
         ///
-        /// kDoNotAdvertiseFeature:
-        /// - Clears Feature::kOnOff. OnOff changes do not modify CurrentLevel.
-        /// - Examples: pump/fan (Off stops the motor, speed setpoint stays); amplifier with a
-        ///   motorized volume knob (mute uses a relay, knob does not move).
-        Config & WithOnOffCluster(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
+        /// kDisabled:
+        /// - On/Off commands do not change CurrentLevel. OnLevel, OnTransitionTime and
+        ///   OffTransitionTime have no effect.
+        /// - Example: amplifier with a motorized volume knob; mute uses a relay, knob does not move.
+        ///
+        /// Why one call with a parameter: the spec uses two different conditions.
+        /// - On/Off cluster present: suppression while Off, and OnOff side effects of *WithOnOff.
+        /// - OO bit set: effect of On/Off commands on CurrentLevel.
+        /// - ExecuteIfOff is only conformant with OO or Lighting, but suppression applies without OO.
+        /// - Options is "meant to be changed only during commissioning" but is not a persisted (N) attribute.
+        Config & WithOnOffCluster(OnOffCluster & onOffCluster, OnOffFeature feature = OnOffFeature::kEnabled)
         {
             mOnOffCluster = &onOffCluster;
-            mFeatureMap.Set(LevelControl::Feature::kOnOff, setting == OnOffSetting::kAdvertiseFeature);
+            mFeatureMap.Set(LevelControl::Feature::kOnOff, feature == OnOffFeature::kEnabled);
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
@@ -183,10 +193,6 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    // OnOffDelegate Implementation
-    void OnOffStartup(bool on) override;
-    void OnOnOffChanged(bool on) override;
-
     // Cluster Public API
     void SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
     void SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel);
@@ -243,6 +249,10 @@ public:
                           scenes::TransitionTimeMs timeMs) override;
 
 private:
+    // OnOffDelegate. Registered in Startup() only with Feature::kOnOff.
+    void OnOffStartup(bool on) override;
+    void OnOnOffChanged(bool on) override;
+
     enum class ReportingMode
     {
         kForceReport,

@@ -97,11 +97,6 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    if (mOnOffCluster != nullptr && mFeatureMap.Has(Feature::kOnOff))
-    {
-        mOnOffCluster->AddDelegate(this);
-    }
-
     AttributePersistence attributePersistence(context.attributeStorage);
 
     // 1. Determine the initial value for CurrentLevel
@@ -140,6 +135,11 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
     if (!mCurrentLevel.value().IsNull())
     {
         mDelegate.OnLevelChanged(mCurrentLevel.value().Value());
+    }
+
+    if (mOnOffCluster != nullptr && mFeatureMap.Has(Feature::kOnOff))
+    {
+        mOnOffCluster->AddDelegate(this);
     }
 
     return CHIP_NO_ERROR;
@@ -825,7 +825,6 @@ void LevelControlCluster::TransitionHandler::TimerFired()
 
 void LevelControlCluster::OnOnOffChanged(bool isOn)
 {
-    VerifyOrReturn(mFeatureMap.Has(Feature::kOnOff));
     VerifyOrReturn(!mCurrentLevel.value().IsNull() && !mTemporarilyIgnoreOnOffCallbacks);
 
     if (isOn)
