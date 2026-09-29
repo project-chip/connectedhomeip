@@ -880,7 +880,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         {
             ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
             return Status::ConstraintError;
-        }        
+        }
     }
 
     // At least one of Video Stream ID, Audio Stream ID, AudioStreamID or VideoStreams has to be present
@@ -973,7 +973,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     else
     {
         // WebRTCSessionID is null - new session request
-        
+
         // Both stream usage and endpoint ID are mandated in this case. Verify their presence.
         if ((!req.streamUsage.HasValue()) || (!req.originatingEndpointID.HasValue()))
         {
