@@ -72,12 +72,12 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
 
     // Setup initial values
     mLocalTemperature.SetNonNull(kInitialTemperature);
-    mHeatingEnabled         = true;
-    mBoostState             = BoostStateEnum::kInactive;
-    mBoostRemainingTime     = 0;
-    mBoostOneShot           = false;
+    mHeatingEnabled     = true;
+    mBoostState         = BoostStateEnum::kInactive;
+    mBoostRemainingTime = 0;
+    mBoostOneShot       = false;
     mBoostTemporarySetpoint.reset();
-    mHeatDemand             = mHeaterTypes;
+    mHeatDemand = mHeaterTypes;
 
     WaterHeaterModeCluster().UpdateCurrentMode(kWaterHeaterModeManual);
     ThermostatCluster().SetLocalTemperature(mLocalTemperature);
@@ -129,9 +129,9 @@ void SimulatedWaterHeater::TimerFired()
     }
 
     const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-    const temperature target = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.has_value())
-        ? mBoostTemporarySetpoint.value()
-        : mOccupiedHeatingSetpoint;
+    const temperature target      = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.has_value())
+             ? mBoostTemporarySetpoint.value()
+             : mOccupiedHeatingSetpoint;
 
     // Handle heating
     if (mHeatingEnabled)

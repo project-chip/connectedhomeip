@@ -112,9 +112,8 @@ private:
     // Thermostat attributes
     Clusters::Thermostat::ControlSequenceOfOperationEnum mControlSequenceOfOperation =
         Clusters::Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly;
-    Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
-    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature =
-        DataModel::MakeNullable(kInitialTemperature);
+    Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;
+    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::MakeNullable(kInitialTemperature);
     Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = kFinalTemperature;
 };
 
