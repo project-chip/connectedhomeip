@@ -36,17 +36,19 @@ def setup_logging(verbose=False):
 def get_platform_vars():
     """Set platform-specific variables and URLs for SLT CLI download. Linux and macOS only."""
     platform = sys.platform
-    host_arch = "x64"
     if platform == "darwin":
         platform_name = "mac"
-        host_arch = "arm64" if machine() == "arm64" else "x64"
+        slt_os = "darwin"
+        slt_arch = "arm64" if machine() == "arm64" else "amd64"
     elif platform == "linux":
         platform_name = "linux"
+        slt_os = "linux"
+        slt_arch = "amd64"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{host_arch}.zip"
+    slt_cli_url = f"https://updates.silabs.com/studio/v6/updates/tools/slt/slt-cli_{slt_os}_{slt_arch}.zip"
     return platform_name, slt_cli_url
 
 
