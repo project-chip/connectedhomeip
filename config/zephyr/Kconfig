@@ -62,11 +62,22 @@ config CHIP_DEVICE_VENDOR_ID
 	  an attribute of the Basic Informationcluster, and included in the header
 	  of the generated Matter Over-the-air (OTA) update image.
 
+<<<<<<< HEAD
 config CHIP_DEVICE_VENDOR_NAME
 	string "Device vendor name"
 	help
 	  Provides a human-readable name of the device manufacturer. The name is
 	  exposed as an attribute of the Basic Information cluster.
+=======
+config CHIP_DATA_MODEL_CODEDRIVEN
+	bool "Code-driven data model provider"
+	help
+	  Builds the code-driven data model provider into the Matter library. Select
+	  this when the application registers clusters and endpoints at run time
+	  instead of using the ZAP generated data model.
+
+if OPENTHREAD
+>>>>>>> 0cf1b49 ([all-device-app][Zephyr] Zephyr all-device app 2/3 Config and Build Files (#73899))
 
 config CHIP_DEVICE_PRODUCT_ID
 	int "Product ID"

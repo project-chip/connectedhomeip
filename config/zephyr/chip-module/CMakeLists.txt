@@ -42,6 +42,23 @@ if(CONFIG_CHIP)
     # Get common Cmake sources
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
+<<<<<<< HEAD
+=======
+    include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
+
+    # Defines chip_ota_image(), which applications call to package their binary.
+    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+        include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
+    endif()
+
+    # Prepare compiler flags
+
+    # CHIP_CFLAGS can be optionally defined by the application to pass additional
+    # C flags to the CHIP GN build system
+    if (CHIP_CFLAGS)
+        matter_add_flags("${CHIP_CFLAGS}")
+    endif()
+>>>>>>> 0cf1b49 ([all-device-app][Zephyr] Zephyr all-device app 2/3 Config and Build Files (#73899))
 
     if(CONFIG_POSIX_API)
         matter_add_flags(-D_DEFAULT_SOURCE)
@@ -51,6 +68,29 @@ if(CONFIG_CHIP)
     if(CONFIG_MBEDTLS)
         zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
         zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
+<<<<<<< HEAD
+=======
+
+        if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
+            zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
+        endif()
+
+        # Put the NXP accel header (Kconfig.defaults TF_PSA_CRYPTO_USER_CONFIG_FILE)
+        # on the include path so tf-psa-crypto can find it. SGI-PKC gate keeps
+        # non-NXP targets unaffected.
+        if(CONFIG_PSA_CRYPTO_DRIVER_SGI_PKC)
+            zephyr_include_directories(${CHIP_ROOT}/config/nxp/chip-module)
+        endif()
+    endif()
+
+
+    # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
+    # so its priority is forced to cooperative to prevent starvation.
+    if(CONFIG_SOC_FAMILY_NXP_RW)
+        if(DEFINED CONFIG_NUM_COOP_PRIORITIES AND CONFIG_NUM_COOP_PRIORITIES GREATER 0)
+            zephyr_compile_definitions(IMU_TASK_PRIORITY=-1)
+        endif()
+>>>>>>> 0cf1b49 ([all-device-app][Zephyr] Zephyr all-device app 2/3 Config and Build Files (#73899))
     endif()
 
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
@@ -60,7 +100,7 @@ if(CONFIG_CHIP)
     zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
     matter_add_cxxflags("${ZEPHYR_GNU_CPP_STD}")
 
-    # Set up custom OpenThread configuration
+        # Set up custom OpenThread configuration
     if(CONFIG_CHIP_OPENTHREAD_CONFIG)
         get_filename_component(CHIP_OPENTHREAD_CONFIG
             ${CONFIG_CHIP_OPENTHREAD_CONFIG}
@@ -79,6 +119,10 @@ if(CONFIG_CHIP)
         LIB_TESTS CONFIG_CHIP_BUILD_TESTS
         PROJECT_CONFIG ${CONFIG_CHIP_PROJECT_CONFIG}
     )
+
+    if(CONFIG_CHIP_OTA_REQUESTOR)
+        matter_add_gn_arg_bool("chip_enable_ota_requestor" TRUE)
+    endif()
 
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
@@ -138,5 +182,43 @@ if(CONFIG_CHIP)
         LIB_TESTS ${CONFIG_CHIP_BUILD_TESTS}
         GN_DEPENDENCIES kernel
     )
+<<<<<<< HEAD
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
+=======
+
+    set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
+
+    target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+    include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+    chip_enable_gnu_std(chip)
+
+    # //src/data-model-providers/codedriven is a GN source_set and is not part of
+    # libCHIP.a, so the module compiles the code-driven provider itself.
+    if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        zephyr_library_named(chip_codedriven_data_model)
+        target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
+            ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
+        )
+        target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+    endif()
+
+    if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
+        target_link_options(chip INTERFACE
+            -Wl,--wrap=malloc
+            -Wl,--wrap=calloc
+            -Wl,--wrap=realloc
+            -Wl,--wrap=free
+            -Wl,--wrap=_malloc_r
+            -Wl,--wrap=_calloc_r
+            -Wl,--wrap=_realloc_r
+            -Wl,--wrap=_free_r
+        )
+    endif()
+>>>>>>> 0cf1b49 ([all-device-app][Zephyr] Zephyr all-device app 2/3 Config and Build Files (#73899))
 endif() # CONFIG_CHIP
