@@ -76,6 +76,7 @@ if (chip_build_tests) {
     ]
     test_sources = [
       "TestBasicPacketFilters.cpp",
+      "TestIPv6Datagram.cpp",
       "TestInetAddress.cpp",
       "TestInetErrorStr.cpp",
     ]

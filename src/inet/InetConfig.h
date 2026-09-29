@@ -140,6 +140,25 @@
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 /**
+ *  @def INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+ *
+ *  @brief
+ *    Defines whether (1) or not (0) UDP endpoints report peer port-unreachable errors. Supported on Linux sockets
+ *    (IPV6_RECVERR) and on OpenThread endpoints; on by default only for Linux sockets.
+ */
+#ifndef INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__linux__)
+#define INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE             1
+#else
+#define INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE             0
+#endif
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE && CHIP_SYSTEM_CONFIG_USE_SOCKETS && !defined(__linux__)
+#error "INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE on sockets requires Linux"
+#endif
+
+/**
  *  @def INET_CONFIG_ENABLE_UDP_ENDPOINT
  *
  *  @brief
