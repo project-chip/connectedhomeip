@@ -158,7 +158,8 @@ public:
     {}
 
     AirQualitySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate,
-                     EndpointComposition::SemanticTag tag) : AirQualitySensor(timerDelegate, identifyDelegate, Config{}, tag)
+                     EndpointComposition::SemanticTag tag) :
+        AirQualitySensor(timerDelegate, identifyDelegate, Config{}, tag)
     {}
 
     ~AirQualitySensor() override = default;
