@@ -304,7 +304,7 @@
 	url = https://github.com/google/fuzztest.git
 	platforms = linux,darwin
 [submodule "third_party/googletest"]
-	path = third_party/googletest/repo
+	path = third_party/googletest
 	url = https://github.com/google/googletest
 	platforms = linux,android,darwin,tizen
 [submodule "third_party/libdatachannel/repo"]
