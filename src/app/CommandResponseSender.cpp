@@ -237,12 +237,13 @@ size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
     auto sessionHandle = mExchangeCtx->GetSessionHandle();
     if (sessionHandle->AllowsLargePayload())
     {
-        // Clamp to the session's negotiated MaxTCPPayloadSize (or the legacy default if unadvertised)
+        // Clamp to the session negotiated MaxTCPPayloadSize (or legacy default)
         // to ensure the encoded command response does not exceed the limit enforced by SessionManager::PrepareMessage.
+        // Also clamp to PacketBuffer::kMaxAllocSize in case large packet buffers are not supported.
         uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
         size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
         size_t limit        = std::min<size_t>(remoteLimit, kMaxLargeAppMessageLen);
-        return limit + kMaxTagLen;
+        return std::min<size_t>(limit + kMaxTagLen, System::PacketBuffer::kMaxAllocSize);
     }
 
     return kMaxSecureSduLengthBytes;

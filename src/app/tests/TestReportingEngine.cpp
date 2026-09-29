@@ -253,6 +253,9 @@ public:
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePayload)
 {
+#if !INET_CONFIG_ENABLE_TCP_ENDPOINT
+    GTEST_SKIP() << "TCP endpoint / large packet buffers disabled on this platform.";
+#else
     LargeReportDataModel largeDataModel;
     InteractionModelEngine::GetInstance()->SetDataModelProvider(&largeDataModel);
 
@@ -341,6 +344,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
     session->SetRemoteSessionParameters(origParams);
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
     InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)
