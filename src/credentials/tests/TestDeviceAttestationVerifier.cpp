@@ -260,8 +260,8 @@ TEST_F(TestDeviceAttestationVerifier, VerifyAttestationInformationRejectsUnsuppo
     ArrayAttestationTrustStore trustStore(certSpans, 1);
     DefaultDACVerifier verifier(&trustStore);
 
-    DeviceAttestationVerifier::AttestationInfo pqcInfo(ByteSpan(testData), ByteSpan(testData), ByteSpan(testData),
-                                                       ByteSpan(testData), ByteSpan(testData), ByteSpan(testData), VendorId(0x1234),
+    ByteSpan testSpan(testData);
+    DeviceAttestationVerifier::AttestationInfo pqcInfo(testSpan, testSpan, testSpan, testSpan, testSpan, testSpan, VendorId(0x1234),
                                                        0x5678, DeviceAttestationCertProfile::kMlDsa44);
 
     AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
@@ -361,9 +361,10 @@ TEST_F(TestDeviceAttestationVerifier, LegacyRequestProfileStillChecksMlDsaPaaCap
     const ByteSpan certSpans[] = { ByteSpan(data) };
     ArrayAttestationTrustStore trustStore(certSpans, 1);
     DefaultDACVerifier verifier(&trustStore);
-    DeviceAttestationVerifier::AttestationInfo info(ByteSpan(data), ByteSpan(data), ByteSpan(data),
-                                                    ByteSpan(pai.data(), pai.size()), ByteSpan(data), ByteSpan(data),
-                                                    VendorId(0xFFF1), 0x8000, DeviceAttestationCertProfile::kEcdsaMatterLegacy);
+    const ByteSpan dataSpan(data);
+    DeviceAttestationVerifier::AttestationInfo info(dataSpan, dataSpan, dataSpan, ByteSpan(pai.data(), pai.size()), dataSpan,
+                                                    dataSpan, VendorId(0xFFF1), 0x8000,
+                                                    DeviceAttestationCertProfile::kEcdsaMatterLegacy);
     AttestationVerificationResult result = AttestationVerificationResult::kInternalError;
     Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> callback(
         [](void * context, const DeviceAttestationVerifier::AttestationInfo &, AttestationVerificationResult verificationResult) {

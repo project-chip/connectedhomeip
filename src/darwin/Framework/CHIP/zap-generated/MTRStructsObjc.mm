@@ -3401,36 +3401,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRGroupKeyManagementClusterGroupcastAdoptionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupcastAdopted = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRGroupKeyManagementClusterGroupcastAdoptionStruct alloc] init];
-
-    other.groupcastAdopted = self.groupcastAdopted;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupcastAdopted:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupcastAdopted, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRFixedLabelClusterLabelStruct
 - (instancetype)init
 {
