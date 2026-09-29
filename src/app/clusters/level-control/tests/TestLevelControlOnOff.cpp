@@ -573,7 +573,7 @@ TEST_F(TestLevelControlOnOff, TestStopWithOnOffWhileOffWithNullCurrentLevel)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate).WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

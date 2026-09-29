@@ -693,7 +693,7 @@ TEST_F(TestLevelControlBase, TestCurrentLevelPersistence)
 // CurrentLevel defaults to null. Stop on a cluster that never had a level set must leave it null.
 TEST_F(TestLevelControlBase, TestStopWithNullCurrentLevel)
 {
-    LevelControlCluster cluster{ kTestEndpointId, LevelControlCluster::Config(mockTimer, mockDelegate) };
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
