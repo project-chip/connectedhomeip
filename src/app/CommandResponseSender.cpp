@@ -234,9 +234,13 @@ size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
         return kMaxSecureSduLengthBytes;
     }
 
-    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    auto sessionHandle = mExchangeCtx->GetSessionHandle();
+    if (sessionHandle->AllowsLargePayload())
     {
-        return kMaxLargeSecureSduLengthBytes;
+        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
+        return limit + kMaxTagLen;
     }
 
     return kMaxSecureSduLengthBytes;

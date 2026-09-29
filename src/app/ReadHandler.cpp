@@ -935,7 +935,10 @@ size_t ReadHandler::GetReportBufferMaxSize()
     Transport::SecureSession * session = GetSession();
     if (session && session->AllowsLargePayload())
     {
-        return kMaxLargeSecureSduLengthBytes;
+        uint32_t maxPayload = session->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
+        return limit + kMaxTagLen;
     }
     return kMaxSecureSduLengthBytes;
 }
