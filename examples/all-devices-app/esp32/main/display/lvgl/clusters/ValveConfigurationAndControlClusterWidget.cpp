@@ -177,26 +177,28 @@ lv_obj_t * CreateValveConfigurationAndControlClusterWidget(lv_obj_t * parent, Va
         lv_obj_set_width(levelSlider, LV_PCT(96));
         lv_slider_set_range(levelSlider, kMinLevel, kMaxLevel);
         lv_slider_set_value(levelSlider, cluster.GetDefaultOpenLevel(), LV_ANIM_OFF);
-        UpdateTargetLevelLabel(levelLabel, cluster.GetDefaultOpenLevel());
+        UpdateTargetLevelLabel(levelLabel, SnapToLevelStep(cluster.GetDefaultOpenLevel(), cluster.GetLevelStep()));
 
         // The slider only picks the level the next Open command uses, so nothing is sent while it
-        // moves; the label tracks the knob.
+        // moves; the label tracks the snapped level.
+        lv_obj_set_user_data(levelSlider, levelLabel);
         lv_obj_add_event_cb(
             levelSlider,
             [](lv_event_t * event) {
-                auto * slider = static_cast<lv_obj_t *>(lv_event_get_target(event));
-                auto * label  = static_cast<lv_obj_t *>(lv_event_get_user_data(event));
-                UpdateTargetLevelLabel(label, static_cast<uint8_t>(lv_slider_get_value(slider)));
+                auto * clusterPtr = static_cast<ValveConfigurationAndControlCluster *>(lv_event_get_user_data(event));
+                auto * slider     = static_cast<lv_obj_t *>(lv_event_get_target(event));
+                auto * label      = static_cast<lv_obj_t *>(lv_obj_get_user_data(slider));
+                UpdateTargetLevelLabel(
+                    label, SnapToLevelStep(static_cast<uint8_t>(lv_slider_get_value(slider)), clusterPtr->GetLevelStep()));
             },
-            LV_EVENT_VALUE_CHANGED, levelLabel);
+            LV_EVENT_VALUE_CHANGED, &cluster);
     }
 
     lv_obj_t * buttonRow = CreateButtonRow(card);
     lv_obj_t * openBtn   = CreateActionButton(buttonRow, "Open", LV_PALETTE_GREEN);
     lv_obj_t * closeBtn  = CreateActionButton(buttonRow, "Close", LV_PALETTE_RED);
 
-    // The Open command carries no duration: the valve stays open until it is closed from the
-    // display or over the network.
+    // The Open command uses the cluster's DefaultOpenDuration (which is null unless configured).
     lv_obj_set_user_data(openBtn, levelSlider);
     lv_obj_add_event_cb(
         openBtn,
@@ -212,8 +214,9 @@ lv_obj_t * CreateValveConfigurationAndControlClusterWidget(lv_obj_t * parent, Va
                     SnapToLevelStep(static_cast<uint8_t>(lv_slider_get_value(slider)), clusterPtr->GetLevelStep()));
             }
 
-            DeviceLayer::SystemLayer().ScheduleLambda(
-                [clusterPtr, targetLevel]() { LogErrorOnFailure(clusterPtr->OpenValve(targetLevel, DataModel::NullNullable)); });
+            DeviceLayer::SystemLayer().ScheduleLambda([clusterPtr, targetLevel]() {
+                LogErrorOnFailure(clusterPtr->OpenValve(targetLevel, clusterPtr->GetDefaultOpenDuration()));
+            });
         },
         LV_EVENT_CLICKED, &cluster);
 
