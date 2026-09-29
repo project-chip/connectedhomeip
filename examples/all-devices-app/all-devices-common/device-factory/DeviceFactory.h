@@ -20,6 +20,7 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
@@ -105,8 +106,10 @@ namespace chip::app {
  *
  * ```
  * +-------------------------------------------------------------------------+
- * | 1. Initialize Context (Main / Startup)                                  |
- * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;  |
+ * | 1. Register Root Node and Initialize Context (Main / Startup)           |
+ * |    rootNode.Register(...);                                              |
+ * |    AppFactory::Context context{                                         |
+ * |        .breadcrumbTracker = rootNode.GeneralCommissioning(), ... };      |
  * |    AppFactory::GetInstance().Init(context);                             |
  * +-------------------------------------------------------------------------+
  *                                    |
@@ -135,6 +138,9 @@ namespace chip::app {
  * ```
  *
  * ### Example Usage
+ *
+ * The root node must be registered before initialization because Context contains the
+ * BreadCrumbTracker owned by its General Commissioning cluster.
  *
  * Standard (Embedded / No-Hooks):
  * @code
@@ -231,6 +237,7 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         TestEventTriggerDelegate & testEventTriggerDelegate;
@@ -504,11 +511,12 @@ private:
             RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                    .nodeLabel       = nodeLabel,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
                 });
             });
         }
@@ -647,11 +655,12 @@ private:
             RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
-                    .timerDelegate   = mContext->timerDelegate,
-                    .storage         = mContext->storageDelegate,
-                    .platformManager = mContext->platformManager,
-                    .failSafeContext = mContext->failSafeContext,
-                    .nodeLabel       = nodeLabel,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
                 });
             });
         }

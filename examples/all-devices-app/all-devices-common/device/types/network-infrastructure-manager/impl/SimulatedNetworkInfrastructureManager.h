@@ -17,8 +17,8 @@
 
 #pragma once
 
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
-#include <device/capabilities/breadcrumb/SimpleBreadCrumbTracker.h>
 #include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
@@ -32,17 +32,11 @@ namespace app {
 /**
  * Concrete simulated implementation of NetworkInfrastructureManager.
  *
- * Inherits from ThreadBorderRouterManagementDelegate, SimpleBreadCrumbTracker, and
- * DirectThreadNetworkDiagnosticsProvider before NetworkInfrastructureManager so that
- * these base subobjects are fully constructed before NetworkInfrastructureManager's constructor
- * receives references to them.
- *
- * Note on BreadCrumbTracker:
- * See SimpleBreadCrumbTracker.h for details on Matter Core Spec 14.3.6.4.2. A future refactor
- * should route breadcrumb updates to the root node's GeneralCommissioningCluster.
+ * Inherits from ThreadBorderRouterManagementDelegate and DirectThreadNetworkDiagnosticsProvider
+ * before NetworkInfrastructureManager so that these base subobjects are fully constructed before
+ * NetworkInfrastructureManager's constructor receives references to them.
  */
 class SimulatedNetworkInfrastructureManager : public Clusters::ThreadBorderRouterManagementDelegate,
-                                              public SimpleBreadCrumbTracker,
                                               public Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider,
                                               public NetworkInfrastructureManager
 {
@@ -53,6 +47,7 @@ public:
         PersistentStorageDelegate & storage;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         std::string nodeLabel;
     };
 
