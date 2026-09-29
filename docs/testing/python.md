@@ -949,6 +949,13 @@ for that run, e.g.:
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
+-   `app` may also be a script that starts several applications, for example
+    around a mocked network, and logs the `app-ready-pattern` once they are up.
+    Such tests need root, so `local.py python-tests` skips them. List them under
+    `dedicated_runner` in `src/python_testing/test_metadata.yaml`.
+
+    -   Example: `scripts/tests/run_compro_test.py`
+
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.

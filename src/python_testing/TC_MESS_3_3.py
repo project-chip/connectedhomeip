@@ -21,14 +21,14 @@ from TC_MESSTestBase import MESSAGE_ID_1, MESSAGE_ID_2, MESSTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_MESS_3_3(MatterBaseTest, MESSTestBase):
+class TC_MESS_3_3(MatterTestCommissionedDevice, MESSTestBase):
 
     def desc_TC_MESS_3_3(self) -> str:
         return "[TC-MESS-3.3] MessageNotPresented Event Verification (DUT as Server)"
