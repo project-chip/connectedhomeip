@@ -107,8 +107,7 @@ public:
         auto oscillateConcentration = [this](auto & clusterWrapper, auto clusterIdTag) {
             using TagType                 = decltype(clusterIdTag);
             constexpr ClusterId clusterId = TagType::value;
-            if constexpr (clusterId != Clusters::TemperatureMeasurement::Id &&
-                          clusterId != Clusters::RelativeHumidityMeasurement::Id)
+            if constexpr (AirQualitySensorInternal::IsConcentrationCluster<clusterId>)
             {
                 if (clusterWrapper.IsConstructed())
                 {

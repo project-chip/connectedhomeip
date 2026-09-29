@@ -34,15 +34,30 @@ namespace app {
 namespace AirQualitySensorInternal {
 
 /**
- * @brief Compile-time mapping from ClusterId to the concrete ServerCluster type.
- *
- * Specializations define `using Type = ...` mapping Matter cluster IDs to their
- * corresponding code-driven cluster implementation classes.
+ * @brief Compile-time predicate identifying Matter concentration measurement clusters.
  */
 template <ClusterId CID>
+inline constexpr bool IsConcentrationCluster =
+    (CID == Clusters::CarbonDioxideConcentrationMeasurement::Id || CID == Clusters::Pm25ConcentrationMeasurement::Id ||
+     CID == Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id ||
+     CID == Clusters::CarbonMonoxideConcentrationMeasurement::Id || CID == Clusters::NitrogenDioxideConcentrationMeasurement::Id ||
+     CID == Clusters::OzoneConcentrationMeasurement::Id || CID == Clusters::FormaldehydeConcentrationMeasurement::Id ||
+     CID == Clusters::Pm1ConcentrationMeasurement::Id || CID == Clusters::Pm10ConcentrationMeasurement::Id ||
+     CID == Clusters::RadonConcentrationMeasurement::Id);
+
+/**
+ * @brief Compile-time mapping from ClusterId to the concrete ServerCluster type.
+ */
+template <ClusterId CID, typename = void>
 struct ClusterTypeTraits
 {
     using Type = void;
+};
+
+template <ClusterId CID>
+struct ClusterTypeTraits<CID, std::enable_if_t<IsConcentrationCluster<CID>>>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 };
 
 template <>
@@ -69,66 +84,6 @@ struct ClusterTypeTraits<Clusters::RelativeHumidityMeasurement::Id>
     using Type = Clusters::RelativeHumidityMeasurementCluster;
 };
 
-template <>
-struct ClusterTypeTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::Pm25ConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::OzoneConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::Pm1ConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::Pm10ConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
-template <>
-struct ClusterTypeTraits<Clusters::RadonConcentrationMeasurement::Id>
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
-};
-
 /**
  * @brief Alias helper to obtain the concrete cluster type for a given ClusterId.
  */
@@ -136,14 +91,38 @@ template <ClusterId CID>
 using ClusterType = typename ClusterTypeTraits<CID>::Type;
 
 /**
- * @brief Compile-time traits mapping ClusterId to its configuration type and default initializer.
- *
- * Each supported cluster specializes this struct with:
- *   - `Type`: The concrete configuration struct type passed to the cluster's `.Create()` method.
- *   - `Default()`: Static method returning a spec-compliant default configuration.
+ * @brief Provides standard Matter spec concentration units, min, and max defaults
+ *        for standard gas measurement clusters. Implemented in AirQualitySensor.cpp.
  */
-template <ClusterId CID>
+Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
+
+/**
+ * @brief Compile-time traits mapping ClusterId to its configuration type and default initializer.
+ */
+template <ClusterId CID, typename = void>
 struct ClusterConfigTraits;
+
+template <ClusterId CID>
+struct ClusterConfigTraits<CID, std::enable_if_t<IsConcentrationCluster<CID>>>
+{
+    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config;
+    static Type Default() { return DefaultConcentrationConfig(CID); }
+
+    template <typename ClusterWrapper>
+    static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
+    {
+        if (config.clusterId == CID)
+        {
+            wrapper.Create(endpoint, config);
+        }
+        else
+        {
+            Type resolvedConfig      = config;
+            resolvedConfig.clusterId = CID;
+            wrapper.Create(endpoint, resolvedConfig);
+        }
+    }
+};
 
 template <>
 struct ClusterConfigTraits<Clusters::TemperatureMeasurement::Id>
@@ -192,88 +171,6 @@ struct ClusterConfigTraits<Clusters::RelativeHumidityMeasurement::Id>
 };
 
 /**
- * @brief Provides standard Matter spec concentration units, min, and max defaults
- *        for standard gas measurement clusters. Implemented in AirQualitySensor.cpp.
- */
-Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId);
-
-/**
- * @brief Base traits helper for concentration measurement clusters.
- */
-template <ClusterId CID>
-struct ConcentrationConfigTraits
-{
-    using Type = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster::Config;
-    static Type Default() { return DefaultConcentrationConfig(CID); }
-
-    template <typename ClusterWrapper>
-    static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
-    {
-        if (config.clusterId == CID)
-        {
-            wrapper.Create(endpoint, config);
-        }
-        else
-        {
-            Type resolvedConfig      = config;
-            resolvedConfig.clusterId = CID;
-            wrapper.Create(endpoint, resolvedConfig);
-        }
-    }
-};
-
-template <>
-struct ClusterConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::CarbonDioxideConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::Pm25ConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::CarbonMonoxideConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::NitrogenDioxideConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::OzoneConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::OzoneConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::FormaldehydeConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::Pm1ConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::Pm10ConcentrationMeasurement::Id>
-{
-};
-template <>
-struct ClusterConfigTraits<Clusters::RadonConcentrationMeasurement::Id>
-    : ConcentrationConfigTraits<Clusters::RadonConcentrationMeasurement::Id>
-{
-};
-
-/**
  * @brief Helper alias to extract the config type for a given ClusterId.
  */
 template <ClusterId CID>
@@ -319,23 +216,7 @@ constexpr size_t IndexOf()
 template <ClusterId Target, ClusterId... List>
 constexpr size_t CountOf()
 {
-    if constexpr (sizeof...(List) == 0)
-    {
-        return 0;
-    }
-    else
-    {
-        constexpr ClusterId arr[] = { List... };
-        size_t count              = 0;
-        for (size_t i = 0; i < sizeof...(List); ++i)
-        {
-            if (arr[i] == Target)
-            {
-                count++;
-            }
-        }
-        return count;
-    }
+    return ((List == Target ? 1 : 0) + ... + 0);
 }
 
 } // namespace AirQualitySensorInternal
