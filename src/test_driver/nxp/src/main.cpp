@@ -47,6 +47,12 @@ void test_task(void * pvParameters)
     assert(err == CHIP_NO_ERROR);
 
     chip::test::RunAllTests();
+
+    //  For some OS, task exit is not allowed
+    while (1)
+    {
+        vTaskDelay(1);
+    }
 }
 
 #if FSL_OSA_MAIN_FUNC_ENABLE
@@ -59,9 +65,6 @@ extern "C" void main_task(void const * argument)
     PlatformMgrImpl().HardwareInit();
 
     test_task(nullptr);
-    // do not exit this task function to prevent logging issue
-    while (1)
-        ;
 }
 #else
 extern "C" int main(int argc, char * argv[])
