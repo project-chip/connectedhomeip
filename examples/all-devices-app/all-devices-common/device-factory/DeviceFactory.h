@@ -317,6 +317,19 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
+            using AirQualitySensorCo2 =
+                SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                          Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+
+            using AirQualitySensorFull = SimulatedAirQualitySensor<
+                Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,
+                Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                Clusters::CarbonMonoxideConcentrationMeasurement::Id, Clusters::NitrogenDioxideConcentrationMeasurement::Id,
+                Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
+                Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
+                Clusters::RadonConcentrationMeasurement::Id>;
+
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
@@ -325,8 +338,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
                 };
-                return MakeDevice<SimulatedStandardAirQualitySensor>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                                     kAirQualityTag);
+                return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
             });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
@@ -336,8 +348,7 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return MakeDevice<SimulatedFullAirQualitySensor>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                                 kAirQualityFullTag);
+                return MakeDevice<AirQualitySensorFull>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityFullTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)

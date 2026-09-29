@@ -191,7 +191,9 @@ TEST_F(TestAirQualitySensor, TestConcentrationConfigWithoutExplicitClusterId)
 
 TEST_F(TestAirQualitySensor, TestSimulationTick)
 {
-    SimulatedStandardAirQualitySensor sensor(mTimerDelegate, mIdentifyDelegate);
+    using Sensor = SimulatedAirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id,
+                                             CarbonDioxideConcentrationMeasurement::Id>;
+    Sensor sensor(mTimerDelegate, mIdentifyDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
@@ -226,7 +228,12 @@ TEST_F(TestAirQualitySensor, TestSimulationTick)
 
 TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
 {
-    using FullSensor = FullAirQualitySensor;
+    using FullSensor =
+        AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id,
+                         Pm25ConcentrationMeasurement::Id, TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                         CarbonMonoxideConcentrationMeasurement::Id, NitrogenDioxideConcentrationMeasurement::Id,
+                         OzoneConcentrationMeasurement::Id, FormaldehydeConcentrationMeasurement::Id,
+                         Pm1ConcentrationMeasurement::Id, Pm10ConcentrationMeasurement::Id, RadonConcentrationMeasurement::Id>;
 
     FullSensor sensor(mTimerDelegate, mIdentifyDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
