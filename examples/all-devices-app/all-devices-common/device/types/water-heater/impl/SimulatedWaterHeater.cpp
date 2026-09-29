@@ -71,14 +71,16 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
 
     // Setup initial values
-    mTemperature        = kInitialTemperature;
-    mHeatingEnabled     = true;
-    mBoostState         = BoostStateEnum::kInactive;
-    mBoostRemainingTime = 0;
-    mHeatDemand         = mHeaterTypes;
+    mLocalTemperature.SetNonNull(kInitialTemperature);
+    mHeatingEnabled         = true;
+    mBoostState             = BoostStateEnum::kInactive;
+    mBoostRemainingTime     = 0;
+    mBoostOneShot           = false;
+    mBoostTemporarySetpoint.reset();
+    mHeatDemand             = mHeaterTypes;
 
     WaterHeaterModeCluster().UpdateCurrentMode(kWaterHeaterModeManual);
-    ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
+    ThermostatCluster().SetLocalTemperature(mLocalTemperature);
     ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
@@ -126,18 +128,32 @@ void SimulatedWaterHeater::TimerFired()
         }
     }
 
+    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+    const temperature target = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.has_value())
+        ? mBoostTemporarySetpoint.value()
+        : mOccupiedHeatingSetpoint;
+
     // Handle heating
     if (mHeatingEnabled)
     {
         temperature temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
-        mTemperature                = static_cast<temperature>(mTemperature + temperatureStep);
-        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRId16 "°C", static_cast<int16_t>(mTemperature / 100));
-        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
-        if (mTemperature >= mOccupiedHeatingSetpoint)
+        temperature newTemp         = static_cast<temperature>(currentTemp + temperatureStep);
+        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
+        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
+        if (newTemp >= target)
         {
             if (mBoostState == BoostStateEnum::kActive)
             {
-                EndBoost();
+                if (mBoostOneShot)
+                {
+                    EndBoost();
+                }
+                else
+                {
+                    mHeatingEnabled = false;
+                    mHeatDemand.ClearAll();
+                    NotifyHeatDemandAndBoostStateChanged();
+                }
             }
             else
             {
@@ -149,10 +165,10 @@ void SimulatedWaterHeater::TimerFired()
     }
     else
     {
-        mTemperature = static_cast<temperature>(std::max(static_cast<temperature>(mTemperature - 100), kInitialTemperature));
-        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(mTemperature / 100));
-        ThermostatCluster().SetLocalTemperature(DataModel::Nullable<temperature>(mTemperature));
-        if (mTemperature <= kInitialTemperature && !modeOff && !systemOff)
+        temperature newTemp = static_cast<temperature>(std::max(static_cast<temperature>(currentTemp - 100), kInitialTemperature));
+        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
+        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
+        if (newTemp <= kInitialTemperature && (mBoostState == BoostStateEnum::kActive || (!modeOff && !systemOff)))
         {
             mHeatingEnabled = true;
             mHeatDemand     = mHeaterTypes;
@@ -169,12 +185,12 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
 {
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
 
-    mBoostState         = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
-    mBoostRemainingTime = duration;
-    mHeatingEnabled     = true;
-    mHeatDemand         = mHeaterTypes;
-
-    ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
+    mBoostState             = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
+    mBoostRemainingTime     = duration;
+    mBoostOneShot           = oneShot.ValueOr(false);
+    mBoostTemporarySetpoint = temporarySetpoint.HasValue() ? std::make_optional(temporarySetpoint.Value()) : std::nullopt;
+    mHeatingEnabled         = true;
+    mHeatDemand             = mHeaterTypes;
 
     CHIP_ERROR err =
         GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
@@ -233,11 +249,14 @@ void SimulatedWaterHeater::EndBoost()
 {
     mBoostState         = BoostStateEnum::kInactive;
     mBoostRemainingTime = 0;
+    mBoostOneShot       = false;
+    mBoostTemporarySetpoint.reset();
 
-    const bool modeOff   = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-    const bool systemOff = mSystemMode == SystemModeEnum::kOff;
+    const bool modeOff            = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
+    const bool systemOff          = mSystemMode == SystemModeEnum::kOff;
+    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
 
-    if (modeOff || systemOff || mTemperature >= mOccupiedHeatingSetpoint)
+    if (modeOff || systemOff || currentTemp >= mOccupiedHeatingSetpoint)
     {
         mHeatingEnabled = false;
         mHeatDemand.ClearAll();
@@ -304,8 +323,9 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemMo
     }
     else if (systemMode == SystemModeEnum::kHeat)
     {
-        const bool modeOff = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-        if (!modeOff && mTemperature < mOccupiedHeatingSetpoint && !mHeatingEnabled)
+        const bool modeOff            = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
+        const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+        if (!modeOff && currentTemp < mOccupiedHeatingSetpoint && !mHeatingEnabled)
         {
             mHeatingEnabled = true;
             mHeatDemand     = mHeaterTypes;
@@ -368,11 +388,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetLocalTemperature(Da
         return Status::Success;
     }
     mLocalTemperature = temp;
-    if (!temp.IsNull())
-    {
-        mTemperature = temp.Value();
-    }
-    changed = true;
+    changed           = true;
     return Status::Success;
 }
 
@@ -400,13 +416,14 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
     mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
     changed                  = true;
 
-    if (mHeatingEnabled && mTemperature >= mOccupiedHeatingSetpoint && mBoostState == BoostStateEnum::kInactive)
+    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+    if (mHeatingEnabled && currentTemp >= mOccupiedHeatingSetpoint && mBoostState == BoostStateEnum::kInactive)
     {
         mHeatingEnabled = false;
         mHeatDemand.ClearAll();
         NotifyHeatDemandAndBoostStateChanged();
     }
-    else if (!mHeatingEnabled && mTemperature < mOccupiedHeatingSetpoint && mSystemMode == SystemModeEnum::kHeat)
+    else if (!mHeatingEnabled && currentTemp < mOccupiedHeatingSetpoint && mSystemMode == SystemModeEnum::kHeat)
     {
         const bool modeOff = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
         if (!modeOff)
@@ -480,7 +497,8 @@ void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBas
     }
     else
     {
-        if (mSystemMode == SystemModeEnum::kHeat && mTemperature < mOccupiedHeatingSetpoint && !mHeatingEnabled)
+        const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+        if (mSystemMode == SystemModeEnum::kHeat && currentTemp < mOccupiedHeatingSetpoint && !mHeatingEnabled)
         {
             mHeatingEnabled = true;
             mHeatDemand     = mHeaterTypes;

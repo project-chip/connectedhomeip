@@ -22,6 +22,8 @@
 #include <device/types/water-heater/WaterHeater.h>
 #include <lib/support/TimerDelegate.h>
 
+#include <optional>
+
 namespace chip::app {
 
 class SimulatedWaterHeater
@@ -103,17 +105,16 @@ private:
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
     uint32_t mBoostRemainingTime                                = 0;
-    // Simulated physical water temperature in 0.01 °C steps.
-    Clusters::Thermostat::temperature mTemperature = kInitialTemperature;
-    bool mHeatingEnabled                           = false;
+    std::optional<Clusters::Thermostat::temperature> mBoostTemporarySetpoint;
+    bool mBoostOneShot   = false;
+    bool mHeatingEnabled = false;
 
     // Thermostat attributes
     Clusters::Thermostat::ControlSequenceOfOperationEnum mControlSequenceOfOperation =
         Clusters::Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly;
     Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
-    // LocalTemperature attribute value reported to the Thermostat cluster, which may be Nullable (e.g. uncalibrated or sensor
-    // error).
-    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature =
+        DataModel::MakeNullable(kInitialTemperature);
     Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = kFinalTemperature;
 };
 
