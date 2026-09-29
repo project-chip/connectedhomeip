@@ -282,7 +282,7 @@ TEST_F(TestLevelControlBase, TestFeatureMap)
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
     LevelControlCluster::Config config(mockTimer, mockDelegate);
-    config.WithOnOff(onOffCluster).WithLighting(DataModel::NullNullable);
+    config.WithOnOffCluster(onOffCluster).WithLighting(DataModel::NullNullable);
 
     LevelControlCluster cluster(kTestEndpointId, config);
 

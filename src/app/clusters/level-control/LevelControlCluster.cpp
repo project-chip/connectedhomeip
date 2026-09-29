@@ -84,6 +84,7 @@ LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & con
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTransitionHandler.StopTransition();
+    OnOffDelegate::Unlink();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -95,6 +96,11 @@ LevelControlCluster::TransitionHandler::~TransitionHandler()
 CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    if (mOnOffCluster != nullptr && mFeatureMap.Has(Feature::kOnOff))
+    {
+        mOnOffCluster->AddDelegate(this);
+    }
 
     AttributePersistence attributePersistence(context.attributeStorage);
 
@@ -863,22 +869,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
 
 bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec: "Command execution SHALL NOT continue beyond the Options processing if all of these criteria are true:
-    // ...
-    // * The On/Off cluster exists on the same endpoint as this cluster.
-    // * The OnOff attribute of the On/Off cluster, on this endpoint, is FALSE.
-    // * The value of the ExecuteIfOff bit is 0."
-
-    // 1. If the On/Off cluster is not on this endpoint, there is no dependency, so we execute.
-    //    Spec "Effect of Level Control Commands Depends on OnOff": the dependency holds "Even if the
-    //    On/Off (OO) feature set bit is set to zero", so the check uses cluster presence, not the OO bit.
-    // 2. If the OnOff state is On, we execute.
+    // Spec "Options Attribute" and "Effect of Level Control Commands Depends on OnOff":
+    // command suppression while OnOff is FALSE depends on On/Off cluster presence on the endpoint,
+    // even when Feature::kOnOff is 0.
     if (mOnOffCluster == nullptr || GetOnOff())
     {
         return true;
     }
 
-    // 3. The device is Off. We check the ExecuteIfOff bit.
     if (optionsMask.Has(OptionsBitmap::kExecuteIfOff))
     {
         return optionsOverride.Has(OptionsBitmap::kExecuteIfOff);

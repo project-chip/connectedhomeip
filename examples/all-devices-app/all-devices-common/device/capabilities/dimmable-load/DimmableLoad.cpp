@@ -63,7 +63,7 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     LevelControlCluster::Config lvlConfig(mContext.timerDelegate, mLevelControlDelegate);
-    lvlConfig.WithOnOff(mOnOffCluster.Cluster());
+    lvlConfig.WithOnOffCluster(mOnOffCluster.Cluster());
 
     if (mConfig.levelControl.startUpCurrentLevel.has_value())
     {
@@ -95,7 +95,6 @@ CHIP_ERROR DimmableLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     }
 
     mLevelControlCluster.Create(endpoint, lvlConfig);
-    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
     mGroupsCluster.Create(endpoint,
@@ -146,14 +145,10 @@ void DimmableLoad::Unregister(CodeDrivenDataModelProvider & provider)
         }
     }
 
-    // 2. Remove all delegates from OnOff cluster
+    // 2. Remove application delegate from OnOff cluster
     if (mOnOffCluster.IsConstructed())
     {
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        if (mLevelControlCluster.IsConstructed())
-        {
-            mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
-        }
     }
 
     // === PHASE 2: DESTRUCTION ===

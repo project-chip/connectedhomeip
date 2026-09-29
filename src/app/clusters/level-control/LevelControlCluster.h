@@ -72,30 +72,25 @@ public:
         Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        /// Links the On/Off cluster on the same endpoint. Call this whenever the endpoint has an
-        /// On/Off cluster, in both modes.
+        /// Links the On/Off cluster on the same endpoint.
         ///
-        /// Both modes: *WithOnOff commands set OnOff to TRUE when raising CurrentLevel and to FALSE
-        /// when CurrentLevel reaches MinLevel. MoveToLevel/Move/Step/Stop do nothing while OnOff is
-        /// FALSE, unless ExecuteIfOff is set (spec "Options Attribute"). ExecuteIfOff is only
-        /// conformant with OO or Lighting.
+        /// Both modes:
+        /// - *WithOnOff commands set OnOff to TRUE when raising CurrentLevel and to FALSE when
+        ///   CurrentLevel reaches MinLevel.
+        /// - MoveToLevel/Move/Step/Stop do nothing while OnOff is FALSE unless ExecuteIfOff is set.
         ///
-        /// kAdvertiseFeature: OnOff changes move CurrentLevel as in spec "Effect of On/Off Commands
-        /// on the CurrentLevel attribute". Off moves to MinLevel; if OnLevel is null, CurrentLevel then
-        /// returns to the pre-off level. On starts at MinLevel and moves to OnLevel, or to the pre-off
-        /// level if OnLevel is null. The move uses OnTransitionTime/OffTransitionTime/OnOffTransitionTime.
-        ///   - Dimmable light (device type requires OO): Off fades to dark, On fades back.
-        ///   - TV speaker with OnLevel null: mute ramps volume down, unmute ramps it back to the
-        ///     previous volume. CurrentLevel reads the previous volume while muted.
-        /// kDoNotAdvertiseFeature: OnOff changes do not change CurrentLevel. The application acts on
-        ///   OnOff itself.
-        ///   - Pump or fan with its own motor drive: Off stops the motor, the speed setpoint stays.
-        ///   - Amplifier with a motorized volume knob: mute uses a relay, the knob does not move.
+        /// kAdvertiseFeature:
+        /// - Sets Feature::kOnOff and registers this cluster as an OnOffDelegate on Startup().
+        /// - Off moves CurrentLevel to MinLevel (and restores the pre-off level when OnLevel is null);
+        ///   On moves CurrentLevel from MinLevel to OnLevel (or the pre-off level).
+        /// - Examples: dimmable light (fades off/on); TV speaker with OnLevel null (ramps volume on
+        ///   mute/unmute while keeping the pre-mute level).
         ///
-        /// For kAdvertiseFeature, register with onOffCluster.AddDelegate(&levelControl) after
-        /// construction. The delegate removes itself from the list when destroyed. With
-        /// kDoNotAdvertiseFeature the delegate does nothing, so registering is optional.
-        Config & WithOnOff(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
+        /// kDoNotAdvertiseFeature:
+        /// - Clears Feature::kOnOff. OnOff changes do not modify CurrentLevel.
+        /// - Examples: pump/fan (Off stops the motor, speed setpoint stays); amplifier with a
+        ///   motorized volume knob (mute uses a relay, knob does not move).
+        Config & WithOnOffCluster(OnOffCluster & onOffCluster, OnOffSetting setting = OnOffSetting::kAdvertiseFeature)
         {
             mOnOffCluster = &onOffCluster;
             mFeatureMap.Set(LevelControl::Feature::kOnOff, setting == OnOffSetting::kAdvertiseFeature);

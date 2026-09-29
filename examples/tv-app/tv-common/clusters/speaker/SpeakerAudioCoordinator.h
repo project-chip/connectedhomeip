@@ -51,13 +51,10 @@ namespace chip::app::Clusters::Speaker {
 // construction and &GetXxx() to Unregister() before destruction, registering Audio Control
 // last so its Startup() -> OnStartup() reconcile sees the other two started.
 //
-// On/Off has TWO delegates -- this coordinator and the Level Control cluster itself
-// (mOnOff.AddDelegate(&mLevelControl.Cluster())), as examples/all-devices-app wires a
-// lighting-style device. A raw On/Off/Toggle runs Level Control's CurrentLevel choreography,
-// mirrored step by step into AudioControl.Volume via OnLevelChanged(). OnLevel is kept NULL so
-// that choreography restores CurrentLevel to its pre-off value instead of leaving it at
-// MinLevel, keeping level -- and volume -- across a mute. Config also gets WithOnOff() for
-// Level Control's own *WithOnOff command variants.
+// LevelControlCluster::Config::WithOnOffCluster links On/Off and registers Level Control as an
+// On/Off delegate on Startup(). On/Off/Toggle commands move CurrentLevel through MinLevel and
+// notify OnLevelChanged(), which updates AudioControl.Volume. OnLevel is NULL so CurrentLevel and
+// Volume return to their pre-off values after an Off transition.
 //
 // No On/Off or Level Control cluster code is changed: only their public methods are called,
 // and Volume is written back via AudioControl.SetVolume()/SetSoftMuted() (which report but
@@ -71,8 +68,8 @@ namespace chip::app::Clusters::Speaker {
 //     delegate, whose status gates the command's commit.
 //   * OnOnOffChanged(on) -- from an On/Off command -- drives AudioControl.SetSoftMuted(!on) and
 //     forwards (Volume, SoftMuted) to the hardware delegate; Level Control (the other On/Off
-//     delegate) separately runs its CurrentLevel choreography.
-//   * OnLevelChanged(level) -- any CurrentLevel change, command- or choreography-driven --
+//     delegate) separately transitions CurrentLevel.
+//   * OnLevelChanged(level) -- any CurrentLevel change --
 //     drives AudioControl.SetVolume(LevelToVolume(level)) and forwards (Volume, SoftMuted) to
 //     the hardware delegate.
 //   * OnStartup() -- Audio Control is authoritative: OnOff and CurrentLevel are reconciled to
