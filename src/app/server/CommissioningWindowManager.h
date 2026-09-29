@@ -32,6 +32,11 @@
 
 namespace chip {
 
+namespace Testing {
+// Forward declaration of CommissioningWindowManagerTestAccess to allow it to be friends with CommissioningWindowManager
+class CommissioningWindowManagerTestAccess;
+} // namespace Testing
+
 enum class CommissioningWindowAdvertisement
 {
     kAllSupported,
@@ -45,6 +50,8 @@ class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
                                    public app::CommissioningModeProvider,
                                    public SessionDelegate
 {
+    friend class Testing::CommissioningWindowManagerTestAccess;
+
 public:
     CommissioningWindowManager() : mPASESession(*this) {}
 

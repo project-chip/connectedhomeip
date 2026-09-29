@@ -49,13 +49,13 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_15(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_15(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_15(self) -> str:
         """Test case description."""
         return "[TC-PAVST-2.15] Validate UpdateMotionZoneOptions command with Server as DUT - PROVISIONAL"

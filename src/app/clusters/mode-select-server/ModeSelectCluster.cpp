@@ -348,7 +348,15 @@ CHIP_ERROR ModeSelectCluster::ApplyScene(EndpointId endpoint, ClusterId cluster,
     while (pair_iterator.Next())
     {
         auto & decodePair = pair_iterator.GetValue();
-        VerifyOrReturnError(decodePair.attributeID == CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an attribute
+        // that is not implemented on the endpoint is ignored rather than failing the recall. Our
+        // SerializeSave only ever stores CurrentMode, so foreign pairs can only appear in scenes stored
+        // by other implementations.
+        if (decodePair.attributeID != CurrentMode::Id)
+        {
+            continue;
+        }
         VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
         // Invalid values in a scene extension field set are clamped to the closest supported value
