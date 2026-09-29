@@ -357,13 +357,10 @@ class ProximityRangingTestBase:
         """Launch a second all-devices-app proximity-ranger instance (DUT_R) and
         record how to commission it onto the DUT's fabric.
 
-        all-devices-app takes --port (not --secured-device-port) and has no
-        --passcode flag (its setup passcode is the SDK default 20202021), so the
-        generic AppServerSubprocess wrapper cannot launch it; the base Subprocess
-        is used with the app's real flags instead. The reflector's shared
-        singletons are kept distinct from the primary DUT and any other host app:
-        a private temp-dir KVS, a reflector-specific discriminator, and its own
-        secure --port (see DECISIONS.md). Returns the reflector node id.
+        The reflector's shared singletons are kept distinct from the primary DUT
+        and any other host app: a private temp-dir KVS, a reflector-specific
+        discriminator, and its own secure --port (see DECISIONS.md). Returns the
+        reflector node id.
         """
         app = self.user_params.get("th_reflector_app_path", None)
         asserts.assert_true(app is not None and os.path.exists(app),
@@ -372,7 +369,7 @@ class ProximityRangingTestBase:
         self._reflector_storage = tempfile.TemporaryDirectory(prefix="proxr-reflector-")
         self._reflector_kvs = os.path.join(self._reflector_storage.name, "kvs-reflector")
         self._reflector_discriminator = random.randint(2048, 4095)
-        # all-devices-app has no --passcode flag; it uses the SDK default passcode.
+        # Not passed on the command line, so the app uses the SDK default passcode.
         self._reflector_passcode = 20202021
         # Reflector secure port defaults to 5546 but is overridable so two runs on
         # one host (e.g. concurrent 2.3 and 2.4) can pick distinct ports and not

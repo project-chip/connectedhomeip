@@ -33,6 +33,19 @@
 #       --endpoint 2
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 2
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -46,7 +59,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -76,7 +89,7 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
-class TC_CLDIM_6_1(MatterBaseTest):
+class TC_CLDIM_6_1(MatterTestCommissionedDevice):
     async def read_cldim_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureDimension
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

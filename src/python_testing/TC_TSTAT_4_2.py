@@ -48,6 +48,7 @@ from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -55,8 +56,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_4_2(ThermostatBaseTest):
-
+class TC_TSTAT_4_2(MatterTestCommissionedDevice, ThermostatBaseTest):
     def check_returned_presets(self, sent_presets: list, returned_presets: list):
         asserts.assert_true(len(sent_presets) == len(returned_presets), "Returned presets are a different length than sent presets")
         for i, sent_preset in enumerate(sent_presets):
