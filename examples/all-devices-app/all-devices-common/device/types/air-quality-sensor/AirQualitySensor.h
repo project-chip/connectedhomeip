@@ -157,6 +157,10 @@ public:
         mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate), mConfig(config), mTag(tag)
     {}
 
+    AirQualitySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate,
+                     EndpointComposition::SemanticTag tag) : AirQualitySensor(timerDelegate, identifyDelegate, Config{}, tag)
+    {}
+
     ~AirQualitySensor() override = default;
 
     /**
@@ -337,6 +341,21 @@ protected:
     /// Statically sized tuple holding only declared optional clusters (zero overhead for unconfigured clusters)
     std::tuple<LazyRegisteredServerCluster<AirQualitySensorInternal::ClusterType<OptionalClusters>>...> mOptionalClusters;
 };
+
+/**
+ * @brief Common pre-configured AirQualitySensor types.
+ */
+using StandardAirQualitySensor = AirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                                  Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+
+using FullAirQualitySensor =
+    AirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                     Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,
+                     Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
+                     Clusters::CarbonMonoxideConcentrationMeasurement::Id, Clusters::NitrogenDioxideConcentrationMeasurement::Id,
+                     Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
+                     Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
+                     Clusters::RadonConcentrationMeasurement::Id>;
 
 } // namespace app
 } // namespace chip
