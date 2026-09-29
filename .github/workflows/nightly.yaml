@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -237,7 +237,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -336,7 +336,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             options: --privileged
 
         steps:
@@ -458,7 +458,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
