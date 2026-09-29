@@ -459,7 +459,7 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -472,8 +472,17 @@ tests:
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
-          value: []
-          # TODO : Have FabricSceneInfo initialized on adding a new fabric
+          value:
+              [
+                  {
+                      SceneCount: 0,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
+                      FabricIndex: th2FabricIndex,
+                      SceneValid: false,
+                      RemainingCapacity: fabricCapacity,
+                  },
+              ]
 
     - label: "TH2 sends an AddScene command to DUT for Scene 1 G1"
       identity: "beta"
@@ -530,10 +539,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -547,7 +556,7 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -587,10 +596,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -605,7 +614,7 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -640,8 +649,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -656,7 +665,7 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -696,8 +705,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -712,7 +721,7 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -738,8 +747,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -754,10 +763,10 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 4,
                   },
               ]
@@ -789,16 +798,18 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
 
     - label:
-          "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
+          "TH1 confirms its FabricSceneInfo's deprecated CurrentScene,
+          CurrentGroup and SceneValid fields remain fixed at 0xFF, 0x00 and
+          false (Scenes Management Revision 2)"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -806,10 +817,10 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 4,
                   },
               ]
@@ -836,10 +847,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -854,10 +865,10 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
@@ -889,8 +900,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -905,10 +916,10 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
@@ -935,8 +946,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -951,8 +962,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
