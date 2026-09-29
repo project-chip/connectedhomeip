@@ -32,6 +32,9 @@ AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config &
 CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                       EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -43,7 +46,9 @@ CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
     mCO2Cluster.Create(endpoint, mConfig.co2Config);
     ReturnErrorOnFailure(provider.AddCluster(mCO2Cluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void AirQualitySensor::Unregister(CodeDrivenDataModelProvider & provider)

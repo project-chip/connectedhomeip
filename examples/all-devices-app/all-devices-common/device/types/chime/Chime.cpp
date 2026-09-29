@@ -30,6 +30,9 @@ Chime::Chime(TimerDelegate & timerDelegate, Span<const Sound> sounds) :
 
 CHIP_ERROR Chime::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
@@ -38,7 +41,9 @@ CHIP_ERROR Chime::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvide
     mChimeCluster.Create(endpoint, *this);
     ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void Chime::Unregister(CodeDrivenDataModelProvider & provider)

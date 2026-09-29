@@ -31,6 +31,9 @@ AmbientContextSensor::AmbientContextSensor(AmbientContextSensingConfig config, T
 CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                           EndpointComposition composition)
 {
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Create the identify cluster.
@@ -52,7 +55,9 @@ CHIP_ERROR AmbientContextSensor::Register(chip::EndpointId endpoint, CodeDrivenD
         /* fabricIndex= */ 1));
     ReturnErrorOnFailure(provider.AddCluster(mAmbientSensingUnionCluster.Registration()));
 
-    return provider.AddEndpoint(mEndpointRegistration);
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
 void AmbientContextSensor::Unregister(CodeDrivenDataModelProvider & provider)
