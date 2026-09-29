@@ -107,6 +107,14 @@ jobs:
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+            - name: Test Android App IDE Setup (android_app_ide.sh) and Source Build
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "TARGET_CPU=arm64 ./scripts/examples/android_app_ide.sh"
+                  ./scripts/run_in_build_env.sh \
+                    "./examples/android/CHIPTool/gradlew -p ./examples/android/CHIPTool -PmatterBuildSrcDir=../../../../out/android_arm64 -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=arm64-v8a :app:buildCMakeDebug[arm64-v8a] :chip-library:assembleDebug"
+            - name: Clean out IDE build output
+              run: rm -rf ./out examples/android/CHIPTool/app/.cxx examples/android/CHIPTool/app/build examples/android/CHIPTool/chip-library/build
             - name: Build Android arm64-chip-test
               run: |
                   ./scripts/run_in_build_env.sh \

@@ -188,43 +188,58 @@ from `src/controller/java`, or other Matter C++ code within Android Studio.
 ## Building Android CHIPTool from Android Studio
 
 This option allows Android Studio to build the core Matter code from source,
-which allows us to directly edit core Matter code in-IDE.
+which enables directly editing core Matter C++ and Java/Kotlin code in-IDE.
 
-1. In the command line, run the following command from the top Matter directory:
+1. Set up required environment variables (`ANDROID_HOME`, `ANDROID_NDK_HOME`,
+   and `TARGET_CPU`):
 
     ```shell
-    TARGET_CPU=arm64 ./scripts/examples/android_app_ide.sh
+    export ANDROID_HOME=~/Android/Sdk
+    export ANDROID_NDK_HOME=~/Android/Sdk/ndk/28.2.13676358
+    export TARGET_CPU=arm64
     ```
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterSdkSourceBuild` variable to true, `matterBuildSrcDir` point
-   to the appropriate output directory (e.g. `../../../../out/android_arm64`),
-   and `matterSourceBuildAbiFilters` to the desired ABIs in
-   [examples/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/examples/android/CHIPTool/gradle.properties)
+2. Run the IDE setup script from the top-level Matter directory:
 
-3) Open the project in Android Studio and run **File -> Sync Project with Gradle
-   Files**.
+    ```shell
+    ./scripts/examples/android_app_ide.sh
+    ```
 
-4) Use one of the following options to build an Android package:
+    This will run GN generation and produce `CMakeLists.txt` inside
+    `out/android_$TARGET_CPU/`.
 
-    - Click **Make Project** in Android Studio.
-    - Run the following command in the command line:
+3. Modify `examples/android/CHIPTool/gradle.properties`:
+
+    - Set `matterSdkSourceBuild=true`
+    - Set `matterBuildSrcDir=../../../../out/android_arm64` (matching your
+      `TARGET_CPU` directory)
+    - Set `matterSourceBuildAbiFilters=arm64-v8a` (matching your `TARGET_CPU`
+      architecture)
+
+4. Open `examples/android/CHIPTool` in Android Studio and run **File -> Sync
+   Project with Gradle Files**.
+
+5. Build the Android package:
+
+    - Click **Make Project** or **Run** in Android Studio.
+    - Or run the following command in the command line:
 
         ```shell
         cd examples/android/CHIPTool
-        ./gradlew build
+        ./gradlew assembleDebug
         ```
 
 The debug Android package `app-debug.apk` will be generated at
-`examples/android/CHIPTool/app/build/outputs/apk/debug/`, and can be installed
-with
+`examples/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk`, and can
+be installed with:
 
 ```shell
 adb install examples/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-or
+or:
 
 ```shell
 (cd examples/android/CHIPTool && ./gradlew installDebug)
