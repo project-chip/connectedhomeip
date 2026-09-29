@@ -44,7 +44,7 @@ public:
         return Register(allocator.Allocate(), provider, composition);
     }
 
-    EndpointId GetEndpointId() const { return mEndpointId; }
+    EndpointId GetEndpointId() const override { return mEndpointId; }
 
     /// Subclasses implement this to perform single-endpoint registration on a specific endpoint ID.
     virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,

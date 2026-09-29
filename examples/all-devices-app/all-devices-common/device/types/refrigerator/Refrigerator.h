@@ -30,7 +30,7 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    EndpointId GetEndpointId() const { return mEndpointId; }
+    EndpointId GetEndpointId() const override { return mEndpointId; }
 
 protected:
     /// Default semantic tags applied to the refrigerator root endpoint descriptor when the
