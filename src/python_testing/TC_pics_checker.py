@@ -265,21 +265,15 @@ class TC_PICS_Checker(BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(11)
-        # Default off: enabling this turns the spec-conformance event rules
-        # into an assertion. Bounded to --endpoint to match Steps 2-6's
-        # per-endpoint semantics, and OTA clusters are skipped here for the
-        # same reason they're skipped from checkable_clusters above (no
-        # published PICS codes today).
-        if self.user_params.get("assert_mandatory_events", False):
-            endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
-            for cluster_id, event_ids in endpoint_events.items():
-                if cluster_id in ota_ids:
-                    continue
-                pics_base = self.xml_clusters[cluster_id].pics
-                for event_id in event_ids:
-                    location = EventPathLocation(
-                        endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
-                    self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
+        endpoint_events = base_facts.mandatory_events_by_cluster.get(self.endpoint_id, {})
+        for cluster_id, event_ids in endpoint_events.items():
+            if cluster_id in ota_ids:
+                continue
+            pics_base = self.xml_clusters[cluster_id].pics
+            for event_id in event_ids:
+                location = EventPathLocation(
+                    endpoint_id=self.endpoint_id, cluster_id=cluster_id, event_id=event_id)
+                self._check_and_record_errors(location, True, event_pics_str(pics_base, event_id))
 
         self.step(12)
         if not self.success:
