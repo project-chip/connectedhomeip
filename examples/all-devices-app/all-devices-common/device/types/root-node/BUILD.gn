@@ -86,6 +86,20 @@ source_set("ota") {
   ]
 }
 
+source_set("icd") {
+  sources = [
+    "features/IcdFeature.cpp",
+    "features/IcdFeature.h",
+  ]
+
+  public_deps = [
+    ":root-node",
+    "${chip_root}/src/app/clusters/icd-management-server:icd-management-server",
+    "${chip_root}/src/app/icd/server:configuration-data",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+  ]
+}
+
 source_set("posix") {
   sources = [
     "NamedPipeTranslators.cpp",
