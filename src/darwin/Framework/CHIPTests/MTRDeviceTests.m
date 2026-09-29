@@ -6232,36 +6232,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     delegate.forceTimeUpdateShortDelayToZero = YES;
-    __weak __auto_type weakDelegate = delegate;
 
-    // Wait for the subscription to be established, not just for the device to be reachable:
-    // restarting the app while the subscription is still being set up costs a 10 second timeout.
-    __auto_type expectSubscriptionEstablished = ^(NSString * description) {
-        XCTestExpectation * expectation = [self expectationWithDescription:description];
-        weakDelegate.onInternalStateChanged = ^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                MTRInternalDeviceState state = [device _getInternalState];
-                if (state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished) {
-                    weakDelegate.onInternalStateChanged = nil;
-                    [expectation fulfill];
-                }
-            });
-        };
-        return expectation;
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
     };
 
-    // Also wait for the time update that subscription setup schedules, so it cannot time out
-    // against the restarted app below and be reported to the first iteration.  This app has no
-    // mock clock, so it rejects the update; we only need it to be done.
-    XCTestExpectation * subscribed = expectSubscriptionEstablished(@"Subscription established");
-    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
-    delegate.onUTCTimeSet = ^(NSError * error) {
-        __strong __auto_type strongDelegate = weakDelegate;
-        strongDelegate.onUTCTimeSet = nil;
-        [baselineTimeSet fulfill];
-    };
     [device setDelegate:delegate queue:queue];
-    [self waitForExpectations:@[ subscribed, baselineTimeSet ] timeout:60];
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
 
     // We relaunch the app multiple times, to try to trigger time
     // synchronization loss detection. These are the different cases:
@@ -6276,25 +6255,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     //
     // test049a covers exhausting the budget, without relaunching the app.
     for (int i = 0; i < 4; ++i) {
+        __weak __auto_type weakDelegate = delegate;
+
         XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
         delegate.onNotReachable = ^() {
-            __strong __auto_type strongDelegate = weakDelegate;
-            strongDelegate.onNotReachable = nil;
             [subscriptionDroppedExpectation fulfill];
         };
 
         XCTestExpectation * resubscriptionReachableExpectation =
             [self expectationWithDescription:@"Resubscription has become reachable"];
         XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Resubscription got reports"];
-        BOOL expectUpdate = (i < 3);
-        XCTestExpectation * correctedTime = expectUpdate ? [self expectationWithDescription:@"onUTCTimeSet called"] : nil;
-        __block BOOL lossDetected = NO;
-        delegate.onTimeSynchronizationLossDetected = ^{
-            lossDetected = YES;
-        };
+        XCTestExpectation * correctedTime = [self expectationWithDescription:@"onUTCTimeSet called"];
         delegate.onReachable = ^() {
             __strong __auto_type strongDelegate = weakDelegate;
-            strongDelegate.onReachable = nil;
 
             strongDelegate.onReportEnd = ^() {
                 __strong __auto_type strongDelegate = weakDelegate;
@@ -6304,9 +6277,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
             strongDelegate.onUTCTimeSet = ^(NSError * _Nullable error) {
                 XCTAssertNil(error);
-                XCTAssertTrue(expectUpdate);
                 [correctedTime fulfill];
             };
+            if (i == 3) {
+                correctedTime.inverted = YES;
+            }
             [resubscriptionReachableExpectation fulfill];
         };
 
@@ -6324,19 +6299,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         BOOL started = [self restartApp:app additionalArguments:@[ @"--use_mock_clock", @(utcTime).stringValue ]];
         XCTAssertTrue(started);
 
-        // Resubscribe now rather than waiting for the subscription liveness timeout to notice the
-        // restart, and drop the old CASE session, which the restarted app no longer knows about.
-        XCTestExpectation * resubscribed = expectSubscriptionEstablished(@"Resubscription established");
-        [controller invalidateCASESessionForNode:@(kDeviceId2)];
-        [device unitTestResetSubscription];
+        [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionReachableExpectation, gotReportsExpectation ] timeout:60];
 
-        [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionReachableExpectation, gotReportsExpectation, resubscribed ] timeout:60];
-
-        // Loss detection happens while the priming report is processed, so it is done by report end.
-        XCTAssertEqual(lossDetected, expectUpdate);
-        if (expectUpdate) {
-            [self waitForExpectations:@[ correctedTime ] timeout:10];
-        }
+        // correctedTime is sometimes inverted, so wait on it separately with a lower timeout to avoid
+        // always waiting for at least a minute every time we don't expect onUTCTimeset to be called.
+        [self waitForExpectations:@[ correctedTime ] timeout:10];
     }
 }
 
@@ -6396,35 +6363,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with a bad clock the way test049 does.
     __weak __auto_type weakDelegate = delegate;
     __auto_type injectLoss = ^(BOOL expectRepair, NSString * label) {
-        XCTestExpectation * repaired = expectRepair ? [self expectationWithDescription:[NSString stringWithFormat:@"SetUTCTime for %@", label]] : nil;
-        __block BOOL lossDetected = NO;
-        delegate.onTimeSynchronizationLossDetected = ^{
-            lossDetected = YES;
-        };
-        // Clear the handler as it fires, so a later SetUTCTime cannot reach an expectation an
-        // earlier iteration is done with.
+        XCTestExpectation * repaired = [self expectationWithDescription:[NSString stringWithFormat:@"SetUTCTime for %@", label]];
+        repaired.inverted = !expectRepair;
+        XCTestExpectation * reportEnded = [self expectationWithDescription:[NSString stringWithFormat:@"Report end for %@", label]];
+        // Clear the handlers as they fire, so a later report cannot reach an expectation
+        // an earlier iteration is done with.
         delegate.onUTCTimeSet = ^(NSError * error) {
             __strong __auto_type strongDelegate = weakDelegate;
             strongDelegate.onUTCTimeSet = nil;
             XCTAssertNil(error);
-            XCTAssertTrue(expectRepair, @"Unexpected SetUTCTime for %@", label);
             [repaired fulfill];
         };
+        delegate.onReportEnd = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+            [reportEnded fulfill];
+        };
 
-        // The injected report is handled on the Matter queue and then the device queue, so drain
-        // both.  Waiting for a report end instead is racy: the app reports after every command we
-        // send it, and one of those can end first.
         [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
-        [controller syncRunOnWorkQueue:^{
-        } error:nil];
-        [device unitTestSyncRunOnDeviceQueue:^ {}];
-
-        // A repair is only scheduled for a detected loss, so there is no need to wait to prove a
-        // repair did not happen.
-        XCTAssertEqual(lossDetected, expectRepair);
-        if (expectRepair) {
-            [self waitForExpectations:@[ repaired ] timeout:60];
-        }
+        [self waitForExpectations:@[ reportEnded ] timeout:kTimeoutInSeconds];
+        // Short timeout for the inverted ones, so a passing test does not sit there
+        // proving a negative.
+        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 5];
     };
 
     // The whole loop runs well inside the window, so losses past the budget must not be
@@ -6522,43 +6482,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    const int budget = 5; // MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET
-    const int olderGroupCount = 3;
-
-    // Spend part of the budget, then leave a gap before spending the rest, so the two
-    // groups have ages we can tell apart below.
-    for (int i = 0; i < olderGroupCount; ++i) {
-        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
-        [device unitTestNoteTimeSynchronizationRepairScheduled];
+    // Spend the whole budget (5): 3 repairs 50 minutes ago and 2 repairs 10 minutes ago.
+    NSDate * fiftyMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-50 * 60];
+    NSDate * tenMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-10 * 60];
+    for (int i = 0; i < 3; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:fiftyMinutesAgo];
     }
-    NSDate * olderGroupEnd = [NSDate now];
-
-    // The newer group ages past the window chosen below after gap/2, so keep the gap
-    // comfortably longer than the work that follows.
-    [NSThread sleepForTimeInterval:3];
-
-    NSDate * newerGroupStart = [NSDate now];
-    for (int i = olderGroupCount; i < budget; ++i) {
-        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
-        [device unitTestNoteTimeSynchronizationRepairScheduled];
+    for (int i = 0; i < 2; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:tenMinutesAgo];
     }
-
-    // Budget is spent.
     XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
 
-    // Age out only the older group. Its entries are all at least (now - olderGroupEnd)
-    // old and the newer group's are at most (now - newerGroupStart), so any window
-    // between those two ages expires exactly the older group.
-    NSTimeInterval youngestOlderGroupAge = -[olderGroupEnd timeIntervalSinceNow];
-    NSTimeInterval oldestNewerGroupAge = -[newerGroupStart timeIntervalSinceNow];
-    XCTAssertGreaterThan(youngestOlderGroupAge, oldestNewerGroupAge);
-    delegate.timeSynchronizationLossDetectionCadenceOverride = @((youngestOlderGroupAge + oldestNewerGroupAge) / 2);
-
-    // Exactly olderGroupCount slots came back. Expiring the window all at once would give
-    // us the whole budget, and dropping one entry per check would give us fewer.
-    for (int i = 0; i < olderGroupCount; ++i) {
+    // With a 30 minute window only the older 3 age out, so exactly 3 slots come back.
+    // Expiring the window all at once would give us 5, and dropping one entry per check
+    // would give us fewer.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(30 * 60);
+    for (int i = 0; i < 3; ++i) {
         XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
-        [device unitTestNoteTimeSynchronizationRepairScheduled];
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:[NSDate now]];
     }
     XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
 }

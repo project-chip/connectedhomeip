@@ -782,14 +782,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 // Spends one unit of budget. Call this where the repair is issued, not where the loss is
 // noticed, so seeing one loss several times only costs one repair.
-- (void)_noteTimeSynchronizationRepairScheduled
+- (void)_noteTimeSynchronizationRepairScheduledAt:(NSDate *)date
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     if (!_timeSynchronizationRepairTimes) {
         _timeSynchronizationRepairTimes = [NSMutableArray array];
     }
-    [_timeSynchronizationRepairTimes addObject:[NSDate now]];
+    [_timeSynchronizationRepairTimes addObject:date];
 }
 
 - (void)_setTimeOnDevice
@@ -2345,7 +2345,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         {
             // Lock order is _timeSyncLock then _lock, as in _setTimeOnDevice.
             std::lock_guard lock(_lock);
-            [self _noteTimeSynchronizationRepairScheduled];
+            [self _noteTimeSynchronizationRepairScheduledAt:[NSDate now]];
         }
         dispatch_source_cancel(self.timeUpdateTimer);
         self.timeUpdateTimer = nil;
@@ -2525,10 +2525,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _injectAttributeReport:attributeReport fromSubscription:isFromSubscription];
 }
 
-- (void)unitTestNoteTimeSynchronizationRepairScheduled
+// Dates must not be earlier than ones already recorded, since the list is kept oldest first.
+- (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date
 {
     std::lock_guard lock(_lock);
-    [self _noteTimeSynchronizationRepairScheduled];
+    [self _noteTimeSynchronizationRepairScheduledAt:date];
 }
 
 - (BOOL)unitTestShouldDetectTimeSynchronizationLoss
