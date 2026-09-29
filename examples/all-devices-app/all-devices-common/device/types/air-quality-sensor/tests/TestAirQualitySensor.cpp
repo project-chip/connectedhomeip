@@ -59,8 +59,20 @@ TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
 {
     AirQualitySensor<> sensor(mTimerDelegate, mIdentifyDelegate);
 
+    // Before registration, GetCluster returns nullptr since clusters are not yet constructed
+    EXPECT_EQ(sensor.GetCluster<Clusters::Identify::Id>(), nullptr);
+    EXPECT_EQ(sensor.GetCluster<Clusters::AirQuality::Id>(), nullptr);
+
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_EQ(sensor.GetEndpointId(), 1);
+
+    EXPECT_NE(sensor.GetCluster<Clusters::Identify::Id>(), nullptr);
+    EXPECT_NE(sensor.GetCluster<Clusters::AirQuality::Id>(), nullptr);
+
+    // Verify const overload of GetCluster
+    const auto & constSensor = sensor;
+    EXPECT_NE(constSensor.GetCluster<Clusters::AirQuality::Id>(), nullptr);
+    EXPECT_EQ(constSensor.GetCluster<Clusters::TemperatureMeasurement::Id>(), nullptr);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
     EXPECT_EQ(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
@@ -68,6 +80,10 @@ TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
     EXPECT_EQ(sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>(), nullptr);
 
     sensor.Unregister(mProvider);
+
+    // After unregistration, GetCluster returns nullptr again
+    EXPECT_EQ(sensor.GetCluster<Clusters::Identify::Id>(), nullptr);
+    EXPECT_EQ(sensor.GetCluster<Clusters::AirQuality::Id>(), nullptr);
 }
 
 TEST_F(TestAirQualitySensor, TestTemplatedClusters)

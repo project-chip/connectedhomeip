@@ -281,25 +281,48 @@ public:
     {
         if constexpr (CID == Clusters::Identify::Id)
         {
-            return &mIdentifyCluster.Cluster();
+            return mIdentifyCluster.IsConstructed() ? &mIdentifyCluster.Cluster() : nullptr;
         }
         if constexpr (CID == Clusters::AirQuality::Id)
         {
-            return &mAirQualityCluster.Cluster();
+            return mAirQualityCluster.IsConstructed() ? &mAirQualityCluster.Cluster() : nullptr;
         }
         if constexpr (((OptionalClusters == CID) || ... || false))
         {
             constexpr size_t kIdx = AirQualitySensorInternal::IndexOf<CID, OptionalClusters...>();
-            return &std::get<kIdx>(mOptionalClusters).Cluster();
+            auto & wrapper        = std::get<kIdx>(mOptionalClusters);
+            return wrapper.IsConstructed() ? &wrapper.Cluster() : nullptr;
         }
         return static_cast<AirQualitySensorInternal::ClusterType<CID> *>(nullptr);
     }
 
+    template <ClusterId CID>
+    const auto * GetCluster() const
+    {
+        if constexpr (CID == Clusters::Identify::Id)
+        {
+            return mIdentifyCluster.IsConstructed() ? &mIdentifyCluster.Cluster() : nullptr;
+        }
+        if constexpr (CID == Clusters::AirQuality::Id)
+        {
+            return mAirQualityCluster.IsConstructed() ? &mAirQualityCluster.Cluster() : nullptr;
+        }
+        if constexpr (((OptionalClusters == CID) || ... || false))
+        {
+            constexpr size_t kIdx = AirQualitySensorInternal::IndexOf<CID, OptionalClusters...>();
+            const auto & wrapper  = std::get<kIdx>(mOptionalClusters);
+            return wrapper.IsConstructed() ? &wrapper.Cluster() : nullptr;
+        }
+        return static_cast<const AirQualitySensorInternal::ClusterType<CID> *>(nullptr);
+    }
+
     /// Convenience accessor for the mandatory Air Quality cluster.
     Clusters::AirQualityCluster & AirQualityCluster() { return mAirQualityCluster.Cluster(); }
+    const Clusters::AirQualityCluster & AirQualityCluster() const { return mAirQualityCluster.Cluster(); }
 
     /// Convenience accessor for the mandatory Identify cluster.
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    const Clusters::IdentifyCluster & IdentifyCluster() const { return mIdentifyCluster.Cluster(); }
 
 protected:
     TimerDelegate & mTimerDelegate;

@@ -18,7 +18,9 @@
 #pragma once
 
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/air-quality-server/AirQualityCluster.h>
 #include <app/clusters/concentration-measurement-server/ConcentrationMeasurementCluster.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/relative-humidity-measurement-server/RelativeHumidityMeasurementCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 
@@ -38,7 +40,22 @@ namespace AirQualitySensorInternal {
  * corresponding code-driven cluster implementation classes.
  */
 template <ClusterId CID>
-struct ClusterTypeTraits;
+struct ClusterTypeTraits
+{
+    using Type = void;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::Identify::Id>
+{
+    using Type = Clusters::IdentifyCluster;
+};
+
+template <>
+struct ClusterTypeTraits<Clusters::AirQuality::Id>
+{
+    using Type = Clusters::AirQualityCluster;
+};
 
 template <>
 struct ClusterTypeTraits<Clusters::TemperatureMeasurement::Id>
