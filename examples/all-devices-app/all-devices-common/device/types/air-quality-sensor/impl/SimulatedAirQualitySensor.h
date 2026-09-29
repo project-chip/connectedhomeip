@@ -112,7 +112,7 @@ public:
                 if (clusterWrapper.IsConstructed())
                 {
                     float val = 20.0f + static_cast<float>((mTickCount % 10) * 5);
-                    if (clusterId == Clusters::CarbonDioxideConcentrationMeasurement::Id)
+                    if constexpr (clusterId == Clusters::CarbonDioxideConcentrationMeasurement::Id)
                     {
                         val = 450.0f + static_cast<float>((mTickCount % 9) * 50);
                     }

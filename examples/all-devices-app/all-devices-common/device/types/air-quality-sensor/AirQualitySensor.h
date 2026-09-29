@@ -79,7 +79,7 @@ namespace app {
  *   config.Get<Clusters::TemperatureMeasurement::Id>().minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-1000));
  *   config.Get<Clusters::CarbonDioxideConcentrationMeasurement::Id>().minMeasured = DataModel::MakeNullable(400.0f);
  *
- *   MySensor sensor(timerDelegate, config);
+ *   MySensor sensor(timerDelegate, identifyDelegate, config);
  *   sensor.Register(endpointId, provider);
  * @endcode
  *
@@ -197,31 +197,24 @@ public:
         mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
 
-        // 3. Register all statically declared optional clusters (Temperature, Relative Humidity, Concentrations)
-        auto registerCluster = [&](auto & clusterWrapper, const auto & clusterConfig, auto clusterIdTag) -> CHIP_ERROR {
-            using TagType                 = decltype(clusterIdTag);
-            constexpr ClusterId clusterId = TagType::value;
-
-            // Instantiate cluster in-place with its specific config signature (handled by ClusterConfigTraits)
-            AirQualitySensorInternal::ClusterConfigTraits<clusterId>::CreateCluster(clusterWrapper, endpoint, clusterConfig);
-
-            // Register cluster with data model provider
-            return provider.AddCluster(clusterWrapper.Registration());
-        };
-
         if constexpr (sizeof...(OptionalClusters) > 0)
         {
-            CHIP_ERROR err   = CHIP_NO_ERROR;
-            auto tryRegister = [&](auto & wrapper, const auto & clusterConfig, auto clusterIdTag) {
-                if (err == CHIP_NO_ERROR)
-                {
-                    err = registerCluster(wrapper, clusterConfig, clusterIdTag);
-                }
+            auto registerCluster = [&](auto & clusterWrapper, const auto & clusterConfig, auto clusterIdTag) -> CHIP_ERROR {
+                using TagType                 = decltype(clusterIdTag);
+                constexpr ClusterId clusterId = TagType::value;
+
+                // Instantiate cluster in-place with its specific config signature (handled by ClusterConfigTraits)
+                AirQualitySensorInternal::ClusterConfigTraits<clusterId>::CreateCluster(clusterWrapper, endpoint, clusterConfig);
+
+                // Register cluster with data model provider
+                return provider.AddCluster(clusterWrapper.Registration());
             };
-            (tryRegister(
-                 std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
-                 std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mConfig.clusterConfigs),
-                 std::integral_constant<ClusterId, OptionalClusters>{}),
+
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            (((err = registerCluster(
+                   std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
+                   std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mConfig.clusterConfigs),
+                   std::integral_constant<ClusterId, OptionalClusters>{})) == CHIP_NO_ERROR) &&
              ...);
             ReturnErrorOnFailure(err);
         }
@@ -284,6 +277,8 @@ public:
     template <ClusterId CID>
     auto * GetCluster()
     {
+        static_assert(!std::is_void_v<AirQualitySensorInternal::ClusterType<CID>>, "Cluster not supported by AirQualitySensor");
+
         if constexpr (CID == Clusters::Identify::Id)
         {
             return mIdentifyCluster.IsConstructed() ? &mIdentifyCluster.Cluster() : nullptr;
@@ -304,6 +299,8 @@ public:
     template <ClusterId CID>
     const auto * GetCluster() const
     {
+        static_assert(!std::is_void_v<AirQualitySensorInternal::ClusterType<CID>>, "Cluster not supported by AirQualitySensor");
+
         if constexpr (CID == Clusters::Identify::Id)
         {
             return mIdentifyCluster.IsConstructed() ? &mIdentifyCluster.Cluster() : nullptr;
@@ -322,12 +319,28 @@ public:
     }
 
     /// Convenience accessor for the mandatory Air Quality cluster.
-    Clusters::AirQualityCluster & AirQualityCluster() { return mAirQualityCluster.Cluster(); }
-    const Clusters::AirQualityCluster & AirQualityCluster() const { return mAirQualityCluster.Cluster(); }
+    Clusters::AirQualityCluster & AirQualityCluster()
+    {
+        VerifyOrDie(mAirQualityCluster.IsConstructed());
+        return mAirQualityCluster.Cluster();
+    }
+    const Clusters::AirQualityCluster & AirQualityCluster() const
+    {
+        VerifyOrDie(mAirQualityCluster.IsConstructed());
+        return mAirQualityCluster.Cluster();
+    }
 
     /// Convenience accessor for the mandatory Identify cluster.
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
-    const Clusters::IdentifyCluster & IdentifyCluster() const { return mIdentifyCluster.Cluster(); }
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
+    const Clusters::IdentifyCluster & IdentifyCluster() const
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
 
 protected:
     TimerDelegate & mTimerDelegate;

@@ -19,7 +19,6 @@ source_set("air-quality-sensor") {
     "AirQualityOptionalClusters.h",
     "AirQualitySensor.cpp",
     "AirQualitySensor.h",
-    "impl/SimulatedAirQualitySensor.h",
   ]
 
   public_deps = [
@@ -34,4 +33,10 @@ source_set("air-quality-sensor") {
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+}
+
+source_set("simulated") {
+  sources = [ "impl/SimulatedAirQualitySensor.h" ]
+
+  public_deps = [ ":air-quality-sensor" ]
 }

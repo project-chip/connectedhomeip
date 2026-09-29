@@ -111,16 +111,9 @@ struct ClusterConfigTraits<CID, std::enable_if_t<IsConcentrationCluster<CID>>>
     template <typename ClusterWrapper>
     static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
     {
-        if (config.clusterId == CID)
-        {
-            wrapper.Create(endpoint, config);
-        }
-        else
-        {
-            Type resolvedConfig      = config;
-            resolvedConfig.clusterId = CID;
-            wrapper.Create(endpoint, resolvedConfig);
-        }
+        Type resolvedConfig      = config;
+        resolvedConfig.clusterId = CID;
+        wrapper.Create(endpoint, resolvedConfig);
     }
 };
 
