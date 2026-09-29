@@ -283,8 +283,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigIsDeepCopied)
     request.SFrameConfig.SetValue(sframeConfig);
 
     auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess());
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
 
     // Clobber the original input buffers now that the command has returned.
     memset(senderKid, 0xFF, sizeof(senderKid));
