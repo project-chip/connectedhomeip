@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/webrtc-transport-provider-server/SFrameConfigStorage.h>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -53,5 +54,5 @@ public:
     // SFrame End-to-End Encryption configuration (optional)
     // For transport types that support SFrame (e.g., WebRTC), this will contain the encryption config.
     // For transport types that don't support SFrame (e.g., PushAV), this will remain empty (!HasValue()).
-    chip::Optional<chip::app::Clusters::Globals::Structs::SFrameStruct::Type> sFrameConfig;
+    chip::Optional<chip::app::Clusters::WebRTCTransportProvider::SFrameConfigStorage> sFrameConfig;
 };

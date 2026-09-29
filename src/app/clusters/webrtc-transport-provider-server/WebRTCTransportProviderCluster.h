@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include "SFrameConfigStorage.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/WebRTCTransportProvider/ClusterId.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
@@ -53,7 +54,7 @@ public:
         StreamUsageEnum streamUsage;
         Optional<std::vector<uint16_t>> videoStreams;
         Optional<std::vector<uint16_t>> audioStreams;
-        Optional<Globals::Structs::SFrameStruct::Type> sFrameConfig;
+        Optional<SFrameConfigStorage> sFrameConfig;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
         NodeId peerNodeId;

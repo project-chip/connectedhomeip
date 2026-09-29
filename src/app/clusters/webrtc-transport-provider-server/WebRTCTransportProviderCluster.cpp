@@ -97,36 +97,6 @@ bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::Decodabl
     return true;
 }
 
-using SFrameKeyStructType = Globals::Structs::SFrameKeyStruct::Type;
-
-/**
- * @brief Converts a decoded SFrameConfig into an encodable SFrameStruct::Type.
- *
- * The decodable and encodable forms are distinct generated types with no implicit
- * conversion, so copy field by field. `receiveKeys` is materialized into
- * `receiveKeysStorage`, which must outlive the returned value.
- */
-Globals::Structs::SFrameStruct::Type ConvertSFrameConfig(const Globals::Structs::SFrameStruct::DecodableType & in,
-                                                         std::vector<SFrameKeyStructType> & receiveKeysStorage)
-{
-    Globals::Structs::SFrameStruct::Type out;
-    out.audioCipherSuite = in.audioCipherSuite;
-    out.videoCipherSuite = in.videoCipherSuite;
-    out.senderKey        = in.senderKey;
-    out.ratchetBits      = in.ratchetBits;
-    out.ratchetTime      = in.ratchetTime;
-
-    receiveKeysStorage.clear();
-    auto iter = in.receiveKeys.begin();
-    while (iter.Next())
-    {
-        receiveKeysStorage.push_back(iter.GetValue());
-    }
-    out.receiveKeys = DataModel::List<const SFrameKeyStructType>(receiveKeysStorage.data(), receiveKeysStorage.size());
-
-    return out;
-}
-
 /**
  * @brief Checks if a URL has a turns or stuns scheme.
  *
@@ -747,7 +717,17 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
         CHIP_ERROR err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(
+                Zcl, "HandleSolicitOffer: SFrame configuration validation for the video cipher suite failed: %" CHIP_ERROR_FORMAT,
+                err.Format());
+            return Status::DynamicConstraintError;
+        }
+        err = mDelegate.ValidateSFrameConfig(sframeConfig.audioCipherSuite, sframeConfig.senderKey.baseKey.size());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(
+                Zcl, "HandleSolicitOffer: SFrame configuration validation for the audio cipher suite failed: %" CHIP_ERROR_FORMAT,
+                err.Format());
             return Status::DynamicConstraintError;
         }
     }
@@ -787,10 +767,9 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     args.fabricIndex           = commandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
 
-    std::vector<SFrameKeyStructType> sframeReceiveKeys;
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(ConvertSFrameConfig(req.SFrameConfig.Value(), sframeReceiveKeys));
+        args.sFrameConfig.SetValue(SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value()));
     }
 
     // ICEServers: copy the validated list
@@ -1101,10 +1080,9 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
     args.originatingEndpointId = req.originatingEndpointID.Value();
 
-    std::vector<SFrameKeyStructType> sframeReceiveKeys;
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(ConvertSFrameConfig(req.SFrameConfig.Value(), sframeReceiveKeys));
+        args.sFrameConfig.SetValue(SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value()));
     }
 
     // ICEServers: copy the validated list
