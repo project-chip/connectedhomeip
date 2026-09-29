@@ -312,4 +312,52 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigIsDeepCopied)
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigRejectsTooManyReceiveKeys)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportProviderDelegate mockDelegate;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(server);
+
+    uint8_t kid[]     = { 0x01, 0x02 };
+    uint8_t baseKey[] = { 0xAA, 0xBB };
+
+    Globals::Structs::SFrameKeyStruct::Type senderKey;
+    senderKey.kid     = ByteSpan(kid);
+    senderKey.baseKey = ByteSpan(baseKey);
+
+    // One more receive key than the data model permits (SFrameStruct.ReceiveKeys max length is 64).
+    std::vector<Globals::Structs::SFrameKeyStruct::Type> receiveKeys(SFrameConfigStorage::kMaxReceiveKeys + 1);
+    for (auto & key : receiveKeys)
+    {
+        key.kid     = ByteSpan(kid);
+        key.baseKey = ByteSpan(baseKey);
+    }
+
+    Globals::Structs::SFrameStruct::Type sframeConfig;
+    sframeConfig.audioCipherSuite = 1;
+    sframeConfig.videoCipherSuite = 2;
+    sframeConfig.senderKey        = senderKey;
+    sframeConfig.receiveKeys =
+        DataModel::List<const Globals::Structs::SFrameKeyStruct::Type>(receiveKeys.data(), receiveKeys.size());
+    sframeConfig.ratchetBits = 1;
+
+    uint16_t videoStreamId = 7;
+    Commands::SolicitOffer::Type request;
+    request.streamUsage = StreamUsageEnum::kLiveView;
+    request.videoStreams.SetValue(DataModel::List<const uint16_t>(&videoStreamId, 1));
+    request.SFrameConfig.SetValue(sframeConfig);
+
+    auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+
+    // The delegate must not have received a partial configuration.
+    EXPECT_FALSE(mockDelegate.mCapturedSFrameConfig.HasValue());
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

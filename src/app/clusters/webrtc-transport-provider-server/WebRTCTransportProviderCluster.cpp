@@ -769,7 +769,14 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
 
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value()));
+        SFrameConfigStorage ownedSFrameConfig;
+        err = SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value(), ownedSFrameConfig);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: Failed to decode SFrameConfig: %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::InvalidCommand;
+        }
+        args.sFrameConfig.SetValue(ownedSFrameConfig);
     }
 
     // ICEServers: copy the validated list
@@ -866,11 +873,14 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
 
-    // Validate the streamUsage field against the allowed enum values.
-    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    // Validate the streamUsage field if present against the allowed enum values.
+    if (req.streamUsage.HasValue())
     {
-        ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
-        return Status::ConstraintError;
+        if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
+            return Status::ConstraintError;
+        }        
     }
 
     // At least one of Video Stream ID, Audio Stream ID, AudioStreamID or VideoStreams has to be present
@@ -963,6 +973,12 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     else
     {
         // WebRTCSessionID is null - new session request
+        
+        // Both stream usage and endpoint ID are mandated in this case. Verify their presence.
+        if ((!req.streamUsage.HasValue()) || (!req.originatingEndpointID.HasValue()))
+        {
+            return Status::InvalidCommand;
+        }
 
         // Check privacy modes (per spec: only for new sessions)
         Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage.Value());
@@ -1082,7 +1098,14 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value()));
+        SFrameConfigStorage ownedSFrameConfig;
+        CHIP_ERROR sframeErr = SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value(), ownedSFrameConfig);
+        if (sframeErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to decode SFrameConfig: %" CHIP_ERROR_FORMAT, sframeErr.Format());
+            return Status::InvalidCommand;
+        }
+        args.sFrameConfig.SetValue(ownedSFrameConfig);
     }
 
     // ICEServers: copy the validated list

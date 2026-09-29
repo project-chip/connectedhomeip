@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cstddef>
 #include <cstdint>
+#include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <vector>
 
@@ -41,6 +42,9 @@ namespace WebRTCTransportProvider {
 class SFrameConfigStorage : public Globals::Structs::SFrameStruct::Type
 {
 public:
+    // Data model constraint: SFrameStruct.ReceiveKeys is a list with max length 64.
+    static constexpr size_t kMaxReceiveKeys = 64;
+
     SFrameConfigStorage() = default;
     SFrameConfigStorage(const SFrameConfigStorage & other) { *this = other; }
 
@@ -73,10 +77,17 @@ public:
 
     /**
      * @brief Builds an owned configuration from a decoded command payload.
+     *
+     * @param[in]  in   The decoded configuration.
+     * @param[out] out  Populated with an owned copy of `in` on success.
+     *
+     * @return CHIP_NO_ERROR on success; an error if the receive-keys list could
+     *         not be fully decoded or exceeds kMaxReceiveKeys, in which case
+     *         `out` is left empty.
      */
-    static SFrameConfigStorage FromDecodable(const Globals::Structs::SFrameStruct::DecodableType & in)
+    static CHIP_ERROR FromDecodable(const Globals::Structs::SFrameStruct::DecodableType & in, SFrameConfigStorage & out)
     {
-        SFrameConfigStorage out;
+        out                  = SFrameConfigStorage{};
         out.audioCipherSuite = in.audioCipherSuite;
         out.videoCipherSuite = in.videoCipherSuite;
         out.ratchetBits      = in.ratchetBits;
@@ -87,15 +98,22 @@ public:
         auto iter = in.receiveKeys.begin();
         while (iter.Next())
         {
+            if (out.mReceiveKeys.size() >= kMaxReceiveKeys)
+            {
+                out = SFrameConfigStorage{};
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
             out.mReceiveKeysKid.emplace_back();
             out.mReceiveKeysBaseKey.emplace_back();
             out.mReceiveKeys.emplace_back();
             CopyKey(iter.GetValue(), out.mReceiveKeysKid.back(), out.mReceiveKeysBaseKey.back(), out.mReceiveKeys.back());
         }
+        ReturnErrorOnFailure(iter.GetStatus());
+
         out.receiveKeys =
             DataModel::List<const Globals::Structs::SFrameKeyStruct::Type>(out.mReceiveKeys.data(), out.mReceiveKeys.size());
 
-        return out;
+        return CHIP_NO_ERROR;
     }
 
 private:
