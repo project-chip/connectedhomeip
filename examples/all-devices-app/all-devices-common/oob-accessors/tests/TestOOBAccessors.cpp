@@ -31,7 +31,6 @@
 #include <oob-accessors/clusters/AmbientContextOOBAccessor.h>
 #include <oob-accessors/clusters/BasicInformationOOBAccessor.h>
 #include <oob-accessors/clusters/BooleanStateOOBAccessor.h>
-#include <oob-accessors/clusters/DoorbellOOBAccessor.h>
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 #include <oob-accessors/clusters/ModeSelectOOBAccessor.h>
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
@@ -693,98 +692,6 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
     }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-class MockDoorbellSimulation : public DoorbellSimulationDelegate
-{
-public:
-    CHIP_ERROR HandleShortPress() override
-    {
-        mShortPressCalled = true;
-        return mResultToReturn;
-    }
-
-    CHIP_ERROR HandleSetCurrentPosition(uint8_t currentPosition) override
-    {
-        mLastPosition = currentPosition;
-        return mResultToReturn;
-    }
-
-    bool mShortPressCalled = false;
-    std::optional<uint8_t> mLastPosition;
-    CHIP_ERROR mResultToReturn = CHIP_NO_ERROR;
-};
-
-TEST_F(TestOOBAccessors, DoorbellOOBAccessor)
-{
-    constexpr EndpointId kEndpointId = 1;
-    InMemoryOOBAccessorRegistry registry;
-    MockDoorbellSimulation mockSimulation;
-
-    auto accessor = std::make_unique<DoorbellOOBAccessor>(mockSimulation, kEndpointId);
-    EXPECT_EQ(registry.Register(std::move(accessor)), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Size(), 1U);
-
-    // Test ShortPress action
-    {
-        uint8_t buffer[64];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outer;
-        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        EXPECT_EQ(registry.HandleAction("ShortPress"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        EXPECT_TRUE(mockSimulation.mShortPressCalled);
-    }
-
-    // Test Press action (alias)
-    {
-        mockSimulation.mShortPressCalled = false;
-        uint8_t buffer[64];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outer;
-        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        EXPECT_EQ(registry.HandleAction("Press"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        EXPECT_TRUE(mockSimulation.mShortPressCalled);
-    }
-
-    // Test SetCurrentPosition action
-    {
-        uint8_t buffer[64];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outer;
-        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), kEndpointId), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(2), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        EXPECT_EQ(registry.HandleAction("SetCurrentPosition"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
-        EXPECT_EQ(mockSimulation.mLastPosition, 1);
-    }
-
-    // Test wrong endpoint (should return CHIP_ERROR_NOT_FOUND)
-    {
-        uint8_t buffer[64];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-        TLV::TLVType outer;
-        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Put(TLV::ContextTag(1), static_cast<EndpointId>(2)), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-        EXPECT_EQ(registry.HandleAction("ShortPress"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
-    }
 }
 
 TEST_F(TestOOBAccessors, NoopRegistryLifecycle)

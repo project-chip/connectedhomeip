@@ -42,8 +42,6 @@ source_set("oob-accessors") {
     "clusters/BasicInformationOOBAccessor.h",
     "clusters/BooleanStateOOBAccessor.cpp",
     "clusters/BooleanStateOOBAccessor.h",
-    "clusters/DoorbellOOBAccessor.cpp",
-    "clusters/DoorbellOOBAccessor.h",
     "clusters/ElectricalEnergyMeasurementOOBAccessor.cpp",
     "clusters/ElectricalEnergyMeasurementOOBAccessor.h",
     "clusters/ModeSelectOOBAccessor.cpp",

@@ -37,7 +37,6 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/AmbientContextOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BasicInformationOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/BooleanStateOOBAccessor.cpp"
-        "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/DoorbellOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/ModeSelectOOBAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/oob-accessors/clusters/OccupancyOOBAccessor.cpp"

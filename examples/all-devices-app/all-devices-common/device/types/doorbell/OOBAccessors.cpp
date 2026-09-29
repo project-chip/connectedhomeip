@@ -15,17 +15,125 @@
  */
 
 #include "OOBAccessors.h"
+#include <device/types/doorbell/Doorbell.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
-#include <oob-accessors/clusters/DoorbellOOBAccessor.h>
+#include <lib/support/Span.h>
+#include <oob-accessors/OOBAccessor.h>
+#include <optional>
 
 namespace chip::app {
 
-void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
-{
-    // Base Doorbell does not provide simulation hooks.
-}
+namespace {
 
-void RegisterOOBAccessors(SimulatedDoorbell & device, OOBAccessorRegistry & registry)
+class DoorbellOOBAccessor : public OOBAccessor
+{
+public:
+    DoorbellOOBAccessor(Doorbell & device, EndpointId endpointId) : mDevice(device), mEndpointId(endpointId) {}
+
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override
+    {
+        if (action.data_equal("ShortPress"_span) || action.data_equal("Press"_span))
+        {
+            return HandleShortPress(tlvData);
+        }
+        if (action.data_equal("SetCurrentPosition"_span))
+        {
+            return HandleSetCurrentPosition(tlvData);
+        }
+        return std::nullopt;
+    }
+
+private:
+    std::optional<CHIP_ERROR> HandleShortPress(ByteSpan tlvData) const
+    {
+        TLV::TLVReader reader;
+        reader.Init(tlvData);
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+        EndpointId endpointId = kInvalidEndpointId;
+        bool hasEndpointId    = false;
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            TLV::Tag tag = reader.GetTag();
+            if (TLV::IsContextTag(tag) && TLV::TagNumFromTag(tag) == 1)
+            {
+                ReturnErrorOnFailure(reader.Get(endpointId));
+                hasEndpointId = true;
+            }
+        }
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+        VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+        if (endpointId != mEndpointId)
+        {
+            return std::nullopt;
+        }
+
+        return mDevice.HandleShortPress();
+    }
+
+    std::optional<CHIP_ERROR> HandleSetCurrentPosition(ByteSpan tlvData) const
+    {
+        TLV::TLVReader reader;
+        reader.Init(tlvData);
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+        TLV::TLVType outerType;
+        ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+        EndpointId endpointId   = kInvalidEndpointId;
+        uint8_t currentPosition = 0;
+        bool hasEndpointId      = false;
+        bool hasCurrentPosition = false;
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            TLV::Tag tag = reader.GetTag();
+            if (!TLV::IsContextTag(tag))
+            {
+                continue;
+            }
+            switch (TLV::TagNumFromTag(tag))
+            {
+            case 1:
+                ReturnErrorOnFailure(reader.Get(endpointId));
+                hasEndpointId = true;
+                break;
+            case 2:
+                ReturnErrorOnFailure(reader.Get(currentPosition));
+                hasCurrentPosition = true;
+                break;
+            default:
+                break;
+            }
+        }
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+        VerifyOrReturnError(hasEndpointId && hasCurrentPosition, CHIP_ERROR_INVALID_ARGUMENT);
+        if (endpointId != mEndpointId)
+        {
+            return std::nullopt;
+        }
+
+        return mDevice.HandleSetCurrentPosition(currentPosition);
+    }
+
+    Doorbell & mDevice;
+    EndpointId mEndpointId;
+};
+
+} // namespace
+
+void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
 {
     LogErrorOnFailure(registry.Register(std::make_unique<DoorbellOOBAccessor>(device, device.GetEndpointId())));
 }

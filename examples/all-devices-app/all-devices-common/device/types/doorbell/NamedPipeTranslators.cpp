@@ -16,18 +16,12 @@
 
 #include "NamedPipeTranslators.h"
 #include <device/types/doorbell/Doorbell.h>
-#include <device/types/doorbell/impl/SimulatedDoorbell.h>
 #include <lib/support/CodeUtils.h>
 #include <posix/named_pipe/translators/DoorbellTranslator.h>
 
 namespace chip::app {
 
 void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher)
-{
-    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::DoorbellTranslator>());
-}
-
-void RegisterNamedPipeTranslators(SimulatedDoorbell & device, NamedPipe::Dispatcher & dispatcher)
 {
     LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::DoorbellTranslator>());
 }

@@ -118,5 +118,25 @@ CHIP_ERROR Doorbell::SetSwitchPosition(uint8_t newPosition)
     return mSwitchCluster.Cluster().SetCurrentPosition(newPosition);
 }
 
+CHIP_ERROR Doorbell::HandleShortPress()
+{
+    // A basic doorbell short press simulates pressing the momentary switch (position 1),
+    // triggering the chime, and then returning it to its idle released state (position 0).
+    ReturnErrorOnFailure(SetSwitchPosition(1));
+    if (mSwitchCluster.Cluster().OnInitialPress(1) == std::nullopt)
+    {
+        ChipLogError(AppServer, "Doorbell: Unable to send OnInitialPress event");
+    }
+    // Chime should be triggered here.
+    return SetSwitchPosition(0);
+}
+
+CHIP_ERROR Doorbell::HandleSetCurrentPosition(uint8_t currentPosition)
+{
+    ReturnErrorOnFailure(SetSwitchPosition(currentPosition));
+    // Chime should be triggered here.
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip

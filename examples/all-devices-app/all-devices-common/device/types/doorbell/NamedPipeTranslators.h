@@ -21,9 +21,7 @@
 namespace chip::app {
 
 class Doorbell;
-class SimulatedDoorbell;
 
 void RegisterNamedPipeTranslators(Doorbell & device, NamedPipe::Dispatcher & dispatcher);
-void RegisterNamedPipeTranslators(SimulatedDoorbell & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

@@ -21,8 +21,6 @@ source_set("doorbell") {
     "Doorbell.h",
     "OOBAccessors.cpp",
     "OOBAccessors.h",
-    "impl/SimulatedDoorbell.cpp",
-    "impl/SimulatedDoorbell.h",
   ]
 
   public_deps = [
