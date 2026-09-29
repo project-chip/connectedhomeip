@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/groups-server/GroupsCluster.h>
+#include <credentials/GroupDataProvider.h>
 #include <device/types/window-covering/WindowCovering.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -26,13 +27,18 @@
 namespace chip {
 namespace app {
 
-class SimulatedWindowCovering : public WindowCovering,
-                                public Clusters::IdentifyDelegate,
-                                public Clusters::WindowCovering::WindowCoveringDelegate,
-                                public TimerContext
+class SimulatedWindowCovering : private Clusters::IdentifyDelegate,
+                                private Clusters::WindowCovering::WindowCoveringDelegate,
+                                private TimerContext,
+                                public WindowCovering
 {
 public:
-    explicit SimulatedWindowCovering(const Context & context);
+    struct Context
+    {
+        Credentials::GroupDataProvider & groupDataProvider;
+    };
+
+    SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext);
     ~SimulatedWindowCovering() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -50,6 +56,8 @@ public:
     void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) override;
     void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) override;
     void OnModeChanged(chip::BitMask<Clusters::WindowCovering::Mode> newMode) override;
+    void OnSafetyStatusChanged(chip::BitMask<Clusters::WindowCovering::SafetyStatus> newSafetyStatus) override;
+    void OnConfigStatusChanged(chip::BitMask<Clusters::WindowCovering::ConfigStatus> newConfigStatus) override;
 
     // TimerContext
     void TimerFired() override;
@@ -74,6 +82,7 @@ private:
     };
     std::variant<MovementState, CalibratingState> mState = MovementState{};
 
+    Credentials::GroupDataProvider & mGroupDataProvider;
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 

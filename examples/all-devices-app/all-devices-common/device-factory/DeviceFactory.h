@@ -874,10 +874,9 @@ private:
         {
             RegisterCreator("window-covering", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedWindowCovering>(WindowCovering::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                return MakeDevice<SimulatedWindowCovering>(
+                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
             });
         }
 

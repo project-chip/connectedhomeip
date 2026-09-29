@@ -126,16 +126,6 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
                                                rawMode, rawMode);
     mMode = chip::BitMask<Mode>(rawMode);
 
-    if (mMode.Has(Mode::kCalibrationMode))
-    {
-        // Mode is restored directly above rather than via SetMode(), so the delegate was never
-        // notified. If the device was mid-calibration when it last shut down (e.g. a crash), let it
-        // know now so it can resume/restart its own calibration state - otherwise the device would
-        // be permanently locked (see GetMotionLockStatus()) with nothing left to ever complete the
-        // calibration routine and leave calibration mode.
-        mDelegate.OnModeChanged(mMode);
-    }
-
     uint8_t rawConfigStatus = mConfigStatus.Raw();
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::ConfigStatus::Id), rawConfigStatus,
@@ -145,8 +135,20 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
     // Refresh the derived bits after loading persisted state: the Mode-derived bits (Operational,
     // LiftMovementReversed) can change across boots, and a persisted ConfigStatus must not shadow
     // the feature-mirroring PositionAware bits. Applied directly, with no change notification or
-    // delegate callback: this is initialization from persisted state, not a state change.
+    // delegate callback: this is initialization from persisted state, not a state change. This must
+    // happen before the delegate notification below, so OnModeChanged() observes a consistent
+    // GetConfigStatus()/GetMotionLockStatus() rather than the pre-refresh value.
     mConfigStatus = DeriveConfigStatus();
+
+    if (mMode.Has(Mode::kCalibrationMode))
+    {
+        // Mode is restored directly above rather than via SetMode(), so the delegate was never
+        // notified. If the device was mid-calibration when it last shut down (e.g. a crash), let it
+        // know now so it can resume/restart its own calibration state - otherwise the device would
+        // be permanently locked (see GetMotionLockStatus()) with nothing left to ever complete the
+        // calibration routine and leave calibration mode.
+        mDelegate.OnModeChanged(mMode);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -305,8 +307,6 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
 
     VerifyOrReturn(SetAttributeValue(mMode, mode, Attributes::Mode::Id));
 
-    mDelegate.OnModeChanged(mode);
-
     if (mContext != nullptr)
     {
         uint8_t rawMode = mMode.Raw();
@@ -315,7 +315,11 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
             ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id), rawMode));
     }
 
+    // ConfigStatus must be updated before the delegate is notified, so OnModeChanged() observes
+    // a consistent GetConfigStatus()/GetMotionLockStatus() rather than the pre-transition value.
     SetConfigStatus(DeriveConfigStatus());
+
+    mDelegate.OnModeChanged(mode);
 }
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)

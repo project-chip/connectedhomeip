@@ -18,7 +18,6 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/window-covering-server/WindowCoveringCluster.h>
-#include <credentials/GroupDataProvider.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TimerDelegate.h>
@@ -32,7 +31,6 @@ class WindowCovering : public SingleEndpoint
 public:
     struct Context
     {
-        Credentials::GroupDataProvider & groupDataProvider;
         TimerDelegate & timerDelegate;
     };
 
@@ -71,10 +69,11 @@ protected:
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
     const Context mContext;
+
+private:
     const Delegates mDelegates;
     const Config mConfig;
 
-private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::WindowCovering::WindowCoveringCluster> mWindowCoveringCluster;
 };
