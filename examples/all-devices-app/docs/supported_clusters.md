@@ -204,4 +204,4 @@ To update or validate this list manually, follow these steps:
 | 158       | Window Covering                                            | 258 (0x0102)  | No                 | No                  |                                       |
 | 159       | Zone Management                                            | 1360 (0x0550) | Yes                | No                  |                                       |
 | 160       | Smoke Concentration Measurement                            | 1076 (0x0434) | Yes                | Yes                 | Instance of Concentration Measurement |
-| **Total** | **160**                                                    |               | **108**            | **74**              |                                       |
+| **Total** | **160**                                                    |               | **108**            | **73**              |                                       |

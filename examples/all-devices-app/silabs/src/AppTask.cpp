@@ -106,6 +106,7 @@ constexpr std::size_t kMaxConstructedDevices = ((ALL_DEVICES_DEFAULT_DEVICES_COU
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     + 1
 #endif
+;
 
     std::array<std::unique_ptr<chip::app::DeviceInterface>, kMaxConstructedDevices>
         sConstructedDevices;
