@@ -88,6 +88,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'temperature-sensor',
     'thread-border-router',
     'water-freeze-detector',
+    'water-heater',
     'water-leak-detector',
     'water-valve',
     # keep-sorted: end
