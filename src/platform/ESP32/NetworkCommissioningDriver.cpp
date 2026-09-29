@@ -348,9 +348,12 @@ CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
     // back on if that were interrupted.
     VerifyOrReturnError(FailSafeBackupExists(), CHIP_NO_ERROR);
 
+    // Failures are logged as well as returned, because the cluster ignores the result: it calls
+    // this once CommissioningComplete has already succeeded.
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    // Bring the store of record up to date. Before the commit point, a failure (returned here) or
-    // a reboot rolls back to the backup.
+    // Bring the store of record up to date. Before the commit point, a failure or a reboot rolls
+    // back to the backup.
     //
     // A passphrase network only reaches esp_wifi if ConnectNetwork applied it (see above). If the
     // EAP-TLS association is still in place it wasn't, and esp_wifi's config was cleared when that
@@ -358,14 +361,15 @@ CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
     // reboot. Keep it instead, the same way esp_wifi keeps a previous passphrase network.
     if (mStagingNetwork.UsingPDC() || !mEapTlsCredentials)
     {
-        ReturnErrorOnFailure(StoreCommittedPDCNetwork());
+        ReturnErrorAndLogOnFailure(StoreCommittedPDCNetwork(), DeviceLayer, "Failed to store committed network");
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     // Commit point.
     auto & kvs     = PersistedStorage::KeyValueStoreMgr();
     CHIP_ERROR err = kvs.Delete(kWiFiSSIDKeyName);
-    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, err,
+                        ChipLogFailure(err, DeviceLayer, "Failed to commit network configuration"));
 
     // After the commit point the rest of the backup is inert, so its removal is best effort.
     RETURN_SAFELY_IGNORED kvs.Delete(kWiFiCredentialsKeyName);
@@ -395,16 +399,13 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     WiFiNetwork network;
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
+    bool backupRead       = false;
     bool keepBackup       = false;
 
     // No backup means no change since the last commit, so nothing to roll back.
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, network.ssid, sizeof(network.ssid), &ssidLen);
     VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-    // A backup that can't be read right now is kept for another attempt, rather than disposed of
-    // or restored as garbage over the store of record. Like a failure to store the restored
-    // network (below), this isn't returned, because Init() treats a failed revert as fatal.
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_NO_ERROR,
-                        ChipLogFailure(error, DeviceLayer, "Failed to read fail-safe backup, keeping it"));
+    SuccessOrExit(error);
     VerifyOrExit(CanCastTo<uint8_t>(ssidLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, network.credentials, sizeof(network.credentials),
                                                           &credentialsLen) == CHIP_NO_ERROR,
@@ -423,6 +424,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
+    backupRead      = true;
     mStagingNetwork = network;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -461,6 +463,16 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 
 exit:
     VerifyOrReturnError(!keepBackup, error);
+    if (!backupRead)
+    {
+        // Nothing has been restored, so the store of record is left as it is, and a backup that
+        // can't be read is disposed of: keeping it would only help if the error were transient,
+        // and could stop BackupConfiguration() from ever replacing it. Like a failure to store the
+        // restored network (above), this isn't returned, because Init() treats a failed revert as
+        // fatal.
+        ChipLogFailure(error, DeviceLayer, "Failed to read fail-safe backup, discarding it");
+        error = CHIP_NO_ERROR;
+    }
 
     // Commit point of the rollback (or, if the backup couldn't be read, its disposal). Should
     // deleting kWiFiSSIDKeyName fail, the next boot just reverts again.
