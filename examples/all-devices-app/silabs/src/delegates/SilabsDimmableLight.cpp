@@ -38,13 +38,13 @@ using Status = Protocols::InteractionModel::Status;
 #if SL_MATTER_DISPLAY_ENABLED
 
 namespace {
-constexpr const char * kDeviceTypeName = "dimmable-light";    
-constexpr int kLcdSize          = 128;
-constexpr int kBitmapWidth      = 64;
-constexpr int kBitmapHeight     = 64;
-constexpr uint8_t kHeaderLine   = 0;
-constexpr uint8_t kEndpointLine = 1;
-constexpr uint8_t kStateLine    = 10;
+constexpr const char * kDeviceTypeName = "dimmable-light";
+constexpr int kLcdSize                 = 128;
+constexpr int kBitmapWidth             = 64;
+constexpr int kBitmapHeight            = 64;
+constexpr uint8_t kHeaderLine          = 0;
+constexpr uint8_t kEndpointLine        = 1;
+constexpr uint8_t kStateLine           = 10;
 
 // 64x64 lightbulb bitmap shared with examples/lighting-app/silabs so
 // dimmable-light instances in all-devices-app render the same familiar icon.
