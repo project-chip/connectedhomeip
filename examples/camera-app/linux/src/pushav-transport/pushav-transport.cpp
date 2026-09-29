@@ -621,9 +621,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
                 }
                 else
                 {
-                    auto now = std::chrono::steady_clock::now();
-                    auto elapsedSeconds =
-                        std::chrono::duration_cast<std::chrono::seconds>(now - mClipInfo.mActivationTime).count();
+                    auto now            = std::chrono::steady_clock::now();
+                    auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - mClipInfo.mActivationTime).count();
 
                     // Check if recording duration has expired
                     if (elapsedSeconds >= mClipInfo.mMotionDetectedDurationS)
@@ -827,9 +826,9 @@ void PushAVTransport::CheckAndUpdateSession()
             InitializeRecorder();
             if (mRecorder)
             {
-                auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() -
-                                                                                       mClipInfo.mActivationTime)
-                                          .count();
+                auto elapsedSeconds =
+                    std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - mClipInfo.mActivationTime)
+                        .count();
                 mRecorder->mClipInfo.mElapsedTimeS = static_cast<uint16_t>(elapsedSeconds);
                 mRecorder->Start();
                 mStreaming = true;
