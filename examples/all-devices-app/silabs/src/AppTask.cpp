@@ -86,7 +86,7 @@ namespace {
 chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
-std::unique_ptr<chip::app::DeviceInterface> sRootNode;
+std::unique_ptr<chip::app::RootNode> sRootNode;
 
 // Fixed-capacity storage for constructed devices. The maximum number of
 // devices this build can ever instantiate is known at compile time:
@@ -249,6 +249,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .diagnosticDataProvider   = chip::DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = chip::DeviceLayer::PlatformMgr(),
         .failSafeContext          = chip::Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = sRootNode->BreadCrumbTracker(),
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = sTestEventTriggerDelegate,

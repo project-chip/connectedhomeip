@@ -105,8 +105,10 @@ namespace chip::app {
  *
  * ```
  * +-------------------------------------------------------------------------+
- * | 1. Initialize Context (Main / Startup)                                  |
- * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;  |
+ * | 1. Register Root Node and Initialize Context (Main / Startup)           |
+ * |    rootNode.Register(...);                                              |
+ * |    AppFactory::Context context{                                         |
+ * |        .breadcrumbTracker = rootNode.BreadCrumbTracker(), ... };         |
  * |    AppFactory::GetInstance().Init(context);                             |
  * +-------------------------------------------------------------------------+
  *                                    |
@@ -135,6 +137,9 @@ namespace chip::app {
  * ```
  *
  * ### Example Usage
+ *
+ * The root node must be registered before initialization because Context contains the
+ * BreadCrumbTracker owned by its General Commissioning cluster.
  *
  * Standard (Embedded / No-Hooks):
  * @code
@@ -231,6 +236,7 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         TestEventTriggerDelegate & testEventTriggerDelegate;
@@ -244,13 +250,6 @@ public:
     }
 
     void Init(const Context & context) { mContext.emplace(context); }
-
-    void SetBreadCrumbTracker(Clusters::BreadCrumbTracker * tracker) { mBreadCrumbTracker = tracker; }
-    Clusters::BreadCrumbTracker & GetBreadCrumbTracker() const
-    {
-        VerifyOrDie(mBreadCrumbTracker != nullptr);
-        return *mBreadCrumbTracker;
-    }
 
     void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator && creator)
     {
@@ -298,7 +297,6 @@ private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
-    Clusters::BreadCrumbTracker * mBreadCrumbTracker = nullptr;
 
     DeviceFactory()
     {
@@ -507,7 +505,7 @@ private:
                     .storage           = mContext->storageDelegate,
                     .platformManager   = mContext->platformManager,
                     .failSafeContext   = mContext->failSafeContext,
-                    .breadcrumbTracker = GetBreadCrumbTracker(),
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
                     .nodeLabel         = nodeLabel,
                 });
             });
@@ -651,7 +649,7 @@ private:
                     .storage           = mContext->storageDelegate,
                     .platformManager   = mContext->platformManager,
                     .failSafeContext   = mContext->failSafeContext,
-                    .breadcrumbTracker = GetBreadCrumbTracker(),
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
                     .nodeLabel         = nodeLabel,
                 });
             });
