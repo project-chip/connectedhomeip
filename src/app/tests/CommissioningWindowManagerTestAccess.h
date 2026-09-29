@@ -37,7 +37,7 @@ public:
 #endif
 
 private:
-    CommissioningWindowManager * mManager = nullptr;
+    [[maybe_unused]] CommissioningWindowManager * mManager = nullptr;
 };
 } // namespace Testing
 } // namespace chip
