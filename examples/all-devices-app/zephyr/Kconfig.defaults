@@ -63,6 +63,55 @@ config BT_DEVICE_NAME
 config BT_HOST_CRYPTO
 	default y
 
+config BT_PERIPHERAL_PREF_MIN_INT
+	default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+	default 36
+
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+	default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+	default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+	default 1000
+
+config BT_GATT_DYNAMIC_DB
+	default y
+
+config BT_DEVICE_NAME_DYNAMIC
+	default y
+
+config BT_DEVICE_NAME_MAX
+	default 15
+
+config BT_MAX_CONN
+	default 1
+
+config BT_L2CAP_TX_MTU
+	default 247
+
+config BT_BUF_ACL_RX_SIZE
+	default 251
+
+config BT_BUF_ACL_TX_SIZE
+	default 251
+
+config BT_RX_STACK_SIZE
+	default 1200
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+	default n
+
+config BT_GATT_CACHING
+	default n
+
 config MBEDTLS_ENTROPY_C
 	default y
 
@@ -79,8 +128,26 @@ endchoice
 config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 4096
 
+config NVS_LOOKUP_CACHE_SIZE
+	default 512 if NVS
+
+config ZMS_LOOKUP_CACHE_SIZE
+	default 512 if ZMS
+
 config THREAD_LOCAL_STORAGE
 	default y
+
+config NET_PKT_RX_COUNT
+	default 8
+
+config NET_PKT_TX_COUNT
+	default 8
+
+config NET_BUF_RX_COUNT
+	default 16
+
+config NET_BUF_TX_COUNT
+	default 16
 
 config MAIN_STACK_SIZE
 	default 12288
@@ -115,6 +182,10 @@ choice CHIP_CRYPTO
 	default CHIP_CRYPTO_PSA
 endchoice
 
+# CHIPCryptoPALPSA.cpp uses mbedtls_md_info_from_type() for SPAKE2+.
+config MBEDTLS_MD_C
+	default y if CHIP_CRYPTO_SPAKE2P_MBEDTLS
+
 config MBEDTLS_HEAP_SIZE
 	default 8192
 
@@ -132,6 +203,25 @@ config SHELL
 config CHIP_LIB_SHELL
 	default y
 
+config CHIP_WIFI
+	default y if WIFI
+	imply NET_STATISTICS
+	imply NET_IPV6_ND
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_ENABLE_WIFI_STATION
+	default y if CHIP_WIFI
+
+if CHIP_WIFI
+config NET_IF_IPV6_PREFIX_COUNT
+	default NET_IF_UNICAST_IPV6_ADDR_COUNT
+config ZVFS_POLL_MAX
+	default 6
+config NET_BUF_DATA_SIZE
+	default 512
+endif
 
 if SHELL
 
