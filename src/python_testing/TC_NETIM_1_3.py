@@ -49,7 +49,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ _MAX_CLIENT_INDEX = 2047
 _MAX_NETWORK_IDENTITY_INDEX = 65534
 
 
-class TC_NETIM_1_3(MatterBaseTest):
+class TC_NETIM_1_3(MatterTestCommissionedDevice):
 
     async def _query(self, endpoint, **selector):
         """Sends a QueryIdentity command and returns the QueryIdentityResponse (QueryIdentity is untimed)."""
