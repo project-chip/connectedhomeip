@@ -249,7 +249,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .diagnosticDataProvider   = chip::DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = chip::DeviceLayer::PlatformMgr(),
         .failSafeContext          = chip::Server::GetInstance().GetFailSafeContext(),
-        .breadcrumbTracker        = sRootNode->BreadCrumbTracker(),
+        .breadcrumbTracker        = sRootNode->GeneralCommissioning(),
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = sTestEventTriggerDelegate,

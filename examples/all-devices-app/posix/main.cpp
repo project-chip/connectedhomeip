@@ -209,7 +209,7 @@ public:
             .diagnosticDataProvider   = mContext.diagnosticDataProvider,
             .platformManager          = mContext.platformManager,
             .failSafeContext          = mContext.failSafeContext,
-            .breadcrumbTracker        = mRootNode.RootDevice().BreadCrumbTracker(),
+            .breadcrumbTracker        = mRootNode.RootDevice().GeneralCommissioning(),
             .bindingTable             = mContext.bindingTable,
             .bindingManager           = mContext.bindingManager,
             .testEventTriggerDelegate = *mContext.testEventTriggerDelegate,

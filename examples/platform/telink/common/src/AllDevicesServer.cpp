@@ -165,7 +165,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .breadcrumbTracker        = gRootNodeDevice->BreadCrumbTracker(),
+        .breadcrumbTracker        = gRootNodeDevice->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,

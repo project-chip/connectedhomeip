@@ -109,7 +109,7 @@ namespace chip::app {
  * | 1. Register Root Node and Initialize Context (Main / Startup)           |
  * |    rootNode.Register(...);                                              |
  * |    AppFactory::Context context{                                         |
- * |        .breadcrumbTracker = rootNode.BreadCrumbTracker(), ... };         |
+ * |        .breadcrumbTracker = rootNode.GeneralCommissioning(), ... };      |
  * |    AppFactory::GetInstance().Init(context);                             |
  * +-------------------------------------------------------------------------+
  *                                    |

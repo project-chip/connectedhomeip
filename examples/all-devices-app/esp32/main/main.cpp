@@ -323,7 +323,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .breadcrumbTracker        = gRootNode->BreadCrumbTracker(),
+        .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *testEventTriggerDelegate,
