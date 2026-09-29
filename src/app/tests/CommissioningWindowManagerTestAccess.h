@@ -17,11 +17,8 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-
 #include <app/server/CommissioningWindowManager.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Testing {
@@ -35,12 +32,12 @@ public:
     CommissioningWindowManagerTestAccess() = delete;
     CommissioningWindowManagerTestAccess(CommissioningWindowManager * manager) : mManager(manager) {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool IsWiFiPAF() const { return mManager->mIsWiFiPAF; }
+#endif
 
 private:
-    CommissioningWindowManager * mManager = nullptr;
+    [[maybe_unused]] CommissioningWindowManager * mManager = nullptr;
 };
 } // namespace Testing
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
