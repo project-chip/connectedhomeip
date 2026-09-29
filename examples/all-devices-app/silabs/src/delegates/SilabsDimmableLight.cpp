@@ -35,13 +35,10 @@ namespace app {
 
 using Status = Protocols::InteractionModel::Status;
 
-namespace {
-constexpr const char * kDeviceTypeName = "dimmable-light";
-} // namespace
-
 #if SL_MATTER_DISPLAY_ENABLED
 
 namespace {
+constexpr const char * kDeviceTypeName = "dimmable-light";    
 constexpr int kLcdSize          = 128;
 constexpr int kBitmapWidth      = 64;
 constexpr int kBitmapHeight     = 64;
