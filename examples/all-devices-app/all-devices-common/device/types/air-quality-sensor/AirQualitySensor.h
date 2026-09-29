@@ -211,13 +211,15 @@ public:
             };
 
             CHIP_ERROR err = CHIP_NO_ERROR;
-            static_cast<void>(
-                (((err = registerCluster(
-                       std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
-                       std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mConfig.clusterConfigs),
-                       std::integral_constant<ClusterId, OptionalClusters>{})) == CHIP_NO_ERROR) &&
-                 ...));
-            ReturnErrorOnFailure(err);
+            if (!(((err = registerCluster(
+                        std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
+                        std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(
+                            mConfig.clusterConfigs),
+                        std::integral_constant<ClusterId, OptionalClusters>{})) == CHIP_NO_ERROR) &&
+                  ...))
+            {
+                return err;
+            }
         }
 
         ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
