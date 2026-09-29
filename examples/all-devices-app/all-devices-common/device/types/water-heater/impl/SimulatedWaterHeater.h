@@ -37,6 +37,7 @@ class SimulatedWaterHeater
 public:
     static constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
     static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
+    static constexpr Clusters::Thermostat::temperature kMaxTemperature     = 10000;
 
     explicit SimulatedWaterHeater(const Config & config);
     ~SimulatedWaterHeater() override;

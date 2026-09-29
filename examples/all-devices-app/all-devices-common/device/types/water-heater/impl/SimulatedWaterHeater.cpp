@@ -19,6 +19,7 @@
 #include <lib/support/CodeUtils.h>
 
 #include <algorithm>
+#include <limits>
 
 using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters;
@@ -136,8 +137,12 @@ void SimulatedWaterHeater::TimerFired()
     // Handle heating
     if (mHeatingEnabled)
     {
-        temperature temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
-        temperature newTemp         = static_cast<temperature>(currentTemp + temperatureStep);
+        const int32_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
+        const int32_t ceiling         = std::min(static_cast<int32_t>(std::max(currentTemp, target)),
+                                                 static_cast<int32_t>(std::numeric_limits<temperature>::max()));
+        const int32_t nextTemp        = std::min(static_cast<int32_t>(currentTemp) + temperatureStep, ceiling);
+        const temperature newTemp     = static_cast<temperature>(nextTemp);
+
         ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
         if (newTemp >= target)
@@ -165,7 +170,9 @@ void SimulatedWaterHeater::TimerFired()
     }
     else
     {
-        temperature newTemp = static_cast<temperature>(std::max(static_cast<temperature>(currentTemp - 100), kInitialTemperature));
+        const int32_t nextTemp    = std::max(static_cast<int32_t>(currentTemp) - 100, static_cast<int32_t>(kInitialTemperature));
+        const temperature newTemp = static_cast<temperature>(nextTemp);
+
         ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
         if (newTemp <= kInitialTemperature && (mBoostState == BoostStateEnum::kActive || (!modeOff && !systemOff)))
@@ -183,6 +190,15 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
                                          Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
                                          Optional<Percent> targetReheat)
 {
+    if (temporarySetpoint.HasValue())
+    {
+        if (temporarySetpoint.Value() < kInitialTemperature || temporarySetpoint.Value() > kMaxTemperature)
+        {
+            ChipLogError(AppServer, "WaterHeater: Boost temporarySetpoint out of range: %" PRId16, temporarySetpoint.Value());
+            return Status::ConstraintError;
+        }
+    }
+
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
 
     mBoostState             = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
@@ -411,6 +427,11 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
     if (mOccupiedHeatingSetpoint == occupiedHeatingSetpoint)
     {
         return Status::Success;
+    }
+
+    if (occupiedHeatingSetpoint < kInitialTemperature || occupiedHeatingSetpoint > kMaxTemperature)
+    {
+        return Status::ConstraintError;
     }
 
     mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
