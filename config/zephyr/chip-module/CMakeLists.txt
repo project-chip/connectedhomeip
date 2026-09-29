@@ -143,10 +143,6 @@ if(CONFIG_CHIP)
     elseif(BOARD STREQUAL "native_sim/native/64")
         matter_add_gn_arg_string("target_cpu" "x64")
     elseif(CONFIG_RISCV)
-        # RISC-V Zephyr targets (e.g. ESP32-C6). Without this the GN build
-        # defaults target_cpu to the host and applies ARM flags (-mthumb) to the
-        # RISC-V compiler. Leaving riscv_arch/abi empty lets the Zephyr-provided
-        # -march/-mabi in target_cflags drive the arch.
         matter_add_gn_arg_string("target_cpu" "riscv")
     endif()
 
