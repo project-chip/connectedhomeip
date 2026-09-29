@@ -19,7 +19,6 @@ source_set("air-quality-sensor") {
     "AirQualityOptionalClusters.h",
     "AirQualitySensor.cpp",
     "AirQualitySensor.h",
-    "impl/SimulatedAirQualitySensor.cpp",
     "impl/SimulatedAirQualitySensor.h",
   ]
 

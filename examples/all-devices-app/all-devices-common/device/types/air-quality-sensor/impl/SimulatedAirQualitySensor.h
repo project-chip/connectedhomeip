@@ -49,7 +49,12 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
         ReturnErrorOnFailure(Base::Register(endpoint, provider, composition));
-        return this->mTimerDelegate.StartTimer(this, kDefaultUpdateInterval);
+        CHIP_ERROR err = this->mTimerDelegate.StartTimer(this, kDefaultUpdateInterval);
+        if (err != CHIP_NO_ERROR)
+        {
+            Base::Unregister(provider);
+        }
+        return err;
     }
 
     void Unregister(CodeDrivenDataModelProvider & provider) override
@@ -62,6 +67,7 @@ public:
     void TimerFired() override
     {
         mTickCount++;
+        LogErrorOnFailure(this->mTimerDelegate.StartTimer(this, kDefaultUpdateInterval));
 
         // 1. Advance Air Quality enum
         Clusters::AirQuality::AirQualityEnum aqValue;
@@ -118,8 +124,9 @@ public:
 
         if constexpr (sizeof...(OptionalClusters) > 0)
         {
-            (oscillateConcentration(std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(this->mOptionalClusters),
-                                    std::integral_constant<ClusterId, OptionalClusters>{}),
+            (oscillateConcentration(
+                 std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(this->mOptionalClusters),
+                 std::integral_constant<ClusterId, OptionalClusters>{}),
              ...);
         }
     }

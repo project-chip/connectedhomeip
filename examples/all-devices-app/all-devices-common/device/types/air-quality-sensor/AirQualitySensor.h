@@ -88,17 +88,10 @@ namespace app {
 template <ClusterId... OptionalClusters>
 class AirQualitySensor : public SingleEndpoint
 {
-    static_assert(((Detail::CountOf<OptionalClusters, OptionalClusters...>() == 1) && ...),
+    static_assert(((AirQualitySensorInternal::CountOf<OptionalClusters, OptionalClusters...>() == 1) && ...),
                   "Optional cluster IDs must not be duplicated");
 
 public:
-    /**
-     * @brief Compile-time query to check if a specific cluster is supported by this sensor instance.
-     */
-    template <ClusterId CID>
-    static constexpr bool HasCluster =
-        ((OptionalClusters == CID) || ... || false) || (CID == Clusters::Identify::Id) || (CID == Clusters::AirQuality::Id);
-
     /**
      * @brief Configuration for the AirQualitySensor and its optional clusters.
      *
@@ -108,15 +101,15 @@ public:
      */
     struct Config
     {
-        /// Feature flags for the Air Quality cluster (defaults: Fair, Moderate, VeryPoor, ExtremelyPoor).
+        /// Feature flags for the Air Quality cluster.
         BitFlags<Clusters::AirQuality::Feature> airQualityFeatures{ Clusters::AirQuality::Feature::kFair,
                                                                     Clusters::AirQuality::Feature::kModerate,
                                                                     Clusters::AirQuality::Feature::kVeryPoor,
                                                                     Clusters::AirQuality::Feature::kExtremelyPoor };
 
         /// Exact storage for each configured optional cluster's configuration struct.
-        std::tuple<Detail::ClusterConfigType<OptionalClusters>...> clusterConfigs{
-            Detail::DefaultClusterConfig<OptionalClusters>()...
+        std::tuple<AirQualitySensorInternal::ClusterConfigType<OptionalClusters>...> clusterConfigs{
+            AirQualitySensorInternal::DefaultClusterConfig<OptionalClusters>()...
         };
 
         Config() = default;
@@ -128,10 +121,10 @@ public:
          * @return Mutable reference to the cluster's configuration struct.
          */
         template <ClusterId CID>
-        Detail::ClusterConfigType<CID> & Get()
+        AirQualitySensorInternal::ClusterConfigType<CID> & Get()
         {
             static_assert(((OptionalClusters == CID) || ...), "Cluster not configured on this sensor");
-            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            constexpr size_t kIdx = AirQualitySensorInternal::IndexOf<CID, OptionalClusters...>();
             return std::get<kIdx>(clusterConfigs);
         }
 
@@ -142,10 +135,10 @@ public:
          * @return Const reference to the cluster's configuration struct.
          */
         template <ClusterId CID>
-        const Detail::ClusterConfigType<CID> & Get() const
+        const AirQualitySensorInternal::ClusterConfigType<CID> & Get() const
         {
             static_assert(((OptionalClusters == CID) || ...), "Cluster not configured on this sensor");
-            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            constexpr size_t kIdx = AirQualitySensorInternal::IndexOf<CID, OptionalClusters...>();
             return std::get<kIdx>(clusterConfigs);
         }
     };
@@ -154,13 +147,14 @@ public:
      * @brief Constructs an AirQualitySensor device.
      *
      * @param timerDelegate Reference to platform TimerDelegate (used by IdentifyCluster and simulation).
+     * @param identifyDelegate Reference to application IdentifyDelegate.
      * @param config Device and optional cluster configuration.
      * @param tag Optional semantic tag for endpoint disambiguation under wildcard allocation (*).
      */
-    AirQualitySensor(TimerDelegate & timerDelegate, const Config & config = {},
+    AirQualitySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate, const Config & config = {},
                      std::optional<EndpointComposition::SemanticTag> tag = std::nullopt) :
         SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)),
-        mTimerDelegate(timerDelegate), mConfig(config), mTag(tag)
+        mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate), mConfig(config), mTag(tag)
     {}
 
     ~AirQualitySensor() override = default;
@@ -192,41 +186,37 @@ public:
 
         ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-        mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
+        mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
         ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
         mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
 
         // 3. Register all statically declared optional clusters (Temperature, Relative Humidity, Concentrations)
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        // Helper lambda to instantiate and register an individual optional cluster from mOptionalClusters.
-        // Takes a compile-time tag std::integral_constant<ClusterId, CID> to extract constexpr ClusterId.
-        auto registerCluster = [&](auto & clusterWrapper, auto clusterIdTag) {
+        auto registerCluster = [&](auto & clusterWrapper, const auto & clusterConfig, auto clusterIdTag) -> CHIP_ERROR {
             using TagType                 = decltype(clusterIdTag);
             constexpr ClusterId clusterId = TagType::value;
-            if (err != CHIP_NO_ERROR)
-            {
-                return;
-            }
-
-            // Retrieve the cluster's configuration from mConfig.clusterConfigs tuple
-            constexpr size_t kIdx = Detail::IndexOf<clusterId, OptionalClusters...>();
-            auto & clusterConfig  = std::get<kIdx>(mConfig.clusterConfigs);
 
             // Instantiate cluster in-place with its specific config signature (handled by ClusterConfigTraits)
-            Detail::ClusterConfigTraits<clusterId>::CreateCluster(clusterWrapper, endpoint, clusterConfig);
+            AirQualitySensorInternal::ClusterConfigTraits<clusterId>::CreateCluster(clusterWrapper, endpoint, clusterConfig);
 
             // Register cluster with data model provider
-            err = provider.AddCluster(clusterWrapper.Registration());
+            return provider.AddCluster(clusterWrapper.Registration());
         };
 
         if constexpr (sizeof...(OptionalClusters) > 0)
         {
-            // Expand fold expression across all OptionalClusters to instantiate each declared cluster
-            (registerCluster(std::get<Detail::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
-                             std::integral_constant<ClusterId, OptionalClusters>{}),
+            CHIP_ERROR err   = CHIP_NO_ERROR;
+            auto tryRegister = [&](auto & wrapper, const auto & clusterConfig, auto clusterIdTag) {
+                if (err == CHIP_NO_ERROR)
+                {
+                    err = registerCluster(wrapper, clusterConfig, clusterIdTag);
+                }
+            };
+            (tryRegister(
+                 std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mOptionalClusters),
+                 std::get<AirQualitySensorInternal::IndexOf<OptionalClusters, OptionalClusters...>()>(mConfig.clusterConfigs),
+                 std::integral_constant<ClusterId, OptionalClusters>{}),
              ...);
             ReturnErrorOnFailure(err);
         }
@@ -293,29 +283,27 @@ public:
         {
             return &mIdentifyCluster.Cluster();
         }
-        else if constexpr (CID == Clusters::AirQuality::Id)
+        if constexpr (CID == Clusters::AirQuality::Id)
         {
             return &mAirQualityCluster.Cluster();
         }
-        else if constexpr (((OptionalClusters == CID) || ... || false))
+        if constexpr (((OptionalClusters == CID) || ... || false))
         {
-            constexpr size_t kIdx = Detail::IndexOf<CID, OptionalClusters...>();
+            constexpr size_t kIdx = AirQualitySensorInternal::IndexOf<CID, OptionalClusters...>();
             return &std::get<kIdx>(mOptionalClusters).Cluster();
         }
-        else
-        {
-            return static_cast<Detail::ClusterType<CID> *>(nullptr);
-        }
+        return static_cast<AirQualitySensorInternal::ClusterType<CID> *>(nullptr);
     }
 
     /// Convenience accessor for the mandatory Air Quality cluster.
-    Clusters::AirQualityCluster & AirQualityCluster() { return *GetCluster<Clusters::AirQuality::Id>(); }
+    Clusters::AirQualityCluster & AirQualityCluster() { return mAirQualityCluster.Cluster(); }
 
     /// Convenience accessor for the mandatory Identify cluster.
-    Clusters::IdentifyCluster & IdentifyCluster() { return *GetCluster<Clusters::Identify::Id>(); }
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
 protected:
     TimerDelegate & mTimerDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
     Config mConfig;
     std::optional<EndpointComposition::SemanticTag> mTag;
 
@@ -324,7 +312,7 @@ protected:
     LazyRegisteredServerCluster<Clusters::AirQualityCluster> mAirQualityCluster;
 
     /// Statically sized tuple holding only declared optional clusters (zero overhead for unconfigured clusters)
-    std::tuple<LazyRegisteredServerCluster<Detail::ClusterType<OptionalClusters>>...> mOptionalClusters;
+    std::tuple<LazyRegisteredServerCluster<AirQualitySensorInternal::ClusterType<OptionalClusters>>...> mOptionalClusters;
 };
 
 } // namespace app

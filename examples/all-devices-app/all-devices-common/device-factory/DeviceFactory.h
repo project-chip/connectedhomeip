@@ -328,7 +328,7 @@ private:
                 return MakeDevice<
                     SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                                               Clusters::CarbonDioxideConcentrationMeasurement::Id>>(
-                    mContext->timerDelegate,
+                    mContext->timerDelegate, mContext->identifyDelegate,
                     SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                                               Clusters::CarbonDioxideConcentrationMeasurement::Id>::Config{},
                     kAirQualityTag);
@@ -349,7 +349,7 @@ private:
                     Clusters::OzoneConcentrationMeasurement::Id, Clusters::FormaldehydeConcentrationMeasurement::Id,
                     Clusters::Pm1ConcentrationMeasurement::Id, Clusters::Pm10ConcentrationMeasurement::Id,
                     Clusters::RadonConcentrationMeasurement::Id>>(
-                    mContext->timerDelegate,
+                    mContext->timerDelegate, mContext->identifyDelegate,
                     SimulatedAirQualitySensor<
                         Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                         Clusters::CarbonDioxideConcentrationMeasurement::Id, Clusters::Pm25ConcentrationMeasurement::Id,

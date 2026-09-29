@@ -33,6 +33,15 @@ using chip::Testing::ClusterTester;
 
 namespace {
 
+class MockIdentifyDelegate : public IdentifyDelegate
+{
+public:
+    void OnIdentifyStart(IdentifyCluster & cluster) override {}
+    void OnIdentifyStop(IdentifyCluster & cluster) override {}
+    void OnTriggerEffect(IdentifyCluster & cluster) override {}
+    bool IsTriggerEffectEnabled() const override { return false; }
+};
+
 class TestAirQualitySensor : public ::testing::Test
 {
 public:
@@ -43,11 +52,12 @@ protected:
     Testing::TestServerClusterContext mContext;
     CodeDrivenDataModelProvider mProvider{ mContext.StorageDelegate(), mContext.AttributePersistenceProvider() };
     TimerDelegateMock mTimerDelegate;
+    MockIdentifyDelegate mIdentifyDelegate;
 };
 
 TEST_F(TestAirQualitySensor, TestMinimalConfiguration)
 {
-    AirQualitySensor<> sensor(mTimerDelegate);
+    AirQualitySensor<> sensor(mTimerDelegate, mIdentifyDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_EQ(sensor.GetEndpointId(), 1);
@@ -73,7 +83,7 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
     config.Get<CarbonDioxideConcentrationMeasurement::Id>().minMeasured = DataModel::MakeNullable(400.0f);
     config.Get<CarbonDioxideConcentrationMeasurement::Id>().maxMeasured = DataModel::MakeNullable(2000.0f);
 
-    ConfiguredSensor sensor(mTimerDelegate, config);
+    ConfiguredSensor sensor(mTimerDelegate, mIdentifyDelegate, config);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_NE(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
@@ -108,7 +118,7 @@ TEST_F(TestAirQualitySensor, TestTemplatedClusters)
 TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
 {
     AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id> sensor(
-        mTimerDelegate);
+        mTimerDelegate, mIdentifyDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
@@ -139,11 +149,35 @@ TEST_F(TestAirQualitySensor, TestTelemetryUpdate)
     sensor.Unregister(mProvider);
 }
 
+TEST_F(TestAirQualitySensor, TestConcentrationConfigWithoutExplicitClusterId)
+{
+    // Verify that designated initialization without repeating `.clusterId` works correctly
+    using Sensor = AirQualitySensor<CarbonDioxideConcentrationMeasurement::Id>;
+    Sensor::Config config;
+    config.Get<CarbonDioxideConcentrationMeasurement::Id>() = {
+        .features    = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement),
+        .medium      = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+        .unit        = ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+        .minMeasured = DataModel::MakeNullable(100.0f),
+        .maxMeasured = DataModel::MakeNullable(5000.0f),
+    };
+
+    Sensor sensor(mTimerDelegate, mIdentifyDelegate, config);
+    EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
+
+    auto * co2 = sensor.GetCluster<CarbonDioxideConcentrationMeasurement::Id>();
+    ASSERT_NE(co2, nullptr);
+    ASSERT_EQ(co2->GetPaths().size(), 1u);
+    EXPECT_EQ(co2->GetPaths()[0].mClusterId, CarbonDioxideConcentrationMeasurement::Id);
+
+    sensor.Unregister(mProvider);
+}
+
 TEST_F(TestAirQualitySensor, TestSimulationTick)
 {
     SimulatedAirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id,
                               CarbonDioxideConcentrationMeasurement::Id>
-        sensor(mTimerDelegate);
+        sensor(mTimerDelegate, mIdentifyDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_EQ(sensor.AirQualityCluster().GetAirQuality(), AirQualityEnum::kUnknown);
@@ -185,7 +219,7 @@ TEST_F(TestAirQualitySensor, TestAllConcentrationClusters)
                          OzoneConcentrationMeasurement::Id, FormaldehydeConcentrationMeasurement::Id,
                          Pm1ConcentrationMeasurement::Id, Pm10ConcentrationMeasurement::Id, RadonConcentrationMeasurement::Id>;
 
-    FullSensor sensor(mTimerDelegate);
+    FullSensor sensor(mTimerDelegate, mIdentifyDelegate);
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
 
     EXPECT_NE(sensor.GetCluster<TemperatureMeasurement::Id>(), nullptr);
@@ -209,7 +243,7 @@ TEST_F(TestAirQualitySensor, TestCleanTeardown)
     using TestSensor =
         AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
-    TestSensor sensor(mTimerDelegate);
+    TestSensor sensor(mTimerDelegate, mIdentifyDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     sensor.Unregister(mProvider);
@@ -223,7 +257,7 @@ TEST_F(TestAirQualitySensor, TestCleanTeardownStartedProvider)
     using TestSensor =
         AirQualitySensor<TemperatureMeasurement::Id, RelativeHumidityMeasurement::Id, CarbonDioxideConcentrationMeasurement::Id>;
 
-    TestSensor sensor(mTimerDelegate);
+    TestSensor sensor(mTimerDelegate, mIdentifyDelegate);
 
     EXPECT_EQ(sensor.Register(1, mProvider), CHIP_NO_ERROR);
     EXPECT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);

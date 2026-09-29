@@ -19,7 +19,7 @@
 
 namespace chip {
 namespace app {
-namespace Detail {
+namespace AirQualitySensorInternal {
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ConcentrationMeasurement;
@@ -86,6 +86,6 @@ ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clu
     };
 }
 
-} // namespace Detail
+} // namespace AirQualitySensorInternal
 } // namespace app
 } // namespace chip

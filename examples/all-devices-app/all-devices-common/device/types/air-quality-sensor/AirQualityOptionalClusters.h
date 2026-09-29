@@ -29,7 +29,7 @@
 namespace chip {
 namespace app {
 
-namespace Detail {
+namespace AirQualitySensorInternal {
 
 /**
  * @brief Compile-time mapping from ClusterId to the concrete ServerCluster type.
@@ -192,7 +192,16 @@ struct ConcentrationConfigTraits
     template <typename ClusterWrapper>
     static void CreateCluster(ClusterWrapper & wrapper, EndpointId endpoint, const Type & config)
     {
-        wrapper.Create(endpoint, config);
+        if (config.clusterId == CID)
+        {
+            wrapper.Create(endpoint, config);
+        }
+        else
+        {
+            Type resolvedConfig      = config;
+            resolvedConfig.clusterId = CID;
+            wrapper.Create(endpoint, resolvedConfig);
+        }
     }
 };
 
@@ -312,7 +321,7 @@ constexpr size_t CountOf()
     }
 }
 
-} // namespace Detail
+} // namespace AirQualitySensorInternal
 
 } // namespace app
 } // namespace chip
