@@ -20,15 +20,18 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
+#include <device/types/air-quality-sensor/impl/SimulatedAirQualitySensor.h>
 #include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
@@ -41,6 +44,7 @@
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
@@ -49,7 +53,7 @@
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
-#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
@@ -61,10 +65,13 @@
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
 #include <device/types/refrigerator/impl/LoggingRefrigerator.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -100,8 +107,10 @@ namespace chip::app {
  *
  * ```
  * +-------------------------------------------------------------------------+
- * | 1. Initialize Context (Main / Startup)                                  |
- * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;  |
+ * | 1. Register Root Node and Initialize Context (Main / Startup)           |
+ * |    rootNode.Register(...);                                              |
+ * |    AppFactory::Context context{                                         |
+ * |        .breadcrumbTracker = rootNode.GeneralCommissioning(), ... };      |
  * |    AppFactory::GetInstance().Init(context);                             |
  * +-------------------------------------------------------------------------+
  *                                    |
@@ -130,6 +139,9 @@ namespace chip::app {
  * ```
  *
  * ### Example Usage
+ *
+ * The root node must be registered before initialization because Context contains the
+ * BreadCrumbTracker owned by its General Commissioning cluster.
  *
  * Standard (Embedded / No-Hooks):
  * @code
@@ -226,6 +238,7 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         TestEventTriggerDelegate & testEventTriggerDelegate;
@@ -303,7 +316,7 @@ private:
         {
             RegisterCreator("air-purifier", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingAirPurifier>(FanLoad::Context{
+                return MakeDevice<LoggingAirPurifier>(LoggingAirPurifier::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -312,24 +325,44 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
+            using AirQualitySensorCo2 =
+                SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                          Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+
+            using AirQualitySensorFull =
+                SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
+                                          Clusters::RelativeHumidityMeasurement::Id,                           //
+                                          Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
+                                          Clusters::Pm25ConcentrationMeasurement::Id,                          //
+                                          Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, //
+                                          Clusters::CarbonMonoxideConcentrationMeasurement::Id,                //
+                                          Clusters::NitrogenDioxideConcentrationMeasurement::Id,               //
+                                          Clusters::OzoneConcentrationMeasurement::Id,                         //
+                                          Clusters::FormaldehydeConcentrationMeasurement::Id,                  //
+                                          Clusters::Pm1ConcentrationMeasurement::Id,                           //
+                                          Clusters::Pm10ConcentrationMeasurement::Id,                          //
+                                          Clusters::RadonConcentrationMeasurement::Id                          //
+                                          >;
+
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                using namespace Clusters::ConcentrationMeasurement;
-                return MakeDevice<AirQualitySensor>(
-                    mContext->timerDelegate,
-                    AirQualitySensor::Config{
-                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
-                            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
-                            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
-                        .co2Config =
-                            ConcentrationMeasurementCluster::Config{
-                                .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                                .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
-                                .medium    = MeasurementMediumEnum::kAir,
-                                .unit      = MeasurementUnitEnum::kPpm,
-                            },
-                    });
+                // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
+            });
+            RegisterCreator("air-quality-sensor-full", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from air-quality-sensor (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<AirQualitySensorFull>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityFullTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
@@ -350,23 +383,24 @@ private:
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
+        if constexpr (ALL_DEVICES_ENABLE_CHIME)
         {
-            RegisterCreator("color-temperature-light", [this]() {
+            RegisterCreator("chime", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-                });
+                static const Chime::Sound kDefaultSounds[] = {
+                    { 0, "Ding Dong"_span },
+                    { 1, "Ring Ring"_span },
+                };
+                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("contact-sensor", [this]() {
+            RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                    SimulatedClosure::ThreePanelDoorClosureConfig(), mContext->groupDataProvider,
+                                                    mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -384,15 +418,23 @@ private:
                 return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
-        if constexpr (ALL_DEVICES_ENABLE_CHIME)
+        if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
         {
-            RegisterCreator("chime", [this]() {
+            RegisterCreator("color-temperature-light", [this]() {
                 VerifyOrDie(mContext.has_value());
-                static const Chime::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
+                return MakeDevice<LoggingColorTemperatureLight>(LoggingColorTemperatureLight::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CONTACT_SENSOR)
+        {
+            RegisterCreator("contact-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)
@@ -429,13 +471,13 @@ private:
             RegisterCreator("dimmable-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<DimmablePlugInUnit>(
-                    LoggingDimmableLight::Context{
+                    DimmablePlugInUnit::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    DimmablePlugInUnit::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
@@ -464,20 +506,20 @@ private:
             RegisterCreator("mounted-dimmable-load-control", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<MountedDimmableLoadControl>(
-                    LoggingDimmableLight::Context{
+                    MountedDimmableLoadControl::Context{
                         .groupDataProvider = mContext->groupDataProvider,
                         .fabricTable       = mContext->fabricTable,
                         .timerDelegate     = mContext->timerDelegate,
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
-                    DimmableLoad::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+                    MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<MountedOnOffControl>(LoggingOnOffLight::Context{
+                return MakeDevice<MountedOnOffControl>(MountedOnOffControl::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
@@ -487,10 +529,16 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this]() {
+            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                mContext->platformManager, mContext->failSafeContext);
+                return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -517,12 +565,34 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffPlugInUnit>(LoggingOnOffLight::Context{
+                return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                     .identifyDelegate  = mContext->identifyDelegate,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)
+        {
+            RegisterCreator("room-air-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Distinguish the two RAC variants when both are included by --device '*'.
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
+            });
+            RegisterCreator("room-air-conditioner-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
@@ -601,6 +671,20 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
         }
+        if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
+        {
+            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
             RegisterCreator("electrical-sensor", [this]() {
@@ -612,7 +696,7 @@ private:
         {
             RegisterCreator("extractor-hood", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<ExtractorHood>(FanLoad::Context{
+                return MakeDevice<ExtractorHood>(ExtractorHood::Context{
                     .groupDataProvider   = mContext->groupDataProvider,
                     .fabricTable         = mContext->fabricTable,
                     .timerDelegate       = mContext->timerDelegate,
@@ -703,6 +787,13 @@ private:
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<WaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
+        {
+            RegisterCreator("humidity-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)

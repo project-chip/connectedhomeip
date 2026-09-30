@@ -130,6 +130,9 @@ public:
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
+        Clusters::IdentifyDelegate & identifyDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
@@ -197,6 +200,21 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+
+        PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
+            .groupDataProvider        = mContext.groupDataProvider,
+            .fabricTable              = mContext.fabricTable,
+            .timerDelegate            = mContext.timerDelegate,
+            .storageDelegate          = mContext.storageDelegate,
+            .diagnosticDataProvider   = mContext.diagnosticDataProvider,
+            .platformManager          = mContext.platformManager,
+            .failSafeContext          = mContext.failSafeContext,
+            .breadcrumbTracker        = mRootNode.RootDevice().GeneralCommissioning(),
+            .bindingTable             = mContext.bindingTable,
+            .bindingManager           = mContext.bindingManager,
+            .testEventTriggerDelegate = *mContext.testEventTriggerDelegate,
+            .identifyDelegate         = mContext.identifyDelegate,
+        });
         PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
@@ -270,20 +288,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
-        .groupDataProvider        = gGroupDataProvider,                     //
-        .fabricTable              = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate            = gTimerDelegate,                         //
-        .storageDelegate          = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager          = DeviceLayer::PlatformMgr(),
-        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable             = Binding::Table::GetInstance(),
-        .bindingManager           = Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
-        .identifyDelegate         = gIdentifyDelegate,
-    });
-
     RegisterDeviceFactoryOverrides(PosixDeviceFactory::GetInstance(), gTimerDelegate, Server::GetInstance().GetFabricTable(),
                                    initParams.persistentStorageDelegate, gAudioManager);
 
@@ -337,6 +341,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
+            .bindingTable               = Binding::Table::GetInstance(),                           //
+            .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
@@ -398,8 +405,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
 
-    chip::rpc::Init(33000); // TODO: Add an arg for Pw port.
-    ChipLogProgress(AppServer, "PW_RPC initialized.");
+    const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort);
+    chip::rpc::Init(rpcServerPort);
+    ChipLogProgress(AppServer, "PW_RPC initialized on port %u.", rpcServerPort);
+#else
+    if (AppOptions::GetConfig().rpcServerPort.has_value())
+    {
+        ChipLogError(AppServer,
+                     "--rpc-server-port was specified, but this binary was built without Pigweed RPC support. Ignoring it.");
+    }
 #endif // PW_RPC_ENABLED
 
     // Init ZCL Data Model and CHIP App Server
@@ -515,7 +529,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 {
     auto discriminator = config.discriminator.value_or(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR));
 
-    const auto setupPasscode             = MakeOptional(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE));
+    const auto setupPasscode =
+        MakeOptional(config.passcode.value_or(static_cast<uint32_t>(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE)));
     const uint32_t spake2pIterationCount = Crypto::kSpake2p_Min_PBKDF_Iterations;
 
     Optional<std::vector<uint8_t>> serializedSpake2pVerifier = NullOptional;
@@ -564,6 +579,19 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // Non-concurrent builds are excluded: BLEManagerImpl starts management itself
+    // once the BLE connection closes.
+    //
+    // Synchronous on purpose. The Wi-Fi PAF publish that follows starts management
+    // itself if it is not up yet, and a second start while the first is still
+    // completing deadlocks.
+    if (config.enableWiFi)
+    {
+        LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
+    }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     ConfigureWiFiPaf(config.wifipafFreqList);

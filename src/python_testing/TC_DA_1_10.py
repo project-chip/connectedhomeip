@@ -34,7 +34,7 @@
 # All certificate validation runs in Python (see support_modules/pqc_support.py) rather than through
 # the SDK's C++ crypto, so the harness is an independent check on the stack. Verifying ML-DSA
 # signatures therefore needs a cryptography build providing hazmat.primitives.asymmetric.mldsa
-# (46.0.0 or newer, linked against OpenSSL 3.5 or newer);
+# (48.0.0 or newer, linked against OpenSSL 3.5 or newer);
 #
 #   python3 src/python_testing/TC_DA_1_10.py --commissioning-method on-network \
 #       --discriminator 1234 --passcode 20202021 \
@@ -50,13 +50,13 @@ from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCr
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DA_1_10(MatterBaseTest):
+class TC_DA_1_10(MatterTestCommissionedDevice):
     """Validate CertificateChainRequest with PQC Profiles [DUT-Commissionee]."""
 
     def desc_TC_DA_1_10(self) -> str:

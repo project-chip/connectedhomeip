@@ -29,9 +29,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
-// TODO : (#73746) Uncomment this when datamodel is updated with the new revision
-// static_assert(Groups::kRevision >= 5, "This Stubbed Groups cluster implementation is only valid for cluster revision 5 and
-// above");
+static_assert(Groups::kRevision >= 5,
+              "This Stubbed Groups cluster implementation is only valid for groups cluster revision 5 and above");
 
 CHIP_ERROR StubbedGroupsCluster::Attributes(const ConcreteClusterPath & path,
                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
@@ -78,11 +77,8 @@ DataModel::ActionReturnStatus StubbedGroupsCluster::ReadAttribute(const DataMode
 
     switch (request.path.mAttributeId)
     {
-    case ClusterRevision::Id: {
-        // TODO : (#73746) Remove this, only use kRevision (from metadata) when datamodel is updated with the new revision.
-        constexpr uint16_t enforcedRev = kRevision < 5 ? 5 : kRevision;
-        return encoder.Encode(enforcedRev);
-    }
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);

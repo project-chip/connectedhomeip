@@ -137,52 +137,23 @@ TEST_F(TestAmbientSensingUnionCluster, TestReadUnionName)
 
 TEST_F(TestAmbientSensingUnionCluster, TestReadUnionHealth)
 {
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(*cluster);
 
-    // Test health with no contributors (NonFunctional)
-    {
-        auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
-        EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-        chip::Testing::ClusterTester tester(*cluster);
+    // Default health is NonFunctional
+    UnionHealthEnum health = UnionHealthEnum::kFullyFunctional;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
+    EXPECT_EQ(health, UnionHealthEnum::kNonFunctional);
 
-        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
-        EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
-        EXPECT_EQ(health, UnionHealthEnum::kNonFunctional);
-    }
+    // SetUnionHealth updates the readable attribute
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kFullyFunctional), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
+    EXPECT_EQ(health, UnionHealthEnum::kFullyFunctional);
 
-    // Test health with all online contributors (FullyFunctional)
-    {
-        auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
-        EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-        EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                                kDefaultTestFabricIndex),
-                  CHIP_NO_ERROR);
-
-        chip::Testing::ClusterTester tester(*cluster);
-
-        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
-        EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
-        EXPECT_EQ(health, UnionHealthEnum::kFullyFunctional);
-    }
-
-    // Test health with mixed online/offline contributors (LimitedDegraded)
-    {
-        auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
-        EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-        EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                                kDefaultTestFabricIndex),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
-                                                kDefaultTestFabricIndex),
-                  CHIP_NO_ERROR);
-
-        chip::Testing::ClusterTester tester(*cluster);
-
-        UnionHealthEnum health = UnionHealthEnum::kNonFunctional;
-        EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
-        EXPECT_EQ(health, UnionHealthEnum::kLimitedDegraded);
-    }
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kLimitedDegraded), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::UnionHealth::Id, health), CHIP_NO_ERROR);
+    EXPECT_EQ(health, UnionHealthEnum::kLimitedDegraded);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestReadEmptyContributorList)
@@ -307,7 +278,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributor)
               CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 1u);
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestAddMatterContributorDuplicate)
@@ -361,7 +331,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributor)
     EXPECT_EQ(cluster->RemoveMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 0u);
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestRemoveMatterContributorNotFound)
@@ -389,9 +358,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatus)
     EXPECT_EQ(
         cluster->UpdateMatterContributorStatus(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
         CHIP_NO_ERROR);
-
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
-    EXPECT_EQ(mDelegate.mLastUnionHealth, UnionHealthEnum::kNonFunctional);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateMatterContributorStatusSameValue)
@@ -443,7 +409,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributor)
               CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 1u);
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestAddNonMatterContributorEmptyName)
@@ -496,7 +461,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestRemoveNonMatterContributor)
     EXPECT_EQ(cluster->RemoveNonMatterContributor(CharSpan::fromCharString(kContributorName)), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster->GetContributorCount(), 0u);
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
 }
 
 TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
@@ -516,9 +480,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUpdateNonMatterContributorStatus)
     EXPECT_EQ(cluster->UpdateNonMatterContributorStatus(CharSpan::fromCharString(kContributorName),
                                                         UnionContributorStatusEnum::kUnionContributorOffline),
               CHIP_NO_ERROR);
-
-    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
-    EXPECT_EQ(mDelegate.mLastUnionHealth, UnionHealthEnum::kNonFunctional);
 }
 
 // =============================================================================
@@ -585,7 +546,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestMaxContributorsBoundary)
     }
 
     EXPECT_EQ(cluster->GetContributorCount(), 128u);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
 
     NodeId extraNodeId = static_cast<NodeId>(0x2000000000000000ULL);
     EXPECT_EQ(cluster->AddMatterContributor(extraNodeId, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
@@ -625,107 +585,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestContributorSlotReuse)
                                                UnionContributorStatusEnum::kUnionContributorOnline, kDefaultTestFabricIndex),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 3u);
-}
-
-// =============================================================================
-// Union Health Recalculation Tests
-// =============================================================================
-
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOnline)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
-}
-
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthAllOffline)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
-}
-
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthPartialOffline)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
-}
-
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthNoContributors)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->RemoveMatterContributor(kTestNodeId1, kContributorEp1), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
-}
-
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthTransitions)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
-        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
-
-    EXPECT_EQ(
-        cluster->UpdateMatterContributorStatus(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
-        CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
-
-    EXPECT_EQ(
-        cluster->UpdateMatterContributorStatus(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
-        CHIP_NO_ERROR);
-    EXPECT_EQ(
-        cluster->UpdateMatterContributorStatus(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline),
-        CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
 }
 
 // =============================================================================
@@ -919,19 +778,6 @@ TEST_F(TestAmbientSensingUnionCluster, TestUnionNameChangeNotification)
     EXPECT_TRUE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionName::Id }));
 }
 
-TEST_F(TestAmbientSensingUnionCluster, TestUnionHealthChangeNotification_OnContributorAdd)
-{
-
-    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(AmbientSensingUnionCluster::Config{ kTestEndpointId });
-    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
-
-    EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
-                                            kDefaultTestFabricIndex),
-              CHIP_NO_ERROR);
-
-    EXPECT_TRUE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
-}
-
 TEST_F(TestAmbientSensingUnionCluster, TestContributorListChangeNotification_OnAdd)
 {
 
@@ -1071,34 +917,29 @@ TEST_F(TestAmbientSensingUnionCluster, TestFullWorkflow)
 
     // 1. Initial state
     EXPECT_EQ(cluster->GetContributorCount(), 0u);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
 
     // 2. Add first Matter contributor (online)
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
                                             kDefaultTestFabricIndex),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 1u);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
 
     // 3. Add second Matter contributor (offline)
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOffline,
                                             kDefaultTestFabricIndex),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 2u);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
 
     // 4. Add non-Matter contributor (online)
     EXPECT_EQ(cluster->AddNonMatterContributor(CharSpan::fromCharString("ZigbeeSensor"),
                                                UnionContributorStatusEnum::kUnionContributorOnline, kDefaultTestFabricIndex),
               CHIP_NO_ERROR);
     EXPECT_EQ(cluster->GetContributorCount(), 3u);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
 
     // 5. Bring offline contributor back online
     EXPECT_EQ(
         cluster->UpdateMatterContributorStatus(kTestNodeId2, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline),
         CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
 
     // 6. Update union name
     EXPECT_EQ(cluster->SetUnionName(CharSpan::fromCharString("UpdatedUnion")), CHIP_NO_ERROR);
@@ -1129,12 +970,11 @@ TEST_F(TestAmbientSensingUnionCluster, TestConfigurationChaining)
     EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(cluster->GetUnionName().data_equal(CharSpan::fromCharString("ChainedConfig")));
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
 
     EXPECT_EQ(cluster->AddMatterContributor(kTestNodeId1, kContributorEp1, UnionContributorStatusEnum::kUnionContributorOnline,
                                             kDefaultTestFabricIndex),
               CHIP_NO_ERROR);
-    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
+    EXPECT_EQ(cluster->GetContributorCount(), 1u);
 }
 
 // =============================================================================
@@ -1218,6 +1058,65 @@ TEST_F(TestAmbientSensingUnionCluster, TestGetContributorsArray)
 
     size_t activeCount = cluster->GetContributorCount();
     EXPECT_EQ(activeCount, 2u);
+}
+
+// =============================================================================
+// SetUnionHealth Direct Method Tests
+// =============================================================================
+
+TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthDirectly)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
+
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kFullyFunctional), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kFullyFunctional);
+
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kLimitedDegraded), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kLimitedDegraded);
+
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kNonFunctional), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster->GetUnionHealth(), UnionHealthEnum::kNonFunctional);
+}
+
+TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthNotifiesDelegate)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    mDelegate.Reset();
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kFullyFunctional), CHIP_NO_ERROR);
+    EXPECT_TRUE(mDelegate.mUnionHealthChangedCalled);
+    EXPECT_EQ(mDelegate.mLastUnionHealth, UnionHealthEnum::kFullyFunctional);
+}
+
+TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthSameValueIsNoOp)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kNonFunctional), CHIP_NO_ERROR);
+
+    mDelegate.Reset();
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kNonFunctional), CHIP_NO_ERROR);
+    EXPECT_FALSE(mDelegate.mUnionHealthChangedCalled);
+    EXPECT_FALSE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
+}
+
+TEST_F(TestAmbientSensingUnionCluster, TestSetUnionHealthNotifiesAttributeChanged)
+{
+    auto cluster = std::make_unique<AmbientSensingUnionClusterT<>>(
+        AmbientSensingUnionCluster::Config{ kTestEndpointId }.WithDelegate(&mDelegate));
+    EXPECT_EQ(cluster->Startup(mContext->Get()), CHIP_NO_ERROR);
+
+    mContext->ChangeListener().DirtyList().clear();
+    EXPECT_EQ(cluster->SetUnionHealth(UnionHealthEnum::kFullyFunctional), CHIP_NO_ERROR);
+    EXPECT_TRUE(mContext->ChangeListener().IsDirty({ kTestEndpointId, AmbientSensingUnion::Id, Attributes::UnionHealth::Id }));
 }
 
 } // namespace

@@ -94,6 +94,16 @@ constexpr DataModel::DeviceTypeEntry kSecondaryNetworkInterface = {
     .deviceTypeRevision = kSecondaryNetworkInterfaceDeviceTypeRevision,
 };
 
+constexpr DataModel::DeviceTypeEntry kStreamingAudioPlayer = {
+    .deviceTypeId       = kStreamingAudioPlayerDeviceTypeId,
+    .deviceTypeRevision = kStreamingAudioPlayerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kCastingAudioPlayer = {
+    .deviceTypeId       = kCastingAudioPlayerDeviceTypeId,
+    .deviceTypeRevision = kCastingAudioPlayerDeviceTypeRevision,
+};
+
 constexpr DataModel::DeviceTypeEntry kSpeaker = {
     .deviceTypeId       = kSpeakerDeviceTypeId,
     .deviceTypeRevision = kSpeakerDeviceTypeRevision,
@@ -522,6 +532,11 @@ constexpr DataModel::DeviceTypeEntry kElectricalSurgeProtector = {
 constexpr DataModel::DeviceTypeEntry kResidualCurrentCircuitBreaker = {
     .deviceTypeId       = kResidualCurrentCircuitBreakerDeviceTypeId,
     .deviceTypeRevision = kResidualCurrentCircuitBreakerDeviceTypeRevision,
+};
+
+constexpr DataModel::DeviceTypeEntry kAuxiliaryLoadSwitch = {
+    .deviceTypeId       = kAuxiliaryLoadSwitchDeviceTypeId,
+    .deviceTypeRevision = kAuxiliaryLoadSwitchDeviceTypeRevision,
 };
 
 constexpr DataModel::DeviceTypeEntry kControlBridge = {

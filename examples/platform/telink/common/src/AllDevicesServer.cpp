@@ -76,7 +76,7 @@ LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
-std::unique_ptr<DeviceInterface> gRootNodeDevice;
+std::unique_ptr<RootNode> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -116,12 +116,12 @@ CHIP_ERROR CreateAndRegisterRootNode(CommonCaseDeviceServerInitParams & initPara
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     gRootNodeDevice = std::make_unique<WifiRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                     WifiRootNode::WifiContext{
+                                                     WifiFeature::Context{
                                                          .wifiDriver = NetworkCommissioning::TelinkWiFiDriver::Instance(),
                                                      });
 #elif CHIP_ENABLE_OPENTHREAD
     gRootNodeDevice = std::make_unique<ThreadRootNode>(MakeRootNodeContext(initParams, *deviceInfoProvider),
-                                                       ThreadRootNode::ThreadContext{
+                                                       ThreadFeature::Context{
                                                            .threadDriver = gThreadDriver,
                                                        });
 #else
@@ -165,6 +165,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = gRootNodeDevice->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
