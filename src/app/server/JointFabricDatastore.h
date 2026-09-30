@@ -35,6 +35,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -266,6 +267,9 @@ public:
         static JointFabricDatastore sInstance;
         return sInstance;
     }
+
+    // Single-entry syncs that may wait per node while another runs. Commands that would exceed it fail with BUSY.
+    static constexpr size_t kMaxQueuedNodeSyncs = 64;
 
     /**
      * Pushes datastore changes to nodes and reads their current state.
@@ -729,7 +733,8 @@ private:
 
     CHIP_ERROR IsNodeIDInDatastore(NodeId nodeId, size_t & index);
 
-    CHIP_ERROR UpdateNodeKeySetList(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
+    // Marks the node entries of `groupKeySetId` Pending and syncs the stored key set to their nodes.
+    CHIP_ERROR UpdateNodeKeySetList(uint16_t groupKeySetId);
     CHIP_ERROR RemoveKeySet(uint16_t groupKeySetId);
 
     CHIP_ERROR IsGroupIDInDatastore(GroupId groupId, size_t & index);
@@ -774,21 +779,33 @@ private:
     void MarkRefreshAclsSyncFailed(NodeId nodeId, CHIP_ERROR err);
 
     /**
-     * Single-entry ACL and binding syncs read the node's whole list, edit it and write it back, so the datastore runs
-     * at most one of them per node at a time. RefreshNode also holds the node's slot until it finishes.
+     * The datastore runs at most one single-entry sync per node at a time. Single-entry ACL and binding syncs read the
+     * node's whole list, edit it and write it back, and an add and a removal of the same group or key set must reach
+     * the node in order. RefreshNode, whose own syncs do not queue, holds the node's slot until it finishes.
      *
      * Starts `start` now if `nodeId` has nothing in flight and returns its result; otherwise queues it and returns
-     * CHIP_NO_ERROR. `start` must end in exactly one FinishNodeSync(nodeId), synchronously or from a completion. At
-     * most kMaxACLs operations wait per node.
+     * CHIP_NO_ERROR, or BUSY if kMaxQueuedNodeSyncs operations already wait. `start` must end in exactly one
+     * FinishNodeSync(nodeId), synchronously or from a completion.
+     *
+     * Commands check HasNodeSyncCapacity before changing any entry, so that a BUSY rejection leaves the datastore
+     * unchanged and the commissioner's retry repeats the whole command.
      */
     CHIP_ERROR RunOrQueueNodeSync(NodeId nodeId, std::function<CHIP_ERROR()> start);
     void FinishNodeSync(NodeId nodeId);
     bool IsNodeSyncIdle(NodeId nodeId) const;
+    bool HasNodeSyncCapacity(NodeId nodeId, size_t count = 1) const;
+    bool HasNodeSyncCapacity(const std::map<NodeId, size_t> & countsPerNode) const;
 
     // Queued operations. Each looks its entry up by key when it starts, and syncs a removal if the entry is being
     // removed, or an add of its current value if it is not Committed. Each ends with FinishNodeSync(nodeId).
     CHIP_ERROR StartAclEntrySync(NodeId nodeId, uint16_t listId);
     CHIP_ERROR StartBindingEntrySync(NodeId nodeId, EndpointId endpointId, uint16_t listId);
+    // An add is not synced while the entry for `requiredKeySetId` on the node is CommitFailed.
+    CHIP_ERROR StartEndpointGroupEntrySync(NodeId nodeId, EndpointId endpointId, GroupId groupId,
+                                           std::optional<uint16_t> requiredKeySetId);
+    CHIP_ERROR StartNodeKeySetEntrySync(NodeId nodeId, uint16_t groupKeySetId);
+    template <typename Wire, typename Entry, typename Match>
+    CHIP_ERROR StartEntrySync(std::vector<Entry> & entries, NodeId nodeId, Match match);
 
     // Records that a stage of `nodeId`'s refresh failed, if that refresh is still active.
     void MarkRefreshFailed(NodeId nodeId, CHIP_ERROR err);
@@ -801,6 +818,8 @@ private:
     Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
     EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const;
 
+    // Nodes with an endpoint in `groupId`.
+    std::unordered_set<NodeId> NodesInGroup(GroupId groupId) const;
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
 
