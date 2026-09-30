@@ -863,7 +863,7 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
         // because saturation arrived first. OnTick ticks hue before saturation and clears a finished
         // axis right after its Tick* returns, so hsx->hue reads post-completion here.
         const auto * hsx     = std::get_if<HueSatTransition>(&mTransition);
-        const bool hueMoving = (hsx != nullptr) && hsx->hue.has_value();
+        const bool hueMoving = ((hsx != nullptr) && hsx->hue.has_value()) || LoopIsDriving();
         mDelegate.OnColorHSChanged(ehs->hue8(), ehs->saturation, !done);
         mDelegate.OnEnhancedHueChanged(ehs->enhancedHue, hueMoving);
     }
@@ -2091,7 +2091,7 @@ DataModel::ActionReturnStatus ColorControlCluster::ReadAttribute(const DataModel
     // Fixed descriptor readers: a descriptor exists only if the app supplied the table (mStaticConfig) AND
     // the specific optional is engaged; otherwise the attribute is genuinely absent → UnsupportedAttribute.
     // `field` selects one std::optional<ChromaticityPoint>, `proj` picks x / y / intensity off it.
-    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::*field, auto proj) -> DataModel::ActionReturnStatus {
+    auto point = [&](std::optional<ChromaticityPoint> StaticConfig::* field, auto proj) -> DataModel::ActionReturnStatus {
         if (mStaticConfig == nullptr || !(mStaticConfig->*field).has_value())
         {
             return Status::UnsupportedAttribute;
