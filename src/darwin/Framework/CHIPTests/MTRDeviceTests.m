@@ -6384,7 +6384,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [self waitForExpectations:@[ reportEnded ] timeout:kTimeoutInSeconds];
         // Short timeout for the inverted ones, so a passing test does not sit there
         // proving a negative.
-        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 5];
+        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 1];
     };
 
     // The whole loop runs well inside the window, so losses past the budget must not be
