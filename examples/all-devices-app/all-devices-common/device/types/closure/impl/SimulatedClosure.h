@@ -60,10 +60,10 @@ public:
         std::vector<PanelList> panels;
     };
 
-    /// The closure exposed by `--device closure`: a door that positions, latches and moves at a
-    /// selectable speed, composed of a translating lift panel, a flow-modulating panel and a
-    /// latching rotating panel. The semantic tags it references have static storage duration.
-    static Config ThreePanelDoorClosureConfig();
+    /// The closure exposed by `--device closure`: a non-access cabinet that positions, latches and
+    /// moves at a selectable speed, composed of a translating lift panel, a latching flow-modulating
+    /// panel and a latching rotating panel. The semantic tags it references have static storage duration.
+    static Config ThreePanelCabinetClosureConfig();
 
     SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,

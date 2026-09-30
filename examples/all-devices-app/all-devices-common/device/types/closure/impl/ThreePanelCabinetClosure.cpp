@@ -24,14 +24,14 @@ namespace {
 using namespace Clusters;
 
 // Spans over these are handed to the device, so they must outlive it.
-const EndpointComposition::SemanticTag kDoorTag[]   = { { .namespaceID = CommonNamespace::kClosureId,
-                                                          .tag         = to_underlying(Globals::ClosureTag::kDoor) } };
-const EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kLift) } };
-const EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) } };
-const EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) } };
+const EndpointComposition::SemanticTag kCabinetTag[] = { { .namespaceID = CommonNamespace::kClosureId,
+                                                           .tag         = to_underlying(Globals::ClosureTag::kCabinet) } };
+const EndpointComposition::SemanticTag kLiftTag[]    = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kLift) } };
+const EndpointComposition::SemanticTag kRotateTag[]  = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) } };
+const EndpointComposition::SemanticTag kSlideTag[]   = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) } };
 
 constexpr Percent100ths kPanelResolution = 1;
 constexpr Percent100ths kPanelStepValue  = 1;
@@ -39,12 +39,17 @@ constexpr Percent100ths kPanelStepValue  = 1;
 ClosurePanel::Config LiftPanel()
 {
     return {
-        .withAccess = true,
+        .withAccess = false,
         .positioning =
             ClosurePanel::PositioningParams{
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::TranslationParams{ ClosureDimension::TranslationDirectionEnum::kBackward },
+                .unit =
+                    ClosurePanel::UnitParams{
+                        .unit  = ClosureDimension::ClosureUnitEnum::kMillimeter,
+                        .range = DataModel::MakeNullable(ClosureDimension::Structs::UnitRangeStruct::Type{ .min = 0, .max = 2000 }),
+                    },
             },
     };
 }
@@ -53,6 +58,9 @@ ClosurePanel::Config ModulatingPanel()
 {
     return {
         .withAccess = false,
+        .motionLatching =
+            BitFlags<ClosureDimension::LatchControlModesBitmap>(ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
+                                                                ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
         .positioning =
             ClosurePanel::PositioningParams{
                 .resolution = kPanelResolution,
@@ -65,7 +73,7 @@ ClosurePanel::Config ModulatingPanel()
 ClosurePanel::Config RotatingPanel()
 {
     return {
-        .withAccess = true,
+        .withAccess = false,
         .motionLatching =
             BitFlags<ClosureDimension::LatchControlModesBitmap>(ClosureDimension::LatchControlModesBitmap::kRemoteLatching,
                                                                 ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching),
@@ -81,11 +89,11 @@ ClosurePanel::Config RotatingPanel()
 
 } // namespace
 
-SimulatedClosure::Config SimulatedClosure::ThreePanelDoorClosureConfig()
+SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfig()
 {
     return {
         .closure = Closure::Config{
-            .tags            = Span<const EndpointComposition::SemanticTag>(kDoorTag),
+            .tags            = Span<const EndpointComposition::SemanticTag>(kCabinetTag),
             .withPositioning = true,
             .motionLatching  = BitFlags<ClosureControl::LatchControlModesBitmap>(
                 ClosureControl::LatchControlModesBitmap::kRemoteLatching,
@@ -97,7 +105,8 @@ SimulatedClosure::Config SimulatedClosure::ThreePanelDoorClosureConfig()
             .withCalibration            = true,
             .withManuallyOperable       = true,
             .withProtection             = true,
-            .withAccess                 = true,
+            .withAccess                 = false, // ACC would make the !ACC test cases (CLCTRL_7_x, CLDIM_5_x/6_x) skip
+            .withCountdownTime          = true,
             .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(
                 MakeOptional(DataModel::MakeNullable(ClosureControl::CurrentPositionEnum::kFullyClosed)),
                 MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto))),

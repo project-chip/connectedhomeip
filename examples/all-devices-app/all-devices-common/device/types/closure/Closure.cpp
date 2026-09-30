@@ -83,6 +83,10 @@ CHIP_ERROR Closure::Register(EndpointIdAllocator & allocator, CodeDrivenDataMode
     {
         CCconfig.WithAccess();
     }
+    if (mConfig.withCountdownTime)
+    {
+        CCconfig.WithCountdownTime();
+    }
     if (mConfig.withCalibration)
     {
         CCconfig.WithCalibration();
