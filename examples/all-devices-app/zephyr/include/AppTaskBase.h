@@ -83,7 +83,9 @@ public:
 
     CHIP_ERROR InitThreadNetworking();
 
-    // TODO: no Wi-Fi implementation yet
+    // Binds the Zephyr Wi-Fi station driver to the optional Matter shell. The
+    // driver itself is consumed by WifiFeature when it creates the root
+    // Network Commissioning and Wi-Fi Network Diagnostics clusters.
     CHIP_ERROR InitWifiNetworking();
 
     /// Storage/group data provider setup.

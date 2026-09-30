@@ -124,9 +124,13 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitWifiNetworking()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // InitChipStack() initializes the Zephyr connectivity layer.  The same
+    // singleton is then used by WifiFeature for Matter Network Commissioning;
+    // the shell registration below is only a development/debug interface.
 #if CONFIG_CHIP_LIB_SHELL
     Shell::SetWiFiDriver(&mWifiDriver);
 #endif // CONFIG_CHIP_LIB_SHELL
+    ChipLogProgress(AppServer, "Matter Wi-Fi station commissioning is enabled");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     return CHIP_NO_ERROR;
 }
