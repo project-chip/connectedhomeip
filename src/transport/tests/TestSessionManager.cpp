@@ -21,6 +21,7 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <algorithm>
 #include <errno.h>
 
 #include <pw_unit_test/framework.h>
@@ -41,6 +42,7 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/RAIIMockClock.h>
 #include <transport/MessageStats.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -1183,5 +1185,577 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
 
     sessionManager.Shutdown();
 }
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+namespace {
+
+constexpr uint16_t kUnreachableTestPort1      = 5540;
+constexpr uint16_t kUnreachableTestPort2      = 5541;
+constexpr NodeId kUnreachableLocalNodeId      = 0xAAAA'AAAA'AAAA'0001ull;
+constexpr NodeId kUnreachablePeerNodeId       = 0xBBBB'BBBB'BBBB'0001ull;
+constexpr FabricIndex kUnreachableFabricIndex = 1;
+
+Transport::PeerAddress MakeUdpPeer(const char * addrStr, uint16_t port)
+{
+    IPAddress addr;
+    IPAddress::FromString(addrStr, addr);
+    return Transport::PeerAddress::UDP(addr, port);
+}
+
+SecureSession * InjectActiveCaseSession(SessionManager & mgr, SessionHolder & holder, const Transport::PeerAddress & peer,
+                                        uint16_t localSessionId, uint16_t peerSessionId = 1)
+{
+    CHIP_ERROR err =
+        mgr.InjectCaseSessionWithTestKey(holder, localSessionId, peerSessionId, kUnreachableLocalNodeId, kUnreachablePeerNodeId,
+                                         kUnreachableFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    holder->AsSecureSession()->MarkActive();
+    return holder->AsSecureSession();
+}
+
+struct QuotedMessage
+{
+    uint8_t bytes[32] = {};
+    uint16_t length   = 0;
+    ByteSpan Span() const { return ByteSpan(bytes, length); }
+};
+
+QuotedMessage QuoteHeader(uint16_t sessionId, uint32_t counter,
+                          Header::SessionType sessionType = Header::SessionType::kUnicastSession)
+{
+    QuotedMessage quoted;
+    PacketHeader header;
+    header.SetSessionType(sessionType).SetSessionId(sessionId).SetMessageCounter(counter);
+    EXPECT_EQ(header.Encode(quoted.bytes, sizeof(quoted.bytes), &quoted.length), CHIP_NO_ERROR);
+    return quoted;
+}
+
+uint32_t NextSendCounter(SecureSession & session)
+{
+    uint32_t counter = 0;
+    EXPECT_EQ(session.GetSessionMessageCounter().GetLocalMessageCounter().AdvanceAndConsume(counter), CHIP_NO_ERROR);
+    return counter;
+}
+
+QuotedMessage QuoteNextSend(SecureSession & session)
+{
+    return QuoteHeader(session.GetPeerSessionId(), NextSendCounter(session));
+}
+
+Inet::InterfaceId FirstPresentInterface()
+{
+    Inet::InterfaceIterator it;
+    while (it.Next())
+    {
+        if (it.GetInterfaceId().IsPresent())
+        {
+            return it.GetInterfaceId();
+        }
+    }
+    return Inet::InterfaceId::Null();
+}
+
+} // namespace
+
+TEST_F(TestSessionManager, PortUnreachable_MarksMatchingSessionDefunct)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 100);
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.OnPortUnreachable(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsDefunct());
+    EXPECT_FALSE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_DistinguishesByPort)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peerA = MakeUdpPeer("::1", kUnreachableTestPort1);
+    Transport::PeerAddress peerB = MakeUdpPeer("::1", kUnreachableTestPort2);
+    SessionHolder holderA, holderB;
+    auto * a               = InjectActiveCaseSession(sessionManager, holderA, peerA, /*lsid*/ 300);
+    auto * b               = InjectActiveCaseSession(sessionManager, holderB, peerB, /*lsid*/ 301);
+    const uint32_t counter = std::max(NextSendCounter(*a), NextSendCounter(*b));
+    a->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(counter);
+    b->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(counter);
+
+    sessionManager.OnPortUnreachable(peerA, QuoteHeader(b->GetPeerSessionId(), counter).Span());
+
+    EXPECT_TRUE(a->IsDefunct());
+    EXPECT_TRUE(b->IsActiveSession()); // different port: untouched
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_DistinguishesByTransport)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress udpPeer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    Transport::PeerAddress tcpPeer = Transport::PeerAddress::TCP(udpPeer.GetIPAddress(), kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, tcpPeer, /*lsid*/ 310);
+
+    sessionManager.OnPortUnreachable(udpPeer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession()); // different transport: untouched
+    EXPECT_FALSE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_RetiresOnlyTheQuotedSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder h1, h2;
+    auto * s1 = InjectActiveCaseSession(sessionManager, h1, peer, /*lsid*/ 400);
+    auto * s2 = InjectActiveCaseSession(sessionManager, h2, peer, /*lsid*/ 401);
+
+    const QuotedMessage quoted = QuoteNextSend(*s1);
+    PacketHeader header;
+    uint16_t headerSize = 0;
+    ASSERT_EQ(header.Decode(quoted.bytes, quoted.length, &headerSize), CHIP_NO_ERROR);
+    s2->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(header.GetMessageCounter() + 1000);
+
+    sessionManager.OnPortUnreachable(peer, quoted.Span());
+
+    EXPECT_TRUE(s1->IsDefunct());
+    EXPECT_TRUE(s2->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_DistinguishesByPeerSessionId)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder h1, h2;
+    auto * s1              = InjectActiveCaseSession(sessionManager, h1, peer, /*lsid*/ 410, /*peerSessionId*/ 7);
+    auto * s2              = InjectActiveCaseSession(sessionManager, h2, peer, /*lsid*/ 411, /*peerSessionId*/ 8);
+    const uint32_t counter = std::max(NextSendCounter(*s1), NextSendCounter(*s2));
+    s1->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(counter);
+    s2->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(counter);
+
+    sessionManager.OnPortUnreachable(peer, QuoteHeader(s2->GetPeerSessionId(), counter).Span());
+
+    EXPECT_TRUE(s1->IsActiveSession());
+    EXPECT_TRUE(s2->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_DistinguishesByAddress)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress sessionPeer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    Transport::PeerAddress otherPeer   = MakeUdpPeer("::2", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, sessionPeer, /*lsid*/ 500);
+
+    sessionManager.OnPortUnreachable(otherPeer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession()); // different address: untouched
+    EXPECT_FALSE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresAnIdleSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    System::Clock::Internal::RAIIMockClock clock;
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 960);
+    session->SetRemoteSessionParameters(
+        ReliableMessageProtocolConfig({ System::Clock::Timestamp(300), System::Clock::Timestamp(300) }));
+    const QuotedMessage quoted = QuoteNextSend(*session);
+
+    clock.AdvanceMonotonic(session->GetMRPBaseTimeout() + System::Clock::Milliseconds64(1));
+    sessionManager.OnPortUnreachable(peer, quoted.Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_AcceptsReportAtMrpIntervalEdge)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    System::Clock::Internal::RAIIMockClock clock;
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 961);
+    session->SetRemoteSessionParameters(
+        ReliableMessageProtocolConfig({ System::Clock::Timestamp(300), System::Clock::Timestamp(300) }));
+    const QuotedMessage quoted = QuoteNextSend(*session);
+
+    clock.AdvanceMonotonic(session->GetMRPBaseTimeout());
+    sessionManager.OnPortUnreachable(peer, quoted.Span());
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_LeavesPaseAlone)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(holder, /*lsid*/ 950, kUnreachablePeerNodeId, /*peerSessionId*/ 1,
+                                                          kUnreachableFabricIndex, peer, CryptoContext::SessionRole::kInitiator));
+    auto * session = holder->AsSecureSession();
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.OnPortUnreachable(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_MatchesAcrossInterfaces)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    IPAddress addr;
+    IPAddress::FromString("fe80::1", addr);
+    Inet::InterfaceId ifid = FirstPresentInterface();
+    ASSERT_TRUE(ifid.IsPresent());
+    Transport::PeerAddress sessionPeer = Transport::PeerAddress::UDP(addr, kUnreachableTestPort1, ifid);
+    Transport::PeerAddress icmpPeer    = Transport::PeerAddress::UDP(addr, kUnreachableTestPort1);
+    ASSERT_NE(sessionPeer, icmpPeer); // they differ only by interface
+
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, sessionPeer, /*lsid*/ 900);
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.OnPortUnreachable(icmpPeer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresEstablishingSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer     = MakeUdpPeer("::1", kUnreachableTestPort1);
+    Optional<SessionHandle> pending = sessionManager.AllocateSession(Transport::SecureSession::Type::kCASE,
+                                                                     ScopedNodeId(kUnreachablePeerNodeId, kUnreachableFabricIndex));
+    ASSERT_TRUE(pending.HasValue());
+    auto * session = pending.Value()->AsSecureSession();
+    session->SetPeerAddress(peer);
+    session->MarkActive();
+    ASSERT_TRUE(session->IsEstablishing());
+
+    sessionManager.OnPortUnreachable(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsEstablishing());
+    EXPECT_FALSE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresWrongQuotedSessionId)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1100);
+    sessionManager.OnPortUnreachable(
+        peer, QuoteHeader(static_cast<uint16_t>(session->GetPeerSessionId() + 1), NextSendCounter(*session)).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_AcceptsCounterAtWindowEdge)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session      = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1101);
+    const uint32_t sent = NextSendCounter(*session);
+    for (uint32_t i = 0; i < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE - 1; i++)
+    {
+        NextSendCounter(*session);
+    }
+    sessionManager.OnPortUnreachable(peer, QuoteHeader(session->GetPeerSessionId(), sent).Span());
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresCounterBeyondWindow)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session      = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1102);
+    const uint32_t sent = NextSendCounter(*session);
+    for (uint32_t i = 0; i < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i++)
+    {
+        NextSendCounter(*session);
+    }
+    sessionManager.OnPortUnreachable(peer, QuoteHeader(session->GetPeerSessionId(), sent).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresUnsentCounter)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session        = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1103);
+    const uint32_t unsent = NextSendCounter(*session) + 1;
+    sessionManager.OnPortUnreachable(peer, QuoteHeader(session->GetPeerSessionId(), unsent).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresCounterBeforeFirstSend)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session       = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1106);
+    const uint32_t first = NextSendCounter(*session);
+    for (uint32_t below = 1; below < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE && below < first; below++)
+    {
+        sessionManager.OnPortUnreachable(peer, QuoteHeader(session->GetPeerSessionId(), first - below).Span());
+        EXPECT_TRUE(session->IsActiveSession());
+    }
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresUnsentCounterAcrossWrap)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1107);
+    session->GetSessionMessageCounter().GetLocalMessageCounter().TestSetCounter(0);
+    sessionManager.OnPortUnreachable(
+        peer, QuoteHeader(session->GetPeerSessionId(), LocalSessionMessageCounter::kMessageCounterMax).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresGroupSessionQuote)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1104);
+    sessionManager.OnPortUnreachable(
+        peer, QuoteHeader(session->GetPeerSessionId(), NextSendCounter(*session), Header::SessionType::kGroupSession).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, PortUnreachable_IgnoresUndecodableQuote)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kUnreachableTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1105);
+    PacketHeader header;
+    header.SetSessionType(Header::SessionType::kUnicastSession)
+        .SetSessionId(session->GetPeerSessionId())
+        .SetMessageCounter(NextSendCounter(*session))
+        .SetSourceNodeId(kUnreachablePeerNodeId);
+    uint8_t encoded[32];
+    uint16_t encodedLength = 0;
+    ASSERT_EQ(header.Encode(encoded, sizeof(encoded), &encodedLength), CHIP_NO_ERROR);
+    sessionManager.OnPortUnreachable(peer, ByteSpan(encoded, encodedLength - sizeof(NodeId)));
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 } // namespace
