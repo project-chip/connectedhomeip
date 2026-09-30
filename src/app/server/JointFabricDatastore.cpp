@@ -553,23 +553,27 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 entryToSync.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             auto match = [nodeId = entryToSync.nodeID, endpointId = entryToSync.endpointID, groupId = entryToSync.groupID](
                              const auto & e) { return e.nodeID == nodeId && e.endpointID == endpointId && e.groupID == groupId; };
-            CHIP_ERROR syncErr =
-                mDelegate->SyncNode(mRefreshingNodeId, entryToSync, [this, entryToSync, removal, match](CHIP_ERROR innerErr) {
+            // The result applies only if the entry is still being added or removed as when the sync started.
+            auto sameOperation = [this, match, removal](const auto & e) { return match(e) && HasRemovalIntent(e) == removal; };
+            CHIP_ERROR syncErr = mDelegate->SyncNode(
+                mRefreshingNodeId, entryToSync, [this, entryToSync, removal, sameOperation](CHIP_ERROR innerErr) {
                     if (innerErr != CHIP_NO_ERROR)
                     {
-                        detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, match, innerErr);
+                        detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, sameOperation, innerErr);
                         MarkRefreshFailed(entryToSync.nodeID, innerErr);
                         return;
                     }
                     if (removal)
                     {
-                        ClearRemovalIntent(entryToSync);
-                        mEndpointGroupIDEntries.erase(
-                            std::remove_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), match),
-                            mEndpointGroupIDEntries.end());
+                        auto erased = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), sameOperation);
+                        if (erased != mEndpointGroupIDEntries.end())
+                        {
+                            ClearRemovalIntent(*erased);
+                            mEndpointGroupIDEntries.erase(erased);
+                        }
                         return;
                     }
-                    detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, match);
+                    detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, sameOperation);
                 });
             if (syncErr != CHIP_NO_ERROR)
             {
@@ -957,25 +961,23 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             entryToRemove.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             CHIP_ERROR syncErr =
                 mDelegate->SyncNode(nodeIdToErase, entryToRemove, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
-                    auto match = [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
-                        return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase;
+                    // An add that cancelled the removal while it was in flight owns the entry now.
+                    auto stillRemoving = [this, nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
+                        return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase &&
+                            HasRemovalIntent(entry);
                     };
                     if (innerErr == CHIP_NO_ERROR)
                     {
-                        mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
-                                                                [&](const auto & entry) {
-                                                                    if (!match(entry))
-                                                                    {
-                                                                        return false;
-                                                                    }
-                                                                    ClearRemovalIntent(entry);
-                                                                    return true;
-                                                                }),
-                                                 mNodeKeySetEntries.end());
+                        auto erased = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), stillRemoving);
+                        if (erased != mNodeKeySetEntries.end())
+                        {
+                            ClearRemovalIntent(*erased);
+                            mNodeKeySetEntries.erase(erased);
+                        }
                     }
                     else
                     {
-                        detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
+                        detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, stillRemoving, innerErr);
                         MarkRefreshFailed(nodeIdToErase, innerErr);
                     }
 
@@ -2059,13 +2061,15 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
             auto groupMatch             = [erasedNodeId, erasedEndpointId, erasedGroupId](const auto & entry) {
                 return entry.nodeID == erasedNodeId && entry.endpointID == erasedEndpointId && entry.groupID == erasedGroupId;
             };
-            CHIP_ERROR groupStartErr = mDelegate->SyncNode(nodeId, *it, [this, groupMatch](CHIP_ERROR syncErr) {
+            // An add that cancelled the removal while it was in flight owns the entry now.
+            auto stillRemoving = [this, groupMatch](const auto & entry) { return groupMatch(entry) && HasRemovalIntent(entry); };
+            CHIP_ERROR groupStartErr = mDelegate->SyncNode(nodeId, *it, [this, stillRemoving](CHIP_ERROR syncErr) {
                 if (syncErr != CHIP_NO_ERROR)
                 {
-                    detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, groupMatch, syncErr);
+                    detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, stillRemoving, syncErr);
                     return;
                 }
-                auto eraseIt = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), groupMatch);
+                auto eraseIt = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), stillRemoving);
                 if (eraseIt != mEndpointGroupIDEntries.end())
                 {
                     ClearRemovalIntent(*eraseIt);
@@ -2091,19 +2095,24 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                         auto keySetMatch               = [erasedKeySetNodeId, erasedKeySetGroupId](const auto & entry) {
                             return entry.nodeID == erasedKeySetNodeId && entry.groupKeySetID == erasedKeySetGroupId;
                         };
-                        CHIP_ERROR keySetStartErr = mDelegate->SyncNode(nodeId, *it2, [this, keySetMatch](CHIP_ERROR syncErr) {
-                            if (syncErr != CHIP_NO_ERROR)
-                            {
-                                detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, keySetMatch, syncErr);
-                                return;
-                            }
-                            auto eraseIt = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), keySetMatch);
-                            if (eraseIt != mNodeKeySetEntries.end())
-                            {
-                                ClearRemovalIntent(*eraseIt);
-                                mNodeKeySetEntries.erase(eraseIt);
-                            }
-                        });
+                        auto keySetStillRemoving = [this, keySetMatch](const auto & entry) {
+                            return keySetMatch(entry) && HasRemovalIntent(entry);
+                        };
+                        CHIP_ERROR keySetStartErr =
+                            mDelegate->SyncNode(nodeId, *it2, [this, keySetStillRemoving](CHIP_ERROR syncErr) {
+                                if (syncErr != CHIP_NO_ERROR)
+                                {
+                                    detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, keySetStillRemoving, syncErr);
+                                    return;
+                                }
+                                auto eraseIt =
+                                    std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), keySetStillRemoving);
+                                if (eraseIt != mNodeKeySetEntries.end())
+                                {
+                                    ClearRemovalIntent(*eraseIt);
+                                    mNodeKeySetEntries.erase(eraseIt);
+                                }
+                            });
                         if (keySetStartErr != CHIP_NO_ERROR)
                         {
                             detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, keySetMatch, keySetStartErr);
@@ -3050,13 +3059,15 @@ CHIP_ERROR JointFabricDatastore::RemoveNodeKeySetEntry(GroupId groupId, uint16_t
                 auto match                = [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
                     return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase;
                 };
-                CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, entryToRemove, [this, match](CHIP_ERROR syncErr) {
+                // An add that cancelled the removal while it was in flight owns the entry now.
+                auto stillRemoving  = [this, match](const auto & entry) { return match(entry) && HasRemovalIntent(entry); };
+                CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, entryToRemove, [this, stillRemoving](CHIP_ERROR syncErr) {
                     if (syncErr != CHIP_NO_ERROR)
                     {
-                        detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, syncErr);
+                        detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, stillRemoving, syncErr);
                         return;
                     }
-                    auto eraseIt = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), match);
+                    auto eraseIt = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), stillRemoving);
                     if (eraseIt != mNodeKeySetEntries.end())
                     {
                         ClearRemovalIntent(*eraseIt);

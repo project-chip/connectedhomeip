@@ -2086,6 +2086,78 @@ TEST(JointFabricDatastoreTest, AddCancelsPendingEndpointGroupRemoval)
     EXPECT_EQ(store.GetEndpointGroupIDList().size(), 1u);
 }
 
+// Group and key set syncs are not serialized per node: a removal can complete after an add has cancelled it.
+// Its result then no longer applies to the entry.
+TEST(JointFabricDatastoreTest, RemovalCompletingAfterReAddKeepsEndpointGroup)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, std::nullopt);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kEndpointGroup;
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 2u);
+
+    delegate.RunDeferred(); // the removal
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the add
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+TEST(JointFabricDatastoreTest, FailedRemovalCompletingAfterReAddDoesNotMarkEndpointGroup)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, std::nullopt);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kEndpointGroup;
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    delegate.RunDeferred(1);                                 // the add
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout)); // the removal
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+TEST(JointFabricDatastoreTest, RemovalCompletingAfterReAddKeepsNodeKeySet)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, 55);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+
+    delegate.deferKind = SyncKind::kNodeKeySet;
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 2u);
+
+    delegate.RunDeferred(); // the key set removal
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the key set add, which then adds the group
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
 // Each endpoint's fetched binding list only replaces that endpoint's bindings.
 TEST(JointFabricDatastoreTest, RefreshKeepsBindingsOnOtherEndpoints)
 {
