@@ -307,6 +307,12 @@ template("siwx917_sdk") {
 
     defines += [ "SL_MATTER_USE_SI70XX_SENSOR=${sl_enable_si70xx_sensor}" ]
 
+    if (sl_use_provision_channel) {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=0" ]
+    }
+
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {

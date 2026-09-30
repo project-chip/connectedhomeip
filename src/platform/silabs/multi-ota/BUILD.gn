@@ -49,6 +49,9 @@ source_set("multi-ota-common") {
     "OTATlvProcessor.cpp",
   ]
   deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  if (chip_enable_multi_ota_encryption) {
+    deps += [ "${chip_root}/examples/platform/silabs/provision:storage" ]
+  }
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
