@@ -238,6 +238,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = mRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
