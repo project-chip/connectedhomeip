@@ -57,16 +57,17 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init(AttributeChangeCallback *
 {
     mpActivateDatasetCallback = nullptr;
     mpAttributeChangeCallback = callback;
-    if (callback == nullptr)
-    {
-        // The cluster calls Init(nullptr) from its Shutdown().
-        DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-        return CHIP_NO_ERROR;
-    }
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     // When the Thread Border Router is reboot during SetActiveDataset, we need to revert the active dateset.
     TEMPORARY_RETURN_IGNORED RevertActiveDataset();
     return CHIP_NO_ERROR;
+}
+
+void GenericOpenThreadBorderRouterDelegate::Shutdown()
+{
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    mpActivateDatasetCallback = nullptr;
+    mpAttributeChangeCallback = nullptr;
 }
 
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)

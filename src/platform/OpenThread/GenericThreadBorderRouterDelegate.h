@@ -47,6 +47,7 @@ public:
     }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
+    void Shutdown() override;
 
     bool GetPanChangeSupported() override { return true; }
 

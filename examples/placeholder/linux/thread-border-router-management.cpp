@@ -34,6 +34,7 @@ namespace {
 class FakeBorderRouterDelegate final : public ThreadBorderRouterManagement::Delegate
 {
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override { return CHIP_NO_ERROR; }
+    void Shutdown() override {}
 
     bool GetPanChangeSupported() override { return true; }
 

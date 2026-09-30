@@ -60,6 +60,7 @@ public:
 
     // ThreadBorderRouterManagementDelegate
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override;
+    void Shutdown() override;
     bool GetPanChangeSupported() override;
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override;
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;
