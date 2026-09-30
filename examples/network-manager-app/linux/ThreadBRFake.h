@@ -77,24 +77,24 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
         return dataset.Init(source->AsByteSpan());
     }
 
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override
     {
         if (mActivateDatasetCallback != nullptr)
         {
-            callback->OnActivateDatasetComplete(sequenceNum, CHIP_ERROR_INCORRECT_STATE);
+            callback(context, CHIP_ERROR_INCORRECT_STATE);
             return;
         }
 
         CHIP_ERROR err = mActiveDataset.Init(activeDataset.AsByteSpan());
         if (err != CHIP_NO_ERROR)
         {
-            callback->OnActivateDatasetComplete(sequenceNum, err);
+            callback(context, err);
             return;
         }
 
         mActivateDatasetCallback = callback;
-        mActivateDatasetSequence = sequenceNum;
+        mActivateDatasetContext  = context;
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset,
                                                                        this);
     }
@@ -114,10 +114,9 @@ private:
     static void ActivateActiveDataset(System::Layer *, void * context)
     {
         auto * self                    = static_cast<FakeBorderRouterDelegate *>(context);
-        auto * callback                = self->mActivateDatasetCallback;
-        auto sequenceNum               = self->mActivateDatasetSequence;
+        auto callback                  = self->mActivateDatasetCallback;
         self->mActivateDatasetCallback = nullptr;
-        callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+        callback(self->mActivateDatasetContext, CHIP_NO_ERROR);
     }
 
     static void ActivatePendingDataset(System::Layer *, void * context)
@@ -136,8 +135,8 @@ private:
     Thread::OperationalDataset mActiveDataset;
     Thread::OperationalDataset mPendingDataset;
 
-    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
-    uint32_t mActivateDatasetSequence;
+    ActivateDatasetCompleteCallback mActivateDatasetCallback = nullptr;
+    void * mActivateDatasetContext                           = nullptr;
 };
 
 } // namespace chip

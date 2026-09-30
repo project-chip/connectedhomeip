@@ -37,8 +37,8 @@ public:
     uint16_t GetThreadVersion() override;
     bool GetInterfaceEnabled() override;
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override;
 
     bool GetPanChangeSupported() override { return false; }
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
@@ -57,8 +57,8 @@ private:
     uint8_t mBorderAgentID[app::Clusters::ThreadBorderRouterManagement::kBorderAgentIdLength];
 
     Thread::OperationalDataset mActiveDataset;
-    ActivateDatasetCallback * mActivateDatasetCallback = nullptr;
-    uint32_t mActivateDatasetSequence;
+    ActivateDatasetCompleteCallback mActivateDatasetCallback = nullptr;
+    void * mActivateDatasetContext                           = nullptr;
 };
 
 } // namespace chip

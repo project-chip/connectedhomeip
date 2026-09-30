@@ -57,11 +57,11 @@ class FakeBorderRouterDelegate final : public ThreadBorderRouterManagement::Dele
 
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override { return CHIP_ERROR_NOT_FOUND; }
 
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override
     {
         ChipLogAutomation("SetActiveDataset");
-        callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
+        callback(context, CHIP_NO_ERROR);
     }
 
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }

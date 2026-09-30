@@ -67,8 +67,8 @@ public:
     uint16_t GetThreadVersion() override;
     bool GetInterfaceEnabled() override;
     CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) override;
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override;
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override;
     CHIP_ERROR CommitActiveDataset() override;
     CHIP_ERROR RevertActiveDataset() override;
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override;
@@ -113,8 +113,8 @@ private:
     struct Activating
     {
         Thread::OperationalDataset dataset;
-        ActivateDatasetCallback * callback;
-        uint32_t sequence;
+        ActivateDatasetCompleteCallback callback;
+        void * context;
     };
     struct ActiveUncommitted
     {
