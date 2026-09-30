@@ -193,7 +193,6 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        # www.silabs.com only allows curl for scripted downloads
         subprocess.run(["curl", "-fsSL", slt_cli_url, "-o", slt_zip_path], check=True)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
