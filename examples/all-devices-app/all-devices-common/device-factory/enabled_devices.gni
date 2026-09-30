@@ -75,6 +75,10 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "closure",
+    "CLOSURE",
+  ],
+  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],
@@ -233,6 +237,10 @@ _available_devices = [
   [
     "temperature-sensor",
     "TEMPERATURE_SENSOR",
+  ],
+  [
+    "thread-border-router",
+    "THREAD_BORDER_ROUTER",
   ],
   [
     "water-freeze-detector",

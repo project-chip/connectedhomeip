@@ -24,6 +24,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
+#include <device/types/root-node/RootNode.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
@@ -134,7 +135,7 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
-    std::unique_ptr<DeviceInterface> mRootNode;
+    std::unique_ptr<RootNode> mRootNode;
 
     std::unique_ptr<DeviceInterface> mDevices[ALL_DEVICES_ENABLED_DEVICE_COUNT];
     size_t mDeviceCount = 0;

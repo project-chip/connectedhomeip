@@ -44,6 +44,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ThreePanelDoorClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/impl/LoggingColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/Cooktop.cpp"
@@ -82,6 +87,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OnOffLight.cpp"
@@ -116,6 +122,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/ThreadBorderRouter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/impl/SimulatedThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     # keep-sorted: end
 
@@ -162,6 +170,7 @@ endif()
 #   - Keep list in sync with enabled_devices.gni
 #   - ensure enabled_devices_config.h.in contains required ALL_DEVICES_ENABLE* defines
 #   - Update scripts/build/build/targets.py to include the new device
+#   - Update examples/all-devices-app/zephyr/Kconfig.devices
 foreach(_key
         # keep-sorted: start
         aggregator
@@ -170,6 +179,7 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        closure
         color-temperature-light
         commissioning-proxy
         contact-sensor
@@ -210,6 +220,7 @@ foreach(_key
         soil-sensor
         speaker
         temperature-sensor
+        thread-border-router
         water-freeze-detector
         water-leak-detector
         water-valve
