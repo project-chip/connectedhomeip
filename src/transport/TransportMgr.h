@@ -58,6 +58,8 @@ public:
     virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                                    Transport::MessageTransportContext * ctxt = nullptr) = 0;
 
+    virtual void OnConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload) {}
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      * @brief

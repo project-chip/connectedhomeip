@@ -41,6 +41,7 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/RAIIMockClock.h>
 #include <transport/MessageStats.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
@@ -1180,6 +1181,546 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     paramsLarge.SetMaxTCPPayloadSize(kMaxLargeAppMessageLen + 1000);
     tcpSessionClamped->AsSecureSession()->SetRemoteSessionParameters(paramsLarge);
     EXPECT_EQ(tcpSessionClamped->GetMaxAppMessageLen(), kMaxLargeAppMessageLen);
+
+    sessionManager.Shutdown();
+}
+
+namespace {
+
+constexpr uint16_t kHceTestPort1      = 5540;
+constexpr uint16_t kHceTestPort2      = 5541;
+constexpr NodeId kHceLocalNodeId      = 0xAAAA'AAAA'AAAA'0001ull;
+constexpr NodeId kHcePeerNodeId       = 0xBBBB'BBBB'BBBB'0001ull;
+constexpr FabricIndex kHceFabricIndex = 1;
+
+Transport::PeerAddress MakeUdpPeer(const char * addrStr, uint16_t port)
+{
+    IPAddress addr;
+    IPAddress::FromString(addrStr, addr);
+    return Transport::PeerAddress::UDP(addr, port);
+}
+
+SecureSession * InjectActiveCaseSession(SessionManager & mgr, SessionHolder & holder, const Transport::PeerAddress & peer,
+                                        uint16_t localSessionId)
+{
+    CHIP_ERROR err = mgr.InjectCaseSessionWithTestKey(holder, localSessionId, /*peerSessionId*/ 1, kHceLocalNodeId, kHcePeerNodeId,
+                                                      kHceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    holder->AsSecureSession()->MarkActive();
+    return holder->AsSecureSession();
+}
+
+struct QuotedMessage
+{
+    uint8_t bytes[32] = {};
+    uint16_t length   = 0;
+    ByteSpan Span() const { return ByteSpan(bytes, length); }
+};
+
+QuotedMessage QuoteHeader(uint16_t sessionId, uint32_t counter,
+                          Header::SessionType sessionType = Header::SessionType::kUnicastSession)
+{
+    QuotedMessage quoted;
+    PacketHeader header;
+    header.SetSessionType(sessionType).SetSessionId(sessionId).SetMessageCounter(counter);
+    EXPECT_EQ(header.Encode(quoted.bytes, sizeof(quoted.bytes), &quoted.length), CHIP_NO_ERROR);
+    return quoted;
+}
+
+uint32_t NextSendCounter(SecureSession & session)
+{
+    uint32_t counter = 0;
+    EXPECT_EQ(session.GetSessionMessageCounter().GetLocalMessageCounter().AdvanceAndConsume(counter), CHIP_NO_ERROR);
+    return counter;
+}
+
+QuotedMessage QuoteNextSend(SecureSession & session)
+{
+    return QuoteHeader(session.GetPeerSessionId(), NextSendCounter(session));
+}
+
+Inet::InterfaceId FirstPresentInterface()
+{
+    Inet::InterfaceIterator it;
+    while (it.Next())
+    {
+        if (it.GetInterfaceId().IsPresent())
+        {
+            return it.GetInterfaceId();
+        }
+    }
+    return Inet::InterfaceId::Null();
+}
+
+} // namespace
+
+TEST_F(TestSessionManager, HandleConnectionExpired_MarksMatchingSessionDefunct)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 100);
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsDefunct());
+    EXPECT_FALSE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_Idempotent)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 200);
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+    ASSERT_TRUE(session->IsDefunct());
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_DistinguishesByPort)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peerA = MakeUdpPeer("::1", kHceTestPort1);
+    Transport::PeerAddress peerB = MakeUdpPeer("::1", kHceTestPort2);
+    SessionHolder holderA, holderB;
+    auto * a = InjectActiveCaseSession(sessionManager, holderA, peerA, /*lsid*/ 300);
+    auto * b = InjectActiveCaseSession(sessionManager, holderB, peerB, /*lsid*/ 301);
+
+    sessionManager.HandleConnectionExpired(peerA, QuoteNextSend(*a).Span());
+
+    EXPECT_TRUE(a->IsDefunct());
+    EXPECT_TRUE(b->IsActiveSession()); // different port — untouched
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_RetiresOnlyTheQuotedSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder h1, h2;
+    auto * s1 = InjectActiveCaseSession(sessionManager, h1, peer, /*lsid*/ 400);
+    auto * s2 = InjectActiveCaseSession(sessionManager, h2, peer, /*lsid*/ 401);
+
+    const QuotedMessage quoted = QuoteNextSend(*s1);
+    PacketHeader header;
+    uint16_t headerSize = 0;
+    ASSERT_EQ(header.Decode(quoted.bytes, quoted.length, &headerSize), CHIP_NO_ERROR);
+    static_cast<LocalSessionMessageCounter &>(s2->GetSessionMessageCounter().GetLocalMessageCounter())
+        .TestSetCounter(header.GetMessageCounter() + 1000);
+
+    sessionManager.HandleConnectionExpired(peer, quoted.Span());
+
+    EXPECT_TRUE(s1->IsDefunct());
+    EXPECT_TRUE(s2->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_DistinguishesByAddress)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress sessionPeer = MakeUdpPeer("::1", kHceTestPort1);
+    Transport::PeerAddress otherPeer   = MakeUdpPeer("::2", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, sessionPeer, /*lsid*/ 500);
+
+    sessionManager.HandleConnectionExpired(otherPeer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession()); // different address — untouched
+    EXPECT_FALSE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_StaleAfterRecovery)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress oldPeer = MakeUdpPeer("::1", kHceTestPort1);
+    Transport::PeerAddress newPeer = MakeUdpPeer("::1", kHceTestPort2);
+    SessionHolder oldHolder, newHolder;
+    auto * oldSession = InjectActiveCaseSession(sessionManager, oldHolder, oldPeer, /*lsid*/ 600);
+
+    sessionManager.HandleConnectionExpired(oldPeer, QuoteNextSend(*oldSession).Span());
+    ASSERT_TRUE(oldSession->IsDefunct());
+
+    auto * newSession = InjectActiveCaseSession(sessionManager, newHolder, newPeer, /*lsid*/ 601);
+    ASSERT_TRUE(newSession->IsActiveSession());
+
+    sessionManager.HandleConnectionExpired(oldPeer, QuoteNextSend(*oldSession).Span());
+
+    EXPECT_TRUE(newSession->IsActiveSession());
+    EXPECT_TRUE(oldSession->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresAnIdleSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 960);
+
+    session->SetRemoteSessionParameters(
+        ReliableMessageProtocolConfig({ System::Clock::Timestamp(0), System::Clock::Timestamp(0) }));
+    const System::Clock::Timestamp sent = session->GetLastActivityTime();
+    while (System::SystemClock().GetMonotonicTimestamp() <= sent)
+    {
+    }
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_LeavesPaseAlone)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(holder, /*lsid*/ 950, kHcePeerNodeId, /*peerSessionId*/ 1,
+                                                          kHceFabricIndex, peer, CryptoContext::SessionRole::kInitiator));
+    auto * session = holder->AsSecureSession();
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, OnConnectionExpired_RoutesToHandleConnectionExpired)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 800);
+    ASSERT_TRUE(session->IsActiveSession());
+
+    static_cast<TransportMgrDelegate &>(sessionManager).OnConnectionExpired(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresInterfaceMismatch)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    IPAddress addr;
+    IPAddress::FromString("fe80::1", addr);
+    Inet::InterfaceId ifid = FirstPresentInterface();
+    ASSERT_TRUE(ifid.IsPresent());
+    Transport::PeerAddress sessionPeer = Transport::PeerAddress::UDP(addr, kHceTestPort1, ifid);
+    Transport::PeerAddress icmpPeer    = Transport::PeerAddress::UDP(addr, kHceTestPort1);
+    ASSERT_NE(sessionPeer, icmpPeer); // they differ only by interface
+
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, sessionPeer, /*lsid*/ 900);
+    ASSERT_TRUE(session->IsActiveSession());
+
+    sessionManager.HandleConnectionExpired(icmpPeer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresEstablishingSession)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    Optional<SessionHandle> pending =
+        sessionManager.AllocateSession(Transport::SecureSession::Type::kCASE, ScopedNodeId(kHcePeerNodeId, kHceFabricIndex));
+    ASSERT_TRUE(pending.HasValue());
+    auto * session = pending.Value()->AsSecureSession();
+    session->SetPeerAddress(peer);
+    session->MarkActive();
+    ASSERT_TRUE(session->IsEstablishing());
+
+    sessionManager.HandleConnectionExpired(peer, QuoteNextSend(*session).Span());
+
+    EXPECT_TRUE(session->IsEstablishing());
+    EXPECT_FALSE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresWrongQuotedSessionId)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1100);
+    sessionManager.HandleConnectionExpired(
+        peer, QuoteHeader(static_cast<uint16_t>(session->GetPeerSessionId() + 1), NextSendCounter(*session)).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_AcceptsCounterAtWindowEdge)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session      = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1101);
+    const uint32_t sent = NextSendCounter(*session);
+    for (uint32_t i = 0; i < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE - 1; i++)
+    {
+        NextSendCounter(*session);
+    }
+    sessionManager.HandleConnectionExpired(peer, QuoteHeader(session->GetPeerSessionId(), sent).Span());
+    EXPECT_TRUE(session->IsDefunct());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresCounterBeyondWindow)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session      = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1102);
+    const uint32_t sent = NextSendCounter(*session);
+    for (uint32_t i = 0; i < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE; i++)
+    {
+        NextSendCounter(*session);
+    }
+    sessionManager.HandleConnectionExpired(peer, QuoteHeader(session->GetPeerSessionId(), sent).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresUnsentCounter)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session        = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1103);
+    const uint32_t unsent = NextSendCounter(*session) + 1;
+    sessionManager.HandleConnectionExpired(peer, QuoteHeader(session->GetPeerSessionId(), unsent).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresCounterBeforeFirstSend)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session       = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1106);
+    const uint32_t first = NextSendCounter(*session);
+    for (uint32_t below = 1; below < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE && below < first; below++)
+    {
+        sessionManager.HandleConnectionExpired(peer, QuoteHeader(session->GetPeerSessionId(), first - below).Span());
+        EXPECT_TRUE(session->IsActiveSession());
+    }
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresGroupSessionQuote)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1104);
+    sessionManager.HandleConnectionExpired(
+        peer, QuoteHeader(session->GetPeerSessionId(), NextSendCounter(*session), Header::SessionType::kGroupSession).Span());
+    EXPECT_TRUE(session->IsActiveSession());
+
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, HandleConnectionExpired_IgnoresUndecodableQuote)
+{
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer = MakeUdpPeer("::1", kHceTestPort1);
+    SessionHolder holder;
+    auto * session = InjectActiveCaseSession(sessionManager, holder, peer, /*lsid*/ 1105);
+    NextSendCounter(*session);
+    const uint8_t truncated[3] = { 0, 1, 0 };
+    sessionManager.HandleConnectionExpired(peer, ByteSpan(truncated));
+    EXPECT_TRUE(session->IsActiveSession());
 
     sessionManager.Shutdown();
 }
