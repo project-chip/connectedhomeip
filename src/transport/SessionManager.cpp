@@ -649,6 +649,56 @@ void SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
     });
 }
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+void SessionManager::OnPortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload)
+{
+    PacketHeader quotedHeader;
+    uint16_t quotedHeaderSize = 0;
+    if (quotedHeader.Decode(quotedPayload.data(), quotedPayload.size(), &quotedHeaderSize) != CHIP_NO_ERROR ||
+        !quotedHeader.IsUnicastSession())
+    {
+        return;
+    }
+
+    const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+
+    mSecureSessions.ForEachSession([&peer, &quotedHeader, now](auto session) {
+        if (!session->IsActiveSession() || !session->IsCASESession())
+        {
+            return Loop::Continue;
+        }
+
+        // Peer session IDs are only unique per peer node, so this relies on no two nodes sharing an address and port,
+        // which nothing here can check. The interface is not compared: not every platform reports one for an ICMP error.
+        const Transport::PeerAddress & sessionPeer = session->GetPeerAddress();
+        if (sessionPeer.GetTransportType() != peer.GetTransportType() || sessionPeer.GetIPAddress() != peer.GetIPAddress() ||
+            sessionPeer.GetPort() != peer.GetPort())
+        {
+            return Loop::Continue;
+        }
+
+        // ICMPv6 is unauthenticated. Counters start at a random value per session, so only a sender that has seen our
+        // traffic can quote one this session sent recently.
+        if (session->GetPeerSessionId() != quotedHeader.GetSessionId() ||
+            !session->GetSessionMessageCounter().GetLocalMessageCounter().WasRecentlyUsed(quotedHeader.GetMessageCounter(),
+                                                                                          CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE))
+        {
+            return Loop::Continue;
+        }
+
+        // The report follows our send by about a round trip, so one arriving after a quiet MRP interval is stale.
+        if (now - session->GetLastActivityTime() > session->GetMRPBaseTimeout())
+        {
+            return Loop::Continue;
+        }
+
+        ChipLogProgress(Inet, "Session %u: port unreachable at peer; marking defunct", session->GetLocalSessionId());
+        session->MarkAsDefunct();
+        return Loop::Continue;
+    });
+}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
 {
     mSecureSessions.ForEachSession([&node, &addr](auto session) {

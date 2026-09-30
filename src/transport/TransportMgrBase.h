@@ -62,6 +62,10 @@ public:
     void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                Transport::MessageTransportContext * ctxt = nullptr) override;
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    void HandlePortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload) override;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 private:
     TransportMgrDelegate * mSessionManager = nullptr;
     Transport::Base * mTransport           = nullptr;

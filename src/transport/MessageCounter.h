@@ -22,6 +22,7 @@
 #pragma once
 
 #include <crypto/RandUtils.h>
+#include <inet/InetConfig.h>
 #include <lib/core/CHIPError.h>
 
 #include <stdint.h>
@@ -87,7 +88,13 @@ public:
      *
      * The mLastUsedValue is the predecessor of the initial value, it will be advanced before using, so don't need to add 1 here.
      */
-    LocalSessionMessageCounter() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
+    LocalSessionMessageCounter()
+    {
+        mLastUsedValue = GetDefaultInitialValuePredecessor();
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+        mFirstValue = mLastUsedValue + 1;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    }
 
     Type GetType() const override { return Session; }
     CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override
@@ -104,8 +111,20 @@ public:
     // Test-only function to set the counter value
     void TestSetCounter(uint32_t value) { mLastUsedValue = value; }
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    /// Whether @p counter is one of the last @p window values this counter handed out.
+    bool WasRecentlyUsed(uint32_t counter, uint32_t window) const
+    {
+        return counter >= mFirstValue && counter <= mLastUsedValue && mLastUsedValue - counter < window;
+    }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 private:
     uint32_t mLastUsedValue;
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    // Counters below this were never sent.
+    uint32_t mFirstValue;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 };
 
 } // namespace chip
