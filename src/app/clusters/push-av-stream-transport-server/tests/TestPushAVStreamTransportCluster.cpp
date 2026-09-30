@@ -368,6 +368,22 @@ public:
     }
 };
 
+// Yields an endpoint whose ccdid is null. TlsClientManagement stores such an endpoint, since a null ccdid
+// means the endpoint is used without a client certificate.
+class TestTLSClientManagementDelegateNullClientCertId : public TestTLSClientManagementDelegate
+{
+public:
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
+    {
+        TlsClientManagement::Structs::TLSEndpointStruct::DecodableType endpoint;
+        endpoint.endpointID = endpointID;
+        endpoint.caid       = 0;
+        endpoint.ccdid.SetNull();
+        return callback(endpoint);
+    }
+};
+
 class TestPushAVStreamTransportServerLogic : public ::testing::Test
 {
 public:
@@ -389,6 +405,64 @@ protected:
     PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
     chip::Testing::ClusterTester mClusterTester;
 };
+
+TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpointWithNullClientCertificateId)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegateNullClientCertId tlsClientManagementDelegate;
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType commandData;
+    commandData.transportOptions = transportOptions;
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+
+    // The endpoint carries no client certificate, so no transport is allocated and the command reports
+    // InvalidTLSEndpoint rather than returning a response.
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_FALSE(commandHandler.HasResponse());
+    ASSERT_TRUE(commandHandler.HasStatus());
+    ASSERT_EQ(commandHandler.GetStatuses().size(), (size_t) 1);
+
+    const auto & status = commandHandler.GetStatuses()[0].status;
+    ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
+    EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+}
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 {
