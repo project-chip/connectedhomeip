@@ -304,7 +304,7 @@ BLE and so omits the proxy:
 ```bash
 # From the root of your checkout, on the host:
 docker run -it --user "$(id -u):$(id -g)" -v "$PWD":"$PWD" -w "$PWD" \
-    ghcr.io/project-chip/chip-build-crosscompile:200 /bin/bash
+    ghcr.io/project-chip/chip-build-crosscompile:215 /bin/bash
 
 # Then, inside the container:
 ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-devices-boringssl-clang build"
