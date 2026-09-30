@@ -429,12 +429,11 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
                             if (it == mEndpointGroupIDEntries.end())
                             {
-                                Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type newEntry;
+                                datastore::EndpointGroupIDEntryStruct newEntry;
                                 newEntry.nodeID            = mRefreshingNodeId;
                                 newEntry.endpointID        = currentEndpointId;
                                 newEntry.groupID           = static_cast<GroupId>(endpointGroup.groupID);
                                 newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                                ClearRemovalIntent(newEntry);
 
                                 // A value whose removal failed unrecoverably is added back to be removed.
                                 auto tombstone = std::find_if(
@@ -465,13 +464,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                                {
                                                    return false;
                                                }
-                                               if (std::any_of(endpointGroups.begin(), endpointGroups.end(),
-                                                               [&](const auto & eg) { return entry.groupID == eg.groupID; }))
-                                               {
-                                                   return false;
-                                               }
-                                               ClearRemovalIntent(entry);
-                                               return true;
+                                               return std::none_of(endpointGroups.begin(), endpointGroups.end(),
+                                                                   [&](const auto & eg) { return entry.groupID == eg.groupID; });
                                            }),
                             mEndpointGroupIDEntries.end());
 
@@ -508,7 +502,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
         // All endpoints processed. Collect this node's work before issuing any SyncNode: a completion that
         // runs synchronously can erase entries.
-        std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> groupEntriesToSync;
+        std::vector<datastore::EndpointGroupIDEntryStruct> groupEntriesToSync;
         for (auto it = mEndpointGroupIDEntries.begin(); it != mEndpointGroupIDEntries.end();)
         {
             if (it->nodeID != mRefreshingNodeId)
@@ -521,7 +515,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             {
                 // remove entry from the list
                 RecordTombstoneIfRemoving(*it);
-                ClearRemovalIntent(*it);
                 it = mEndpointGroupIDEntries.erase(it);
                 continue;
             }
@@ -554,7 +547,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             auto match = [nodeId = entryToSync.nodeID, endpointId = entryToSync.endpointID, groupId = entryToSync.groupID](
                              const auto & e) { return e.nodeID == nodeId && e.endpointID == endpointId && e.groupID == groupId; };
             // The result applies only if the entry is still being added or removed as when the sync started.
-            auto sameOperation = [this, match, removal](const auto & e) { return match(e) && HasRemovalIntent(e) == removal; };
+            auto sameOperation = [match, removal](const auto & e) { return match(e) && HasRemovalIntent(e) == removal; };
             CHIP_ERROR syncErr = mDelegate->SyncNode(
                 mRefreshingNodeId, entryToSync, [this, entryToSync, removal, sameOperation](CHIP_ERROR innerErr) {
                     if (innerErr != CHIP_NO_ERROR)
@@ -568,7 +561,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         auto erased = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), sameOperation);
                         if (erased != mEndpointGroupIDEntries.end())
                         {
-                            ClearRemovalIntent(*erased);
                             mEndpointGroupIDEntries.erase(erased);
                         }
                         return;
@@ -625,7 +617,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
                             if (it == mEndpointBindingEntries.end())
                             {
-                                Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type newEntry;
+                                datastore::EndpointBindingEntryStruct newEntry;
                                 newEntry.nodeID     = mRefreshingNodeId;
                                 newEntry.endpointID = endpointBinding.endpointID;
                                 newEntry.binding    = endpointBinding.binding;
@@ -635,7 +627,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                     continue;
                                 }
                                 newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                                ClearRemovalIntent(newEntry);
 
                                 // A value whose removal failed unrecoverably is added back to be removed.
                                 auto tombstone =
@@ -665,14 +656,9 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                     {
                                         return false;
                                     }
-                                    if (std::any_of(endpointBindings.begin(), endpointBindings.end(), [&](const auto & eb) {
-                                            return entry.endpointID == eb.endpointID && BindingMatches(entry.binding, eb.binding);
-                                        }))
-                                    {
-                                        return false;
-                                    }
-                                    ClearRemovalIntent(entry);
-                                    return true;
+                                    return std::none_of(endpointBindings.begin(), endpointBindings.end(), [&](const auto & eb) {
+                                        return entry.endpointID == eb.endpointID && BindingMatches(entry.binding, eb.binding);
+                                    });
                                 }),
                             mEndpointBindingEntries.end());
 
@@ -719,7 +705,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             {
                 // remove entry from the list
                 RecordTombstoneIfRemoving(*it);
-                ClearRemovalIntent(*it);
                 it = mEndpointBindingEntries.erase(it);
                 continue;
             }
@@ -770,17 +755,12 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     mEndpointBindingEntries.erase(
                         std::remove_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
                                        [this, refreshingNodeId](const auto & entry) {
-                                           if (entry.nodeID != refreshingNodeId || !HasRemovalIntent(entry) ||
-                                               std::any_of(mRefreshingBindingEntries.begin(), mRefreshingBindingEntries.end(),
-                                                           [&entry](const auto & written) {
-                                                               return written.endpointID == entry.endpointID &&
-                                                                   written.listID == entry.listID;
-                                                           }))
-                                           {
-                                               return false;
-                                           }
-                                           ClearRemovalIntent(entry);
-                                           return true;
+                                           return entry.nodeID == refreshingNodeId && HasRemovalIntent(entry) &&
+                                               std::none_of(mRefreshingBindingEntries.begin(), mRefreshingBindingEntries.end(),
+                                                            [&entry](const auto & written) {
+                                                                return written.endpointID == entry.endpointID &&
+                                                                    written.listID == entry.listID;
+                                                            });
                                        }),
                         mEndpointBindingEntries.end());
                 }
@@ -834,7 +814,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                             });
                         if (nodeHoldsKeySet && !tracked)
                         {
-                            auto entry                    = *tombstone;
+                            datastore::NodeKeySetEntryStruct entry{ *tombstone };
                             entry.statusEntry.failureCode = 0;
                             MarkRemovalRequested(entry);
                             mNodeKeySetEntries.push_back(entry);
@@ -935,7 +915,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     {
                         // remove entry from the list
                         RecordTombstoneIfRemoving(*nkIt);
-                        ClearRemovalIntent(*nkIt);
                         nkIt = mNodeKeySetEntries.erase(nkIt);
                         continue;
                     }
@@ -962,7 +941,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             CHIP_ERROR syncErr =
                 mDelegate->SyncNode(nodeIdToErase, entryToRemove, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
                     // An add that cancelled the removal while it was in flight owns the entry now.
-                    auto stillRemoving = [this, nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
+                    auto stillRemoving = [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
                         return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase &&
                             HasRemovalIntent(entry);
                     };
@@ -971,7 +950,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         auto erased = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), stillRemoving);
                         if (erased != mNodeKeySetEntries.end())
                         {
-                            ClearRemovalIntent(*erased);
                             mNodeKeySetEntries.erase(erased);
                         }
                     }
@@ -1052,7 +1030,6 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     {
                         // remove entry from the list
                         RecordTombstoneIfRemoving(*nkIt);
-                        ClearRemovalIntent(*nkIt);
                         nkIt = mNodeKeySetEntries.erase(nkIt);
                     }
                     else if (HasRemovalIntent(*nkIt))
@@ -1921,7 +1898,7 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
         return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.groupID == groupId;
     };
 
-    Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type newGroupEntry;
+    datastore::EndpointGroupIDEntryStruct newGroupEntry;
     auto existing = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), groupMatch);
     if (existing != mEndpointGroupIDEntries.end())
     {
@@ -1931,7 +1908,7 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
         }
 
         // Adding an entry that is being removed cancels the removal.
-        ClearRemovalIntent(*existing);
+        existing->pendingRemoval          = false;
         existing->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
         existing->statusEntry.failureCode = 0;
         newGroupEntry                     = *existing;
@@ -1947,7 +1924,6 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
         newGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
         // Add the new endpoint-group entry to the datastore.
-        ClearRemovalIntent(newGroupEntry);
         mEndpointGroupIDEntries.push_back(newGroupEntry);
     }
     mEndpointGroupTombstones.erase(std::remove_if(mEndpointGroupTombstones.begin(), mEndpointGroupTombstones.end(), groupMatch),
@@ -1963,14 +1939,14 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
         };
 
         bool nodeKeySetNeeded = true;
-        Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newNodeKeySet;
+        datastore::NodeKeySetEntryStruct newNodeKeySet;
         auto existingKeySet = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), keySetMatch);
         if (existingKeySet != mNodeKeySetEntries.end())
         {
             if (HasRemovalIntent(*existingKeySet))
             {
                 // Adding an entry that is being removed cancels the removal.
-                ClearRemovalIntent(*existingKeySet);
+                existingKeySet->pendingRemoval          = false;
                 existingKeySet->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
                 existingKeySet->statusEntry.failureCode = 0;
                 newNodeKeySet                           = *existingKeySet;
@@ -1986,7 +1962,6 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
             newNodeKeySet.groupKeySetID     = groupKeySetID;
             newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-            ClearRemovalIntent(newNodeKeySet);
             mNodeKeySetEntries.push_back(newNodeKeySet);
         }
 
@@ -2062,7 +2037,7 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                 return entry.nodeID == erasedNodeId && entry.endpointID == erasedEndpointId && entry.groupID == erasedGroupId;
             };
             // An add that cancelled the removal while it was in flight owns the entry now.
-            auto stillRemoving = [this, groupMatch](const auto & entry) { return groupMatch(entry) && HasRemovalIntent(entry); };
+            auto stillRemoving       = [groupMatch](const auto & entry) { return groupMatch(entry) && HasRemovalIntent(entry); };
             CHIP_ERROR groupStartErr = mDelegate->SyncNode(nodeId, *it, [this, stillRemoving](CHIP_ERROR syncErr) {
                 if (syncErr != CHIP_NO_ERROR)
                 {
@@ -2072,7 +2047,6 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                 auto eraseIt = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), stillRemoving);
                 if (eraseIt != mEndpointGroupIDEntries.end())
                 {
-                    ClearRemovalIntent(*eraseIt);
                     mEndpointGroupIDEntries.erase(eraseIt);
                 }
             });
@@ -2095,7 +2069,7 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                         auto keySetMatch               = [erasedKeySetNodeId, erasedKeySetGroupId](const auto & entry) {
                             return entry.nodeID == erasedKeySetNodeId && entry.groupKeySetID == erasedKeySetGroupId;
                         };
-                        auto keySetStillRemoving = [this, keySetMatch](const auto & entry) {
+                        auto keySetStillRemoving = [keySetMatch](const auto & entry) {
                             return keySetMatch(entry) && HasRemovalIntent(entry);
                         };
                         CHIP_ERROR keySetStartErr =
@@ -2109,7 +2083,6 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                                     std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), keySetStillRemoving);
                                 if (eraseIt != mNodeKeySetEntries.end())
                                 {
-                                    ClearRemovalIntent(*eraseIt);
                                     mNodeKeySetEntries.erase(eraseIt);
                                 }
                             });
@@ -2256,7 +2229,7 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
-    Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type newBindingEntry;
+    datastore::EndpointBindingEntryStruct newBindingEntry;
     auto existing = std::find_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(), [&](const auto & entry) {
         return entry.nodeID == nodeId && entry.endpointID == endpointId && BindingMatches(entry.binding, binding);
     });
@@ -2268,7 +2241,7 @@ JointFabricDatastore::AddBindingToEndpointForNode(
         }
 
         // Adding an entry that is being removed cancels the removal.
-        ClearRemovalIntent(*existing);
+        existing->pendingRemoval          = false;
         existing->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
         existing->statusEntry.failureCode = 0;
         newBindingEntry                   = *existing;
@@ -2285,7 +2258,6 @@ JointFabricDatastore::AddBindingToEndpointForNode(
         newBindingEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
         // Add the new binding entry to the datastore
-        ClearRemovalIntent(newBindingEntry);
         mEndpointBindingEntries.push_back(newBindingEntry);
     }
     mBindingTombstones.erase(std::remove_if(mBindingTombstones.begin(), mBindingTombstones.end(),
@@ -2442,77 +2414,6 @@ JointFabricDatastore::EncodeAclEntryForSync(const datastore::ACLEntryStruct & en
     return encoded;
 }
 
-void JointFabricDatastore::MarkRemovalRequested(datastore::ACLEntryStruct & entry)
-{
-    entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-    entry.pendingRemoval    = true;
-}
-
-void JointFabricDatastore::MarkRemovalRequested(
-    Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry)
-{
-    entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-    mBindingRemovalIntents.emplace(entry.nodeID, entry.endpointID, entry.listID);
-}
-
-void JointFabricDatastore::MarkRemovalRequested(
-    Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry)
-{
-    entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-    mEndpointGroupRemovalIntents.emplace(entry.nodeID, entry.endpointID, entry.groupID);
-}
-
-void JointFabricDatastore::MarkRemovalRequested(
-    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry)
-{
-    entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-    mNodeKeySetRemovalIntents.emplace(entry.nodeID, entry.groupKeySetID);
-}
-
-bool JointFabricDatastore::HasRemovalIntent(const datastore::ACLEntryStruct & entry) const
-{
-    return entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending || entry.pendingRemoval;
-}
-
-bool JointFabricDatastore::HasRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry) const
-{
-    return entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending ||
-        mBindingRemovalIntents.count(std::make_tuple(entry.nodeID, entry.endpointID, entry.listID)) != 0;
-}
-
-bool JointFabricDatastore::HasRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry) const
-{
-    return entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending ||
-        mEndpointGroupRemovalIntents.count(std::make_tuple(entry.nodeID, entry.endpointID, entry.groupID)) != 0;
-}
-
-bool JointFabricDatastore::HasRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry) const
-{
-    return entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending ||
-        mNodeKeySetRemovalIntents.count(std::make_pair(entry.nodeID, entry.groupKeySetID)) != 0;
-}
-
-void JointFabricDatastore::ClearRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry)
-{
-    mBindingRemovalIntents.erase(std::make_tuple(entry.nodeID, entry.endpointID, entry.listID));
-}
-
-void JointFabricDatastore::ClearRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry)
-{
-    mEndpointGroupRemovalIntents.erase(std::make_tuple(entry.nodeID, entry.endpointID, entry.groupID));
-}
-
-void JointFabricDatastore::ClearRemovalIntent(
-    const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry)
-{
-    mNodeKeySetRemovalIntents.erase(std::make_pair(entry.nodeID, entry.groupKeySetID));
-}
-
 void JointFabricDatastore::RecordTombstoneIfRemoving(const datastore::ACLEntryStruct & entry)
 {
     if (HasRemovalIntent(entry))
@@ -2521,30 +2422,35 @@ void JointFabricDatastore::RecordTombstoneIfRemoving(const datastore::ACLEntrySt
     }
 }
 
-void JointFabricDatastore::RecordTombstoneIfRemoving(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry)
+void JointFabricDatastore::RecordTombstoneIfRemoving(const datastore::EndpointBindingEntryStruct & entry)
 {
     if (HasRemovalIntent(entry))
     {
-        PushTombstone(mBindingTombstones, entry, kMaxGroups);
+        PushTombstone(
+            mBindingTombstones,
+            static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type &>(entry),
+            kMaxGroups);
     }
 }
 
-void JointFabricDatastore::RecordTombstoneIfRemoving(
-    const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry)
+void JointFabricDatastore::RecordTombstoneIfRemoving(const datastore::EndpointGroupIDEntryStruct & entry)
 {
     if (HasRemovalIntent(entry))
     {
-        PushTombstone(mEndpointGroupTombstones, entry, kMaxGroups);
+        PushTombstone(
+            mEndpointGroupTombstones,
+            static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type &>(entry),
+            kMaxGroups);
     }
 }
 
-void JointFabricDatastore::RecordTombstoneIfRemoving(
-    const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry)
+void JointFabricDatastore::RecordTombstoneIfRemoving(const datastore::NodeKeySetEntryStruct & entry)
 {
     if (HasRemovalIntent(entry))
     {
-        PushTombstone(mNodeKeySetTombstones, entry, kMaxGroupKeySet);
+        PushTombstone(mNodeKeySetTombstones,
+                      static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type &>(entry),
+                      kMaxGroupKeySet);
     }
 }
 
@@ -2656,7 +2562,7 @@ CHIP_ERROR JointFabricDatastore::StartAclEntrySync(NodeId nodeId, uint16_t listI
     }
 
     // The result applies only if the entry is still being added or removed as when the sync started.
-    auto sameOperation  = [this, match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
+    auto sameOperation  = [match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
     CHIP_ERROR startErr = mDelegate->SyncNode(
         nodeId, payload, superseded, [this, nodeId, sameOperation, removal, sentValue = it->ACLEntry](CHIP_ERROR syncErr) {
             if (syncErr != CHIP_NO_ERROR)
@@ -2715,7 +2621,7 @@ CHIP_ERROR JointFabricDatastore::StartBindingEntrySync(NodeId nodeId, EndpointId
                                         : Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
     // The result applies only if the entry is still being added or removed as when the sync started.
-    auto sameOperation  = [this, match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
+    auto sameOperation  = [match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
     CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, payload, [this, nodeId, sameOperation, removal](CHIP_ERROR syncErr) {
         if (syncErr != CHIP_NO_ERROR)
         {
@@ -2726,7 +2632,6 @@ CHIP_ERROR JointFabricDatastore::StartBindingEntrySync(NodeId nodeId, EndpointId
             auto entry = std::find_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(), sameOperation);
             if (entry != mEndpointBindingEntries.end())
             {
-                ClearRemovalIntent(*entry);
                 mEndpointBindingEntries.erase(entry);
             }
         }
@@ -2911,7 +2816,7 @@ CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t gr
 
             // Skip if a matching NodeKeySet entry already exists for this node, unless it is being removed:
             // adding an entry that is being removed cancels the removal.
-            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newEntry;
+            datastore::NodeKeySetEntryStruct newEntry;
             auto existing = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), match);
             if (existing != mNodeKeySetEntries.end())
             {
@@ -2919,7 +2824,7 @@ CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t gr
                 {
                     continue;
                 }
-                ClearRemovalIntent(*existing);
+                existing->pendingRemoval          = false;
                 existing->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
                 existing->statusEntry.failureCode = 0;
                 newEntry                          = *existing;
@@ -2930,7 +2835,6 @@ CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t gr
                 newEntry.groupKeySetID     = groupKeySetId;
                 newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-                ClearRemovalIntent(newEntry);
                 mNodeKeySetEntries.push_back(newEntry);
             }
             mNodeKeySetTombstones.erase(std::remove_if(mNodeKeySetTombstones.begin(), mNodeKeySetTombstones.end(), match),
@@ -2987,7 +2891,7 @@ CHIP_ERROR JointFabricDatastore::RemoveNodeKeySetEntry(GroupId groupId, uint16_t
                     return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase;
                 };
                 // An add that cancelled the removal while it was in flight owns the entry now.
-                auto stillRemoving  = [this, match](const auto & entry) { return match(entry) && HasRemovalIntent(entry); };
+                auto stillRemoving  = [match](const auto & entry) { return match(entry) && HasRemovalIntent(entry); };
                 CHIP_ERROR startErr = mDelegate->SyncNode(nodeId, entryToRemove, [this, stillRemoving](CHIP_ERROR syncErr) {
                     if (syncErr != CHIP_NO_ERROR)
                     {
@@ -2997,7 +2901,6 @@ CHIP_ERROR JointFabricDatastore::RemoveNodeKeySetEntry(GroupId groupId, uint16_t
                     auto eraseIt = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), stillRemoving);
                     if (eraseIt != mNodeKeySetEntries.end())
                     {
-                        ClearRemovalIntent(*eraseIt);
                         mNodeKeySetEntries.erase(eraseIt);
                     }
                 });
@@ -3019,12 +2922,11 @@ CHIP_ERROR JointFabricDatastore::TestAddNodeKeySetEntry(GroupId groupId, uint16_
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newEntry;
+    datastore::NodeKeySetEntryStruct newEntry;
     newEntry.nodeID            = nodeId;
     newEntry.groupKeySetID     = groupKeySetId;
     newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-    ClearRemovalIntent(newEntry);
     mNodeKeySetEntries.push_back(newEntry);
 
     // Sync to the node and mark committed on success. Re-resolve by stable key inside the completion
@@ -3061,12 +2963,11 @@ CHIP_ERROR JointFabricDatastore::TestAddEndpointEntry(EndpointId endpointId, Nod
 
 CHIP_ERROR JointFabricDatastore::ForceAddNodeKeySetEntry(uint16_t groupKeySetId, NodeId nodeId)
 {
-    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newEntry;
+    datastore::NodeKeySetEntryStruct newEntry;
     newEntry.nodeID            = nodeId;
     newEntry.groupKeySetID     = groupKeySetId;
     newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
 
-    ClearRemovalIntent(newEntry);
     mNodeKeySetEntries.push_back(newEntry);
     return CHIP_NO_ERROR;
 }

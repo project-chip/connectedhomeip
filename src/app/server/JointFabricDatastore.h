@@ -33,8 +33,6 @@
 #include <map>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
-#include <set>
-#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -72,6 +70,26 @@ struct ACLEntryStruct
 
     // Set while this entry is being removed from the node. Survives a failure recorded as CommitFailed,
     // which the cluster reports identically for adds and removals.
+    bool pendingRemoval = false;
+};
+
+// The stored forms of the cluster's entry types. The base is what the cluster reports; the added state is
+// the datastore's own and is not on the wire.
+struct EndpointGroupIDEntryStruct : Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type
+{
+    // As ACLEntryStruct::pendingRemoval.
+    bool pendingRemoval = false;
+};
+
+struct EndpointBindingEntryStruct : Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type
+{
+    // As ACLEntryStruct::pendingRemoval.
+    bool pendingRemoval = false;
+};
+
+struct NodeKeySetEntryStruct : Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type
+{
+    // As ACLEntryStruct::pendingRemoval.
     bool pendingRemoval = false;
 };
 
@@ -469,20 +487,11 @@ public:
     }
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type & GetStatus() { return mDatastoreStatusEntry; }
 
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> & GetEndpointGroupIDList()
-    {
-        return mEndpointGroupIDEntries;
-    }
+    std::vector<datastore::EndpointGroupIDEntryStruct> & GetEndpointGroupIDList() { return mEndpointGroupIDEntries; }
 
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & GetEndpointBindingList()
-    {
-        return mEndpointBindingEntries;
-    }
+    std::vector<datastore::EndpointBindingEntryStruct> & GetEndpointBindingList() { return mEndpointBindingEntries; }
 
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> & GetNodeKeySetList()
-    {
-        return mNodeKeySetEntries;
-    }
+    std::vector<datastore::NodeKeySetEntryStruct> & GetNodeKeySetList() { return mNodeKeySetEntries; }
 
     std::vector<datastore::ACLEntryStruct> & GetNodeACLList() { return mACLEntries; }
 
@@ -653,9 +662,6 @@ private:
         mNodeKeySetEntries.clear();
         mACLEntries.clear();
         mEndpointEntries.clear();
-        mBindingRemovalIntents.clear();
-        mEndpointGroupRemovalIntents.clear();
-        mNodeKeySetRemovalIntents.clear();
         mNodeSyncQueues.clear();
         mAclTombstones.clear();
         mBindingTombstones.clear();
@@ -681,9 +687,9 @@ private:
     std::unordered_map<NodeId, AdminEntryStorage> mAdminEntryStorage;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> mGroupInformationEntries;
     std::unordered_map<GroupId, GroupInformationStorage> mGroupInformationStorage;
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
-    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
+    std::vector<datastore::EndpointGroupIDEntryStruct> mEndpointGroupIDEntries;
+    std::vector<datastore::EndpointBindingEntryStruct> mEndpointBindingEntries;
+    std::vector<datastore::NodeKeySetEntryStruct> mNodeKeySetEntries;
     struct NodeSyncQueue
     {
         bool inFlight = false;
@@ -691,12 +697,6 @@ private:
     };
     // Present only for nodes with an operation in flight.
     std::map<NodeId, NodeSyncQueue> mNodeSyncQueues;
-
-    // Removal intent for entries stored as generated cluster types, which have no field for it. Keyed
-    // by each entry's stable identity.
-    std::set<std::tuple<NodeId, EndpointId, uint16_t>> mBindingRemovalIntents;      // (node, endpoint, listID)
-    std::set<std::tuple<NodeId, EndpointId, GroupId>> mEndpointGroupRemovalIntents; // (node, endpoint, group)
-    std::set<std::pair<NodeId, uint16_t>> mNodeKeySetRemovalIntents;                // (node, keySetID)
 
     // Values whose removal failed with an unrecoverable status. RefreshNode drops such an entry, as the
     // specification requires, and would then adopt the node's copy as a new entry. A tombstoned value that
@@ -744,31 +744,29 @@ private:
      * Marks `entry` DeletePending and records that it is being removed from its node. A failed sync
      * leaves the entry CommitFailed, which does not say whether an add or a removal failed, and
      * RefreshNode re-writes recoverable CommitFailed entries. The recorded intent makes RefreshNode
-     * retry the removal instead. It is cleared when the entry is erased, and by any add for the same key.
+     * retry the removal instead. Any add for the same entry clears it.
      */
-    void MarkRemovalRequested(datastore::ACLEntryStruct & entry);
-    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
-    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
-    void MarkRemovalRequested(Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+    template <typename T>
+    static void MarkRemovalRequested(T & entry)
+    {
+        entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
+        entry.pendingRemoval    = true;
+    }
 
     // True if `entry` is DeletePending or has recorded removal intent.
-    bool HasRemovalIntent(const datastore::ACLEntryStruct & entry) const;
-    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry) const;
-    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry) const;
-    bool HasRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry) const;
-
-    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
-    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
-    void ClearRemovalIntent(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+    template <typename T>
+    static bool HasRemovalIntent(const T & entry)
+    {
+        return entry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending ||
+            entry.pendingRemoval;
+    }
 
     // Called when the refresh triage drops an entry with an unrecoverable failure. If the entry was being
     // removed, records a tombstone for its value.
     void RecordTombstoneIfRemoving(const datastore::ACLEntryStruct & entry);
-    void
-    RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & entry);
-    void
-    RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & entry);
-    void RecordTombstoneIfRemoving(const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & entry);
+    void RecordTombstoneIfRemoving(const datastore::EndpointBindingEntryStruct & entry);
+    void RecordTombstoneIfRemoving(const datastore::EndpointGroupIDEntryStruct & entry);
+    void RecordTombstoneIfRemoving(const datastore::NodeKeySetEntryStruct & entry);
 
     // Records a failed refresh write on `nodeId`'s entries that were in the write and not Committed, and
     // on its entries being removed, which keep their removal intent.

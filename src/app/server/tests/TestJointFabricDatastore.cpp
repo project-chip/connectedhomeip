@@ -1121,7 +1121,7 @@ TEST(JointFabricDatastoreTest, RefreshDropsUnrecoverableCommitFailedBinding)
     bindingEntry.binding.group.SetValue(10);
     bindingEntry.statusEntry.state       = State::kCommitFailed;
     bindingEntry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
-    store.GetEndpointBindingList().push_back(bindingEntry);
+    store.GetEndpointBindingList().push_back({ bindingEntry });
 
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
     EXPECT_TRUE(store.GetEndpointBindingList().empty());
@@ -1523,7 +1523,7 @@ TEST(JointFabricDatastoreTest, RefreshCommitsSuccessfullyRetriedBinding)
     bindingEntry.binding.group.SetValue(10);
     bindingEntry.statusEntry.state       = State::kCommitFailed;
     bindingEntry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::Timeout);
-    store.GetEndpointBindingList().push_back(bindingEntry);
+    store.GetEndpointBindingList().push_back({ bindingEntry });
     delegate.bindingsToFetch.push_back(bindingEntry);
 
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
@@ -1554,7 +1554,7 @@ TEST(JointFabricDatastoreTest, RefreshRetriesRecoverableCommitFailedBinding)
     bindingEntry.binding.group.SetValue(10);
     bindingEntry.statusEntry.state       = State::kCommitFailed;
     bindingEntry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::Timeout);
-    store.GetEndpointBindingList().push_back(bindingEntry);
+    store.GetEndpointBindingList().push_back({ bindingEntry });
 
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
 
@@ -1719,9 +1719,9 @@ void AddGroupTen(JointFabricDatastore & store, std::optional<uint16_t> groupKeyS
     ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
 }
 
-EndpointGroupIdEntryType MakeEndpointGroupEntry(State state, uint8_t failureCode = 0)
+datastore::EndpointGroupIDEntryStruct MakeEndpointGroupEntry(State state, uint8_t failureCode = 0)
 {
-    EndpointGroupIdEntryType entry;
+    datastore::EndpointGroupIDEntryStruct entry;
     entry.nodeID                  = 123;
     entry.endpointID              = 1;
     entry.groupID                 = 10;
@@ -1848,7 +1848,7 @@ TEST(JointFabricDatastoreTest, RefreshRetriesKeySetRemovalAsRemoval)
     keySetEntry.nodeID            = 123;
     keySetEntry.groupKeySetID     = 55;
     keySetEntry.statusEntry.state = State::kDeletePending;
-    store.GetNodeKeySetList().push_back(keySetEntry);
+    store.GetNodeKeySetList().push_back({ keySetEntry });
     delegate.fetchedGroupKeySetIDs = { 55 };
 
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
@@ -2227,9 +2227,9 @@ TEST(JointFabricDatastoreTest, RefreshKeepsBindingsOnOtherEndpoints)
         ASSERT_EQ(store.AddBindingToEndpointForNode(123, endpointId, binding), CHIP_NO_ERROR);
     }
     ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
-    const uint16_t listId1   = store.GetEndpointBindingList()[0].listID;
-    const uint16_t listId2   = store.GetEndpointBindingList()[1].listID;
-    delegate.bindingsToFetch = store.GetEndpointBindingList();
+    const uint16_t listId1 = store.GetEndpointBindingList()[0].listID;
+    const uint16_t listId2 = store.GetEndpointBindingList()[1].listID;
+    delegate.bindingsToFetch.assign(store.GetEndpointBindingList().begin(), store.GetEndpointBindingList().end());
 
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
 
