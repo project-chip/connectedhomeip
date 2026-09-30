@@ -31,6 +31,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -524,13 +525,13 @@ bool SetKeyUsageExtension(X509 * cert, bool isCA, CertStructConfig & certConfig)
  */
 bool AddSubjectKeyId(X509 * cert, bool isSKIDLengthValid)
 {
-    bool res             = true;
-    ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(cert);
+    bool res                    = true;
+    const ASN1_BIT_STRING * pk  = X509_get0_pubkey_bitstr(cert);
     unsigned char pkHash[EVP_MAX_MD_SIZE];
     unsigned int pkHashLen;
     std::unique_ptr<ASN1_STRING, void (*)(ASN1_STRING *)> pkHashOS(ASN1_STRING_type_new(V_ASN1_OCTET_STRING), &ASN1_STRING_free);
 
-    if (!EVP_Digest(pk->data, static_cast<size_t>(pk->length), pkHash, &pkHashLen, EVP_sha1(), nullptr))
+    if (!EVP_Digest(ASN1_STRING_get0_data(pk), static_cast<size_t>(ASN1_STRING_length(pk)), pkHash, &pkHashLen, EVP_sha1(), nullptr))
     {
         ReportOpenSSLErrorAndExit("EVP_Digest", res = false);
     }
@@ -575,7 +576,7 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert, bool isAKIDLengthValid)
 
     if (!isAKIDLengthValid)
     {
-        akid->keyid->length = 19;
+        ASN1_STRING_length_set(akid->keyid, 19);
     }
 
     if (!X509_add1_ext_i2d(cert, NID_authority_key_identifier, akid.get(), 0, X509V3_ADD_APPEND))
@@ -948,8 +949,10 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     // Injuct error into public key value.
     if (certConfig.IsPublicKeyError())
     {
-        ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(newCert);
-        pk->data[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+        const ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(newCert);
+        std::vector<unsigned char> pkBuf(ASN1_STRING_get0_data(pk), ASN1_STRING_get0_data(pk) + ASN1_STRING_length(pk));
+        pkBuf[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+        ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(pk), pkBuf.data(), static_cast<int>(pkBuf.size()));
     }
 
     // Set certificate subject DN.
@@ -1042,7 +1045,9 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     {
         const ASN1_BIT_STRING * sig = nullptr;
         X509_get0_signature(&sig, nullptr, newCert);
-        sig->data[20] ^= 0xFF;
+        std::vector<unsigned char> sigBuf(ASN1_STRING_get0_data(sig), ASN1_STRING_get0_data(sig) + ASN1_STRING_length(sig));
+        sigBuf[20] ^= 0xFF;
+        ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(sig), sigBuf.data(), static_cast<int>(sigBuf.size()));
     }
 
 exit:
@@ -1305,7 +1310,8 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
     uint8_t signatureRawBuf[chip::Crypto::kP256_ECDSA_Signature_Length_Raw];
     MutableByteSpan signatureRaw(signatureRawBuf);
     ReturnErrorOnFailure(chip::Crypto::EcdsaAsn1SignatureToRaw(
-        chip::Crypto::kP256_FE_Length, ByteSpan(asn1Signature->data, static_cast<size_t>(asn1Signature->length)), signatureRaw));
+        chip::Crypto::kP256_FE_Length,
+        ByteSpan(ASN1_STRING_get0_data(asn1Signature), static_cast<size_t>(ASN1_STRING_length(asn1Signature))), signatureRaw));
 
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), signatureRaw));
 
@@ -1449,7 +1455,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         }
 
         // Add common name attribute to the certificate subject DN.
-        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), NID_commonName, MBSTRING_UTF8,
+        if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), NID_commonName, MBSTRING_UTF8,
                                         reinterpret_cast<uint8_t *>(cnAttrStr), static_cast<int>(cnAttrStrLen), -1, 0))
         {
             ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
@@ -1466,7 +1472,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrVID, MBSTRING_UTF8,
+            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrVID, MBSTRING_UTF8,
                                             reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
@@ -1481,7 +1487,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrPID, MBSTRING_UTF8,
+            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrPID, MBSTRING_UTF8,
                                             reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);

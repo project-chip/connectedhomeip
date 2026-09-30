@@ -687,7 +687,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
             crlIssuerName = GENERAL_NAME_new();
             VerifyOrReturnError(crlIssuerName != nullptr, false);
             crlIssuerName->type            = GEN_DIRNAME;
-            crlIssuerName->d.directoryName = X509_get_subject_name(cRLIssuerCert.get());
+            crlIssuerName->d.directoryName = const_cast<X509_NAME *>(X509_get_subject_name(cRLIssuerCert.get()));
             distPoint->CRLissuer           = GENERAL_NAMES_new();
             sk_GENERAL_NAME_push(distPoint->CRLissuer, crlIssuerName);
 
