@@ -666,6 +666,10 @@ private:
         mNodeKeySetEntries.clear();
         mACLEntries.clear();
         mEndpointEntries.clear();
+        // Operations in flight complete later; their completions find a new generation and return. Queued ones
+        // never start.
+        ++mSyncGeneration;
+        ResetRefreshState();
         mNodeSyncQueues.clear();
         mAclTombstones.clear();
         mBindingTombstones.clear();
@@ -812,6 +816,7 @@ private:
 
     // Ends the active refresh, if any, and resets all refresh state. The only place a refresh ends.
     void FinishRefresh(CHIP_ERROR err);
+    void ResetRefreshState();
 
     // The result views the subject and target storage of `entry`, so it is valid only while `entry` is
     // unchanged.
@@ -858,6 +863,10 @@ private:
     }
 
     Delegate * mDelegate = nullptr;
+
+    // Changed by ClearAllRecords. Refresh and queued-sync completions capture it when their operation starts, and
+    // return without touching the datastore if it has changed since.
+    uint32_t mSyncGeneration = 0;
 
     NodeId mRefreshingNodeId           = kUndefinedNodeId;
     RefreshState mRefreshState         = kIdle;

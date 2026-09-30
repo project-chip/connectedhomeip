@@ -2754,6 +2754,73 @@ TEST(JointFabricDatastoreTest, RefreshCommitsNodeWhenGroupFetchFails)
     EXPECT_EQ(store.GetEndpointGroupIDList().size(), 1u);
 }
 
+// Removing the joint fabric drops queued syncs. A sync in flight still completes, and its completion changes
+// nothing: it must not start an operation queued since, which would then run alongside the one in flight.
+TEST(JointFabricDatastoreTest, FabricRemovalIgnoresSyncCompletingAfterIt)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    store.SetAnchorFabricIndex(1);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x5 }, State::kCommitted);
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x6 }, State::kCommitted);
+
+    auto aclSyncCount = [&delegate]() {
+        return std::count_if(delegate.syncCalls.begin(), delegate.syncCalls.end(),
+                             [](const auto & call) { return call.second == SyncKind::kAcl; });
+    };
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(6, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(aclSyncCount(), 1);
+
+    store.OnFabricRemoved(1);
+
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 7, Privilege::kView, AuthMode::kCase, { 0x7 }, State::kCommitted);
+    SeedAcl(store, 123, 8, Privilege::kView, AuthMode::kCase, { 0x8 }, State::kCommitted);
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(8, 123), CHIP_NO_ERROR);
+    EXPECT_EQ(aclSyncCount(), 2);
+
+    delegate.RunDeferred(); // the removal of 5, from before the fabric was removed
+    EXPECT_EQ(aclSyncCount(), 2);
+    EXPECT_NE(FindAcl(store, 123, 7), nullptr);
+
+    delegate.RunDeferred(); // the removal of 7
+    EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
+    EXPECT_EQ(aclSyncCount(), 3);
+}
+
+// A refresh in flight when the joint fabric is removed no longer blocks refreshes, and its completion does not end
+// a later one.
+TEST(JointFabricDatastoreTest, FabricRemovalDuringRefreshReleasesIt)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    store.SetAnchorFabricIndex(1);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    store.OnFabricRemoved(1);
+
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 2u);
+
+    delegate.RunDeferred(); // the first refresh's ACL write
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the second refresh's ACL write
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
 {
     JointFabricDatastore store;
