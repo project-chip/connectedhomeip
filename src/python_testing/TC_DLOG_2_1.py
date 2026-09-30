@@ -55,6 +55,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/l
 """
 
 import asyncio
+import contextlib
 import logging
 import os
 import random
@@ -200,7 +201,13 @@ class TC_DLOG_2_1(MatterBaseTest):
                 self.dut_node_id, self.endpoint, command, responseType=commands.RetrieveLogsResponse))
             done, _ = await asyncio.wait([response_task, bdx_future], return_when=asyncio.FIRST_COMPLETED,
                                          timeout=RESPONSE_OR_BDX_TIMEOUT_SEC)
-            asserts.assert_true(done, "Neither a RetrieveLogsResponse nor a BDX SendInit was received from the DUT")
+            if not done:
+                # Nothing arrived: release the armed receive and the command so neither lingers into later requests
+                bdx_future.cancel()
+                response_task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await response_task
+                asserts.fail("Neither a RetrieveLogsResponse nor a BDX SendInit was received from the DUT")
             if bdx_future in done:
                 logger.info("DUT initiated BDX for %s", intent.name)
                 return bdx_future.result(), response_task
