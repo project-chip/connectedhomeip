@@ -39,14 +39,15 @@ cluster_to_pics_dict = {
     "Application Basic": "Media Cluster",
     "Content Launcher": "Media Cluster",
     "Content App Observer": "Media Cluster",
-    "Application Launch": "Media Cluster",
+    "Application Launcher": "Media Cluster",
     "Operational Credentials": "Node Operational Credentials",
 
     # Workaround for naming colisions with current logic
     "Thermostat": "Thermostat Cluster",
     "Boolean State": "Boolean State Cluster",
-    "AccessControl": "Access Control Cluster",
+    "Access Control": "Access Control Cluster",
     "Energy EVSE": "Energy EVSE Cluster",
+    "AV Analysis": "AV Analytics Control",
 }
 
 
@@ -79,3 +80,16 @@ def map_cluster_name_to_pics_xml(cluster_name, pics_xml_file_list) -> str:
             break
 
     return file_name
+
+
+def normalize_pics_item_number(item_number: str | None) -> str:
+    """Return a PICS itemNumber in the form used for comparisons.
+
+    The CSA PICS XML templates are not consistent about the case of hex digits
+    (e.g. "BRBINFO.S.A000a" and "HSTAT.S.A000A" in the same bundle), so
+    itemNumbers are compared case-insensitively. A missing itemNumber
+    normalizes to "", which never matches a generated PICS code.
+    """
+    if item_number is None:
+        return ""
+    return item_number.lower()

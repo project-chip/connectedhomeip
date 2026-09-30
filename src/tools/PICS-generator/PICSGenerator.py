@@ -24,7 +24,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
-from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
+from pics_generator_support import map_cluster_name_to_pics_xml, normalize_pics_item_number, pics_xml_file_list_loader
 from rich.console import Console
 
 import matter.clusters as Clusters
@@ -180,32 +180,24 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                                assessment_data: ConformanceAssessmentData | None = None):
 
     xmlPath = xmlTemplatePathStr
-    fileName = ""
 
     console.print(f"Handling PICS for {clusterName}")
 
-    picsFileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
+    # Skip clusters without a template. Falling through here would let the
+    # empty name prefix-match the first template in the folder and write an
+    # unmarked copy of it over any real output for that template.
+    fileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
+    if not fileName:
+        console.print(f"[red]Could not find matching file for \"{clusterName}\" ❌")
+        return
 
     # If we've already written an output for this cluster's template
     # (e.g. OTA Software Update Provider and Requestor both resolve to
     # the same template, or a cluster appears as both server and client
     # on this endpoint), reuse the existing file as input so the new
     # markings get merged in instead of writing a fresh copy.
-    if picsFileName:
-        existing_output = Path(outputPathStr) / picsFileName
-        if existing_output.is_file():
-            xmlPath = outputPathStr
-            fileName = picsFileName
-
-    # If no file is found in output folder, determine if there is a match for the cluster name in input folder
-    if fileName == "":
-        for file in xmlFileList:
-            if file.lower().startswith(picsFileName.lower()):
-                fileName = file
-                break
-        else:
-            console.print(f"[red]Could not find matching file for \"{clusterName}\" ❌")
-            return
+    if (Path(outputPathStr) / fileName).is_file():
+        xmlPath = outputPathStr
 
     try:
         # Open the XML PICS template file
@@ -217,6 +209,14 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         console.print(f"[red]Could not find \"{fileName}\" ❌")
         return
 
+    # The generated PICS codes use lowercase hex while the templates mix both
+    # cases, so every itemNumber comparison below uses the normalized form.
+    clusterPicsCodeNormalized = normalize_pics_item_number(clusterPicsCode)
+    featurePicsSet = {normalize_pics_item_number(pics) for pics in featurePicsList}
+    attributePicsSet = {normalize_pics_item_number(pics) for pics in attributePicsList}
+    acceptedCommandPicsSet = {normalize_pics_item_number(pics) for pics in acceptedCommandPicsList}
+    generatedCommandPicsSet = {normalize_pics_item_number(pics) for pics in generatedCommandPicsList}
+
     # Usage PICS
     usageNode = root.find('usage')
     for picsItem in usageNode:
@@ -224,7 +224,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
         console.print(f"Searching for {itemNumberElement.text}")
 
-        if itemNumberElement.text == f"{clusterPicsCode}":
+        if normalize_pics_item_number(itemNumberElement.text) == clusterPicsCodeNormalized:
             console.print("Found usage PICS value in XML template ✅")
             supportElement = picsItem.find('support')
             supportElement.text = "true"
@@ -242,7 +242,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in featurePicsList:
+            if normalize_pics_item_number(itemNumberElement.text) in featurePicsSet:
                 console.print("Found feature PICS value in XML template ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
@@ -257,7 +257,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in attributePicsList:
+            if normalize_pics_item_number(itemNumberElement.text) in attributePicsSet:
                 console.print("Found attribute PICS value in XML template ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
@@ -272,7 +272,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in acceptedCommandPicsList:
+            if normalize_pics_item_number(itemNumberElement.text) in acceptedCommandPicsSet:
                 console.print("Found acceptedCommand PICS value in XML template ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
@@ -287,7 +287,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in generatedCommandPicsList:
+            if normalize_pics_item_number(itemNumberElement.text) in generatedCommandPicsSet:
                 console.print("Found generatedCommand PICS value in XML template ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
