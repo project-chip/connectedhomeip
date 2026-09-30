@@ -281,10 +281,12 @@ COAP
 codeaurora
 codebase
 codec
+Codecov
 codegen
 CodeGenerator
 CodeLab
 codelabs
+CodeQL
 ColorControl
 Combinators
 Comcast
@@ -1628,6 +1630,7 @@ TXD
 txt
 uargument
 UART
+UBSan
 UDC
 udcport
 udhcpc

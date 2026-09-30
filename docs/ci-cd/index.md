@@ -3,6 +3,7 @@
 ```{toctree}
 :glob:
 
+host_unit_tests
 tools/*
 ```
 
