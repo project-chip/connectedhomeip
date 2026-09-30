@@ -92,11 +92,11 @@ west build -p always -b siwx917_rb4338a/siwg917m111mgtba \
 ```
 
 The Si917 app is Wi-Fi-only: its devicetree does not select OpenThread. The
-Matter root endpoint exposes Network Commissioning and Wi-Fi Network
-Diagnostics through `ZephyrWifiDriver`. Commission over BLE, provide the AP
-credentials using Network Commissioning, then verify IPv6/mDNS operational
-connectivity. Wi-Fi credentials and fabric state use Zephyr settings storage;
-factory data remains in its separate factory-flash partition.
+Matter root endpoint exposes Network Commissioning and Wi-Fi Network Diagnostics
+through `ZephyrWifiDriver`. Commission over BLE, provide the AP credentials
+using Network Commissioning, then verify IPv6/mDNS operational connectivity.
+Wi-Fi credentials and fabric state use Zephyr settings storage; factory data
+remains in its separate factory-flash partition.
 
 For first bring-up, retain the Matter shell and use its Wi-Fi commands to
 inspect scan/connect status. The final release profile can disable the shell.
