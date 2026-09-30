@@ -577,7 +577,23 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert, bool isAKIDLengthValid)
 
     if (!isAKIDLengthValid)
     {
-        ASN1_STRING_length_set(akid->keyid, 19);
+        // Intentionally truncate the key identifier by one byte to produce an invalid AKID
+        // for negative testing. ASN1_STRING_length_set() only exists in OpenSSL (and is
+        // deprecated since 3.0); BoringSSL has no equivalent. Re-set the string from a copy
+        // of its own (now-shorter) data instead, which OpenSSL 1.1.x/3.x/4.x and BoringSSL
+        // all support identically.
+        int origLen = ASN1_STRING_length(akid->keyid);
+        if (origLen <= 19)
+        {
+            fprintf(stderr, "Unexpected key identifier length in AUTHORITY_KEYID\n");
+            ExitNow(res = false);
+        }
+        uint8_t truncated[19];
+        memcpy(truncated, ASN1_STRING_get0_data(akid->keyid), sizeof(truncated));
+        if (!ASN1_STRING_set(akid->keyid, truncated, static_cast<int>(sizeof(truncated))))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
     if (!X509_add1_ext_i2d(cert, NID_authority_key_identifier, akid.get(), 0, X509V3_ADD_APPEND))
