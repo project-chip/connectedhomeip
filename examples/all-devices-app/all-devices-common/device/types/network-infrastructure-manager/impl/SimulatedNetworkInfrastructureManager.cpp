@@ -148,19 +148,19 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::GetDataset(Thread::Operational
     return dataset.Init(source->AsByteSpan());
 }
 
-void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                             ActivateDatasetCallback * callback)
+void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+                                                             ActivateDatasetCompleteCallback callback, void * context)
 {
-    ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
+    ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::SetActiveDataset called");
     if (!std::holds_alternative<NoActiveDataset>(mActive))
     {
-        callback->OnActivateDatasetComplete(sequenceNum, CHIP_ERROR_INCORRECT_STATE);
+        callback(context, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
     Activating activating;
     activating.callback = callback;
-    activating.sequence = sequenceNum;
+    activating.context  = context;
     CHIP_ERROR err      = activating.dataset.Init(activeDataset.AsByteSpan());
     if (err == CHIP_NO_ERROR)
     {
@@ -168,7 +168,7 @@ void SimulatedNetworkInfrastructureManager::SetActiveDataset(const Thread::Opera
     }
     if (err != CHIP_NO_ERROR)
     {
-        callback->OnActivateDatasetComplete(sequenceNum, err);
+        callback(context, err);
         return;
     }
 
@@ -232,14 +232,14 @@ void SimulatedNetworkInfrastructureManager::OnActiveDatasetTimerFired()
     VerifyOrReturn(activating != nullptr);
 
     auto * callback = activating->callback;
-    auto sequence   = activating->sequence;
+    auto context    = activating->context;
     mActive         = ActiveUncommitted{ activating->dataset };
     ReportAttributeChange(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
     ReportAttributeChange(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
 
     if (callback != nullptr)
     {
-        callback->OnActivateDatasetComplete(sequence, CHIP_NO_ERROR);
+        callback(context, CHIP_NO_ERROR);
     }
 }
 
@@ -283,11 +283,11 @@ void SimulatedNetworkInfrastructureManager::CompleteActivation(CHIP_ERROR error)
     VerifyOrReturn(activating != nullptr);
 
     auto * callback = activating->callback;
-    auto sequence   = activating->sequence;
+    auto context    = activating->context;
     mActive         = NoActiveDataset{};
     if (callback != nullptr)
     {
-        callback->OnActivateDatasetComplete(sequence, error);
+        callback(context, error);
     }
 }
 
