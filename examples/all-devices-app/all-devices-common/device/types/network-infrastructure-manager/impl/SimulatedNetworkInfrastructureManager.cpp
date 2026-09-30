@@ -36,7 +36,7 @@ SimulatedNetworkInfrastructureManager::SimulatedNetworkInfrastructureManager(con
         .failSafeContext     = context.failSafeContext,
         .platformManager     = context.platformManager,
         .storage             = context.storage,
-        .breadcrumbTracker   = *this,
+        .breadcrumbTracker   = context.breadcrumbTracker,
         .diagnosticsProvider = *this,
     }),
     mTimerDelegate(context.timerDelegate), mBorderRouterName(context.nodeLabel)
