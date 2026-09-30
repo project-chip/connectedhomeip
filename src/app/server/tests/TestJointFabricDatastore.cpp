@@ -2400,6 +2400,31 @@ TEST(JointFabricDatastoreTest, CommitClearsSupersededValue)
     EXPECT_FALSE(FindAcl(store, 123, 7)->supersededValue.has_value());
 }
 
+// A permission change made while RefreshNode's ACL write is in flight: the write carried the old value,
+// so the entry is not Committed by it, and the queued sync replaces the value the write left on the node.
+TEST(JointFabricDatastoreTest, RefreshAclWriteDoesNotCommitUpdateMadeDuringIt)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+
+    delegate.ResetCapturedSyncs();
+    delegate.RunDeferred();
+
+    ASSERT_TRUE(delegate.hasLastAclSync);
+    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(FindAcl(store, 123, 7)->ACLEntry.privilege, Privilege::kManage);
+}
+
 // An entry removed while its update has not reached the node: the removal removes the old value too.
 TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValue)
 {

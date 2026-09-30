@@ -1244,6 +1244,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
         mRefreshingACLEntries.clear();
 
         // 5.
+        // Owned copies of the written values: an entry can be updated again while the write is in flight.
+        std::vector<std::pair<uint16_t, datastore::AccessControlEntryStruct>> writtenValues;
         for (auto it = mACLEntries.begin(); it != mACLEntries.end();)
         {
             if (it->nodeID != mRefreshingNodeId)
@@ -1265,14 +1267,16 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             if (!HasRemovalIntent(*it))
             {
                 mRefreshingACLEntries.push_back(EncodeAclEntryForSync(*it));
+                writtenValues.emplace_back(it->listID, it->ACLEntry);
             }
 
             ++it;
         }
 
         const NodeId refreshingNodeId = mRefreshingNodeId;
-        CHIP_ERROR syncErr =
-            mDelegate->SyncNode(mRefreshingNodeId, mRefreshingACLEntries, [this, refreshingNodeId](CHIP_ERROR innerErr) {
+        CHIP_ERROR syncErr            = mDelegate->SyncNode(
+            mRefreshingNodeId, mRefreshingACLEntries,
+            [this, refreshingNodeId, writtenValues = std::move(writtenValues)](CHIP_ERROR innerErr) {
                 if (innerErr != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer,
@@ -1293,12 +1297,24 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     {
                         continue;
                     }
-                    if (std::any_of(mRefreshingACLEntries.begin(), mRefreshingACLEntries.end(),
-                                    [&entry](const auto & written) { return written.listID == entry.listID; }))
+                    auto written = std::find_if(writtenValues.begin(), writtenValues.end(),
+                                                [&entry](const auto & value) { return value.first == entry.listID; });
+                    if (written == writtenValues.end())
+                    {
+                        continue;
+                    }
+                    if (detail::AclEntryValueEquals(EncodeAccessControlEntry(entry.ACLEntry),
+                                                    EncodeAccessControlEntry(written->second)))
                     {
                         entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
                         entry.statusEntry.failureCode = 0;
                         entry.supersededValue.reset();
+                    }
+                    else
+                    {
+                        // Updated while the write was in flight: the node now holds the written value, which the
+                        // queued sync replaces.
+                        entry.supersededValue = written->second;
                     }
                 }
 
