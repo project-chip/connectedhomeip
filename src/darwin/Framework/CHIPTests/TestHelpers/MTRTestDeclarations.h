@@ -58,6 +58,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @end
 
+MTR_TESTABLE_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory (Test)
++ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
+                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval;
+@end
+
 @interface MTRDevice (Test)
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
@@ -80,6 +86,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+
++ (void)unitTestResetInvokeRequestMessageCount;
++ (NSUInteger)unitTestInvokeRequestMessageCount;
+
+// Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
++ (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
 @end
 
 @interface MTRDevice (TestDebug)

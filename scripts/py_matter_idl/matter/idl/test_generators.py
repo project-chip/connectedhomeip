@@ -67,7 +67,7 @@ class TestCaseStorage(GeneratorStorage):
             if expected.file_name == relative_path:
                 return os.path.join(TESTS_DIR, expected.golden_path)
 
-        self.checker.fail("Expected output %s not found" % relative_path)
+        self.checker.fail(f"Expected output {relative_path} not found")
         return None
 
     def get_existing_data(self, relative_path: str):
@@ -82,12 +82,12 @@ class TestCaseStorage(GeneratorStorage):
                 return golden.read()
 
         # This will attempt a new write, causing a unit test failure
-        self.checker.fail("Expected output %s not found" % relative_path)
+        self.checker.fail(f"Expected output {relative_path} not found")
         return None
 
     def write_new_data(self, relative_path: str, content: str):
         if REGENERATE_GOLDEN_IMAGES:
-            print("RE-GENERATING %r" % relative_path)
+            print(f"RE-GENERATING {relative_path!r}")
             # Expect writing only on regeneration
             path = os.path.abspath(self.get_existing_data_path(relative_path))
             dir_path = os.path.dirname(path)
@@ -101,12 +101,11 @@ class TestCaseStorage(GeneratorStorage):
         # to write any new data
 
         # This will display actual diffs in the output files
-        self.checker.assertEqual(
-            self.get_existing_data(relative_path), content, "Content of %s" % relative_path)
+        self.checker.assertEqual(self.get_existing_data(relative_path), content, f"Content of {relative_path}")
 
         # Even if no diff, to be build system friendly, we do NOT expect any
         # actual data writes.
-        raise AssertionError("Unexpected write to %s" % relative_path)
+        raise AssertionError(f"Unexpected write to {relative_path}")
 
 
 @dataclass

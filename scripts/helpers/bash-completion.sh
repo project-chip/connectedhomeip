@@ -103,6 +103,11 @@ _chip_build_example() {
 
 }
 
+# Get the list of commands from the output of the chip-cert tool.
+_chip_cert_get_commands() {
+    "$@" --help 2>&1 | awk '/ -- / && $1 !~ /^-/ { print $1 }'
+}
+
 # Get the list of commands from the output of the chip-tool,
 # where each command is prefixed with the ' | * ' string.
 _chip_tool_get_commands() {
@@ -162,6 +167,61 @@ _chip_app() {
     case "$cur" in
         -*)
             readarray -t COMPREPLY < <(compgen -W "$(_parse_help "$1")" -- "$cur")
+            ;;
+    esac
+
+}
+
+_chip_cert() {
+
+    local cur prev words cword split
+    _init_completion -s || return
+
+    local i command
+    # Get the first non-option argument.
+    for ((i = 1; i < COMP_CWORD; i++)); do
+        if [[ "${COMP_WORDS[i]}" != -* ]] && [[ -n "${COMP_WORDS[i]}" ]]; then
+            command="${COMP_WORDS[i]}"
+            break
+        fi
+    done
+
+    if [[ -z "$command" ]]; then
+        words=$(_chip_cert_get_commands "$1")
+        readarray -t COMPREPLY < <(compgen -W "$words" -- "$cur")
+        return
+    fi
+
+    case "$command" in
+        gen-cert)
+            case "$prev" in
+                -t | --type)
+                    readarray -t COMPREPLY < <(compgen -W "r c n f p v" -- "$cur")
+                    return
+                    ;;
+                -F | --out-format)
+                    readarray -t COMPREPLY < <(compgen -W "x509-pem x509-der x509-hex chip chip-b64 chip-hex" -- "$cur")
+                    return
+                    ;;
+            esac
+            ;;
+        gen-att-cert)
+            case "$prev" in
+                -t | --type)
+                    readarray -t COMPREPLY < <(compgen -W "a i d" -- "$cur")
+                    return
+                    ;;
+            esac
+            ;;
+    esac
+
+    case "$cur" in
+        -*)
+            words=$("$1" "$command" --help | _parse_help -)
+            readarray -t COMPREPLY < <(compgen -W "$words" -- "$cur")
+            ;;
+        *)
+            _filedir
             ;;
     esac
 
@@ -232,4 +292,5 @@ complete -F _chip_app chip-tv-app
 complete -F _chip_app chip-tv-casting-app
 complete -F _chip_app matter-water-heater-app
 
+complete -F _chip_cert chip-cert
 complete -F _chip_tool chip-tool

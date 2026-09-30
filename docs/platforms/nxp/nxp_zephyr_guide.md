@@ -15,6 +15,7 @@ commissioning and different cluster control.
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Factory data](#factory-data)
 -   [Manufacturing data](#generate-factory-data)
+-   [DAC private key blob generation](#dac-private-key-blob-generation)
 -   [OTA Software Update](#ota-software-update)
 -   [Testing the example](#testing-the-example)
 -   [Using Matter CLI in NXP Zephyr examples](#using-matter-cli-in-nxp-zephyr-examples)
@@ -57,7 +58,7 @@ Prerequisites:
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.3.0
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.4.1.1
 ```
 
 > **Note**: While some of NXP platforms are supported in Zephyr upstream, we
@@ -65,8 +66,8 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > not upstream yet. While you can decide to use nxp-zsdk top of tree, we
 > recommend using a proper release tag delivered by NXP. This will ensure a
 > certain level of quality of the nxp-zsdk in use. Currently, we highly
-> recommend using the `nxp-v4.3.0` tag, based on Zephyr 4.3 release. Reach to
-> your NXP contact for more details.
+> recommend using the `nxp-v4.4.1.1` tag, based on Zephyr 4.4.1 release. Reach
+> to your NXP contact for more details.
 
 Steps to build the example:
 
@@ -209,6 +210,71 @@ the partition address: please refer to `factory_partition` defined in
 
 See
 [Guide for writing manufacturing data on NXP devices](./nxp_manufacturing_flow.md)
+
+### DAC private key blob generation
+
+The RW61x platform provides a mechanism to protect the DAC (Device Attestation
+Certificate) private key at rest by converting it from a plain 32-byte key
+stored in the factory data partition into a 48-byte ELS (EdgeLock Subsystem)
+hardware-wrapped blob. The wrapped blob is device-unique and can only be
+unwrapped by the same S50 hardware instance that created it, preventing the key
+from being extracted from flash.
+
+This is a provisioning-time operation. It requires a dedicated intermediate
+binary to be flashed on the device. Once the conversion is done and the blob is
+written back to the factory data partition, the real Matter application binary
+(without the blob generation option) is flashed and uses the wrapped key
+directly.
+
+> **Note**: This step requires the factory data binary to already be programmed
+> in flash (e.g. at address `0x1bfff000` on `frdm_rw612`). This conversion only
+> needs to be done **once**, unless the factory data partition is overridden.
+
+#### Step-by-step procedure
+
+**Step 0 (prerequisite) — Flash the factory data**
+
+Make sure the factory data binary is programmed in flash at the correct address
+before proceeding. Refer to the [Generate factory data](#generate-factory-data)
+section above.
+
+**Step 1 — Build the blob generation binary**
+
+Build a dedicated Matter application binary with
+`CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION=y` enabled. This Kconfig can be passed
+directly on the `west build` command line.
+
+Example with the `frdm_rw612` board and the thermostat application:
+
+```bash
+west build -b frdm_rw612 -p auto -d build_blob examples/thermostat/nxp/zephyr/ \
+    -DEXTRA_CONF_FILE=prj_ota.conf \
+    -DFILE_SUFFIX=fdata \
+    -DCONFIG_NXP_FACTORY_DAC_BLOB_GENERATION=y
+```
+
+**Step 2 — Flash and run the blob generation binary**
+
+Flash the blob generation binary to the application region of the device (do
+**not** erase the factory data partition). Boot the device.
+
+The UART log will show the following sequence, confirming the conversion was
+successful:
+
+```
+SSS: convert DAC private key to blob
+SSS: extracted blob from DAC private key
+SSS: replaced DAC private key with secured blob
+SSS: updated factory data
+```
+
+**Step 3 — Flash the real Matter application binary**
+
+Flash the final Matter application binary built **without**
+`CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION`. The factory data partition already
+contains the wrapped blob, so no conversion will take place. The application
+uses the S50 hardware to unwrap the blob and perform DAC signing operations
+without the plain key ever being held in accessible memory.
 
 <a name="ota-software-update"></a>
 

@@ -135,6 +135,15 @@
         return [[MCMediaPlaybackCluster alloc] initWithCppCluster:cppCluster];
     }
 
+    case MCEndpointClusterTypeMediaFileManagement: {
+        auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+        if (cppCluster == nullptr) {
+            ChipLogError(AppServer, "MCEndpoint::clusterForType() MCEndpointClusterTypeMediaFileManagement GetCluster() returned nullptr");
+            return nil;
+        }
+        return [[MCMediaFileManagementCluster alloc] initWithCppCluster:cppCluster];
+    }
+
     case MCEndpointClusterTypeOnOff: {
         auto cppCluster = _cppEndpoint->GetCluster<matter::casting::clusters::on_off::OnOffCluster>();
         if (cppCluster == nullptr) {

@@ -22,4 +22,7 @@ declare_args() {
 
   # Enable factory data support
   chip_enable_factory_data = false
+
+  # Realtek IC type: "rtl87x2g" or "rtl87x3g"
+  chip_realtek_ic_type = "rtl87x2g"
 }

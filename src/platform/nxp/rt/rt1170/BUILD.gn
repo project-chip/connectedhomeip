@@ -75,6 +75,8 @@ static_library("nxp_platform") {
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
     "../../../SingletonConfigurationManager.cpp",
+    "../../common/BootReason.h",
+    "../../common/BootReasonDefaultImpl.cpp",
     "../../common/CHIPDevicePlatformEvent.h",
     "../../common/ConfigurationManagerImpl.cpp",
     "../../common/ConfigurationManagerImpl.h",
@@ -178,11 +180,11 @@ static_library("nxp_platform") {
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
         sources += [
+          "../../../OpenThread/DnssdImplBr.cpp",
+          "../../../OpenThread/OpenThreadBrDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadBrDnssdImpl.h",
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
-          "../../common/DnssdImpl.cpp",
-          "../../common/DnssdImplBr.cpp",
-          "../../common/DnssdImplBr.h",
         ]
       } else {
         sources += [
@@ -197,8 +199,8 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-      "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.cpp",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.h",
       "../../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]

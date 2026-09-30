@@ -17,6 +17,7 @@ Feature: ios-device-instance-info-provider
 
 import os
 import re
+from pathlib import Path
 
 import pytest
 
@@ -24,7 +25,7 @@ import pytest
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 MC_CASTING_APP_MM = os.path.join(
     REPO_ROOT,
     "examples",

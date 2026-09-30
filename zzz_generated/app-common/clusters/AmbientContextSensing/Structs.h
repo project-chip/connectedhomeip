@@ -41,14 +41,14 @@ namespace AmbientContextTypeStruct {
 enum class Fields : uint8_t
 {
     kAmbientContextSensed = 0,
-    kDetectionStartTime   = 1,
+    kDetectionConfidence  = 1,
 };
 
 struct Type
 {
 public:
     DataModel::List<const Globals::Structs::SemanticTagStruct::Type> ambientContextSensed;
-    Optional<uint32_t> detectionStartTime;
+    Optional<DataModel::Nullable<chip::Percent>> detectionConfidence;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -59,7 +59,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Globals::Structs::SemanticTagStruct::DecodableType> ambientContextSensed;
-    Optional<uint32_t> detectionStartTime;
+    Optional<DataModel::Nullable<chip::Percent>> detectionConfidence;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

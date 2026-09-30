@@ -65,6 +65,14 @@ command.
 Only examples without display support have been verified with ESP-IDF v6.0.
 Tested on ESP32-C3-Devkit.
 
+## Using ESP-IDF v6.1+ (alpha)
+
+After running `./install.sh`, install the matching component manager:
+
+```
+pip install "idf-component-manager~=3.0"
+```
+
 ---
 
 Once IDF and Matter environment is set up, head over to

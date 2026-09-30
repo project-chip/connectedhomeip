@@ -3,3 +3,4 @@ intelhex
 cbor
 cbor2
 jsonschema
+python-path

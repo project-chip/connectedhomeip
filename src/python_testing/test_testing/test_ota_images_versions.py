@@ -43,17 +43,17 @@ def run_single_test(otaimage: str, otaimage_version: int) -> int:
         OTA_TOOL_DIR, 'ota_image_tool.py'))
     extract_cmd = str(ota_tool) + ' extract ' + str(ota_image) + ' ' + str(ota_image_bin)
     status = subprocess.call(extract_cmd, shell=True)
-    log.info("Extract image : " + str(status))
+    log.info("Extract image : %s", str(status))
     if status != 0:
-        log.error(f"Failed to extract the image from {ota_image}")
+        log.error("Failed to extract the image from %s", ota_image)
         exit(1)
-    log.info(f"Image extracted into {ota_image_bin}")
+    log.info("Image extracted into %s", ota_image_bin)
 
     # Mod update
     cmd_mod = "chmod +x " + str(ota_image_bin)
     status = subprocess.call(cmd_mod, shell=True)
     if status != 0:
-        log.info(f"Failed to change +x permission on the image  {ota_image_bin}")
+        log.info("Failed to change +x permission on the image  %s", ota_image_bin)
         exit(1)
 
     app_args = ' --discriminator 1234 '
@@ -98,13 +98,13 @@ def main(otaimages: str, otaimagesversions: int):
     for index in range(len(otaimages)):
         otaimage = otaimages[index]
         otaimage_version = otaimagesversions[index]
-        log.info(f"Verifying the image {otaimage} has the reported version {otaimage_version}")
+        log.info("Verifying the image %s has the reported version %s", otaimage, otaimage_version)
         status = run_single_test(otaimage=otaimage, otaimage_version=otaimage_version)
         passes.append((otaimage, otaimage_version, status))
 
     for it in passes:
         if it[2] != 0:
-            log.error(f"Image version missmatched for ota image: {it[0]} expected: {it[1]}")
+            log.error("Image version missmatched for ota image: %s expected: %s", it[0], it[1])
             main_status = 1
 
     sys.exit(main_status)

@@ -39,18 +39,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceLayer.h>
 
-/**********************************************************
- * Defines
- *********************************************************/
-
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
 struct GenericSwitchEventData
 {
     chip::EndpointId endpoint;
@@ -106,25 +94,79 @@ public:
 
     static AppTask & GetAppTask();
 
+    /**
+     * @brief AppTask task main loop function
+     *
+     * @param pvParameter FreeRTOS task parameter
+     */
     static void AppTaskMain(void * pvParameter);
+
     CHIP_ERROR StartAppTask();
 
+    /**
+     * @brief Event handler when a button is pressed
+     *
+     * @param button    APP_FUNCTION_BUTTON or the action button
+     * @param btnAction SL_SIMPLE_BUTTON_PRESSED, SL_SIMPLE_BUTTON_RELEASED
+     */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+
     static void AppEventHandler(AppEvent * aEvent);
 
+    /**
+     * @brief Notifies the binding manager that a bound cluster changed to drive the outgoing switch. This action is queued to
+     *        the Matter thread/task.
+     *
+     * @param context Work item pointer passed to PlatformMgr::ScheduleWork
+     */
     static void SwitchWorkerFunction(intptr_t context);
+
+    /**
+     * @brief Handler scheduled on the Matter thread to emit a Generic Switch cluster event for the queued switch action.
+     *
+     * @param context Pointer to a GenericSwitchEventData allocated for this work item
+     */
     static void GenericSwitchWorkerFunction(intptr_t context);
 
+    /**
+     * @brief Sends an OnOff cluster command to the bound peer device for the given binding entry.
+     *
+     * @param commandId   OnOff cluster command to send
+     * @param binding     Binding table entry identifying the target
+     * @param peer_device Operational session to the bound peer, or nullptr for group bindings
+     */
     static void ProcessOnOffBindingCommand(chip::CommandId commandId, const chip::app::Clusters::Binding::TableEntry & binding,
                                            chip::OperationalDeviceProxy * peer_device);
 
+    /**
+     * @brief Sends a LevelControl cluster command to the bound peer device for the given binding entry.
+     *
+     * @param data        LevelControl command payload and local endpoint context
+     * @param binding     Binding table entry identifying the target
+     * @param peer_device Operational session to the bound peer, or nullptr for group bindings
+     */
     static void ProcessLevelControlBindingCommand(BindingCommandData * data,
                                                   const chip::app::Clusters::Binding::TableEntry & binding,
                                                   chip::OperationalDeviceProxy * peer_device);
 
+    /**
+     * @brief Matter stack callback after a server attribute write, logs Identify cluster changes.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
+    /**
+     * @brief Binding manager callback invoked per bound device to send a switch command to the target light.
+     *
+     * @param binding     Binding table entry for the peer light
+     * @param peer_device Operational session to the bound peer
+     * @param context     Opaque context from the binding manager
+     */
     static void LightSwitchChangedHandler(const chip::app::Clusters::Binding::TableEntry & binding,
                                           chip::OperationalDeviceProxy * peer_device, void * context);
 
@@ -133,5 +175,10 @@ protected:
 
     CHIP_ERROR InitLightSwitch(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
 
+    /**
+     * @brief Handler scheduled on the Matter thread to set up the binding table.
+     *
+     * @param arg Opaque argument passed to PlatformMgr::ScheduleWork
+     */
     static void InitBindingHandler(intptr_t arg);
 };

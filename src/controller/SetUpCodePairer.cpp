@@ -33,6 +33,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
+#include <utility>
 #include <vector>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
@@ -742,17 +743,34 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
         TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
-        mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
+        EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, 0));
     }
     else
     {
         for (size_t i = 0; i < resolutionData.numIPs; i++)
         {
-            mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, i);
+            EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, i));
         }
     }
 
     ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters && params)
+{
+    // The same device can be advertised more than once -- most notably the same non-link-local
+    // address arriving on multiple interfaces -- producing candidates that would drive an identical
+    // PASE attempt. Retrying the same attempt just wastes it and adds latency, so drop duplicates.
+    for (const SetUpCodePairerParameters & existing : mDiscoveredParameters)
+    {
+        if (existing.CanCoalesceWith(params))
+        {
+            ChipLogDetail(Controller, "SetUpCodePairer: dropping duplicate discovered rendezvous parameters");
+            return;
+        }
+    }
+
+    mDiscoveredParameters.emplace_back(std::move(params));
 }
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)

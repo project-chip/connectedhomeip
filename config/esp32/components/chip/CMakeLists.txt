@@ -31,7 +31,11 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns)
+# wpa_supplicant is here for esp_eap_client.h, which the Wi-Fi PDC support in
+# src/platform/ESP32 needs. It is listed unconditionally because the requirements have to be
+# identical during CMake's early expansion pass, where CONFIG_* is not yet available.
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns
+                            wpa_supplicant)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
@@ -349,6 +353,10 @@ if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
+if (CONFIG_SECURE_ENABLE_TEE)
+    chip_gn_arg_append("chip_enable_esp32_tee" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS)
     target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
@@ -468,6 +476,32 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
     "${freertos_dir}/include/freertos"
     "${freertos_dir}/FreeRTOS-Kernel/include/freertos")
 
+# ESP32TEEOpKey.cpp / ESP32TEEOperationalKeystore.cpp (and, on the PBKDF2 DAC path,
+# ESP32SecureCertDACProvider.cpp) include esp_tee_sec_storage.h, owned by the tee_sec_storage
+# component (an esp_tee subproject component that is not in this component's REQUIRES). The
+# operational keystore is compiled whenever CONFIG_SECURE_ENABLE_TEE is set, so add the include
+# dir to the gn compile path under that condition. A config-gated PRIV_REQUIRES is unreliable
+# here: CONFIG_* is unset during IDF's early-expansion pass when REQUIRES is resolved, so inject
+# the dir directly instead.
+if (CONFIG_SECURE_ENABLE_TEE)
+    # tee_sec_storage lives under esp_tee/subproject and is NOT auto-discovered just because
+    # CONFIG_SECURE_ENABLE_TEE is set; the app must add it to the build (the bundled lighting-app
+    # does this from EXTRA_COMPONENT_DIRS when its sdkconfig defaults enable TEE). Check the build's
+    # component list first and fail with an actionable message if it is absent: calling
+    # idf_component_get_property on an undiscovered component aborts with a bare
+    # "Failed to resolve component 'tee_sec_storage'" that hides the real cause.
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    if (NOT "tee_sec_storage" IN_LIST build_components)
+        message(FATAL_ERROR
+                "CONFIG_SECURE_ENABLE_TEE is set but the 'tee_sec_storage' component was not found. "
+                "Add it to the application's EXTRA_COMPONENT_DIRS, e.g. "
+                "\"$ENV{IDF_PATH}/components/esp_tee/subproject/components/tee_sec_storage\" "
+                "(see examples/lighting-app/esp32/CMakeLists.txt).")
+    endif()
+    idf_component_get_property(tee_sec_storage_dir tee_sec_storage COMPONENT_DIR)
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${tee_sec_storage_dir}/include")
+endif()
+
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
     "${CHIP_ROOT}/src/platform/OpenThread"
@@ -493,12 +527,13 @@ elseif("mdns" IN_LIST build_components)
     list(APPEND matter_requires mdns)
 endif()
 
-if (CONFIG_OPENTHREAD_BORDER_ROUTER)
-    list(APPEND matter_requires espressif__esp_rcp_update)
-endif()
-
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
+if (CONFIG_SECURE_ENABLE_TEE)
+    # Links esp_tee_sec_storage_* used by the operational keystore and the PBKDF2 TEE-DAC path.
+    list(APPEND matter_requires tee_sec_storage)
 endif()
 
 if (CONFIG_ENABLE_ENCRYPTED_OTA)

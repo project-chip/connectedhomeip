@@ -31,7 +31,6 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import random
 
 from mobly import asserts
@@ -41,13 +40,11 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
-log = logging.getLogger(__name__)
 
-
-class TC_ACL_2_9(MatterBaseTest):
+class TC_ACL_2_9(MatterTestCommissionedDevice):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
         value = await self.read_single_attribute_check_success(
             cluster=Clusters.Objects.AccessControl,

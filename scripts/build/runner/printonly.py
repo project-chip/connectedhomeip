@@ -28,7 +28,7 @@ class PrintOnlyRunner(Runner):
     def StartCommandExecution(self):
         self.output_file.write(
             "# Commands will be run in CHIP project root.\n")
-        self.output_file.write('cd "%s"\n\n' % self.root)
+        self.output_file.write(f'cd "{self.root}"\n\n')
 
     def Run(self, cmd: list[str], title: str | None = None, dedup: bool = False, quiet: bool = False):
         if title and not quiet:

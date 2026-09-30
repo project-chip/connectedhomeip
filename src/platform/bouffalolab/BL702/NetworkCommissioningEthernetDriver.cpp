@@ -20,6 +20,7 @@ extern "C" {
 }
 #include <lwip/dhcp6.h>
 #include <lwip/netifapi.h>
+#include <lwip/tcpip.h>
 
 #include <lib/support/SafePointerCast.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -69,7 +70,7 @@ static int ethernet_callback(eth_link_state val)
 
 CHIP_ERROR BflbEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    netif_add(&eth_mac, NULL, NULL, NULL, NULL, eth_init, ethernet_input);
+    netif_add(&eth_mac, NULL, NULL, NULL, NULL, eth_init, tcpip_input);
 
     ethernet_init(ethernet_callback);
 

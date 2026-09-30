@@ -48,7 +48,8 @@ public:
 
     // Code-driven data model initialization hooks required by MatterConfig.cpp
     static CHIP_ERROR InitCodeDrivenDataModel(chip::PersistentStorageDelegate & storage,
-                                              chip::Credentials::GroupDataProvider * groupDataProvider);
+                                              chip::Credentials::GroupDataProvider * groupDataProvider,
+                                              chip::Crypto::SessionKeystore * sessionKeyStore);
     static chip::app::CodeDrivenDataModelProvider * GetDataModelProvider();
 
 private:

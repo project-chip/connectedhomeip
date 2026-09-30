@@ -24,14 +24,11 @@
 #include "FreeRTOS.h"
 #include "timers.h"
 
-#include <app/icd/server/ICDStateObserver.h>
 #include <platform/CHIPDeviceLayer.h>
 
-extern "C" {
-#include <bl_gpio.h>
-#include <hal_gpio.h>
-#include <hosal_gpio.h>
-}
+#if CHIP_DEVICE_LAYER_TARGET_BL702L && CHIP_DETAIL_LOGGING
+#include <app/icd/server/ICDStateObserver.h>
+#endif
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -52,7 +49,7 @@ using namespace ::chip::DeviceLayer;
 
 struct Identify;
 
-#if CHIP_DETAIL_LOGGING
+#if CHIP_DEVICE_LAYER_TARGET_BL702L && CHIP_DETAIL_LOGGING
 class AppTask : public chip::app::ICDStateObserver
 #else
 class AppTask
@@ -90,9 +87,9 @@ public:
 
     EndpointId GetEndpointId(void) { return mEndpointId; }
     void PostEvent(app_event_t event);
-    static void ButtonEventHandler(void * arg);
+    static void ButtonEventHandler(int pin, bool is_pin_high);
 
-#if CHIP_DETAIL_LOGGING
+#if CHIP_DEVICE_LAYER_TARGET_BL702L && CHIP_DETAIL_LOGGING
     void OnEnterActiveMode();
     void OnEnterIdleMode();
     void OnTransitionToIdle();
@@ -105,11 +102,6 @@ private:
 
     static void ScheduleInit(intptr_t arg);
     static void AppTaskMain(void * pvParameter);
-
-#if CONFIG_ENABLE_CHIP_SHELL
-    static void StartAppShellTask();
-    static void AppShellTask(void * args);
-#endif
 
     uint64_t mButtonPressedTime;
 
@@ -128,3 +120,5 @@ inline AppTask & GetAppTask(void)
 }
 
 void StartAppTask();
+
+void app_pds_init(void (*pinHandler)(int, bool));

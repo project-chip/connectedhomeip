@@ -562,7 +562,9 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 // static
 void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<UDPEndPointImplSockets *>(data)->HandlePendingIO(events);
+    auto * endPoint = reinterpret_cast<UDPEndPointImplSockets *>(data);
+    VerifyOrReturn(endPoint != nullptr);
+    endPoint->HandlePendingIO(events);
 }
 
 void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)

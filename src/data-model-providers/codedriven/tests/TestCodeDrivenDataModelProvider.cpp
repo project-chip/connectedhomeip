@@ -222,7 +222,6 @@ public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-protected:
     ::TestProviderChangeListener mChangeListener;
     chip::Testing::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;

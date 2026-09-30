@@ -19,11 +19,12 @@ import("//build_overrides/efr32_sdk.gni")
 import("${build_root}/config/defaults.gni")
 import("${silabs_sdk_build_root}/silabs_executable.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 import(
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/enabled_devices.gni")
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory/enabled_devices.gni")
 
 assert(current_os == "freertos")
 
@@ -71,10 +72,20 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/codeDrivenImp",
     "${examples_common_plat_dir}/freertos_config",
   ]
 
   defines = []
+}
+
+source_set("silabs-battery-power-source") {
+  sources = [
+    "src/delegates/SilabsBatteryPowerSource.cpp",
+    "src/delegates/SilabsBatteryPowerSource.h",
+  ]
+
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source" ]
 }
 
 silabs_executable("all_devices_app") {
@@ -82,6 +93,7 @@ silabs_executable("all_devices_app") {
   defines = []
   include_dirs = [
     "include",
+    "src",
     "${chip_root}/examples/all-devices-app/all-devices-common",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/data-model-providers",
@@ -92,6 +104,8 @@ silabs_executable("all_devices_app") {
   }
 
   sources = [
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.cpp",
+    "${examples_common_plat_dir}/codeDrivenImp/SilabsIdentifyDelegate.h",
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
@@ -106,22 +120,39 @@ silabs_executable("all_devices_app") {
 
   deps = [
     ":sdk",
+    ":silabs-battery-power-source",
     "${chip_root}/src/platform/logging:default",
 
     # Code-driven data model providers
     "${chip_root}/src/data-model-providers/codedriven",
 
     # All devices common targets
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/boolean-state-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/proximity-ranger",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/soil-sensor",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/room-air-conditioner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
@@ -132,9 +163,38 @@ silabs_executable("all_devices_app") {
   ]
 
   if (chip_enable_wifi) {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi" ]
   } else {
-    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:thread" ]
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread" ]
+  }
+
+  # OTA Requestor is advertised on the silabs root endpoint when the OTA client
+  # state machine is compiled in. The composed OTARequestorCluster wires directly
+  # into gRequestorCore from OTAConfig.cpp, so the feature and the runtime are
+  # gated by the same flag.
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota" ]
+  }
+
+  if (chip_enable_icd_server) {
+    deps += [ "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:icd" ]
+  }
+
+  # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
+  # Pull in exactly the requestor implementation files it needs. The singleton
+  # getters normally defined by src/app/clusters/ota-requestor/CodegenIntegration.cpp
+  # (which we cannot link because it wires the cluster through the codegen
+  # data-model path) are provided by OTAConfig.cpp itself under
+  # SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL.
+  if (chip_enable_ota_requestor) {
+    _ota_requestor_dir = "${chip_root}/src/app/clusters/ota-requestor"
+    sources += [
+      "${_ota_requestor_dir}/BDXDownloader.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestor.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestorDriver.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestorStorage.cpp",
+    ]
+    deps += [ "${_ota_requestor_dir}:ota-requestor" ]
   }
 
   deps += [ "${examples_plat_dir}:efr32-common" ]

@@ -109,6 +109,9 @@ void JFAManager::HandleCommissioningCompleteEvent()
 
                 jfFabricIndex = fabricIndex;
 
+                // Record the joint fabric index so the datastore can be purged if this fabric is ever removed.
+                Server::GetInstance().GetJointFabricDatastore().SetAnchorFabricIndex(fabricIndex);
+
                 // Set AnchorRootCA
                 uint8_t mAnchorRootCABuffer[Credentials::kMaxDERCertLength];
                 MutableByteSpan rootCertSpan(mAnchorRootCABuffer);

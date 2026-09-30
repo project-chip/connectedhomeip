@@ -118,7 +118,10 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
 
 
 class TestConformanceTest(DeviceConformanceTests):
+    requires_dut = False
+
     def setup_class(self):
+        super().setup_class()
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
         self.xml_clusters, self.problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)

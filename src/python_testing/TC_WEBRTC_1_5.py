@@ -43,14 +43,14 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTC_1_5(MatterBaseTest):
+class TC_WEBRTC_1_5(MatterTestCommissionedDevice):
     def steps_TC_WEBRTC_1_5(self) -> list[TestStep]:
         return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
@@ -185,7 +185,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                 cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
                     streamUsage=aStreamUsagePriorities[0],
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                    minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                    minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                     maxFrameRate=aVideoSensorParams.maxFPS,
                     minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(
@@ -207,7 +207,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             return response.videoStreamID
 
         except Exception as e:
-            log.error(f"Failed to allocate video stream. {e}")
+            log.error("Failed to allocate video stream. %s", e)
             return None
 
 

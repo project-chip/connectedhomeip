@@ -58,8 +58,7 @@ typedef struct wfx_wifi_scan_ext
 
 #ifdef SL_MATTER_SIWX_WIFI_ENABLE
 /*
- * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
- * We took it from the SDK (for WF200)
+ * Station/SoftAP interface selector for GetMacAddress (legacy WFX naming).
  */
 typedef enum
 {
@@ -296,7 +295,6 @@ public:
      *        connection attempt was successful or not.
      *
      *        The returned error code only indicates if the connection attempt was triggered or not.
-     *        On retry after failure, the implementation may use quick join (no scan) when channel/BSSID are known.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
      *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials

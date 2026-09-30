@@ -62,6 +62,21 @@ struct Type;
 struct DecodableType;
 } // namespace LauncherResponse
 
+namespace ContentReplicationRequest {
+struct Type;
+struct DecodableType;
+} // namespace ContentReplicationRequest
+
+namespace ContentReplicationResponse {
+struct Type;
+struct DecodableType;
+} // namespace ContentReplicationResponse
+
+namespace PlayPreset {
+struct Type;
+struct DecodableType;
+} // namespace PlayPreset
+
 } // namespace Commands
 
 namespace Commands {
@@ -73,6 +88,8 @@ enum class Fields : uint8_t
     kData                = 2,
     kPlaybackPreferences = 3,
     kUseCurrentContext   = 4,
+    kContentAppVendorID  = 5,
+    kContentAppProductID = 6,
 };
 
 struct Type
@@ -87,6 +104,8 @@ public:
     Optional<chip::CharSpan> data;
     Optional<Structs::PlaybackPreferencesStruct::Type> playbackPreferences;
     Optional<bool> useCurrentContext;
+    Optional<DataModel::Nullable<uint16_t>> contentAppVendorID;
+    Optional<DataModel::Nullable<uint16_t>> contentAppProductID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -107,6 +126,8 @@ public:
     Optional<chip::CharSpan> data;
     Optional<Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences;
     Optional<bool> useCurrentContext;
+    Optional<DataModel::Nullable<uint16_t>> contentAppVendorID;
+    Optional<DataModel::Nullable<uint16_t>> contentAppProductID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -117,6 +138,12 @@ enum class Fields : uint8_t
     kContentURL          = 0,
     kDisplayString       = 1,
     kBrandingInformation = 2,
+    kPlaybackPreferences = 3,
+    kContentType         = 4,
+    kContentHeaders      = 5,
+    kOffsetMillisecs     = 6,
+    kQueueType           = 7,
+    kNextUrl             = 8,
 };
 
 struct Type
@@ -129,6 +156,12 @@ public:
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
     Optional<Structs::BrandingInformationStruct::Type> brandingInformation;
+    Optional<Structs::PlaybackPreferencesStruct::Type> playbackPreferences;
+    Optional<DataModel::Nullable<chip::CharSpan>> contentType;
+    Optional<DataModel::Nullable<DataModel::List<const chip::CharSpan>>> contentHeaders;
+    Optional<DataModel::Nullable<uint32_t>> offsetMillisecs;
+    Optional<DataModel::Nullable<QueueTypeEnum>> queueType;
+    Optional<DataModel::Nullable<chip::CharSpan>> nextUrl;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -147,6 +180,12 @@ public:
     chip::CharSpan contentURL;
     Optional<chip::CharSpan> displayString;
     Optional<Structs::BrandingInformationStruct::DecodableType> brandingInformation;
+    Optional<Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences;
+    Optional<DataModel::Nullable<chip::CharSpan>> contentType;
+    Optional<DataModel::Nullable<DataModel::DecodableList<chip::CharSpan>>> contentHeaders;
+    Optional<DataModel::Nullable<uint32_t>> offsetMillisecs;
+    Optional<DataModel::Nullable<QueueTypeEnum>> queueType;
+    Optional<DataModel::Nullable<chip::CharSpan>> nextUrl;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -187,6 +226,105 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
+namespace ContentReplicationRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ContentReplicationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::ContentLauncher::Commands::ContentReplicationResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ContentReplicationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ContentReplicationRequest
+namespace ContentReplicationResponse {
+enum class Fields : uint8_t
+{
+    kStatus          = 0,
+    kReplicationInfo = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ContentReplicationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<DataModel::Nullable<Structs::ReplicationInfo::Type>> replicationInfo;
+
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ContentReplicationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<DataModel::Nullable<Structs::ReplicationInfo::DecodableType>> replicationInfo;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ContentReplicationResponse
+namespace PlayPreset {
+enum class Fields : uint8_t
+{
+    kPresetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::PlayPreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::PlayPreset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint8_t presetID = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace PlayPreset
 } // namespace Commands
 } // namespace ContentLauncher
 } // namespace Clusters

@@ -120,6 +120,7 @@ enum class Fields : uint8_t
     kThreshold         = 6,
     kLabel             = 7,
     kPredicted         = 8,
+    kExternalID        = 9,
 };
 
 struct Type
@@ -134,6 +135,7 @@ public:
     DataModel::Nullable<int64_t> threshold;
     Optional<DataModel::Nullable<chip::CharSpan>> label;
     Optional<bool> predicted;
+    Optional<chip::CharSpan> externalID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

@@ -50,17 +50,18 @@ CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEn
 
 } // anonymous namespace
 
-EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(EndpointId endpointId,
+                                                                   DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const BitFlags<Feature> enabledFeatures,
                                                                    OptionalAttributeSet optionalAttributeSet) :
-    DefaultServerCluster({ kRootEndpointId, Id }),
+    DefaultServerCluster({ endpointId, Id }),
     mProvider(provider), mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                               AttributeValueEncoder & encoder)
 {
-    uint64_t value;
+    uint64_t value = 0;
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
     switch (request.path.mAttributeId)

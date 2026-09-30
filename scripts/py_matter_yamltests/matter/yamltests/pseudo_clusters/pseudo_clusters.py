@@ -44,15 +44,20 @@ class PseudoClusters:
                 return cluster
         return None
 
-    async def execute(self, request, definitions=None):
+    async def execute(self, request, definitions=None, **kwargs):
         status = {'error': 'FAILURE'}
 
         command = self.__get_command(request)
         if command:
-            if 'definitions' in inspect.signature(command).parameters:
-                status = await command(request, definitions)
-            else:
-                status = await command(request)
+            sig = inspect.signature(command)
+            call_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+            # 'definitions' is a formal parameter of the execute method to maintain API
+            # compatibility, meaning it is not collected in **kwargs. We must check and
+            # inject it separately if the command signature expects it.
+            if 'definitions' in sig.parameters:
+                call_kwargs['definitions'] = definitions
+
+            status = await command(request, **call_kwargs)
 
             # If the command does not returns an error, it is considered a success.
             if status is None:

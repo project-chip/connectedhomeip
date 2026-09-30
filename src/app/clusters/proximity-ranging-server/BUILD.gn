@@ -18,13 +18,32 @@ source_set("proximity-ranging-server") {
   sources = [
     "ProximityRangingCluster.cpp",
     "ProximityRangingCluster.h",
+    "ProximityRangingDriver.cpp",
     "ProximityRangingDriver.h",
+    "RangingAdapter.h",
   ]
 
   public_deps = [
+    ":ble-rssi-helpers",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/ProximityRanging",
+  ]
+}
+
+# Optional helper library for adapters that implement the BLE Beacon RSSI
+# Ranging technology. Only platforms whose RangingAdapter handles
+# kBLEBeaconRSSIRanging should depend on this target - Wi-Fi USD or BLTCS
+# only adapters can ignore it and avoid pulling in src/ble headers.
+source_set("ble-rssi-helpers") {
+  sources = [
+    "BleRssiRangingHelpers.cpp",
+    "BleRssiRangingHelpers.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/ble",
+    "${chip_root}/src/crypto",
   ]
 }

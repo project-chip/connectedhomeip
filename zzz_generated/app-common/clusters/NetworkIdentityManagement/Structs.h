@@ -73,7 +73,8 @@ enum class Fields : uint8_t
 {
     kClientIndex          = 0,
     kClientIdentifier     = 1,
-    kNetworkIdentityIndex = 2,
+    kClientIdentityType   = 2,
+    kNetworkIdentityIndex = 3,
 };
 
 struct Type
@@ -81,6 +82,7 @@ struct Type
 public:
     uint16_t clientIndex = static_cast<uint16_t>(0);
     chip::ByteSpan clientIdentifier;
+    IdentityTypeEnum clientIdentityType = static_cast<IdentityTypeEnum>(0);
     DataModel::Nullable<uint16_t> networkIdentityIndex;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -77,6 +77,7 @@ static void BleHandleShortPress(const AppEvent & event)
     if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         // If the device is commissioned and a factory reset is not scheduled, switch to active mode.
+        TEMPORARY_RETURN_IGNORED
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); }, 0);
         return;
@@ -121,12 +122,14 @@ void chip::NXP::App::ButtonBle::HandleDoubleClick()
     {
         if (!sitModeRequested)
         {
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
             sitModeRequested = true;
         }
         else
         {
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
             sitModeRequested = false;

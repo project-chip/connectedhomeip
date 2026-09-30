@@ -267,7 +267,8 @@ public:
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-        for (ListIndex i = firstItemToAppendIndex; i < listValue.size(); i++)
+        const size_t listSize = listValue.size();
+        for (size_t i = firstItemToAppendIndex; i < listSize; i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, listValue[i]));
         }

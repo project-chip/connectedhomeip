@@ -47,13 +47,13 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_9(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_9(self) -> str:
         return "[TC-PAVST-2.9] Validate Transport allocation with an ExpiryTime with Server as DUT"
 
@@ -131,10 +131,10 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
-        log.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        log.info("SupportedIngestMethods: %s", aSupportedIngestMethods)
 
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
-        log.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
+        log.info("SupportedContainerFormats: %s", aSupportedContainerFormats)
 
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()

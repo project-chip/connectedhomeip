@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <clusters/SmokeCoAlarm/Attributes.h>
+#include <clusters/SmokeCoAlarm/Events.h>
 
 /**
  * @brief User handler for handling the test event trigger

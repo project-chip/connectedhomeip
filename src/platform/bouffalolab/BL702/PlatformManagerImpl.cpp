@@ -33,6 +33,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 
@@ -70,12 +71,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    otRadio_opt_t opt;
-    opt.bf.isFtd        = true;
-    opt.bf.isCoexEnable = true;
-
+    ReturnErrorOnFailure(Internal::InitThreadPlatform());
     ot_alarmInit();
-    ot_radioInit(opt);
+    ot_radioInit();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
