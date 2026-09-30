@@ -381,6 +381,44 @@ TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A scene that starts the loop replaces an XY transition still running, the same way ColorLoopSet does.
+TEST_F(TestColorControlScenes, ApplySceneColorLoopReplacesXYTransition)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation).Set(Feature::kXy);
+    config.mColorValue = XYColor{ 1000, 2000 };
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.MoveToColor(30000, 30000, 100), Status::Success); // 10 s transition
+    mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = Attributes::EnhancedCurrentHue::Id;
+    pairs[0].valueUnsigned16.SetValue(0x4000);
+    pairs[1].attributeID = Attributes::CurrentSaturation::Id;
+    pairs[1].valueUnsigned8.SetValue(200);
+    pairs[2].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[2].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation));
+    pairs[3].attributeID = Attributes::ColorLoopActive::Id;
+    pairs[3].valueUnsigned8.SetValue(1);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.ColorLoopActive(), 1);
+
+    const uint16_t hueAtStart = cluster.EnhancedHue();
+    mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    EXPECT_NE(cluster.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // SerializeAdd only accepts the decodable form of an EFS, so a Type is TLV-encoded into `backing` and
 // decoded back into `out`. `backing` must outlive every use of `out` — the decoded list iterates over
 // those bytes. Builds an EFS scoped to the ColorControl cluster from the given attribute/value pairs.

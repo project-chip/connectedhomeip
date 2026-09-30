@@ -1003,4 +1003,101 @@ TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
     EXPECT_EQ(c.EnhancedHue(), 10649u); // still following the loop, not the (ignored) MoveToHue target
 }
 
+// Records the notifications a loop start sends: the loop supersedes a running transition, so its own start
+// notification is the replacement and no OnTransitionStopped is expected.
+struct LoopStartDelegate : public ColorControlDelegate
+{
+    void OnTransitionStopped() override { transitionStopped++; }
+    void OnColorLoopStarted(uint16_t, uint16_t, bool) override { loopStarted++; }
+
+    int transitionStopped = 0;
+    int loopStarted       = 0;
+};
+
+ColorControlCluster::Config LoopWithXyCtConfig(ColorControlDelegate & delegate, TimerDelegateMock & timer)
+{
+    ColorControlCluster::Config c(delegate, timer);
+    c.mFeatures.Set(Feature::kColorLoop)
+        .Set(Feature::kEnhancedHue)
+        .Set(Feature::kHueAndSaturation)
+        .Set(Feature::kXy)
+        .Set(Feature::kColorTemperature);
+    c.ctConfig.colorTempPhysicalMinMireds = 100;
+    c.ctConfig.colorTempPhysicalMaxMireds = 400;
+    return c;
+}
+
+Status ActivateColorLoop(ColorControlCluster & c)
+{
+    const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateAction);
+    return c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+                          BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>());
+}
+
+// Starting a loop switches the mode to enhanced hue/sat, which an XY transition cannot follow: the loop
+// replaces it and drives the hue from there.
+TEST_F(TestColorControlCommands, ColorLoopStartReplacesXYTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = XYColor{ 1000, 2000 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToColor(30000, 30000, 100), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.loopStarted, 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
+TEST_F(TestColorControlCommands, ColorLoopStartReplacesCTTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = CTColor{ 250 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToColorTemp(400, 100), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.loopStarted, 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
+// Saturation is independent of the hue axis the loop takes over (§3.2.5.2), so its transition keeps running.
+TEST_F(TestColorControlCommands, ColorLoopStartKeepsSaturationTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToHueAndSaturation(0x8000, 200, 100, /*isEnhanced=*/true), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+
+    Tick(20000);
+    EXPECT_EQ(c.Saturation(), 200);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
 } // namespace

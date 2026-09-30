@@ -1210,6 +1210,12 @@ void ColorControlCluster::StartColorLoop(bool startFromStartHue)
     {
         hsx->hue.reset();
     }
+    else
+    {
+        // An XY or CT transition is only valid while mColorValue holds an XYColor/CTColor, so it stops now that the
+        // color loop has switched the mode to enhanced hue/sat.
+        mTransition = std::monostate{};
+    }
 
     mColorLoop.active            = 1;
     mColorLoopEngaged            = true;            // (re)engage the green light — ColorLoopSet is the only way back on
