@@ -411,8 +411,8 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         deviceFactory.RegisterCreator("humidity-sensor", []() {
             return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsHumiditySensor>(sTimerDelegate
 #if SL_MATTER_DISPLAY_ENABLED
-            ,
-            BaseApplication::GetLCD()
+                                                                                                ,
+                                                                                                BaseApplication::GetLCD()
 #endif
             );
         });
