@@ -158,7 +158,7 @@ class TC_DLOG_2_1(MatterBaseTest):
             TestStep(13, "TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX, "
                          "TransferFileDesignator=TH_LOG_ERROR_EMPTY) to DUT. If DUT sends a BDX SendInit, TH rejects it.",
                      "Verify DUT responds RetrieveLogsResponse with Status=Exhausted(1) and LogContent of at most 1024 "
-                     "bytes, Status=NoLogs(2) and empty LogContent, or Status=Denied(4)."),
+                     "bytes, Status=NoLogs(2) and empty LogContent, or Status=Denied(4) and empty LogContent."),
             TestStep(14, "TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX, "
                          "TransferFileDesignator=TH_LOG_BAD_LENGTH) to DUT.",
                      "Verify DUT responds CONSTRAINT_ERROR."),
@@ -399,7 +399,8 @@ class TC_DLOG_2_1(MatterBaseTest):
         # *** STEP 13 ***
         # TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX,
         # TransferFileDesignator=TH_LOG_ERROR_EMPTY) to DUT; if DUT sends a BDX SendInit, TH rejects it.
-        # Verify Status=Exhausted with at most 1024 bytes, Status=NoLogs with empty LogContent, or Status=Denied.
+        # Verify Status=Exhausted with at most 1024 bytes, Status=NoLogs with empty LogContent, or Status=Denied with
+        # empty LogContent.
         self.step(13)
         if self.pics_guard(supports_bdx):
             bdx_transfer, response_task = await self._request_logs(
