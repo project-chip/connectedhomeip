@@ -52,7 +52,13 @@
 // (See https://discourse.llvm.org/t/rfc-typed-allocator-support/79720 for
 // information on how clang/llvm uses this).
 #ifndef CHIP_SYSTEM_CONFIG_TYPED_MALLOC
-#if defined(__APPLE__) && defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED
+// malloc_type_* need macOS 14 / iOS 17 / tvOS 17 / watchOS 10, and are undeclared when back-deploying.
+#if defined(__APPLE__) && defined(_MALLOC_TYPE_ENABLED) && _MALLOC_TYPE_ENABLED &&                                                 \
+    !(defined(_MALLOC_TYPE_MALLOC_IS_BACKDEPLOYING) && _MALLOC_TYPE_MALLOC_IS_BACKDEPLOYING) &&                                    \
+    !(defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 140000) &&         \
+    !(defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ < 170000) &&       \
+    !(defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__ < 170000) &&               \
+    !(defined(__ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__) && __ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__ < 100000)
 #define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 1
 #else
 #define CHIP_SYSTEM_CONFIG_TYPED_MALLOC 0
