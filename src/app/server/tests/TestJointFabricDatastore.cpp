@@ -805,6 +805,55 @@ TEST(JointFabricDatastoreTest, AddAclDeduplicatesAndRemoveAclSyncsDeletePayload)
     EXPECT_EQ(delegate.lastAclSync.statusEntry.state, JointFabricCluster::DatastoreStateEnum::kDeletePending);
     EXPECT_TRUE(store.GetNodeACLList().empty());
 }
+// Round-trips `value` through TLV, as the cluster receives it. The decoded lists read from `buffer`.
+CHIP_ERROR DecodeAcl(const AclType & value, uint8_t * buffer, size_t bufferSize,
+                     JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType & decoded)
+{
+    TLV::TLVWriter writer;
+    writer.Init(buffer, bufferSize);
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), value));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ReturnErrorOnFailure(reader.Next());
+    return DataModel::Decode(reader, decoded);
+}
+
+// The node matches ACL entries with subjects in any order, so the datastore does too: two such entries
+// would be one on the node, and removing either would remove both.
+TEST(JointFabricDatastoreTest, AddAclDeduplicatesRegardlessOfSubjectOrder)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    const uint64_t subjectsAB[] = { 0x1111, 0x2222 };
+    const uint64_t subjectsBA[] = { 0x2222, 0x1111 };
+    AclType value;
+    value.privilege = Privilege::kView;
+    value.authMode  = AuthMode::kCase;
+    value.targets.SetNull();
+
+    uint8_t bufferAB[64];
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclAB;
+    value.subjects.SetNonNull(Span<const uint64_t>(subjectsAB));
+    ASSERT_EQ(DecodeAcl(value, bufferAB, sizeof(bufferAB), aclAB), CHIP_NO_ERROR);
+
+    uint8_t bufferBA[64];
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclBA;
+    value.subjects.SetNonNull(Span<const uint64_t>(subjectsBA));
+    ASSERT_EQ(DecodeAcl(value, bufferBA, sizeof(bufferBA), aclBA), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.AddACLToNode(123, aclAB), CHIP_NO_ERROR);
+    delegate.ResetCapturedSyncs();
+    ASSERT_EQ(store.AddACLToNode(123, aclBA), CHIP_NO_ERROR);
+
+    EXPECT_EQ(store.GetNodeACLList().size(), 1u);
+    EXPECT_FALSE(delegate.hasLastAclSync);
+}
+
 // Regression for the JointFabricDatastore async-callback iterator use-after-free. Run under ASan
 // (the existing out/asan unit-test config) to catch the heap-use-after-free in the unpatched code.
 

@@ -739,10 +739,6 @@ private:
     CHIP_ERROR GenerateAndAssignAUniqueListID(uint16_t & listId);
     bool BindingMatches(const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding1,
                         const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding2);
-    bool ACLMatches(const datastore::AccessControlEntryStruct & acl1,
-                    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2);
-    bool ACLTargetMatches(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
-                          const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
 
     /**
      * Marks `entry` DeletePending and records that it is being removed from its node. A failed sync

@@ -2431,13 +2431,6 @@ ApplyAclEdit(const std::vector<Clusters::JointFabricDatastore::Structs::Datastor
 
 } // namespace detail
 
-bool JointFabricDatastore::ACLTargetMatches(
-    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
-    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2)
-{
-    return detail::AclTargetValueEquals(target1, target2);
-}
-
 Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
 JointFabricDatastore::EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const
 {
@@ -2791,77 +2784,6 @@ void JointFabricDatastore::FinishRefresh(CHIP_ERROR err)
     FinishNodeSync(finishedNodeId);
 }
 
-bool JointFabricDatastore::ACLMatches(
-    const datastore::AccessControlEntryStruct & acl1,
-    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2)
-{
-    if (acl1.privilege != acl2.privilege)
-    {
-        return false;
-    }
-
-    if (acl1.authMode != acl2.authMode)
-    {
-        return false;
-    }
-
-    if (acl2.subjects.IsNull())
-    {
-        if (!acl1.subjects.empty())
-        {
-            return false;
-        }
-    }
-    else
-    {
-        auto it1 = acl1.subjects.begin();
-        auto it2 = acl2.subjects.Value().begin();
-
-        while (it1 != acl1.subjects.end() && it2.Next())
-        {
-            if (*it1 != it2.GetValue())
-            {
-                return false;
-            }
-            ++it1;
-        }
-
-        if (it1 != acl1.subjects.end() || it2.Next())
-        {
-            return false;
-        }
-    }
-
-    if (acl2.targets.IsNull())
-    {
-        if (!acl1.targets.empty())
-        {
-            return false;
-        }
-    }
-    else
-    {
-        auto it1 = acl1.targets.begin();
-        auto it2 = acl2.targets.Value().begin();
-
-        while (it1 != acl1.targets.end() && it2.Next())
-        {
-            if (ACLTargetMatches(*it1, it2.GetValue()) == false)
-            {
-                return false;
-            }
-            ++it1;
-        }
-
-        if (it1 != acl1.targets.end() || it2.Next())
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 CHIP_ERROR
 JointFabricDatastore::AddACLToNode(
     NodeId nodeId, const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry)
@@ -2871,10 +2793,37 @@ JointFabricDatastore::AddACLToNode(
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdInNodeInformationEntries(nodeId, index));
 
+    datastore::AccessControlEntryStruct value;
+    value.privilege = aclEntry.privilege;
+    value.authMode  = aclEntry.authMode;
+
+    if (!aclEntry.subjects.IsNull())
+    {
+        auto iter = aclEntry.subjects.Value().begin();
+        while (iter.Next())
+        {
+            value.subjects.push_back(iter.GetValue());
+        }
+        ReturnErrorOnFailure(iter.GetStatus());
+    }
+
+    if (!aclEntry.targets.IsNull())
+    {
+        auto iter = aclEntry.targets.Value().begin();
+        while (iter.Next())
+        {
+            value.targets.push_back(iter.GetValue());
+        }
+        ReturnErrorOnFailure(iter.GetStatus());
+    }
+
+    // Matched as the node matches it (see detail::ApplyAclEdit): two entries that differ only in subject or target
+    // order are one entry on the node, and removing either would remove both.
+    const auto encodedValue                 = EncodeAccessControlEntry(value);
     datastore::ACLEntryStruct * storedEntry = nullptr;
     for (auto & entry : mACLEntries)
     {
-        if (entry.nodeID == nodeId && ACLMatches(entry.ACLEntry, aclEntry))
+        if (entry.nodeID == nodeId && detail::AclEntryValueEquals(EncodeAccessControlEntry(entry.ACLEntry), encodedValue))
         {
             if (!HasRemovalIntent(entry))
             {
@@ -2895,31 +2844,9 @@ JointFabricDatastore::AddACLToNode(
         VerifyOrReturnError(mACLEntries.size() < kMaxACLs, CHIP_ERROR_NO_MEMORY);
         // Create a new ACL entry
         datastore::ACLEntryStruct newACLEntry;
-        newACLEntry.nodeID             = nodeId;
-        newACLEntry.ACLEntry.privilege = aclEntry.privilege;
-        newACLEntry.ACLEntry.authMode  = aclEntry.authMode;
-
+        newACLEntry.nodeID            = nodeId;
+        newACLEntry.ACLEntry          = std::move(value);
         newACLEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
-
-        if (!aclEntry.subjects.IsNull())
-        {
-            auto iter = aclEntry.subjects.Value().begin();
-            while (iter.Next())
-            {
-                newACLEntry.ACLEntry.subjects.push_back(iter.GetValue());
-            }
-            ReturnErrorOnFailure(iter.GetStatus());
-        }
-
-        if (!aclEntry.targets.IsNull())
-        {
-            auto iter = aclEntry.targets.Value().begin();
-            while (iter.Next())
-            {
-                newACLEntry.ACLEntry.targets.push_back(iter.GetValue());
-            }
-            ReturnErrorOnFailure(iter.GetStatus());
-        }
 
         ReturnErrorOnFailure(GenerateAndAssignAUniqueListID(newACLEntry.listID));
 
