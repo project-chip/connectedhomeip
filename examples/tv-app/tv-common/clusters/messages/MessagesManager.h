@@ -217,6 +217,9 @@ private:
     using MessageIdBuffer = std::array<uint8_t, chip::app::Clusters::Messages::kMessageIdLength>;
     void CompleteMessage(chip::ByteSpan messageId);
 
+    // Report Messages and ActiveMessageIDs so subscribers see list and state changes.
+    void NotifyMessagesChanged();
+
     void StartMessageTimer(chip::ByteSpan messageId, MessageTimerType type, uint32_t delayMs);
     void CancelMessageTimers(chip::ByteSpan messageId);
     static void OnMessageTimerExpired(chip::System::Layer * systemLayer, void * context);

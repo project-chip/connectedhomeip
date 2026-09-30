@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -87,6 +88,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     }
 
     mCachedMessages.push_back(cachedMessage);
+    NotifyMessagesChanged();
     LogErrorOnFailure(LogMessageQueuedEvent(mEndpointId, messageId));
 
     ScheduleOrPresentMessage(messageId);
@@ -115,6 +117,7 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
         else
         {
             mCachedMessages.erase(it);
+            NotifyMessagesChanged();
         }
     }
     return CHIP_NO_ERROR;
@@ -183,6 +186,17 @@ uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 }
 
 // State machine
+
+void MessagesManager::NotifyMessagesChanged()
+{
+    // Messages lists every cached message and ActiveMessageIDs only the presented ones, so any
+    // change to the list or to a message's state can move either. Reporting both is cheaper
+    // than reasoning about which one moved, and a subscriber that never hears about a change
+    // is left holding a stale list.
+    VerifyOrReturn(mEndpointId != kInvalidEndpointId);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::Messages::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::ActiveMessageIDs::Id);
+}
 
 std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(ByteSpan messageId)
 {
@@ -287,6 +301,7 @@ void MessagesManager::PresentOrSuppressMessage(std::list<CachedMessage>::iterato
         case MessagePriorityEnum::kMedium:
             LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
             mCachedMessages.erase(it);
+            NotifyMessagesChanged();
             return;
         case MessagePriorityEnum::kHigh:
             // Reported as not presented but kept queued, so RemovedFromQueue is false.
@@ -327,6 +342,7 @@ void MessagesManager::PresentMessage(CachedMessage & message)
     }
 
     message.SetState(MessageState::kPresented);
+    NotifyMessagesChanged();
     LogErrorOnFailure(LogMessagePresentedEvent(mEndpointId, message.GetMessageId()));
 
     const auto & duration = message.GetDuration();
@@ -356,6 +372,7 @@ void MessagesManager::CompleteMessage(ByteSpan messageId)
                                               DataModel::Nullable<FutureMessagePreferenceEnum>()));
 
     mCachedMessages.erase(it);
+    NotifyMessagesChanged();
 }
 
 void MessagesManager::StartMessageTimer(ByteSpan messageId, MessageTimerType type, uint32_t delayMs)
