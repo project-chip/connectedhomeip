@@ -780,8 +780,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 if (syncErr != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer,
-                                 "Failed syncing bindings during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                                 ChipLogValueX64(refreshingNodeId), syncErr.Format());
+                                     "Failed syncing bindings during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueX64(refreshingNodeId), syncErr.Format());
                     MarkRefreshWriteFailed(mEndpointBindingEntries, refreshingNodeId, syncErr);
                     MarkRefreshFailed(refreshingNodeId, syncErr);
                 }
@@ -805,11 +805,11 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     // The node no longer holds the entries being removed that the write left out. A removal
                     // requested while the write was in flight is still queued and runs after the refresh.
                     mEndpointBindingEntries.erase(std::remove_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
-                                                                 [this, refreshingNodeId](const auto & entry) {
+                                                                     [this, refreshingNodeId](const auto & entry) {
                                                                      return entry.nodeID == refreshingNodeId &&
                                                                          HasRemovalIntent(entry) && !InRefreshWrite(entry);
                                                                  }),
-                                                  mEndpointBindingEntries.end());
+                                                      mEndpointBindingEntries.end());
                 }
 
                 if (mRefreshingNodeId != refreshingNodeId)
@@ -1355,11 +1355,11 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 // The node no longer holds the entries being removed that the write left out. A removal requested
                 // while the write was in flight is still queued and runs after the refresh.
                 mACLEntries.erase(std::remove_if(mACLEntries.begin(), mACLEntries.end(),
-                                                 [this, refreshingNodeId](const auto & entry) {
+                                                            [this, refreshingNodeId](const auto & entry) {
                                                      return entry.nodeID == refreshingNodeId && HasRemovalIntent(entry) &&
                                                          !InRefreshWrite(entry);
                                                  }),
-                                  mACLEntries.end());
+                                             mACLEntries.end());
 
                 if (mRefreshingNodeId != refreshingNodeId)
                 {
@@ -2151,8 +2151,8 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
     if (IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR && !mGroupInformationEntries[index].groupKeySetID.IsNull())
     {
         const uint16_t groupKeySetId = mGroupInformationEntries[index].groupKeySetID.Value();
-        keySet = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
-                              [&](const auto & entry) { return entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetId; });
+        keySet                       = std::find_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
+                                                    [&](const auto & entry) { return entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetId; });
     }
 
     // Checked before any change, so that a BUSY rejection leaves the datastore as it was.
