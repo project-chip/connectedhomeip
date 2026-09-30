@@ -28,7 +28,6 @@
 
 #include <inet/InetConfig.h>
 
-#include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <lib/support/DLLUtil.h>
 
@@ -37,6 +36,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#include <net/if.h>
 struct if_nameindex;
 struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -48,6 +48,10 @@ struct net_if;
 struct net_if_ipv4;
 struct net_if_ipv6;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <openthread/ip6.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 #include <stddef.h>
 #include <stdint.h>
@@ -137,6 +141,12 @@ public:
      *  The name of the unspecified network interface is the empty string.
      */
     CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize) const;
+
+    /**
+     * Get the numeric platform interface index (e.g. for APIs that require an
+     * interface/scope index). Returns 0 for the null interface.
+     */
+    uint32_t GetInterfaceIndex() const;
 
     /**
      * Search the list of network interfaces for the indicated name.

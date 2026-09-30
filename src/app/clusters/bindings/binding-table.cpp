@@ -188,6 +188,10 @@ CHIP_ERROR Table::LoadFromStorage()
 
 CHIP_ERROR Table::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex)
 {
+    // The index and the chained next-entry indices come from persistent storage and are used to index
+    // the fixed mBindingTable / mNextIndex arrays. Reject an out-of-range value before touching them.
+    VerifyOrReturnError(index < kMaxBindingEntries, CHIP_ERROR_INVALID_ARGUMENT);
+
     uint8_t buffer[kEntryStorageSize] = { 0 };
     uint16_t size                     = sizeof(buffer);
     TableEntry entry;

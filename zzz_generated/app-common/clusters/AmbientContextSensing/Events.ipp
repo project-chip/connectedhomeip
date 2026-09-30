@@ -36,7 +36,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAmbientContextDetected), ambientContextDetected));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kObjectCountReached), objectCountReached));
+    ReturnErrorOnFailure(
+        DataModel::Encode(aWriter, TLV::ContextTag(Fields::kObjectCountThresholdReached), objectCountThresholdReached));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kObjectCount), objectCount));
     return aWriter.EndContainer(outer);
 }
@@ -55,9 +56,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ambientContextDetected);
         }
-        else if (__context_tag == to_underlying(Fields::kObjectCountReached))
+        else if (__context_tag == to_underlying(Fields::kObjectCountThresholdReached))
         {
-            err = DataModel::Decode(reader, objectCountReached);
+            err = DataModel::Decode(reader, objectCountThresholdReached);
         }
         else if (__context_tag == to_underlying(Fields::kObjectCount))
         {
@@ -76,7 +77,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEventStartTime), eventStartTime));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEventStartTimePos), eventStartTimePos));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEventStartTimeSys), eventStartTimeSys));
     return aWriter.EndContainer(outer);
 }
 
@@ -90,9 +92,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kEventStartTime))
+        if (__context_tag == to_underlying(Fields::kEventStartTimePos))
         {
-            err = DataModel::Decode(reader, eventStartTime);
+            err = DataModel::Decode(reader, eventStartTimePos);
+        }
+        else if (__context_tag == to_underlying(Fields::kEventStartTimeSys))
+        {
+            err = DataModel::Decode(reader, eventStartTimeSys);
         }
         else
         {

@@ -48,13 +48,13 @@ from TC_EWATERHTRBase import EWATERHTRBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
+class TC_EWATERHTR_2_1(MatterTestCommissionedDevice, EWATERHTRBase):
 
     def desc_TC_EWATERHTR_2_1(self) -> str:
         """Returns a description of this test"""
@@ -96,7 +96,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         feature_map = await self.read_whm_attribute_expect_success(attribute="FeatureMap")
         em_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kEnergyManagement)
         tp_supported = bool(feature_map & Clusters.WaterHeaterManagement.Bitmaps.Feature.kTankPercent)
-        log.info(f"FeatureMap: {feature_map} : TP supported: {tp_supported} | EM supported: {em_supported}")
+        log.info("FeatureMap: %s : TP supported: %s | EM supported: %s", feature_map, tp_supported, em_supported)
 
         self.step("3")
         heaterTypes = await self.read_whm_attribute_expect_success(attribute="HeaterTypes")

@@ -43,13 +43,13 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WHM_1_2(MatterBaseTest):
+class TC_WHM_1_2(MatterTestCommissionedDevice):
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode
@@ -112,7 +112,7 @@ class TC_WHM_1_2(MatterBaseTest):
         # derived cluster defined tags
         derivedTags = [tag.value for tag in Clusters.WaterHeaterMode.Enums.ModeTag]
 
-        log.info("Derived tags: %s" % derivedTags)
+        log.info("Derived tags: %s", derivedTags)
 
         # According to the Mode spec:
         # At least one entry in the SupportedModes attribute SHALL include the Manual mode tag in the ModeTags field list.
@@ -164,7 +164,7 @@ class TC_WHM_1_2(MatterBaseTest):
 
         self.step(3)
         current_mode = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentMode)
-        log.info("CurrentMode: %s" % current_mode)
+        log.info("CurrentMode: %s", current_mode)
         asserts.assert_true(current_mode in modes,
                             "CurrentMode is not a supported mode!")
 

@@ -103,6 +103,8 @@ enum class Fields : uint8_t
     kZoneType          = 1,
     kZoneSource        = 2,
     kTwoDCartesianZone = 3,
+    kNodeID            = 4,
+    kEndpointID        = 5,
 };
 
 struct Type
@@ -112,6 +114,8 @@ public:
     ZoneTypeEnum zoneType     = static_cast<ZoneTypeEnum>(0);
     ZoneSourceEnum zoneSource = static_cast<ZoneSourceEnum>(0);
     Optional<Structs::TwoDCartesianZoneStruct::Type> twoDCartesianZone;
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -125,6 +129,8 @@ public:
     ZoneTypeEnum zoneType     = static_cast<ZoneTypeEnum>(0);
     ZoneSourceEnum zoneSource = static_cast<ZoneSourceEnum>(0);
     Optional<Structs::TwoDCartesianZoneStruct::DecodableType> twoDCartesianZone;
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

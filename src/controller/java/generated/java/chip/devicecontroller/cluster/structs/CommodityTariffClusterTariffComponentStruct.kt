@@ -33,6 +33,7 @@ class CommodityTariffClusterTariffComponentStruct(
   val threshold: Long?,
   val label: Optional<String>?,
   val predicted: Optional<Boolean>,
+  val externalID: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffComponentStruct {\n")
@@ -45,6 +46,7 @@ class CommodityTariffClusterTariffComponentStruct(
     append("\tthreshold : $threshold\n")
     append("\tlabel : $label\n")
     append("\tpredicted : $predicted\n")
+    append("\texternalID : $externalID\n")
     append("}\n")
   }
 
@@ -93,6 +95,10 @@ class CommodityTariffClusterTariffComponentStruct(
         val optpredicted = predicted.get()
         put(ContextSpecificTag(TAG_PREDICTED), optpredicted)
       }
+      if (externalID.isPresent) {
+        val optexternalID = externalID.get()
+        put(ContextSpecificTag(TAG_EXTERNAL_ID), optexternalID)
+      }
       endStructure()
     }
   }
@@ -107,6 +113,7 @@ class CommodityTariffClusterTariffComponentStruct(
     private const val TAG_THRESHOLD = 6
     private const val TAG_LABEL = 7
     private const val TAG_PREDICTED = 8
+    private const val TAG_EXTERNAL_ID = 9
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffComponentStruct {
       tlvReader.enterStructure(tlvTag)
@@ -190,6 +197,12 @@ class CommodityTariffClusterTariffComponentStruct(
         } else {
           Optional.empty()
         }
+      val externalID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_ID))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_EXTERNAL_ID)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -203,6 +216,7 @@ class CommodityTariffClusterTariffComponentStruct(
         threshold,
         label,
         predicted,
+        externalID,
       )
     }
   }

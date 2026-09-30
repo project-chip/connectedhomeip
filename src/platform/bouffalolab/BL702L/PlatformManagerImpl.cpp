@@ -28,17 +28,24 @@
 #include <lwip/tcpip.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
+#endif
+
 extern "C" {
 #include <bl_sec.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread_port.h>
-#include <ot_utils_ext.h>
+#endif
 }
 
 namespace chip {
 namespace DeviceLayer {
 
 extern "C" int bl_rand_stream(unsigned char *, int);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otrNotifyEvent(ot_system_event_t sevent);
+#endif
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -55,22 +62,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-    otRadio_opt_t opt;
-    opt.byte = 0;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
-    opt.bf.isFtd = true;
-#else
-    opt.bf.isFtd = false;
-#endif
-    opt.bf.isCoexEnable = true;
-#endif
-
-    ot_utils_init();
-
+    ReturnErrorOnFailure(Internal::InitThreadPlatform());
     ot_alarmInit();
-    ot_radioInit(opt);
+    ot_radioInit();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.

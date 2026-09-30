@@ -33,10 +33,26 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device closure:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -45,7 +61,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -82,7 +98,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState)
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
-class TC_CLCTRL_4_2(MatterBaseTest):
+class TC_CLCTRL_4_2(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -178,7 +194,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
 
         self.step("2b")
         if not is_latching_supported:
@@ -189,16 +205,16 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-        log.info(f"LatchControlModes: {latch_control_modes}")
+        log.info("LatchControlModes: %s", latch_control_modes)
 
         self.step("2d")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_latch: bool = None
         if overall_current_state is NullValue:
             current_latch = NullValue
         else:
             current_latch = overall_current_state.latch
-        log.info(f"CurrentLatch: {current_latch}")
+        log.info("CurrentLatch: %s", current_latch)
 
         self.step("2e")
         sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)

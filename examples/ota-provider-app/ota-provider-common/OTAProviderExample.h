@@ -47,6 +47,8 @@ public:
     static constexpr size_t kUriMaxLen               = 256;
     static constexpr size_t kMaxLocation             = 3;
     static constexpr size_t kMaxProtocolsSupported   = 4;
+    // Update token is up to 32 bytes; hex-encoded string needs 2 chars per byte + null terminator.
+    static constexpr size_t kUpdateTokenStrLen = 65;
 
     size_t kProtocolsSupportedCount = 0;
 
@@ -84,6 +86,17 @@ public:
     void SetIgnoreQueryImageCount(uint32_t count) { mIgnoreQueryImageCount = count; }
     void SetIgnoreApplyUpdateCount(uint32_t count) { mIgnoreApplyUpdateCount = count; }
     void SetQueryImageStatus(OTAQueryStatus status) { mQueryImageStatus = status; }
+    // When enabled, the configured QueryImageStatus (and its DelayedActionTime) is kept for
+    // every QueryImageResponse instead of reverting to UpdateAvailable after the first one.
+    void SetPersistQueryImageStatus(bool persist) { mPersistQueryImageStatus = persist; }
+    OTAQueryStatus GetQueryImageStatus() const { return mQueryImageStatus; }
+    uint32_t GetDelayedQueryActionTimeSec() const { return mDelayedQueryActionTimeSec; }
+
+    // Applies the post-response transition of the QueryImage state: unless persistence is
+    // enabled, revert QueryImageStatus to UpdateAvailable and DelayedActionTime to 0 so that
+    // subsequent queries default to UpdateAvailable. Called at the end of HandleQueryImage;
+    // exposed so the persistence behaviour can be unit tested without a full server/BDX stack.
+    void ApplyQueryImageStatusAfterResponse();
     void SetApplyUpdateAction(chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction action)
     {
         mUpdateAction = action;
@@ -104,12 +117,31 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    // Variables used for named pipes
+    bool GetApplyRequestSentStatus() const { return mApplyUpdateRequestSent; }
+    chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction GetApplyRequestActionStatus() const
+    {
+        return mApplyUpdateRequestActionSent;
+    }
+    uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
+    uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    // Update token that was generated and sent in the most recent QueryImageResponse.
+    // Empty string if no UpdateAvailable response has been sent yet.
+    const char * GetUpdateToken() const { return mUpdateToken; }
+    // Update token received in the most recent ApplyUpdateRequest from the requestor.
+    // Empty string if no ApplyUpdateRequest has been received yet.
+    const char * GetApplyUpdateRequestToken() const { return mApplyUpdateRequestUpdateToken; }
+    // NewVersion field received in the most recent ApplyUpdateRequest from the requestor.
+    uint32_t GetApplyUpdateRequestNewVersion() const { return mApplyUpdateRequestNewVersion; }
+    // End of variables used for named pipes
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
         return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
     const char * GetLocation() const { return mLocation; }
+    bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
+    uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
@@ -143,6 +175,7 @@ private:
     char mImageUri[kUriMaxLen];
     bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
+    bool mPersistQueryImageStatus = false;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
     uint32_t mIgnoreApplyUpdateCount;
@@ -161,4 +194,14 @@ private:
     DownloadProtocolEnum mProtocolsSupported[kMaxProtocolsSupported];
     bool mRequestorCanConsent;
     char mLocation[kMaxLocation] = { 0, 0, 0 };
+    bool mApplyUpdateRequestSent = false;
+    OTAApplyUpdateAction mApplyUpdateRequestActionSent;
+    uint32_t mApplyUpdateRequestDelaySent;
+    u_int16_t mApplyUpdateRequestCount = 0;
+    // Hex-encoded update token issued in the most recent QueryImageResponse.
+    char mUpdateToken[kUpdateTokenStrLen] = { 0 };
+    // Hex-encoded update token received in the most recent ApplyUpdateRequest.
+    char mApplyUpdateRequestUpdateToken[kUpdateTokenStrLen] = { 0 };
+    // NewVersion field received in the most recent ApplyUpdateRequest.
+    uint32_t mApplyUpdateRequestNewVersion = 0;
 };

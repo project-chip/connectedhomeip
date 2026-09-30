@@ -19,7 +19,13 @@
                 <li>Stream ID: {{stream.id}}</li>
                 <li>Strict Mode: {{stream.strict_mode}}</li>
                 <li>Interface: {{stream.interface}}</li>
-                <li>Track name: {{stream.track_name}}</li>
+                <li>Expected track names:
+                    {%- if stream.expected_track_names -%}
+                        {{ stream.expected_track_names | join(', ') }}
+                    {%- else -%}
+                        (not set)
+                    {%- endif -%}
+                </li>
             </ul>
         <h3>Sessions</h3>
         <ul>

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,18 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeValueEncoder.h>
-#include <app/MessageDef/AttributeDataIB.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
-CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+class ThreadNetworkDiagnosticsProvider
+{
+public:
+    virtual ~ThreadNetworkDiagnosticsProvider() = default;
+
+    virtual CHIP_ERROR ReadAttribute(AttributeId attributeId, app::AttributeValueEncoder & encoder) = 0;
+    virtual void ResetCounts()                                                                      = 0;
+};
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics

@@ -282,11 +282,15 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     }
 
     // Initialize the ESP WiFi layer.
-    cfg = WIFI_INIT_CONFIG_DEFAULT();
-    err = esp_wifi_init(&cfg);
-    if (err != ESP_OK)
+    wifi_mode_t mode = WIFI_MODE_NULL;
+    if (esp_wifi_get_mode(&mode) == ESP_ERR_WIFI_NOT_INIT)
     {
-        return ESP32Utils::MapError(err);
+        cfg = WIFI_INIT_CONFIG_DEFAULT();
+        err = esp_wifi_init(&cfg);
+        if (err != ESP_OK)
+        {
+            return ESP32Utils::MapError(err);
+        }
     }
 
     err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);

@@ -181,6 +181,13 @@ class TestRunner(TestRunnerBase):
                 return item.get('value')
         return None
 
+    async def run_step(self, request, config: TestRunnerConfig):
+        if config.adapter is None:
+            raise RuntimeError("Adapter is not configured")
+        encoded_request = config.adapter.encode(request)
+        encoded_response = await self.execute(encoded_request)
+        return config.adapter.decode(encoded_response)
+
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
@@ -234,7 +241,7 @@ class TestRunner(TestRunnerBase):
                         responses = {'value': {'responseValue': response}}
                         logs = []
                     else:
-                        responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
+                        responses, logs = await config.pseudo_clusters.execute(request, parser.definitions, runner=self, config=config)
                 else:
                     encoded_request = config.adapter.encode(request)
                     encoded_response = await self.execute(encoded_request)

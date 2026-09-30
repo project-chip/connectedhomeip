@@ -90,11 +90,11 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
              messageHeader = NLMSG_NEXT(messageHeader, len))
         {
-            if (header->nlmsg_type == RTM_NEWADDR)
+            if (messageHeader->nlmsg_type == RTM_NEWADDR)
             {
-                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(messageHeader);
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
-                size_t rtl                        = IFA_PAYLOAD(header);
+                size_t rtl                        = IFA_PAYLOAD(messageHeader);
 
                 for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
@@ -204,7 +204,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     auto * context      = g_main_context_new();
     mGLibMainLoop       = g_main_loop_new(context, FALSE);
-    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    mGLibMainLoopThread = g_thread_new("gmatter", GLibMainLoopThread, mGLibMainLoop);
     g_main_context_unref(context);
 
     {
@@ -241,6 +241,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
+    // Initialize the reference time point as soon as possible, so we could
+    // use it during the CHIP stack initialization, e.g. time counters for
+    // diagnostics.
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
@@ -248,8 +253,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Now set up our device instance info provider.  We couldn't do that
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
-
-    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     return CHIP_NO_ERROR;
 }

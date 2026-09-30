@@ -60,13 +60,13 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OCC_2_1(MatterBaseTest):
+class TC_OCC_2_1(MatterTestCommissionedDevice):
     async def read_occ_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.OccupancySensing
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -113,8 +113,8 @@ class TC_OCC_2_1(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        log.info(
-            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        log.info("Feature map: 0x%x. PIR: %s, US:%s, PHY:%s",
+                 feature_map, has_feature_pir, has_feature_ultrasonic, has_feature_contact)
 
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 

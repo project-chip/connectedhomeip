@@ -25,6 +25,9 @@ menu "Demo"
         default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
         default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
         default DEVICE_TYPE_ESP32_S3_DEVKITM if IDF_TARGET_ESP32S3
+        default DEVICE_TYPE_ESP32_S31_DEVKITC if IDF_TARGET_ESP32S31
+        default DEVICE_TYPE_ESP32_H21_DEVKITC if IDF_TARGET_ESP32H21
+        default DEVICE_TYPE_ESP32_H4_DEVKITC if IDF_TARGET_ESP32H4
         help
             Specifies the type of ESP32 device.
 
@@ -43,9 +46,18 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_S3_DEVKITM
             bool "ESP32S3-DevKitM"
             depends on IDF_TARGET_ESP32S3
-        config DEVICE_TYPE_ESP32H2_DEVKITC
+        config DEVICE_TYPE_ESP32_H2_DEVKITC
             bool "ESP32H2-DevKitC"
             depends on IDF_TARGET_ESP32H2
+        config DEVICE_TYPE_ESP32_H21_DEVKITC
+            bool "ESP32H21-DevKitC"
+            depends on IDF_TARGET_ESP32H21
+        config DEVICE_TYPE_ESP32_H4_DEVKITC
+            bool "ESP32H4-DevKitC"
+            depends on IDF_TARGET_ESP32H4
+        config DEVICE_TYPE_ESP32_S31_DEVKITC
+            bool "ESP32S31-DevKitC"
+            depends on IDF_TARGET_ESP32S31
     endchoice
 
     choice

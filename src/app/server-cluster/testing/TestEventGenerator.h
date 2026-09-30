@@ -63,7 +63,7 @@ public:
         }
 
     private:
-        uint8_t mEventEncodeBuffer[128];
+        uint8_t mEventEncodeBuffer[256];
         uint32_t mEncodedLength;
 
         friend class LogOnlyEvents;

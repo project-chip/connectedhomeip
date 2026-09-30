@@ -10,7 +10,14 @@ void RvcDevice::Init()
     SuccessOrDie(mRunModeInstance.Init());
     SuccessOrDie(mCleanModeInstance.Init());
     SuccessOrDie(mOperationalStateInstance.Init());
+
+    // set the current-mode at start-up
+    mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
+    SetDeviceToIdleState();
 }
+
+void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId) {}
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
 
 void RvcDevice::SetDeviceToIdleState()
 {
@@ -52,7 +59,6 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
         mCharging = false;
         mDocked   = false;
-        mRunModeInstance.UpdateCurrentMode(newMode);
         TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(
             to_underlying(OperationalState::OperationalStateEnum::kRunning));
         mServiceAreaDelegate.SetAttributesAtCleanStart();
@@ -68,7 +74,6 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
             return;
         }
 
-        mRunModeInstance.UpdateCurrentMode(newMode);
         TEMPORARY_RETURN_IGNORED mOperationalStateInstance.SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         response.status = to_underlying(ModeBase::StatusCode::kSuccess);

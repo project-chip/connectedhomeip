@@ -180,8 +180,6 @@ enum class Fields : uint8_t
     kChunkDuration   = 2,
     kSessionGroup    = 3,
     kTrackName       = 4,
-    kCENCKey         = 5,
-    kCENCKeyID       = 6,
     kMetadataEnabled = 7,
 };
 
@@ -191,10 +189,8 @@ public:
     CMAFInterfaceEnum CMAFInterface = static_cast<CMAFInterfaceEnum>(0);
     uint16_t segmentDuration        = static_cast<uint16_t>(0);
     uint16_t chunkDuration          = static_cast<uint16_t>(0);
-    uint8_t sessionGroup            = static_cast<uint8_t>(0);
-    chip::CharSpan trackName;
-    Optional<chip::ByteSpan> CENCKey;
-    Optional<chip::ByteSpan> CENCKeyID;
+    Optional<uint8_t> sessionGroup;
+    Optional<chip::CharSpan> trackName;
     Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

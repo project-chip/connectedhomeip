@@ -26,11 +26,14 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <ifaddrs.h>
+#include <net/if.h> // must precede <linux/*.h>
+
 #include <linux/ethtool.h>
 #include <linux/if_link.h>
 #include <linux/sockios.h>
 #include <linux/types.h> /* for "caddr_t" et al */
 #include <linux/wireless.h>
+
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +46,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -278,6 +282,11 @@ uint8_t MapFrequencyToChannel(const uint16_t frequency)
     return frequency / 5 - 1000;
 }
 
+bool IsValidInterface(const char * ifname)
+{
+    return ifname != nullptr && if_nametoindex(ifname) != 0;
+}
+
 InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
 {
     InterfaceTypeEnum ret = InterfaceTypeEnum::kUnspecified;
@@ -285,7 +294,7 @@ InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to open socket");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return InterfaceTypeEnum::kUnspecified;
     }
 
@@ -329,7 +338,7 @@ CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t 
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -482,7 +491,7 @@ CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -508,7 +517,7 @@ CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -569,7 +578,7 @@ CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCoun
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -592,7 +601,7 @@ CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -653,13 +662,13 @@ CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiag
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
     if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
     {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
+        ChipLogError(DeviceLayer, "Cannot get interface settings: %s", strerror(errno));
         close(skfd);
         return CHIP_ERROR_READ_FAILED;
     }
@@ -710,36 +719,46 @@ CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiag
 
 CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-
-    int skfd;
-    struct ethtool_cmd ecmd = {};
-    ecmd.cmd                = ETHTOOL_GSET;
     struct ifreq ifr        = {};
+    struct ethtool_cmd ecmd = {};
+
+    ecmd.cmd = ETHTOOL_GSET;
 
     ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
     Platform::CopyString(ifr.ifr_name, ifname);
 
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(fd != -1, CHIP_ERROR_OPEN_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
+    auto deferClose = MakeDefer([fd]() { close(fd); });
 
-    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
-        err = CHIP_ERROR_READ_FAILED;
-    }
-    else
-    {
-        fullDuplex = ecmd.duplex == DUPLEX_FULL;
-        err        = CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(ioctl(fd, SIOCETHTOOL, &ifr) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Cannot get interface settings: %s", strerror(errno)));
 
-    close(skfd);
+    fullDuplex = ecmd.duplex == DUPLEX_FULL;
+    return CHIP_NO_ERROR;
+}
 
-    return err;
+CHIP_ERROR GetEthCarrierDetect(const char * ifname, bool & carrierDetect)
+{
+    struct ifreq ifr            = {};
+    struct ethtool_value evalue = {};
+
+    evalue.cmd = ETHTOOL_GLINK;
+
+    ifr.ifr_data = reinterpret_cast<char *>(&evalue);
+    Platform::CopyString(ifr.ifr_name, ifname);
+
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    VerifyOrReturnError(fd != -1, CHIP_ERROR_OPEN_FAILED,
+                        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
+    auto deferClose = MakeDefer([fd]() { close(fd); });
+
+    VerifyOrReturnError(ioctl(fd, SIOCETHTOOL, &ifr) != -1, CHIP_ERROR_READ_FAILED,
+                        ChipLogError(DeviceLayer, "Cannot get link status: %s", strerror(errno)));
+
+    carrierDetect = evalue.data != 0;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ConnectivityUtils

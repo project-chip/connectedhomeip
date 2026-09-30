@@ -20,6 +20,7 @@
 #include "PWMManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/window-covering-server/CodegenIntegration.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -43,14 +44,14 @@ WindowCovering::WindowCovering()
 
 void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 {
+    auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current{};
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) ==
-                   chip::Protocols::InteractionModel::Status::Success);
-    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) ==
-                   chip::Protocols::InteractionModel::Status::Success);
+    current = wc->GetCurrentPositionLiftPercent100ths();
+    target  = wc->GetTargetPositionLiftPercent100ths();
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
 
@@ -60,8 +61,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     // assume single move completed
     Instance().mInLiftMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) ==
-                   chip::Protocols::InteractionModel::Status::Success);
+    current = wc->GetCurrentPositionLiftPercent100ths();
 
     if (!TargetCompleted(WindowCoveringType::Lift, current, target))
     {
@@ -77,29 +77,31 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 
 chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMoveType)
 {
-    chip::Protocols::InteractionModel::Status status{};
     chip::Percent100ths percent100ths{};
     NPercent100ths current{};
     OperationalState opState = OperationalState::Stall;
 
+    auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrReturnValue(wc != nullptr, percent100ths);
+
     if (aMoveType == WindowCoveringType::Lift)
     {
-        status  = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current);
+        current = wc->GetCurrentPositionLiftPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kLift);
     }
     else if (aMoveType == WindowCoveringType::Tilt)
     {
-        status  = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current);
+        current = wc->GetCurrentPositionTiltPercent100ths();
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
-    if ((status == chip::Protocols::InteractionModel::Status::Success) && !current.IsNull())
+    if (!current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
     else
     {
-        LOG_ERR("Cannot read the current lift position. Error: %d", static_cast<uint8_t>(status));
+        LOG_ERR("Cannot read the current lift position");
     }
 
     return percent100ths;
@@ -152,16 +154,16 @@ void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer,
 
 void WindowCovering::DriveCurrentTiltPosition(intptr_t)
 {
+    auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths current{};
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) ==
-                   chip::Protocols::InteractionModel::Status::Success);
-    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) ==
-                   chip::Protocols::InteractionModel::Status::Success);
+    current = wc->GetCurrentPositionTiltPercent100ths();
+    target  = wc->GetTargetPositionTiltPercent100ths();
 
-    UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
+    UpdateOperationalStatus(WindowCoveringType::Tilt, ComputeOperationalState(target, current));
 
     positionToSet.SetNonNull(CalculateSingleStep(WindowCoveringType::Tilt));
     TiltPositionSet(Endpoint(), positionToSet);
@@ -169,8 +171,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     // assume single move completed
     Instance().mInTiltMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) ==
-                   chip::Protocols::InteractionModel::Status::Success);
+    current = wc->GetCurrentPositionTiltPercent100ths();
 
     if (!TargetCompleted(WindowCoveringType::Tilt, current, target))
     {
@@ -232,39 +233,37 @@ void WindowCovering::UpdateOperationalStatus(WindowCoveringType aMoveType, Opera
 
 void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percent100ths aPosition)
 {
-    chip::Protocols::InteractionModel::Status status{};
+    auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrReturn(wc != nullptr, LOG_ERR("Cannot set the target position: cluster not found"));
+
     if (Instance().mCurrentUIMoveType == WindowCoveringType::Lift)
     {
-        status = Attributes::TargetPositionLiftPercent100ths::Set(Endpoint(), aPosition);
+        wc->SetTargetPositionLiftPercent100ths(chip::app::DataModel::MakeNullable(aPosition));
     }
     else if (Instance().mCurrentUIMoveType == WindowCoveringType::Tilt)
     {
-        status = Attributes::TargetPositionTiltPercent100ths::Set(Endpoint(), aPosition);
-    }
-
-    if (status != chip::Protocols::InteractionModel::Status::Success)
-    {
-        LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
+        wc->SetTargetPositionTiltPercent100ths(chip::app::DataModel::MakeNullable(aPosition));
     }
 }
 
 void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
 {
-    chip::Protocols::InteractionModel::Status status{};
+    auto wc = FindClusterOnEndpoint(Endpoint());
+    VerifyOrReturn(wc != nullptr);
     NPercent100ths currentPosition{};
 
     if (aMoveType == WindowCoveringType::Lift)
     {
-        status = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), currentPosition);
-        if (chip::Protocols::InteractionModel::Status::Success == status && !currentPosition.IsNull())
+        currentPosition = wc->GetCurrentPositionLiftPercent100ths();
+        if (!currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Lift, currentPosition.Value());
         }
     }
     else if (aMoveType == WindowCoveringType::Tilt)
     {
-        status = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), currentPosition);
-        if (chip::Protocols::InteractionModel::Status::Success == status && !currentPosition.IsNull())
+        currentPosition = wc->GetCurrentPositionTiltPercent100ths();
+        if (!currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Tilt, currentPosition.Value());
         }

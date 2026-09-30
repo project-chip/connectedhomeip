@@ -46,13 +46,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_6(MatterBaseTest):
+class TC_GC_2_6(MatterTestCommissionedDevice):
     def desc_TC_GC_2_6(self):
         return "[TC-GC-2.6] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
 
@@ -209,7 +209,7 @@ class TC_GC_2_6(MatterBaseTest):
 
         self.step(10)
         # Use TH1 to remove TH2's fabric
-        logger.info(f"Cleaning up: Removing TH2 fabric at index {self.th2.fabricId}")
+        logger.info("Cleaning up: Removing TH2 fabric at index %s", self.th2.fabricId)
         await self.th1.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=0,

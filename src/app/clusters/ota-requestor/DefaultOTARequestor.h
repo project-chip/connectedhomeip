@@ -41,6 +41,12 @@ class DefaultOTARequestor : public OTARequestorInterface, public BDXDownloader::
 public:
     DefaultOTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
+    // mUpdateToken / mFileDesignator span into this object's own buffers, so a copy would alias the
+    // source's. Forbid copying explicitly, pinning the invariant to the buffers rather than to the
+    // Callback members.
+    DefaultOTARequestor(const DefaultOTARequestor &)             = delete;
+    DefaultOTARequestor & operator=(const DefaultOTARequestor &) = delete;
+
     //////////// OTARequestorInterface Implementation ///////////////
     void Reset(void) override;
 

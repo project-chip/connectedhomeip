@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlassert.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
@@ -48,6 +47,9 @@ config("darwin_config") {
       "CoreWLAN.framework",
       "IOKit.framework",
     ]
+    if (chip_enable_nfc_based_commissioning) {
+      frameworks += [ "PCSC.framework" ]
+    }
   }
 
   cflags = [ "-Wconversion" ]
@@ -159,10 +161,18 @@ static_library("Darwin") {
   }
 
   if (chip_enable_nfc_based_commissioning) {
-    sources += [
-      "NFCCommissioningManagerImpl.cpp",
-      "NFCCommissioningManagerImpl.h",
-    ]
+    if (current_os == "mac") {
+      # On macOS, use the Linux PC/SC-based implementation
+      sources += [
+        "../Linux/NFCCommissioningManagerImpl.cpp",
+        "../Linux/NFCCommissioningManagerImpl.h",
+      ]
+    } else {
+      sources += [
+        "NFCCommissioningManagerImpl.cpp",
+        "NFCCommissioningManagerImpl.h",
+      ]
+    }
 
     deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }

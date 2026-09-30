@@ -70,6 +70,8 @@ enum class Fields : uint8_t
     kDuration       = 4,
     kMessageText    = 5,
     kResponses      = 6,
+    kLanguageCode   = 7,
+    kMessageURI     = 8,
 };
 
 struct Type
@@ -86,6 +88,8 @@ public:
     DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
+    Optional<chip::CharSpan> languageCode;
+    Optional<chip::CharSpan> messageURI;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -108,6 +112,8 @@ public:
     DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
+    Optional<chip::CharSpan> languageCode;
+    Optional<chip::CharSpan> messageURI;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };

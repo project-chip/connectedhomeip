@@ -130,8 +130,6 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
                           uint16_t & targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> & targetSoC,
                           DataModel::Nullable<int64_t> & targetAddedEnergy_mWh, bool bAllowTargetsInPast)
 {
-    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
-
     uint16_t minTimeToTarget_m = 24 * 60; // 24 hours
     bool bFound                = false;
 
@@ -586,5 +584,24 @@ CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(
     const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
     AdjustmentCauseEnum cause)
 {
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                                 const Optional<int64_t> maxPower,
+                                                                                 const uint32_t durationS,
+                                                                                 AdjustmentCauseEnum cause)
+{
+    // Currently not implemented by our EVSE app
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
+{
+    // Currently not implemented by our EVSE app
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause)
+{
+    // Currently not implemented by our EVSE app
     return CHIP_NO_ERROR;
 }

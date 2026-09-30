@@ -100,14 +100,15 @@ enum class TransportStatusEnum : uint8_t
 // Enum for TransportTriggerTypeEnum
 enum class TransportTriggerTypeEnum : uint8_t
 {
-    kCommand    = 0x00,
-    kMotion     = 0x01,
-    kContinuous = 0x02,
+    kCommand        = 0x00,
+    kMotion         = 0x01,
+    kContinuous     = 0x02,
+    kAmbientContext = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 4,
 };
 
 // Enum for TriggerActivationReasonEnum

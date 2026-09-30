@@ -199,7 +199,8 @@ enum class Fields : uint8_t
 {
     kNetworkIdentityIndex = 0,
     kNetworkIdentityType  = 1,
-    kIdentifier           = 2,
+    kClientIndex          = 2,
+    kIdentifier           = 3,
 };
 
 struct Type
@@ -211,6 +212,7 @@ public:
 
     Optional<uint16_t> networkIdentityIndex;
     Optional<IdentityTypeEnum> networkIdentityType;
+    Optional<uint16_t> clientIndex;
     Optional<chip::ByteSpan> identifier;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -229,6 +231,7 @@ public:
 
     Optional<uint16_t> networkIdentityIndex;
     Optional<IdentityTypeEnum> networkIdentityType;
+    Optional<uint16_t> clientIndex;
     Optional<chip::ByteSpan> identifier;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

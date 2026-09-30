@@ -22,6 +22,14 @@ CI:
       args:
           - --device
           - on-off-light
+    - name: "Test against all-devices/cooktop"
+      app: all-devices
+      args:
+          - --device
+          - cooktop
+      test_args:
+          - --endpoint
+          - "2"
 
 name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
 

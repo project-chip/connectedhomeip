@@ -1,7 +1,8 @@
 """
 Matter-specific assertions building on top of Mobly asserts.
 """
-from typing import Any, Callable, Optional, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from mobly import asserts
 
@@ -135,7 +136,7 @@ def assert_int_in_range(value: Any, min_value: int, max_value: int, description:
 
 # List assertions
 
-def assert_list(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+def assert_list(value: Any, description: str, min_length: int | None = None, max_length: int | None = None) -> None:
     """
     Asserts that the value is a list with optional length constraints.
 
@@ -215,7 +216,7 @@ def assert_is_string(value: Any, description: str) -> None:
     asserts.assert_true(isinstance(value, str), f"{description} must be a string")
 
 
-def assert_string_length(value: Any, description: str, min_length: Optional[int] = None, max_length: Optional[int] = None) -> None:
+def assert_string_length(value: Any, description: str, min_length: int | None = None, max_length: int | None = None) -> None:
     """
     Asserts that the string length is within the specified bounds.
 
@@ -377,7 +378,7 @@ async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    pase_params: PaseParams | None = None
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -428,7 +429,7 @@ async def assert_fabric_count(
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    pase_params: Optional[PaseParams] = None
+    pase_params: PaseParams | None = None
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.

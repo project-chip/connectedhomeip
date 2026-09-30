@@ -22,7 +22,6 @@ import random
 import shutil
 import tempfile
 from enum import StrEnum
-from typing import Optional
 
 import psutil
 import requests
@@ -60,7 +59,7 @@ class PushAvServerProcess(Subprocess):
         server_ip: str | None = None,
     ):
         if server_path is None:
-            log.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
+            log.error("No path provided for Push AV Server, using the default path for TH: %s", self.DEFAULT_SERVER_PATH)
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):
@@ -108,7 +107,7 @@ class PushAvServerProcess(Subprocess):
         response.raise_for_status()
         return response.json()
 
-    def _post_json(self, endpoint: str, data: Optional[dict] = None) -> dict:
+    def _post_json(self, endpoint: str, data: dict | None = None) -> dict:
         url = f"{self.base_url}{endpoint}"
         response = requests.post(url, json=data or {}, verify=False, timeout=5)
         response.raise_for_status()
@@ -139,12 +138,12 @@ class PushAvServerProcess(Subprocess):
         response = self._post_json(f"/streams?interface={interface}")
         return response["id"]
 
-    def update_track_name(self, stream_id: str, trackName: str) -> None:
+    def update_expected_track_names(self, stream_id: str, expected_track_names: list[str]) -> None:
         """
-            Request the server to add a track name associated with stream_id.
-            This is required to validate trackName of the segments that are uploaded.
+        Request the server to set the expected track names for a stream.
+        This is required to validate that uploaded track names match the expected list.
         """
-        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"track_name": trackName})
+        self._post_json(endpoint=f"/streams/{stream_id}/expectedTrackNames", data={"expected_track_names": expected_track_names})
 
 
 class PAVSTIUtils:
@@ -187,7 +186,7 @@ class PAVSTIUtils:
 
         # TLS clusters are always on EP0, per spec
         tls_utils = TLSUtils(self, endpoint=0)
-        log.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+        log.info("Using IP: %s as hostname to provision TLS Endpoint", host_ip)
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)

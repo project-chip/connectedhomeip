@@ -48,9 +48,9 @@ def run_stage_1(arch, suite, mirror, full_dir, packages_str):
     Changes ownership of the created directory to the current user.
     """
     logger.info(
-        f"=== Stage 1: Running debootstrap for {arch} in {full_dir} ==="
+        "=== Stage 1: Running debootstrap for %s in %s ===", arch, full_dir
     )
-    logger.info(f"Cleaning up full directory {full_dir} ...")
+    logger.info("Cleaning up full directory %s ...", full_dir)
     if os.path.exists(full_dir):
         subprocess.run(["sudo", "rm", "-rf", full_dir], check=True)
     os.makedirs(full_dir)
@@ -70,7 +70,7 @@ def run_stage_1(arch, suite, mirror, full_dir, packages_str):
         check=True,
     )
 
-    logger.info(f"Changing ownership of {full_dir} to current user ...")
+    logger.info("Changing ownership of %s to current user ...", full_dir)
     import grp
     import pwd
 
@@ -104,7 +104,7 @@ def extract_debs(full_dir, sysroot_dir):
         abs_sysroot_dir = os.path.abspath(sysroot_dir)
 
         for deb in tqdm(extracted_debs, desc="Extracting packages"):
-            logger.debug(f"Extracting {os.path.basename(deb)} ...")
+            logger.debug("Extracting %s ...", os.path.basename(deb))
             with tempfile.TemporaryDirectory() as tmp_extract_dir:
                 subprocess.run(
                     ["ar", "x", os.path.abspath(deb)],
@@ -140,9 +140,7 @@ def extract_debs(full_dir, sysroot_dir):
                         check=True,
                     )
                 else:
-                    logger.warning(
-                        f"No data.tar.* found in {os.path.basename(deb)}"
-                    )
+                    logger.warning("No data.tar.* found in %s", os.path.basename(deb))
 
 
 def ensure_lib_symlink(sysroot_dir):
@@ -156,10 +154,10 @@ def ensure_lib_symlink(sysroot_dir):
     if os.path.islink(lib_path):
         target = os.readlink(lib_path)
         if target == "usr/lib":
-            logger.info(f"Symlink {lib_path} -> usr/lib is correct.")
+            logger.info("Symlink %s -> usr/lib is correct.", lib_path)
             return
         logger.warning(
-            f"Symlink {lib_path} points to {target}, expected usr/lib. Fixing..."
+            "Symlink %s points to %s, expected usr/lib. Fixing...", lib_path, target
         )
         os.unlink(lib_path)
         os.symlink("usr/lib", lib_path)
@@ -167,27 +165,27 @@ def ensure_lib_symlink(sysroot_dir):
 
     if os.path.isdir(lib_path):
         logger.warning(
-            f"Conflict detected: {lib_path} is a directory. Merging into {usr_lib_path} ..."
+            "Conflict detected: %s is a directory. Merging into %s ...", lib_path, usr_lib_path
         )
         os.makedirs(usr_lib_path, exist_ok=True)
         for item in os.listdir(lib_path):
             src = os.path.join(lib_path, item)
             subprocess.run(["cp", "-a", src, usr_lib_path], check=True)
 
-        logger.info(f"Removing {lib_path} directory ...")
+        logger.info("Removing %s directory ...", lib_path)
         shutil.rmtree(lib_path)
 
-        logger.info(f"Recreating symlink {lib_path} -> usr/lib ...")
+        logger.info("Recreating symlink %s -> usr/lib ...", lib_path)
         os.symlink("usr/lib", lib_path)
         return
 
     if os.path.exists(lib_path):
         logger.warning(
-            f"Conflict detected: {lib_path} exists but is not a dir or symlink. Removing..."
+            "Conflict detected: %s exists but is not a dir or symlink. Removing...", lib_path
         )
         os.unlink(lib_path)
 
-    logger.info(f"Creating missing symlink {lib_path} -> usr/lib ...")
+    logger.info("Creating missing symlink %s -> usr/lib ...", lib_path)
     os.symlink("usr/lib", lib_path)
 
 
@@ -196,11 +194,11 @@ def cleanup_sysroot(sysroot_dir):
 
     Keeps only 'usr' and 'lib' (which points to 'usr/lib').
     """
-    logger.info(f"Cleaning up unneeded directories in {sysroot_dir} ...")
+    logger.info("Cleaning up unneeded directories in %s ...", sysroot_dir)
     for item in os.listdir(sysroot_dir):
         if item not in ["usr", "lib"]:
             path = os.path.join(sysroot_dir, item)
-            logger.info(f"Deleting unneeded item: {path}")
+            logger.info("Deleting unneeded item: %s", path)
             if os.path.isdir(path) and not os.path.islink(path):
                 shutil.rmtree(path)
             else:
@@ -242,7 +240,7 @@ def cleanup_sysroot(sysroot_dir):
     for pattern in excludes:
         full_pattern = os.path.join(sysroot_dir, pattern)
         for path in glob.glob(full_pattern):
-            logger.info(f"Deleting excluded large item: {path}")
+            logger.info("Deleting excluded large item: %s", path)
             if os.path.isdir(path) and not os.path.islink(path):
                 shutil.rmtree(path)
             else:
@@ -256,7 +254,7 @@ def fix_symlinks(sysroot_dir):
     converts them to be relative to the sysroot directory.
     Skips special filesystems like /proc, /sys, /dev.
     """
-    logger.info(f"Fixing absolute symlinks in {sysroot_dir} ...")
+    logger.info("Fixing absolute symlinks in %s ...", sysroot_dir)
     abs_sysroot_dir = os.path.abspath(sysroot_dir)
     for root, dirs, files in os.walk(sysroot_dir):
         for name in files + dirs:
@@ -270,7 +268,7 @@ def fix_symlinks(sysroot_dir):
                         or target.startswith("/dev/")
                     ):
                         logger.info(
-                            f"Skipping special filesystem link {path} -> {target}"
+                            "Skipping special filesystem link %s -> %s", path, target
                         )
                         continue
 
@@ -282,7 +280,7 @@ def fix_symlinks(sysroot_dir):
                     )
 
                     logger.info(
-                        f"Updating link {path}: {target} -> {rel_target}"
+                        "Updating link %s: %s -> %s", path, target, rel_target
                     )
                     os.unlink(path)
                     os.symlink(rel_target, path)
@@ -294,15 +292,15 @@ def run_stage_2(full_dir, sysroot_dir):
     Creates the clean sysroot directory, copies base files from the full rootfs,
     and calls helper functions to extract packages, clean up, and fix symlinks.
     """
-    logger.info(f"=== Stage 2: Creating sysroot in {sysroot_dir} ===")
+    logger.info("=== Stage 2: Creating sysroot in %s ===", sysroot_dir)
 
     if not os.path.isdir(full_dir):
         logger.error(
-            f"Error: Stage 1 output directory {full_dir} does not exist. Run Stage 1 first or enable it."
+            "Error: Stage 1 output directory %s does not exist. Run Stage 1 first or enable it.", full_dir
         )
         sys.exit(1)
 
-    logger.info(f"Cleaning up sysroot directory {sysroot_dir} ...")
+    logger.info("Cleaning up sysroot directory %s ...", sysroot_dir)
     if os.path.exists(sysroot_dir):
         subprocess.run(["rm", "-rf", sysroot_dir], check=True)
     os.makedirs(sysroot_dir)
@@ -313,9 +311,9 @@ def run_stage_2(full_dir, sysroot_dir):
         symlink_path = os.path.join(sysroot_dir, d)
         if not os.path.exists(symlink_path):
             os.symlink(f"usr/{d}", symlink_path)
-            logger.info(f"Created symlink {d} -> usr/{d} in {sysroot_dir}")
+            logger.info("Created symlink %s -> usr/%s in %s", d, d, sysroot_dir)
 
-    logger.info(f"Copying base system files from {full_dir} ...")
+    logger.info("Copying base system files from %s ...", full_dir)
     os.makedirs(os.path.join(sysroot_dir, "usr/include"), exist_ok=True)
     subprocess.run(
         [
@@ -410,14 +408,14 @@ def main(arch, skip_debootstrap, install_prereqs):
         logger.info("Skipping debootstrap step as requested.")
         if not os.path.isdir(full_dir):
             logger.error(
-                f"Error: Stage 1 output directory {full_dir} does not exist. Cannot skip debootstrap."
+                "Error: Stage 1 output directory %s does not exist. Cannot skip debootstrap.", full_dir
             )
             sys.exit(1)
 
     run_stage_2(full_dir, sysroot_dir)
 
     logger.info("DONE")
-    logger.info(f"Sysroot created in {sysroot_dir}")
+    logger.info("Sysroot created in %s", sysroot_dir)
 
 
 if __name__ == "__main__":

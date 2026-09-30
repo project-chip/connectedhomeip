@@ -42,7 +42,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ D_OK_SINGLE = bytes.fromhex(
     '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
 
 
-class TC_ACL_2_7(MatterBaseTest):
+class TC_ACL_2_7(MatterTestCommissionedDevice):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
@@ -61,13 +61,13 @@ class TC_ACL_2_7(MatterBaseTest):
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
         """Helper method to validate events for a TH"""
-        log.info(f"Found {len(events)} events for {controller_name}")
+        log.info("Found %s events for %s", len(events), controller_name)
 
         found_valid_events = 0
         found_other_event = False
 
         for event in events:
-            log.info(f"Examining event: {str(event)}")
+            log.info("Examining event: %s", event)
             if hasattr(event, 'Data') and hasattr(event.Data, 'changeType'):
                 if expected_node_id == self.th1.nodeId:
                     # Check for expected field values
@@ -164,7 +164,7 @@ class TC_ACL_2_7(MatterBaseTest):
         # TH1 writes Extension attribute with D_OK_EMPTY
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
-        log.info(f"TH1 writing extension with data {D_OK_EMPTY.hex()}")
+        log.info("TH1 writing extension with data %s", D_OK_EMPTY.hex())
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension]
@@ -180,7 +180,7 @@ class TC_ACL_2_7(MatterBaseTest):
         # TH2 writes Extension attribute with D_OK_SINGLE
         extension_th2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
-        log.info(f"TH2 writing extension with data {D_OK_SINGLE.hex()}")
+        log.info("TH2 writing extension with data %s", D_OK_SINGLE.hex())
 
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension_th2]

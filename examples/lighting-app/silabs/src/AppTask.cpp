@@ -77,7 +77,7 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
-CustomerAppTask & appInstance()
+CustomerAppTask & AppInstance()
 {
     return CustomerAppTask::GetAppTask();
 }
@@ -131,7 +131,7 @@ void PostLightControlColorEvent(ColorAction_t action, const RGBLEDWidget::ColorD
     light_event.LightControlEvent.Action = static_cast<uint8_t>(action);
     light_event.LightControlEvent.Value  = colorData;
     light_event.Handler                  = &CustomerAppTask::LightControlEventHandler;
-    appInstance().PostEvent(&light_event);
+    AppInstance().PostEvent(&light_event);
 }
 #endif
 
@@ -142,7 +142,7 @@ void OffEffectTimerEventHandler(AppEvent * /* aEvent */)
 
     sLightOn = false;
     sLightLED.Set(false);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(false);
 #endif
 }
@@ -173,7 +173,7 @@ void AppTask::LightTimerEventHandler(void * /* timerCbArg */)
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = nullptr;
     event.Handler            = &OffEffectTimerEventHandler;
-    appInstance().PostEvent(&event);
+    AppInstance().PostEvent(&event);
 }
 
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
@@ -188,7 +188,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     DisarmOffWithEffectTimer();
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
 
@@ -239,7 +239,7 @@ CHIP_ERROR AppTask::AppInit()
 {
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&CustomerAppTask::ButtonEventHandler);
 
-    CHIP_ERROR err = appInstance().InitLight();
+    CHIP_ERROR err = AppInstance().InitLight();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("InitLight() failed");
@@ -250,9 +250,9 @@ CHIP_ERROR AppTask::AppInit()
     sLightLED.Set(sLightOn);
 
 // Update the LCD with the stored value. Show QR Code if not provisioned
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     GetLCD().WriteDemoUI(sLightOn);
-#ifdef QR_CODE_ENABLED
+#if SL_MATTER_QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -261,7 +261,7 @@ CHIP_ERROR AppTask::AppInit()
     {
         GetLCD().ShowQRCode(true);
     }
-#endif // QR_CODE_ENABLED
+#endif // SL_MATTER_QR_CODE_ENABLED
 #endif
 
     return err;
@@ -338,7 +338,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppEvent event;
     osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
-    CHIP_ERROR err = GetAppTask().Init();
+    CHIP_ERROR err = AppInstance().Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("AppTask.Init() failed");
@@ -346,7 +346,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
-    GetAppTask().StartStatusLEDTimer();
+    AppInstance().StartStatusLEDTimer();
 #endif
 
     SILABS_LOG("App Task started");
@@ -356,7 +356,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, nullptr, osWaitForever);
         while (eventReceived == osOK)
         {
-            GetAppTask().DispatchEvent(&event);
+            AppInstance().DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, nullptr, 0);
         }
     }
@@ -371,12 +371,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     if (button == APP_LIGHT_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = &CustomerAppTask::LightActionEventHandler;
-        appInstance().PostEvent(&button_event);
+        AppInstance().PostEvent(&button_event);
     }
     else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
-        appInstance().PostEvent(&button_event);
+        AppInstance().PostEvent(&button_event);
     }
 }
 
@@ -459,7 +459,7 @@ void AppTask::DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePa
 
             sLightOn = lightOn;
             sLightLED.Set(sLightOn);
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
             BaseApplication::GetLCD().WriteDemoUI(sLightOn);
 #endif
         }

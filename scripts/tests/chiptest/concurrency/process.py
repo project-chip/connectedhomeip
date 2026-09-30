@@ -23,13 +23,13 @@ import signal
 import threading
 import traceback
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 from typing import ClassVar, Concatenate, Generic, ParamSpec, Protocol, Self, TypeVar
 
-from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
+from chiptest.concurrency.work_queue import CancellableQueue, EndOfQueue, QueueCancelled, wait_for_mp_managed
 from chiptest.log_config import LogConfig
 
 log = logging.getLogger(__name__)
@@ -161,16 +161,29 @@ class ProcessState:
         Timeout as for `Condition.wait_for()`, i.e. it can be a positive float for maximum wait time, or None to wait indefinitely.
 
         Returns the result of the predicate.
+
+        We need the wait_for_mp_managed wrapper because otherwise we wouldn't be able to catch a KeyboardInterrupt for the condition
+        which is managed by multiprocessing.Manager, as the manager process explicitly ignores SIGINT.
         """
         with self._state_changed:
-            return self._state_changed.wait_for(lambda: predicate(self._phase.get(), self._exception.get()), timeout)
+            return wait_for_mp_managed(self._state_changed, lambda: predicate(self._phase.get(), self._exception.get()), timeout)
+
+    @contextlib.contextmanager
+    def working_context(self) -> Iterator[None]:
+        """Context manager to set the process phase to WORKING for the duration of the context."""
+        self.phase = ProcessPhase.WORKING
+        try:
+            yield
+        finally:
+            self.phase = ProcessPhase.READY
 
 
+WorkerConfigT = TypeVar("WorkerConfigT", bound=ProcessConfig)
 WorkRequestT = TypeVar("WorkRequestT")
 WorkResponseT = TypeVar("WorkResponseT")
 
 
-class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
+class WrappedProcess(ABC, Generic[WorkerConfigT, WorkRequestT, WorkResponseT]):
     """
     Base class for wrapped Python subprocesses.
 
@@ -193,7 +206,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
        resources that require cleanup should be registered in the provided `ExitStack`.
     4. On success, phase becomes `READY`.
     5. `_proc_work()` executes the main loop (by default waits for cancellation). Implementations may optionally toggle between
-       `READY` and `WORKING` to expose idle vs active periods.
+       `READY` and `WORKING` to expose idle vs active periods. You can use working_context() for that.
     6. After finishing work, the resources initialized in `_proc_init()` are cleaned up by the exit stack.
     7. Phase becomes `CLOSED` when the subprocess exits.
 
@@ -206,7 +219,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
     """
     # Methods run in the parent process.
 
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ProcessConfig,
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfigT,
                  work_queue: CancellableQueue[WorkRequestT], rsp_queue: CancellableQueue[WorkResponseT]) -> None:
         # Neither mp_context or mp_manager should be saved as fields, as they are not picklable between processes. They can be used
         # to initialize some shared resources in the constructor.
@@ -267,7 +280,13 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         except BaseException as start_exc:
             if not isinstance(start_exc, KeyboardInterrupt):
                 log.error("Stopping process %s on failure during initialization", self.name)
-            self.stop(raise_on_proc_error=False)
+            try:
+                self.stop()
+            except KeyboardInterrupt:
+                raise
+            except BaseException as stop_exc:
+                log.error("Error when stopping process %s after failure during initialization: %r", self.name, stop_exc)
+                raise stop_exc.with_traceback(stop_exc.__traceback__) from start_exc
             raise
 
     def has_stopped(self, timeout: float) -> bool:
@@ -278,7 +297,7 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
         return False
 
     @with_annotated_exception
-    def stop(self, raise_on_proc_error: bool = True) -> None:
+    def stop(self) -> None:
         """
         Stop the subprocess with escalating termination signals.
 
@@ -319,7 +338,9 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
             raise TimeoutError(f"Failed to terminate the process {self.name}. May become a zombie")
         finally:
             self._stopped = True
-            if raise_on_proc_error and self.state.exception is not None:
+            if isinstance(self.state.exception, KeyboardInterrupt):
+                raise self.state.exception
+            if self.state.exception is not None:
                 raise RuntimeError("Process reported an exception during execution") from self.state.exception
 
     # Methods run in the subprocess.
@@ -368,10 +389,11 @@ class WrappedProcess(ABC, Generic[WorkRequestT, WorkResponseT]):
                     log.warning("Received a cancel event")
                 except EndOfQueue:
                     log.debug("Received end of work signal")
-                except KeyboardInterrupt:
-                    log.debug("Caught an interrupt")
         except BaseException as e:
-            log.error("Process failed with an exception: %r", e)
+            if isinstance(e, KeyboardInterrupt):
+                log.debug("Process interrupted by user")
+            else:
+                log.error("Process failed with an exception: %r", e)
             self.state.exception = e
         finally:
             self.state.phase = ProcessPhase.CLOSED

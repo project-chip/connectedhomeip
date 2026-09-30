@@ -19,6 +19,7 @@ import logging
 import multiprocessing
 import os
 import sys
+from pathlib import Path
 
 import click
 
@@ -98,8 +99,7 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, external
         )
 
     if not sdk_root:
-        sdk_root = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), '..')
+        sdk_root = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
     sdk_root = os.path.abspath(sdk_root)
 

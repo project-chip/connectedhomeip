@@ -28,6 +28,19 @@ namespace app {
 namespace Clusters {
 namespace OperationalCredentials {
 
+// Enum for AttestationCryptoProfileEnum
+enum class AttestationCryptoProfileEnum : uint8_t
+{
+    kEcdsaMatterLegacy = 0x00,
+    kMlDsa44           = 0x01,
+    kMlDsa65           = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for CertificateChainTypeEnum
 enum class CertificateChainTypeEnum : uint8_t
 {
@@ -58,6 +71,20 @@ enum class NodeOperationalCertStatusEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
+};
+
+// Bitmap for AttestationCryptoProfileBitmap
+enum class AttestationCryptoProfileBitmap : uint16_t
+{
+    kSupportsEcdsaMatterLegacy = 0x1,
+    kSupportsMlDsa44           = 0x2,
+    kSupportsMlDsa65           = 0x4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPQCDeviceAttestation = 0x1,
 };
 } // namespace OperationalCredentials
 } // namespace Clusters

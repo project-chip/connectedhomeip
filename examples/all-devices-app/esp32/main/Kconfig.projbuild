@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2025-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,11 +20,154 @@
 
 menu "Demo"
 
+    choice
+        prompt "Device Type"
+        default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
+        default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
+        default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
+        default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
+        default DEVICE_TYPE_M5STACK_CORES3 if IDF_TARGET_ESP32S3
+        default DEVICE_TYPE_ESP32_S31_DEVKITC if IDF_TARGET_ESP32S31
+        default DEVICE_TYPE_ESP32_H2_DEVKITM if IDF_TARGET_ESP32H2
+        default DEVICE_TYPE_ESP32_H21_DEVKITM if IDF_TARGET_ESP32H21
+        default DEVICE_TYPE_ESP32_H4_DEVKITM if IDF_TARGET_ESP32H4
+        default DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD if IDF_TARGET_ESP32P4
+        help
+            Specifies the type of ESP32 device.
+
+            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
+            available from third-party manufacturers.
+
+        config DEVICE_TYPE_ESP32_DEVKITC
+            bool "ESP32-DevKitC"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_WROVER_KIT
+            bool "ESP32-WROVER-KIT_V4.1"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_M5STACK
+            bool "M5Stack"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_M5STACK_CORES3
+            bool "M5Stack CoreS3"
+            depends on IDF_TARGET_ESP32S3
+            help
+                M5Stack CoreS3 / CoreS3 SE (ESP32-S3, 16MB flash, 8MB quad PSRAM).
+
+                The LCD and capacitive touch panel are driven by the LVGL renderer;
+                the vendored TFT library used by the other M5Stack boards is
+                ESP32-only.
+        config DEVICE_TYPE_ESP32_C3_DEVKITM
+            bool "ESP32C3-DevKitM"
+            depends on IDF_TARGET_ESP32C3
+        config DEVICE_TYPE_ESP32_C2_DEVKITM
+            bool "ESP32C2-DevKitM"
+            depends on IDF_TARGET_ESP32C2
+        config DEVICE_TYPE_ESP32_C6_DEVKITC
+            bool "ESP32C6-DevKitC"
+            depends on IDF_TARGET_ESP32C6
+        config DEVICE_TYPE_ESP32_S31_DEVKITC
+            bool "ESP32S31-DevKitC"
+            depends on IDF_TARGET_ESP32S31
+        config DEVICE_TYPE_ESP32_H2_DEVKITM
+            bool "ESP32H2-DevKitM"
+            depends on IDF_TARGET_ESP32H2
+        config DEVICE_TYPE_ESP32_H21_DEVKITM
+            bool "ESP32H21-DevKitM"
+            depends on IDF_TARGET_ESP32H21
+        config DEVICE_TYPE_ESP32_H4_DEVKITM
+            bool "ESP32H4-DevKitM"
+            depends on IDF_TARGET_ESP32H4
+        config DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
+            bool "ESP32P4 Function EV Board"
+            depends on IDF_TARGET_ESP32P4
+    endchoice
+
+    choice
+      prompt "Rendezvous Mode"
+      default RENDEZVOUS_MODE_BLE if BT_ENABLED
+      default RENDEZVOUS_MODE_SOFTAP
+      help
+          Specifies the Rendezvous mode of the peripheral.
+
+      config RENDEZVOUS_MODE_SOFTAP
+          bool "Soft-AP"
+          select ESP_WIFI_SOFTAP_SUPPORT
+      config RENDEZVOUS_MODE_BLE
+          bool "BLE"
+          depends on BT_ENABLED
+      config RENDEZVOUS_MODE_ON_NETWORK
+          bool "On-Network"
+      config RENDEZVOUS_MODE_THREAD_MESHCOP
+          bool "Thread MeshCoP"
+          depends on CHIP_DEVICE_ENABLE_THREAD_MESHCOP
+      config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
+          bool "Soft-AP / On-Network"
+          select ESP_WIFI_SOFTAP_SUPPORT
+      config RENDEZVOUS_MODE_BLE_ON_NETWORK
+          bool "BLE / On-Network"
+    endchoice
+
+    config TFT_PREDEFINED_DISPLAY_TYPE
+        int
+        range 0 5
+        default 0 if DEVICE_TYPE_ESP32_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM || DEVICE_TYPE_ESP32_H21_DEVKITM || DEVICE_TYPE_ESP32_H4_DEVKITM || DEVICE_TYPE_ESP32_P4_FUNCTION_EV_BOARD
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_S31_DEVKITC
+        default 3 if DEVICE_TYPE_M5STACK
+        default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
+
+    config HAVE_DISPLAY
+        bool
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT || DEVICE_TYPE_M5STACK_CORES3)
+
+    config DISPLAY_LVGL
+        bool
+        depends on HAVE_DISPLAY
+        default y if DEVICE_TYPE_M5STACK_CORES3
+        help
+            Selects the LVGL display implementation instead of the default one
+            built on the vendored TFT library, which is ESP32-only.
+
+    config HAVE_SPEAKER
+        bool
+        default y if DEVICE_TYPE_M5STACK_CORES3
+        default n if !DEVICE_TYPE_M5STACK_CORES3
+
+    config CHIME_ATTENUATION_DB
+        int "Chime attenuation (dB below maximum)"
+        depends on HAVE_SPEAKER
+        range 0 96
+        default 40
+        help
+            Attenuation applied to the chime output, in decibels below the
+            amplifier's maximum gain. 0 is full volume; each 6 dB halves the
+            amplitude. The value is programmed into the AW88298 volume
+            register, so digital resolution is unaffected.
+
+
+
+    config RENDEZVOUS_MODE
+       int
+       range 0 63
+       default 1 if RENDEZVOUS_MODE_SOFTAP
+       default 2 if RENDEZVOUS_MODE_BLE
+       default 4 if RENDEZVOUS_MODE_ON_NETWORK
+       default 32 if RENDEZVOUS_MODE_THREAD_MESHCOP
+       default 5 if RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
+       default 6 if RENDEZVOUS_MODE_BLE_ON_NETWORK
+
+    config DISPLAY_AUTO_OFF
+        bool "Automatically turn off the M5Stack's Display after a few seconds"
+        default "y"
+        depends on DEVICE_TYPE_M5STACK
+        help
+            To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
+
     config ALL_DEVICES_ENDPOINT
         int "Device Endpoint ID"
         default 1
         range 1 254
         help
-            The endpoint ID to use for the device.
+            The endpoint ID to use for the single device mode.
 
 endmenu

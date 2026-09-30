@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 
 #include <array>
 #include <bitset>
+#include <utility>
+#include <variant>
 
 #include <lib/support/Span.h>
 
@@ -35,54 +37,43 @@ public:
     static constexpr size_t kChallengeSize      = 8;
     static constexpr uint32_t kInitialSyncValue = 0;
 
-    PeerMessageCounter() : mStatus(Status::NotSynced) {}
+    PeerMessageCounter() : mSyncState(NotSynced{}) {}
+    PeerMessageCounter(const PeerMessageCounter &)             = default;
+    PeerMessageCounter(PeerMessageCounter &&)                  = default;
+    PeerMessageCounter & operator=(const PeerMessageCounter &) = default;
+    PeerMessageCounter & operator=(PeerMessageCounter &&)      = default;
     ~PeerMessageCounter() { Reset(); }
 
-    void Reset()
-    {
-        switch (mStatus)
-        {
-        case Status::NotSynced:
-            break;
-        case Status::SyncInProcess:
-            mSyncInProcess.~SyncInProcess();
-            break;
-        case Status::Synced:
-            mSynced.~Synced();
-            break;
-        }
-        mStatus = Status::NotSynced;
-    }
+    void Reset() { mSyncState = NotSynced{}; }
 
-    bool IsSynchronizing() { return mStatus == Status::SyncInProcess; }
-    bool IsSynchronized() { return mStatus == Status::Synced; }
+    bool IsSynchronizing() const { return std::holds_alternative<SyncInProcess>(mSyncState); }
+    bool IsSynchronized() const { return std::holds_alternative<Synced>(mSyncState); }
 
     void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
     {
-        VerifyOrDie(mStatus == Status::NotSynced);
-        mStatus = Status::SyncInProcess;
-        new (&mSyncInProcess) SyncInProcess();
-        ::memcpy(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize);
+        VerifyOrDie(std::holds_alternative<NotSynced>(mSyncState));
+        SyncInProcess sip;
+        ::memcpy(sip.mChallenge.data(), challenge.data(), kChallengeSize);
+        mSyncState = std::move(sip);
     }
 
     void SyncFailed() { Reset(); }
 
     CHIP_ERROR VerifyChallenge(uint32_t counter, FixedByteSpan<kChallengeSize> challenge)
     {
-        if (mStatus != Status::SyncInProcess)
+        if (!std::holds_alternative<SyncInProcess>(mSyncState))
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        if (::memcmp(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize) != 0)
+        SyncInProcess & sip = std::get<SyncInProcess>(mSyncState);
+        if (::memcmp(sip.mChallenge.data(), challenge.data(), kChallengeSize) != 0)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        mSyncInProcess.~SyncInProcess();
-        mStatus = Status::Synced;
-        new (&mSynced) Synced();
-        mSynced.mMaxCounter = counter;
-        mSynced.mWindow.reset(); // reset all bits, accept all packets in the window
+        mSyncState                               = Synced{};
+        std::get<Synced>(mSyncState).mMaxCounter = counter;
+        std::get<Synced>(mSyncState).mWindow.reset();
         return CHIP_NO_ERROR;
     }
 
@@ -99,7 +90,7 @@ public:
      */
     CHIP_ERROR VerifyGroup(uint32_t counter) const
     {
-        if (mStatus != Status::Synced)
+        if (!std::holds_alternative<Synced>(mSyncState))
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -110,20 +101,17 @@ public:
 
     CHIP_ERROR VerifyOrTrustFirstGroup(uint32_t counter)
     {
-        switch (mStatus)
+        if (std::holds_alternative<NotSynced>(mSyncState))
         {
-        case Status::NotSynced: {
-            // Trust and set the counter when not synced
             SetCounter(counter);
             return CHIP_NO_ERROR;
         }
-        case Status::Synced: {
+        if (std::holds_alternative<Synced>(mSyncState))
+        {
             return VerifyGroup(counter);
         }
-        default:
-            VerifyOrDie(false);
-            return CHIP_ERROR_INTERNAL;
-        }
+        VerifyOrDie(false);
+        return CHIP_ERROR_INTERNAL;
     }
 
     /**
@@ -137,7 +125,7 @@ public:
 
     CHIP_ERROR VerifyEncryptedUnicast(uint32_t counter) const
     {
-        if (mStatus != Status::Synced)
+        if (!std::holds_alternative<Synced>(mSyncState))
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -157,22 +145,18 @@ public:
 
     CHIP_ERROR VerifyUnencrypted(uint32_t counter)
     {
-        switch (mStatus)
+        if (std::holds_alternative<NotSynced>(mSyncState))
         {
-        case Status::NotSynced: {
-            // Trust and set the counter when not synced
             SetCounter(counter);
             return CHIP_NO_ERROR;
         }
-        case Status::Synced: {
+        if (std::holds_alternative<Synced>(mSyncState))
+        {
             Position pos = ClassifyWithRollover(counter);
             return VerifyPositionUnencrypted(pos, counter);
         }
-        default: {
-            VerifyOrDie(false);
-            return CHIP_ERROR_INTERNAL;
-        }
-        }
+        VerifyOrDie(false);
+        return CHIP_ERROR_INTERNAL;
     }
 
     /**
@@ -186,18 +170,15 @@ public:
 
     void SetCounter(uint32_t value)
     {
-        Reset();
-        mStatus = Status::Synced;
-        new (&mSynced) Synced();
-        mSynced.mMaxCounter = value;
-        mSynced.mWindow.reset();
+        mSyncState                               = Synced{};
+        std::get<Synced>(mSyncState).mMaxCounter = value;
+        std::get<Synced>(mSyncState).mWindow.reset();
     }
 
-    uint32_t GetCounter() const { return mSynced.mMaxCounter; }
+    uint32_t GetCounter() const { return std::get<Synced>(mSyncState).mMaxCounter; }
 
 private:
-    // Counter position indicator with respect to our current
-    // mSynced.mMaxCounter.
+    // Counter position indicator with respect to our current max counter.
     enum class Position
     {
         BeforeWindow,
@@ -207,10 +188,11 @@ private:
     };
 
     // Classify an incoming counter value's position.  Must be used only if
-    // mStatus is Status::Synced.
+    // the peer is synchronized.
     Position ClassifyWithoutRollover(uint32_t counter) const
     {
-        if (counter > mSynced.mMaxCounter)
+        auto & synced = std::get<Synced>(mSyncState);
+        if (counter > synced.mMaxCounter)
         {
             return Position::FutureCounter;
         }
@@ -220,8 +202,8 @@ private:
 
     /**
      * Classify an incoming counter value's position for the cases when counters
-     * are allowed to roll over.  Must be used only if mStatus is
-     * Status::Synced.
+     * are allowed to roll over.  Must be used only if the peer is
+     * synchronized.
      *
      * This can be used as the basis for implementing section 4.5.4.2 in the
      * spec:
@@ -235,7 +217,8 @@ private:
      */
     Position ClassifyWithRollover(uint32_t counter) const
     {
-        uint32_t counterIncrease               = counter - mSynced.mMaxCounter;
+        auto & synced                          = std::get<Synced>(mSyncState);
+        uint32_t counterIncrease               = counter - synced.mMaxCounter;
         constexpr uint32_t futureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
 
         if (counterIncrease >= 1 && counterIncrease <= futureCounterWindow)
@@ -252,12 +235,13 @@ private:
      */
     Position ClassifyNonFutureCounter(uint32_t counter) const
     {
-        if (counter == mSynced.mMaxCounter)
+        auto & synced = std::get<Synced>(mSyncState);
+        if (counter == synced.mMaxCounter)
         {
             return Position::MaxCounter;
         }
 
-        uint32_t offset = mSynced.mMaxCounter - counter;
+        uint32_t offset = synced.mMaxCounter - counter;
         if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
             return Position::InWindow;
@@ -272,13 +256,14 @@ private:
      */
     CHIP_ERROR VerifyPositionEncrypted(Position position, uint32_t counter) const
     {
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::FutureCounter:
             return CHIP_NO_ERROR;
         case Position::InWindow: {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-            if (mSynced.mWindow.test(offset - 1))
+            uint32_t offset = synced.mMaxCounter - counter;
+            if (synced.mWindow.test(offset - 1))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
             }
@@ -297,13 +282,14 @@ private:
      */
     CHIP_ERROR VerifyPositionUnencrypted(Position position, uint32_t counter) const
     {
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::MaxCounter:
             return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
         case Position::InWindow: {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-            if (mSynced.mWindow.test(offset - 1))
+            uint32_t offset = synced.mMaxCounter - counter;
+            if (synced.mWindow.test(offset - 1))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
             }
@@ -336,11 +322,12 @@ private:
      */
     void CommitWithPosition(Position position, uint32_t counter)
     {
+        auto & synced = std::get<Synced>(mSyncState);
         switch (position)
         {
         case Position::InWindow: {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-            mSynced.mWindow.set(offset - 1);
+            uint32_t offset = synced.mMaxCounter - counter;
+            synced.mWindow.set(offset - 1);
             break;
         }
         case Position::MaxCounter: {
@@ -349,28 +336,24 @@ private:
         }
         default: {
             // Since we are committing, this becomes a new max-counter value.
-            uint32_t shift      = counter - mSynced.mMaxCounter;
-            mSynced.mMaxCounter = counter;
+            uint32_t shift     = counter - synced.mMaxCounter;
+            synced.mMaxCounter = counter;
             if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                mSynced.mWindow.reset();
+                synced.mWindow.reset();
             }
             else
             {
-                mSynced.mWindow <<= shift;
-                mSynced.mWindow.set(shift - 1);
+                synced.mWindow <<= shift;
+                synced.mWindow.set(shift - 1);
             }
             break;
         }
         }
     }
 
-    enum class Status
-    {
-        NotSynced,     // No state associated
-        SyncInProcess, // mSyncInProcess will be active
-        Synced,        // mSynced will be active
-    } mStatus;
+    // Synthetic type for "not synced" state (std::monostate)
+    using NotSynced = std::monostate;
 
     struct SyncInProcess
     {
@@ -391,12 +374,7 @@ private:
         std::bitset<CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE> mWindow;
     };
 
-    // We should use std::variant here when migrated to C++17
-    union
-    {
-        SyncInProcess mSyncInProcess;
-        Synced mSynced;
-    };
+    std::variant<NotSynced, SyncInProcess, Synced> mSyncState;
 };
 
 } // namespace Transport

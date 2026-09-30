@@ -56,7 +56,7 @@ class AVSMTestBase:
 
         # First verify that SNP is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
         asserts.assert_true(snpSupport, "Snapshot Feature is not supported.")
 
@@ -64,7 +64,7 @@ class AVSMTestBase:
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info("Rx'd AllocatedSnapshotStreams: %s", aAllocatedSnapshotStreams)
         if len(aAllocatedSnapshotStreams) > 0:
             return
 
@@ -72,7 +72,7 @@ class AVSMTestBase:
         aSnapshotCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
         )
-        log.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
+        log.info("Rx'd SnapshotCapabilities: %s", aSnapshotCapabilities)
 
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
 
@@ -91,7 +91,7 @@ class AVSMTestBase:
                 OSDEnabled=osd
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            log.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            log.info("Rx'd SnapshotStreamAllocateResponse: %s", snpStreamAllocateResponse)
             asserts.assert_is_not_none(
                 snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
             )
@@ -107,7 +107,7 @@ class AVSMTestBase:
 
         # First verify that ADO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         asserts.assert_equal(adoSupport, cluster.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
 
@@ -115,7 +115,7 @@ class AVSMTestBase:
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info("Rx'd AllocatedAudioStreams: %s", aAllocatedAudioStreams)
         if len(aAllocatedAudioStreams) > 0:
             return
 
@@ -123,11 +123,11 @@ class AVSMTestBase:
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
-        log.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
+        log.info("Rx'd MicrophoneCapabilities: %s", aMicrophoneCapabilities)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities : %s", aStreamUsagePriorities)
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
         if streamUsage:
             asserts.assert_in(streamUsage, aStreamUsagePriorities,
@@ -145,7 +145,7 @@ class AVSMTestBase:
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            log.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            log.info("Rx'd AudioStreamAllocateResponse: %s", audioStreamAllocateResponse)
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
@@ -161,7 +161,7 @@ class AVSMTestBase:
 
         # First verify that VDO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -169,7 +169,7 @@ class AVSMTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         if len(aAllocatedVideoStreams) > 0:
             return
 
@@ -177,23 +177,23 @@ class AVSMTestBase:
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", aStreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        log.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info("Rx'd RateDistortionTradeOffPoints: %s", aRateDistortionTradeOffPoints)
         aMinViewportRes = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        log.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
+        log.info("Rx'd MinViewportResolution: %s", aMinViewportRes)
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        log.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info("Rx'd VideoSensorParams: %s", aVideoSensorParams)
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        log.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info("Rx'd MaxEncodedPixelRate: %s", aMaxEncodedPixelRate)
 
         # Check for Watermark and OSD features
         watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
@@ -210,7 +210,7 @@ class AVSMTestBase:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=streamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -223,7 +223,7 @@ class AVSMTestBase:
                 OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )

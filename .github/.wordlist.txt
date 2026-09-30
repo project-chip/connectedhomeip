@@ -39,8 +39,8 @@ aef
 AES
 AFL
 AIDL
-aliased
 algs
+aliased
 alloc
 allocator
 allocators
@@ -125,6 +125,7 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -193,9 +194,9 @@ bz
 bzip
 CACACACA
 cacerts
+CAfile
 callsite
 callsites
-CAfile
 cancelled
 capacitive
 CarbonDioxideConcentrationMeasurement
@@ -317,8 +318,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -416,6 +417,7 @@ dereferencing
 desc
 descheduled
 destructor
+destructors
 detokenization
 detokenizer
 dev
@@ -436,6 +438,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+devicetree
 Devkit
 DevKitC
 DevKitM
@@ -540,6 +543,7 @@ endian
 EndpointId
 eno
 entrypoint
+Entrypoints
 enum
 Enums
 env
@@ -648,6 +652,7 @@ generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
+Genericity
 GenericPlatformManagerImpl
 GenericThreadConfigurationManagerImpl
 GenericThreadStackManagerImpl
@@ -678,6 +683,7 @@ googleapis
 googlesource
 GPG
 GPIO
+GPIOs
 GPL
 GPLv
 Gradle
@@ -695,6 +701,7 @@ gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
 HandleCommand
+Hardcode
 hardcoded
 hardcodes
 hardknott
@@ -833,6 +840,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -880,6 +888,7 @@ libTransportLayer
 libudev
 libwebkitgtk
 lifecycle
+lifecycles
 lightbulb
 lightin
 LightingApp
@@ -985,6 +994,7 @@ minLength
 MinRtrAdvInterval
 minValue
 mkdir
+mixins
 mlan
 MLD
 mmevk
@@ -1187,10 +1197,11 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
-Pm1ConcentrationMeasurement
-Pm10ConcentrationMeasurement
-Pm25ConcentrationMeasurement
+pluggable
 PluginServerCallback
+Pm10ConcentrationMeasurement
+Pm1ConcentrationMeasurement
+Pm25ConcentrationMeasurement
 png
 Podman
 PollControl
@@ -1215,6 +1226,8 @@ ProductID
 ProductLabel
 ProductName
 ProductURL
+programmatically
+proguard
 proto
 protobuf
 protos
@@ -1265,8 +1278,8 @@ QueryImageResponse
 queryImageStatus
 Quickstart
 qvCHIP
-RADVD
 RadonConcentrationMeasurement
+RADVD
 raspberryPi
 RasPi
 rAv
@@ -1291,13 +1304,14 @@ recurse
 refrigeratoralarm
 regen
 registerAttributeAccessOverride
-registration
 RegisterCommandHandler
-registry
+registration
 registrations
+registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1307,17 +1321,19 @@ repo
 repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
+resync
 retargeting
 reusability
 reviwed
 rfid
 rfids
 RGB
+ripgrep
 riscv
 rloc
 rmw
@@ -1367,13 +1383,14 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1396,6 +1413,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1464,6 +1482,7 @@ strcpy
 struct
 structs
 su
+subclasses
 Subclassing
 subcommand
 subcommands
@@ -1471,9 +1490,11 @@ subdirectories
 subdirectory
 subflag
 subfolder
+subfolders
 submodule
 submodules
 subnet
+subobject
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1483,6 +1504,7 @@ subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
+superset
 suppressResponse
 svg
 SVR
@@ -1559,6 +1581,7 @@ TKIP
 TLS
 tlsr
 TLV
+TLX
 tmp
 tngvndl
 TODO
@@ -1630,9 +1653,11 @@ unpair
 unprovisioned
 unreferenced
 unregister
+unregisters
 unregistration
 Unsecure
 Unselect
+unsynchronized
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1724,9 +1749,9 @@ xbef
 xc
 xcd
 Xcode
+Xcode's
 xcodebuild
 xcodeproj
-Xcode's
 xcworkspace
 xd
 xds

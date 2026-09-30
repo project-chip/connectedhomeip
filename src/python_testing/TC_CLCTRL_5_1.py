@@ -32,6 +32,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -43,7 +58,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -78,7 +93,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
-class TC_CLCTRL_5_1(MatterBaseTest):
+class TC_CLCTRL_5_1(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -173,7 +188,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("2a")
 
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        log.info(f"FeatureMap: {feature_map}")
+        log.info("FeatureMap: %s", feature_map)
         is_is_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
         is_ps_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_cl_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
@@ -199,7 +214,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("2d")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
-        log.info(f"AttributeList: {attribute_list}")
+        log.info("AttributeList: %s", attribute_list)
 
         # STEP 2e: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2e")
@@ -217,7 +232,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("3b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -229,7 +244,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
-                log.info(f"LatchControlModes: {LatchControlModes}")
+                log.info("LatchControlModes: %s", LatchControlModes)
                 if LatchControlModes is NullValue:
                     asserts.assert_fail("LatchControlModes is NullValue.")
             else:
@@ -293,7 +308,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("3j")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
                                  "MainState is not in the expected state")
 
@@ -360,7 +375,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 self.step("4e")
 
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                log.info(f"OverallCurrentState: {overall_current_state}")
+                log.info("OverallCurrentState: %s", overall_current_state)
                 if overall_current_state is NullValue:
                     asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -401,7 +416,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("5b")
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            log.info(f"OverallCurrentState: {overall_current_state}")
+            log.info("OverallCurrentState: %s", overall_current_state)
             if overall_current_state is NullValue:
                 asserts.assert_fail("OverallCurrentState is NullValue.")
 
@@ -464,7 +479,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("6c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_true((main_state == Clusters.ClosureControl.Enums.MainStateEnum.kMoving or main_state == Clusters.ClosureControl.Enums.MainStateEnum.kWaitingForMotion),
                                 "MainState is not in the expected state")
 
@@ -509,7 +524,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("7c")
 
             main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            log.info(f"MainState: {main_state}")
+            log.info("MainState: %s", main_state)
             asserts.assert_true(main_state == Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
                                 "MainState is not in the expected state")
 
@@ -692,7 +707,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
             # Check if the MainState attribute has the expected values
-            log.info(f"Mainstate: {mainstate}")
+            log.info("Mainstate: %s", mainstate)
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
                                  "MainState is not in the expected state")
 

@@ -2,7 +2,7 @@ menu "LED Widget"
 
     choice LED_TYPE
         prompt "LED type"
-        default LED_TYPE_RMT if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32C6
+        default LED_TYPE_RMT if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32H21 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H4 || IDF_TARGET_ESP32S31
         default LED_TYPE_GPIO
         help
             Defines the LED driver type.
@@ -18,7 +18,7 @@ menu "LED Widget"
     config LED_GPIO
         int "LED GPIO number"
         range 0 48
-        default 8 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C6
+        default 8 if IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32H2 || IDF_TARGET_ESP32H21 || IDF_TARGET_ESP32H4 || IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32S31
         default 48 if IDF_TARGET_ESP32S3
         default 2
         help

@@ -42,7 +42,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -55,7 +55,9 @@ D_OK_SINGLE = bytes.fromhex(
     '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
 
 
-class TC_ACL_2_10(MatterBaseTest):
+class TC_ACL_2_10(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
+
     def desc_TC_ACL_2_10(self) -> str:
         return "[TC-ACL-2.10] Persistence"
 
@@ -201,7 +203,7 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH1 writes Extension attribute with D_OK_EMPTY
             extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_EMPTY)
-            log.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
+            log.info("Writing extension with data %s", D_OK_EMPTY.hex())
             extensions_list1 = [extension1]
             result = await self.th1.WriteAttribute(
                 self.dut_node_id,
@@ -216,7 +218,7 @@ class TC_ACL_2_10(MatterBaseTest):
             # TH2 writes Extension attribute with D_OK_SINGLE
             extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
                 data=D_OK_SINGLE)
-            log.info(f"Writing extension with data {D_OK_SINGLE.hex()}")
+            log.info("Writing extension with data %s", D_OK_SINGLE.hex())
             extensions_list2 = [extension2]
 
             result = await self.th2.WriteAttribute(

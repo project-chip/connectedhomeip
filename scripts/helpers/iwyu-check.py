@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 __LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
-proj_root_dir = os.path.join(Path(root_dir).parent.parent)
+proj_root_dir = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 
 def find_program(names):

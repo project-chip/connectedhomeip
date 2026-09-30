@@ -5009,3 +5009,534 @@ TEST_F(TestTLV, CheckGetStringBoundsCheck)
         EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
     }
 }
+
+namespace {
+// Build a 1-byte-length UTF-8 string TLV with the given payload bytes and try to read it.
+// Returns the CHIP_ERROR from Get(CharSpan&). Used by the read-path validation tests.
+CHIP_ERROR ReadUtf8TlvBytes(const uint8_t * payload, uint8_t payloadLen)
+{
+    uint8_t buf[258];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = payloadLen;
+    if (payloadLen > 0)
+    {
+        memcpy(&buf[2], payload, payloadLen);
+    }
+    ContiguousBufferTLVReader reader;
+    reader.Init(buf, static_cast<size_t>(2 + payloadLen));
+    ReturnErrorOnFailure(reader.Next());
+    CharSpan span;
+    return reader.Get(span);
+}
+
+// Read-path enforcement is gated by CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+// (default off / lenient). These macros let the same test bodies pin both modes:
+// strict (flag=1) rejects with the spec error, lenient (flag=0) tolerates and
+// returns CHIP_NO_ERROR. Default CI builds run with the flag off; the strict path
+// is also exercised at runtime in this file via GetLocalizedStringIdentifierForTest,
+// which forces the check on independent of the global flag, and via the direct
+// ValidateCharStringForTest predicate tests.
+#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+#define EXPECTED_INVALID_UTF8_ON_READ CHIP_ERROR_INVALID_UTF8
+#define EXPECTED_TRAILING_NUL_ON_READ CHIP_ERROR_INVALID_TLV_CHAR_STRING
+#else
+#define EXPECTED_INVALID_UTF8_ON_READ CHIP_NO_ERROR
+#define EXPECTED_TRAILING_NUL_ON_READ CHIP_NO_ERROR
+#endif
+} // namespace
+
+// ---------------------------------------------------------------------------
+// Direct tests of the shared conformance predicate (ValidateCharString in
+// TLVReader.cpp, reached through the CHIP_CONFIG_TEST-gated ValidateCharStringForTest
+// shim). The predicate is compiled unconditionally and is the single decision point
+// both read overloads route through, so pinning its verdict here pins the
+// LSID/CharSpan parity property in the default (lenient) build as well.
+// ---------------------------------------------------------------------------
+TEST_F(TestTLV, CheckValidateCharStringRejectsMalformedUtf8)
+{
+    // Each of these is a distinct UTF-8 well-formedness violation per spec §A.11.2.
+    const uint8_t overlongA[]     = { 0xC1, 0x81 };             // overlong encoding of 'A'
+    const uint8_t highSurrogate[] = { 0xED, 0xA0, 0x80 };       // U+D800 surrogate half
+    const uint8_t truncated[]     = { 0xE2, 0x80 };             // truncated 3-byte sequence
+    const uint8_t loneCont[]      = { 0x80 };                   // lone continuation byte
+    const uint8_t aboveMax[]      = { 0xF4, 0x90, 0x80, 0x80 }; // U+110000, beyond U+10FFFF
+
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(overlongA), sizeof(overlongA))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(highSurrogate), sizeof(highSurrogate))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(truncated), sizeof(truncated))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(loneCont), sizeof(loneCont))),
+              CHIP_ERROR_INVALID_UTF8);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(aboveMax), sizeof(aboveMax))),
+              CHIP_ERROR_INVALID_UTF8);
+}
+
+TEST_F(TestTLV, CheckValidateCharStringRejectsNulBytes)
+{
+    // Spec §A.11.2 forbids a terminating NUL marker; the predicate additionally rejects
+    // ANY interior NUL because Matter has no field for which an embedded 0x00 makes sense
+    // and a C++ string handler would mis-terminate. Both branches map to
+    // CHIP_ERROR_INVALID_TLV_CHAR_STRING — distinct from CHIP_ERROR_INVALID_UTF8 because
+    // 0x00 is, taken alone, a valid UTF-8 byte sequence.
+
+    // Trailing NUL.
+    const uint8_t trailingNul[] = { 'a', 'b', 'c', 0x00 };
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(trailingNul), sizeof(trailingNul))),
+              CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+
+    // Interior NUL.
+    const uint8_t interiorNul[] = { 'a', 0x00, 'b' };
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(interiorNul), sizeof(interiorNul))),
+              CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+
+    // Leading NUL.
+    const uint8_t leadingNul[] = { 0x00, 'a', 'b' };
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(leadingNul), sizeof(leadingNul))),
+              CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+
+    // BOM (U+FEFF) is valid UTF-8 and U+0000 is valid UTF-8, so IsValid() accepts this;
+    // the NUL check must still fire. Guards against tying the NUL check to UTF-8 invalidity.
+    const uint8_t bomThenNul[] = { 0xEF, 0xBB, 0xBF, 'h', 0x00 };
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(bomThenNul), sizeof(bomThenNul))),
+              CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+}
+
+TEST_F(TestTLV, CheckValidateCharStringAcceptsConformantStrings)
+{
+    // Conformant strings must pass regardless of build configuration.
+    const uint8_t grinningFace[] = { 0xF0, 0x9F, 0x98, 0x80 };     // U+1F600, valid 4-byte
+    const uint8_t bomPrefixed[]  = { 0xEF, 0xBB, 0xBF, 'h', 'i' }; // leading BOM is fine
+
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(grinningFace), sizeof(grinningFace))),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(reinterpret_cast<const char *>(bomPrefixed), sizeof(bomPrefixed))), CHIP_NO_ERROR);
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan()), CHIP_NO_ERROR); // empty string is conformant
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadRejectsInvalidSequences)
+{
+    // Reader-side validation per spec §A.11.2 must reject every malformed-UTF-8 case when
+    // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ is enabled, and tolerate it (CHIP_NO_ERROR)
+    // when it is not. Each buffer is hand-crafted (the writer can't produce these) to exercise
+    // the path a non-conformant accessory would take through TLVReader::Get(CharSpan&).
+
+    // Overlong encoding of 'A' (U+0041 expressed in 2 bytes).
+    {
+        const uint8_t payload[] = { 0xC1, 0x81 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+    // High-surrogate half U+D800 (forbidden in UTF-8).
+    {
+        const uint8_t payload[] = { 0xED, 0xA0, 0x80 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+    // Truncated 3-byte sequence (start of U+2018, missing third byte).
+    {
+        const uint8_t payload[] = { 0xE2, 0x80 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+    // Lone continuation byte.
+    {
+        const uint8_t payload[] = { 0x80 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+    // Code point above U+10FFFF (F4 90 80 80 = U+110000).
+    {
+        const uint8_t payload[] = { 0xF4, 0x90, 0x80, 0x80 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadAcceptsValidSequences)
+{
+    // Conformant strings must always read cleanly regardless of the flag.
+
+    // Valid 4-byte sequence (U+1F600 GRINNING FACE).
+    {
+        const uint8_t payload[] = { 0xF0, 0x9F, 0x98, 0x80 };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), CHIP_NO_ERROR);
+    }
+    // BOM-prefixed string (BOM is a valid Unicode scalar value, must not be rejected).
+    {
+        const uint8_t payload[] = { 0xEF, 0xBB, 0xBF, 'h', 'i' };
+        EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), CHIP_NO_ERROR);
+    }
+    // Empty string (zero-length, valid).
+    {
+        EXPECT_EQ(ReadUtf8TlvBytes(nullptr, 0), CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnWriteRejectsInvalidSequences)
+{
+    // Pre-existing-behavior guard (NOT exercising this PR's read-path change):
+    // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE has defaulted to true for a long time, so
+    // these assertions held before this PR. They are kept to guard against an accidental
+    // regression of the write-side scan that the read-path unification interacts with.
+    uint8_t out[64];
+
+    // Overlong encoding (U+0000 in 2 bytes).
+    {
+        TLVWriter writer;
+        writer.Init(out);
+        const char payload[] = { static_cast<char>(0xC0), static_cast<char>(0x80) };
+        EXPECT_EQ(writer.PutString(AnonymousTag(), payload, static_cast<uint32_t>(sizeof(payload))), CHIP_ERROR_INVALID_UTF8);
+    }
+    // Truncated 2-byte sequence (start of U+00C0..U+00FF, no continuation byte).
+    {
+        TLVWriter writer;
+        writer.Init(out);
+        const char payload[] = { static_cast<char>(0xC3) };
+        EXPECT_EQ(writer.PutString(AnonymousTag(), payload, static_cast<uint32_t>(sizeof(payload))), CHIP_ERROR_INVALID_UTF8);
+    }
+    // Embedded low-surrogate half U+DC00.
+    {
+        TLVWriter writer;
+        writer.Init(out);
+        const char payload[] = { static_cast<char>(0xED), static_cast<char>(0xB0), static_cast<char>(0x80) };
+        EXPECT_EQ(writer.PutString(AnonymousTag(), payload, static_cast<uint32_t>(sizeof(payload))), CHIP_ERROR_INVALID_UTF8);
+    }
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnWriteAcceptsValidSequences)
+{
+    // Pre-existing-behavior guard (NOT this PR's change): on_write has defaulted to true.
+    uint8_t out[64];
+    TLVWriter writer;
+    writer.Init(out);
+    // U+1F4A9 PILE OF POO.
+    const char payload[] = { static_cast<char>(0xF0), static_cast<char>(0x9F), static_cast<char>(0x92), static_cast<char>(0xA9) };
+    EXPECT_EQ(writer.PutString(AnonymousTag(), payload, static_cast<uint32_t>(sizeof(payload))), CHIP_NO_ERROR);
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadRejectsBomWithEmbeddedNulls)
+{
+    // A UTF-8 BOM is a valid Unicode scalar value (U+FEFF) and U+0000 is also valid
+    // UTF-8, so Utf8::IsValid() will accept this payload. The NUL-byte check must still
+    // fire — exercising it independently of plain UTF-8 invalidity (strict mode -> rejected,
+    // lenient mode -> tolerated).
+    const uint8_t payload[] = { 0xEF, 0xBB, 0xBF, 'h', 0x00, 'i', 0x00 };
+    EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_TRAILING_NUL_ON_READ);
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadAcceptsMaxLength1ByteForm)
+{
+    // Hardening: a fully-populated 1-byte-length UTF-8 string (255 bytes of valid ASCII)
+    // sits at the encoding boundary — one more byte would force the 2-byte-length form.
+    // Confirm validation walks the entire payload (no early-out short-circuit) and that
+    // the boundary itself is accepted.
+    uint8_t payload[255];
+    memset(payload, 'A', sizeof(payload));
+    EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadValidatesBytesAfterInformationSeparator1)
+{
+    // Per Matter spec §A.11.2, all char strings MUST be UTF-8 and may contain an IS1
+    // separator. TLVReader::Get(CharSpan&) truncates the returned view at IS1 for caller
+    // convenience, but conformance is checked across the WHOLE on-wire element (pre- AND
+    // post-IS1). A malformed continuation byte (0x80) placed after IS1 must therefore be
+    // rejected in strict mode; lenient mode tolerates per the escape-hatch contract.
+    const uint8_t payload[] = { 'h', 'i', 0x1F, 0x80 };
+    EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_INVALID_UTF8_ON_READ);
+
+    // Sanity: spec-conformant payload (pre-IS1 ASCII, post-IS1 ASCII hex) still passes.
+    const uint8_t good[] = { 'h', 'i', 0x1F, '1', 'F', 'A' };
+    EXPECT_EQ(ReadUtf8TlvBytes(good, sizeof(good)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadRejectsPlainTrailingNul)
+{
+    // Spec §A.11.2: senders SHALL NOT include a terminating null character. The BOM-with-NUL
+    // test exercises this through a payload that Utf8::IsValid still accepts; this covers the
+    // simple case of a plain ASCII string followed by a single trailing NUL. Strict mode
+    // rejects with CHIP_ERROR_INVALID_TLV_CHAR_STRING; lenient mode tolerates.
+    const uint8_t payload[] = { 'a', 'b', 'c', 0x00 };
+    EXPECT_EQ(ReadUtf8TlvBytes(payload, sizeof(payload)), EXPECTED_TRAILING_NUL_ON_READ);
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnReadValidates2ByteLengthForm)
+{
+    // The other read tests use UTF8String_1ByteLength. Validation lives in
+    // TLVReader::Get(CharSpan&) and is independent of the length-prefix encoding, but a typo
+    // in the length-decoding path (e.g. validating only when the cached mElemLenOrVal fits in
+    // a byte) would let a malformed string slip through the 2-byte-length form. Hand-build a
+    // 2-byte-length UTF-8 string carrying an overlong 'A' (0xC1 0x81) and confirm the same
+    // expected result fires.
+    uint8_t buf[5];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_2ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x02; // length LSB
+    buf[2] = 0x00; // length MSB
+    buf[3] = 0xC1;
+    buf[4] = 0x81;
+    ContiguousBufferTLVReader reader;
+    reader.Init(buf, sizeof(buf));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    CharSpan span;
+    EXPECT_EQ(reader.Get(span), EXPECTED_INVALID_UTF8_ON_READ);
+}
+
+TEST_F(TestTLV, CheckTLVGetLocalizedStringIdentifierRejectsInvalidUtf8Prefix)
+{
+    // Pin parity between Get(CharSpan&) and Get(Optional<LocalizedStringIdentifier>&):
+    // both overloads must treat a non-UTF-8 byte sequence in the user-visible (pre-IS1)
+    // portion of the string identically. Payload:
+    //   0xC3 IS1 0x37  (lone continuation byte, then IS1, then ASCII '7')
+    // Without LSID-side validation this would silently parse a valid LSID 0x7 from the
+    // suffix while accepting malformed leading bytes.
+    uint8_t buf[5];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x03; // length
+    buf[2] = 0xC3;
+    buf[3] = static_cast<uint8_t>(0x1F); // IS1 separator
+    buf[4] = 0x37;                       // ASCII '7'
+    ContiguousBufferTLVReader reader;
+    reader.Init(buf, sizeof(buf));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    Optional<LocalizedStringIdentifier> lsid;
+    EXPECT_EQ(reader.Get(lsid), EXPECTED_INVALID_UTF8_ON_READ);
+
+    // Structural parity: reading the same payload through Get(CharSpan&) must yield the
+    // identical verdict to Get(LSID).
+    ContiguousBufferTLVReader charReader;
+    charReader.Init(buf, sizeof(buf));
+    EXPECT_EQ(charReader.Next(), CHIP_NO_ERROR);
+    CharSpan charPrefix;
+    EXPECT_EQ(reader.Get(lsid), charReader.Get(charPrefix));
+}
+
+TEST_F(TestTLV, CheckTLVGetLocalizedStringIdentifierRejectsTrailingNulPrefix)
+{
+    // Parity, NUL branch: 0x00 is itself valid UTF-8, so the LSID overload would accept
+    // a "a\0" prefix unless it applies the same trailing-NUL rule as Get(CharSpan&).
+    // Payload: 'a' 0x00 IS1 0x37.
+    uint8_t buf[6];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x04; // length
+    buf[2] = 'a';
+    buf[3] = 0x00;
+    buf[4] = static_cast<uint8_t>(0x1F); // IS1 separator
+    buf[5] = 0x37;                       // ASCII '7'
+    ContiguousBufferTLVReader reader;
+    reader.Init(buf, sizeof(buf));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    Optional<LocalizedStringIdentifier> lsid;
+    EXPECT_EQ(reader.Get(lsid), EXPECTED_TRAILING_NUL_ON_READ);
+
+    // Same payload through Get(CharSpan&) yields the identical result.
+    ContiguousBufferTLVReader reader2;
+    reader2.Init(buf, sizeof(buf));
+    EXPECT_EQ(reader2.Next(), CHIP_NO_ERROR);
+    CharSpan span;
+    EXPECT_EQ(reader2.Get(span), EXPECTED_TRAILING_NUL_ON_READ);
+
+    // Flag-independent parity proof (holds in the default lenient build): the pre-IS1
+    // prefix "a\0" is rejected by the single shared conformance predicate that BOTH
+    // overloads call.
+    const char prefix[] = { 'a', 0x00 };
+    EXPECT_EQ(ValidateCharStringForTest(CharSpan(prefix, sizeof(prefix))), CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+}
+
+TEST_F(TestTLV, CheckTLVGetLocalizedStringIdentifierParityThroughPublicApi)
+{
+    // Pin Get(CharSpan&) <-> Get(LSID) parity in a way that runs in the DEFAULT (lenient)
+    // build, where both overloads return CHIP_NO_ERROR and so cannot be told apart by
+    // return code. The property is structural: both judge the on-wire bytes with the
+    // same shared predicate. Read the prefix through Get(CharSpan&) and feed that exact
+    // span to ValidateCharStringForTest (the predicate the LSID overload applies),
+    // asserting the non-conformant verdict.
+    uint8_t buf[6];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x04; // length
+    buf[2] = 'a';
+    buf[3] = 0x00;
+    buf[4] = static_cast<uint8_t>(0x1F); // IS1 separator
+    buf[5] = 0x37;                       // ASCII '7'
+
+    ContiguousBufferTLVReader reader;
+    reader.Init(buf, sizeof(buf));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    CharSpan publicPrefix;
+    EXPECT_EQ(reader.Get(publicPrefix), EXPECTED_TRAILING_NUL_ON_READ);
+
+    // Get(CharSpan&) truncates the visible span at IS1 regardless of the flag, so the
+    // span the public API exposes is exactly the pre-IS1 prefix "a\0".
+    EXPECT_EQ(publicPrefix.size(), 2u);
+
+    // The shared predicate's verdict on that publicly-derived span is the same value
+    // that gates the LSID overload — this is the parity invariant and it holds even in
+    // the default lenient build.
+    EXPECT_EQ(ValidateCharStringForTest(publicPrefix), CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+
+    // Same parity for the malformed-UTF-8 branch.
+    uint8_t bad[5];
+    bad[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    bad[1] = 0x03;                       // length
+    bad[2] = 0xC3;                       // lone lead byte (no continuation)
+    bad[3] = static_cast<uint8_t>(0x1F); // IS1 separator
+    bad[4] = 0x37;                       // ASCII '7'
+    ContiguousBufferTLVReader badReader;
+    badReader.Init(bad, sizeof(bad));
+    EXPECT_EQ(badReader.Next(), CHIP_NO_ERROR);
+    CharSpan badPrefix;
+    EXPECT_EQ(badReader.Get(badPrefix), EXPECTED_INVALID_UTF8_ON_READ);
+    EXPECT_EQ(badPrefix.size(), 1u);
+    EXPECT_EQ(ValidateCharStringForTest(badPrefix), CHIP_ERROR_INVALID_UTF8);
+}
+
+// --------------------------------------------------------------------------------------------
+// Runtime guard that the Get(Optional<LocalizedStringIdentifier>&) overload actually invokes
+// the shared conformance predicate. In the default (flag-off) build the overload returns
+// CHIP_NO_ERROR for every payload, so return-code-based assertions cannot distinguish
+// "predicate ran and accepted" from "predicate never ran". GetLocalizedStringIdentifierForTest
+// drives the overload's shared implementation with the check forced on independent of
+// CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ, so the assertions below exercise the strict
+// path in the default CI build.
+// --------------------------------------------------------------------------------------------
+
+TEST_F(TestTLV, CheckLsidOverloadStrictPathRejectsInvalidUtf8Prefix)
+{
+    // Payload: 0xC3 IS1 '7'  — lone UTF-8 lead byte in the pre-IS1 prefix, valid LSID suffix.
+    uint8_t buf[5];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x03; // length
+    buf[2] = 0xC3;
+    buf[3] = static_cast<uint8_t>(0x1F); // IS1 separator
+    buf[4] = 0x37;                       // ASCII '7'
+
+    // Strict path (forced on, flag-independent): the LSID overload itself must reject the bad
+    // prefix. This fails on upstream where the overload never validates the prefix.
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Optional<LocalizedStringIdentifier> lsid;
+        EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/true), CHIP_ERROR_INVALID_UTF8);
+        EXPECT_FALSE(lsid.HasValue());
+    }
+
+    // Lenient path (forced off): the overload tolerates the bad prefix and still decodes the
+    // LSID 0x7 from the suffix — pins the historical default-build behavior.
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Optional<LocalizedStringIdentifier> lsid;
+        EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/false), CHIP_NO_ERROR);
+        EXPECT_EQ(lsid, Optional<LocalizedStringIdentifier>(0x7));
+    }
+}
+
+TEST_F(TestTLV, CheckLsidOverloadStrictPathRejectsTrailingNulPrefix)
+{
+    // Payload: 'a' 0x00 IS1 '7'  — pre-IS1 prefix "a\0" ends in a forbidden terminating NUL.
+    // 0x00 is valid UTF-8, so this is the branch that would silently diverge from Get(CharSpan&)
+    // if the LSID overload did not apply the trailing-NUL rule. The strict path must reject it.
+    uint8_t buf[6];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x04; // length
+    buf[2] = 'a';
+    buf[3] = 0x00;
+    buf[4] = static_cast<uint8_t>(0x1F); // IS1 separator
+    buf[5] = 0x37;                       // ASCII '7'
+
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Optional<LocalizedStringIdentifier> lsid;
+        EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/true),
+                  CHIP_ERROR_INVALID_TLV_CHAR_STRING);
+        EXPECT_FALSE(lsid.HasValue());
+    }
+
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Optional<LocalizedStringIdentifier> lsid;
+        EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/false), CHIP_NO_ERROR);
+        EXPECT_EQ(lsid, Optional<LocalizedStringIdentifier>(0x7));
+    }
+}
+
+TEST_F(TestTLV, CheckLsidOverloadStrictPathAcceptsConformantPrefix)
+{
+    // Payload: "Thé" IS1 "1FA"  — well-formed multibyte UTF-8 prefix, valid LSID suffix.
+    // The strict path must ACCEPT it and decode the identifier, proving the forced-on check
+    // is not over-eager (i.e. it does not reject conformant strings).
+    uint8_t payload[10];
+    payload[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    payload[1] = 0x08; // length: 'T' 'h' 0xC3 0xA9 IS1 '1' 'F' 'A'
+    payload[2] = 'T';
+    payload[3] = 'h';
+    payload[4] = 0xC3; // é
+    payload[5] = 0xA9;
+    payload[6] = static_cast<uint8_t>(0x1F); // IS1 separator
+    payload[7] = '1';
+    payload[8] = 'F';
+    payload[9] = 'A';
+
+    ContiguousBufferTLVReader reader;
+    reader.Init(payload, sizeof(payload));
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+    Optional<LocalizedStringIdentifier> lsid;
+    EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/true), CHIP_NO_ERROR);
+    EXPECT_EQ(lsid, Optional<LocalizedStringIdentifier>(0x1FA));
+}
+
+TEST_F(TestTLV, CheckLsidOverloadStrictPathRejectsInvalidUtf8AfterIs1)
+{
+    // The LSID overload validates the WHOLE on-wire char string, not just the pre-IS1
+    // prefix. Payload: 'h' 'i' IS1 0x80 — pre-IS1 conformant, post-IS1 lone continuation
+    // byte. Strict path must reject with CHIP_ERROR_INVALID_UTF8 (matching the CharSpan
+    // overload, which also validates the full element). Lenient path tolerates.
+    uint8_t buf[6];
+    buf[0] = static_cast<uint8_t>(TLVElementType::UTF8String_1ByteLength) | static_cast<uint8_t>(TLVTagControl::Anonymous);
+    buf[1] = 0x04; // length: 'h' 'i' IS1 0x80
+    buf[2] = 'h';
+    buf[3] = 'i';
+    buf[4] = static_cast<uint8_t>(0x1F);
+    buf[5] = 0x80; // lone continuation byte after IS1
+
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Optional<LocalizedStringIdentifier> lsid;
+        EXPECT_EQ(GetLocalizedStringIdentifierForTest(reader, lsid, /*validateCharString=*/true), CHIP_ERROR_INVALID_UTF8);
+        EXPECT_FALSE(lsid.HasValue());
+    }
+
+    // Parity through Get(CharSpan&): with strict mode on, the CharSpan overload also
+    // rejects, even though the returned view would have been truncated to "hi" — proving
+    // validation operates on the WHOLE element.
+    {
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf, sizeof(buf));
+        EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+        CharSpan span;
+        EXPECT_EQ(reader.Get(span), EXPECTED_INVALID_UTF8_ON_READ);
+    }
+}
+
+TEST_F(TestTLV, CheckUtf8ValidationOnWriteEnforcedAtSingleEntryPoint)
+{
+    // Pre-existing-behavior guard (NOT this PR's read-path change): PutString validates the
+    // byte sequence against spec §A.11.2 before emitting the element under
+    // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE (defaults true, unchanged by this PR).
+    // Pin that a single bad call surfaces CHIP_ERROR_INVALID_UTF8 through both the (buf, len)
+    // and CharSpan overloads, so a refactor can't silently drop the write-side scan.
+    uint8_t out[64];
+    TLVWriter writer;
+    writer.Init(out);
+    const char invalid[] = { static_cast<char>(0xC0), static_cast<char>(0x80) };
+    EXPECT_EQ(writer.PutString(AnonymousTag(), invalid, static_cast<uint32_t>(sizeof(invalid))), CHIP_ERROR_INVALID_UTF8);
+
+    // Same payload via the CharSpan overload — same enforcement.
+    TLVWriter writer2;
+    writer2.Init(out);
+    EXPECT_EQ(writer2.PutString(AnonymousTag(), CharSpan(invalid, sizeof(invalid))), CHIP_ERROR_INVALID_UTF8);
+}

@@ -41,13 +41,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 MAX_SPIN_SPEEDS = 16
 
 
-class TC_WASHERCTRL_2_1(MatterBaseTest):
+class TC_WASHERCTRL_2_1(MatterTestCommissionedDevice):
 
     def desc_TC_WASHERCTRL_2_1(self) -> str:
         """Returns a description of this test"""

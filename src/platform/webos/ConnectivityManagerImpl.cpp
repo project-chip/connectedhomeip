@@ -1283,7 +1283,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     size_t bufferLen;
     value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
     GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
@@ -1376,7 +1377,8 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     size_t bufferLen;
     value = g_variant_lookup_value(reply_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
+    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied SSI too short"));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
 
     /*

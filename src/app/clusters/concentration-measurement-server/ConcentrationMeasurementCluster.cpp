@@ -27,6 +27,7 @@
 #include <clusters/Pm1ConcentrationMeasurement/Metadata.h>
 #include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
 #include <clusters/RadonConcentrationMeasurement/Metadata.h>
+#include <clusters/SmokeConcentrationMeasurement/Metadata.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
@@ -46,6 +47,8 @@ static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevis
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
               chip::app::Clusters::RadonConcentrationMeasurement::kRevision);
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::SmokeConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
               chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::kRevision);
 
 using namespace chip::app::Clusters::ConcentrationMeasurement::Attributes;
@@ -57,8 +60,10 @@ bool IsInRange(const chip::app::DataModel::Nullable<float> & value, const chip::
                const chip::app::DataModel::Nullable<float> & maxV)
 {
     VerifyOrReturnValue(!value.IsNull(), true);
-    VerifyOrReturnValue(!minV.IsNull() && value.Value() > minV.Value(), false);
-    VerifyOrReturnValue(!maxV.IsNull() && value.Value() < maxV.Value(), false);
+    // A null bound means "unbounded" on that side; only reject when a non-null bound is exceeded.
+    // Bounds are inclusive per the spec's "MinMeasuredValue to MaxMeasuredValue" range constraint.
+    VerifyOrReturnValue(minV.IsNull() || value.Value() >= minV.Value(), false);
+    VerifyOrReturnValue(maxV.IsNull() || value.Value() <= maxV.Value(), false);
     return true;
 }
 

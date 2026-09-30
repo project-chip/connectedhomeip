@@ -17,9 +17,10 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/StringBuilder.h>
 
 extern "C" {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <bflb_ota.h>
 #include <bl_sys.h>
 #else
@@ -36,6 +37,42 @@ extern "C" void hal_reboot(void);
 using namespace chip::System;
 
 namespace chip {
+
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+#define OTA_IMAGE_TYPE_XZ "XZ"
+#define OTA_IMAGE_TYPE_RAW "RAW"
+
+static bool check_ota_header(ota_header_s_t * ota_header_s)
+{
+    StringBuilder<sizeof(ota_header_s->header) + 1> header(ota_header_s->header, sizeof(ota_header_s->header));
+    ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA header: %s", header.c_str());
+
+    if (0 == memcmp(OTA_IMAGE_TYPE_XZ, ota_header_s->type, strlen(OTA_IMAGE_TYPE_XZ)))
+    {
+        ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA image type: %s", OTA_IMAGE_TYPE_XZ);
+    }
+    else if (0 == memcmp(OTA_IMAGE_TYPE_RAW, ota_header_s->type, strlen(OTA_IMAGE_TYPE_RAW)))
+    {
+        ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA image type: %s", OTA_IMAGE_TYPE_RAW);
+    }
+    else
+    {
+        return false;
+    }
+
+    ChipLogProgress(SoftwareUpdate, "Bouffalo Lab OTA image file size: %ld", ota_header_s->image_len);
+
+    StringBuilder<sizeof(ota_header_s->ver_hardware) + 1> hardwareVersion(ota_header_s->ver_hardware,
+                                                                          sizeof(ota_header_s->ver_hardware));
+    ChipLogProgress(SoftwareUpdate, "OTA image hardware version: %s", hardwareVersion.c_str());
+
+    StringBuilder<sizeof(ota_header_s->ver_software) + 1> softwareVersion(ota_header_s->ver_software,
+                                                                          sizeof(ota_header_s->ver_software));
+    ChipLogProgress(SoftwareUpdate, "OTA image software version: %s", softwareVersion.c_str());
+
+    return true;
+}
+#endif
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
@@ -130,6 +167,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     imageProcessor->mParams.totalFileBytes  = 0;
     imageProcessor->mHeaderParser.Init();
 
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+    memset(&(imageProcessor->mOtaHdr), 0, sizeof(ota_header_s_t));
+    imageProcessor->mImageTotalSize = 0;
+#endif
+
     TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -142,7 +184,14 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+    if (bflb_ota_update(imageProcessor->mImageTotalSize, imageProcessor->mParams.downloadedBytes - sizeof(ota_header_t),
+                        imageProcessor->mOtaHdr.sha256, sizeof(imageProcessor->mOtaHdr.sha256)) < 0)
+    {
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        return;
+    }
+
     if (bflb_ota_check() < 0)
 #else
     if (hosal_ota_check() < 0)
@@ -168,8 +217,12 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
-    bflb_ota_apply();
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+    if (bflb_ota_apply() < 0)
+    {
+        ChipLogError(SoftwareUpdate, "OTA image apply error");
+        return;
+    }
 #else
     hosal_ota_apply(0);
 #endif
@@ -177,7 +230,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         System::Clock::Seconds32(OTA_AUTO_REBOOT_DELAY),
         [](Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
             bl_sys_reset_por();
 #else
             hal_reboot();
@@ -194,7 +247,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     bflb_ota_abort();
 #else
     hosal_ota_abort();
@@ -207,6 +260,10 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     OTAImageHeader header;
     CHIP_ERROR error;
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+    uint32_t iOffset;
+    uint32_t iSize;
+#endif
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -241,30 +298,75 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mParams.totalFileBytes = header.mPayloadSize;
         imageProcessor->mHeaderParser.Clear();
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
-        if (bflb_ota_start(header.mPayloadSize) < 0)
-#else
+#if !CHIP_DEVICE_LAYER_TARGET_BFLB
         if (hosal_ota_start(header.mPayloadSize) < 0)
-#endif
         {
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_OPEN_FAILED);
             return;
         }
+#endif
     }
 
     if (imageProcessor->mParams.totalFileBytes)
     {
-#if CHIP_DEVICE_LAYER_TARGET_BL616
-        if (bflb_ota_update(imageProcessor->mParams.totalFileBytes, imageProcessor->mParams.downloadedBytes,
-                            (uint8_t *) block.data(), block.size()) < 0)
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
+        if (0 == imageProcessor->mImageTotalSize)
+        {
+            iSize = sizeof(ota_header_s_t) - imageProcessor->mParams.downloadedBytes;
+            if (block.size() < iSize)
+            {
+                iSize = block.size();
+            }
+
+            memcpy(reinterpret_cast<uint8_t *>(&imageProcessor->mOtaHdr) + imageProcessor->mParams.downloadedBytes, block.data(),
+                   iSize);
+
+            if (imageProcessor->mParams.downloadedBytes + iSize >= sizeof(ota_header_s_t))
+            {
+                if (!check_ota_header(&imageProcessor->mOtaHdr))
+                {
+                    imageProcessor->mDownloader->EndDownload(CHIP_ERROR_DECODE_FAILED);
+                    return;
+                }
+
+                if (bflb_ota_start(imageProcessor->mOtaHdr.image_len + sizeof(imageProcessor->mOtaHdr.sha256)) < 0)
+                {
+                    imageProcessor->mDownloader->EndDownload(CHIP_ERROR_OPEN_FAILED);
+                    return;
+                }
+
+                imageProcessor->mImageTotalSize = imageProcessor->mOtaHdr.image_len + sizeof(imageProcessor->mOtaHdr.sha256);
+            }
+        }
+
+        if (imageProcessor->mImageTotalSize && imageProcessor->mParams.downloadedBytes + block.size() > sizeof(ota_header_t))
+        {
+            if (imageProcessor->mParams.downloadedBytes >= sizeof(ota_header_t))
+            {
+                iOffset = imageProcessor->mParams.downloadedBytes - sizeof(ota_header_t);
+                iSize   = 0;
+            }
+            else
+            {
+                iOffset = 0;
+                iSize   = sizeof(ota_header_t) - imageProcessor->mParams.downloadedBytes;
+            }
+
+            if (bflb_ota_update(imageProcessor->mImageTotalSize, iOffset, const_cast<uint8_t *>(block.data() + iSize),
+                                block.size() - iSize) < 0)
+            {
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                return;
+            }
+        }
 #else
         if (hosal_ota_update(imageProcessor->mParams.totalFileBytes, imageProcessor->mParams.downloadedBytes,
                              (uint8_t *) block.data(), block.size()) < 0)
-#endif
         {
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
+#endif
         imageProcessor->mParams.downloadedBytes += block.size();
     }
 

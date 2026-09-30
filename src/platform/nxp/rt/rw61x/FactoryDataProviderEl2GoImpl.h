@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2024 NXP
+ *    Copyright 2024, 2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,13 +44,16 @@ public:
     ~FactoryDataProviderImpl(){};
 
     CHIP_ERROR Init(void) override;
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
+    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
+    CHIP_ERROR FactoryReset() override;
 
 private:
+    // Factory data validation constants
+    static constexpr uint32_t kFactoryDataHashId = 0xCE47BA5E;
+    static constexpr size_t kHashLength          = 4;
     struct Header
     {
         uint32_t hashId;
@@ -59,6 +62,10 @@ private:
     };
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
     Header mHeader;
+
+    bool mKeyIdsCached       = false;
+    uint32_t mEl2GoDacKeyId  = 0;
+    uint32_t mEl2GoDacCertId = 0;
 
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };

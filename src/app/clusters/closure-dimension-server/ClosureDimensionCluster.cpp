@@ -112,10 +112,27 @@ CHIP_ERROR ClosureDimensionCluster::AcceptedCommands(const ConcreteClusterPath &
         Commands::Step::kMetadataEntry,
     };
 
+    static constexpr DataModel::AcceptedCommandEntry kGroupedSetTargetCommand[] = {
+        Commands::GroupedSetTarget::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kGroupedStepCommand[] = {
+        Commands::GroupedStep::kMetadataEntry,
+    };
+
     ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
     if (mFeatureMap.Has(Feature::kPositioning))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kStepCommand));
+    }
+
+    if (!mFeatureMap.Has(Feature::kAccess))
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGroupedSetTargetCommand));
+        if (mFeatureMap.Has(Feature::kPositioning))
+        {
+            ReturnErrorOnFailure(builder.ReferenceExisting(kGroupedStepCommand));
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -172,6 +189,16 @@ std::optional<DataModel::ActionReturnStatus> ClosureDimensionCluster::InvokeComm
     }
     case Commands::Step::Id: {
         Commands::Step::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed);
+    }
+    case Commands::GroupedSetTarget::Id: {
+        Commands::GroupedSetTarget::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleSetTargetCommand(commandData.position, commandData.latch, commandData.speed);
+    }
+    case Commands::GroupedStep::Id: {
+        Commands::GroupedStep::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed);
     }
