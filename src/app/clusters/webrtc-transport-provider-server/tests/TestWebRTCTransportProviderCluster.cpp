@@ -351,15 +351,8 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigRejectsTooManyReceive
     request.SFrameConfig.SetValue(sframeConfig);
 
     auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
-    ASSERT_TRUE(result.status.has_value());
     
-    // Keep clang happy, even though if we're here result.status must have a value!
-    if (result.status.has_value())
-    {
-        EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
-    }
-    
-    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    ASSERT_TRUE(result.status.has_value() && (result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::InvalidCommand));
 
     // The delegate must not have received a partial configuration.
     EXPECT_FALSE(mockDelegate.mCapturedSFrameConfig.HasValue());
