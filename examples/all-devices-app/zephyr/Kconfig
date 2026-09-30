@@ -1,3 +1,4 @@
+#
 # Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
+mainmenu "Matter All-Devices Zephyr"
 
-source_set("breadcrumb") {
-  sources = [ "SimpleBreadCrumbTracker.h" ]
+rsource "Kconfig.defaults"
+rsource "Kconfig.devices"
 
-  public_deps = [ "${chip_root}/src/app/clusters/general-commissioning-server" ]
-}
+if NET_L2_OPENTHREAD
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_FTD
+endchoice
+endif # NET_L2_OPENTHREAD
+
+source "Kconfig.zephyr"

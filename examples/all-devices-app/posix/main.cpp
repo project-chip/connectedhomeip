@@ -130,6 +130,9 @@ public:
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
+        Clusters::Binding::Table & bindingTable;
+        Clusters::Binding::Manager & bindingManager;
+        Clusters::IdentifyDelegate & identifyDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
@@ -197,6 +200,21 @@ public:
         DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
         endpointIdAllocator.ForceNext(kRootEndpointId);
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+
+        PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
+            .groupDataProvider        = mContext.groupDataProvider,
+            .fabricTable              = mContext.fabricTable,
+            .timerDelegate            = mContext.timerDelegate,
+            .storageDelegate          = mContext.storageDelegate,
+            .diagnosticDataProvider   = mContext.diagnosticDataProvider,
+            .platformManager          = mContext.platformManager,
+            .failSafeContext          = mContext.failSafeContext,
+            .breadcrumbTracker        = mRootNode.RootDevice().GeneralCommissioning(),
+            .bindingTable             = mContext.bindingTable,
+            .bindingManager           = mContext.bindingManager,
+            .testEventTriggerDelegate = *mContext.testEventTriggerDelegate,
+            .identifyDelegate         = mContext.identifyDelegate,
+        });
         PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
@@ -270,20 +288,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(sTestEventTriggerDelegate.Init(ByteSpan(AppOptions::GetConfig().testEventTriggerEnableKey)));
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
-        .groupDataProvider        = gGroupDataProvider,                     //
-        .fabricTable              = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate            = gTimerDelegate,                         //
-        .storageDelegate          = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager          = DeviceLayer::PlatformMgr(),
-        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable             = Binding::Table::GetInstance(),
-        .bindingManager           = Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
-        .identifyDelegate         = gIdentifyDelegate,
-    });
-
     RegisterDeviceFactoryOverrides(PosixDeviceFactory::GetInstance(), gTimerDelegate, Server::GetInstance().GetFabricTable(),
                                    initParams.persistentStorageDelegate, gAudioManager);
 
@@ -337,6 +341,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
+            .bindingTable               = Binding::Table::GetInstance(),                           //
+            .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
