@@ -762,6 +762,15 @@ private:
         entry.pendingRemoval    = true;
     }
 
+    // Adding an entry that is being removed cancels the removal: the entry is added again.
+    template <typename T>
+    static void CancelRemoval(T & entry)
+    {
+        entry.pendingRemoval          = false;
+        entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+        entry.statusEntry.failureCode = 0;
+    }
+
     // True if `entry` is DeletePending or has recorded removal intent.
     template <typename T>
     static bool HasRemovalIntent(const T & entry)
@@ -777,10 +786,18 @@ private:
     void RecordTombstoneIfRemoving(const datastore::EndpointGroupIDEntryStruct & entry);
     void RecordTombstoneIfRemoving(const datastore::NodeKeySetEntryStruct & entry);
 
+    // True if `tombstone` is for `value` on `nodeId`, as its value or as the value it superseded.
+    static bool AclTombstoneMatches(const AclTombstone & tombstone, NodeId nodeId,
+                                    const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type & value);
+
+    // True if `entry` was in the active refresh's ACL or binding write.
+    bool InRefreshWrite(const datastore::ACLEntryStruct & entry) const;
+    bool InRefreshWrite(const datastore::EndpointBindingEntryStruct & entry) const;
+
     // Records a failed refresh write on `nodeId`'s entries that were in the write and not Committed, and
     // on its entries being removed, which keep their removal intent.
-    void MarkRefreshBindingsSyncFailed(NodeId nodeId, CHIP_ERROR err);
-    void MarkRefreshAclsSyncFailed(NodeId nodeId, CHIP_ERROR err);
+    template <typename Entry>
+    void MarkRefreshWriteFailed(std::vector<Entry> & entries, NodeId nodeId, CHIP_ERROR err);
 
     /**
      * The datastore runs at most one single-entry sync per node at a time. Single-entry ACL and binding syncs read the
@@ -823,6 +840,8 @@ private:
     Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type
     EncodeAclEntryForSync(const datastore::ACLEntryStruct & entry) const;
 
+    // Queues a sync of `groupKeySetId`'s entry on each of `nodeIds`, and returns the first error.
+    CHIP_ERROR QueueNodeKeySetSyncs(const std::vector<NodeId> & nodeIds, uint16_t groupKeySetId);
     // Nodes with an endpoint in `groupId`.
     std::unordered_set<NodeId> NodesInGroup(GroupId groupId) const;
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
