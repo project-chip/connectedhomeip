@@ -101,6 +101,15 @@ done
 # Translate other options
 [[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && target_defines+=("CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1")
 [[ $ENABLE_BITCODE == YES ]] && target_cflags+=("-flto")
+# Typed allocator flags as emitted by Clang.xcspec (C: all languages, C++: C++ and ObjC++)
+case "$CLANG_ENABLE_C_TYPED_ALLOCATOR_SUPPORT" in
+    YES) target_cflags+=("-ftyped-memory-operations") ;;
+    NO) target_cflags+=("-fno-typed-memory-operations") ;;
+esac
+case "$CLANG_ENABLE_CPLUSPLUS_TYPED_ALLOCATOR_SUPPORT" in
+    YES) target_cflags_cc+=("-ftyped-cxx-new-delete" "-ftyped-cxx-delete") ;;
+    NO) target_cflags_cc+=("-fno-typed-cxx-new-delete" "-fno-typed-cxx-delete") ;;
+esac
 
 declare -a args=(
     'import("//config/darwin/args.gni")'
