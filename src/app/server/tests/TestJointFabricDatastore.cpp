@@ -297,6 +297,17 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    // The recorded values of the last single-entry ACL sync, or an empty value if none was recorded. Tests check
+    // has_value() first where it matters; reading through value_or keeps every access checked.
+    datastore::AccessControlEntryStruct LastAclSync() const
+    {
+        return lastAclSyncOwned.value_or(datastore::AccessControlEntryStruct{});
+    }
+    datastore::AccessControlEntryStruct LastAclSuperseded() const
+    {
+        return lastAclSuperseded.value_or(datastore::AccessControlEntryStruct{});
+    }
+
     void ResetCapturedSyncs()
     {
         hasLastEndpointGroupSync = false;
@@ -2560,8 +2571,8 @@ TEST(JointFabricDatastoreTest, AclRemovalSendsFullEntryValue)
     ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
 
     ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kOperate);
-    EXPECT_TRUE(delegate.lastAclSyncOwned->subjects == std::vector<uint64_t>{ 0x1111 });
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kOperate);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ 0x1111 });
     EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
     EXPECT_FALSE(delegate.lastAclSuperseded.has_value());
 }
@@ -2579,7 +2590,7 @@ TEST(JointFabricDatastoreTest, AclAddSendsNoSupersededValue)
     ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
 
     ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kView);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kView);
     EXPECT_EQ(delegate.lastAclSyncState, State::kPending);
     EXPECT_FALSE(delegate.lastAclSuperseded.has_value());
 }
@@ -2611,10 +2622,10 @@ TEST(JointFabricDatastoreTest, AclUpdateSendsSupersededValue)
     ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
 
     ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kManage);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
-    EXPECT_TRUE(delegate.lastAclSuperseded->subjects == std::vector<uint64_t>{ 10 });
+    EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kView);
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ 10 });
 }
 
 // The first of two permission changes fails: the node still holds the original value, so the second
@@ -2633,9 +2644,9 @@ TEST(JointFabricDatastoreTest, BackToBackUpdatesKeepOldestSupersededValue)
     delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout));
 
     ASSERT_EQ(delegate.deferred.size(), 1u);
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kAdminister);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kAdminister);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kView);
 }
 
 // The first of two permission changes succeeds: the node now holds the intermediate value, so the second
@@ -2653,9 +2664,9 @@ TEST(JointFabricDatastoreTest, BackToBackUpdatesReplaceTheValueTheNodeHolds)
     delegate.RunDeferred();
 
     ASSERT_EQ(delegate.deferred.size(), 1u);
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kAdminister);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kAdminister);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kManage);
+    EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kManage);
 
     delegate.RunDeferred();
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
@@ -2692,9 +2703,9 @@ TEST(JointFabricDatastoreTest, RefreshAclWriteDoesNotCommitUpdateMadeDuringIt)
     delegate.RunDeferred();
 
     ASSERT_TRUE(delegate.hasLastAclSync);
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kManage);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kView);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
     EXPECT_EQ(FindAcl(store, 123, 7)->ACLEntry.privilege, Privilege::kManage);
 }
@@ -2731,9 +2742,9 @@ TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValu
     ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
 
     EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kManage);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_EQ(delegate.lastAclSuperseded->privilege, Privilege::kView);
+    EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kView);
     EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
 }
 
@@ -2803,10 +2814,10 @@ TEST(JointFabricDatastoreTest, UpdateGroupRewritesCatSubjectToNewVersion)
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
 
     ASSERT_TRUE(delegate.lastAclSyncOwned.has_value());
-    EXPECT_TRUE(delegate.lastAclSyncOwned->subjects == std::vector<uint64_t>{ newSubject });
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ newSubject });
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_TRUE(delegate.lastAclSuperseded->subjects == std::vector<uint64_t>{ oldSubject });
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kOperate); // version-only bump
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ oldSubject });
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kOperate); // version-only bump
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
@@ -2837,7 +2848,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupRewritesOnCatIdentifierChange)
 
     EXPECT_TRUE(FindAcl(store, 123, 5)->ACLEntry.subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x3456'0001) });
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_TRUE(delegate.lastAclSuperseded->subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0001) });
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0001) });
 }
 
 // Matching by CAT identifier also catches an entry left at an older version.
@@ -2887,15 +2898,15 @@ TEST(JointFabricDatastoreTest, UpdateGroupSplitsMixedEntryOnPermissionChange)
 
     // The replace of the original entry is issued first.
     ASSERT_EQ(delegate.deferred.size(), 1u);
-    EXPECT_TRUE(delegate.lastAclSyncOwned->subjects == std::vector<uint64_t>{ 0xDEADBEEF });
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kOperate);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ 0xDEADBEEF });
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kOperate);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
-    EXPECT_TRUE(delegate.lastAclSuperseded->subjects == (std::vector<uint64_t>{ catSubject, 0xDEADBEEF }));
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == (std::vector<uint64_t>{ catSubject, 0xDEADBEEF }));
 
     delegate.RunDeferred();
     ASSERT_EQ(delegate.deferred.size(), 1u);
-    EXPECT_TRUE(delegate.lastAclSyncOwned->subjects == std::vector<uint64_t>{ catSubject });
-    EXPECT_EQ(delegate.lastAclSyncOwned->privilege, Privilege::kManage);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ catSubject });
+    EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kManage);
     EXPECT_FALSE(delegate.lastAclSuperseded.has_value());
     delegate.RunDeferred();
 
