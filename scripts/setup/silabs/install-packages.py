@@ -15,7 +15,6 @@ import shutil
 import stat
 import subprocess
 import sys
-import urllib.request
 from platform import machine
 from zipfile import ZipFile
 
@@ -33,17 +32,15 @@ def get_platform_vars():
     platform = sys.platform
     if platform == "darwin":
         platform_name = "mac"
-        slt_os = "darwin"
-        slt_arch = "arm64" if machine() == "arm64" else "amd64"
+        slt_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
-        slt_os = "linux"
-        slt_arch = "amd64"
+        slt_arch = "x64"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://updates.silabs.com/studio/v6/updates/tools/slt/slt-cli_{slt_os}_{slt_arch}.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{slt_arch}.zip"
     return platform_name, slt_cli_url
 
 
@@ -196,8 +193,8 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        with urllib.request.urlopen(slt_cli_url) as response, open(slt_zip_path, "wb") as output:
-            shutil.copyfileobj(response, output)
+        # www.silabs.com only allows curl for scripted downloads
+        subprocess.run(["curl", "-fsSL", slt_cli_url, "-o", slt_zip_path], check=True)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
             for member in zObject.infolist():
