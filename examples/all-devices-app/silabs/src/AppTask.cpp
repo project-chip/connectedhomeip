@@ -493,11 +493,12 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         {
             deviceType = std::string(storedDeviceType, strnlen(storedDeviceType, storedLen));
         }
-    }
-    ReturnErrorOnFailure(instantiateDevice(deviceType));
-    if (deviceType != "power-source")
-    {
-        ReturnErrorOnFailure(maybeAddPowerSource());
+    
+        ReturnErrorOnFailure(instantiateDevice(deviceType));
+        if (deviceType != "power-source")
+        {
+            ReturnErrorOnFailure(maybeAddPowerSource());
+        }
     }
     return CHIP_NO_ERROR;
 }
