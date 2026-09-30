@@ -31,6 +31,14 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
         mAttributeChangeCallback = attributeChangeCallback;
         return CHIP_NO_ERROR;
     }
+    void Shutdown() override
+    {
+        // Timers armed before this would report into a cluster that is gone.
+        DeviceLayer::SystemLayer().CancelTimer(ActivateActiveDataset, this);
+        DeviceLayer::SystemLayer().CancelTimer(ActivatePendingDataset, this);
+        mAttributeChangeCallback = nullptr;
+        mActivateDatasetCallback = nullptr;
+    }
 
     bool GetPanChangeSupported() override { return true; }
 

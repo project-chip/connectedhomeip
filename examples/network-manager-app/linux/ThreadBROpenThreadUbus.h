@@ -30,6 +30,7 @@ public:
     OpenThreadUbusBorderRouterDelegate(ubus::UbusManager & ubusManager) : mUbusManager(ubusManager) {}
 
     CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override;
+    void Shutdown() override;
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override;
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;

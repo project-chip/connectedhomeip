@@ -45,7 +45,16 @@ public:
     bool mPanChangeSupported        = true;
     size_t mMockBorderAgentIdLength = 16;
 
-    CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) override
+    {
+        mAttributeChangeCallback = attributeChangeCallback;
+        return CHIP_NO_ERROR;
+    }
+    void Shutdown() override
+    {
+        mAttributeChangeCallback = nullptr;
+        mShutdownCalled          = true;
+    }
     bool GetPanChangeSupported() override { return mPanChangeSupported; }
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
@@ -102,6 +111,9 @@ public:
     }
     CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) override { return CHIP_NO_ERROR; }
 
+    AttributeChangeCallback * mAttributeChangeCallback = nullptr;
+    bool mShutdownCalled                               = false;
+
     bool mRevertCalled             = false;
     bool mReturnNotFoundForDataset = false;
     bool mCommitCalled             = false;
@@ -152,6 +164,18 @@ struct TestThreadBorderRouterManagementCluster : public ::testing::Test
     ThreadBorderRouterManagementCluster::Config config;
     ThreadBorderRouterManagementCluster cluster;
 };
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestStartupAndShutdownHandTheDelegateItsCallback)
+{
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mAttributeChangeCallback, &cluster);
+    EXPECT_FALSE(delegate.mShutdownCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_TRUE(delegate.mShutdownCalled);
+    EXPECT_EQ(delegate.mAttributeChangeCallback, nullptr);
+}
 
 TEST_F(TestThreadBorderRouterManagementCluster, TestReadClusterRevision)
 {
