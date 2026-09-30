@@ -73,6 +73,7 @@ def generate(args: argparse.Namespace, allure: Path) -> None:
         history.mkdir(parents=True)
     prune_reports(history, args.keep_reports)
 
+    args.results.mkdir(parents=True, exist_ok=True)
     if (published / "last-history").is_dir():
         shutil.copytree(published / "last-history", args.results / "history", dirs_exist_ok=True)
     executor = {

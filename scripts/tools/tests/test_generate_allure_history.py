@@ -122,6 +122,14 @@ class TestGenerateAllureHistory(unittest.TestCase):
 
         self.assertEqual(sorted(p.name for p in (self.history / "7").iterdir()), ["executor.json", "history", "index.html"])
 
+    def test_missing_results_still_produce_report(self) -> None:
+        # download-artifact creates no directory when no artifact matches.
+        (self.root / "junit-results").rmdir()
+
+        self.run_main()
+
+        self.assertEqual((self.history / "7" / "index.html").read_text(), "report")
+
     def test_executor_links_back_to_run(self) -> None:
         self.run_main(report_name='Nightly "CI" Tests')
 
