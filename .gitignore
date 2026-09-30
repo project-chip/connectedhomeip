@@ -17,6 +17,9 @@ out/
 /src/python_testing/matter_testing_infrastructure/build/
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/autogen
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/user.slconf
+/integrations/docker/images/stage-2/chip-build-efr32/files-slt/sisdk-pkg.lock
+/integrations/docker/images/stage-2/chip-build-efr32/files-slt/wiseconnect-pkg.lock
+/scripts/setup/silabs/slt_default.ini
 /scripts/setup/silabs/slt
 /scripts/setup/silabs/gui/
 /scripts/setup/silabs/.install-packages-done
