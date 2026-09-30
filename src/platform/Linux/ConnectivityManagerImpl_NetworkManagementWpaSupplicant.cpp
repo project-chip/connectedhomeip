@@ -390,6 +390,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             const uint32_t attemptId = mConnectAttemptId.load();
             LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, attemptId, connectStatus, reason]() {
                 VerifyOrReturn(attemptId == mConnectAttemptId.load());
+                // A reconnect wpa_supplicant started by itself is not a ConnectNetwork failure, so leave its network enabled.
+                VerifyOrReturn(IsWiFiStationConnecting());
                 DeviceLayer::SystemLayer().CancelTimer(OnWiFiConnectTimeout, this);
                 DisableNetworkAfterConnectFailure();
                 OnConnectResult(connectStatus, CharSpan(), reason);
@@ -984,8 +986,8 @@ void ConnectivityManagerImpl::DisableNetworkAfterConnectFailure()
     // events would land in the next connect, so stop them once the failure has been reported.
     // Disconnect cannot do this after an authentication failure, because wpa_supplicant no longer
     // treats the network as current and ignores the call. Disabling the network works in both cases.
-    // The network then stays disabled, so wpa_supplicant does not rejoin it by itself if the AP returns,
-    // until the next ConnectNetwork removes it and adds it again.
+    // Only a failed ConnectNetwork gets here. The network then stays disabled, so wpa_supplicant does not
+    // rejoin it by itself if the AP returns, until the next ConnectNetwork removes it and adds it again.
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturn(mWpaSupplicant.iface && mWpaSupplicant.networkPath);
 
