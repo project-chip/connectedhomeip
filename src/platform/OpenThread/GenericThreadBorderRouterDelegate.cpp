@@ -63,6 +63,13 @@ CHIP_ERROR GenericOpenThreadBorderRouterDelegate::Init(AttributeChangeCallback *
     return CHIP_NO_ERROR;
 }
 
+void GenericOpenThreadBorderRouterDelegate::Shutdown()
+{
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    mpActivateDatasetCallback = nullptr;
+    mpAttributeChangeCallback = nullptr;
+}
+
 CHIP_ERROR GenericOpenThreadBorderRouterDelegate::GetBorderAgentId(MutableByteSpan & borderAgentIdSpan)
 {
     otInstance * otInst = DeviceLayer::ThreadStackMgrImpl().OTInstance();
@@ -159,18 +166,22 @@ void GenericOpenThreadBorderRouterDelegate::OnPlatformEventHandler(const DeviceL
     {
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_NETIF_STATE)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [delegate]() { delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
+                delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::InterfaceEnabled::Id);
+            });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_ACTIVE_DATASET)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::ActiveDatasetTimestamp::Id);
             });
         }
         if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_PENDING_DATASET)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate]() {
+                VerifyOrReturn(delegate->mpAttributeChangeCallback != nullptr);
                 delegate->mpAttributeChangeCallback->ReportAttributeChanged(Attributes::PendingDatasetTimestamp::Id);
             });
         }

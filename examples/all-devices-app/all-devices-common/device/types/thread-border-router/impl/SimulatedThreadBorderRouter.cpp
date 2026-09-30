@@ -81,6 +81,17 @@ CHIP_ERROR SimulatedThreadBorderRouter::Init(AttributeChangeCallback * attribute
     return CHIP_NO_ERROR;
 }
 
+void SimulatedThreadBorderRouter::Shutdown()
+{
+    // An activation still in flight is dropped without a report: nothing may reach the cluster from here on.
+    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    if (std::holds_alternative<Activating>(mActive))
+    {
+        mActive = NoActiveDataset{};
+    }
+    mAttributeChangeCallback = nullptr;
+}
+
 bool SimulatedThreadBorderRouter::GetPanChangeSupported()
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::GetPanChangeSupported called");

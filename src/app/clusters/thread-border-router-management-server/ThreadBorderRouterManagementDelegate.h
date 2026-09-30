@@ -62,6 +62,10 @@ public:
 
     virtual CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) = 0;
 
+    // The counterpart of Init(), called from the cluster's Shutdown(): release what Init() set up and drop the callbacks
+    // it was handed. Nothing may be reported to the cluster after this returns.
+    virtual void Shutdown() = 0;
+
     // Get whether PanChange feature is supported for the Thread BR.
     virtual bool GetPanChangeSupported() = 0;
 

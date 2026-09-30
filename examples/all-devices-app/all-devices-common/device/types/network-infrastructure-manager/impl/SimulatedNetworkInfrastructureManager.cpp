@@ -77,6 +77,17 @@ CHIP_ERROR SimulatedNetworkInfrastructureManager::Init(AttributeChangeCallback *
     return CHIP_NO_ERROR;
 }
 
+void SimulatedNetworkInfrastructureManager::Shutdown()
+{
+    // An activation still in flight is dropped without a report: nothing may reach the cluster from here on.
+    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    if (std::holds_alternative<Activating>(mActive))
+    {
+        mActive = NoActiveDataset{};
+    }
+    mAttributeChangeCallback = nullptr;
+}
+
 bool SimulatedNetworkInfrastructureManager::GetPanChangeSupported()
 {
     ChipLogProgress(AppServer, "SimulatedNetworkInfrastructureManager::GetPanChangeSupported called");
