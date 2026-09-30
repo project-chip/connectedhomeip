@@ -15,16 +15,11 @@ import shutil
 import stat
 import subprocess
 import sys
+import urllib.request
 from platform import machine
 from zipfile import ZipFile
 
 logger = logging.getLogger(__name__)
-
-try:
-    import dload
-except ImportError:
-    logger.error("dload package is required. Install it with: pip install dload")
-    sys.exit(1)
 
 
 def setup_logging(verbose=False):
@@ -201,7 +196,8 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        dload.save(slt_cli_url, slt_zip_path)
+        with urllib.request.urlopen(slt_cli_url) as response, open(slt_zip_path, "wb") as output:
+            shutil.copyfileobj(response, output)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
             for member in zObject.infolist():
