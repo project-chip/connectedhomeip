@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -53,7 +54,9 @@ public:
      *
      * @param[out] verificationKey The MutableByteSpan to copy the verification key into. On success,
      *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     *             the attribute is null (e.g. no reader configuration is provisioned), the callee
+     *             must leave the MutableByteSpan empty: the cluster reports an empty span as a null
+     *             attribute value.
      */
     virtual CHIP_ERROR GetAliroReaderVerificationKey(MutableByteSpan & verificationKey) = 0;
 
@@ -62,7 +65,9 @@ public:
      *
      * @param[out] groupIdentifier The MutableByteSpan to copy the group identifier into. On success,
      *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     *             the attribute is null (e.g. no reader configuration is provisioned), the callee
+     *             must leave the MutableByteSpan empty: the cluster reports an empty span as a null
+     *             attribute value.
      */
     virtual CHIP_ERROR GetAliroReaderGroupIdentifier(MutableByteSpan & groupIdentifier) = 0;
 
@@ -91,7 +96,9 @@ public:
      *
      * @param[out] groupResolvingKey The MutableByteSpan to copy the group resolving key into. On success,
      *             the callee must update the length to the length of the copied data. If the value of
-     *             the attribute is null, the callee must set the MutableByteSpan to empty.
+     *             the attribute is null (e.g. no reader configuration is provisioned), the callee
+     *             must leave the MutableByteSpan empty: the cluster reports an empty span as a null
+     *             attribute value.
      */
     virtual CHIP_ERROR GetAliroGroupResolvingKey(MutableByteSpan & groupResolvingKey) = 0;
 
@@ -143,6 +150,78 @@ public:
      * Clear the Aliro reader configuration for the lock.
      */
     virtual CHIP_ERROR ClearAliroReaderConfig() = 0;
+
+    /**
+     * @brief Hardware actuation hook for the LockDoor command.
+     *
+     * @param[in] endpointId endpoint for which remote lock command is called
+     * @param[in] fabricIdx fabric index responsible for operating the lock
+     * @param[in] nodeId node id responsible for operating the lock
+     * @param[in] pinCode PIN code (optional)
+     * @param[out] err error code if door locking failed (set only if retval == false)
+     * @retval true on success
+     */
+    virtual bool HandleDoorLockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
+                                       const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                       OperationErrorEnum & err)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Hardware actuation hook for the UnlockDoor / UnlockWithTimeout commands.
+     *
+     * @param[in] endpointId endpoint for which remote unlock command is called
+     * @param[in] fabricIdx fabric index responsible for operating the lock
+     * @param[in] nodeId node id responsible for operating the lock
+     * @param[in] pinCode PIN code (optional)
+     * @param[out] err error code if door unlocking failed (set only if retval == false)
+     * @retval true on success
+     */
+    virtual bool HandleDoorUnlockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
+                                         const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                         OperationErrorEnum & err)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Hardware actuation hook for the UnboltDoor command.
+     *
+     * @param[in] endpointId endpoint for which remote unbolt command is called
+     * @param[in] fabricIdx fabric index responsible for operating the lock
+     * @param[in] nodeId node id responsible for operating the lock
+     * @param[in] pinCode PIN code (optional)
+     * @param[out] err error code if door unbolting failed (set only if retval == false)
+     * @retval true on success
+     */
+    virtual bool HandleDoorUnboltCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
+                                         const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                         OperationErrorEnum & err)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Called after the AutoRelock timer expires and the cluster reports
+     * the door as locked (legacy `emberAfPluginDoorLockOnAutoRelock`
+     * equivalent).
+     *
+     * The cluster has already updated the LockState attribute (and emitted the
+     * lock operation event) when this is called. Matching the legacy contract,
+     * the delegate performs the physical relock actuation here.
+     *
+     * @param[in] endpointId endpoint on which the auto relock fired
+     */
+    virtual void OnAutoRelock(EndpointId endpointId) {}
+
+    /**
+     * @brief Called when the UserCodeTemporaryDisableTime lockout window starts.
+     *
+     * @param[in] endpointId endpoint on which the lockout started
+     * @param[in] lockoutEndTimestamp timestamp at which the lockout window ends
+     */
+    virtual void OnLockoutStarted(EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTimestamp) {}
 };
 
 } // namespace DoorLock
