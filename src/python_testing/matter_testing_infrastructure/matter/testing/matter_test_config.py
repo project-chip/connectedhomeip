@@ -30,6 +30,12 @@ class MatterTestConfig:
     ble_controller: int | None = None
     commission_only: bool = False
     commission_only_re_open_window: bool = False
+    # Commission even when the DUT is already commissioned on this fabric.
+    force_commissioning: bool = False
+    # Set by the runner when it found the DUT commissioned and did not run the commissioning step.
+    commissioning_skipped: bool = False
+    # Ask the test runner to snapshot the app's state once commissioning is done (runner use only).
+    snapshot_commissioned_state: bool = False
     spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID

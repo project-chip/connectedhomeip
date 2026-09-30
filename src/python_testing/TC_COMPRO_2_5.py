@@ -66,7 +66,7 @@ Example usage:
 import logging
 
 from mobly import asserts
-from support_modules.compro_support import COMPROBaseTest, commission_if_needed
+from support_modules.compro_support import COMPROBaseTest
 
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissionedDevice
@@ -197,5 +197,4 @@ class TC_COMPRO_2_5(MatterTestCommissionedDevice, COMPROBaseTest):
 
 
 if __name__ == "__main__":
-    commission_if_needed()
     default_matter_test_main()
