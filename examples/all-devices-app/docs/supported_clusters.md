@@ -80,7 +80,6 @@ To update or validate this list manually, follow these steps:
 | 34        | Content App Observer                                       | 1296 (0x0510) | No                 | No                  |                                       |
 | 35        | Content Control                                            | 1295 (0x050F) | No                 | No                  |                                       |
 | 36        | Content Launcher                                           | 1290 (0x050A) | No                 | No                  |                                       |
-| 37        | Demand Response Load Control                               | 150 (0x0096)  | No                 | No                  |                                       |
 | 38        | Descriptor                                                 | 29 (0x001D)   | Yes                | Yes                 |                                       |
 | 39        | Device Energy Management                                   | 152 (0x0098)  | Yes                | Yes                 |                                       |
 | 40        | Device Energy Management Mode                              | 159 (0x009F)  | Yes                | No                  | Instance of Mode Base                 |
