@@ -1282,8 +1282,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 if (innerErr != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer,
-                                 "Failed syncing ACLs during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                                 ChipLogValueX64(refreshingNodeId), innerErr.Format());
+                                            "Failed syncing ACLs during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                                            ChipLogValueX64(refreshingNodeId), innerErr.Format());
 
                     // Keep entries for retry. The node stays Pending.
                     MarkRefreshAclsSyncFailed(refreshingNodeId, innerErr);
@@ -1300,13 +1300,13 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         continue;
                     }
                     auto written = std::find_if(writtenValues.begin(), writtenValues.end(),
-                                                [&entry](const auto & value) { return value.first == entry.listID; });
+                                                           [&entry](const auto & value) { return value.first == entry.listID; });
                     if (written == writtenValues.end())
                     {
                         continue;
                     }
                     if (detail::AclEntryValueEquals(EncodeAccessControlEntry(entry.ACLEntry),
-                                                    EncodeAccessControlEntry(written->second)))
+                                                               EncodeAccessControlEntry(written->second)))
                     {
                         entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
                         entry.statusEntry.failureCode = 0;
@@ -1324,10 +1324,10 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 // while the write was in flight is still queued and runs after the refresh.
                 mACLEntries.erase(
                     std::remove_if(mACLEntries.begin(), mACLEntries.end(),
-                                   [this, refreshingNodeId](const auto & entry) {
+                                              [this, refreshingNodeId](const auto & entry) {
                                        return entry.nodeID == refreshingNodeId && HasRemovalIntent(entry) &&
                                            std::none_of(mRefreshingACLEntries.begin(), mRefreshingACLEntries.end(),
-                                                        [&entry](const auto & written) { return written.listID == entry.listID; });
+                                                                   [&entry](const auto & written) { return written.listID == entry.listID; });
                                    }),
                     mACLEntries.end());
 
@@ -1339,8 +1339,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 if (mRefreshHadFailure)
                 {
                     ChipLogError(AppServer,
-                                 "Finished refreshing node (ID: 0x" ChipLogFormatX64 ") with failures. Node is left Pending.",
-                                 ChipLogValueX64(refreshingNodeId));
+                                            "Finished refreshing node (ID: 0x" ChipLogFormatX64 ") with failures. Node is left Pending.",
+                                            ChipLogValueX64(refreshingNodeId));
                     FinishRefresh(CHIP_NO_ERROR);
                     return;
                 }
@@ -1354,7 +1354,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
 
                 ChipLogDetail(AppServer, "Finished refreshing node (ID: 0x" ChipLogFormatX64 "). Node is now marked as Committed.",
-                              ChipLogValueX64(refreshingNodeId));
+                                         ChipLogValueX64(refreshingNodeId));
 
                 for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
                 {
