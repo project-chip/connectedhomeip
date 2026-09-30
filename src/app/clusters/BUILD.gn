@@ -45,6 +45,7 @@ source_set("clusters") {
     "device-energy-management-server",
     "diagnostic-logs-server",
     "dishwasher-alarm-server",
+    "door-lock-server",
     "dynamic-lighting-server",
     "electrical-alarm-server",
     "electrical-distribution-server",
