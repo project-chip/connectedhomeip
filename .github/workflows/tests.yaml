@@ -1359,6 +1359,19 @@ jobs:
                 require_tests: false
                 annotate_only: true
 
+<<<<<<< HEAD
+=======
+          - name: Test Allure history script
+            run: |
+                python3 -m unittest scripts/tools/tests/test_generate_allure_history.py
+
+          # The gh-pages Allure history is handled several times over on this
+          # runner (checkout, history copy, deploy clone), so free up disk first.
+          - name: Maximize runner disk
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
+            uses: ./.github/actions/maximize-runner-disk
+
+>>>>>>> 0021961 ([CI] Generate Allure reports with a script instead of a Docker action (#74508))
           - name: Checkout gh-pages for Allure history
             uses: actions/checkout@v6.0.3
             with:
@@ -1366,6 +1379,7 @@ jobs:
                 path: gh-pages
 
           - name: Generate Allure Report
+<<<<<<< HEAD
             uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
             with:
                 allure_results: junit-results
@@ -1376,6 +1390,19 @@ jobs:
                 keep_reports: 2000
                 # This is the name that will show up in the Dashboard Overview
                 report_name: "CI Tests"
+=======
+            if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
+            # --report-name is the name that will show up in the Dashboard Overview
+            run: |
+                scripts/tools/generate_allure_history.py \
+                    --results junit-results \
+                    --gh-pages gh-pages \
+                    --output allure-history \
+                    --report allure-report \
+                    --subfolder allure-report/ci_tests \
+                    --keep-reports 200 \
+                    --report-name "CI Tests"
+>>>>>>> 0021961 ([CI] Generate Allure reports with a script instead of a Docker action (#74508))
 
           - name: Upload Allure Report
             uses: actions/upload-artifact@v7
