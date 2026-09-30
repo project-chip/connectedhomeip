@@ -1130,16 +1130,19 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
 
     EXPECT_EQ(CHIP_NO_ERROR,
               fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                                GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex));
+                                                                GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey,
+                                                                &aliceFabricIndex));
     EXPECT_EQ(CHIP_NO_ERROR,
               fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                                GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex));
+                                                                GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey,
+                                                                &bobFabricIndex));
 
     // 1. Non-TCP (UDP) session should return kMaxAppMessageLen.
     Transport::PeerAddress udpPeer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
     SessionHolder udpSession;
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.InjectPaseSessionWithTestKey(udpSession, 1, fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 2,
+              sessionManager.InjectPaseSessionWithTestKey(udpSession, 1,
+                                                          fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 2,
                                                           aliceFabricIndex, udpPeer, CryptoContext::SessionRole::kInitiator));
     EXPECT_FALSE(udpSession->AllowsLargePayload());
     EXPECT_EQ(udpSession->GetMaxAppMessageLen(), kMaxAppMessageLen);
