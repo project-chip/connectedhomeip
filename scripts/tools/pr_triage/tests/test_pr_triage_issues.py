@@ -340,6 +340,11 @@ class RenderAndState(unittest.TestCase):
         ok = {"pr": 40191, "issues": [entry(1, "close", "a")], "unassessed": [
             {"issue": 2, "reason": "could not be read: HTTP 404"}]}
         self.assertEqual(mi.validate_issue_judgment(ok, d), [])
+        both = {"pr": 40191, "issues": [entry(1, "close", "a")],
+                "unassessed": [{"issue": 1, "reason": "x"}, {"issue": 2, "reason": "y"}, {"issue": 2, "reason": "z"}]}
+        problems = mi.validate_issue_judgment(both, d)
+        self.assertTrue(any("#1: cannot be both judged and unassessed" in p for p in problems))
+        self.assertTrue(any("#2: appears more than once in unassessed" in p for p in problems))
 
     def test_any_pull_request_gets_a_related_issues_report(self):
         d = dossier(7, verdict="keep", issues={1: issue(1, title="Same ask"), 2: issue(2, title="Same area"), 3: issue(3, title="Noise")},
@@ -404,7 +409,9 @@ class RenderAndState(unittest.TestCase):
             mi.render(self.root, f"{OWNER}/{NAME}", pr1)
 
     def test_a_sibling_that_names_nothing_stops_sync_with_a_message(self):
-        with mock.patch.object(mi, "resolve_repo", return_value=(OWNER, NAME)), \
+        # A valid sibling from the environment must not vouch for a bad one given on the command line.
+        with mock.patch.dict(os.environ, {"MATTER_PR_TRIAGE_SIBLINGS": "a/b"}), \
+                mock.patch.object(mi, "resolve_repo", return_value=(OWNER, NAME)), \
                 mock.patch.object(mi, "sync_corpus") as synced, \
                 mock.patch("sys.stdout", new_callable=io.StringIO) as out, self.assertRaises(SystemExit) as stop:
             mi.sync(".", f"{OWNER}/{NAME}", False, 18, siblings=["chip-test-plans"])
@@ -413,14 +420,12 @@ class RenderAndState(unittest.TestCase):
         synced.assert_not_called()                                       # nothing is fetched on a bad name
 
     def test_sibling_repositories_are_remembered_and_scored_on_content_only(self):
-        os.environ.pop("MATTER_PR_TRIAGE_SIBLINGS", None)
-        self.assertEqual(mi.sibling_repos(self.root), [])
-        mi.triage.write_json(self.root / "siblings.json", ["CHIP-Specifications/chip-test-plans"])
-        os.environ["MATTER_PR_TRIAGE_SIBLINGS"] = "a/b:CHIP-Specifications/chip-test-plans:not a repo"
-        try:
-            self.assertEqual(mi.sibling_repos(self.root, ["c/d"]), ["CHIP-Specifications/chip-test-plans", "a/b", "c/d"])
-        finally:
+        with mock.patch.dict(os.environ, {}, clear=False):
             os.environ.pop("MATTER_PR_TRIAGE_SIBLINGS", None)
+            self.assertEqual(mi.sibling_repos(self.root), [])
+            mi.triage.write_json(self.root / "siblings.json", ["CHIP-Specifications/chip-test-plans"])
+            os.environ["MATTER_PR_TRIAGE_SIBLINGS"] = "a/b:CHIP-Specifications/chip-test-plans:not a repo"
+            self.assertEqual(mi.sibling_repos(self.root, ["c/d"]), ["CHIP-Specifications/chip-test-plans", "a/b", "c/d"])
         # a clone's path names its repository the same way the main repository is inferred
         import subprocess
         clone = pathlib.Path(self.tmp.name) / "tp-clone"
