@@ -1953,7 +1953,9 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     }
     VerifyOrExit(distinguishedName != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    result = X509_NAME_get0_der(distinguishedName, &pDistinguishedName, &distinguishedNameLen);
+    // X509_NAME_get0_der() takes a non-const X509_NAME* on BoringSSL (it is read-only regardless),
+    // while OpenSSL 3.x/4.x declare it as taking const. Cast to keep both backends compiling.
+    result = X509_NAME_get0_der(const_cast<X509_NAME *>(distinguishedName), &pDistinguishedName, &distinguishedNameLen);
     VerifyOrExit(result == 1, err = CHIP_ERROR_INTERNAL);
     err = CopySpanToMutableSpan(ByteSpan(pDistinguishedName, distinguishedNameLen), dn);
 
