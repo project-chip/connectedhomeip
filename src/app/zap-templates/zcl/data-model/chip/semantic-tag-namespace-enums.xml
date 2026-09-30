@@ -200,4 +200,21 @@ limitations under the License.
     <item value="0x32" name="Wine Cooler"/>
   </enum>
 
+  <enum name="ClosureTag" type="enum8">
+    <item value="0x00" name="Covering"/>
+    <item value="0x01" name="Window"/>
+    <item value="0x02" name="Barrier"/>
+    <item value="0x03" name="Cabinet"/>
+    <item value="0x04" name="Gate"/>
+    <item value="0x05" name="Garage Door"/>
+    <item value="0x06" name="Door"/>
+  </enum>
+
+  <enum name="ClosurePanelTag" type="enum8">
+    <item value="0x00" name="Lift"/>
+    <item value="0x01" name="Tilt"/>
+    <item value="0x02" name="Sliding"/>
+    <item value="0x03" name="Rotate"/>
+  </enum>
+
 </configurator>
