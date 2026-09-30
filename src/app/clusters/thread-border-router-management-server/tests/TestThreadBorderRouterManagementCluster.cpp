@@ -79,19 +79,16 @@ public:
         }
         return CHIP_NO_ERROR;
     }
-    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                          ActivateDatasetCallback * callback) override
+    void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                          void * context) override
     {
         if (mDeferActivation)
         {
             mPendingCallback = callback;
-            mPendingSequence = sequenceNum;
+            mPendingContext  = context;
             return;
         }
-        if (callback != nullptr)
-        {
-            callback->OnActivateDatasetComplete(sequenceNum, CHIP_NO_ERROR);
-        }
+        callback(context, CHIP_NO_ERROR);
     }
     CHIP_ERROR CommitActiveDataset() override
     {
@@ -103,9 +100,9 @@ public:
         mRevertCalled = true;
         if (mCompleteOnRevert && mPendingCallback != nullptr)
         {
-            auto * callback  = mPendingCallback;
+            auto callback    = mPendingCallback;
             mPendingCallback = nullptr;
-            callback->OnActivateDatasetComplete(mPendingSequence, CHIP_ERROR_CANCELLED);
+            callback(mPendingContext, CHIP_ERROR_CANCELLED);
         }
         return CHIP_NO_ERROR;
     }
@@ -121,9 +118,9 @@ public:
     // When set, SetActiveDataset keeps the callback instead of completing right away.
     bool mDeferActivation = false;
     // When set, RevertActiveDataset completes the kept callback with CHIP_ERROR_CANCELLED.
-    bool mCompleteOnRevert                     = false;
-    ActivateDatasetCallback * mPendingCallback = nullptr;
-    uint32_t mPendingSequence                  = 0;
+    bool mCompleteOnRevert                           = false;
+    ActivateDatasetCompleteCallback mPendingCallback = nullptr;
+    void * mPendingContext                           = nullptr;
 };
 
 class MockBreadcrumbTracker : public BreadCrumbTracker
@@ -430,7 +427,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeExpiryRespondsTimeou
     // The delegate defers completion, so Invoke() has no status yet. ClusterTester reports that as an
     // error; the response is checked below after the fail-safe expires.
     (void) tester.Invoke(request);
-    ASSERT_NE(delegate.mPendingCallback, nullptr);
+    ASSERT_TRUE(delegate.mPendingCallback != nullptr);
 
     DeviceLayer::ChipDeviceEvent event;
     event.Type = DeviceLayer::DeviceEventType::kFailSafeTimerExpired;
@@ -440,6 +437,37 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestFailSafeExpiryRespondsTimeou
     const auto & statuses = tester.GetCommandHandler().GetStatuses();
     ASSERT_EQ(statuses.size(), 1u);
     EXPECT_EQ(statuses[0].status, Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Timeout));
+    EXPECT_FALSE(breadcrumbTracker.mCalled);
+}
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestSetActiveDatasetHandsTheDelegateTheClusterAsContext)
+{
+    delegate.mReturnNotFoundForDataset = true;
+    delegate.mDeferActivation          = true;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestFabricIndex, System::Clock::Seconds16(kTestFailSafeTimeout)), CHIP_NO_ERROR);
+
+    Commands::SetActiveDatasetRequest::Type request;
+    request.activeDataset = ByteSpan();
+    (void) tester.Invoke(request);
+    ASSERT_TRUE(delegate.mPendingCallback != nullptr);
+    EXPECT_EQ(delegate.mPendingContext, &cluster);
+
+    // Reporting through what the delegate was handed answers the command.
+    delegate.mPendingCallback(delegate.mPendingContext, CHIP_NO_ERROR);
+    const auto & statuses = tester.GetCommandHandler().GetStatuses();
+    ASSERT_EQ(statuses.size(), 1u);
+    EXPECT_EQ(statuses[0].status, Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Success));
+}
+
+TEST_F(TestThreadBorderRouterManagementCluster, TestACompletionWithNothingPendingIsIgnored)
+{
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(&cluster, CHIP_NO_ERROR);
+    EXPECT_EQ(tester.GetCommandHandler().GetStatuses().size(), 0u);
     EXPECT_FALSE(breadcrumbTracker.mCalled);
 }
 
@@ -460,7 +488,7 @@ TEST_F(TestThreadBorderRouterManagementCluster, TestBreadcrumbHandling)
     EXPECT_TRUE(result.IsSuccess());
 
     // Simulate async completion
-    cluster.OnActivateDatasetComplete(1, CHIP_NO_ERROR);
+    ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(&cluster, CHIP_NO_ERROR);
 
     // Verify breadcrumb was applied to tracker!
     EXPECT_TRUE(breadcrumbTracker.mCalled);
