@@ -452,11 +452,11 @@ class TC_DA_1_2(BasicCompositionTests):
                 if not filename.name.endswith('.der'):
                     continue
                 with filename.open("rb") as f:
-                    log.info(f'Parsing CD signing certificate file: {filename}')
+                    log.info('Parsing CD signing certificate file: %s', filename)
                     try:
                         cert = x509.load_der_x509_certificate(f.read())
                     except ValueError:
-                        log.info(f'File {filename} is not a valid certificate, skipping')
+                        log.info('File %s is not a valid certificate, skipping', filename)
                         continue
                     pub = cert.public_key()
                     ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest

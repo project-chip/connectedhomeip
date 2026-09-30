@@ -34,6 +34,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device extended-color-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -46,13 +60,13 @@ import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CC_2_3(MatterBaseTest):
+class TC_CC_2_3(MatterTestCommissionedDevice):
 
     # Test includes several long waits, adjust timeout to accommodate.
     @property
@@ -174,7 +188,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         async def accumulate_reports():
             sub_handler.reset()
-            log.info(f"Test will now wait {gather_time} seconds to accumulate reports")
+            log.info("Test will now wait %s seconds to accumulate reports", gather_time)
             await asyncio.sleep(gather_time)
 
         def check_report_counts(attr: ClusterObjects.ClusterAttributeDescriptor):
@@ -321,7 +335,7 @@ class TC_CC_2_3(MatterBaseTest):
         await asyncio.sleep(20)
 
         self.step(40)
-        log.info(f'received reports: {sub_handler.attribute_reports[cc.Attributes.RemainingTime]}')
+        log.info('received reports: %s', sub_handler.attribute_reports[cc.Attributes.RemainingTime])
         count = sub_handler.attribute_report_counts[cc.Attributes.RemainingTime]
         asserts.assert_equal(count, 3, "Unexpected number of reports received")
 

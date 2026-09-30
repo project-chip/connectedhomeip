@@ -35,6 +35,13 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -58,6 +65,12 @@ System::LayerSelectLoop & SystemLayerSelectLoop()
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
+#if CHIP_CRYPTO_PSA
+    // Initialize the PSA crypto backend before the base class, which sets up
+    // entropy/DRBG that already require PSA. Mirrors the Zephyr platform managers.
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 

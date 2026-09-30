@@ -92,11 +92,6 @@ if (wifi_soc) {
       "${examples_common_plat_dir}/freertos_config",
     ]
 
-    if (use_wf200) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -117,7 +112,6 @@ silabs_executable("thermostat_app") {
 
   sources = [
     "${examples_common_plat_dir}/customer/CustomerAppTask.cpp",
-    "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "src/AppTask.cpp",
   ]
 
@@ -128,6 +122,7 @@ silabs_executable("thermostat_app") {
   deps = [
     ":sdk",
     "${chip_root}/src/platform/logging:default",
+    "${thermostat_common_dir}:thermostat-delegate-impl",
     app_data_model,
   ]
 
@@ -150,15 +145,15 @@ silabs_executable("thermostat_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/pigweed_rpc/Rpc.cpp",
     ]
 
     deps += [
       "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
-      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/config/efr32/lib/pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",

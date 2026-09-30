@@ -48,13 +48,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_9(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
     """This test case verifies the primary functionality of the Energy EVSE Cluster server
     with the optional RFID feature supported."""
 
@@ -107,7 +107,7 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
             uid is not NullValue and len(uid) <= 10,
             f"RFID event received with UID: {uid}")
 
-        log.info(f"RFID event received with UID: 0x{bytes(uid).hex()}")
+        log.info("RFID event received with UID: %s (hex)", bytes(uid).hex())
 
 
 if __name__ == "__main__":

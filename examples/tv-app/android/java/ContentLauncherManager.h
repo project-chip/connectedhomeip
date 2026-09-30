@@ -20,6 +20,7 @@
 
 #include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
+#include <clusters/ContentLauncher/Metadata.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/JniReferences.h>
@@ -27,11 +28,12 @@
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
-using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using ContentLauncherDelegate        = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType             = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
+using ContentReplicationResponseType = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Type;
+using ParameterType                  = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
+using BrandingInformationType        = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using PlaybackPreferencesType        = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
 
 class ContentLauncherManager : public ContentLauncherDelegate
 {
@@ -45,8 +47,13 @@ public:
                              bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
+    void HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper) override;
+    void HandlePlayPreset(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          uint16_t presetID) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
+    bool HandleGetMovable() override;
+    CHIP_ERROR HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
@@ -57,7 +64,8 @@ private:
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
-
-    // TODO: set this based upon meta data from app
-    static constexpr uint16_t kClusterRevision = 2;
+    jmethodID mContentReplicationRequestMethod      = nullptr;
+    jmethodID mPlayPresetMethod                     = nullptr;
+    jmethodID mGetMovableMethod                     = nullptr;
+    jmethodID mGetPresetsMethod                     = nullptr;
 };

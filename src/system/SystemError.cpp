@@ -91,18 +91,14 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
     // Use thread-safe strerror_r when available
-#if defined(_GNU_SOURCE) && !defined(__ANDROID__) && !defined(__Fuchsia__) && !defined(__MUSL__)
+#if defined(__GLIBC__) && defined(_GNU_SOURCE)
     // GNU version returns char*
     const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
     if (s != nullptr)
     {
-        if (s != errBuf)
-        {
-            chip::Platform::CopyString(errBuf, sizeof(errBuf), s);
-        }
-        return errBuf;
+        return s; // errBuf or suitable glibc buffer
     }
-#elif defined(_POSIX_C_SOURCE)
+#elif defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L)
     // POSIX version returns int (0 on success)
     if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
     {

@@ -95,29 +95,51 @@ enum class ParameterEnum : uint8_t
     kUnknownEnumValue = 17,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for QueueTypeEnum
+enum class QueueTypeEnum : uint8_t
 {
-    kSuccess                = 0x00,
-    kURLNotAvailable        = 0x01,
-    kAuthFailed             = 0x02,
-    kTextTrackNotAvailable  = 0x03,
-    kAudioTrackNotAvailable = 0x04,
+    kReplace = 0x00,
+    kNext    = 0x01,
+    kLast    = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 3,
+};
+
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
+{
+    kSuccess                 = 0x00,
+    kURLNotAvailable         = 0x01,
+    kAuthFailed              = 0x02,
+    kTextTrackNotAvailable   = 0x03,
+    kAudioTrackNotAvailable  = 0x04,
+    kInvalidData             = 0x05,
+    kAccountMismatch         = 0x06,
+    kContentAppNotAvailable  = 0x07,
+    kReplicationNotAllowed   = 0x08,
+    kReplicationNotSupported = 0x09,
+    kPresetNotFound          = 0x0A,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 11,
 };
 
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kContentSearch = 0x1,
-    kURLPlayback   = 0x2,
-    kAdvancedSeek  = 0x4,
-    kTextTracks    = 0x8,
-    kAudioTracks   = 0x10,
+    kContentSearch      = 0x1,
+    kURLPlayback        = 0x2,
+    kAdvancedSeek       = 0x4,
+    kTextTracks         = 0x8,
+    kAudioTracks        = 0x10,
+    kContentReplication = 0x20,
+    kContentQueueing    = 0x40,
+    kPresets            = 0x80,
 };
 
 // Bitmap for SupportedProtocolsBitmap

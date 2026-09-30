@@ -266,9 +266,9 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
     {
         // There's not much we can do if persistence fails here, so we ignore the return value.
         // The application must ensure that persistence is working correctly.
-        RETURN_SAFELY_IGNORED mContext->attributeStorage.WriteValue(
-            { mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
-            { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
+        AttributePersistence persistence(mContext->attributeStorage);
+        RETURN_SAFELY_IGNORED persistence.StoreNativeEndianValue(
+            { mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, mHoldTime);
     }
 
     return Protocols::InteractionModel::Status::Success;

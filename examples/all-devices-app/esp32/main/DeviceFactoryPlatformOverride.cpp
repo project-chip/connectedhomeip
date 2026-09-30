@@ -15,26 +15,23 @@
  *    limitations under the License.
  */
 #include "DeviceFactoryPlatformOverride.h"
-#include "Esp32BleRssiRangingAdapter.h"
+#include "AppDeviceFactory.h"
+#include "sdkconfig.h"
+#include <app_config/enabled_devices.h>
 
-#include <devices/device-factory/DeviceFactory.h>
-#include <devices/proximity-ranger/ProximityRangerDevice.h>
+#if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
+#include "CoreS3Chime.h"
+#endif
 
 namespace chip {
 namespace app {
 
 void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
 {
-    if constexpr (ALL_DEVICES_ENABLE_PROXIMITY_RANGER)
-    {
-        static Esp32BleRssiRangingAdapter sBleAdapter;
-        VerifyOrDie(sBleAdapter.Init(storageDelegate) == CHIP_NO_ERROR);
-        DeviceFactory::GetInstance().RegisterCreator("proximity-ranger", [&timerDelegate]() {
-            static Clusters::ProximityRanging::RangingAdapter * adapters[] = { &sBleAdapter };
-            return std::make_unique<ProximityRangerDevice>(timerDelegate,
-                                                           Span<Clusters::ProximityRanging::RangingAdapter * const>(adapters));
-        });
-    }
+#if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
+    AppDeviceFactory::GetInstance().RegisterCreator(
+        "chime", [&timerDelegate]() { return AppDeviceFactory::MakeDevice<CoreS3Chime>(timerDelegate); });
+#endif
 }
 
 } // namespace app

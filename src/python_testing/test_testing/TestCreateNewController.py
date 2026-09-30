@@ -24,11 +24,11 @@ import asyncio
 from mobly import asserts
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 
-class TestCreateNewController(MatterBaseTest):
+class TestCreateNewController(MatterTestCommissionedDevice):
     # Using get_code and a modified version of setup_class_helper functions from chip.testing.basic_composition module
     def get_code(self, dev_ctrl):
         created_codes = []

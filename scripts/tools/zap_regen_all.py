@@ -434,7 +434,7 @@ def getTargets(target_type):
                 if t.distinct_output() == o:
                     log.error("   %s", t.zap_config)
 
-            raise Exception("Duplicate/overlapping output directory: %r" % o)
+            raise Exception(f"Duplicate/overlapping output directory: {o!r}")
 
         distinct_outputs.add(o)
 
@@ -524,12 +524,9 @@ def main():
             tmpl = tmpl.replace("/zap-templates/", "/../")
             tmpl = tmpl.replace("/templates/", "/../")
 
-        print(" %8d | %50s | %50s" % (
-            timing.generate_time,
-            ".." + timing.config[len(timing.config) -
-                                 48:] if len(timing.config) > 50 else timing.config,
-            ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
-        ))
+        config = ".." + timing.config[len(timing.config) - 48:] if len(timing.config) > 50 else timing.config
+        template = ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl
+        print(f" {timing.generate_time:8} | {config:>50s} | {template:>50s}")
 
 
 if __name__ == '__main__':

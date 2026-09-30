@@ -124,13 +124,13 @@ config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
 if CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
 config CHIP_APP_EXTRA_GATT_DB_HEADER
     string "Extra application Gatt db header"
-    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw72/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW72
     help
         Set path to extra application Gatt db header.
 
 config CHIP_APP_EXTRA_GATT_UUID_HEADER
     string "Extra application Gatt UUID header"
-    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw72/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW72
     help
         Set path to extra application Gatt UUID header.
 endif
@@ -251,7 +251,7 @@ config CHIP_APP_CLI
 
 config CHIP_APP_OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
-	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
+	default y if (CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X) && !CHIP_CRYPTO_PSA
 	default y if CHIP_SE05X
 	help
 		Use custom implementation of operational keystore.
@@ -284,11 +284,6 @@ if CHIP_APP_OPERATIONAL_KEYSTORE
                 Enable application Operational keystore SE05X implementation.
 
     endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
-
-    config PRIVATE_ECC_KEY_BLOB_SIZE
-        int "Operational private ECC key blob size"
-        default 120 if CHIP_APP_OPERATIONAL_KEYSTORE_S200
-        default 48 if CHIP_APP_OPERATIONAL_KEYSTORE_S50
 
 endif # CHIP_APP_OPERATIONAL_KEYSTORE
 
@@ -425,7 +420,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
 
 config CHIP_APP_TASK_STACK_SIZE
     int "App Task Stack Size"
-    default 12500 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers
+    default 13312 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers required for secure session
     default 6144
     help
         Set the stack size for the application task in bytes.

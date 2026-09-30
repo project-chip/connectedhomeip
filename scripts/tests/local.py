@@ -28,8 +28,8 @@ import subprocess
 import sys
 import textwrap
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional
 
 import alive_progress
 import click
@@ -84,7 +84,7 @@ def _get_native_machine_target():
 _CONFIG_PATH = "out/local_py.ini"
 
 
-def get_coverage_default(coverage: Optional[bool]) -> bool:
+def get_coverage_default(coverage: bool | None) -> bool:
     if coverage is not None:
         return coverage
     config = configparser.ConfigParser()
@@ -95,7 +95,7 @@ def get_coverage_default(coverage: Optional[bool]) -> bool:
         return False
 
 
-def _get_variants(coverage: Optional[bool]):
+def _get_variants(coverage: bool | None):
     """
     compute the build variant suffixes for the given options
     """
@@ -138,7 +138,7 @@ class ApplicationTarget:
     binary: str  # elf binary to run after it is built
 
 
-def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
+def _get_targets(coverage: bool | None) -> list[ApplicationTarget]:
     target_prefix = _get_native_machine_target()
     suffix = _get_variants(coverage)
 
@@ -205,6 +205,15 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             cli_key="evse",
             target=f"{target_prefix}-evse-{suffix}",
             binary="chip-evse-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ELECTRICAL_PROTECTION_APP",
+            cli_key="electrical-protection",
+            target=f"{target_prefix}-electrical-protection-{suffix}",
+            binary="chip-electrical-protection-app",
         )
     )
     targets.append(
@@ -512,7 +521,7 @@ def _do_build_python():
     )
 
 
-def _do_build_apps(coverage: Optional[bool], ccache: bool):
+def _do_build_apps(coverage: bool | None, ccache: bool):
     """
     Builds example python apps suitable for running all python_tests.
 
@@ -535,7 +544,7 @@ def _do_build_apps(coverage: Optional[bool], ccache: bool):
     subprocess.run(_with_activate(cmd), check=True)
 
 
-def _do_build_basic_apps(coverage: Optional[bool]):
+def _do_build_basic_apps(coverage: bool | None):
     """
     Builds a minimal subset of test applications, specifically
     all-clusters and chip-tool only, for basic tests.
@@ -977,6 +986,8 @@ def python_tests(
 
         # PushAV is special
         f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
+        # The COMPRO tests' app is the script that brings up their mocked topology
+        f.write("COMPRO_RUNNER: scripts/tests/run_compro_test.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:
@@ -1002,7 +1013,7 @@ def python_tests(
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
-        print("SKIP IS %r" % skip)
+        print(f"SKIP IS {skip!r}")
         skip = _parse_filters(skip)
 
     if from_filter:
@@ -1028,6 +1039,7 @@ def python_tests(
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
+    dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
@@ -1038,14 +1050,21 @@ def python_tests(
         raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
+    skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
             continue
         if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
+        if os.path.basename(file) in dedicated_runner_tests:
+            skipped_dedicated_runner.append(os.path.basename(file))
+            continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
+
+    for name in sorted(skipped_dedicated_runner):
+        log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
 
     execution_times = []
     failed_tests = []
@@ -1160,7 +1179,7 @@ def python_tests(
             sys.exit(1)
 
 
-def _do_build_fabric_sync_apps(coverage: Optional[bool]):
+def _do_build_fabric_sync_apps(coverage: bool | None):
     """
     Build applications used for fabric sync tests
     """

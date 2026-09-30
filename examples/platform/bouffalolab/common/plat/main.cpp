@@ -27,6 +27,11 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 volatile int apperror_cnt;
+
+#ifndef BOUFFALOLAB_APP_NAME
+#define BOUFFALOLAB_APP_NAME "chip-lighting-example"
+#endif
+
 // ================================================================================
 // App Error
 //=================================================================================
@@ -50,7 +55,7 @@ extern "C" int START_ENTRY(void)
     Internal::BflbConfig::Init();
 
     ChipLogProgress(NotSpecified, "==================================================");
-    ChipLogProgress(NotSpecified, "bouffalolab chip-lighting-example, built at " __DATE__ " " __TIME__);
+    ChipLogProgress(NotSpecified, "bouffalolab " BOUFFALOLAB_APP_NAME ", built at " __DATE__ " " __TIME__);
     ChipLogProgress(NotSpecified, "==================================================");
 
     ChipLogProgress(NotSpecified, "Init CHIP Memory");

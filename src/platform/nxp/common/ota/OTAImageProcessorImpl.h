@@ -108,6 +108,11 @@ private:
      */
     void Cleanup();
 
+    /**
+     * Called to handle the image status and log status
+     */
+    CHIP_ERROR HandleImageStatus();
+
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;

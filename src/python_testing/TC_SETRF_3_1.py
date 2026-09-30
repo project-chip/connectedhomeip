@@ -50,6 +50,7 @@ from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
+class TC_SETRF_3_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_3_1."""
 
     def desc_TC_SETRF_3_1(self) -> str:
@@ -280,6 +281,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -326,6 +328,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -364,6 +367,7 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;

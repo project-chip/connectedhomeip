@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,7 @@ void MicrowaveOvenMode::Shutdown()
     }
 }
 
-void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(gMicrowaveOvenModeDelegate == nullptr && gMicrowaveOvenModeInstance == nullptr);
     gMicrowaveOvenModeDelegate = new MicrowaveOvenMode::ExampleMicrowaveOvenModeDelegate;
@@ -104,7 +104,7 @@ void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gMicrowaveOvenModeInstance->Init();
 }
 
-void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gMicrowaveOvenModeInstance)
     {

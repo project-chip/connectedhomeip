@@ -20,7 +20,7 @@
 
 #if CONFIG_CHIP_LIB_SHELL
 
-#include <devices/device-factory/DeviceFactory.h>
+#include <device-factory/DeviceFactory.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <zephyr/shell/shell.h>
@@ -63,7 +63,7 @@ int cmd_devtype_set(const struct shell * shell, size_t argc, char ** argv)
     }
 
     const std::string deviceType(argv[1]);
-    auto & factory = chip::app::DeviceFactory::GetInstance();
+    auto & factory = chip::app::NoHooksDeviceFactory::GetInstance();
 
     if (!factory.IsValidDevice(deviceType))
     {

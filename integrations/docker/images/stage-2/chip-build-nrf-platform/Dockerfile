@@ -3,12 +3,13 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} AS build
 
 # Compatible Nordic Connect SDK revision and required tools versions
-ARG NCS_REVISION=v3.3.0
+ARG NCS_REVISION=v3.4.0
 ARG JLINK_VERSION="JLink_Linux_V924a_x86_64"
 ARG WEST_VERSION=1.4.0
-ARG CMAKE_VERSION=4.2.0
 ARG NRFUTIL_VERSION=8.1.1
-ARG NRFUTIL_DEVICE_VERSION=2.17.5
+ARG NRFUTIL_DEVICE_VERSION=2.19.0
+# CMake is Installed automatically by nrfutil, stored here only for reference
+ARG CMAKE_VERSION=4.2.1
 
 # Requirements to clone SDKs
 RUN set -x \
@@ -30,7 +31,7 @@ RUN set -x \
     && curl --location https://files.nordicsemi.com/artifactory/swtools/external/nrfutil/executables/x86_64-unknown-linux-gnu/nrfutil -o nrfutil \
     && chmod +x ./nrfutil \
     && ./nrfutil self-upgrade --to-version ${NRFUTIL_VERSION} \
-    && ./nrfutil install device=${NRFUTIL_DEVICE_VERSION} \
+    && ./nrfutil install device=${NRFUTIL_DEVICE_VERSION} --force \
     && ./nrfutil install sdk-manager \
     # Download nRF Connect toolchain
     && ./nrfutil sdk-manager toolchain install --ncs-version "$NCS_REVISION" --install-dir ./zephyr-sdk \

@@ -33,6 +33,11 @@ constexpr static size_t kMessageTextLengthMax          = 256;
 constexpr static size_t kMessageMaxOptionCount         = 4;
 constexpr static size_t kMessageResponseIdMin          = 1;
 constexpr static size_t kMessageResponseLabelMaxLength = 32;
+constexpr static size_t kLanguageCodeLengthMax         = 32;
+constexpr static size_t kMessageUriLengthMax           = 256;
+constexpr static size_t kSupportedLanguageCodeMaxCount = 32;
+constexpr static size_t kSupportedMimeTypeMaxCount     = 64;
+constexpr static size_t kSupportedMimeTypeLengthMax    = 256;
 
 class Delegate
 {
@@ -43,12 +48,16 @@ public:
         const chip::BitMask<MessageControlBitmap> & messageControl, const DataModel::Nullable<uint32_t> & startTime,
         const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
         const chip::Optional<DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses)                                                                                          = 0;
+            responses,
+        const chip::Optional<CharSpan> & languageCode, const chip::Optional<CharSpan> & messageUri,
+        chip::FabricIndex fabricIndex)                                                                          = 0;
     virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;
 
     // Attributes
-    virtual CHIP_ERROR HandleGetMessages(app::AttributeValueEncoder & aEncoder)         = 0;
-    virtual CHIP_ERROR HandleGetActiveMessageIds(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetMessages(app::AttributeValueEncoder & aEncoder)               = 0;
+    virtual CHIP_ERROR HandleGetActiveMessageIds(app::AttributeValueEncoder & aEncoder)       = 0;
+    virtual CHIP_ERROR HandleGetSupportedLanguageCodes(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetSupportedMimeTypes(app::AttributeValueEncoder & aEncoder)     = 0;
 
     // Global Attributes
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
@@ -56,6 +65,23 @@ public:
 
     virtual ~Delegate() = default;
 };
+
+// Logs a MessageNotPresented event for the given endpoint.
+CHIP_ERROR LogMessageNotPresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId, bool removedFromQueue,
+                                       chip::FabricIndex fabricIndex);
+
+// Logs a MessageQueued event for the given endpoint.
+CHIP_ERROR LogMessageQueuedEvent(chip::EndpointId endpoint, const ByteSpan & messageId);
+
+// Logs a MessagePresented event for the given endpoint.
+CHIP_ERROR LogMessagePresentedEvent(chip::EndpointId endpoint, const ByteSpan & messageId);
+
+// Logs a MessageComplete event for the given endpoint. responseId/reply/futureMessagesPreference
+// are null when the message was auto-dismissed rather than answered by a real user response.
+CHIP_ERROR LogMessageCompleteEvent(chip::EndpointId endpoint, const ByteSpan & messageId,
+                                   const chip::Optional<DataModel::Nullable<uint32_t>> & responseId,
+                                   const chip::Optional<DataModel::Nullable<CharSpan>> & reply,
+                                   const DataModel::Nullable<FutureMessagePreferenceEnum> & futureMessagesPreference);
 
 } // namespace Messages
 } // namespace Clusters

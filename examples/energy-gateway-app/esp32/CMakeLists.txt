@@ -52,6 +52,10 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 #For the H2, -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
 
+# GCC 15 (ESP-IDF v6.0) is stricter about designated initializers that skip
+# optional fields. Demote to warning until upstream fixes land.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=missing-field-initializers" APPEND)
+
 flashing_script()
 
 # Dependencies required for pw_containers (used by CommodityTariff cluster)

@@ -474,7 +474,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
     ]
 
-    defines = [ "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"" ]
+    defines = [ "MBEDTLS_CONFIG_FILE=\"mbedtls_sample_config.h\"" ]
   }
 
   source_set("${sdk_target_name}_mbedtls") {
@@ -570,6 +570,7 @@ template("bl_iot_sdk") {
     defines = [
       "CONFIG_BT_CONN=1",
       "CONFIG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BLE_USING_DYNAMIC_RAM=0",
       "CONFIG_BT_PERIPHERAL",
       "CFG_BLE_ENABLE",
       "BFLB_BLE",
@@ -592,6 +593,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
     ]
 
@@ -602,6 +604,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/dec.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/log.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/poll.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/utils.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/hci_onchip/hci_driver.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/att.c",
@@ -938,10 +941,9 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_factory_data") {
-    defines = [ "BL_MFD_PLAT_H=\"bl_mfd_bl602.h\"" ]
     sources = [
-      "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd.c",
-      "${bl_iot_sdk_root}/components/network/matter/mfd/bl_mfd_decrypt.c",
+      "${bl_iot_sdk_root}/components/network/matter/mfd/bflb_mfd.c",
+      "${bl_iot_sdk_root}/components/network/matter/mfd/bflb_mfd_decrypt_iot.c",
     ]
 
     configs += [

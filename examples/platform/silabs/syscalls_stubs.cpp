@@ -251,9 +251,8 @@ void __attribute__((weak)) exit(int status)
     static const char kExitMessage[] = "exit not supported, resetting system...\r\n";
     _write(0, kExitMessage, sizeof(kExitMessage) - 1);
     NVIC_SystemReset();
-    while (1)
-    {
-    } // Unreachable, satisfies noreturn attribute
+    // Unreachable, satisfies noreturn attribute
+    __builtin_unreachable();
 }
 
 #ifdef __cplusplus

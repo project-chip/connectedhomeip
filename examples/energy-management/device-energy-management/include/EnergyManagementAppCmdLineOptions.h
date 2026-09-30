@@ -26,7 +26,7 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-chip::BitMask<Feature> GetFeatureMapFromCmdLine();
+chip::BitMask<Feature> GetFeatureMap();
 
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

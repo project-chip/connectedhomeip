@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from typing import Any, Optional
+from typing import Any
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision
@@ -28,7 +28,7 @@ def _is_mandatory(conformance, feature_map=0, revision=1):
     return conformance(info).decision == ConformanceDecision.MANDATORY
 
 
-def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Optional[Clusters.ClusterObjects.ClusterObjectFieldDescriptor]:
+def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Clusters.ClusterObjects.ClusterObjectFieldDescriptor | None:
     for field in cl_object.descriptor.Fields:
         if field.Label == label:
             return field
@@ -80,7 +80,7 @@ def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int
     return attrs
 
 
-def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: dict[uint, XmlDeviceType], device_type_id: int, is_tlv_endpoint: bool = True, server_override: Optional[list[uint]] = None, apply_dt_element_overrides: bool = True) -> dict[int, dict[int, Any]]:
+def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: dict[uint, XmlDeviceType], device_type_id: int, is_tlv_endpoint: bool = True, server_override: list[uint] | None = None, apply_dt_element_overrides: bool = True) -> dict[int, dict[int, Any]]:
     ''' Creates the internals of an endpoint with the minimal set of clusters, with the minimal set of attributes and commands. Global attributes only.
         Does NOT take into account overrides yet.
     '''

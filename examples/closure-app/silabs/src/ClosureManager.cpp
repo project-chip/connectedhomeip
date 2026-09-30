@@ -1257,7 +1257,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     return true;
 }
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 ClosureUIData ClosureManager::GetClosureUIData()
 {
     ClosureUIData uiData;
@@ -1265,7 +1265,7 @@ ClosureUIData ClosureManager::GetClosureUIData()
     uiData.overallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
     return uiData;
 }
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
 bool ClosureManager::IsClosureControlMotionInProgress() const
 {

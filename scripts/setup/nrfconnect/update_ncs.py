@@ -20,6 +20,7 @@ import argparse
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 
 def get_commit_sha(repository_location, rev):
@@ -45,8 +46,7 @@ def update_ncs(repository_location, revision, fetch_shallow):
 
 
 def get_ncs_recommended_revision():
-    chip_root = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), os.path.normpath('../../..')))
+    chip_root = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
     # Read recommended revision saved in the .nrfconnect-recommended-revision file.
     try:
@@ -78,7 +78,7 @@ def print_check_revision_warning_message(current_revision, recommended_revision)
         allowed_message), len(update_message), len(call_command_message)])
 
     # To keep right frame shape the space characters are added to messages shorter than the longest one.
-    fmt = "# {:<%s}#" % (longest_message_len)
+    fmt = f"# {{:<{longest_message_len}}}#"
 
     print_messages([
         (longest_message_len+3)*'#', fmt.format(current_revision_message),

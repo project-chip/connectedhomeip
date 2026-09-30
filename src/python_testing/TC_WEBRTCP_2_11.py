@@ -45,14 +45,14 @@ from test_plan_support import commission_if_required
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import Objects, WebRTCTransportProvider
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_11(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_11(self) -> str:
         return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
@@ -153,7 +153,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
         offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=30)
 
         elapsed_time = time.time() - start_time
-        log.info(f"Received Offer command after {elapsed_time:.2f} seconds")
+        log.info("Received Offer command after %.2f seconds", elapsed_time)
         asserts.assert_less(elapsed_time, 30.0, f"Offer command should be received within 30 seconds, but took {elapsed_time:.2f}s")
 
         self.step(4)
@@ -162,8 +162,8 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WEBRTCPTestBase):
                              f"Offer command WebRTCSessionID {offer_sessionId} should match allocated session ID {session_id}")
         asserts.assert_true(len(remote_offer_sdp) > 0, "Offer command should contain non-empty SDP string")
 
-        log.info(
-            f"Successfully validated deferred Offer command timing: received in {elapsed_time:.2f}s with correct session ID {session_id}")
+        log.info("Successfully validated deferred Offer command timing: received in %.2fs with correct session ID %s",
+                 elapsed_time, session_id)
 
         # Clean up - End the session
         await self.send_single_cmd(

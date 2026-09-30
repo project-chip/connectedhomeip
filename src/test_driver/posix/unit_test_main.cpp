@@ -26,6 +26,13 @@
 #include "pw_unit_test/event_handler.h"
 #include "pw_unit_test/framework.h"
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 using namespace chip;
 using namespace pw::unit_test;
 
@@ -201,6 +208,12 @@ private:
 int main(int argc, char ** argv)
 {
     SuccessOrDie(Platform::MemoryInit());
+
+#if CHIP_CRYPTO_PSA
+    // Catch-all for tests that use crypto without InitChipStack() (which is where
+    // the POSIX platform manager initializes PSA). Idempotent.
+    VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
 
     ArgParser::HelpOptions helpOptions(argv[0], "Usage: unit_test_main [options]", "1.0");
     ArgParser::OptionSet * allOptions[] = { &helpOptions, &gProgramCustomOptions, nullptr };

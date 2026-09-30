@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::Testing;
 
 using Status = chip::Protocols::InteractionModel::Status;
+using CSC    = chip::Protocols::InteractionModel::ClusterStatusCode;
 using Config = ClosureControlCluster::Config;
 
 // Mock callback functions
@@ -217,6 +218,7 @@ public:
     ClosureControlCluster mCluster;
     ClusterTester mClusterTester;
 };
+
 } // namespace
 
 TEST_F(TestClosureControlCluster, TestAttributesList)
@@ -244,6 +246,7 @@ TEST_F(TestClosureControlCluster, TestMandatoryAcceptedCommands)
                                               {
                                                   ClosureControl::Commands::Stop::kMetadataEntry,
                                                   ClosureControl::Commands::MoveTo::kMetadataEntry,
+                                                  ClosureControl::Commands::GroupedMoveTo::kMetadataEntry,
                                               }));
 }
 
@@ -275,6 +278,22 @@ TEST_F(TestClosureControlCluster, TestCalibrationFeatureMapAndAcceptedCommands)
                                                   ClosureControl::Commands::Stop::kMetadataEntry,
                                                   ClosureControl::Commands::MoveTo::kMetadataEntry,
                                                   ClosureControl::Commands::Calibrate::kMetadataEntry,
+                                                  ClosureControl::Commands::GroupedMoveTo::kMetadataEntry,
+                                              }));
+}
+
+TEST_F(TestClosureControlCluster, TestAccessFeatureMapAndAcceptedCommands)
+{
+    ClosureControlCluster accessCluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning().WithAccess());
+    ClusterTester tester(accessCluster);
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, BitFlags<Feature>(Feature::kPositioning).Set(Feature::kAccess));
+
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(accessCluster,
+                                              {
+                                                  ClosureControl::Commands::Stop::kMetadataEntry,
+                                                  ClosureControl::Commands::MoveTo::kMetadataEntry,
                                               }));
 }
 
@@ -290,6 +309,7 @@ TEST_F(TestClosureControlCluster, TestInstantaneousFeatureMapAndAcceptedCommands
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(instantaneousCluster,
                                               {
                                                   ClosureControl::Commands::MoveTo::kMetadataEntry,
+                                                  ClosureControl::Commands::GroupedMoveTo::kMetadataEntry,
                                               }));
 }
 
@@ -614,6 +634,167 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToConstraintValidation)
               Status::ConstraintError);
 }
 
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToNoArgumentsAndInvalidState)
+{
+    TestServerClusterContext testContext;
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
+
+    {
+        Commands::GroupedMoveTo::Type request;
+        auto result = tester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidCommand)));
+    }
+
+    EXPECT_EQ(cluster.SetMainState(MainStateEnum::kError), CHIP_NO_ERROR);
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+        auto result      = tester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    }
+}
+
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToAllFeatures)
+{
+    TestServerClusterContext testContext;
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate)
+                                      .WithPositioning()
+                                      .WithMotionLatching(BitFlags<LatchControlModesBitmap>()
+                                                              .Set(LatchControlModesBitmap::kRemoteLatching)
+                                                              .Set(LatchControlModesBitmap::kRemoteUnlatching))
+                                      .WithSpeed());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetOverallCurrentState(
+                  LatchedState(CurrentPositionEnum::kPartiallyOpened, true, Optional(Globals::ThreeLevelAutoEnum::kLow))),
+              CHIP_NO_ERROR);
+    mockDelegate.moveToCommandCalls = 0;
+
+    Commands::GroupedMoveTo::Type request;
+    request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+    request.latch    = Optional(false);
+    request.speed    = Optional(Globals::ThreeLevelAutoEnum::kHigh);
+    auto result      = tester.Invoke(request);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_EQ(mockDelegate.moveToCommandCalls, 1);
+
+    DataModel::Nullable<GenericOverallTargetState> targetState = cluster.GetOverallTargetState();
+    ASSERT_FALSE(targetState.IsNull());
+    EXPECT_EQ(targetState.Value().position.Value().Value(), TargetPositionEnum::kMoveToFullyOpen);
+    EXPECT_EQ(targetState.Value().latch.Value().Value(), false);
+    EXPECT_EQ(targetState.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(mockDelegate.GetOverallTargetStateValue(), targetState);
+
+    MainStateEnum state = cluster.GetMainState();
+    EXPECT_EQ(state, MainStateEnum::kMoving);
+}
+
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToTransitionsToWaitingWhenNotReady)
+{
+    mockDelegate.isReadyToMove = false;
+    TestServerClusterContext testContext;
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
+
+    Commands::GroupedMoveTo::Type request;
+    request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+    auto result      = tester.Invoke(request);
+    EXPECT_TRUE(result.IsSuccess());
+    MainStateEnum state = cluster.GetMainState();
+    EXPECT_EQ(state, MainStateEnum::kWaitingForMotion);
+}
+
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToLatchedPositionChangeRequiresUnlatch)
+{
+    TestServerClusterContext testContext;
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate)
+                                      .WithPositioning()
+                                      .WithMotionLatching(BitFlags<LatchControlModesBitmap>()
+                                                              .Set(LatchControlModesBitmap::kRemoteLatching)
+                                                              .Set(LatchControlModesBitmap::kRemoteUnlatching)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetOverallCurrentState(LatchedState(CurrentPositionEnum::kPartiallyOpened, true)), CHIP_NO_ERROR);
+
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+        auto result      = tester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    }
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+        request.latch    = Optional(true);
+        auto result      = tester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    }
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+        request.latch    = Optional(false);
+        auto result      = tester.Invoke(request);
+        EXPECT_TRUE(result.IsSuccess());
+    }
+}
+
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToRemoteLatchingConformanceChecks)
+{
+    TestServerClusterContext testContext;
+
+    ClosureControlCluster latchOnlyCluster(
+        Config(kTestEndpointId, mockDelegate, mockTimerDelegate)
+            .WithPositioning()
+            .WithMotionLatching(BitFlags<LatchControlModesBitmap>().Set(LatchControlModesBitmap::kRemoteLatching)));
+    ClusterTester latchOnlyTester(latchOnlyCluster);
+    ASSERT_EQ(latchOnlyCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(latchOnlyCluster.SetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState>(
+                  GenericOverallCurrentState(NullOptional, Optional(DataModel::MakeNullable(true)), NullOptional))),
+              CHIP_NO_ERROR);
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.latch = Optional(false);
+        auto result   = latchOnlyTester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    }
+
+    ClosureControlCluster unlatchOnlyCluster(
+        Config(kTestEndpointId, mockDelegate, mockTimerDelegate)
+            .WithPositioning()
+            .WithMotionLatching(BitFlags<LatchControlModesBitmap>().Set(LatchControlModesBitmap::kRemoteUnlatching)));
+    ClusterTester unlatchOnlyTester(unlatchOnlyCluster);
+    ASSERT_EQ(unlatchOnlyCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(unlatchOnlyCluster.SetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState>(
+                  GenericOverallCurrentState(NullOptional, Optional(DataModel::MakeNullable(true)), NullOptional))),
+              CHIP_NO_ERROR);
+    {
+        Commands::GroupedMoveTo::Type request;
+        request.latch = Optional(true);
+        auto result   = unlatchOnlyTester.Invoke(request);
+        EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::InvalidInState)));
+    }
+}
+
+TEST_F(TestClosureControlCluster, TestInvokeGroupedMoveToDelegateFailure)
+{
+    mockDelegate.moveToCommandStatus = Status::Busy;
+    TestServerClusterContext testContext;
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
+
+    Commands::GroupedMoveTo::Type request;
+    request.position = Optional(TargetPositionEnum::kMoveToFullyOpen);
+    auto result      = tester.Invoke(request);
+    EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::Busy)));
+}
+
 TEST_F(TestClosureControlCluster, TestErrorListLifecycle)
 {
     ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning());
@@ -757,6 +938,12 @@ TEST_F(TestClosureControlCluster, TestConformanceCalibrationRequiresPositioning)
 {
     ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning().WithCalibration());
     EXPECT_EQ(cluster.GetFeatureMap(), BitFlags<Feature>(Feature::kPositioning).Set(Feature::kCalibration));
+}
+
+TEST_F(TestClosureControlCluster, TestConformanceAccess)
+{
+    ClosureControlCluster cluster(Config(kTestEndpointId, mockDelegate, mockTimerDelegate).WithPositioning().WithAccess());
+    EXPECT_EQ(cluster.GetFeatureMap(), BitFlags<Feature>(Feature::kPositioning).Set(Feature::kAccess));
 }
 
 TEST_F(TestClosureControlCluster, TestConformanceVentilationPedestrianCalibrationWithPositioning)

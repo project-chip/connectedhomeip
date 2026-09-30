@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <app/ReadHandler.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
@@ -118,7 +120,7 @@ public:
         bool IsReportableNow(const Timestamp & now) const
         {
             return (mReadHandler->CanStartReporting() &&
-                    ((now >= mMinTimestamp && (mReadHandler->IsDirty() || now >= mMaxTimestamp || CanBeSynced())) ||
+                    ((now >= GetMinTimestamp() && (mReadHandler->IsDirty() || now >= GetMaxTimestamp() || CanBeSynced())) ||
                      IsEngineRunScheduled()));
         }
 
@@ -150,14 +152,22 @@ public:
             mScheduler->ReportTimerCallback();
         }
 
-        System::Clock::Timestamp GetMinTimestamp() const { return mMinTimestamp; }
-        System::Clock::Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+        Timestamp GetMinTimestamp() const { return std::max(mMinTimestamp, mDeferralEndTimestamp); }
+        Timestamp GetMaxTimestamp() const { return mMaxTimestamp; }
+
+        Timestamp GetDeferralEndTimestamp() const { return mDeferralEndTimestamp; }
+        void SetDeferralEndTimestamp(const Timestamp & deferralEndTimestamp) { mDeferralEndTimestamp = deferralEndTimestamp; }
+        bool PathListsContainAnyEndpoint(Span<const EndpointId> targetedEndpoints) const
+        {
+            return mReadHandler->PathListsContainAnyEndpoint(targetedEndpoints);
+        }
 
     private:
         ReadHandler * mReadHandler;
         ReportScheduler * mScheduler;
         Timestamp mMinTimestamp;
         Timestamp mMaxTimestamp;
+        Timestamp mDeferralEndTimestamp = Timestamp(0);
 
         BitFlags<ReadHandlerNodeFlags> mFlags;
     };
@@ -167,6 +177,45 @@ public:
     virtual ~ReportScheduler() = default;
 
     virtual void ReportTimerCallback() = 0;
+
+    /**
+     * @brief Defer report emission for active subscriptions interested in the targeted endpoints.
+     *
+     * This method is called when an Invoke Request containing a report delay parameter is processed.
+     * It scans all registered subscription nodes (ReadHandlerNode) and, for any node whose monitored
+     * paths (attributes or events) match the targeted endpoints, schedules a one-time report deferral.
+     *
+     * @pre The scheduler must be initialized and have active subscription handlers registered.
+     *
+     * @post For each matching subscription node:
+     *       - The node's deferral watermark (mDeferralEndTimestamp) is set to the current timestamp plus
+     *         an effective delay, which is the minimum of:
+     *           1. The newly requested delay.
+     *           2. The remaining duration of any active deferral (if already deferred).
+     *           3. The remaining time until the subscription's maximum reporting interval expires.
+     *       - The next report timer is recalculated and rescheduled to fire at or after the deferral end time.
+     *       - The deferral is a one-time effect: once the deferred report is successfully transmitted,
+     *         subsequent reports revert back to their standard minimum/maximum intervals.
+     *
+     * @param aDelay The duration of the delay to apply, calculated from the client's request.
+     * @param targetedEndpoints The list of endpoint IDs targeted by the commands in the Invoke Request.
+     *                          If empty (e.g. unmapped groupcast), the delay applies to all active subscriptions.
+     */
+    virtual void DeferReports(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints = {}) = 0;
+
+    /**
+     * @brief Recalculate and reschedule the reporting timers for all registered subscription nodes.
+     *
+     * This method is called to force the scheduler to re-evaluate the next report timeout for every
+     * active ReadHandlerNode. Typically called after system-wide changes that affect scheduling,
+     * such as applying a report delay deferral.
+     *
+     * @pre None.
+     *
+     * @post The next report timeouts for all registered nodes are updated and their timers are
+     *       started or rescheduled to fire at the new timeout.
+     */
+    virtual void RescheduleAllReports() = 0;
 
     /// @brief Check whether a ReadHandler is reportable right now, taking into account its minimum and maximum intervals.
     /// @param aReadHandler read handler to check

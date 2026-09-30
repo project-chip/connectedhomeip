@@ -23,7 +23,7 @@ get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-
 
 include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
-include(${ALL_DEVICES_COMMON_DIR}/devices/enabled_devices.cmake)
+include(${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake)
 
 add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
 
@@ -39,7 +39,8 @@ target_include_directories(app PRIVATE
                            ${CHIP_ROOT}/examples/all-devices-app/all-devices-common
                            ${CHIP_ROOT}/src/data-model-providers/codedriven
                            ${CHIP_ROOT}/src/data-model-providers
-                           ${CMAKE_CURRENT_BINARY_DIR}) # for generated app_config/enabled_devices.h
+                           ${CMAKE_CURRENT_BINARY_DIR} # for generated app_config/enabled_devices.h
+                           ${ALL_DEVICES_EXTRA_INCLUDE_DIRS})
 
 target_sources(app PRIVATE
                # Code-driven data model
@@ -50,7 +51,8 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 
                # all-devices common sources (interfaces, root node base, supported devices)
-               ${ALL_DEVICES_DEVICE_SOURCES})
+               ${ALL_DEVICES_DEVICE_SOURCES}
+               ${ALL_DEVICES_CLUSTER_SOURCES})
 
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -66,12 +68,21 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pm_observer.c)
 
 if(CONFIG_NET_L2_OPENTHREAD)
-  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/ThreadRootNodeDevice.cpp)
+  target_sources(app PRIVATE
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/ThreadFeature.h
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/ThreadRootNode.h
+  )
 elseif(CONFIG_CHIP_WIFI)
-  target_sources(app PRIVATE ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/devices/root-node/WifiRootNodeDevice.cpp)
+  target_sources(app PRIVATE
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.cpp
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/features/WifiFeature.h
+    ${CHIP_ROOT}/examples/all-devices-app/all-devices-common/device/types/root-node/WifiRootNode.h
+  )
 endif()
 
 if(CONFIG_PWM)
@@ -82,11 +93,11 @@ if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_TRANSPORT_BT)
-  zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
-  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
-endif()
-
 if (CONFIG_CHIP_PW_RPC)
   include(${TELINK_COMMON}/Rpc.cmake)
+endif()
+
+if(CONFIG_OPENTHREAD_SNTP_CLIENT)
+  target_sources(app PRIVATE
+                   ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
 endif()

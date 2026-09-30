@@ -33,6 +33,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -46,14 +47,13 @@ from support_modules.idm_support import IDMBaseTest
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AttributePath
 from matter.testing import global_attribute_ids
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_IDM_2_2(IDMBaseTest, BasicCompositionTests):
+class TC_IDM_2_2(IDMBaseTest):
     """Test case for IDM-2.2: Report Data Action from DUT to TH.
 
     This test verifies that the DUT correctly handles read requests and responds

@@ -36,18 +36,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 /**********************************************************
- * Defines
- *********************************************************/
-
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
-/**********************************************************
  * AppTask Declaration
  *********************************************************/
 
@@ -57,7 +45,8 @@ class AppTask : public BaseApplication
 public:
     AppTask() = default;
 
-    static AppTask & GetAppTask() { return sAppTask; }
+    /** @brief Returns the active app instance */
+    static AppTask & GetAppTask();
 
     /**
      * @brief AppTask task main loop function
@@ -66,6 +55,7 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    /** @brief Creates and starts the AppTask thread */
     CHIP_ERROR StartAppTask();
 
     /**
@@ -78,12 +68,14 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-private:
-    static AppTask sAppTask;
+    /**
+     * @brief Processes energy management button actions posted from ButtonEventHandler.
+     *
+     * @param aEvent button event being processed
+     */
     static void EnergyManagementActionEventHandler(AppEvent * aEvent);
 
-    static void UpdateClusterState(intptr_t context);
-
+protected:
     /**
      * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
@@ -91,20 +83,6 @@ private:
      */
     CHIP_ERROR AppInit() override;
 
-    /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
-     */
-    static void ButtonHandler(AppEvent * aEvent);
-
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
+    /** @brief Application bring up. Locks the stack and calls EvseApplicationInit(). */
+    void ApplicationInit();
 };
