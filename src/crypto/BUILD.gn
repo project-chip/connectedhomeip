@@ -30,7 +30,7 @@ import("crypto.gni")
 # src/app/tests/TestReportingEngine.cpp.
 # See https://github.com/project-chip/connectedhomeip/issues/74514.
 assert(
-    !chip_crypto_psa_aead_single_part ||
+    chip_crypto != "psa" || !chip_crypto_psa_aead_single_part ||
         !chip_inet_config_enable_tcp_endpoint || chip_build_tests,
     "chip_crypto_psa_aead_single_part cannot be combined with chip_inet_config_enable_tcp_endpoint")
 
