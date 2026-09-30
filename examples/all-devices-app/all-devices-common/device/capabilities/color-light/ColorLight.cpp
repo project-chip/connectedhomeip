@@ -80,7 +80,7 @@ Clusters::DynamicLightingCluster & ColorLight::GetDynamicLightingCluster()
 //   Identify       TriggerEffect command     the Identify delegate's IsTriggerEffectEnabled()
 //   Scenes Mgmt    CopyScene command         supportsCopyScene below
 //   On/Off         Lighting feature          the On/Off feature map below
-//   Level Control  OnOff feature             Config::WithOnOff()
+//   Level Control  OnOff feature             Config::WithOnOffCluster()
 //   Level Control  Lighting feature          Config::WithLighting(), which also applies the
 //                  MinLevel 1 / MaxLevel 254 the table constrains them to
 //   Color Control  RemainingTime attribute   always advertised by ColorControlCluster
@@ -123,9 +123,8 @@ CHIP_ERROR ColorLight::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     Clusters::LevelControlCluster::Config levelConfig(mContext.timerDelegate, mLevelControlDelegate);
-    levelConfig.WithOnOff(mOnOffCluster.Cluster()).WithLighting(DataModel::Nullable<uint8_t>());
+    levelConfig.WithOnOffCluster(mOnOffCluster.Cluster()).WithLighting(DataModel::Nullable<uint8_t>());
     mLevelControlCluster.Create(endpoint, levelConfig);
-    mOnOffCluster.Cluster().AddDelegate(&mLevelControlCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
     mGroupsCluster.Create(endpoint,
@@ -207,14 +206,9 @@ void ColorLight::Unregister(CodeDrivenDataModelProvider & provider)
         }
     }
 
-    // Remove the delegates from the On/Off cluster.
     if (mOnOffCluster.IsConstructed())
     {
         mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
-        if (mLevelControlCluster.IsConstructed())
-        {
-            mOnOffCluster.Cluster().RemoveDelegate(&mLevelControlCluster.Cluster());
-        }
     }
 
     // === PHASE 2: DESTRUCTION (reverse of the creation order in Register) ===
