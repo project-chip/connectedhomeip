@@ -1670,7 +1670,7 @@ void AddGroupTen(JointFabricDatastore & store, std::optional<uint16_t> groupKeyS
     ASSERT_EQ(store.AddGroup(addGroup), CHIP_NO_ERROR);
 }
 
-EndpointGroupIdEntryType MakeEndpointGroupEntry(State state, uint32_t failureCode = 0)
+EndpointGroupIdEntryType MakeEndpointGroupEntry(State state, uint8_t failureCode = 0)
 {
     EndpointGroupIdEntryType entry;
     entry.nodeID                  = 123;
