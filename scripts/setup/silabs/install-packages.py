@@ -32,15 +32,15 @@ def get_platform_vars():
     platform = sys.platform
     if platform == "darwin":
         platform_name = "mac"
-        slt_arch = "arm64" if machine() == "arm64" else "x64"
+        host_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
-        slt_arch = "x64"
+        host_arch = "x64"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{slt_arch}.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{host_arch}.zip"
     return platform_name, slt_cli_url
 
 
