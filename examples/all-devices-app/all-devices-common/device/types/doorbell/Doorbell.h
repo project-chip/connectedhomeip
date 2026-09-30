@@ -58,7 +58,6 @@ public:
 
     // Doorbell actions (can be invoked via OOB accessors, named pipes, or physical button drivers)
     CHIP_ERROR HandleShortPress();
-    CHIP_ERROR HandleSetCurrentPosition(uint8_t currentPosition);
 
     Clusters::IdentifyCluster & IdentifyCluster();
     Clusters::SwitchCluster & SwitchCluster();

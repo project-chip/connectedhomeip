@@ -131,12 +131,5 @@ CHIP_ERROR Doorbell::HandleShortPress()
     return SetSwitchPosition(0);
 }
 
-CHIP_ERROR Doorbell::HandleSetCurrentPosition(uint8_t currentPosition)
-{
-    ReturnErrorOnFailure(SetSwitchPosition(currentPosition));
-    // Chime should be triggered here.
-    return CHIP_NO_ERROR;
-}
-
 } // namespace app
 } // namespace chip

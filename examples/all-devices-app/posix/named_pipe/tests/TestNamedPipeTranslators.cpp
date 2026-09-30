@@ -382,7 +382,7 @@ TEST_F(TestNamedPipeTranslators, DoorbellTranslator)
 {
     DoorbellTranslator translator;
     auto names = translator.GetActionNames();
-    EXPECT_EQ(names.size(), 3U);
+    EXPECT_EQ(names.size(), 2U);
 
     // ShortPress
     Json::Value json1 = ParseJson(R"({"Name": "ShortPress"})");
@@ -394,18 +394,9 @@ TEST_F(TestNamedPipeTranslators, DoorbellTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
 
-    // SetCurrentPosition with CurrentPosition
-    Json::Value json3 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, json3, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
-
-    Json::Value json4 = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 0})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, json4, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
-
-    // Missing field
-    Json::Value invalid = ParseJson(R"({"Name": "SetCurrentPosition"})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, invalid, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+    // Unknown action (SetCurrentPosition is no longer supported)
+    Json::Value unknown = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
 TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
@@ -423,10 +414,10 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     Json::Value defEp = ParseJson(R"({"Name": "SetOnOff", "OnOff": false})");
     EXPECT_EQ(dispatcher.DispatchJson(defEp), CHIP_NO_ERROR);
 
-    // Valid DoorbellTranslator action (SetCurrentPosition)
-    Json::Value switchCmd = ParseJson(R"({"Name": "SetCurrentPosition", "EndpointId": 1, "CurrentPosition": 2})");
-    EXPECT_EQ(dispatcher.DispatchJson(switchCmd), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetCurrentPosition");
+    // Valid DoorbellTranslator action (ShortPress)
+    Json::Value doorbellCmd = ParseJson(R"({"Name": "ShortPress", "EndpointId": 1})");
+    EXPECT_EQ(dispatcher.DispatchJson(doorbellCmd), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
 
     // Invalid JSON structure (not object)
     Json::Value arrayVal(Json::arrayValue);

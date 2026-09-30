@@ -31,12 +31,6 @@ CHIP_ERROR DoorbellTranslator::TranslateAndExecute(EndpointId endpointId, const 
     {
         return DispatchAction(registry, "ShortPress"_span, endpointId);
     }
-    if (action == "SetCurrentPosition")
-    {
-        auto currentPosition = ExtractUInt<uint8_t>(json, "CurrentPosition");
-        VerifyOrReturnError(currentPosition.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-        return DispatchAction(registry, "SetCurrentPosition"_span, endpointId, *currentPosition);
-    }
     return CHIP_ERROR_NOT_FOUND;
 }
 
