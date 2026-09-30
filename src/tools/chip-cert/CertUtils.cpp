@@ -525,13 +525,14 @@ bool SetKeyUsageExtension(X509 * cert, bool isCA, CertStructConfig & certConfig)
  */
 bool AddSubjectKeyId(X509 * cert, bool isSKIDLengthValid)
 {
-    bool res                    = true;
-    const ASN1_BIT_STRING * pk  = X509_get0_pubkey_bitstr(cert);
+    bool res                   = true;
+    const ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(cert);
     unsigned char pkHash[EVP_MAX_MD_SIZE];
     unsigned int pkHashLen;
     std::unique_ptr<ASN1_STRING, void (*)(ASN1_STRING *)> pkHashOS(ASN1_STRING_type_new(V_ASN1_OCTET_STRING), &ASN1_STRING_free);
 
-    if (!EVP_Digest(ASN1_STRING_get0_data(pk), static_cast<size_t>(ASN1_STRING_length(pk)), pkHash, &pkHashLen, EVP_sha1(), nullptr))
+    if (!EVP_Digest(ASN1_STRING_get0_data(pk), static_cast<size_t>(ASN1_STRING_length(pk)), pkHash, &pkHashLen, EVP_sha1(),
+                    nullptr))
     {
         ReportOpenSSLErrorAndExit("EVP_Digest", res = false);
     }
@@ -1472,8 +1473,9 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrVID, MBSTRING_UTF8,
-                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
+            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrVID,
+                                            MBSTRING_UTF8, reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1,
+                                            0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
@@ -1487,8 +1489,9 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrPID, MBSTRING_UTF8,
-                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
+            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrPID,
+                                            MBSTRING_UTF8, reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1,
+                                            0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }

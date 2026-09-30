@@ -1442,16 +1442,14 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
         case NID_subject_key_identifier: {
             VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
             const ASN1_OCTET_STRING * pSKID = X509_get0_subject_key_id(x509Cert);
-            VerifyOrExit(pSKID != nullptr && ASN1_STRING_length(pSKID) == kSubjectKeyIdentifierLength,
-                         err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(pSKID != nullptr && ASN1_STRING_length(pSKID) == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extSKIDPresent = true;
             break;
         }
         case NID_authority_key_identifier: {
             VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
             const ASN1_OCTET_STRING * pAKID = X509_get0_authority_key_id(x509Cert);
-            VerifyOrExit(pAKID != nullptr && ASN1_STRING_length(pAKID) == kAuthorityKeyIdentifierLength,
-                         err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(pAKID != nullptr && ASN1_STRING_length(pAKID) == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
             extAKIDPresent = true;
             break;
         }
@@ -1547,7 +1545,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         VerifyOrExit(pNotBefore != nullptr,
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
         CharSpan asn1TimeSpan(reinterpret_cast<const char *>(ASN1_STRING_get0_data(pNotBefore)),
-                               static_cast<size_t>(ASN1_STRING_length(pNotBefore)));
+                              static_cast<size_t>(ASN1_STRING_length(pNotBefore)));
 
         VerifyOrExit(CHIP_NO_ERROR == asn1Time.ImportFrom_ASN1_TIME_string(asn1TimeSpan),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));

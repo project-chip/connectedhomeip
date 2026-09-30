@@ -460,14 +460,8 @@ class ToolChipDN : public chip::Credentials::ChipDN
 {
 public:
     bool SetCertName(X509_NAME * name) const;
-    bool SetCertSubjectDN(X509 * cert) const
-    {
-        return SetCertName(const_cast<X509_NAME *>(X509_get_subject_name(cert)));
-    };
-    bool SetCertIssuerDN(X509 * cert) const
-    {
-        return SetCertName(const_cast<X509_NAME *>(X509_get_issuer_name(cert)));
-    };
+    bool SetCertSubjectDN(X509 * cert) const { return SetCertName(const_cast<X509_NAME *>(X509_get_subject_name(cert))); };
+    bool SetCertIssuerDN(X509 * cert) const { return SetCertName(const_cast<X509_NAME *>(X509_get_issuer_name(cert))); };
     bool HasAttr(chip::ASN1::OID oid) const;
     void PrintDN(FILE * file, const char * name) const;
 };
