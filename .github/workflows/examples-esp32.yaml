@@ -161,6 +161,17 @@ jobs:
                 scripts/examples/esp_example.sh all-devices-app sdkconfig.defaults
                 rm -rf examples/all-devices-app/esp32/{build,managed_components}
 
+            - name: Build example All Devices App (Target:ESP32 M5Stack, pigweed RPC, IPv6 Only)
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target esp32-m5stack-all-devices-ipv6only-rpc \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
+                  rm -rf out/esp32-m5stack-all-devices-ipv6only-rpc examples/all-devices-app/esp32/managed_components
+
             - name: Build example Energy Gateway App
               if: steps.changed_paths.outputs.energy_gateway == 'true'
               run: |

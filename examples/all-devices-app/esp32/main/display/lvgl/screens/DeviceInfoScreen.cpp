@@ -108,6 +108,7 @@ void ShowDeviceInfo(lv_obj_t * parent)
     sCommissioningLabel = commLabel;
     RequestCommissioningStatus();
 
+#if CONFIG_LWIP_IPV4
     // IP Address
     esp_netif_t * netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
     esp_netif_ip_info_t ipInfo;
@@ -122,6 +123,7 @@ void ShowDeviceInfo(lv_obj_t * parent)
     }
     lv_obj_t * ipLabel = lv_label_create(parent);
     lv_label_set_text(ipLabel, ipBuf);
+#endif // CONFIG_LWIP_IPV4
 
     // Active Device Type
     std::string devStr  = "Type: " + GetActiveDeviceType();
