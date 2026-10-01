@@ -32,11 +32,12 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
-#include <cstring>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
@@ -808,12 +809,8 @@ struct EmberAfPluginDoorLockCredentialInfo
         modificationSource = other.modificationSource;
         lastModifiedBy     = other.lastModifiedBy;
 
-        size_t dataLen = std::min(other.credentialData.size(), sizeof(credentialDataBuffer));
-        if (dataLen > 0)
-        {
-            memcpy(credentialDataBuffer, other.credentialData.data(), dataLen);
-        }
-        credentialData = chip::MutableByteSpan(credentialDataBuffer, dataLen);
+        credentialData = chip::MutableByteSpan(credentialDataBuffer);
+        SuccessOrDie(CopySpanToMutableSpan(other.credentialData, credentialData));
         return *this;
     }
 #endif
@@ -871,12 +868,8 @@ struct EmberAfPluginDoorLockUserInfo
         modificationSource = other.modificationSource;
         lastModifiedBy     = other.lastModifiedBy;
 
-        size_t nameLen = std::min(other.userName.size(), sizeof(nameBuffer));
-        if (nameLen > 0)
-        {
-            memcpy(nameBuffer, other.userName.data(), nameLen);
-        }
-        userName = chip::MutableCharSpan(nameBuffer, nameLen);
+        userName = chip::MutableCharSpan(nameBuffer);
+        SuccessOrDie(CopyCharSpanToMutableCharSpan(other.userName, userName));
 
         size_t credentialCount = std::min(other.credentials.size(), sizeof(credentialsBuffer) / sizeof(credentialsBuffer[0]));
         for (size_t i = 0; i < credentialCount; i++)
