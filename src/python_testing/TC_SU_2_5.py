@@ -185,7 +185,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         update_state_match = AttributeMatcher.from_callable(
             "UpdateState is Idle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+            lambda  report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and  report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         update_state_handler.cancel()
 
@@ -278,12 +278,13 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
             # UpdateStateProgress
             elif report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
+                # logger.info("Report matcher_combined %d progress", report.value)
                 if val is not None and isinstance(val, int) and 1 <= val <= 100:
                     if not progress_seen:
                         progress_seen = True
                         progress_values.append(val)
                         logger.info('%s: Progress observed: %s at %s', step_number_matcher, val, current_time)
-                    if progress_seen and  val is not None and isinstance(val, int) and val ==  99:
+                    if progress_seen and  val is not None and isinstance(val, int) and val >=  99:
                         download_completed = True
 
             return downloading_seen and progress_seen and download_completed
@@ -646,7 +647,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             [update_state_match], timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
         update_state_match = AttributeMatcher.from_callable(
             "Waiting UpdateState is Idle",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         subscription_attr_cluster.await_all_expected_report_matches(
             [update_state_match], self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
         
