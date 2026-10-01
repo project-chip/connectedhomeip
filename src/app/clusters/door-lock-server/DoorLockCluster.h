@@ -187,6 +187,16 @@ public:
     /// True while the UserCodeTemporaryDisableTime lockout window is active.
     bool IsLockoutEngaged() const;
 
+    // ---- Capacity access (applications size their local storage from these) ---
+    uint16_t GetNumberOfUserSupported() const { return mNumberOfTotalUsersSupported; }
+    uint16_t GetNumberOfPINCredentialsSupported() const { return mNumberOfPINUsersSupported; }
+    uint16_t GetNumberOfRFIDCredentialsSupported() const { return mNumberOfRFIDUsersSupported; }
+    uint8_t GetNumberOfWeekDaySchedulesPerUserSupported() const { return mNumberOfWeekDaySchedulesPerUser; }
+    uint8_t GetNumberOfYearDaySchedulesPerUserSupported() const { return mNumberOfYearDaySchedulesPerUser; }
+    uint8_t GetNumberOfHolidaySchedulesSupported() const { return mNumberOfHolidaySchedulesSupported; }
+    uint8_t GetNumberOfCredentialsSupportedPerUser() const { return mNumberOfCredentialsSupportedPerUser; }
+    bool RequirePINforRemoteOperation() const { return mRequirePINforRemoteOperation; }
+
     // ---- Feature access (mirrors the legacy DoorLockServer API) ----------------
 
     BitFlags<Feature> Features() const { return mFeatures; }

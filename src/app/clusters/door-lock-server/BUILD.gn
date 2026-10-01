@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 source_set("door-lock-server") {
   sources = [
+    "CodegenIntegration.h",
     "DoorLockCluster.cpp",
     "DoorLockCluster.h",
   ]

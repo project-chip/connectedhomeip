@@ -13,5 +13,6 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "door-lock-server-callback.cpp",
 ]

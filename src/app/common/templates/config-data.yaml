@@ -63,7 +63,6 @@ ClustersWithInitFunctions:
 ClustersWithAttributeChangedFunctions:
     # keep-sorted start
     - Bridged Device Basic Information
-    - Door Lock
     - Pump Configuration and Control
     # keep-sorted end
 
@@ -71,7 +70,6 @@ ClustersWithShutdownFunctions:
     # keep-sorted start
     - Barrier Control
     - Color Control
-    - Door Lock
     - Level Control
     - On/Off
     - Sample MEI
@@ -79,7 +77,6 @@ ClustersWithShutdownFunctions:
 
 ClustersWithPreAttributeChangeFunctions:
     # keep-sorted start
-    - Door Lock
     - Level Control
     - Pump Configuration and Control
     # keep-sorted end
@@ -112,6 +109,7 @@ CodeDrivenClusters:
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
+    - Door Lock
     - Dishwasher Alarm
     - Dishwasher Mode
     - Dynamic Lighting

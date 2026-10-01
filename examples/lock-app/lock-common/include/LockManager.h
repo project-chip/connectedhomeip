@@ -67,6 +67,9 @@ public:
 
     static LockManager & Instance();
 
+    /// Returns the endpoint registered for the given id, or nullptr.
+    LockEndpoint * GetLockEndpoint(chip::EndpointId endpointId);
+
 private:
     LockEndpoint * getEndpoint(chip::EndpointId endpointId);
 

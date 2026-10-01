@@ -24,9 +24,8 @@
 #include "LEDWidget.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
@@ -95,6 +94,91 @@ k_timer sFunctionTimer;
 
 Identify sIdentify = { kLockEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                        Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
+
+/**
+ * Delegate for the code-driven DoorLock cluster: forwards the lock/unlock
+ * actuation to BoltLockManager. User/credential storage commands are not
+ * supported by the cluster conversion yet, so the storage hooks of the legacy
+ * implementation are gone. Aliro is not enabled on this platform (see the
+ * server-config overrides below): the getters answer with neutral defaults.
+ */
+class NrfDoorLockDelegate : public Clusters::DoorLock::Delegate
+{
+public:
+    bool HandleDoorLockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
+                               const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                               OperationErrorEnum & err) override
+    {
+        bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+        /* Handle changing attribute state on command reception */
+        if (result)
+        {
+            BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
+        }
+
+        return result;
+    }
+
+    bool HandleDoorUnlockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
+                                 const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                 OperationErrorEnum & err) override
+    {
+        bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+        /* Handle changing attribute state on command reception */
+        if (result)
+        {
+            BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
+        }
+
+        return result;
+    }
+
+    // Door Lock alarm/door position sensor attributes are not enabled on this
+    // platform and the Aliro features are disabled; the stubs below are the
+    // "no reader configuration" defaults.
+    CHIP_ERROR GetAliroReaderVerificationKey(chip::MutableByteSpan & verificationKey) override
+    {
+        verificationKey.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetAliroReaderGroupIdentifier(chip::MutableByteSpan & groupIdentifier) override
+    {
+        groupIdentifier.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetAliroReaderGroupSubIdentifier(chip::MutableByteSpan & groupSubIdentifier) override
+    {
+        memset(groupSubIdentifier.data(), 0, groupSubIdentifier.size());
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index, chip::MutableByteSpan & protocolVersion)
+        override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    CHIP_ERROR GetAliroGroupResolvingKey(chip::MutableByteSpan & groupResolvingKey) override
+    {
+        groupResolvingKey.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetAliroSupportedBLEUWBProtocolVersionAtIndex(size_t index, chip::MutableByteSpan & protocolVersion) override
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    uint8_t GetAliroBLEAdvertisingVersion() override { return 0; }
+    uint16_t GetNumberOfAliroCredentialIssuerKeysSupported() override { return 0; }
+    uint16_t GetNumberOfAliroEndpointKeysSupported() override { return 0; }
+    CHIP_ERROR SetAliroReaderConfig(const ByteSpan & signingKey, const ByteSpan & verificationKey, const ByteSpan & groupIdentifier,
+                                    const Optional<ByteSpan> & groupResolvingKey) override
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    CHIP_ERROR ClearAliroReaderConfig() override { return CHIP_NO_ERROR; }
+};
+
+NrfDoorLockDelegate sDoorLockDelegate;
 
 LEDWidget sStatusLED;
 LEDWidget sLockLED;
@@ -277,6 +361,27 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+    // Configure the code-driven DoorLock cluster before the server registers
+    // the endpoint: the cluster captures the delegate and the capacity
+    // overrides at construction time. These values replace the legacy
+    // ember attribute writes in emberAfDoorLockClusterInitCallback.
+    Clusters::DoorLock::SetDelegate(kLockEndpointId, &sDoorLockDelegate);
+
+    Clusters::DoorLock::ServerConfigOverrides doorLockOverrides;
+    // (kUser|kCredentialsOverTheAirAccess|kPinCredential), the legacy write of
+    // FeatureMap to 0x181.
+    doorLockOverrides.features = BitFlags<Clusters::DoorLock::Feature>(Clusters::DoorLock::Feature::kUser,
+                                                                      Clusters::DoorLock::Feature::kCredentialsOverTheAirAccess,
+                                                                      Clusters::DoorLock::Feature::kPINCredential);
+    doorLockOverrides.numberOfTotalUsersSupported             = CONFIG_LOCK_NUM_USERS;
+    doorLockOverrides.numberOfPINUsersSupported               = CONFIG_LOCK_NUM_USERS;
+    doorLockOverrides.numberOfRFIDUsersSupported              = 0;
+    doorLockOverrides.numberOfCredentialsSupportedPerUser     = CONFIG_LOCK_NUM_CREDENTIALS_PER_USER;
+    doorLockOverrides.autoRelockTime                          = 0;
+    doorLockOverrides.lockState                               = chip::app::DataModel::Nullable<Clusters::DoorLock::DlLockState>(
+        Clusters::DoorLock::DlLockState::kLocked);
+    Clusters::DoorLock::ApplyServerConfigOverrides(kLockEndpointId, doorLockOverrides);
+
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -298,8 +403,8 @@ CHIP_ERROR AppTask::Init()
     // between the main and the CHIP threads.
     TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    // Disable auto-relock time feature.
-    DoorLockServer::Instance().SetAutoRelockTime(kLockEndpointId, 0);
+    // Disable auto-relock time feature: configured through the server-config
+    // overrides above (legacy SetAutoRelockTime(kLockEndpointId, 0)).
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -715,22 +820,20 @@ void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::
     }
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newLockState, source] {
-        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
-        chip::app::Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, currentLockState);
-
-        if (currentLockState.IsNull())
+        auto * cluster = Clusters::DoorLock::FindClusterOnEndpoint(kLockEndpointId);
+        if (cluster == nullptr)
         {
-            // Initialize lock state with start value, but not invoke lock/unlock.
-            chip::app::Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, newLockState);
+            LOG_ERR("DoorLock cluster not found on endpoint %d", kLockEndpointId);
+            return;
         }
-        else
-        {
-            LOG_INF("Updating LockState attribute");
 
-            if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, newLockState, source))
-            {
-                LOG_ERR("Failed to update LockState attribute");
-            }
+        LOG_INF("Updating LockState attribute");
+
+        if (cluster->SetLockState(newLockState, source, chip::app::DataModel::NullNullable,
+                                  chip::Span<const CredentialStruct>(), chip::app::DataModel::NullNullable,
+                                  chip::app::DataModel::NullNullable) != CHIP_NO_ERROR)
+        {
+            LOG_ERR("Failed to update LockState attribute");
         }
     });
 }
