@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * The offset is the start offset (STARTOFS) from the node's BDX ReceiveInit
  * message, passed through unchanged: the byte offset in the OTA image at which the
- * transfer starts.
+ * transfer starts, for example to resume an interrupted download.
  *
  * If completion is passed a non-nil error, the transfer will be rejected. A
  * delegate that cannot provide data starting at offset must pass a non-nil

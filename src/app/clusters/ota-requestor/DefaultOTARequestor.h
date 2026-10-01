@@ -123,6 +123,7 @@ public:
     void OnDownloadStateChanged(OTADownloader::State state,
                                 app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason) override;
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override;
+    void OnDownloadRestartRequested() override;
 
     //////////// DefaultOTARequestor public APIs ///////////////
 

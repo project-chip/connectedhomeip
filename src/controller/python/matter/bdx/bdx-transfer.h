@@ -57,7 +57,8 @@ public:
     CHIP_ERROR AcceptAndReceiveData();
 
     // Accepts the transfer with the intent of sending data. This will send an AcceptReceive message to the other end of the
-    // transfer.
+    // transfer. The data is sent from the start offset of the ReceiveInit; an offset past the end of the data rejects the transfer
+    // with START_OFFSET_NOT_SUPPORTED, and the transfer completes with CHIP_ERROR_INVALID_ARGUMENT.
     CHIP_ERROR AcceptAndSendData(const ByteSpan & data_to_send);
 
     // Rejects the transfer.
@@ -76,9 +77,10 @@ private:
     CHIP_ERROR SendMessage(TransferSession::OutputEvent & event);
     CHIP_ERROR SendBlock();
 
-    Delegate * mDelegate = nullptr;
-    bool mAwaitingAccept = false;
-    bool mRejected       = false;
+    Delegate * mDelegate    = nullptr;
+    bool mAwaitingAccept    = false;
+    bool mRejected          = false;
+    CHIP_ERROR mRejectError = CHIP_NO_ERROR;
 
     System::Layer * mSystemLayer = nullptr;
 

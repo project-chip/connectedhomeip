@@ -1436,6 +1436,11 @@ class OtaProviderClientFragment : Fragment() {
       offset: Long,
     ) {
       Log.d(TAG, "handleBDXTransferSessionBegin, $nodeId, $fileDesignator, $offset")
+      if (offset < 0 || (offset > 0 && fileSize > 0 && offset >= fileSize)) {
+        // Throwing rejects the transfer with START_OFFSET_NOT_SUPPORTED, so the requestor downloads
+        // from offset 0 instead of being sent an empty image.
+        throw IllegalArgumentException("Cannot serve the image from offset $offset")
+      }
       onTransferSessionStarted(nodeId)
       // A redundant QueryImage/BDX Init from the same node supersedes its previous session.
       deviceInputStreams.remove(nodeId)?.closeQuietly()
