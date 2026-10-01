@@ -41,6 +41,7 @@ namespace chip {
 namespace app {
 CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 {
+    bool statusPresent = false;
     TLV::TLVReader reader;
     reader.Init(mReader);
     while (CHIP_NO_ERROR == reader.Next())
@@ -53,6 +54,7 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
         {
         case to_underlying(Tag::kStatus):
             ReturnErrorOnFailure(reader.Get(aStatusIB.mStatus));
+            statusPresent = true;
             break;
         case to_underlying(Tag::kClusterStatus):
             ClusterStatus clusterStatus;
@@ -61,6 +63,10 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
             break;
         }
     }
+    // Status is mandatory. Without this check a block that omits it would leave
+    // mStatus at its default (Success), turning a malformed response into a
+    // silent success for the caller.
+    VerifyOrReturnError(statusPresent, CHIP_ERROR_MISSING_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 #if CHIP_CONFIG_IM_PRETTY_PRINT
