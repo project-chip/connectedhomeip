@@ -19,6 +19,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestBdxOtaSenderPeerBinding.cpp",
+    "TestBdxOtaSenderStartOffset.cpp",
     "TestOTAProviderExample.cpp",
   ]
 
@@ -33,5 +34,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/protocols/secure_channel",
   ]
 }
