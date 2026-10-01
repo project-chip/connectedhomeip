@@ -193,7 +193,7 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        subprocess.run(["csa", "-fsSL", "--max-time", "120", slt_cli_url, "-o", slt_zip_path], check=True)
+        subprocess.run(["curl", "-fsSL", "--max-time", "120", slt_cli_url, "-o", slt_zip_path], check=True)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
             for member in zObject.infolist():
