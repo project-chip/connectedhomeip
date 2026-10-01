@@ -155,6 +155,7 @@ To do this, perform the following steps:
 -   Be sure to double-check the summary and generated ID files to ensure the
     provisional markings are as expected
 -   To update the parsing support to use the new data model files:
+
     -   Update src/python_testing/matter_testing_infrastructure/BUILD.gn to
         create and include a zip of the new files. The gni with the file list
         (src/python_testing/matter_testing_infrastructure/data_model_xmls.gni)
@@ -171,11 +172,13 @@ To do this, perform the following steps:
 
         TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete fails
         if any of these are missed.
+
     -   Add unit tests for the new data model files to the data model file unit
         tests in src/python_testing:
         -   TestSpecParsingDeviceType.py
         -   TestSpecParsingSelection.py
         -   TestSpecParsingSupport.py
+
 -   To update the SDK to the new spec revision, update
     src/app/SpecificationDefinedRevisions.h
 -   Add the new data model files to the github CI data model revision checker in
