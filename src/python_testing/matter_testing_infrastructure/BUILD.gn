@@ -95,6 +95,12 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_matter_asserts.py",
     "matter/testing/test_data_model_errata.py",
   ]
+  if (current_os == "linux") {
+    tests += [
+      "matter/testing/test_linux_namespace.py",
+      "matter/testing/test_linux_wifi.py",
+    ]
+  }
 }
 
 pw_zip("data_model_zip_1_1") {
