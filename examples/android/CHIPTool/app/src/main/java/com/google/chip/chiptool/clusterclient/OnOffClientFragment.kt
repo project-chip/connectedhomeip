@@ -105,44 +105,42 @@ class OnOffClientFragment : Fragment() {
 
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+        ChipClient.getDeviceController(requireContext())
+          .readPath(
+            object : ReportCallback {
+              override fun onError(
+                attributePath: ChipAttributePath?,
+                eventPath: ChipEventPath?,
+                ex: java.lang.Exception
+              ) {
+                Log.e(TAG, "Error reading onOff attribute", ex)
+              }
+
+              override fun onReport(nodeState: NodeState?) {
+                val tlv =
+                  nodeState
+                    ?.getEndpointState(endpointId)
+                    ?.getClusterState(clusterId)
+                    ?.getAttributeState(attributeId)
+                    ?.tlv
+                val value = tlv?.let { TlvReader(it).toAny() }
+                Log.v(TAG, "On/Off attribute value: $value")
+                showMessage("On/Off attribute value: $value")
+              }
+            },
+            devicePointer,
+            listOf(attributePath),
+            null,
+            false,
+            0 /* imTimeoutMs */
+          )
       }
-
-    ChipClient.getDeviceController(requireContext())
-      .readPath(
-        object : ReportCallback {
-          override fun onError(
-            attributePath: ChipAttributePath?,
-            eventPath: ChipEventPath?,
-            ex: java.lang.Exception
-          ) {
-            Log.e(TAG, "Error reading onOff attribute", ex)
-          }
-
-          override fun onReport(nodeState: NodeState?) {
-            val tlv =
-              nodeState
-                ?.getEndpointState(endpointId)
-                ?.getClusterState(clusterId)
-                ?.getAttributeState(attributeId)
-                ?.tlv
-            val value = tlv?.let { TlvReader(it).toAny() }
-            Log.v(TAG, "On/Off attribute value: $value")
-            showMessage("On/Off attribute value: $value")
-          }
-        },
-        devicePointer,
-        listOf(attributePath),
-        null,
-        false,
-        0 /* imTimeoutMs */
-      )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showSubscribeDialog() {
@@ -283,32 +281,30 @@ class OnOffClientFragment : Fragment() {
         null
       )
 
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+        deviceController.invoke(
+          object : InvokeCallback {
+            override fun onError(ex: Exception?) {
+              showMessage("MoveToLevel command failure $ex")
+              Log.e(TAG, "MoveToLevel command failure", ex)
+            }
+
+            override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+              Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+              showMessage("MoveToLevel command success")
+            }
+          },
+          devicePointer,
+          invokeElement,
+          0,
+          0
+        )
       }
-
-    deviceController.invoke(
-      object : InvokeCallback {
-        override fun onError(ex: Exception?) {
-          showMessage("MoveToLevel command failure $ex")
-          Log.e(TAG, "MoveToLevel command failure", ex)
-        }
-
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
-          showMessage("MoveToLevel command success")
-        }
-      },
-      devicePointer,
-      invokeElement,
-      0,
-      0
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun sendOnOffClusterCommand(commandId: OnOff.Command) {
@@ -325,32 +321,30 @@ class OnOffClientFragment : Fragment() {
         null
       )
 
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePointer ->
+        deviceController.invoke(
+          object : InvokeCallback {
+            override fun onError(ex: Exception?) {
+              showMessage("${commandId.name} command failure $ex")
+              Log.e(TAG, "${commandId.name} command failure", ex)
+            }
+
+            override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+              Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+              showMessage("${commandId.name} command success")
+            }
+          },
+          devicePointer,
+          invokeElement,
+          0,
+          0
+        )
       }
-
-    deviceController.invoke(
-      object : InvokeCallback {
-        override fun onError(ex: Exception?) {
-          showMessage("${commandId.name} command failure $ex")
-          Log.e(TAG, "${commandId.name} command failure", ex)
-        }
-
-        override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-          Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
-          showMessage("${commandId.name} command success")
-        }
-      },
-      devicePointer,
-      invokeElement,
-      0,
-      0
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showMessage(msg: String) {
