@@ -37,6 +37,10 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        BitFlags<Clusters::Thermostat::Feature> features = {
+            Clusters::Thermostat::Feature::kHeating,
+            Clusters::Thermostat::Feature::kCooling,
+        };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
@@ -50,6 +54,7 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    const BitFlags<Clusters::Thermostat::Feature> & Features() const { return mContext.features; }
     bool HasThermostatCluster() const { return mThermostatCluster.IsConstructed(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }

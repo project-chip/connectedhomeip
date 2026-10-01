@@ -46,11 +46,9 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
                           });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
-    mThermostatCluster.Create(
-        endpoint,
-        BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating, Clusters::Thermostat::Feature::kCooling),
-        ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate), mThermostatDelegate, mHeatingDelegate,
-        mCoolingDelegate);
+    mThermostatCluster.Create(endpoint, mContext.features,
+                              ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
+                              mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     mUserInterfaceCluster.Create(endpoint);

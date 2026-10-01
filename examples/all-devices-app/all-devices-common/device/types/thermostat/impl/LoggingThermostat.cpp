@@ -25,10 +25,21 @@ namespace {
 namespace thermostat = Clusters::Thermostat;
 using Protocols::InteractionModel::Status;
 
-bool IsSupportedMode(thermostat::SystemModeEnum mode)
+bool IsSupportedMode(thermostat::SystemModeEnum mode, const BitFlags<thermostat::Feature> & features)
 {
-    return mode == thermostat::SystemModeEnum::kOff || mode == thermostat::SystemModeEnum::kHeat ||
-        mode == thermostat::SystemModeEnum::kCool;
+    if (mode == thermostat::SystemModeEnum::kOff)
+    {
+        return true;
+    }
+    if (mode == thermostat::SystemModeEnum::kHeat)
+    {
+        return features.Has(thermostat::Feature::kHeating);
+    }
+    if (mode == thermostat::SystemModeEnum::kCool)
+    {
+        return features.Has(thermostat::Feature::kCooling);
+    }
+    return false;
 }
 
 Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
@@ -57,7 +68,7 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
                                       mHeatingSetpoint, thermostat::kDefaultHeatingSetpoint);
     persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::OccupiedCoolingSetpoint::Id },
                                       mCoolingSetpoint, thermostat::kDefaultCoolingSetpoint);
-    if (!IsSupportedMode(mSystemMode))
+    if (!IsSupportedMode(mSystemMode, Features()))
     {
         mSystemMode = thermostat::SystemModeEnum::kOff;
     }
@@ -106,7 +117,7 @@ Status LoggingThermostat::SetLocalTemperature(DataModel::Nullable<int16_t> value
 Status LoggingThermostat::SetSystemMode(thermostat::SystemModeEnum value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(IsSupportedMode(value), Status::InvalidValue);
+    VerifyOrReturnValue(IsSupportedMode(value, Features()), Status::InvalidValue);
     VerifyOrReturnValue(mSystemMode != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
     CHIP_ERROR err =
@@ -122,6 +133,23 @@ Status LoggingThermostat::SetSystemMode(thermostat::SystemModeEnum value, bool &
     ChipLogProgress(AppServer, "Thermostat: SystemMode changed to %u", static_cast<unsigned>(value));
     UpdateSimulatedRunningState();
     return Status::Success;
+}
+
+thermostat::ControlSequenceOfOperationEnum LoggingThermostat::GetControlSequenceOfOperation() const
+{
+    if (Features().Has(thermostat::Feature::kHeating) && Features().Has(thermostat::Feature::kCooling))
+    {
+        return thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating;
+    }
+    if (Features().Has(thermostat::Feature::kHeating))
+    {
+        return thermostat::ControlSequenceOfOperationEnum::kHeatingOnly;
+    }
+    if (Features().Has(thermostat::Feature::kCooling))
+    {
+        return thermostat::ControlSequenceOfOperationEnum::kCoolingOnly;
+    }
+    return thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating;
 }
 
 Status LoggingThermostat::SetControlSequenceOfOperation(thermostat::ControlSequenceOfOperationEnum value, bool & changed)
@@ -197,6 +225,14 @@ Status LoggingThermostat::GetRunningMode(thermostat::ThermostatRunningModeEnum &
 Status LoggingThermostat::SetRunningMode(thermostat::ThermostatRunningModeEnum value, bool & changed)
 {
     changed = false;
+    if (value == thermostat::ThermostatRunningModeEnum::kHeat && !Features().Has(thermostat::Feature::kHeating))
+    {
+        return Status::ConstraintError;
+    }
+    if (value == thermostat::ThermostatRunningModeEnum::kCool && !Features().Has(thermostat::Feature::kCooling))
+    {
+        return Status::ConstraintError;
+    }
     VerifyOrReturnValue(value == thermostat::ThermostatRunningModeEnum::kOff ||
                             value == thermostat::ThermostatRunningModeEnum::kCool ||
                             value == thermostat::ThermostatRunningModeEnum::kHeat,
@@ -218,6 +254,16 @@ Status LoggingThermostat::GetRunningState(BitMask<thermostat::RelayStateBitmap> 
 
 Status LoggingThermostat::SetRunningState(BitMask<thermostat::RelayStateBitmap> value, bool & changed)
 {
+    if (value.HasAny(thermostat::RelayStateBitmap::kHeat, thermostat::RelayStateBitmap::kHeatStage2) &&
+        !Features().Has(thermostat::Feature::kHeating))
+    {
+        return Status::ConstraintError;
+    }
+    if (value.HasAny(thermostat::RelayStateBitmap::kCool, thermostat::RelayStateBitmap::kCoolStage2) &&
+        !Features().Has(thermostat::Feature::kCooling))
+    {
+        return Status::ConstraintError;
+    }
     changed       = (mRunningState != value);
     mRunningState = value;
     if (changed)
@@ -270,12 +316,14 @@ void LoggingThermostat::UpdateSimulatedRunningState()
     if (!mLocalTemperature.IsNull())
     {
         int16_t currentTemp = mLocalTemperature.Value();
-        if (mSystemMode == thermostat::SystemModeEnum::kHeat && currentTemp < mHeatingSetpoint)
+        if (Features().Has(thermostat::Feature::kHeating) && mSystemMode == thermostat::SystemModeEnum::kHeat &&
+            currentTemp < mHeatingSetpoint)
         {
             newRunningMode = thermostat::ThermostatRunningModeEnum::kHeat;
             newRunningState.Set(thermostat::RelayStateBitmap::kHeat);
         }
-        else if (mSystemMode == thermostat::SystemModeEnum::kCool && currentTemp > mCoolingSetpoint)
+        else if (Features().Has(thermostat::Feature::kCooling) && mSystemMode == thermostat::SystemModeEnum::kCool &&
+                 currentTemp > mCoolingSetpoint)
         {
             newRunningMode = thermostat::ThermostatRunningModeEnum::kCool;
             newRunningState.Set(thermostat::RelayStateBitmap::kCool);

@@ -48,10 +48,7 @@ public:
     Clusters::Thermostat::SystemModeEnum GetSystemMode() const override { return mSystemMode; }
     Protocols::InteractionModel::Status SetSystemMode(Clusters::Thermostat::SystemModeEnum value, bool & changed) override;
 
-    Clusters::Thermostat::ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override
-    {
-        return Clusters::Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating;
-    }
+    Clusters::Thermostat::ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
     Protocols::InteractionModel::Status SetControlSequenceOfOperation(Clusters::Thermostat::ControlSequenceOfOperationEnum value,
                                                                       bool & changed) override;
 
