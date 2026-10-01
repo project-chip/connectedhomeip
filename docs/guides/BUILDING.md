@@ -435,8 +435,8 @@ OSS-Fuzz (libFuzzer-compatibility) build with the local toolchain.
 ### Google `FuzzTest` targets
 
 An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
-framework, built by Matter's GN files in `third_party/fuzztest/`. The Tests
-will have to be built and executed manually.
+framework, built by Matter's GN files in `third_party/fuzztest/`. The Tests will
+have to be built and executed manually.
 
 ```shell
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build

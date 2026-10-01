@@ -121,8 +121,8 @@ for an example of a simple fuzz test.
 
 ## `Google's FuzzTest`
 
--   Google FuzzTest is built by Matter's GN files in `third_party/fuzztest/`,
-    no longer through the Pigweed `pw_fuzzer` module. Fuzz targets include
+-   Google FuzzTest is built by Matter's GN files in `third_party/fuzztest/`, no
+    longer through the Pigweed `pw_fuzzer` module. Fuzz targets include
     `<fuzztest/fuzztest_core.h>` and `<gtest/gtest.h>`.
 
 ### Use cases
