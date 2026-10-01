@@ -207,15 +207,32 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
-static bool ShouldSendUnsolicitedSigma2Abort(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                            const SessionHandle & session, MessageFlags msgFlags)
+// Returns true if an unmatched message is an orphan PASE/CASE responder message on an unauthenticated
+// session, which should be answered with a failure StatusReport so that the peer aborts its half-open
+// handshake instead of waiting for a response timeout.
+static bool ShouldRejectOrphanSessionEstablishmentResponse(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                           const SessionHandle & session, MessageFlags msgFlags)
 {
-    // Filter duplicates so legitimate in-flight retransmissions of a previously processed Sigma2
-    // arriving after exchange closure fall through to SendStandaloneAckIfNeeded rather than aborting.
-    return !msgFlags.Has(MessageFlagValues::kDuplicateMessage) && session->IsUnauthenticatedSession() &&
-        payloadHeader.IsResponder(Protocols::SecureChannel::MsgType::CASE_Sigma2,
-                                  Protocols::SecureChannel::MsgType::CASE_Sigma2Resume) &&
-        packetHeader.GetDestinationNodeId().HasValue();
+    if (!session->IsUnauthenticatedSession())
+    {
+        return false;
+    }
+
+    // Duplicates keep the behavior of Matter spec section 8.5.10.5.2 ("Unsolicited Message Processing"):
+    // they are only acknowledged. A late retransmission of a message that was already processed before
+    // its exchange closed therefore falls through to SendStandaloneAckIfNeeded, and never gets a report.
+    if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
+    {
+        return false;
+    }
+
+    if (!SessionManager::IsSessionEstablishmentResponse(payloadHeader))
+    {
+        return false;
+    }
+
+    // The initiator's ephemeral node id is echoed back as the source of the StatusReport.
+    return packetHeader.GetDestinationNodeId().HasValue();
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -323,11 +340,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        if (mSessionManager != nullptr && ShouldSendUnsolicitedSigma2Abort(packetHeader, payloadHeader, session, msgFlags))
+        if (mSessionManager != nullptr &&
+            ShouldRejectOrphanSessionEstablishmentResponse(packetHeader, payloadHeader, session, msgFlags))
         {
             auto * unauthSession = session->AsUnauthenticatedSession();
-            CHIP_ERROR err       = mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader,
-                                                                                         unauthSession->GetPeerAddress());
+            CHIP_ERROR err =
+                mSessionManager->SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, unauthSession->GetPeerAddress());
             LogErrorOnFailure(err);
             return;
         }
