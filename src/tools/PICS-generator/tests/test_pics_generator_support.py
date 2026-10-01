@@ -27,7 +27,8 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from pics_generator_support import map_cluster_name_to_pics_xml, normalize_pics_item_number  # noqa: E402
+from pics_generator_support import (CaseMismatchedPicsItem, format_case_mismatch_warning, is_case_only_mismatch,  # noqa: E402
+                                    map_cluster_name_to_pics_xml, normalize_pics_item_number)
 
 # Sorted like pics_xml_file_list_loader returns it. The first entry is what an
 # empty prefix would match, and several names share a prefix on purpose.
@@ -99,6 +100,52 @@ class TestNormalizePicsItemNumber(unittest.TestCase):
         self.assertEqual(normalize_pics_item_number(None), "")
         self.assertNotIn(normalize_pics_item_number(None),
                          {normalize_pics_item_number("HSTAT.S.A0000")})
+
+
+class TestIsCaseOnlyMismatch(unittest.TestCase):
+
+    def test_uppercase_template_id_is_flagged(self):
+        # TC-IDM-10.4 looks up the lowercase-hex code, so these fail it even when marked.
+        cases = {
+            "HSTAT.S.A000A": f"HSTAT.S.A{0x000A:04x}",
+            "TSTAT.S.A005D": f"TSTAT.S.A{0x005D:04x}",
+            "OO.S.C0A.Rsp": f"OO.S.C{0x0A:02x}.Rsp",
+            "OO.S.F0A": f"OO.S.F{10:02x}",
+            "ACL.S.E0A": f"ACL.S.E{0x0A:02x}",
+        }
+        for item_number, pics_code in cases.items():
+            with self.subTest(item_number=item_number):
+                self.assertTrue(is_case_only_mismatch(item_number, pics_code))
+
+    def test_exact_match_is_not_flagged(self):
+        for code in ("HSTAT.S", "HSTAT.S.A0000", "BRBINFO.S.A000a", "HSTAT.S.C00.Rsp"):
+            with self.subTest(code=code):
+                self.assertFalse(is_case_only_mismatch(code, code))
+
+    def test_different_ids_are_not_flagged(self):
+        self.assertFalse(is_case_only_mismatch("HSTAT.S.A000B", "HSTAT.S.A000a"))
+        # Decimal feature numbers are wrong for another reason, not case.
+        self.assertFalse(is_case_only_mismatch("RVCRUNM.S.F20", "RVCRUNM.S.F14"))
+
+
+class TestFormatCaseMismatchWarning(unittest.TestCase):
+
+    def test_lists_every_item_under_its_file(self):
+        items = [
+            CaseMismatchedPicsItem("endpoint1/Humidistat Cluster Test Plan.xml", "HSTAT.S.A000A", "HSTAT.S.A000a"),
+            CaseMismatchedPicsItem("endpoint1/Humidistat Cluster Test Plan.xml", "HSTAT.S.A000B", "HSTAT.S.A000b"),
+            CaseMismatchedPicsItem("endpoint1/Thermostat Cluster Test Plan.xml", "TSTAT.S.A005B", "TSTAT.S.A005b"),
+        ]
+        lines = format_case_mismatch_warning(items).splitlines()
+        self.assertEqual(lines[0], "3 supported PICS item(s) will fail TC-IDM-10.4.")
+        self.assertEqual(lines.count("endpoint1/Humidistat Cluster Test Plan.xml"), 1)
+        humidistat = lines.index("endpoint1/Humidistat Cluster Test Plan.xml")
+        self.assertEqual(lines[humidistat + 1:humidistat + 3], [
+            "  HSTAT.S.A000A  (TC-IDM-10.4 expects HSTAT.S.A000a)",
+            "  HSTAT.S.A000B  (TC-IDM-10.4 expects HSTAT.S.A000b)",
+        ])
+        thermostat = lines.index("endpoint1/Thermostat Cluster Test Plan.xml")
+        self.assertEqual(lines[thermostat + 1], "  TSTAT.S.A005B  (TC-IDM-10.4 expects TSTAT.S.A005b)")
 
 
 if __name__ == "__main__":

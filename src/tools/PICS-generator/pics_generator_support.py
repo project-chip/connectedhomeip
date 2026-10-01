@@ -16,6 +16,7 @@
 #
 
 import os
+from dataclasses import dataclass
 
 cluster_to_pics_dict = {
     # Name mapping due to inconsistent naming of PICS files
@@ -85,11 +86,54 @@ def map_cluster_name_to_pics_xml(cluster_name, pics_xml_file_list) -> str:
 def normalize_pics_item_number(item_number: str | None) -> str:
     """Return a PICS itemNumber in the form used for comparisons.
 
-    The CSA PICS XML templates are not consistent about the case of hex digits
-    (e.g. "BRBINFO.S.A000a" and "HSTAT.S.A000A" in the same bundle), so
-    itemNumbers are compared case-insensitively. A missing itemNumber
+    The PICS Guidelines require lowercase hex digits in PICS codes, but some
+    CSA PICS XML templates use uppercase (e.g. "BRBINFO.S.A000a" and
+    "HSTAT.S.A000A" in the same bundle). itemNumbers are compared
+    case-insensitively so those items still get marked; see
+    is_case_only_mismatch() for flagging them. A missing itemNumber
     normalizes to "", which never matches a generated PICS code.
     """
     if item_number is None:
         return ""
     return item_number.lower()
+
+
+@dataclass(frozen=True)
+class CaseMismatchedPicsItem:
+    """A supported PICS item whose template itemNumber differs from its PICS code only in case."""
+    # Generated file the item is in, e.g. "endpoint1/Humidistat Cluster Test Plan.xml".
+    output_file: str
+    # itemNumber as written in the template, e.g. "HSTAT.S.A000A".
+    item_number: str
+    # PICS code TC-IDM-10.4 looks up, e.g. "HSTAT.S.A000a".
+    pics_code: str
+
+
+def is_case_only_mismatch(item_number: str, pics_code: str) -> bool:
+    """Return True if a template itemNumber matches pics_code only when case is ignored.
+
+    pics_code is in the lowercase-hex format the PICS Guidelines require.
+    TC-IDM-10.4 looks PICS codes up exactly, so an item like "HSTAT.S.A000A"
+    that is marked as supported still fails that test, which expects
+    "HSTAT.S.A000a".
+    """
+    return item_number != pics_code and normalize_pics_item_number(item_number) == normalize_pics_item_number(pics_code)
+
+
+def format_case_mismatch_warning(items: list[CaseMismatchedPicsItem]) -> str:
+    """Return the end-of-run warning text for supported items that will fail TC-IDM-10.4."""
+    lines = [
+        f"{len(items)} supported PICS item(s) will fail TC-IDM-10.4.",
+        "",
+        "These items are marked as supported, but their itemNumbers in the PICS XML",
+        "templates use uppercase hex digits. The PICS Guidelines require lowercase",
+        "hex, and TC-IDM-10.4 looks PICS codes up exactly, so it reports each item",
+        "below as missing until the template is fixed.",
+    ]
+    items_by_file: dict[str, list[CaseMismatchedPicsItem]] = {}
+    for item in items:
+        items_by_file.setdefault(item.output_file, []).append(item)
+    for output_file, file_items in items_by_file.items():
+        lines += ["", output_file]
+        lines += [f"  {item.item_number}  (TC-IDM-10.4 expects {item.pics_code})" for item in file_items]
+    return "\n".join(lines)
