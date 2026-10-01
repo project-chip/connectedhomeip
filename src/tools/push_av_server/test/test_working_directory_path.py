@@ -1,53 +1,51 @@
 """Tests for WorkingDirectory.path() path resolution.
 
 The file-serving helpers join a caller-supplied segment onto the working
-directory. These tests pin the invariant that the resolved path always stays
-within the working directory, regardless of the segment's shape.
+directory. These tests pin the invariant that the resolved path stays within
+the directory selected by the fixed prefix, regardless of the segment's shape.
 """
-import os
-import tempfile
-
 import pytest
 from utils import WorkingDirectory
 
 
-def _wd():
-    root = tempfile.mkdtemp(prefix="pavs_test_")
-    wd = WorkingDirectory(root)
-    os.makedirs(os.path.join(root, "streams", "1"), exist_ok=True)
-    os.makedirs(os.path.join(root, "certs", "server"), exist_ok=True)
-    open(os.path.join(root, "streams", "1", "seg.m4s"), "w").close()
-    open(os.path.join(root, "certs", "server", "server.key"), "w").close()
-    return wd, root
+@pytest.fixture
+def wd(tmp_path):
+    root = tmp_path
+    (root / "streams" / "1").mkdir(parents=True)
+    (root / "certs" / "server").mkdir(parents=True)
+    (root / "streams" / "1" / "seg.m4s").touch()
+    (root / "certs" / "server" / "server.key").touch()
+    return WorkingDirectory(str(root)), root
 
 
-def test_relative_segment_resolves_inside_root():
-    wd, root = _wd()
-    p = wd.path("streams", "1", "seg.m4s")
-    assert str(p).startswith(os.path.realpath(root))
+def test_relative_segment_resolves_inside_root(wd):
+    working, root = wd
+    p = working.path("streams", "1", "seg.m4s")
+    assert str(p).startswith(str(root.resolve()))
     assert p.exists()
 
 
-def test_absolute_segment_stays_within_root():
-    # An absolute segment is treated as relative, so it maps to a path inside
-    # root rather than resolving to the absolute location on disk.
-    wd, root = _wd()
-    outside = tempfile.NamedTemporaryFile(delete=False)
-    outside.close()
-    p = wd.path("streams", "1", outside.name)
-    assert str(p).startswith(os.path.realpath(root))
-    assert not p.exists()
+def test_nested_relative_segment_is_allowed(wd):
+    working, root = wd
+    p = working.path("streams", "1", "cmaf/example/video.m4s")
+    assert str(p).startswith(str(root.resolve()))
 
 
-def test_absolute_segment_does_not_reach_other_root_subdir():
-    wd, root = _wd()
-    key = os.path.join(root, "certs", "server", "server.key")
-    p = wd.path("streams", "1", key)
-    assert str(p).startswith(os.path.realpath(root))
-    assert not p.exists()
-
-
-def test_parent_segment_stays_within_root():
-    wd, _ = _wd()
+def test_absolute_segment_is_rejected(wd, tmp_path):
+    working, _ = wd
+    outside = tmp_path.parent / "outside.txt"
     with pytest.raises(ValueError):
-        wd.path("streams", "1", "../../../../some/other/path")
+        working.path("streams", "1", str(outside))
+
+
+def test_parent_segment_cannot_reach_sibling_dir(wd):
+    # streams/<id> must not climb into certs/ even though it stays under root.
+    working, _ = wd
+    with pytest.raises(ValueError):
+        working.path("streams", "1", "../../certs/server/server.key")
+
+
+def test_parent_segment_cannot_escape_root(wd):
+    working, _ = wd
+    with pytest.raises(ValueError):
+        working.path("streams", "1", "../../../../some/other/path")

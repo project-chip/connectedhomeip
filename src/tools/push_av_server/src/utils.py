@@ -53,13 +53,21 @@ class WorkingDirectory:
     def path(self, *paths: str) -> Path:
         """Get a path relative to the root directory.
 
-        The joined result is confined to the root: any component that escapes
-        it (absolute segment, ``..``) is rejected rather than resolved.
+        Every segment must be relative and free of ``..`` components, so a
+        caller-supplied segment cannot climb out of the directory the fixed
+        prefix selects (e.g. a ``streams/<id>`` segment reaching ``certs/``).
+        An absolute segment or a ``..`` component raises ``ValueError``; the
+        resolved result is additionally confined to the root to catch symlink
+        escapes.
         """
         root = self.root_dir().resolve()
-        # Neutralise absolute segments so a later component cannot discard the
-        # earlier fixed ones (``join(root, "streams", id, "/etc/passwd")``).
-        rel = Path(*[str(p).lstrip("/\\") for p in paths])
+        for segment in paths:
+            segment = str(segment)
+            if os.path.isabs(segment) or segment.startswith(("/", "\\")):
+                raise ValueError(f"Absolute path segment not allowed: {segment!r}")
+        rel = Path(*[str(p) for p in paths])
+        if ".." in rel.parts:
+            raise ValueError(f"Parent traversal not allowed: {rel}")
         candidate = (root / rel).resolve()
         if candidate != root and root not in candidate.parents:
             raise ValueError(f"Path escapes working directory: {rel}")
