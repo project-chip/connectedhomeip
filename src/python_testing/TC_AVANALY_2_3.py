@@ -168,7 +168,7 @@ class TC_AVANALY_2_3(MatterTestCommissionedDevice, AVANALYTestBase):
             await self.send_disable_context_triggers_command(endpoint, valid_context_triggers, expected_status=Status.DynamicConstraintError)
 
         self.step(11)
-        # Set ZoneIDs to None if no feature, Null if feature 
+        # Set ZoneIDs to None if no feature, Null if feature
         valid_context_triggers[0].zoneIDs = NullValue if self.has_feature_perzonedetect else None
         await self.send_disable_context_triggers_command(endpoint, valid_context_triggers)
 
