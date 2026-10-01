@@ -44,6 +44,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
 
@@ -1691,8 +1692,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode),
-        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
+        mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
@@ -2685,6 +2686,88 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
     EXPECT_EQ(loopback.mSentMessageCount, 1u);
 }
 
+TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeResponses)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    auto isResponse = [](auto messageType, bool initiator) {
+        PayloadHeader payloadHeader;
+        payloadHeader.SetMessageType(messageType).SetInitiator(initiator);
+        return SessionManager::IsSessionEstablishmentResponse(payloadHeader);
+    };
+
+    // PASE and CASE responder messages, without the initiator flag, are the only matches.
+    for (MsgType type : { MsgType::PBKDFParamResponse, MsgType::PASE_Pake2, MsgType::CASE_Sigma2, MsgType::CASE_Sigma2Resume })
+    {
+        EXPECT_TRUE(isResponse(type, /* initiator = */ false));
+        EXPECT_FALSE(isResponse(type, /* initiator = */ true));
+    }
+
+    // Messages that never expect a reply, and initiator handshake messages, never match.
+    for (MsgType type : { MsgType::StatusReport, MsgType::StandaloneAck, MsgType::MsgCounterSyncRsp, MsgType::PBKDFParamRequest,
+                          MsgType::PASE_Pake1, MsgType::PASE_Pake3, MsgType::CASE_Sigma1, MsgType::CASE_Sigma3 })
+    {
+        EXPECT_FALSE(isResponse(type, /* initiator = */ false));
+    }
+
+    // Other protocols never match, even when their message type value equals a matching Secure
+    // Channel one (0x21 == PBKDFParamResponse).
+    PayloadHeader otherProtocol;
+    otherProtocol.SetMessageType(Protocols::InteractionModel::Id, to_underlying(MsgType::PBKDFParamResponse)).SetInitiator(false);
+    EXPECT_FALSE(SessionManager::IsSessionEstablishmentResponse(otherProtocol));
+}
+
+TEST_F(TestCASESession, OrphanNonHandshakeMessagesDoNotTriggerStatusReport)
+{
+    // StatusReport and StandaloneAck never expect a reply, and other protocols are not valid on
+    // unauthenticated sessions. None of them may be answered with an unauthenticated failure
+    // StatusReport when they arrive for an initiator session that does not exist.
+    struct
+    {
+        Protocols::Id protocolId;
+        uint8_t messageType;
+        uint32_t expectedSentMessageCount;
+    } const kCases[] = {
+        { Protocols::SecureChannel::Id, to_underlying(Protocols::SecureChannel::MsgType::StatusReport), 0 },
+        { Protocols::SecureChannel::Id, to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck), 0 },
+        { Protocols::InteractionModel::Id, to_underlying(Protocols::InteractionModel::MsgType::InvokeCommandResponse), 0 },
+        // Positive control: a PASE responder message under the same conditions is answered.
+        { Protocols::SecureChannel::Id, to_underlying(Protocols::SecureChannel::MsgType::PASE_Pake2), 1 },
+    };
+
+    auto & loopback         = GetLoopback();
+    uint32_t messageCounter = 100;
+
+    for (const auto & testCase : kCases)
+    {
+        loopback.mSentMessageCount = 0;
+
+        System::PacketBufferHandle msg = System::PacketBufferHandle::New(64);
+        ASSERT_FALSE(msg.IsNull());
+
+        PayloadHeader payloadHeader;
+        payloadHeader.SetExchangeID(4321)
+            .SetMessageType(testCase.protocolId, testCase.messageType)
+            .SetInitiator(false)
+            .SetNeedsAck(true);
+        EXPECT_EQ(payloadHeader.EncodeBeforeData(msg), CHIP_NO_ERROR);
+
+        // A destination node id with no matching initiator session.
+        PacketHeader packetHeader;
+        packetHeader.SetSessionId(0)
+            .SetSessionType(Header::SessionType::kUnicastSession)
+            .SetMessageCounter(messageCounter++)
+            .SetDestinationNodeId(Node01_01);
+        EXPECT_EQ(packetHeader.EncodeBeforeData(msg), CHIP_NO_ERROR);
+
+        GetSecureSessionManager().OnMessageReceived(
+            Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6)), std::move(msg));
+        ServiceEvents();
+
+        EXPECT_EQ(loopback.mSentMessageCount, testCase.expectedSentMessageCount);
+    }
+}
+
 class DuplicateSigma2LoopbackDelegate : public Testing::LoopbackTransportDelegate
 {
 public:
@@ -2785,6 +2868,108 @@ TEST_F(TestCASESession, DuplicateSigma2DoesNotTriggerStatusReport)
     EXPECT_EQ(loopbackDelegate.mStandaloneAckCount, 1u);
 
     loopback.SetLoopbackTransportDelegate(nullptr);
+    gPairingServer.Shutdown();
+}
+
+// A late retransmission of Sigma2 can arrive after the initiator has completed CASE and released its
+// unauthenticated session. Duplicate detection needs that session, so the retransmission is treated
+// as an orphan and answered with a failure StatusReport. The responder has already completed the
+// handshake by then, so the report must not affect the established sessions or later handshakes.
+TEST_F(TestCASESession, DuplicateSigma2AfterInitiatorSessionReleasedDoesNotAffectEstablishedSession)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    auto pairingCommissioner = chip::Platform::MakeUnique<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback = GetLoopback();
+
+    DuplicateSigma2LoopbackDelegate loopbackDelegate;
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           nullptr, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner.get());
+    ASSERT_NE(contextCommissioner, nullptr);
+
+    // Unlike DuplicateSigma2DoesNotTriggerStatusReport, nothing retains the initiator's
+    // UnauthenticatedSession here, so it is released once the handshake is over.
+    EXPECT_EQ(pairingCommissioner->EstablishSession(
+                  GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                  contextCommissioner, nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    ASSERT_FALSE(loopbackDelegate.mCapturedSigma2.IsNull());
+    ASSERT_TRUE(delegateCommissioner.GetSessionHolder());
+
+    // Both sides of the loopback share one SessionManager, so this counts the CASE sessions of
+    // both the initiator and the responder.
+    auto countActiveCaseSessions = [this]() {
+        uint32_t count = 0;
+        GetSecureSessionManager().GetSecureSessions().ForEachSession([&](auto * session) {
+            if (session->IsActiveSession() && session->GetSecureSessionType() == SecureSession::Type::kCASE)
+            {
+                ++count;
+            }
+            return Loop::Continue;
+        });
+        return count;
+    };
+    const uint32_t activeCaseSessionsBefore = countActiveCaseSessions();
+    EXPECT_GE(activeCaseSessionsBefore, 1u);
+
+    pairingCommissioner.reset();
+    ServiceEvents();
+    loopbackDelegate.ResetCounts();
+
+    System::PacketBufferHandle duplicateSigma2 = loopbackDelegate.mCapturedSigma2.CloneData();
+    ASSERT_FALSE(duplicateSigma2.IsNull());
+
+    GetSecureSessionManager().OnMessageReceived(loopbackDelegate.mPeerAddress, std::move(duplicateSigma2));
+    ServiceEvents();
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    // With heap pools, the released UnauthenticatedSession is freed, so the duplicate cannot be
+    // detected and SessionManager answers it with exactly one failure StatusReport.
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, 1u);
+#else
+    // With static pools, the released UnauthenticatedSession stays in the table until its slot is
+    // reused, so the duplicate is still detected and only acknowledged.
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, 0u);
+    EXPECT_EQ(loopbackDelegate.mStandaloneAckCount, 1u);
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+    // The responder ignores the report, and the established CASE sessions stay active.
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    ASSERT_TRUE(delegateCommissioner.GetSessionHolder());
+    EXPECT_TRUE(delegateCommissioner.GetSessionHolder()->AsSecureSession()->IsActiveSession());
+    EXPECT_EQ(countActiveCaseSessions(), activeCaseSessionsBefore);
+    EXPECT_EQ(gPairingServer.GetSession().GetState(), CASESession::State::kInitialized);
+
+    // The second handshake below must not be observed by the duplicate Sigma2 capture.
+    loopback.SetLoopbackTransportDelegate(nullptr);
+
+    // A new handshake with the responder still succeeds.
+    TestCASESecurePairingDelegate delegateCommissioner2;
+    CASESession pairingCommissioner2;
+    pairingCommissioner2.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextCommissioner2 = NewUnauthenticatedExchangeToBob(&pairingCommissioner2);
+    ASSERT_NE(contextCommissioner2, nullptr);
+
+    EXPECT_EQ(pairingCommissioner2.EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner2,
+                                                    nullptr, nullptr, &delegateCommissioner2,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner2.mNumPairingErrors, 0u);
+
     gPairingServer.Shutdown();
 }
 

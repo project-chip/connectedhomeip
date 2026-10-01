@@ -599,6 +599,13 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
+bool SessionManager::IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader)
+{
+    return payloadHeader.IsResponder(Protocols::SecureChannel::MsgType::PBKDFParamResponse,
+                                     Protocols::SecureChannel::MsgType::PASE_Pake2, Protocols::SecureChannel::MsgType::CASE_Sigma2,
+                                     Protocols::SecureChannel::MsgType::CASE_Sigma2Resume);
+}
+
 CHIP_ERROR SessionManager::SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
                                                                 const PayloadHeader & incomingPayloadHeader,
                                                                 const Transport::PeerAddress & peerAddress)
@@ -647,11 +654,13 @@ CHIP_ERROR SessionManager::SendUnauthenticatedErrorStatusReport(const PacketHead
     Transport::PeerAddress mutablePeerAddress = peerAddress;
     CorrectPeerAddressInterfaceID(mutablePeerAddress);
 
-    ChipLogProgress(Inet,
-                    "Sending failure StatusReport for orphan CASE Sigma2 on exchange " ChipLogFormatExchangeId
-                    " to initiator 0x" ChipLogFormatX64,
-                    ChipLogValueExchangeIdFromReceivedHeader(incomingPayloadHeader),
-                    ChipLogValueX64(incomingPacketHeader.GetDestinationNodeId().Value()));
+    ChipLogProgress(
+        Inet,
+        "Sending failure StatusReport for orphan session establishment message type 0x%02x on exchange " ChipLogFormatExchangeId
+        " (initiator node 0x" ChipLogFormatX64 ")",
+        static_cast<unsigned>(incomingPayloadHeader.GetMessageType()),
+        ChipLogValueExchangeIdFromReceivedHeader(incomingPayloadHeader),
+        ChipLogValueX64(incomingPacketHeader.GetDestinationNodeId().Value()));
 
     return mTransportMgr->SendMessage(mutablePeerAddress, std::move(msg));
 }
@@ -931,9 +940,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
                             ChipLogValueX64(destination.Value()));
 
             PayloadHeader payloadHeader;
-            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR &&
-                payloadHeader.IsResponder(Protocols::SecureChannel::MsgType::CASE_Sigma2,
-                                          Protocols::SecureChannel::MsgType::CASE_Sigma2Resume))
+            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && IsSessionEstablishmentResponse(payloadHeader))
             {
                 LogErrorOnFailure(SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, peerAddress));
             }
