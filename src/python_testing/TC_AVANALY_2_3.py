@@ -71,7 +71,7 @@ class TC_AVANALY_2_3(MatterTestCommissionedDevice, AVANALYTestBase):
             TestStep(9, "TH reads the ActiveAmbientContextTriggers attribute. Verify it matches `supported_ambient_contexts`."),
             TestStep(10, "If 'zoneIDs' is not empty, TH sends a DisableContextTriggers command with `ContextTriggers` containing a subset of enabled contexts and a specified zoneID. Verify DynamicConstraint error."),
             TestStep(11, "TH sends a DisableContextTriggers command with `ContextTriggers` containing a subset of enabled contexts.",
-                         "If the DUT has feature PerZoneDetect, onclude zoneIDs set to null. Verify Success."),
+                         "If the DUT has feature PerZoneDetect, include zoneIDs set to null. Verify Success."),
             TestStep(12, "TH reads the ActiveAmbientContextTriggers attribute. Verify the disabled contexts are no longer present."),
             TestStep(13, "TH sends a DisableContextTriggers command with `ContextTriggers` set to null. Verify Success"),
             TestStep(14, "TH reads the ActiveAmbientContextTriggers attribute. Verify the list is empty."),
