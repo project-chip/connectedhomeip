@@ -46,14 +46,6 @@ assert(
 # library, not just the test harness.
 _use_libfuzzer_compat = oss_fuzz || chip_pw_fuzz_libfuzzer_compat
 
-# Compiler used to resolve the libFuzzer runtime archive: $CXX under OSS-Fuzz, otherwise
-# the clang++ this toolchain compiles with.
-if (oss_fuzz) {
-  _fuzztest_compiler = getenv("CXX")
-} else {
-  _fuzztest_compiler = "clang++"
-}
-
 # 1) Compatibility-mode define. compatibility_mode.cc defines FuzzTestExternalEngineAdaptor
 #    only under #ifdef FUZZTEST_COMPATIBILITY_MODE; a harness-only define leaves that library
 #    symbol undefined at link, so it MUST be toolchain-wide.
@@ -64,13 +56,23 @@ config("fuzztest_compatibility_mode") {
 # 2) libFuzzer driver. FuzzTest keeps its own main (fuzztest_gtest_main) and calls
 #    LLVMFuzzerRunDriver, so link the libFuzzer runtime WITHOUT its main (fuzzer_no_main) --
 #    never plain -fsanitize=fuzzer / $LIB_FUZZING_ENGINE, which carry a conflicting main.
+#    Resolved only in compatibility mode: the archive name is platform-specific and the
+#    lookup would fail `gn gen` where it is absent.
 config("fuzztest_libfuzzer_engine") {
-  ldflags = [ exec_script("print_file_name.py",
-                          [
-                            _fuzztest_compiler,
-                            "libclang_rt.fuzzer_no_main.a",
-                          ],
-                          "trim string") ]
+  if (_use_libfuzzer_compat) {
+    # $CXX under OSS-Fuzz, otherwise the clang++ this toolchain compiles with.
+    if (oss_fuzz) {
+      _fuzztest_compiler = getenv("CXX")
+    } else {
+      _fuzztest_compiler = "clang++"
+    }
+    ldflags = [ exec_script("print_file_name.py",
+                            [
+                              _fuzztest_compiler,
+                              "libclang_rt.fuzzer_no_main.a",
+                            ],
+                            "trim string") ]
+  }
 }
 
 # 3) Optional UBSan for LOCAL FuzzTest builds (`ubsan` modifier -> chip_pw_fuzz_ubsan): the
@@ -97,8 +99,7 @@ config("fuzztest_coverage") {
 # In libFuzzer-compatibility mode the libFuzzer runtime archive is linked ahead
 # of the objects that use it, which GNU ld does not resolve; lld does. chip
 # applies target_ldflags (where OSS-Fuzz passes -fuse-ld=lld) to the default
-# toolchain only, so select lld here. Apple's linker has no such problem and
-# Apple clang ships no lld.
+# toolchain only, so select lld here. Linux only: Apple clang ships no lld.
 config("fuzztest_lld") {
   if (host_os == "linux") {
     ldflags = [ "-fuse-ld=lld" ]

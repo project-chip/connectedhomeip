@@ -121,8 +121,8 @@ for an example of a simple fuzz test.
 
 ## `Google's FuzzTest`
 
--   Google FuzzTest is built by Matter's own GN build in
-    `third_party/fuzztest/`, independent of Pigweed. Fuzz targets include
+-   Google FuzzTest is built by Matter's GN files in `third_party/fuzztest/`,
+    no longer through the Pigweed `pw_fuzzer` module. Fuzz targets include
     `<fuzztest/fuzztest_core.h>` and `<gtest/gtest.h>`.
 
 ### Use cases
@@ -324,7 +324,7 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 > Use Coverage Reports to get more insights while writing FuzzTests.
 
 1. Build FuzzTests with coverage instrumentation
-   [Building pw_fuzzer FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#pw_fuzzer-fuzztests).
+   [Building FuzzTest targets](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#google-fuzztest-targets).
 
 2. Run These FuzzTests using `scripts/tests/run_fuzztest_coverage.py`
 
@@ -369,7 +369,7 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 ### FAQ
 
-#### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?
+#### What revision should the FuzzTest and Abseil submodules be for running FuzzTest?
 
 -   Matter integrates Google FuzzTest and Abseil as submodules
     (`third_party/fuzztest/repo` and `third_party/abseil-cpp/src`).
