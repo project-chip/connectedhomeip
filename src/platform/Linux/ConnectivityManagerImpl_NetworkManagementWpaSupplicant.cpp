@@ -993,7 +993,7 @@ void ConnectivityManagerImpl::DisableNetworkAfterConnectFailure()
 
     GAutoPtr<GError> err;
     GAutoPtr<GVariant> response(g_dbus_connection_call_sync(
-        g_dbus_proxy_get_connection(reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get())), kWpaSupplicantServiceName,
+        g_dbus_proxy_get_connection(G_DBUS_PROXY(mWpaSupplicant.iface.get())), kWpaSupplicantServiceName,
         mWpaSupplicant.networkPath.get(), "org.freedesktop.DBus.Properties", "Set",
         g_variant_new("(ssv)", "fi.w1.wpa_supplicant1.Network", "Enabled", g_variant_new_boolean(FALSE)), nullptr,
         G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));

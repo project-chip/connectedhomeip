@@ -432,7 +432,7 @@ CHIP_ERROR WpaSupplicantClient::GetCurrentNetworkPath(GCharPtr & outPath) noexce
     GAutoPtr<GError> err;
     // The proxy's cached CurrentNetwork is not updated when wpa_supplicant selects a network, so
     // read the property directly.
-    auto * proxy = reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get());
+    auto * proxy = G_DBUS_PROXY(mWpaSupplicant.iface.get());
     GAutoPtr<GVariant> response(
         g_dbus_proxy_call_sync(proxy, "org.freedesktop.DBus.Properties.Get",
                                g_variant_new("(ss)", g_dbus_proxy_get_interface_name(proxy), "CurrentNetwork"),
