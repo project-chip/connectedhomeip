@@ -24,15 +24,18 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
-#include "wbs/WbsAdvertising.h"
-#include "wbs/WbsConnection.h"
-#include "wbs/WbsDeviceScanner.h"
-#include "wbs/WbsGattServer.h"
+// wbs: Helper (central connection/GATT client), ChipDeviceScanner (scan), lsrequester (LS2).
+// The wbs layer only implements the central (commissioner) role; peripheral operations
+// (advertising, GATT server, indications) are reported as not implemented.
+#include "wbs/ChipDeviceScanner.h"
+#include "wbs/Helper.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -68,7 +71,7 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate,
-                             private WbsDeviceScannerDelegate
+                             private ChipDeviceScannerDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -78,22 +81,18 @@ public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
     void OnScanError(CHIP_ERROR error) override;
 
+    // Driven by wbs (Helper) IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
     static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
-    static void HandleRXCharWrite(BLE_CONNECTION_OBJECT user_data, const uint8_t * value, size_t len);
-    static void HandleConnectionClosed(BLE_CONNECTION_OBJECT user_data);
-    static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
-    static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
+    // Name used by wbs/Helper (webOS: HandleConnectionClosed)
+    static void CHIPoWbs_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
 
+    // Internal platform specific notifications
     static void NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress);
     static void NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress);
-    static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
-    static void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
-    static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
-    static void NotifyBLEPeripheralAdvReleased();
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -175,34 +174,32 @@ private:
 
     void DriveBLEState();
     void DisableBLEService(CHIP_ERROR err);
-    // BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
-    void ClearAdvertisingFlag();
+    void ReleaseEndpoint();
+    void ProcessScanResult();
+    void StartConnect(const std::string & address);
 
-    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     static void HandleScanTimer(chip::System::Layer *, void * appState);
     static void HandleConnectTimer(chip::System::Layer *, void * appState);
-
-    // Public CHIPoBLE notifications
-    void NotifyCHIPoBLEConnectionEstablished();
-    void NotifyCHIPoBLEConnectionClosed();
-    void NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change);
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
     uint32_t mAdapterId = 0;
 
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral          = false;
-    WbsEndpoint * mEndpoint  = nullptr;
-    const char * mBLEAdvUUID = nullptr;
+    bool mIsCentral = false;
 
-    WbsDeviceScanner mDeviceScanner;
-    WbsConnection mConnection;
-    WbsAdvertising mAdvertising;
-    WbsGattServer mGattServer;
+    // wbs Helper manages the endpoint by pointer (webOS: BluezEndpoint value member)
+    WbsEndpoint * mpEndpoint = nullptr;
+    ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;
+
+    // Scan result handed over from the LsRequester thread (OnDeviceScanned) to the Matter thread.
+    std::mutex mScanResultMutex;
+    std::string mScanResultAddress;
+    uint16_t mScanResultDiscriminator = 0;
+    bool mScanResultPending           = false;
 };
 
 /**

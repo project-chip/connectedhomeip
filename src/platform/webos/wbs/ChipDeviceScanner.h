@@ -1,28 +1,32 @@
-/* @@@LICENSE
+/*
  *
- * Copyright (c) 2017-2025 LG Electronics, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
- * Confidential computer software. Valid license from LG required for
- * possession, use or copying. Consistent with FAR 12.211 and 12.212,
- * Commercial Computer Software, Computer Software Documentation, and
- * Technical Data for Commercial Items are licensed to the U.S. Government
- * under vendor's standard commercial license.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * LICENSE@@@
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 #pragma once
-#include "LsRequester.h"
-#include "WbsConnection.h"
-#include "WebosLockTracker.h"
-#include <ble/Ble.h>
+
+#include <platform/CHIPDeviceConfig.h>
+
 #include <glib.h>
+
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
-#include <luna-service2++/handle.hpp>
+#include <system/SystemLayer.h>
+
 #include <luna-service2/lunaservice.h>
 #include <pbnjson.hpp>
-#include <platform/CHIPDeviceConfig.h>
-#include <system/SystemLayer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -30,18 +34,19 @@ namespace Internal {
 
 struct BLEChipDevice
 {
-    BLEChipDevice(pbnjson::JValue & device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) :
-        mBleDevice(device), mDeviceInfo(deviceInfo)
-    {}
+    BLEChipDevice(pbnjson::JValue &device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) : mBleDevice(device), mDeviceInfo(deviceInfo) {}
     pbnjson::JValue mBleDevice;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceInfo;
 };
 
 /// Receives callbacks when chip devices are being scanned
-class WbsDeviceScannerDelegate
+///
+/// OnDeviceScanned() is called on the LsRequester (lsTask) thread: implementations must not block it
+/// (e.g. with synchronous LS2 calls) and must not touch Matter stack state without a thread hop.
+class ChipDeviceScannerDelegate
 {
 public:
-    virtual ~WbsDeviceScannerDelegate() {}
+    virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
     virtual void OnDeviceScanned(const pbnjson::JValue & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
@@ -56,18 +61,18 @@ public:
 /// Allows scanning for CHIP devices
 ///
 /// Will perform scan operations and call back whenever a device is discovered.
-class WbsDeviceScanner
+class ChipDeviceScanner
 {
 public:
-    WbsDeviceScanner()                                     = default;
-    WbsDeviceScanner(WbsDeviceScanner &&)                  = default;
-    WbsDeviceScanner(const WbsDeviceScanner &)             = delete;
-    WbsDeviceScanner & operator=(const WbsDeviceScanner &) = delete;
+    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
+    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
+    ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
-    ~WbsDeviceScanner() { Shutdown(); }
+    ~ChipDeviceScanner() { Shutdown(); }
 
     /// Initialize the scanner.
-    CHIP_ERROR Init(WbsDeviceScannerDelegate * delegate);
+    CHIP_ERROR Init(ChipDeviceScannerDelegate * delegate);
 
     /// Release any resources associated with the scanner.
     void Shutdown();
@@ -82,11 +87,10 @@ public:
     CHIP_ERROR StopScan();
 
     /// Check if the scanner is active
-    bool IsScanning() const { return mScannerState == WbsDeviceScannerState::SCANNING; }
-    void setAddress(const std::string & aAddr) { mAddress = aAddr; }
+    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNING; }
 
 private:
-    enum class WbsDeviceScannerState
+    enum class ChipDeviceScannerState
     {
         UNINITIALIZED,
         INITIALIZED,
@@ -102,12 +106,10 @@ private:
     /// Check if a given device is a CHIP device and if yes, remove it from the adapter
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(const pbnjson::JValue & device);
+    ChipDeviceScannerDelegate * mDelegate = nullptr;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::UNINITIALIZED;
 
-    WbsDeviceScannerDelegate * mDelegate = nullptr;
-    WbsDeviceScannerState mScannerState  = WbsDeviceScannerState::UNINITIALIZED;
-    BLEChipDevice * mBleChipDevice       = nullptr;
-    uint32_t mLeInternalStartScanToken   = LSMESSAGE_TOKEN_INVALID;
-    std::string mAddress;
+    LSMessageToken mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
 };
 
 } // namespace Internal

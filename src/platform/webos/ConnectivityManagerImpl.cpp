@@ -24,11 +24,11 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/webos/ConnectivityUtils.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/webos/WirelessDefs.h>
+#include <platform/internal/BLEManager.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -765,7 +765,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     struct PAFPublishSSI PafPublish_ssi;
 
     PafPublish_ssi.DevOpCode = 0;
-    SuccessOrDie(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(PafPublish_ssi.DevInfo));
+    VerifyOrDie(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(PafPublish_ssi.DevInfo) == CHIP_NO_ERROR);
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(PafPublish_ssi.ProductId) != CHIP_NO_ERROR)
     {
         PafPublish_ssi.ProductId = 0;
@@ -1045,7 +1045,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
     const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
+    if (strcmp(networkPath, "/") != 0)
     {
         if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
                                                                  &err.GetReceiver()))
@@ -1271,7 +1271,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     value = g_variant_lookup_value(discov_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    chip::Platform::CopyString(addr_str, paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -1283,8 +1283,7 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     size_t bufferLen;
     value = g_variant_lookup_value(discov_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult SSI too short"));
+    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
     GetWiFiPAF()->SetWiFiPAFState(WiFiPAF::State::kConnected);
 
@@ -1365,7 +1364,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     value = g_variant_lookup_value(reply_info, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    chip::Platform::CopyString(addr_str, paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &peer_addr[0], &peer_addr[1], &peer_addr[2], &peer_addr[3],
            &peer_addr[4], &peer_addr[5]);
 
@@ -1377,8 +1376,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     size_t bufferLen;
     value = g_variant_lookup_value(reply_info, "ssi", G_VARIANT_TYPE_BYTESTRING);
     dataValue.reset(value);
-    auto ssibuf = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
-    VerifyOrReturn(bufferLen >= sizeof(PAFPublishSSI), ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied SSI too short"));
+    auto ssibuf      = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     auto pPublishSSI = reinterpret_cast<const PAFPublishSSI *>(ssibuf);
 
     /*
@@ -1445,7 +1443,7 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
     value = g_variant_lookup_value(obj, "peer_addr", G_VARIANT_TYPE_STRING);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "&s", &paddr);
-    chip::Platform::CopyString(addr_str, paddr);
+    strncpy(addr_str, paddr, sizeof(addr_str));
     sscanf(addr_str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", &RxInfo.peer_addr[0], &RxInfo.peer_addr[1], &RxInfo.peer_addr[2],
            &RxInfo.peer_addr[3], &RxInfo.peer_addr[4], &RxInfo.peer_addr[5]);
 
@@ -1486,33 +1484,6 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     */
     ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect };
     PlatformMgr().PostEventOrDie(&event);
-}
-
-void ConnectivityManagerImpl::_WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam)
-{
-    mPafAdvParam.freq_list_len = pafAdvParam.freq_list_len;
-    mPafAdvParam.freq_list     = std::make_unique<uint16_t[]>(mPafAdvParam.freq_list_len);
-    for (size_t i = 0; i < mPafAdvParam.freq_list_len; i++)
-    {
-        mPafAdvParam.freq_list[i] = pafAdvParam.freq_list[i];
-    }
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId)
-{
-    if (enabled)
-    {
-        VerifyOrReturnError(mPafAdvParam.freq_list_len > 0, CHIP_ERROR_INCORRECT_STATE);
-        auto res = WiFiPAFPublish(mPafAdvParam);
-        if ((res == CHIP_NO_ERROR) && (mPafAdvParam.publish_id != kUndefinedWiFiPafSessionId))
-        {
-            publishId = mPafAdvParam.publish_id;
-        }
-        return res;
-    }
-    // Cancel paf_publish, publish_id should be valid
-    VerifyOrReturnError((publishId != 0) && (publishId != WiFiPAF::kUndefinedWiFiPafSessionId), CHIP_ERROR_INCORRECT_STATE);
-    return WiFiPAFCancelPublish(publishId);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState,
@@ -1681,7 +1652,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
-    VerifyOrReturnError(((id != kUndefinedWiFiPafSessionId) && (id != 0)), CHIP_ERROR_INTERNAL);
     switch (role)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
@@ -1697,7 +1667,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
     // Iterate on the network interface to see if we already have beed assigned addresses.
-    // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+    // The temporary hack for getting IP address change on webOS for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
@@ -1737,7 +1707,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // to run once the network has been connected, with a %s placeholder for the
     // interface name. E.g. "dhclient -nw %s"
     // Run dhclient for IP on WiFi.
-    // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+    // TODO: The wifi can be managed by networkmanager on webOS so we don't have to care about this.
     char cmdBuffer[128];
     sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, sWiFiIfName);
     int dhclientSystemRet = system(cmdBuffer);
@@ -1780,7 +1750,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
-    // On Linux simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
+    // On webOS simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
     // of local WiFi network card instead.
     if (getifaddrs(&ifaddr) == -1)
     {
@@ -1822,7 +1792,6 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
     const char * mode = wpa_supplicant_1_interface_get_current_auth_mode(mWpaSupplicant.iface.get());
     ChipLogProgress(DeviceLayer, "WPA supplicant: Current Wi-Fi security type: %s", StringOrNullMarker(mode));
-    VerifyOrReturnError(mode != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
@@ -1862,7 +1831,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
-    // We don't have direct API to get the WiFi version yet, return 802.11n on Linux simulation.
+    // We don't have direct API to get the WiFi version yet, return 802.11n on webOS simulation.
     wiFiVersion = WiFiVersionEnum::kN;
 
     return CHIP_NO_ERROR;
@@ -1912,7 +1881,6 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
 
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
-    VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
@@ -2218,19 +2186,18 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen     = ssidLen;
-    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
+    result.ssidLen = ssidLen;
     if (signal < INT8_MIN)
     {
-        result.signal.strength = INT8_MIN;
+        result.rssi = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.signal.strength = INT8_MAX;
+        result.rssi = INT8_MAX;
     }
     else
     {
-        result.signal.strength = static_cast<uint8_t>(signal);
+        result.rssi = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
@@ -2277,7 +2244,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
         if (mpScanCallback != nullptr)
         {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
+            WebOSScanResponseIterator<WiFiScanResponse> iter(networkScanned);
             mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
             mpScanCallback = nullptr;
         }
