@@ -25,8 +25,8 @@
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/DefaultTimerDelegate.h>
 
 #include <cstring>
@@ -49,8 +49,8 @@ DefaultTimerDelegate gTimerDelegate;
 // Per-endpoint application wiring (delegate and configuration overrides).
 struct EndpointEntry
 {
-    EndpointId endpointId                            = kInvalidEndpointId;
-    DoorLock::Delegate * delegate                    = nullptr;
+    EndpointId endpointId         = kInvalidEndpointId;
+    DoorLock::Delegate * delegate = nullptr;
     DoorLock::ServerConfigOverrides overrides;
 };
 EndpointEntry gEndpointEntries[kDoorLockMaxClusterCount];
@@ -126,7 +126,6 @@ DoorLock::Delegate * GetDelegateForEndpoint(EndpointId endpointId)
     return &gNoOpDelegate;
 }
 
-
 EndpointEntry & FindOrCreateEndpointEntry(EndpointId endpointId)
 {
     if (EndpointEntry * entry = GetEntryForEndpoint(endpointId))
@@ -172,24 +171,24 @@ void ApplyDefaultConfigValues(DoorLock::Config & config)
     static constexpr char kDefaultLanguage[] = "en";
 
     // lockState intentionally left null, matching Legacy InitServer (SetNull).
-    config.lockType                        = DlLockType::kDeadBolt;
-    config.supportedOperatingModes         = BitMask<DlSupportedOperatingModes>(0xFFF6);
-    config.numberOfTotalUsersSupported     = 10;
-    config.numberOfPINUsersSupported       = 10;
-    config.numberOfRFIDUsersSupported      = 10;
-    config.numberOfWeekDaySchedulesPerUser = 10;
-    config.numberOfYearDaySchedulesPerUser = 10;
-    config.numberOfHolidaySchedulesSupported = 10;
+    config.lockType                            = DlLockType::kDeadBolt;
+    config.supportedOperatingModes             = BitMask<DlSupportedOperatingModes>(0xFFF6);
+    config.numberOfTotalUsersSupported         = 10;
+    config.numberOfPINUsersSupported           = 10;
+    config.numberOfRFIDUsersSupported          = 10;
+    config.numberOfWeekDaySchedulesPerUser     = 10;
+    config.numberOfYearDaySchedulesPerUser     = 10;
+    config.numberOfHolidaySchedulesSupported   = 10;
     config.numberOfCredentialsSupportedPerUser = 5;
-    config.credentialRulesSupport          = BitMask<DlCredentialRuleMask>(1);
-    config.maxPINCodeLength                = 8;
-    config.minPINCodeLength                = 6;
-    config.maxRFIDCodeLength               = 20;
-    config.minRFIDCodeLength               = 10;
-    config.language                        = CharSpan::fromCharString(kDefaultLanguage);
-    config.autoRelockTime                  = 60;
-    config.wrongCodeEntryLimit             = 3;
-    config.userCodeTemporaryDisableTime    = 10;
+    config.credentialRulesSupport              = BitMask<DlCredentialRuleMask>(1);
+    config.maxPINCodeLength                    = 8;
+    config.minPINCodeLength                    = 6;
+    config.maxRFIDCodeLength                   = 20;
+    config.minRFIDCodeLength                   = 10;
+    config.language                            = CharSpan::fromCharString(kDefaultLanguage);
+    config.autoRelockTime                      = 60;
+    config.wrongCodeEntryLimit                 = 3;
+    config.userCodeTemporaryDisableTime        = 10;
 }
 
 void ApplyOverrides(const DoorLock::ServerConfigOverrides & overrides, DoorLock::Config & config)

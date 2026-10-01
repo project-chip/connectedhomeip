@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 #include "LockEndpoint.h"
-#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <cstring>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
@@ -213,7 +213,7 @@ bool LockEndpoint::SetDoorState(DoorStateEnum newState)
         ChipLogProgress(Zcl, "Changing the door state to: %d [endpointId=%d,previousState=%d]", to_underlying(newState),
                         mEndpointId, to_underlying(mDoorState));
 
-        mDoorState = newState;
+        mDoorState     = newState;
         auto * cluster = FindCluster(mEndpointId);
         VerifyOrReturnValue(cluster != nullptr, false);
         return cluster->SetDoorState(chip::app::DataModel::Nullable<DoorStateEnum>(mDoorState)) == CHIP_NO_ERROR;

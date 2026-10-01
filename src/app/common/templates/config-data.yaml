@@ -109,9 +109,9 @@ CodeDrivenClusters:
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
-    - Door Lock
     - Dishwasher Alarm
     - Dishwasher Mode
+    - Door Lock
     - Dynamic Lighting
     - Electrical Alarm
     - Electrical Power Measurement
