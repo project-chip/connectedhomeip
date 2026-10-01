@@ -378,6 +378,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
     __block NSFileHandle * readHandle;
     __block uint64_t imageSize;
+    // The requestor may resume an interrupted download, so the data is served from the offset it asks for.
+    __block uint64_t startOffset = 0;
     __block uint32_t lastBlockIndex = UINT32_MAX;
 
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
@@ -399,7 +401,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(fileDesignator, imagePath);
-        XCTAssertEqualObjects(offset, @(0));
+        startOffset = offset.unsignedLongLongValue;
 
         readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
         XCTAssertNotNil(readHandle);
@@ -422,7 +424,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
 
         XCTAssertNotNil(readHandle);
-        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+        uint64_t offset = startOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
         NSError * seekError = nil;
         [readHandle seekToOffset:offset error:&seekError];
         XCTAssertNil(seekError);
@@ -1117,6 +1119,8 @@ static BOOL sStackInitRan = NO;
 
     __block NSFileHandle * readHandle;
     __block uint64_t imageSize;
+    // The requestor may resume an interrupted download, so the data is served from the offset it asks for.
+    __block uint64_t startOffset = 0;
     __block uint32_t lastBlockIndex = UINT32_MAX;
     const uint16_t busyDelay = 30; // 30 second
 
@@ -1152,7 +1156,7 @@ static BOOL sStackInitRan = NO;
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(fileDesignator, imagePath1);
-        XCTAssertEqualObjects(offset, @(0));
+        startOffset = offset.unsignedLongLongValue;
 
         readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
         XCTAssertNotNil(readHandle);
@@ -1200,7 +1204,7 @@ static BOOL sStackInitRan = NO;
         XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
 
         XCTAssertNotNil(readHandle);
-        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+        uint64_t offset = startOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
         NSError * seekError = nil;
         [readHandle seekToOffset:offset error:&seekError];
         XCTAssertNil(seekError);
@@ -1255,7 +1259,7 @@ static BOOL sStackInitRan = NO;
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
             XCTAssertEqual(controller, sController);
             XCTAssertEqualObjects(fileDesignator, imagePath2);
-            XCTAssertEqualObjects(offset, @(0));
+            startOffset = offset.unsignedLongLongValue;
 
             readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
             XCTAssertNotNil(readHandle);
@@ -1278,7 +1282,7 @@ static BOOL sStackInitRan = NO;
             XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
 
             XCTAssertNotNil(readHandle);
-            uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+            uint64_t offset = startOffset + blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
             NSError * seekError = nil;
             [readHandle seekToOffset:offset error:&seekError];
             XCTAssertNil(seekError);
