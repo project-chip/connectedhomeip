@@ -22,11 +22,10 @@ namespace chip::app {
 Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                        Clusters::Thermostat::Delegate & thermostatDelegate,
                        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-                       Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate) :
+                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)), mContext(context),
     mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate), mHeatingDelegate(heatingDelegate),
-    mCoolingDelegate(coolingDelegate), mUserInterfaceDelegate(userInterfaceDelegate)
+    mCoolingDelegate(coolingDelegate)
 {}
 
 CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -39,21 +38,12 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mGroupsCluster.Create(endpoint,
-                          Clusters::GroupsCluster::Context{
-                              .groupDataProvider   = mContext.groupDataProvider,
-                              .identifyIntegration = &mIdentifyCluster.Cluster(),
-                          });
-    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
-
     mThermostatCluster.Create(endpoint, mContext.features,
                               ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
                               mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
-    mUserInterfaceCluster.Create(endpoint);
-    mUserInterfaceCluster.Cluster().SetDelegate(&mUserInterfaceDelegate);
-    ReturnErrorOnFailure(provider.AddCluster(mUserInterfaceCluster.Registration()));
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
@@ -63,21 +53,11 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 void Thermostat::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    if (mUserInterfaceCluster.IsConstructed())
-    {
-        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
-        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
-        mUserInterfaceCluster.Destroy();
-    }
+    UnregisterAdditionalClusters(provider);
     if (mThermostatCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThermostatCluster.Cluster()));
         mThermostatCluster.Destroy();
-    }
-    if (mGroupsCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
-        mGroupsCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {

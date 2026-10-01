@@ -47,8 +47,7 @@ public:
     Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                Clusters::Thermostat::Delegate & thermostatDelegate,
                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-               Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate);
+               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate);
     ~Thermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -57,12 +56,18 @@ public:
     const BitFlags<Clusters::Thermostat::Feature> & Features() const { return mContext.features; }
     bool HasThermostatCluster() const { return mThermostatCluster.IsConstructed(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
-    Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
     ThermostatClusterType & ThermostatCluster() { return mThermostatCluster.Cluster(); }
-    Clusters::ThermostatUserInterfaceConfigurationCluster & ThermostatUserInterfaceConfigurationCluster()
+
+protected:
+    /// Called before the endpoint is registered, within the registration transaction.
+    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
-        return mUserInterfaceCluster.Cluster();
+        return CHIP_NO_ERROR;
     }
+
+    /// Called after the endpoint is removed, including on partial registration failure.
+    /// Overrides must tolerate clusters that were not constructed or registered.
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:
     const Context mContext;
@@ -70,12 +75,9 @@ private:
     Clusters::Thermostat::Delegate & mThermostatDelegate;
     Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & mHeatingDelegate;
     Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & mCoolingDelegate;
-    Clusters::ThermostatUserInterfaceConfiguration::Delegate & mUserInterfaceDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
-    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 
 } // namespace chip::app

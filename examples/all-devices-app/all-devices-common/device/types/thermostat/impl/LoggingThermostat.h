@@ -16,16 +16,18 @@
 
 #pragma once
 
+#include <app/clusters/groups-server/GroupsCluster.h>
+#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/types/thermostat/Thermostat.h>
 
 namespace chip::app {
 
-class LoggingThermostat : public Thermostat,
-                          public Clusters::IdentifyDelegate,
+class LoggingThermostat : public Clusters::IdentifyDelegate,
                           public Clusters::Thermostat::Delegate,
                           public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
                           public Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
-                          public Clusters::ThermostatUserInterfaceConfiguration::Delegate
+                          public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
+                          public Thermostat
 {
 public:
     explicit LoggingThermostat(const Context & context);
@@ -75,10 +77,15 @@ public:
     void OnTemperatureDisplayModeChanged(Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value) override;
     void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
+protected:
+    CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
+
 private:
     void UpdateSimulatedRunningState();
 
     FabricTable & mFabricTable;
+    Credentials::GroupDataProvider & mGroupDataProvider;
     AttributePersistenceProvider * mAttributeStorage             = nullptr;
     DataModel::Nullable<int16_t> mLocalTemperature               = DataModel::MakeNullable<int16_t>(2500);
     Clusters::Thermostat::SystemModeEnum mSystemMode             = Clusters::Thermostat::SystemModeEnum::kOff;
@@ -88,6 +95,9 @@ private:
     BitMask<Clusters::Thermostat::RelayStateBitmap> mRunningState;
     BitMask<Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing;
     int8_t mCalibration = 0;
+
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
+    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 
 } // namespace chip::app

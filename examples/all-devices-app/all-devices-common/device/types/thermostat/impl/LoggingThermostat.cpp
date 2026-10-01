@@ -61,8 +61,40 @@ Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this), mFabricTable(context.fabricTable)
+    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this), mFabricTable(context.fabricTable),
+    mGroupDataProvider(context.groupDataProvider)
 {}
+
+CHIP_ERROR LoggingThermostat::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    mGroupsCluster.Create(endpoint,
+                          Clusters::GroupsCluster::Context{
+                              .groupDataProvider   = mGroupDataProvider,
+                              .identifyIntegration = &IdentifyCluster(),
+                          });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
+
+    mUserInterfaceCluster.Create(endpoint);
+    mUserInterfaceCluster.Cluster().SetDelegate(this);
+    ReturnErrorOnFailure(provider.AddCluster(mUserInterfaceCluster.Registration()));
+
+    return CHIP_NO_ERROR;
+}
+
+void LoggingThermostat::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mUserInterfaceCluster.IsConstructed())
+    {
+        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
+        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
+        mUserInterfaceCluster.Destroy();
+    }
+    if (mGroupsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
+        mGroupsCluster.Destroy();
+    }
+}
 
 CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
 {
@@ -125,7 +157,7 @@ Status LoggingThermostat::SetLocalTemperature(DataModel::Nullable<int16_t> value
 Status LoggingThermostat::SetSystemMode(thermostat::SystemModeEnum value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(IsSupportedMode(value, Features()), Status::InvalidValue);
+    VerifyOrReturnValue(IsSupportedMode(value, Features()), Status::ConstraintError);
     VerifyOrReturnValue(mSystemMode != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
     CHIP_ERROR err =
