@@ -73,12 +73,11 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
 
     // Setup initial values
     mLocalTemperature.SetNonNull(kInitialTemperature);
-    mHeatingEnabled     = true;
     mBoostState         = BoostStateEnum::kInactive;
     mBoostRemainingTime = 0;
     mBoostOneShot       = false;
     mBoostTemporarySetpoint.reset();
-    mHeatDemand = mHeaterTypes;
+    SetHeatingEnabled(true);
 
     WaterHeaterModeCluster().UpdateCurrentMode(kWaterHeaterModeManual);
     ThermostatCluster().SetLocalTemperature(mLocalTemperature);
@@ -104,14 +103,9 @@ void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
 
 void SimulatedWaterHeater::TimerFired()
 {
-    const bool modeOff   = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-    const bool systemOff = mSystemMode == SystemModeEnum::kOff;
-
-    if (mBoostState == BoostStateEnum::kInactive && (modeOff || systemOff) && mHeatingEnabled)
+    if (mBoostState == BoostStateEnum::kInactive && !IsNormalHeatingPermitted())
     {
-        mHeatingEnabled = false;
-        mHeatDemand.ClearAll();
-        NotifyHeatDemandAndBoostStateChanged();
+        SetHeatingEnabled(false);
     }
 
     // Handle boost
@@ -130,9 +124,7 @@ void SimulatedWaterHeater::TimerFired()
     }
 
     const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-    const temperature target      = (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.has_value())
-             ? mBoostTemporarySetpoint.value()
-             : mOccupiedHeatingSetpoint;
+    const temperature target      = GetHeatingTargetTemperature();
 
     // Handle heating
     if (mHeatingEnabled)
@@ -147,24 +139,13 @@ void SimulatedWaterHeater::TimerFired()
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
         if (newTemp >= target)
         {
-            if (mBoostState == BoostStateEnum::kActive)
+            if (mBoostState == BoostStateEnum::kActive && mBoostOneShot)
             {
-                if (mBoostOneShot)
-                {
-                    EndBoost();
-                }
-                else
-                {
-                    mHeatingEnabled = false;
-                    mHeatDemand.ClearAll();
-                    NotifyHeatDemandAndBoostStateChanged();
-                }
+                EndBoost();
             }
             else
             {
-                mHeatingEnabled = false;
-                mHeatDemand.ClearAll();
-                NotifyHeatDemandAndBoostStateChanged();
+                SetHeatingEnabled(false);
             }
         }
     }
@@ -175,11 +156,9 @@ void SimulatedWaterHeater::TimerFired()
 
         ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
-        if (newTemp <= kInitialTemperature && (mBoostState == BoostStateEnum::kActive || (!modeOff && !systemOff)))
+        if (newTemp <= kInitialTemperature && (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
         {
-            mHeatingEnabled = true;
-            mHeatDemand     = mHeaterTypes;
-            NotifyHeatDemandAndBoostStateChanged();
+            SetHeatingEnabled(true);
         }
     }
 
@@ -205,8 +184,7 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
     mBoostRemainingTime     = duration;
     mBoostOneShot           = oneShot.ValueOr(false);
     mBoostTemporarySetpoint = temporarySetpoint.HasValue() ? std::make_optional(temporarySetpoint.Value()) : std::nullopt;
-    mHeatingEnabled         = true;
-    mHeatDemand             = mHeaterTypes;
+    SetHeatingEnabled(true);
 
     CHIP_ERROR err =
         GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
@@ -215,7 +193,7 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
         ChipLogError(AppServer, "WaterHeater: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    NotifyHeatDemandAndBoostStateChanged();
+    NotifyBoostStateChanged();
     return Status::Success;
 }
 
@@ -268,20 +246,7 @@ void SimulatedWaterHeater::EndBoost()
     mBoostOneShot       = false;
     mBoostTemporarySetpoint.reset();
 
-    const bool modeOff            = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-    const bool systemOff          = mSystemMode == SystemModeEnum::kOff;
-    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-
-    if (modeOff || systemOff || currentTemp >= mOccupiedHeatingSetpoint)
-    {
-        mHeatingEnabled = false;
-        mHeatDemand.ClearAll();
-    }
-    else
-    {
-        mHeatingEnabled = true;
-        mHeatDemand     = mHeaterTypes;
-    }
+    EvaluateHeatingDemand();
 
     CHIP_ERROR err = GenerateBoostEndedEvent();
     if (err != CHIP_NO_ERROR)
@@ -289,16 +254,64 @@ void SimulatedWaterHeater::EndBoost()
         ChipLogError(AppServer, "WaterHeater: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    NotifyHeatDemandAndBoostStateChanged();
+    NotifyBoostStateChanged();
 }
 
-void SimulatedWaterHeater::NotifyHeatDemandAndBoostStateChanged()
+void SimulatedWaterHeater::SetHeatingEnabled(bool enabled)
+{
+    if (mHeatingEnabled == enabled)
+    {
+        return;
+    }
+
+    mHeatingEnabled = enabled;
+    mHeatDemand     = enabled ? mHeaterTypes : BitMask<WaterHeaterHeatSourceBitmap>();
+    NotifyHeatDemandChanged();
+}
+
+void SimulatedWaterHeater::NotifyHeatDemandChanged()
 {
     VerifyOrReturn(mProvider != nullptr);
     mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, HeatDemand::Id },
                                       DataModel::AttributeChangeType::kReportable);
+}
+
+void SimulatedWaterHeater::NotifyBoostStateChanged()
+{
+    VerifyOrReturn(mProvider != nullptr);
     mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, BoostState::Id },
                                       DataModel::AttributeChangeType::kReportable);
+}
+
+bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode)
+{
+    return mode.value_or(WaterHeaterModeCluster().GetCurrentMode()) == kWaterHeaterModeOff;
+}
+
+bool SimulatedWaterHeater::IsNormalHeatingPermitted(std::optional<uint8_t> mode)
+{
+    return (mSystemMode == SystemModeEnum::kHeat) && !IsModeOff(mode);
+}
+
+temperature SimulatedWaterHeater::GetHeatingTargetTemperature() const
+{
+    if (mBoostState == BoostStateEnum::kActive && mBoostTemporarySetpoint.has_value())
+    {
+        return mBoostTemporarySetpoint.value();
+    }
+    return mOccupiedHeatingSetpoint;
+}
+
+void SimulatedWaterHeater::EvaluateHeatingDemand(std::optional<uint8_t> pendingMode)
+{
+    if (mBoostState == BoostStateEnum::kActive)
+    {
+        return;
+    }
+
+    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+    const bool shouldHeat         = IsNormalHeatingPermitted(pendingMode) && (currentTemp < mOccupiedHeatingSetpoint);
+    SetHeatingEnabled(shouldHeat);
 }
 
 // Clusters::Thermostat::Delegate
@@ -328,27 +341,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemMo
     mSystemMode = systemMode;
     changed     = true;
 
-    if (systemMode == SystemModeEnum::kOff)
-    {
-        if (mBoostState == BoostStateEnum::kInactive && mHeatingEnabled)
-        {
-            mHeatingEnabled = false;
-            mHeatDemand.ClearAll();
-            NotifyHeatDemandAndBoostStateChanged();
-        }
-    }
-    else if (systemMode == SystemModeEnum::kHeat)
-    {
-        const bool modeOff            = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-        const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-        if (!modeOff && currentTemp < mOccupiedHeatingSetpoint && !mHeatingEnabled)
-        {
-            mHeatingEnabled = true;
-            mHeatDemand     = mHeaterTypes;
-            NotifyHeatDemandAndBoostStateChanged();
-        }
-    }
-
+    EvaluateHeatingDemand();
     return Status::Success;
 }
 
@@ -437,24 +430,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
     mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
     changed                  = true;
 
-    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-    if (mHeatingEnabled && currentTemp >= mOccupiedHeatingSetpoint && mBoostState == BoostStateEnum::kInactive)
-    {
-        mHeatingEnabled = false;
-        mHeatDemand.ClearAll();
-        NotifyHeatDemandAndBoostStateChanged();
-    }
-    else if (!mHeatingEnabled && currentTemp < mOccupiedHeatingSetpoint && mSystemMode == SystemModeEnum::kHeat)
-    {
-        const bool modeOff = WaterHeaterModeCluster().GetCurrentMode() == kWaterHeaterModeOff;
-        if (!modeOff)
-        {
-            mHeatingEnabled = true;
-            mHeatDemand     = mHeaterTypes;
-            NotifyHeatDemandAndBoostStateChanged();
-        }
-    }
-
+    EvaluateHeatingDemand();
     return Status::Success;
 }
 
@@ -507,24 +483,6 @@ void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBas
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 
-    if (newMode == kWaterHeaterModeOff)
-    {
-        if (mBoostState == BoostStateEnum::kInactive && mHeatingEnabled)
-        {
-            mHeatingEnabled = false;
-            mHeatDemand.ClearAll();
-            NotifyHeatDemandAndBoostStateChanged();
-        }
-    }
-    else
-    {
-        const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
-        if (mSystemMode == SystemModeEnum::kHeat && currentTemp < mOccupiedHeatingSetpoint && !mHeatingEnabled)
-        {
-            mHeatingEnabled = true;
-            mHeatDemand     = mHeaterTypes;
-            NotifyHeatDemandAndBoostStateChanged();
-        }
-    }
+    EvaluateHeatingDemand(newMode);
 }
 } // namespace chip::app
