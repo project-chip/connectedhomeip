@@ -64,6 +64,8 @@ public:
     /// moves at a selectable speed, composed of a translating lift panel, a latching flow-modulating
     /// panel and a latching rotating panel. The semantic tags it references have static storage duration.
     static Config ThreePanelCabinetClosureConfig();
+    static Config ThreePanelCabinetClosureConfigNoLT();
+    static Config ThreePanelCabinetClosureConfigNoPSNoSP();
 
     SimulatedClosure(TimerDelegate & Tdelegate, Clusters::IdentifyDelegate & Idelegate, Config config,
                      Credentials::GroupDataProvider & groupDataProvider, FabricTable & fabricTable,

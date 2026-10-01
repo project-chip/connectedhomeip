@@ -69,7 +69,6 @@ ClosurePanel::Config ModulatingPanel()
             },
     };
 }
-
 ClosurePanel::Config RotatingPanel()
 {
     return {
@@ -83,6 +82,11 @@ ClosurePanel::Config RotatingPanel()
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
                                                         ClosureDimension::OverflowEnum::kTopInside },
+                .unit =
+                    ClosurePanel::UnitParams{
+                        .unit  = ClosureDimension::ClosureUnitEnum::kDegree,
+                        .range = DataModel::MakeNullable(ClosureDimension::Structs::UnitRangeStruct::Type{ .min = 0, .max = 90 }),
+                    },
             },
     };
 }
@@ -110,6 +114,62 @@ SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfig()
             .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(
                 MakeOptional(DataModel::MakeNullable(ClosureControl::CurrentPositionEnum::kFullyClosed)),
                 MakeOptional(DataModel::MakeNullable(false)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto))),
+        },
+        .panels = {
+            PanelList{ LiftPanel(), Span<const EndpointComposition::SemanticTag>(kLiftTag) },
+            PanelList{ ModulatingPanel(), Span<const EndpointComposition::SemanticTag>(kSlideTag) },
+            PanelList{ RotatingPanel(), Span<const EndpointComposition::SemanticTag>(kRotateTag) },
+        },
+    };
+}
+
+SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfigNoLT()
+{
+    return {
+        .closure = Closure::Config{
+            .tags                       = Span<const EndpointComposition::SemanticTag>(kCabinetTag),
+            .withPositioning            = true,
+            .withInstantaneous          = false, // mutually exclusive with Speed below
+            .withSpeed                  = true,
+            .withVentilation            = true,
+            .withPedestrian             = true,
+            .withCalibration            = true,
+            .withManuallyOperable       = true,
+            .withProtection             = true,
+            .withAccess                 = false,
+            .withCountdownTime          = true,
+            .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(
+                MakeOptional(DataModel::MakeNullable(ClosureControl::CurrentPositionEnum::kFullyClosed)),
+                NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto))),
+        },
+         .panels = {
+            PanelList{ LiftPanel(), Span<const EndpointComposition::SemanticTag>(kLiftTag) },
+            PanelList{ ModulatingPanel(), Span<const EndpointComposition::SemanticTag>(kSlideTag) },
+            PanelList{ RotatingPanel(), Span<const EndpointComposition::SemanticTag>(kRotateTag) },
+        },
+    };
+}
+
+SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP()
+{
+    return {
+        .closure = Closure::Config{
+            .tags            = Span<const EndpointComposition::SemanticTag>(kCabinetTag),
+            .withPositioning = false,
+            .motionLatching  = BitFlags<ClosureControl::LatchControlModesBitmap>(
+                ClosureControl::LatchControlModesBitmap::kRemoteLatching,
+                ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
+            .withInstantaneous          = true,  
+            .withSpeed                  = false,
+            .withVentilation            = false,
+            .withPedestrian             = false,
+            .withCalibration            = false,
+            .withManuallyOperable       = true,
+            .withProtection             = true,
+            .withAccess                 = false, // ACC would make the !ACC test cases (CLCTRL_7_x, CLDIM_5_x/6_x) skip
+            .withCountdownTime          = false,
+            .initialOverallCurrentState = DataModel::MakeNullable(ClosureControl::GenericOverallCurrentState(NullOptional,
+                MakeOptional(DataModel::MakeNullable(false))))
         },
         .panels = {
             PanelList{ LiftPanel(), Span<const EndpointComposition::SemanticTag>(kLiftTag) },
