@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -1074,8 +1074,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        # Updating the timeout for REPL Tests - Linux (RUN) since splits now run in under 30 minutes
-        timeout-minutes: 45
+        # Splits target ~30 minutes each; the timeout leaves headroom for drift between rebalances.
+        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1084,20 +1084,28 @@ jobs:
             fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split of ~30 minutes each.
-                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
+                # To rebalance, use scripts/tools/fetch_repl_test_timings.py and
+                # scripts/tools/estimate_repl_test_split.py.
+                filter: ["", "TC_[A-B]", "TC_C[A-K]", "TC_C[L-Z]", "TC_[D-E]", "TC_[F-I]", "TC_[J-O]", "TC_[P-R]", "TC_S", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
-                    - filter: "TC_A"
-                      junitxml: out/junit-results/TC_A-results.xml
-                    - filter: "TC_[B-C]"
-                      junitxml: out/junit-results/TC_B-C-results.xml
-                    - filter: "TC_[D-F]"
-                      junitxml: out/junit-results/TC_D-F-results.xml
-                    - filter: "TC_[G-M]"
-                      junitxml: out/junit-results/TC_G-M-results.xml
-                    - filter: "TC_[N-S]"
-                      junitxml: out/junit-results/TC_N-S-results.xml
+                    - filter: "TC_[A-B]"
+                      junitxml: out/junit-results/TC_A-B-results.xml
+                    - filter: "TC_C[A-K]"
+                      junitxml: out/junit-results/TC_C_A-K-results.xml
+                    - filter: "TC_C[L-Z]"
+                      junitxml: out/junit-results/TC_C_L-Z-results.xml
+                    - filter: "TC_[D-E]"
+                      junitxml: out/junit-results/TC_D-E-results.xml
+                    - filter: "TC_[F-I]"
+                      junitxml: out/junit-results/TC_F-I-results.xml
+                    - filter: "TC_[J-O]"
+                      junitxml: out/junit-results/TC_J-O-results.xml
+                    - filter: "TC_[P-R]"
+                      junitxml: out/junit-results/TC_P-R-results.xml
+                    - filter: "TC_S"
+                      junitxml: out/junit-results/TC_S-results.xml
                     - filter: "!TC_[A-S]"
                       junitxml: out/junit-results/TC_Non-A-S-results.xml
 
@@ -1368,6 +1376,10 @@ jobs:
                 require_tests: false
                 annotate_only: true
 
+          - name: Test Allure history script
+            run: |
+                python3 -m unittest scripts/tools/tests/test_generate_allure_history.py
+
           # The gh-pages Allure history is handled several times over on this
           # runner (checkout, history copy, deploy clone), so free up disk first.
           - name: Maximize runner disk
@@ -1383,16 +1395,16 @@ jobs:
 
           - name: Generate Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
-            uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
-            with:
-                allure_results: junit-results
-                allure_report: allure-report
-                gh_pages: gh-pages
-                allure_history: allure-history
-                subfolder: allure-report/ci_tests
-                keep_reports: 200
-                # This is the name that will show up in the Dashboard Overview
-                report_name: "CI Tests"
+            # --report-name is the name that will show up in the Dashboard Overview
+            run: |
+                scripts/tools/generate_allure_history.py \
+                    --results junit-results \
+                    --gh-pages gh-pages \
+                    --output allure-history \
+                    --report allure-report \
+                    --subfolder allure-report/ci_tests \
+                    --keep-reports 200 \
+                    --report-name "CI Tests"
 
           - name: Upload Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}

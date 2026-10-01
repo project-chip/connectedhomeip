@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -237,7 +237,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -336,7 +336,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             options: --privileged
 
         steps:
@@ -413,16 +413,16 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
-              with:
-                  allure_results: junit-results
-                  allure_report: allure-report
-                  gh_pages: gh-pages
-                  allure_history: allure-history
-                  subfolder: allure-report/nightly
-                  keep_reports: 120
-                  # This is the name that will show up in the Dashboard Overview
-                  report_name: "Nightly CI Tests"
+              # --report-name is the name that will show up in the Dashboard Overview
+              run: |
+                  scripts/tools/generate_allure_history.py \
+                      --results junit-results \
+                      --gh-pages gh-pages \
+                      --output allure-history \
+                      --report allure-report \
+                      --subfolder allure-report/nightly \
+                      --keep-reports 120 \
+                      --report-name "Nightly CI Tests"
 
             - name: Upload Allure Report
               uses: actions/upload-artifact@v7
@@ -458,7 +458,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
