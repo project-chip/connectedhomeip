@@ -73,6 +73,7 @@
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
+#include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -866,6 +867,16 @@ private:
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
+        {
+            RegisterCreator("window-covering", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWindowCovering>(
+                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
             });
         }
 
