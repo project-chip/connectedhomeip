@@ -51,8 +51,19 @@ class WorkingDirectory:
         return Path(self.tmp.name) if self.tmp else self.directory
 
     def path(self, *paths: str) -> Path:
-        """Get a path relative to the root directory."""
-        return Path(os.path.join(self.root_dir(), *paths))
+        """Get a path relative to the root directory.
+
+        The joined result is confined to the root: any component that escapes
+        it (absolute segment, ``..``) is rejected rather than resolved.
+        """
+        root = self.root_dir().resolve()
+        # Neutralise absolute segments so a later component cannot discard the
+        # earlier fixed ones (``join(root, "streams", id, "/etc/passwd")``).
+        rel = Path(*[str(p).lstrip("/\\") for p in paths])
+        candidate = (root / rel).resolve()
+        if candidate != root and root not in candidate.parents:
+            raise ValueError(f"Path escapes working directory: {rel}")
+        return candidate
 
     def mkdir(self, *paths: str, is_file=False) -> Path:
         """
