@@ -170,8 +170,8 @@ To do this, perform the following steps:
         -   Add the new directory's DataModelRevision to
             \_DM_TO_DATA_MODEL_REVISION
 
-        TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete fails
-        if any of these are missed.
+        `TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete`
+        fails if any of these are missed.
 
     -   Add unit tests for the new data model files to the data model file unit
         tests in src/python_testing:
