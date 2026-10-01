@@ -55,7 +55,6 @@ CHIP_ERROR IncreasingTemperatureSensor::Register(EndpointId endpoint, CodeDriven
                                                  EndpointComposition composition)
 {
     ReturnErrorOnFailure(TemperatureSensor::Register(endpoint, provider, composition));
-    ThermostatUserInterfaceConfigurationCluster().SetDelegate(this);
     // Kick off the timer loop to increase temperature every few seconds
     return mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec);
 }
@@ -64,6 +63,23 @@ void IncreasingTemperatureSensor::Unregister(CodeDrivenDataModelProvider & provi
 {
     mTimerDelegate.CancelTimer(this);
     TemperatureSensor::Unregister(provider);
+}
+
+CHIP_ERROR IncreasingTemperatureSensor::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    mUserInterfaceCluster.Create(endpoint);
+    mUserInterfaceCluster.Cluster().SetDelegate(this);
+    return provider.AddCluster(mUserInterfaceCluster.Registration());
+}
+
+void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mUserInterfaceCluster.IsConstructed())
+    {
+        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
+        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
+        mUserInterfaceCluster.Destroy();
+    }
 }
 
 void IncreasingTemperatureSensor::TimerFired()

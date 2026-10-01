@@ -18,7 +18,6 @@
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
-#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -41,18 +40,22 @@ public:
 
     Clusters::TemperatureMeasurementCluster & TemperatureMeasurementCluster() { return mTemperatureMeasurementCluster.Cluster(); }
 
-    Clusters::ThermostatUserInterfaceConfigurationCluster & ThermostatUserInterfaceConfigurationCluster()
+protected:
+    /// Called before the endpoint is registered, within the registration transaction.
+    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
     {
-        return mUserInterfaceCluster.Cluster();
+        return CHIP_NO_ERROR;
     }
 
-protected:
+    /// Called after the endpoint is removed, including on partial registration failure.
+    /// Overrides must tolerate clusters that were not constructed or registered.
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
+
     TimerDelegate & mTimerDelegate;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
     Clusters::TemperatureMeasurementCluster::OptionalAttributeSet mOptionalAttributes;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureMeasurementCluster;
-    LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;
 };
 
 } // namespace app
