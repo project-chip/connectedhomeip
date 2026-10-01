@@ -47,9 +47,9 @@ class TestNamespaceAvailability(unittest.TestCase):
 
     def test_failed_isolation_stops_execution(self):
         with patch.object(namespace.os, "getuid", return_value=0), \
-                patch.object(namespace.os, "execvpe", side_effect=PermissionError("unshare denied")):
-            with self.assertRaises(PermissionError):
-                namespace.ensure_namespace_availability()
+                patch.object(namespace.os, "execvpe", side_effect=PermissionError("unshare denied")), \
+                self.assertRaises(PermissionError):
+            namespace.ensure_namespace_availability()
 
 
 if __name__ == "__main__":
