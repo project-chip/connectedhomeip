@@ -30,10 +30,19 @@ bool IsSupportedMode(thermostat::SystemModeEnum mode)
     return mode == thermostat::SystemModeEnum::kOff || mode == thermostat::SystemModeEnum::kHeat ||
         mode == thermostat::SystemModeEnum::kCool;
 }
+
+Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
+{
+    Thermostat::Context loggingContext                            = context;
+    loggingContext.optionalAttributes.ThermostatRunningState      = true;
+    loggingContext.optionalAttributes.RemoteSensing               = true;
+    loggingContext.optionalAttributes.LocalTemperatureCalibration = true;
+    return loggingContext;
+}
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    Thermostat(context, *this, *this, *this, *this, *this), mFabricTable(context.fabricTable)
+    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this), mFabricTable(context.fabricTable)
 {}
 
 CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
@@ -62,6 +71,7 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
     {
         mCoolingSetpoint = thermostat::kDefaultCoolingSetpoint;
     }
+    UpdateSimulatedRunningState();
     return CHIP_NO_ERROR;
 }
 
@@ -86,6 +96,10 @@ Status LoggingThermostat::SetLocalTemperature(DataModel::Nullable<int16_t> value
     VerifyOrReturnValue(value.IsNull() || value.Value() >= -27315, Status::ConstraintError);
     changed           = mLocalTemperature != value;
     mLocalTemperature = value;
+    if (changed)
+    {
+        UpdateSimulatedRunningState();
+    }
     return Status::Success;
 }
 
@@ -106,6 +120,7 @@ Status LoggingThermostat::SetSystemMode(thermostat::SystemModeEnum value, bool &
     mSystemMode = value;
     changed     = true;
     ChipLogProgress(AppServer, "Thermostat: SystemMode changed to %u", static_cast<unsigned>(value));
+    UpdateSimulatedRunningState();
     return Status::Success;
 }
 
@@ -140,6 +155,7 @@ Status LoggingThermostat::SetOccupiedHeatingSetpoint(int16_t value, bool & chang
     mHeatingSetpoint = value;
     changed          = true;
     ChipLogProgress(AppServer, "Thermostat: heating setpoint changed to %d", value);
+    UpdateSimulatedRunningState();
     return Status::Success;
 }
 
@@ -168,7 +184,114 @@ Status LoggingThermostat::SetOccupiedCoolingSetpoint(int16_t value, bool & chang
     mCoolingSetpoint = value;
     changed          = true;
     ChipLogProgress(AppServer, "Thermostat: cooling setpoint changed to %d", value);
+    UpdateSimulatedRunningState();
     return Status::Success;
+}
+
+Status LoggingThermostat::GetRunningMode(thermostat::ThermostatRunningModeEnum & value) const
+{
+    value = mRunningMode;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetRunningMode(thermostat::ThermostatRunningModeEnum value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value == thermostat::ThermostatRunningModeEnum::kOff ||
+                            value == thermostat::ThermostatRunningModeEnum::kCool ||
+                            value == thermostat::ThermostatRunningModeEnum::kHeat,
+                        Status::InvalidValue);
+    changed      = (mRunningMode != value);
+    mRunningMode = value;
+    if (changed)
+    {
+        ChipLogProgress(AppServer, "Thermostat: RunningMode set to %u", static_cast<unsigned>(value));
+    }
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetRunningState(BitMask<thermostat::RelayStateBitmap> & value) const
+{
+    value = mRunningState;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetRunningState(BitMask<thermostat::RelayStateBitmap> value, bool & changed)
+{
+    changed       = (mRunningState != value);
+    mRunningState = value;
+    if (changed)
+    {
+        ChipLogProgress(AppServer, "Thermostat: RunningState set to 0x%04x", value.Raw());
+    }
+    return Status::Success;
+}
+
+int8_t LoggingThermostat::GetLocalTemperatureCalibration() const
+{
+    return mCalibration;
+}
+
+Status LoggingThermostat::SetLocalTemperatureCalibration(int8_t value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value >= -30 && value <= 30, Status::ConstraintError);
+    changed      = (mCalibration != value);
+    mCalibration = value;
+    if (changed)
+    {
+        ChipLogProgress(AppServer, "Thermostat: LocalTemperatureCalibration set to %d", value);
+    }
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetRemoteSensing(BitMask<thermostat::RemoteSensingBitmap> & value) const
+{
+    value = mRemoteSensing;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetRemoteSensing(BitMask<thermostat::RemoteSensingBitmap> value, bool & changed)
+{
+    changed        = (mRemoteSensing != value);
+    mRemoteSensing = value;
+    if (changed)
+    {
+        ChipLogProgress(AppServer, "Thermostat: RemoteSensing set to 0x%02x", value.Raw());
+    }
+    return Status::Success;
+}
+
+void LoggingThermostat::UpdateSimulatedRunningState()
+{
+    thermostat::ThermostatRunningModeEnum newRunningMode = thermostat::ThermostatRunningModeEnum::kOff;
+    BitMask<thermostat::RelayStateBitmap> newRunningState;
+
+    if (!mLocalTemperature.IsNull())
+    {
+        int16_t currentTemp = mLocalTemperature.Value();
+        if (mSystemMode == thermostat::SystemModeEnum::kHeat && currentTemp < mHeatingSetpoint)
+        {
+            newRunningMode = thermostat::ThermostatRunningModeEnum::kHeat;
+            newRunningState.Set(thermostat::RelayStateBitmap::kHeat);
+        }
+        else if (mSystemMode == thermostat::SystemModeEnum::kCool && currentTemp > mCoolingSetpoint)
+        {
+            newRunningMode = thermostat::ThermostatRunningModeEnum::kCool;
+            newRunningState.Set(thermostat::RelayStateBitmap::kCool);
+        }
+    }
+
+    if (HasThermostatCluster())
+    {
+        ThermostatCluster().SetRunningMode(newRunningMode);
+        ThermostatCluster().SetRunningState(newRunningState);
+    }
+    else
+    {
+        mRunningMode  = newRunningMode;
+        mRunningState = newRunningState;
+    }
 }
 
 void LoggingThermostat::OnTemperatureDisplayModeChanged(

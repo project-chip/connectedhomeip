@@ -37,6 +37,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
     Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
@@ -49,6 +50,7 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    bool HasThermostatCluster() const { return mThermostatCluster.IsConstructed(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::GroupsCluster & GroupsCluster() { return mGroupsCluster.Cluster(); }
     ThermostatClusterType & ThermostatCluster() { return mThermostatCluster.Cluster(); }

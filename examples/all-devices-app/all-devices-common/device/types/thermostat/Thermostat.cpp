@@ -24,9 +24,9 @@ Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & ide
                        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
                        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
                        Clusters::ThermostatUserInterfaceConfiguration::Delegate & userInterfaceDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
-    mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
-    mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate), mUserInterfaceDelegate(userInterfaceDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)), mContext(context),
+    mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate), mHeatingDelegate(heatingDelegate),
+    mCoolingDelegate(coolingDelegate), mUserInterfaceDelegate(userInterfaceDelegate)
 {}
 
 CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -49,7 +49,8 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mThermostatCluster.Create(
         endpoint,
         BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating, Clusters::Thermostat::Feature::kCooling),
-        ThermostatClusterType::Config({}, mContext.timerDelegate), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
+        ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate), mThermostatDelegate, mHeatingDelegate,
+        mCoolingDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     mUserInterfaceCluster.Create(endpoint);

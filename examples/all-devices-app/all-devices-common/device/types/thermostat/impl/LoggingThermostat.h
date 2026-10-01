@@ -60,44 +60,37 @@ public:
     Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(int16_t & value) const override;
     Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(int16_t value, bool & changed) override;
 
-    Protocols::InteractionModel::Status GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & value) const override
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
+    Protocols::InteractionModel::Status GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & value) const override;
     Protocols::InteractionModel::Status SetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum value,
-                                                       bool & changed) override
-    {
-        changed = false;
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-    Protocols::InteractionModel::Status GetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> & value) const override
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
+                                                       bool & changed) override;
+    Protocols::InteractionModel::Status GetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> & value) const override;
     Protocols::InteractionModel::Status SetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> value,
-                                                        bool & changed) override
-    {
-        changed = false;
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
+                                                        bool & changed) override;
+
+    int8_t GetLocalTemperatureCalibration() const override;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t value, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetRemoteSensing(BitMask<Clusters::Thermostat::RemoteSensingBitmap> & value) const override;
     Protocols::InteractionModel::Status SetRemoteSensing(BitMask<Clusters::Thermostat::RemoteSensingBitmap> value,
-                                                         bool & changed) override
-    {
-        changed = false;
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
+                                                         bool & changed) override;
 
     // ThermostatUserInterfaceConfiguration::Delegate
     void OnTemperatureDisplayModeChanged(Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value) override;
     void OnKeypadLockoutChanged(Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value) override;
 
 private:
+    void UpdateSimulatedRunningState();
+
     FabricTable & mFabricTable;
-    AttributePersistenceProvider * mAttributeStorage = nullptr;
-    DataModel::Nullable<int16_t> mLocalTemperature   = DataModel::MakeNullable<int16_t>(2500);
-    Clusters::Thermostat::SystemModeEnum mSystemMode = Clusters::Thermostat::SystemModeEnum::kOff;
-    int16_t mHeatingSetpoint                         = Clusters::Thermostat::kDefaultHeatingSetpoint;
-    int16_t mCoolingSetpoint                         = Clusters::Thermostat::kDefaultCoolingSetpoint;
+    AttributePersistenceProvider * mAttributeStorage             = nullptr;
+    DataModel::Nullable<int16_t> mLocalTemperature               = DataModel::MakeNullable<int16_t>(2500);
+    Clusters::Thermostat::SystemModeEnum mSystemMode             = Clusters::Thermostat::SystemModeEnum::kOff;
+    int16_t mHeatingSetpoint                                     = Clusters::Thermostat::kDefaultHeatingSetpoint;
+    int16_t mCoolingSetpoint                                     = Clusters::Thermostat::kDefaultCoolingSetpoint;
+    Clusters::Thermostat::ThermostatRunningModeEnum mRunningMode = Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
+    BitMask<Clusters::Thermostat::RelayStateBitmap> mRunningState;
+    BitMask<Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing;
+    int8_t mCalibration = 0;
 };
 
 } // namespace chip::app
