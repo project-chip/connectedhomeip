@@ -33,7 +33,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
@@ -82,6 +82,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor:increasing",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/src/lib/support",
   ]
