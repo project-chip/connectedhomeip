@@ -20,6 +20,12 @@ from zipfile import ZipFile
 
 logger = logging.getLogger(__name__)
 
+try:
+    import dload
+except ImportError:
+    logger.error("dload package is required. Install it with: pip install dload")
+    sys.exit(1)
+
 
 def setup_logging(verbose=False):
     """Configure logging level and format based on verbosity setting."""
@@ -30,12 +36,12 @@ def setup_logging(verbose=False):
 def get_platform_vars():
     """Set platform-specific variables and URLs for SLT CLI download. Linux and macOS only."""
     platform = sys.platform
+    host_arch = "x64"
     if platform == "darwin":
         platform_name = "mac"
         host_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
-        host_arch = "x64"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
@@ -193,7 +199,7 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        subprocess.run(["curl", "-fsSL", slt_cli_url, "-o", slt_zip_path], check=True)
+        dload.save(slt_cli_url, slt_zip_path)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
             for member in zObject.infolist():
