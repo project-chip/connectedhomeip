@@ -153,8 +153,8 @@ public:
         memset(groupSubIdentifier.data(), 0, groupSubIdentifier.size());
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index, chip::MutableByteSpan & protocolVersion)
-        override
+    CHIP_ERROR GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index,
+                                                                           chip::MutableByteSpan & protocolVersion) override
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -370,16 +370,16 @@ CHIP_ERROR AppTask::Init()
     Clusters::DoorLock::ServerConfigOverrides doorLockOverrides;
     // (kUser|kCredentialsOverTheAirAccess|kPinCredential), the legacy write of
     // FeatureMap to 0x181.
-    doorLockOverrides.features = BitFlags<Clusters::DoorLock::Feature>(Clusters::DoorLock::Feature::kUser,
-                                                                      Clusters::DoorLock::Feature::kCredentialsOverTheAirAccess,
-                                                                      Clusters::DoorLock::Feature::kPINCredential);
-    doorLockOverrides.numberOfTotalUsersSupported             = CONFIG_LOCK_NUM_USERS;
-    doorLockOverrides.numberOfPINUsersSupported               = CONFIG_LOCK_NUM_USERS;
-    doorLockOverrides.numberOfRFIDUsersSupported              = 0;
-    doorLockOverrides.numberOfCredentialsSupportedPerUser     = CONFIG_LOCK_NUM_CREDENTIALS_PER_USER;
-    doorLockOverrides.autoRelockTime                          = 0;
-    doorLockOverrides.lockState                               = chip::app::DataModel::Nullable<Clusters::DoorLock::DlLockState>(
-        Clusters::DoorLock::DlLockState::kLocked);
+    doorLockOverrides.features                    = BitFlags<Clusters::DoorLock::Feature>(Clusters::DoorLock::Feature::kUser,
+                                                                       Clusters::DoorLock::Feature::kCredentialsOverTheAirAccess,
+                                                                       Clusters::DoorLock::Feature::kPINCredential);
+    doorLockOverrides.numberOfTotalUsersSupported = CONFIG_LOCK_NUM_USERS;
+    doorLockOverrides.numberOfPINUsersSupported   = CONFIG_LOCK_NUM_USERS;
+    doorLockOverrides.numberOfRFIDUsersSupported  = 0;
+    doorLockOverrides.numberOfCredentialsSupportedPerUser = CONFIG_LOCK_NUM_CREDENTIALS_PER_USER;
+    doorLockOverrides.autoRelockTime                      = 0;
+    doorLockOverrides.lockState =
+        chip::app::DataModel::Nullable<Clusters::DoorLock::DlLockState>(Clusters::DoorLock::DlLockState::kLocked);
     Clusters::DoorLock::ApplyServerConfigOverrides(kLockEndpointId, doorLockOverrides);
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
@@ -829,9 +829,8 @@ void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::
 
         LOG_INF("Updating LockState attribute");
 
-        if (cluster->SetLockState(newLockState, source, chip::app::DataModel::NullNullable,
-                                  chip::Span<const CredentialStruct>(), chip::app::DataModel::NullNullable,
-                                  chip::app::DataModel::NullNullable) != CHIP_NO_ERROR)
+        if (cluster->SetLockState(newLockState, source, chip::app::DataModel::NullNullable, chip::Span<const CredentialStruct>(),
+                                  chip::app::DataModel::NullNullable, chip::app::DataModel::NullNullable) != CHIP_NO_ERROR)
         {
             LOG_ERR("Failed to update LockState attribute");
         }
