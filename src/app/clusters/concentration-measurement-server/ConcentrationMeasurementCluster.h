@@ -32,7 +32,7 @@ namespace Clusters {
 namespace ConcentrationMeasurement {
 
 /**
- * Single implementation for all 10 aliased Concentration Measurement clusters.
+ * Single implementation for all 11 aliased Concentration Measurement clusters.
  * The cluster owns all attribute storage. Push readings via Set*().
  */
 class ConcentrationMeasurementCluster : public DefaultServerCluster

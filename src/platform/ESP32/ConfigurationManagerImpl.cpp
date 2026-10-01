@@ -33,6 +33,10 @@
 #include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+#include <platform/ESP32/ESP32TEEOperationalKeystore.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include "esp_mac.h"
 #endif
@@ -279,6 +283,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 
 CHIP_ERROR ConfigurationManagerImpl::GetDeviceTypeId(uint32_t & deviceType)
 {
+    // A runtime override set via SetDeviceTypeId() takes precedence over the persisted value.
+    if (std::optional<uint32_t> deviceTypeOverride = GetDeviceTypeIdOverride(); deviceTypeOverride.has_value())
+    {
+        deviceType = deviceTypeOverride.value();
+        return CHIP_NO_ERROR;
+    }
+
     uint32_t value = 0;
     CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_PrimaryDeviceType, value);
 
@@ -501,6 +512,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();
 #endif
+
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+    // NOC private keys held by the TEE operational keystore live in the secure_storage partition,
+    // which EraseAll() below does not touch. Clear them explicitly so a factory reset does not
+    // orphan operational keys in the TEE. (The TEE DAC key uses a different id and is kept.)
+    Internal::ESP32TEEOperationalKeystore::RemoveAllOperationalKeys();
+#endif // CONFIG_SECURE_ENABLE_TEE
 
     // Erase all key-values including fabric info.
     err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();

@@ -559,7 +559,27 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
     // Create a packet buffer with a large payload that will result in 257 fragments (to test sequence number wraparound).
     size_t packetLength = mBtpEngine.sDefaultFragmentSize - kTransferProtocolMaxHeaderSize + kTransferProtocolAckSize +
         256 * (mBtpEngine.sDefaultFragmentSize - kTransferProtocolMidFragmentMaxHeaderSize + kTransferProtocolAckSize);
+
+    if (packetLength + System::PacketBuffer::kDefaultHeaderReserve > System::PacketBuffer::kMaxAllocSize)
+    {
+        ChipLogProgress(Test, "Skipping IsValidAckOnSequenceWraparound: packetLength (%u) exceeds PacketBuffer::kMaxAllocSize (%u)",
+                        static_cast<unsigned>(packetLength), static_cast<unsigned>(System::PacketBuffer::kMaxAllocSize));
+        return;
+    }
+
     auto packet0 = System::PacketBufferHandle::New(packetLength);
+    ASSERT_FALSE(packet0.IsNull());
+
+    // Fixed-size buffer pools (e.g. CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL) allocate a
+    // fixed kMaxSizeWithoutReserve block regardless of the requested size, so MaxDataLength()
+    // may still be smaller than packetLength even when kMaxAllocSize is large.
+    if (packet0->MaxDataLength() < packetLength)
+    {
+        ChipLogProgress(Test,
+                        "Skipping IsValidAckOnSequenceWraparound: PacketBuffer MaxDataLength (%u) < required packetLength (%u)",
+                        static_cast<unsigned>(packet0->MaxDataLength()), static_cast<unsigned>(packetLength));
+        return;
+    }
     packet0->SetDataLength(packetLength);
 
     // Send the first packet to start transmission.

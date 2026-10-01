@@ -59,9 +59,8 @@ OTAProviderExample & GetOtaProviderExample()
     return gOtaProvider;
 }
 
-constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kOtaHeaderMaxSize   = 1024;
+constexpr uint8_t kUpdateTokenLen  = 32; // must be between 8 and 32
+constexpr size_t kOtaHeaderMaxSize = 1024;
 
 // Arbitrary BDX Transfer Params
 constexpr uint16_t kMaxBdxBlockSize                = 1024;
@@ -272,6 +271,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     {
         GenerateUpdateToken(updateToken, kUpdateTokenLen);
         GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
+        chip::Platform::CopyString(mUpdateToken, strBuf);
         ChipLogDetail(SoftwareUpdate, "Generated updateToken: %s", strBuf);
 
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
@@ -528,6 +528,8 @@ void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandO
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    chip::Platform::CopyString(mApplyUpdateRequestUpdateToken, tokenBuf);
+    mApplyUpdateRequestNewVersion = commandData.newVersion;
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
     ApplyUpdateResponse::Type response;

@@ -66,7 +66,7 @@ CHIP_ERROR ManualSetupPayloadParser::ToNumber(const std::string & decimalString,
     uint32_t number = 0;
     for (char c : decimalString)
     {
-        if (!isdigit(c))
+        if (!isdigit(static_cast<unsigned char>(c)))
         {
             ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", c);
             return CHIP_ERROR_INVALID_INTEGER_VALUE;

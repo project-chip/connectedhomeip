@@ -33,6 +33,10 @@ public:
     EndpointId GetEndpointId() const { return mEndpointId; }
 
 protected:
+    /// Default semantic tags applied to the refrigerator root endpoint descriptor when the
+    /// caller does not pass any in the registration composition.
+    Span<const EndpointComposition::SemanticTag> mTagList = {};
+
     virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
 

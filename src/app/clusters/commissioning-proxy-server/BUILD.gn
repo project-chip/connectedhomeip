@@ -74,3 +74,23 @@ if (chip_config_network_layer_ble) {
     ]
   }
 }
+
+# Wi-Fi PAF (PAFTP) transport driver. Split out for the same reason as ble-transport: an
+# application that proxies over BLE only - or a platform with no Wi-Fi PAF stack - can
+# depend on commissioning-proxy-server without pulling in src/wifipaf. The platform
+# discovery hooks it needs come from CommissioningProxyPafAdapter, which the application
+# implements.
+source_set("paf-transport") {
+  sources = [
+    "CommissioningProxyPafAdapter.h",
+    "CommissioningProxyPafTransport.cpp",
+    "CommissioningProxyPafTransport.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":commissioning-proxy-server",
+    "${chip_root}/src/wifipaf",
+  ]
+}

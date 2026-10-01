@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,11 +43,11 @@ from TC_AVANALYTestBase import AVANALYTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_2(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_2(self) -> str:
         return "[TC-AVANALY-2.2] Validate writeable attributes with Server as DUT"

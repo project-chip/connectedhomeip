@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace LevelControl {
 
-inline constexpr uint32_t kRevision = 6;
+inline constexpr uint32_t kRevision = 8;
 
 namespace Attributes {
 

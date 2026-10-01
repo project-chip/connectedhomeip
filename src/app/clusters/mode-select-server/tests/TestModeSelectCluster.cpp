@@ -417,4 +417,126 @@ TEST_F(TestModeSelectCluster, StartupAppliesOnModeOverStartUpMode)
     EXPECT_EQ(currentMode, 1u);
 }
 
+// ---- Scenes: ApplyScene clamping ----
+
+namespace {
+// Delegate whose supported modes are spaced apart, to exercise tie-breaking when clamping.
+class SpacedModesDelegate : public ModeSelectCluster::Delegate
+{
+public:
+    static constexpr ModeOptionStructType kModes[] = {
+        { .label = "Off"_span, .mode = 0, .semanticTags = Span<const SemanticTagStructType>() },
+        { .label = "High"_span, .mode = 4, .semanticTags = Span<const SemanticTagStructType>() },
+    };
+
+    Span<const ModeOptionStructType> GetSupportedModes() const override { return Span<const ModeOptionStructType>(kModes); }
+};
+
+constexpr ModeOptionStructType SpacedModesDelegate::kModes[];
+} // namespace
+
+TEST_F(TestModeSelectCluster, ApplySceneClampsOutOfRangeModeToClosestSupportedMode)
+{
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ScenesManagement::Structs::AttributeValuePairStruct::Type pairs[1];
+    pairs[0].attributeID = CurrentMode::Id;
+    // Out of range: supported modes are {0, 1}, and 5 is closer to 1.
+    pairs[0].valueUnsigned8.SetValue(5);
+
+    uint8_t buffer[64];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(
+                  app::DataModel::List<ScenesManagement::Structs::AttributeValuePairStruct::Type>(pairs), serializedBytes),
+              CHIP_NO_ERROR);
+
+    // Per the Scenes Management cluster (AttributeValuePairStruct Value fields), an out-of-range value
+    // in an extension field set is clamped to the closest valid value instead of failing the recall.
+    ASSERT_EQ(cluster.ApplyScene(kRootEndpointId, ModeSelect::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    uint8_t currentMode = 0xFF;
+    ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
+    EXPECT_EQ(currentMode, 1u);
+}
+
+TEST_F(TestModeSelectCluster, ApplySceneClampsEquidistantModeToLowerSupportedMode)
+{
+    SpacedModesDelegate spacedModesDelegate; // supported modes {0, 4}
+    ModeSelectCluster cluster(kRootEndpointId, spacedModesDelegate, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    // Start from mode 4 so the assertion below proves ApplyScene actually moved CurrentMode to 0.
+    ASSERT_EQ(cluster.UpdateCurrentMode(4), Status::Success);
+
+    ScenesManagement::Structs::AttributeValuePairStruct::Type pairs[1];
+    pairs[0].attributeID = CurrentMode::Id;
+    // Equidistant between 0 and 4; the lowest of the two valid values is used.
+    pairs[0].valueUnsigned8.SetValue(2);
+
+    uint8_t buffer[64];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(
+                  app::DataModel::List<ScenesManagement::Structs::AttributeValuePairStruct::Type>(pairs), serializedBytes),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.ApplyScene(kRootEndpointId, ModeSelect::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    uint8_t currentMode = 0xFF;
+    ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
+    EXPECT_EQ(currentMode, 0u);
+}
+
+TEST_F(TestModeSelectCluster, ApplySceneIgnoresUnknownAttributePairs)
+{
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ScenesManagement::Structs::AttributeValuePairStruct::Type pairs[1];
+    // An attribute that is not implemented on the endpoint: per the Scenes Management cluster
+    // (AttributeValuePairStruct), the pair is ignored instead of failing the recall.
+    pairs[0].attributeID = 0x9999;
+    pairs[0].valueUnsigned8.SetValue(1);
+
+    uint8_t buffer[64];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(
+                  app::DataModel::List<ScenesManagement::Structs::AttributeValuePairStruct::Type>(pairs), serializedBytes),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.ApplyScene(kRootEndpointId, ModeSelect::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    uint8_t currentMode = 0xFF;
+    ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
+    EXPECT_EQ(currentMode, 0u);
+}
+
+TEST_F(TestModeSelectCluster, ApplySceneIgnoresUnknownPairAndAppliesCurrentMode)
+{
+    ModeSelectCluster cluster(kRootEndpointId, mockDelegate, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ScenesManagement::Structs::AttributeValuePairStruct::Type pairs[2];
+    // Unknown pair first, then the CurrentMode pair which must still be applied.
+    pairs[0].attributeID = 0x9999;
+    pairs[0].valueUnsigned8.SetValue(0);
+    pairs[1].attributeID = CurrentMode::Id;
+    pairs[1].valueUnsigned8.SetValue(1);
+
+    uint8_t buffer[64];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(
+                  app::DataModel::List<ScenesManagement::Structs::AttributeValuePairStruct::Type>(pairs), serializedBytes),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.ApplyScene(kRootEndpointId, ModeSelect::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    uint8_t currentMode = 0xFF;
+    ASSERT_EQ(tester.ReadAttribute(CurrentMode::Id, currentMode), CHIP_NO_ERROR);
+    EXPECT_EQ(currentMode, 1u);
+}
+
 } // namespace

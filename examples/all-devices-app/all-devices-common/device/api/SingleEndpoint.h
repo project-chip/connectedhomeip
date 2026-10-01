@@ -65,10 +65,13 @@ protected:
     /// make this visible to not have the overload below error out. Should not be used directly.
     using DeviceInterface::UnregisterDescriptor;
 
-    /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
-    /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
-    /// for the destruction of the general SingleEndpoint clusters and device-specific clusters from
-    /// the subclass, as well as removal of the device endpoint from the provider to happen together.
+    /// Internal function to unregister a single endpoint device. This unregisters the endpoint from
+    /// the provider (via provider.RemoveEndpoint()) and destroys the Descriptor cluster.
+    ///
+    /// Subclasses MUST call this FIRST in their device-specific Unregister() function before
+    /// removing or destroying any subclass clusters. Once started, CodeDrivenDataModelProvider prevents
+    /// non-atomic modifications and will return CHIP_ERROR_INCORRECT_STATE if RemoveCluster() is called
+    /// while the endpoint remains registered.
     void UnregisterDescriptor(CodeDrivenDataModelProvider & provider);
 
     /// A default value of kInvalidEndpointId is used for the endpoint ID. When this is the value of the endpoint ID,

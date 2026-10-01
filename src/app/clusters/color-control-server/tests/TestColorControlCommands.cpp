@@ -437,6 +437,32 @@ TEST_F(TestColorControlCommands, MoveColorTemperature)
     EXPECT_EQ(c.ColorTempMireds(), 100);
 }
 
+// A rate move must arrive at the instant its rate implies, not on the next tick boundary after it. The
+// tick period is re-armed once each tick has done its work, so without shortening the last one a
+// transition ending between two periods is applied late by up to a full period plus accumulated drift.
+// TC-CC-6.2 step 8b is the case that catches it: with the widest physical range, MoveColorTemperature at
+// the maximum rate sweeps 65278 mireds at 65535/s == 996ms, and the test reads the endpoint 1s later.
+TEST_F(TestColorControlCommands, MoveColorTemperatureArrivesOnItsDeadline)
+{
+    ColorControlCluster::Config cfg(delegate, mockTimer);
+    cfg.mFeatures.Set(Feature::kColorTemperature);
+    cfg.mColorValue                         = CTColor{ 1 };
+    cfg.ctConfig.colorTempPhysicalMinMireds = 1;
+    cfg.ctConfig.colorTempPhysicalMaxMireds = kMaxColorTempMireds;
+    ColorControlCluster c(kEp, cfg);
+
+    EXPECT_EQ(c.MoveColorTemp(MoveModeEnum::kUp, 65535, 0, 0), Status::Success);
+
+    for (int i = 0; i < 9; i++) // nine full periods -> t = 900ms, still 96ms short of the end
+    {
+        Tick(ColorControlCluster::kTickMs);
+    }
+    EXPECT_LT(c.ColorTempMireds(), kMaxColorTempMireds);
+
+    Tick(96); // t = 996ms: the deadline itself, not the 1000ms period boundary after it
+    EXPECT_EQ(c.ColorTempMireds(), kMaxColorTempMireds);
+}
+
 TEST_F(TestColorControlCommands, StepColorTemperature)
 {
     ColorControlCluster c(kEp, CtConfig()); // start 250
@@ -975,6 +1001,135 @@ TEST_F(TestColorControlCommands, ColorLoopIgnoresHueCommandWhenConfigured)
 
     Tick(1000);
     EXPECT_EQ(c.EnhancedHue(), 10649u); // still following the loop, not the (ignored) MoveToHue target
+}
+
+// Records the notifications a loop start sends: the loop supersedes a running transition, so its own start
+// notification is the replacement and no OnTransitionStopped is expected.
+struct LoopStartDelegate : public ColorControlDelegate
+{
+    void OnTransitionStopped() override { transitionStopped++; }
+    void OnColorLoopStarted(uint16_t, uint16_t, bool) override { loopStarted++; }
+
+    int transitionStopped = 0;
+    int loopStarted       = 0;
+};
+
+ColorControlCluster::Config LoopWithXyCtConfig(ColorControlDelegate & delegate, TimerDelegateMock & timer)
+{
+    ColorControlCluster::Config c(delegate, timer);
+    c.mFeatures.Set(Feature::kColorLoop)
+        .Set(Feature::kEnhancedHue)
+        .Set(Feature::kHueAndSaturation)
+        .Set(Feature::kXy)
+        .Set(Feature::kColorTemperature);
+    c.ctConfig.colorTempPhysicalMinMireds = 100;
+    c.ctConfig.colorTempPhysicalMaxMireds = 400;
+    return c;
+}
+
+Status ActivateColorLoop(ColorControlCluster & c)
+{
+    const auto flags = BitMask<UpdateFlagsBitmap>(UpdateFlagsBitmap::kUpdateTime).Set(UpdateFlagsBitmap::kUpdateAction);
+    return c.ColorLoopSet(flags, ColorLoopActionEnum::kActivateFromEnhancedCurrentHue, ColorLoopDirectionEnum::kIncrement, 10, 0,
+                          BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>());
+}
+
+// Starting a loop switches the mode to enhanced hue/sat, which an XY transition cannot follow: the loop
+// replaces it and drives the hue from there.
+TEST_F(TestColorControlCommands, ColorLoopStartReplacesXYTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = XYColor{ 1000, 2000 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToColor(30000, 30000, 100), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.loopStarted, 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
+TEST_F(TestColorControlCommands, ColorLoopStartReplacesCTTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = CTColor{ 250 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToColorTemp(400, 100), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(c.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.loopStarted, 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
+// Saturation is independent of the hue axis the loop takes over (§3.2.5.2), so its transition keeps running.
+TEST_F(TestColorControlCommands, ColorLoopStartKeepsSaturationTransition)
+{
+    LoopStartDelegate loopDelegate;
+    auto config        = LoopWithXyCtConfig(loopDelegate, mockTimer);
+    config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(c.MoveToHueAndSaturation(0x8000, 200, 100, /*isEnhanced=*/true), Status::Success); // 10 s transition
+    Tick(100);
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+
+    const uint16_t hueAtStart = c.EnhancedHue();
+    Tick(1000);
+    EXPECT_NE(c.EnhancedHue(), hueAtStart);
+
+    Tick(20000);
+    EXPECT_EQ(c.Saturation(), 200);
+    EXPECT_EQ(c.ColorLoopActive(), 1);
+    EXPECT_EQ(loopDelegate.transitionStopped, 0);
+}
+
+// Counts hue frames that tell the hardware to stop moving the hue axis.
+struct HueStopFrameDelegate : public ColorControlDelegate
+{
+    void OnEnhancedHueChanged(uint16_t, bool transitionActive) override
+    {
+        if (!transitionActive)
+        {
+            hueStopFrames++;
+        }
+    }
+
+    int hueStopFrames = 0;
+};
+
+// A saturation transition re-asserts the enhanced hue on every tick. While a color loop drives the hue, that
+// frame must stay transitionActive == true: a false frame means stop, and would abort a native hardware loop.
+TEST_F(TestColorControlCommands, SaturationTransitionKeepsColorLoopHueFramesLive)
+{
+    HueStopFrameDelegate hueDelegate;
+    auto config        = LoopWithXyCtConfig(hueDelegate, mockTimer);
+    config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.MoveToSaturation(200, 10), Status::Success); // 1 s transition
+
+    Tick(500);
+    Complete();
+    ASSERT_EQ(c.Saturation(), 200);
+    EXPECT_EQ(hueDelegate.hueStopFrames, 0);
 }
 
 } // namespace

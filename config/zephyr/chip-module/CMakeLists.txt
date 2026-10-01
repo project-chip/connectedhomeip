@@ -44,6 +44,11 @@ if(CONFIG_CHIP)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 
+    # Defines chip_ota_image(), which applications call to package their binary.
+    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+        include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
+    endif()
+
     # Prepare compiler flags
 
     # CHIP_CFLAGS can be optionally defined by the application to pass additional
@@ -74,9 +79,16 @@ if(CONFIG_CHIP)
         if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
             zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
         endif()
+
+        # Put the NXP accel header (Kconfig.defaults TF_PSA_CRYPTO_USER_CONFIG_FILE)
+        # on the include path so tf-psa-crypto can find it. SGI-PKC gate keeps
+        # non-NXP targets unaffected.
+        if(CONFIG_PSA_CRYPTO_DRIVER_SGI_PKC)
+            zephyr_include_directories(${CHIP_ROOT}/config/nxp/chip-module)
+        endif()
     endif()
 
-    
+
     # IMU task has no Kconfig for priority; on RW platforms it is critical infrastructure,
     # so its priority is forced to cooperative to prevent starvation.
     if(CONFIG_SOC_FAMILY_NXP_RW)
@@ -92,7 +104,7 @@ if(CONFIG_CHIP)
     zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
     matter_add_cxxflags("${ZEPHYR_GNU_CPP_STD}")
 
-    # Set up custom OpenThread configuration
+        # Set up custom OpenThread configuration
     if(CONFIG_CHIP_OPENTHREAD_CONFIG)
         get_filename_component(CHIP_OPENTHREAD_CONFIG
             ${CONFIG_CHIP_OPENTHREAD_CONFIG}
@@ -118,6 +130,10 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
     )
 
+    if(CONFIG_CHIP_OTA_REQUESTOR)
+        matter_add_gn_arg_bool("chip_enable_ota_requestor" TRUE)
+    endif()
+
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
@@ -129,14 +145,21 @@ if(CONFIG_CHIP)
     endif()
 
     if(CONFIG_CHIP_ENABLE_DNSSD_SRP)
+        # Explicit SRP DNS-SD: use the SRP-client backed DNS-SD platform layer
+        # regardless of Wi-Fi/Ethernet so OpenThreadDnssdImpl.cpp is compiled.
         matter_add_gn_arg_string("chip_mdns" "platform")
-    endif()
-
-    if(CONFIG_CHIP_WIFI)
-        matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_CHIP_ETHERNET)
-        matter_add_gn_arg_string("chip_mdns" "minimal")
-    elseif(CONFIG_OPENTHREAD)
+    elseif(CONFIG_CHIP_WIFI OR CONFIG_CHIP_ETHERNET)
+        if(CONFIG_NET_L2_OPENTHREAD AND CONFIG_OPENTHREAD_BORDER_ROUTER)
+            matter_add_gn_arg_string("chip_mdns" "platform")
+        else()
+            # IP-only, or Wi-Fi/Ethernet + Thread non-Border-Router: advertise
+            # over the IP interface using the minimal mDNS implementation. On a
+            # non-Border-Router build OpenThread mDNS is not enabled, so the
+            # Thread side relies on the SRP client at runtime.
+            matter_add_gn_arg_string("chip_mdns" "minimal")
+        endif()
+    elseif(CONFIG_NET_L2_OPENTHREAD)
+        # Thread-only (SRP-client backed DNS-SD).
         matter_add_gn_arg_string("chip_mdns" "platform")
     else()
         matter_add_gn_arg_string("chip_mdns" "none")
@@ -160,8 +183,28 @@ if(CONFIG_CHIP)
         DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
         GN_DEPENDENCIES kernel
     )
-    
+
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
+
+    target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+    include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+    chip_enable_gnu_std(chip)
+
+    # //src/data-model-providers/codedriven is a GN source_set and is not part of
+    # libCHIP.a, so the module compiles the code-driven provider itself.
+    if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        zephyr_library_named(chip_codedriven_data_model)
+        target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
+            ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
+        )
+        target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+    endif()
 
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE

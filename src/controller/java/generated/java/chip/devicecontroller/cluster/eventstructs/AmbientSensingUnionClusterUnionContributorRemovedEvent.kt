@@ -25,11 +25,13 @@ import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterUnionContributorRemovedEvent(
   val removedContributor:
-    List<chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>
+    List<chip.devicecontroller.cluster.structs.AmbientSensingUnionClusterUnionContributorStruct>,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterUnionContributorRemovedEvent {\n")
     append("\tremovedContributor : $removedContributor\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -41,12 +43,14 @@ class AmbientSensingUnionClusterUnionContributorRemovedEvent(
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_REMOVED_CONTRIBUTOR = 0
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -66,10 +70,11 @@ class AmbientSensingUnionClusterUnionContributorRemovedEvent(
           }
           tlvReader.exitContainer()
         }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return AmbientSensingUnionClusterUnionContributorRemovedEvent(removedContributor)
+      return AmbientSensingUnionClusterUnionContributorRemovedEvent(removedContributor, fabricIndex)
     }
   }
 }

@@ -130,7 +130,7 @@ struct CTConfig
 {
     uint16_t colorTempPhysicalMinMireds      = 1;
     uint16_t colorTempPhysicalMaxMireds      = 0xFEFF;
-    uint16_t coupleColorTempToLevelMinMireds = 0;
+    uint16_t coupleColorTempToLevelMinMireds = 1;
     DataModel::Nullable<uint16_t> startUpColorTemperatureMireds{};
 };
 
@@ -347,9 +347,11 @@ public:
                             chip::BitMask<ColorControl::OptionsBitmap> optionOverride);
 
 private:
-    // Arm the one-shot tick timer (no-op if already armed). OnTick re-arms itself while active. Returns
-    // the StartTimer error so callers that must not silently drop a transition can propagate it.
-    CHIP_ERROR ArmTick();
+    // Arm the one-shot tick timer (no-op if already armed). OnTick re-arms itself while active, shortening
+    // intervalMs so the next tick lands ON the nearest axis endpoint instead of on the period boundary
+    // after it. Returns the StartTimer error so callers that must not silently drop a transition can
+    // propagate it.
+    CHIP_ERROR ArmTick(uint32_t intervalMs = kTickMs);
     // Advance every active axis to `now`, then re-arm while anything is still moving.
     void OnTick();
     // TimerContext: the cluster is its own timer context, so the delegate calls straight back here.

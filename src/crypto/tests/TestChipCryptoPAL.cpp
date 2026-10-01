@@ -252,6 +252,15 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
     EXPECT_EQ(memcmp(leftChallenge.ConstBytes(), rightChallenge.ConstBytes(), AttestationChallenge::Capacity()), 0);
 }
 
+// Signs a message using `signer` and validates the signature against the public key of `verifier`.
+void ExpectSignAndVerify(P256Keypair & signer, P256Keypair & verifier)
+{
+    const ByteSpan msg = ByteSpan::fromCharSpan("test message for ExpectSignAndVerify"_span);
+    P256ECDSASignature signature;
+    EXPECT_SUCCESS(signer.ECDSA_sign_msg(msg.data(), msg.size(), signature));
+    EXPECT_SUCCESS(verifier.Pubkey().ECDSA_validate_msg_signature(msg.data(), msg.size(), signature));
+}
+
 } // namespace
   //
 
@@ -1627,6 +1636,26 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     EXPECT_TRUE(signatures_match);
 }
 
+TEST_F(TestChipCryptoPAL, TestECDH_RemotePublicKeyNotOnCurve)
+{
+    HeapChecker heapChecker;
+    Test_P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDH));
+
+    // Correct length and SEC1 uncompressed-point marker, but (0, 0) is not on P-256, so decoding the
+    // remote key fails. Exercises the failure path of remote key decoding, which must release
+    // everything it allocated and publish no secret.
+    static constexpr uint8_t kPointNotOnCurve[kP256_PublicKey_Length] = { 0x04 };
+    P256PublicKey invalid_remote_public_key(kPointNotOnCurve);
+
+    P256ECDHDerivedSecret out_secret;
+    ASSERT_EQ(out_secret.Length(), 0u);
+
+    CHIP_ERROR err = keypair.ECDH_derive_secret(invalid_remote_public_key, out_secret);
+    EXPECT_NE(err, CHIP_NO_ERROR);
+    EXPECT_EQ(out_secret.Length(), 0u);
+}
+
 #if CHIP_CRYPTO_OPENSSL
 TEST_F(TestChipCryptoPAL, TestAddEntropySources)
 {
@@ -1765,6 +1794,13 @@ TEST_F(TestChipCryptoPAL, TestP256_InitializeFromBitsOrReject)
         P256SerializedKeypair actual;
         EXPECT_SUCCESS(keypair.Serialize(actual));
         EXPECT_TRUE(actual.Span().data_equal(expected.Span()));
+
+        // Check that the initialized keypair is usable, by cross-checking
+        // signatures against a keypair deserialized from the test vector.
+        P256Keypair reference;
+        EXPECT_SUCCESS(reference.Deserialize(expected));
+        ExpectSignAndVerify(keypair, reference);
+        ExpectSignAndVerify(reference, keypair);
     }
 
     static constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,

@@ -1,7 +1,7 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/tasks.py
 
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from re import Pattern
 from typing import Any, BinaryIO
 
@@ -16,7 +16,8 @@ class Subprocess(threading.Thread):
     output_cb: Callable[[bytes, bool], bytes] | None
     f_stdout: BinaryIO
     f_stderr: BinaryIO
-    output_match: Pattern[bytes] | None
+    output_match: list[Pattern[bytes]]
+    output_match_lock: threading.Lock
     returncode: int | None
     p: Any
     event: threading.Event
@@ -28,9 +29,9 @@ class Subprocess(threading.Thread):
                  f_stdout: BinaryIO = ...,
                  f_stderr: BinaryIO = ...) -> None: ...
 
-    def set_output_match(self, pattern: str | Pattern[bytes]) -> None: ...
+    def set_output_match(self, pattern: str | Pattern[bytes] | Sequence[str | Pattern[bytes]]) -> None: ...
 
-    def arm_output_match(self, pattern: str | Pattern[bytes]) -> None: ...
+    def arm_output_match(self, pattern: str | Pattern[bytes] | Sequence[str | Pattern[bytes]]) -> None: ...
 
     def wait_for_output(self, timeout: float) -> bool: ...
 
@@ -39,11 +40,11 @@ class Subprocess(threading.Thread):
     def run(self) -> None: ...
 
     def start(self,
-              expected_output: str | Pattern[bytes] | None = ...,
+              expected_output: str | Pattern[bytes] | Sequence[str | Pattern[bytes]] | None = ...,
               timeout: float | None = ...) -> None: ...
 
     def send(self, message: str, end: str = ...,
-             expected_output: str | Pattern[bytes] | None = ...,
+             expected_output: str | Pattern[bytes] | Sequence[str | Pattern[bytes]] | None = ...,
              timeout: float | None = ...) -> None: ...
 
     def terminate(self) -> None: ...

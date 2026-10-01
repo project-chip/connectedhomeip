@@ -15,6 +15,7 @@ import shutil
 import stat
 import subprocess
 import sys
+from platform import machine
 from zipfile import ZipFile
 
 logger = logging.getLogger(__name__)
@@ -35,15 +36,17 @@ def setup_logging(verbose=False):
 def get_platform_vars():
     """Set platform-specific variables and URLs for SLT CLI download. Linux and macOS only."""
     platform = sys.platform
+    host_arch = "x64"
     if platform == "darwin":
         platform_name = "mac"
+        host_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.1.1-{platform_name}-x64.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{host_arch}.zip"
     return platform_name, slt_cli_url
 
 

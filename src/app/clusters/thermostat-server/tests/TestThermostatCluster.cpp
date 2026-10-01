@@ -70,6 +70,10 @@ TEST_F(ThermostatTestFixture, TestMandatoryAttributesInAttributeList)
     // Not configured
     EXPECT_FALSE(HasAttribute(cluster, OccupiedCoolingSetpoint::Id));
     EXPECT_FALSE(HasAttribute(cluster, OutdoorTemperature::Id));
+    EXPECT_FALSE(HasAttribute(cluster, CriticalFreezeProtection::Id));
+    EXPECT_FALSE(HasAttribute(cluster, CriticalOverheatProtection::Id));
+    EXPECT_FALSE(cluster.HasAttribute(CriticalFreezeProtection::Id));
+    EXPECT_FALSE(cluster.HasAttribute(CriticalOverheatProtection::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -81,6 +85,8 @@ TEST_F(ThermostatTestFixture, TestOptionalAttributesInAttributeList)
     mOptionalAttributes.RemoteSensing               = true;
     mOptionalAttributes.ThermostatRunningMode       = true;
     mOptionalAttributes.ThermostatRunningState      = true;
+    mOptionalAttributes.CriticalFreezeProtection    = true;
+    mOptionalAttributes.CriticalOverheatProtection  = true;
 
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling);
     ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
@@ -93,6 +99,10 @@ TEST_F(ThermostatTestFixture, TestOptionalAttributesInAttributeList)
     EXPECT_TRUE(HasAttribute(cluster, RemoteSensing::Id));
     EXPECT_TRUE(HasAttribute(cluster, ThermostatRunningMode::Id));
     EXPECT_TRUE(HasAttribute(cluster, ThermostatRunningState::Id));
+    EXPECT_TRUE(HasAttribute(cluster, CriticalFreezeProtection::Id));
+    EXPECT_TRUE(HasAttribute(cluster, CriticalOverheatProtection::Id));
+    EXPECT_TRUE(cluster.HasAttribute(CriticalFreezeProtection::Id));
+    EXPECT_TRUE(cluster.HasAttribute(CriticalOverheatProtection::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -446,6 +456,36 @@ TEST_F(ThermostatTestFixture, TestDefaultDelegateImplementations)
 
     BitMask<RemoteSensingBitmap> remote;
     EXPECT_EQ(delegate.GetRemoteSensing(remote), Status::UnsupportedAttribute);
+
+    // Test heating setpoints delegate default implementations
+    class MinimalHeatingDelegate : public ThermostatHeatingSetpoints::Delegate
+    {
+    public:
+        Status GetOccupiedHeatingSetpoint(temperature & s) const override { return Status::Success; }
+        Status SetOccupiedHeatingSetpoint(temperature s, bool & c) override { return Status::Success; }
+        Status GetAbsMinHeatSetpointLimit(temperature & s) const override { return Status::Success; }
+        Status GetAbsMaxHeatSetpointLimit(temperature & s) const override { return Status::Success; }
+    };
+
+    MinimalHeatingDelegate minimalHeatingDelegate;
+    bool freezeProtection = true;
+    EXPECT_EQ(minimalHeatingDelegate.GetCriticalFreezeProtection(freezeProtection), Status::Success);
+    EXPECT_FALSE(freezeProtection);
+
+    // Test cooling setpoints delegate default implementations
+    class MinimalCoolingDelegate : public ThermostatCoolingSetpoints::Delegate
+    {
+    public:
+        Status GetOccupiedCoolingSetpoint(temperature & s) const override { return Status::Success; }
+        Status SetOccupiedCoolingSetpoint(temperature s, bool & c) override { return Status::Success; }
+        Status GetAbsMinCoolSetpointLimit(temperature & s) const override { return Status::Success; }
+        Status GetAbsMaxCoolSetpointLimit(temperature & s) const override { return Status::Success; }
+    };
+
+    MinimalCoolingDelegate minimalCoolingDelegate;
+    bool overheatProtection = true;
+    EXPECT_EQ(minimalCoolingDelegate.GetCriticalOverheatProtection(overheatProtection), Status::Success);
+    EXPECT_FALSE(overheatProtection);
 }
 
 } // namespace
