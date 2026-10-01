@@ -48,6 +48,14 @@ Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
     loggingContext.optionalAttributes.ThermostatRunningState      = true;
     loggingContext.optionalAttributes.RemoteSensing               = true;
     loggingContext.optionalAttributes.LocalTemperatureCalibration = true;
+    loggingContext.optionalAttributes.AbsMinHeatSetpointLimit     = true;
+    loggingContext.optionalAttributes.AbsMaxHeatSetpointLimit     = true;
+    loggingContext.optionalAttributes.AbsMinCoolSetpointLimit     = true;
+    loggingContext.optionalAttributes.AbsMaxCoolSetpointLimit     = true;
+    loggingContext.optionalAttributes.MinHeatSetpointLimit        = true;
+    loggingContext.optionalAttributes.MaxHeatSetpointLimit        = true;
+    loggingContext.optionalAttributes.MinCoolSetpointLimit        = true;
+    loggingContext.optionalAttributes.MaxCoolSetpointLimit        = true;
     return loggingContext;
 }
 } // namespace
