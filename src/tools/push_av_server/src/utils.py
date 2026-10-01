@@ -63,8 +63,15 @@ class WorkingDirectory:
         root = self.root_dir().resolve()
         for segment in paths:
             segment = str(segment)
-            if os.path.isabs(segment) or segment.startswith(("/", "\\")):
-                raise ValueError(f"Absolute path segment not allowed: {segment!r}")
+            # Reject anything anchored under either path flavour: POSIX/Windows
+            # absolute paths and Windows drive-relative segments ("C:foo") all
+            # let Path(*paths) discard the preceding fixed prefix.
+            if (
+                pathlib.PurePosixPath(segment).is_absolute()
+                or pathlib.PureWindowsPath(segment).is_absolute()
+                or pathlib.PureWindowsPath(segment).drive
+            ):
+                raise ValueError(f"Anchored path segment not allowed: {segment!r}")
         rel = Path(*[str(p) for p in paths])
         if ".." in rel.parts:
             raise ValueError(f"Parent traversal not allowed: {rel}")

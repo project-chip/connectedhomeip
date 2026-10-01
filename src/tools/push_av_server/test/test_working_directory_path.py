@@ -49,3 +49,11 @@ def test_parent_segment_cannot_escape_root(wd):
     working, _ = wd
     with pytest.raises(ValueError):
         working.path("streams", "1", "../../../../some/other/path")
+
+
+def test_windows_drive_relative_segment_is_rejected(wd):
+    # A drive-anchored segment ("C:...") would discard the fixed prefix on
+    # Windows; rejected regardless of host OS.
+    working, _ = wd
+    with pytest.raises(ValueError):
+        working.path("streams", "1", "C:certs/server/server.key")
