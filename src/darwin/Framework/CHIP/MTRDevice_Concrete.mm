@@ -416,6 +416,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
+- (void)unitTestWillHandleReportEndForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -455,8 +456,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Keep track of the current schedule of time updates (only valid if
     // timeUpdateTimer is not nil).
     uint64_t _lastTimeUpdateScheduledDelayInSeconds;
-    // This boolean keeps track, during a priming read, of whether time
-    // synchronization loss has been detected.
+    // Set when a report's attributes show a time synchronization loss; read and
+    // cleared when a report ends.
     BOOL _timeSynchronizationLossDetected;
     // Times at which we scheduled a time synchronization repair, oldest first. Pruned
     // lazily, so only the count after a prune says how much budget is left.
@@ -1941,10 +1942,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeState:MTRDeviceStateReachable];
     }
 
-    // Reset _timeSynchronizationLossDetected, so that it will get set based
-    // on the values in this report.
-    _timeSynchronizationLossDetected = NO;
-
     // If we currently don't have an established subscription, this must be a
     // priming report.
     _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
@@ -2285,6 +2282,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     MTR_LOG("%@ handling report end", self);
 
+#ifdef DEBUG
+    id testDelegate;
+    {
+        std::lock_guard lock(_lock);
+        testDelegate = [_delegateManager firstDelegate];
+    }
+    // Called without _lock held, because the test delegate starts another report from here.
+    if ([testDelegate respondsToSelector:@selector(unitTestWillHandleReportEndForDevice:)]) {
+        [testDelegate unitTestWillHandleReportEndForDevice:self];
+    }
+#endif
+
     uint64_t newUpdateDelay;
     BOOL timeSynchronizationLossDetected;
     {
@@ -2335,6 +2344,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         newUpdateDelay = [self timeUpdateShortDelayInSeconds];
 
         timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+        _timeSynchronizationLossDetected = NO;
     }
 
     std::lock_guard timeSyncLock(_timeSyncLock);

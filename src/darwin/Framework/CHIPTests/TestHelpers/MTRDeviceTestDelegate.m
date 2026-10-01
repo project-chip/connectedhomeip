@@ -168,6 +168,13 @@
     }
 }
 
+- (void)unitTestWillHandleReportEndForDevice:(MTRDevice *)device
+{
+    if (self.onWillHandleReportEnd != nil) {
+        self.onWillHandleReportEnd();
+    }
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
