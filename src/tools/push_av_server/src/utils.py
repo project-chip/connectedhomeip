@@ -63,14 +63,11 @@ class WorkingDirectory:
         root = self.root_dir().resolve()
         for segment in paths:
             segment = str(segment)
-            # Reject anything anchored under either path flavour: POSIX/Windows
-            # absolute paths and Windows drive-relative segments ("C:foo") all
+            # Reject anything anchored under either path flavour. ``anchor``
+            # covers POSIX/Windows absolute paths, Windows drive-relative
+            # ("C:foo") and rooted-relative ("\\foo") segments -- all of which
             # let Path(*paths) discard the preceding fixed prefix.
-            if (
-                pathlib.PurePosixPath(segment).is_absolute()
-                or pathlib.PureWindowsPath(segment).is_absolute()
-                or pathlib.PureWindowsPath(segment).drive
-            ):
+            if pathlib.PurePosixPath(segment).anchor or pathlib.PureWindowsPath(segment).anchor:
                 raise ValueError(f"Anchored path segment not allowed: {segment!r}")
         rel = Path(*[str(p) for p in paths])
         if ".." in rel.parts:
