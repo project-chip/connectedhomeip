@@ -22,6 +22,38 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
+
+def get_chip_root() -> Path:
+    return next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+
+
+def get_ncs_matter_addon_path(chip_root: Path) -> Path:
+    addon_path = chip_root / 'third_party/nrfconnect/ncs-matter'
+    if not addon_path.is_dir():
+        raise RuntimeError(
+            f"ncs-matter add-on not found at {addon_path}. "
+            "Initialize it with: git submodule update --init third_party/nrfconnect/ncs-matter")
+    return addon_path.resolve()
+
+
+def ensure_ncs_matter_submodule(chip_root: Path) -> None:
+    command = [
+        'git', '-C', str(chip_root), 'submodule', 'update', '--init',
+        'third_party/nrfconnect/ncs-matter',
+    ]
+    subprocess.run(command, check=True)
+
+
+def get_west_topdir(zephyr_base: str) -> Path:
+    west_topdir = Path(zephyr_base).resolve().parent
+    if not (west_topdir / '.west').is_dir():
+        raise RuntimeError(
+            f"No west workspace found at {west_topdir}. "
+            "Initialize one with the ncs-matter add-on manifest before running this script.")
+    return west_topdir
+
 
 def get_commit_sha(repository_location, rev):
     command = ['git', '-C', repository_location, 'rev-list', '-n', '1', rev]
@@ -29,32 +61,49 @@ def get_commit_sha(repository_location, rev):
     return process.stdout.decode('ascii').strip()
 
 
-def update_ncs(repository_location, revision, fetch_shallow):
-    # Fetch sdk-nrf to the desired revision.
-    command = ['git', '-C', repository_location, 'fetch']
-    subprocess.run(command, check=True)
+def get_recommended_nrf_revision(ncs_matter_addon: Path) -> str:
+    west_yml = ncs_matter_addon / 'west.yml'
+    try:
+        with open(west_yml, encoding='utf-8') as f:
+            manifest = yaml.safe_load(f)
+    except OSError as exc:
+        raise RuntimeError(f"Unable to read ncs-matter manifest at {west_yml}.") from exc
 
-    # Checkout sdk-nrf to the desired revision.
-    command = ['git', '-C', repository_location, 'checkout', revision]
-    subprocess.run(command, check=True)
+    for project in manifest.get('manifest', {}).get('projects', []):
+        if project.get('name') == 'nrf':
+            revision = project.get('revision')
+            if revision:
+                return revision
 
-    # Call west update command to update all projects and submodules used by sdk-nrf.
+    raise RuntimeError("Unable to find the nrf project revision in ncs-matter west.yml.")
+
+
+def get_manifest_path(west_topdir: Path) -> Path:
+    command = ['west', 'config', 'manifest.path']
+    process = subprocess.run(command, cwd=west_topdir, check=True, stdout=subprocess.PIPE, text=True)
+    manifest_path = process.stdout.strip()
+    if not manifest_path:
+        raise RuntimeError("west manifest.path is not configured.")
+
+    resolved = Path(manifest_path)
+    if not resolved.is_absolute():
+        resolved = (west_topdir / resolved).resolve()
+    else:
+        resolved = resolved.resolve()
+
+    return resolved
+
+
+def switch_manifest_to_addon(west_topdir: Path, ncs_matter_addon: Path) -> None:
+    command = ['west', 'config', 'manifest.path', str(ncs_matter_addon)]
+    subprocess.run(command, cwd=west_topdir, check=True)
+
+
+def update_ncs(west_topdir: Path, fetch_shallow: bool):
     command = ['west', 'update']
     command += ['--fetch', 'smart', '--narrow',
                 '-o=--depth=1'] if fetch_shallow else []
-    subprocess.run(command, check=True)
-
-
-def get_ncs_recommended_revision():
-    chip_root = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
-
-    # Read recommended revision saved in the .nrfconnect-recommended-revision file.
-    try:
-        with open(os.path.join(chip_root, 'config/nrfconnect/.nrfconnect-recommended-revision')) as f:
-            return f.readline().strip()
-    except OSError:
-        raise RuntimeError(
-            "Encountered problem when trying to read .nrfconnect-recommended-revision file.")
+    subprocess.run(command, cwd=west_topdir, check=True)
 
 
 def print_messages(messages: list, yellow_text: bool):
@@ -88,6 +137,31 @@ def print_check_revision_warning_message(current_revision, recommended_revision)
     ], sys.stdout.isatty())
 
 
+def print_check_manifest_warning_message(current_manifest_path, expected_manifest_path):
+    current_manifest_message = f"WARNING: west manifest.path ({current_manifest_path})"
+    expected_manifest_message = f"is not the ncs-matter add-on ({expected_manifest_path})."
+    update_message = "Switch to the add-on manifest and update the workspace by calling:"
+    call_command_message = os.path.abspath(__file__) + " --update"
+
+    longest_message_len = max(
+        len(current_manifest_message),
+        len(expected_manifest_message),
+        len(update_message),
+        len(call_command_message),
+    )
+    fmt = f"# {{:<{longest_message_len}}}#"
+
+    print_messages([
+        (longest_message_len + 3) * '#',
+        fmt.format(current_manifest_message),
+        fmt.format(expected_manifest_message),
+        fmt.format(''),
+        fmt.format(update_message),
+        fmt.format(call_command_message),
+        (longest_message_len + 3) * '#',
+    ], sys.stdout.isatty())
+
+
 def main():
 
     try:
@@ -112,12 +186,22 @@ def main():
             help="Don't print any message if the check succeeds.", action="store_true")
         args = parser.parse_args()
 
+        chip_root = get_chip_root()
+        ensure_ncs_matter_submodule(chip_root)
+        ncs_matter_addon = get_ncs_matter_addon_path(chip_root)
+        west_topdir = get_west_topdir(zephyr_base)
         ncs_base = os.path.join(zephyr_base, '../nrf')
-        recommended_revision = get_ncs_recommended_revision()
+        recommended_revision = get_recommended_nrf_revision(ncs_matter_addon)
 
         if args.check:
             if not args.quiet:
                 print("Checking current nRF Connect SDK revision...")
+
+            current_manifest_path = get_manifest_path(west_topdir)
+            if current_manifest_path != ncs_matter_addon:
+                if not args.quiet:
+                    print_check_manifest_warning_message(current_manifest_path, ncs_matter_addon)
+                sys.exit(1)
 
             current_sha = get_commit_sha(ncs_base, 'HEAD')
             recommended_sha = get_commit_sha(ncs_base, recommended_revision)
@@ -131,8 +215,11 @@ def main():
                 print("Your current version is up to date with the recommended one.")
 
         if args.update:
-            print("Updating nRF Connect SDK to recommended revision...")
-            update_ncs(ncs_base, recommended_revision, args.shallow)
+            print("Switching west manifest to the ncs-matter add-on...")
+            switch_manifest_to_addon(west_topdir, ncs_matter_addon)
+
+            print(f"Updating nRF Connect SDK workspace to {recommended_revision} using the add-on manifest...")
+            update_ncs(west_topdir, args.shallow)
 
     except (RuntimeError, subprocess.CalledProcessError) as e:
         print(e)

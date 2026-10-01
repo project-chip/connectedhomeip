@@ -347,3 +347,8 @@
 [submodule "third_party/miniaudio/repo"]
 	path = third_party/miniaudio/repo
 	url = https://github.com/mackron/miniaudio
+[submodule "third_party/nrfconnect/ncs-matter"]
+	path = third_party/nrfconnect/ncs-matter
+	url = https://github.com/nrfconnect/ncs-matter.git
+	branch = main
+	platforms = nrfconnect
