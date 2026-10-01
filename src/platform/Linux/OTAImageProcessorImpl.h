@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -38,6 +39,8 @@ public:
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
+    CHIP_ERROR SuspendDownload() override;
+    uint64_t GetResumeOffset() override { return mSuspended ? mImageBytesReceived : 0; }
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
@@ -51,9 +54,11 @@ private:
     static void HandleFinalize(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
+    static void HandleSuspend(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
+    bool VerifyPayload();
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -69,7 +74,13 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    const char * mImageFile = nullptr;
+    const char * mImageFile      = nullptr;
+    uint64_t mImageBytesReceived = 0;
+    bool mSuspended              = false;
+    Crypto::Hash_SHA256_stream mPayloadHash;
+    uint8_t mPayloadDigest[Crypto::kSHA256_Hash_Length];
+    size_t mPayloadDigestLength = 0;
+    bool mPayloadVerified       = false;
 };
 
 } // namespace chip
