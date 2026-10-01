@@ -3205,6 +3205,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * clusterPath3 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
     __auto_type * clusterPath4 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
 
+    XCTAssertIdentical(commandPath1, commandPath5);
+    XCTAssertIdentical(eventPath1, eventPath5);
+    XCTAssertIdentical(attributePath1, attributePath5);
+    XCTAssertIdentical(clusterPath1, clusterPath4);
+    XCTAssertIdentical([attributePath1 copy], attributePath1);
+    NSData * archivedPath = [NSKeyedArchiver archivedDataWithRootObject:attributePath1 requiringSecureCoding:YES error:nil];
+    XCTAssertIdentical([NSKeyedUnarchiver unarchivedObjectOfClass:MTRAttributePath.class fromData:archivedPath error:nil], attributePath1);
+
     // Command paths
     XCTAssertTrue([commandPath1 isEqual:commandPath5]);
     XCTAssertEqualObjects(commandPath1, commandPath5);
