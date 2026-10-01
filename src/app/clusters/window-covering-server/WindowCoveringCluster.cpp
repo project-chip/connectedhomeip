@@ -61,6 +61,45 @@ WindowCoveringCluster::WindowCoveringCluster(EndpointId endpointId, const Config
         VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kTilt), AppServer,
                            "Validation failed: PositionAwareTilt requires Tilt feature.");
     }
+
+    // Type is constrained by which of LF/TL are enabled (spec 9.3.6.2).
+    if (mFeatureMap.Has(Feature::kLift) && mFeatureMap.Has(Feature::kTilt))
+    {
+        VerifyOrDieWithMsg(mType == Type::kTiltBlindLiftAndTilt || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when both Lift and Tilt are enabled.");
+    }
+    else if (mFeatureMap.Has(Feature::kLift))
+    {
+        VerifyOrDieWithMsg(mType == Type::kRollerShade || mType == Type::kRollerShade2Motor ||
+                               mType == Type::kRollerShadeExterior || mType == Type::kRollerShadeExterior2Motor ||
+                               mType == Type::kDrapery || mType == Type::kAwning || mType == Type::kShutter ||
+                               mType == Type::kProjectorScreen || mType == Type::kUnknown,
+                           AppServer, "Validation failed: Type is not valid when only Lift is enabled.");
+    }
+    else
+    {
+        VerifyOrDieWithMsg(mType == Type::kShutter || mType == Type::kTiltBlindTiltOnly || mType == Type::kUnknown, AppServer,
+                           "Validation failed: Type is not valid when only Tilt is enabled.");
+    }
+
+    // The PositionAware bits of ConfigStatus mirror the immutable feature map (spec 9.3.6.13), so
+    // they are established here, where the features from the Config are set; with Mode still 0 the
+    // cluster starts operational. Startup() refreshes the whole bitmap after loading persisted
+    // state, since the Mode-derived bits can change across boots.
+    mConfigStatus = DeriveConfigStatus();
+}
+
+chip::BitMask<ConfigStatus> WindowCoveringCluster::DeriveConfigStatus() const
+{
+    // Starts from the current value: only the four spec-derived bits are refreshed here (the
+    // PositionAware pair mirrors the feature map, Operational/LiftMovementReversed follow Mode);
+    // the remaining bits (OnlineReserved, encoder-controlled) are independent state.
+    chip::BitMask<ConfigStatus> status = mConfigStatus;
+    status.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
+    status.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
+    status.Set(ConfigStatus::kLiftPositionAware, mFeatureMap.Has(Feature::kPositionAwareLift));
+    status.Set(ConfigStatus::kTiltPositionAware, mFeatureMap.Has(Feature::kPositionAwareTilt));
+    return status;
 }
 
 CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
@@ -93,6 +132,24 @@ CHIP_ERROR WindowCoveringCluster::Startup(ServerClusterContext & context)
         rawConfigStatus);
     mConfigStatus = chip::BitMask<ConfigStatus>(rawConfigStatus);
 
+    // Refresh the derived bits after loading persisted state: the Mode-derived bits (Operational,
+    // LiftMovementReversed) can change across boots, and a persisted ConfigStatus must not shadow
+    // the feature-mirroring PositionAware bits. Applied directly, with no change notification or
+    // delegate callback: this is initialization from persisted state, not a state change. This must
+    // happen before the delegate notification below, so OnModeChanged() observes a consistent
+    // GetConfigStatus()/GetMotionLockStatus() rather than the pre-refresh value.
+    mConfigStatus = DeriveConfigStatus();
+
+    if (mMode.Has(Mode::kCalibrationMode))
+    {
+        // Mode is restored directly above rather than via SetMode(), so the delegate was never
+        // notified. If the device was mid-calibration when it last shut down (e.g. a crash), let it
+        // know now so it can resume/restart its own calibration state - otherwise the device would
+        // be permanently locked (see GetMotionLockStatus()) with nothing left to ever complete the
+        // calibration routine and leave calibration mode.
+        mDelegate.OnModeChanged(mMode);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -121,6 +178,9 @@ void WindowCoveringCluster::SetNumberOfActuationsTilt(uint16_t numOfTilts)
 void WindowCoveringCluster::SetConfigStatus(chip::BitMask<ConfigStatus> status)
 {
     VerifyOrReturn(SetAttributeValue(mConfigStatus, status, Attributes::ConfigStatus::Id));
+
+    mDelegate.OnConfigStatusChanged(status);
+
     VerifyOrReturn(mContext != nullptr);
 
     uint8_t rawConfigStatus = mConfigStatus.Raw();
@@ -148,6 +208,8 @@ void WindowCoveringCluster::SetTargetPositionLiftPercent100ths(NPercent100ths ne
     VerifyOrReturn(
         SetAttributeValue(mTargetPositionLiftPercent100ths, newTargetLift, Attributes::TargetPositionLiftPercent100ths::Id));
 
+    mDelegate.OnTargetPositionLiftChanged(newTargetLift);
+
     OperationalState opLift = OperationalState::Stall;
     if (!mTargetPositionLiftPercent100ths.IsNull() && !mCurrentPositionLiftPercent100ths.IsNull() &&
         mCurrentPositionLiftPercent100ths.Value() != mTargetPositionLiftPercent100ths.Value())
@@ -163,6 +225,8 @@ void WindowCoveringCluster::SetTargetPositionTiltPercent100ths(NPercent100ths ne
 {
     VerifyOrReturn(
         SetAttributeValue(mTargetPositionTiltPercent100ths, newTargetTilt, Attributes::TargetPositionTiltPercent100ths::Id));
+
+    mDelegate.OnTargetPositionTiltChanged(newTargetTilt);
 
     OperationalState opTilt = OperationalState::Stall;
     if (!mTargetPositionTiltPercent100ths.IsNull() && !mCurrentPositionTiltPercent100ths.IsNull() &&
@@ -251,15 +315,18 @@ void WindowCoveringCluster::SetMode(chip::BitMask<Mode> mode)
             ConcreteAttributePath(mPath.mEndpointId, WindowCovering::Id, Attributes::Mode::Id), rawMode));
     }
 
-    chip::BitMask<ConfigStatus> newStatus = mConfigStatus;
-    newStatus.Set(ConfigStatus::kOperational, !mMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, mMode.Has(Mode::kMotorDirectionReversed));
-    SetConfigStatus(newStatus);
+    // ConfigStatus must be updated before the delegate is notified, so OnModeChanged() observes
+    // a consistent GetConfigStatus()/GetMotionLockStatus() rather than the pre-transition value.
+    SetConfigStatus(DeriveConfigStatus());
+
+    mDelegate.OnModeChanged(mode);
 }
 
 void WindowCoveringCluster::SetSafetyStatus(chip::BitMask<SafetyStatus> status)
 {
-    SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id);
+    VerifyOrReturn(SetAttributeValue(mSafetyStatus, status, Attributes::SafetyStatus::Id));
+
+    mDelegate.OnSafetyStatusChanged(status);
 }
 
 DataModel::ActionReturnStatus WindowCoveringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -314,6 +381,8 @@ DataModel::ActionReturnStatus WindowCoveringCluster::WriteAttribute(const DataMo
         ReturnErrorOnFailure(decoder.Decode(mode));
         VerifyOrReturnValue(mode.Raw() <= 0x0F, Status::ConstraintError);
         // TODO: Spec 5.3.6.14.2: "In a write interaction, setting this bit to 0, while the device
+        // spec issue: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/13478
+        // SDK issue: https://github.com/project-chip/connectedhomeip/issues/72853
         // Disabled because Test_TC_WNCV_2_3 Step 2d writes Mode=0x00 to exit calibration,
         // which contradicts the spec. Needs test update
         // VerifyOrReturnValue(!mMode.Has(Mode::kCalibrationMode) || mode.Has(Mode::kCalibrationMode), Status::Failure);

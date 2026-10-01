@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief Routines for the Door Lock Server plugin.
- *******************************************************************************
- ******************************************************************************/
-
 #include "door-lock-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -81,11 +75,6 @@ DoorLockServer & DoorLockServer::Instance()
     return instance;
 }
 
-/**
- * @brief Initializes given endpoint for a server.
- *
- * @param endpointId
- */
 void DoorLockServer::InitServer(EndpointId endpointId)
 {
     CHIP_ERROR err = InitEndpoint(endpointId);
