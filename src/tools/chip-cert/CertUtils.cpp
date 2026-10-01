@@ -967,9 +967,12 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     if (certConfig.IsPublicKeyError())
     {
         const ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(newCert);
-        std::vector<unsigned char> pkBuf(ASN1_STRING_get0_data(pk), ASN1_STRING_get0_data(pk) + ASN1_STRING_length(pk));
+        std::vector<uint8_t> pkBuf(ASN1_STRING_get0_data(pk), ASN1_STRING_get0_data(pk) + ASN1_STRING_length(pk));
         pkBuf[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
-        ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(pk), pkBuf.data(), static_cast<int>(pkBuf.size()));
+        if (!ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(pk), pkBuf.data(), static_cast<int>(pkBuf.size())))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
     // Set certificate subject DN.
@@ -1062,9 +1065,12 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     {
         const ASN1_BIT_STRING * sig = nullptr;
         X509_get0_signature(&sig, nullptr, newCert);
-        std::vector<unsigned char> sigBuf(ASN1_STRING_get0_data(sig), ASN1_STRING_get0_data(sig) + ASN1_STRING_length(sig));
+        std::vector<uint8_t> sigBuf(ASN1_STRING_get0_data(sig), ASN1_STRING_get0_data(sig) + ASN1_STRING_length(sig));
         sigBuf[20] ^= 0xFF;
-        ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(sig), sigBuf.data(), static_cast<int>(sigBuf.size()));
+        if (!ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(sig), sigBuf.data(), static_cast<int>(sigBuf.size())))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
 exit:
