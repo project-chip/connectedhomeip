@@ -161,9 +161,16 @@ To do this, perform the following steps:
         is updated as a part of the generate_spec_xml.py script, so it is just
         the zip file inclusion in this file that needs to be updated
     -   In
-        src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py
-        update the PrebuiltDataModelDirectory enum to add the new directory and
-        dm_from_spec_version
+        src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py:
+
+        -   Add the new directory to the PrebuiltDataModelDirectory enum and its
+            dirname property
+        -   Add the new SpecificationVersion value to \_SPEC_VERSION_TO_DM
+        -   Add the new directory's DataModelRevision to
+            \_DM_TO_DATA_MODEL_REVISION
+
+        TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete fails
+        if any of these are missed.
     -   Add unit tests for the new data model files to the data model file unit
         tests in src/python_testing:
         -   TestSpecParsingDeviceType.py
