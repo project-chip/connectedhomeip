@@ -14,36 +14,37 @@
 #define LSREQUESTER_H_
 
 #include <atomic>
-#include <mutex>
 #include <glib.h>
 #include <luna-service2/lunaservice.hpp>
+#include <mutex>
 #include <pbnjson.hpp>
 
-#define STR_RETURN_VALUE    "returnValue"
+#define STR_RETURN_VALUE "returnValue"
 
 class LsRequester
 {
 public:
-    static LsRequester* getInstance();
+    static LsRequester * getInstance();
     void stop();
 
     bool lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout = 10);
-    bool lsSubscribe(const char * pAPI, const char * pParams, void* ctx, LSFilterFunc func, LS::Call& call);
-    bool lsSubscribe(const char * pAPI, const char * pParams, void* ctx, LSFilterFunc func, LSMessageToken *pulToken);
-    bool lsCallCancel(LSMessageToken& ulToken);
+    bool lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LS::Call & call);
+    bool lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LSMessageToken * pulToken);
+    bool lsCallCancel(LSMessageToken & ulToken);
 
-    static bool _callbackSync(LSHandle *sh, LSMessage *reply, void *ctx);
+    static bool _callbackSync(LSHandle * sh, LSMessage * reply, void * ctx);
+
 private:
     LsRequester();
     virtual ~LsRequester();
 
-    static void *lsTask(void *arg);
-    GMainLoop* m_mainLoop = nullptr;
+    static void * lsTask(void * arg);
+    GMainLoop * m_mainLoop = nullptr;
     LS::Handle m_handle;
 
-    static std::atomic<LsRequester*> _singleton;
+    static std::atomic<LsRequester *> _singleton;
     static std::mutex _mutex;
-    GThread *m_thread = nullptr;
+    GThread * m_thread = nullptr;
 };
 
 #endif /* LSREQUESTER_H_ */

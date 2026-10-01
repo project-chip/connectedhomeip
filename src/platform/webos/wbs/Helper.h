@@ -28,10 +28,10 @@ struct WbsConnection
     char * mpPeerAddress = nullptr;
 
     bool mIsNotify = false;
-    uint16_t mMtu = 0;
+    uint16_t mMtu  = 0;
     std::string clientId;
     LSMessageToken ulMonitorToken = LSMESSAGE_TOKEN_INVALID;
-    WbsEndpoint * mpEndpoint = nullptr;
+    WbsEndpoint * mpEndpoint      = nullptr;
 
     // [LGE_MATTER_COMPAT_PATCH]
     LSMessageToken mMtuStatusToken = LSMESSAGE_TOKEN_INVALID;

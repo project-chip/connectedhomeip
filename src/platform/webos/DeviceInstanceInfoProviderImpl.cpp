@@ -18,8 +18,8 @@
 
 #include "DeviceInstanceInfoProviderImpl.h"
 
-#include <platform/webos/PosixConfig.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
+#include <platform/webos/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

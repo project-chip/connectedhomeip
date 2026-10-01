@@ -1,25 +1,25 @@
 #include <ble/Ble.h>
-#include <lib/support/SafeInt.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <luna-service2++/handle.hpp>
-#include "lsrequester.h"
 #include "Helper.h"
+#include "lsrequester.h"
+#include <luna-service2++/handle.hpp>
 
 #include <chrono>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
 
 // [LGE_MATTER_COMPAT_PATCH]
+#include <cerrno>
 #include <fcntl.h>
 #include <unistd.h>
-#include <cerrno>
 
 #define API_BLUETOOTH_GATT_GETSTATUS "luna://com.webos.service.bluetooth2/gatt/getStatus"
 #define API_BLUETOOTH_GATT_CONNECT "luna://com.webos.service.bluetooth2/gatt/connect"
@@ -53,8 +53,8 @@ static bool isNotSupportIndication = false;
 
 // BLE Pacing defaults
 #define BLE_PACING_DEFAULT_DELAY_MS 100
-#define BLE_PACING_FAILURE_THRESHOLD 2  // consecutive TIMEOUT failures (stage 10-18) to add
-#define BLE_PACING_REMOVAL_THRESHOLD 2  // consecutive ANY failures to remove (when already in whitelist)
+#define BLE_PACING_FAILURE_THRESHOLD 2 // consecutive TIMEOUT failures (stage 10-18) to add
+#define BLE_PACING_REMOVAL_THRESHOLD 2 // consecutive ANY failures to remove (when already in whitelist)
 
 static pbnjson::JValue sWhitelistRoot;
 static bool sWhitelistFileLoaded = false;
@@ -67,7 +67,7 @@ static void LoadWhitelistFile()
     sWhitelistFileLoaded = true;
 
     // [LGE_MATTER_COMPAT_PATCH] O_NOFOLLOW: whitelist path is world-writable
-    int fd = open(HOMEYMATTER_WHITELIST_PATH, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    int fd   = open(HOMEYMATTER_WHITELIST_PATH, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
     FILE * f = (fd >= 0) ? fdopen(fd, "r") : nullptr;
     if (f == nullptr)
     {
@@ -111,7 +111,7 @@ static void LoadWhitelistFile()
 static void SaveWhitelistFile()
 {
     // [LGE_MATTER_COMPAT_PATCH] O_NOFOLLOW: whitelist path is world-writable
-    int fd = open(HOMEYMATTER_WHITELIST_PATH, O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW | O_CLOEXEC, 0644);
+    int fd   = open(HOMEYMATTER_WHITELIST_PATH, O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW | O_CLOEXEC, 0644);
     FILE * f = (fd >= 0) ? fdopen(fd, "w") : nullptr;
     if (f == nullptr)
     {
@@ -146,7 +146,7 @@ static void SaveWhitelistFile()
     for (size_t t = 0; t < typeKeys.size(); ++t)
     {
         const std::string & typeName = typeKeys[t];
-        pbnjson::JValue section = sWhitelistRoot[typeName];
+        pbnjson::JValue section      = sWhitelistRoot[typeName];
 
         fprintf(f, "  \"%s\": {\n", typeName.c_str());
 
@@ -250,15 +250,15 @@ static void ParsePacingWhitelist()
 
         std::string vidStr = entry["vendorId"].asString();
         std::string pidStr = entry["productId"].asString();
-        vid = static_cast<uint16_t>(strtoul(vidStr.c_str(), nullptr, 0));
-        pid = static_cast<uint16_t>(strtoul(pidStr.c_str(), nullptr, 0));
+        vid                = static_cast<uint16_t>(strtoul(vidStr.c_str(), nullptr, 0));
+        pid                = static_cast<uint16_t>(strtoul(pidStr.c_str(), nullptr, 0));
 
         if (entry.hasKey("delayMs"))
             delay = entry["delayMs"].asNumber<int32_t>();
 
         if (vid != 0 && pid != 0)
         {
-            sPacingWhitelist.push_back({vid, pid, delay});
+            sPacingWhitelist.push_back({ vid, pid, delay });
         }
     }
 
@@ -286,13 +286,12 @@ void SetActivePacingDelay(uint16_t vendorId, uint16_t productId)
     sActivePacingDelayMs.store(delayMs);
     if (delayMs > 0)
     {
-        ChipLogProgress(DeviceLayer, "BLE write pacing ENABLED for vid=0x%04X pid=0x%04X: %dms per write",
-                        vendorId, productId, delayMs);
+        ChipLogProgress(DeviceLayer, "BLE write pacing ENABLED for vid=0x%04X pid=0x%04X: %dms per write", vendorId, productId,
+                        delayMs);
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "BLE write pacing disabled for vid=0x%04X pid=0x%04X (not in whitelist)",
-                        vendorId, productId);
+        ChipLogProgress(DeviceLayer, "BLE write pacing disabled for vid=0x%04X pid=0x%04X (not in whitelist)", vendorId, productId);
     }
 }
 
@@ -348,11 +347,11 @@ static void AddToPacingWhitelist(uint16_t vendorId, uint16_t productId)
             return;
     }
 
-    sPacingWhitelist.push_back({vendorId, productId, BLE_PACING_DEFAULT_DELAY_MS});
+    sPacingWhitelist.push_back({ vendorId, productId, BLE_PACING_DEFAULT_DELAY_MS });
     SyncPacingWhitelistToFile();
 
-    ChipLogProgress(DeviceLayer, "BLE pacing whitelist: auto-added vid=0x%04X pid=0x%04X delay=%dms",
-                    vendorId, productId, BLE_PACING_DEFAULT_DELAY_MS);
+    ChipLogProgress(DeviceLayer, "BLE pacing whitelist: auto-added vid=0x%04X pid=0x%04X delay=%dms", vendorId, productId,
+                    BLE_PACING_DEFAULT_DELAY_MS);
 }
 
 static void RemoveFromPacingWhitelist(uint16_t vendorId, uint16_t productId)
@@ -366,8 +365,7 @@ static void RemoveFromPacingWhitelist(uint16_t vendorId, uint16_t productId)
         {
             it = sPacingWhitelist.erase(it);
             SyncPacingWhitelistToFile();
-            ChipLogProgress(DeviceLayer, "BLE pacing whitelist: auto-removed vid=0x%04X pid=0x%04X",
-                            vendorId, productId);
+            ChipLogProgress(DeviceLayer, "BLE pacing whitelist: auto-removed vid=0x%04X pid=0x%04X", vendorId, productId);
             return;
         }
         ++it;
@@ -394,8 +392,8 @@ struct PacingFailureRecord
 {
     uint16_t vendorId;
     uint16_t productId;
-    int timeoutFailures;    // TIMEOUT failures in stage 10-18 (for adding to whitelist)
-    int generalFailures;    // ANY failures (for removing from whitelist when already in it)
+    int timeoutFailures; // TIMEOUT failures in stage 10-18 (for adding to whitelist)
+    int generalFailures; // ANY failures (for removing from whitelist when already in it)
 };
 
 static std::vector<PacingFailureRecord> sPacingFailureRecords;
@@ -407,7 +405,7 @@ static PacingFailureRecord * FindOrCreateFailureRecord(uint16_t vendorId, uint16
         if (r.vendorId == vendorId && r.productId == productId)
             return &r;
     }
-    sPacingFailureRecords.push_back({vendorId, productId, 0, 0});
+    sPacingFailureRecords.push_back({ vendorId, productId, 0, 0 });
     return &sPacingFailureRecords.back();
 }
 
@@ -425,8 +423,7 @@ void RecordPacingFailure(uint16_t vendorId, uint16_t productId, uint8_t stageFai
 
     bool inWhitelist = IsInPacingWhitelist(vendorId, productId);
     ChipLogProgress(DeviceLayer, "BLE pacing timeout failure: vid=0x%04X pid=0x%04X stage=%u timeoutCount=%d/%d inWhitelist=%d",
-                    vendorId, productId, stageFailed, record->timeoutFailures,
-                    BLE_PACING_FAILURE_THRESHOLD, inWhitelist ? 1 : 0);
+                    vendorId, productId, stageFailed, record->timeoutFailures, BLE_PACING_FAILURE_THRESHOLD, inWhitelist ? 1 : 0);
 
     // Only add to whitelist if not already in it
     if (!inWhitelist && record->timeoutFailures >= BLE_PACING_FAILURE_THRESHOLD)
@@ -452,13 +449,14 @@ void RecordCommissioningFailure(uint16_t vendorId, uint16_t productId)
     PacingFailureRecord * record = FindOrCreateFailureRecord(vendorId, productId);
     record->generalFailures++;
 
-    ChipLogProgress(DeviceLayer, "BLE pacing general failure: vid=0x%04X pid=0x%04X generalCount=%d/%d (in whitelist)",
-                    vendorId, productId, record->generalFailures, BLE_PACING_REMOVAL_THRESHOLD);
+    ChipLogProgress(DeviceLayer, "BLE pacing general failure: vid=0x%04X pid=0x%04X generalCount=%d/%d (in whitelist)", vendorId,
+                    productId, record->generalFailures, BLE_PACING_REMOVAL_THRESHOLD);
 
     if (record->generalFailures >= BLE_PACING_REMOVAL_THRESHOLD)
     {
-        ChipLogProgress(DeviceLayer, "BLE pacing: auto-removing vid=0x%04X pid=0x%04X from whitelist (pacing may be causing issues)",
-                        vendorId, productId);
+        ChipLogProgress(DeviceLayer,
+                        "BLE pacing: auto-removing vid=0x%04X pid=0x%04X from whitelist (pacing may be causing issues)", vendorId,
+                        productId);
         RemoveFromPacingWhitelist(vendorId, productId);
         record->timeoutFailures = 0;
         record->generalFailures = 0;
@@ -549,16 +547,16 @@ void EndpointCleanup(WbsEndpoint * apEndpoint)
 
 CHIP_ERROR InitConnectionData(bool aIsCentral, WbsEndpoint *& apEndpoint)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool retval              = false;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    bool retval            = false;
     WbsEndpoint * endpoint = nullptr;
 
     // initialize server endpoint
     endpoint = g_new0(WbsEndpoint, 1);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
-    endpoint->mConnectionMap  = g_hash_table_new(g_str_hash, g_str_equal);
-    endpoint->mIsCentral = aIsCentral;
+    endpoint->mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
+    endpoint->mIsCentral     = aIsCentral;
 
     retval = true;
 
@@ -585,18 +583,18 @@ CHIP_ERROR ShutdownWbsLayer(WbsEndpoint * apEndpoint)
 
 static bool GattGetStatus(std::string address)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSTATUS, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
-    if(!responsePayload.hasKey("connected") || !responsePayload["connected"].asBool())
+    if (!responsePayload.hasKey("connected") || !responsePayload["connected"].asBool())
     {
         return false;
     }
@@ -607,40 +605,47 @@ static bool GattGetStatus(std::string address)
 static bool GattGetServices(std::string address)
 {
     ChipLogProgress(DeviceLayer, "GattGetServices = %s", address.c_str());
-    isNotSupportIndication = false;
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    isNotSupportIndication    = false;
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSERVICES, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
-    if(responsePayload["services"].arraySize() == 0)
+    if (responsePayload["services"].arraySize() == 0)
     {
         return false;
     }
 
-    //check :  C2 characteristic properties
+    // check :  C2 characteristic properties
     int size = responsePayload["services"].arraySize();
-    for(int i = 0; i < size ; i ++){
-        ChipLogDetail(DeviceLayer, "receiveMessage [%d] = %s", i,responsePayload["services"][i].stringify().c_str());
-        if(responsePayload["services"][i].hasKey("service") == true && (responsePayload["services"][i]["service"].asString().compare(CHIP_BLE_GATT_SERVICE) == 0)) {
+    for (int i = 0; i < size; i++)
+    {
+        ChipLogDetail(DeviceLayer, "receiveMessage [%d] = %s", i, responsePayload["services"][i].stringify().c_str());
+        if (responsePayload["services"][i].hasKey("service") == true &&
+            (responsePayload["services"][i]["service"].asString().compare(CHIP_BLE_GATT_SERVICE) == 0))
+        {
             int characteristicsArraySize = responsePayload["services"][i]["characteristics"].arraySize();
-                for(int j = 0; j < characteristicsArraySize ; j ++){
-                    if(responsePayload["services"][i]["characteristics"][j].hasKey("characteristic") == true
-                    && responsePayload["services"][i]["characteristics"][j].hasKey("properties") == true
-                    && (responsePayload["services"][i]["characteristics"][j]["characteristic"].asString().compare(CHIP_BLE_GATT_CHAR_READ) == 0)) {
-                        bool indicate = responsePayload["services"][i]["characteristics"][j]["properties"]["indicate"].asBool();
-                        bool notify =  responsePayload["services"][i]["characteristics"][j]["properties"]["notify"].asBool();
-                        if(indicate == false && notify == true) {
-                            isNotSupportIndication = true;
-                            ChipLogError(DeviceLayer, "[%s] is not support indication!", address.c_str());
-                        }
+            for (int j = 0; j < characteristicsArraySize; j++)
+            {
+                if (responsePayload["services"][i]["characteristics"][j].hasKey("characteristic") == true &&
+                    responsePayload["services"][i]["characteristics"][j].hasKey("properties") == true &&
+                    (responsePayload["services"][i]["characteristics"][j]["characteristic"].asString().compare(
+                         CHIP_BLE_GATT_CHAR_READ) == 0))
+                {
+                    bool indicate = responsePayload["services"][i]["characteristics"][j]["properties"]["indicate"].asBool();
+                    bool notify   = responsePayload["services"][i]["characteristics"][j]["properties"]["notify"].asBool();
+                    if (indicate == false && notify == true)
+                    {
+                        isNotSupportIndication = true;
+                        ChipLogError(DeviceLayer, "[%s] is not support indication!", address.c_str());
                     }
+                }
             }
         }
     }
@@ -651,7 +656,7 @@ static bool GattGetServices(std::string address)
 static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, WbsEndpoint & aEndpoint)
 {
     WbsConnection * connection = static_cast<WbsConnection *>(g_hash_table_lookup(aEndpoint.mConnectionMap, remoteAddr.c_str()));
-    bool bConnected = GattGetStatus(remoteAddr);
+    bool bConnected            = GattGetStatus(remoteAddr);
 
     if (connection != nullptr && !bConnected)
     {
@@ -685,8 +690,9 @@ static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, 
         connection = nullptr;
     }
 
-    if (connection == nullptr && bConnected)// &&
-        //(!aEndpoint.mIsCentral || GattGetServices(remoteAddr))) // Delete unnecessary duplicate checks
+    if (connection == nullptr &&
+        bConnected) // &&
+                    //(!aEndpoint.mIsCentral || GattGetServices(remoteAddr))) // Delete unnecessary duplicate checks
     {
         // WbsConnection holds std::string/std::atomic members, so it must be constructed (not g_new0).
         connection = chip::Platform::New<WbsConnection>();
@@ -704,8 +710,8 @@ static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, 
 
 static CHIP_ERROR WbsDisconnect(WbsConnection * conn)
 {
-    bool ret = 0;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = 0;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
@@ -721,7 +727,7 @@ static CHIP_ERROR WbsDisconnect(WbsConnection * conn)
     lunaParam.put("clientId", conn->clientId);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -745,8 +751,8 @@ CHIP_ERROR CloseWbsConnection(BLE_CONNECTION_OBJECT apConn)
 
 static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
@@ -762,9 +768,9 @@ static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
     lunaParam.put("clientId", data->mpConn->clientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
-    pbnjson::JValue valueParam = pbnjson::JObject();
+    pbnjson::JValue valueParam  = pbnjson::JObject();
     pbnjson::JValue bytesJArray = pbnjson::JArray();
-    uint8_t * bytes = data->buf->Start();
+    uint8_t * bytes             = data->buf->Start();
     for (size_t i = 0; i < data->buf->DataLength(); ++i)
     {
         bytesJArray.append(bytes[i]);
@@ -773,7 +779,7 @@ static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -799,17 +805,18 @@ static bool gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void
     responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
 
     VerifyOrExit(responsePayload["returnValue"].asBool() == true,
-        ChipLogError(DeviceLayer, "FAIL: WbsSubscribeCharacteristic : %s (%d)", responsePayload["errorText"].asString().c_str(), responsePayload["errorCode"].asNumber<int32_t>()));
-    if (responsePayload.hasKey("changed") == true )
+                 ChipLogError(DeviceLayer, "FAIL: WbsSubscribeCharacteristic : %s (%d)",
+                              responsePayload["errorText"].asString().c_str(), responsePayload["errorCode"].asNumber<int32_t>()));
+    if (responsePayload.hasKey("changed") == true)
     {
         pbnjson::JValueArrayElement bytesDataJObj = responsePayload["changed"]["value"]["bytes"];
-        ssize_t bytesDataJSize = bytesDataJObj.arraySize();
+        ssize_t bytesDataJSize                    = bytesDataJObj.arraySize();
         // Max ATT attribute value length; HandleTXCharChanged() copies the data into a packet buffer.
         uint8_t data[512];
 
         VerifyOrExit(bytesDataJSize >= 0 && static_cast<size_t>(bytesDataJSize) <= sizeof(data),
                      ChipLogError(DeviceLayer, "Invalid TX characteristic value length: %zd", bytesDataJSize));
-        for(ssize_t i  = 0; i < bytesDataJSize; ++i)
+        for (ssize_t i = 0; i < bytesDataJSize; ++i)
         {
             int32_t v = 0;
             bytesDataJObj[i].asNumber<int32_t>(v);
@@ -825,15 +832,16 @@ exit:
 
 static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
-    pbnjson::JValue lunaParam = pbnjson::JObject();
-    pbnjson::JValue valueParam = pbnjson::JObject();
+    bool ret                    = false;
+    LsRequester * lsRequester   = LsRequester::getInstance();
+    pbnjson::JValue lunaParam   = pbnjson::JObject();
+    pbnjson::JValue valueParam  = pbnjson::JObject();
     pbnjson::JValue charsJArray = pbnjson::JArray();
     pbnjson::JValue bytesJArray = pbnjson::JArray();
     pbnjson::JValue responsePayload;
 
-    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
+    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
     lunaParam.put("clientId", conn->clientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
@@ -843,7 +851,8 @@ static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
     lunaParam.put("subscribe", true);
 
     // The token is stored on the connection so that it is cancelled on unsubscribe/destroy.
-    ret = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHRACTERISTICS, lunaParam.stringify().c_str(), conn, gattMonitorCharateristicsCb, &conn->ulMonitorToken);
+    ret = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHRACTERISTICS, lunaParam.stringify().c_str(), conn,
+                                   gattMonitorCharateristicsCb, &conn->ulMonitorToken);
     VerifyOrReturnError(ret == true, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "monitorCharacteristics subscribe failed"));
 
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -853,13 +862,15 @@ static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
     lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_READ));
     lunaParam.put("descriptor", std::string("00002902-0000-1000-8000-00805f9b34fb"));
 
-    if(isNotSupportIndication) {
-        //enable notification
-        ChipLogError(DeviceLayer,"Workaround : This device is not support indicate.");
-        bytesJArray.append(1);//workaround patch
+    if (isNotSupportIndication)
+    {
+        // enable notification
+        ChipLogError(DeviceLayer, "Workaround : This device is not support indicate.");
+        bytesJArray.append(1); // workaround patch
     }
-    else { //enable indication
-        bytesJArray.append(2); //matter spec
+    else
+    {                          // enable indication
+        bytesJArray.append(2); // matter spec
     }
     bytesJArray.append(0);
 
@@ -867,7 +878,7 @@ static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITEDESCRIPTOR, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         lsRequester->lsCallCancel(conn->ulMonitorToken);
         return CHIP_ERROR_INTERNAL;
@@ -888,7 +899,8 @@ static CHIP_ERROR UnsubscribeCharacteristicImpl(WbsConnection * connection)
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
-    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->ulMonitorToken) == true,  ChipLogError(DeviceLayer, "lsCallCancel failed") );
+    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->ulMonitorToken) == true,
+                 ChipLogError(DeviceLayer, "lsCallCancel failed"));
 
     result = CHIP_NO_ERROR;
     BLEManagerImpl::HandleSubscribeOpComplete(connection, false);
@@ -904,7 +916,8 @@ CHIP_ERROR WbsUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 struct ConnectParams
 {
-    ConnectParams(const char * remoteAddress, WbsEndpoint * endpoint) : mAddress(remoteAddress), mEndpoint(endpoint), mNumRetries(0) {}
+    ConnectParams(const char * remoteAddress, WbsEndpoint * endpoint) : mAddress(remoteAddress), mEndpoint(endpoint), mNumRetries(0)
+    {}
     const char * mAddress;
     WbsEndpoint * mEndpoint;
     uint16_t mNumRetries;
@@ -913,21 +926,21 @@ struct ConnectParams
 // [LGE_MATTER_COMPAT_PATCH]
 static CHIP_ERROR ConfigureMtuImpl(WbsConnection * conn);
 
-static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
+static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams) // char * apAddress)
 {
     ChipLogProgress(Ble, "ConnectDeviceImpl() start");
     const char * deviceAddress = apParams->mAddress;
-    WbsEndpoint * endpoint = apParams->mEndpoint;
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
-    pbnjson::JValue lunaParam = pbnjson::JObject();
+    WbsEndpoint * endpoint     = apParams->mEndpoint;
+    bool ret                   = false;
+    LsRequester * lsRequester  = LsRequester::getInstance();
+    pbnjson::JValue lunaParam  = pbnjson::JObject();
     pbnjson::JValue responsePayload;
     std::string wbsAddress;
     std::string wbsClientId;
 
     lunaParam.put("address", std::string(deviceAddress));
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_CONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -956,22 +969,22 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
     };
 
     bool serviceAvailable = false;
-    for (int i = 0; i < kMaxConnectRetries ; ++i)
+    for (int i = 0; i < kMaxConnectRetries; ++i)
     {
-        if(GattGetServices(wbsAddress) == true)
+        if (GattGetServices(wbsAddress) == true)
         {
             serviceAvailable = true;
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
-    if(serviceAvailable == false)
+    if (serviceAvailable == false)
     {
         ChipLogError(Ble, "ConnectDeviceImpl() API_BLUETOOTH_GATT_DISCOVERSERVICES call");
 
         ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCOVERSERVICES, lunaParam.stringify().c_str(), responsePayload);
-        if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool()
-           || GattGetServices(wbsAddress) != true)
+        if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool() ||
+            GattGetServices(wbsAddress) != true)
         {
             disconnectClient();
             return CHIP_ERROR_INTERNAL;
@@ -983,8 +996,7 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
     // [LGE_MATTER_COMPAT_PATCH]
     // Request MTU exchange after connection is established
     {
-        WbsConnection * conn = static_cast<WbsConnection *>(
-            g_hash_table_lookup(endpoint->mConnectionMap, wbsAddress.c_str()));
+        WbsConnection * conn = static_cast<WbsConnection *>(g_hash_table_lookup(endpoint->mConnectionMap, wbsAddress.c_str()));
         if (conn != nullptr)
         {
             ChipLogProgress(DeviceLayer, "ConnectDeviceImpl: initiating MTU exchange for %s", wbsAddress.c_str());
@@ -1023,18 +1035,19 @@ static bool MtuStatusSubscribeCb(LSHandle * sh, LSMessage * message, void * user
 static CHIP_ERROR ConfigureMtuImpl(WbsConnection * conn)
 {
     constexpr uint16_t kRequestedMtu = 247;
-    bool ret = false;
-    LsRequester * lsRequester = LsRequester::getInstance();
-    pbnjson::JValue lunaParam = pbnjson::JObject();
+    bool ret                         = false;
+    LsRequester * lsRequester        = LsRequester::getInstance();
+    pbnjson::JValue lunaParam        = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
-    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
+    VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
     lunaParam.put("clientId", conn->clientId);
     lunaParam.put("mtuSize", static_cast<int32_t>(kRequestedMtu));
 
-    ChipLogProgress(DeviceLayer, "Requesting MTU exchange: clientId=%s peer=%s mtuSize=%u",
-                    conn->clientId.c_str(), conn->mpPeerAddress ? conn->mpPeerAddress : "null", kRequestedMtu);
+    ChipLogProgress(DeviceLayer, "Requesting MTU exchange: clientId=%s peer=%s mtuSize=%u", conn->clientId.c_str(),
+                    conn->mpPeerAddress ? conn->mpPeerAddress : "null", kRequestedMtu);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_REQUESTMTU, lunaParam.stringify().c_str(), responsePayload);
     ChipLogDetail(DeviceLayer, "requestMtu response: %s", responsePayload.stringify().c_str());
@@ -1068,10 +1081,10 @@ static CHIP_ERROR ConfigureMtuImpl(WbsConnection * conn)
         pbnjson::JValue statusParam = pbnjson::JObject();
         statusParam.put("address", conn->mpPeerAddress ? conn->mpPeerAddress : "");
         statusParam.put("subscribe", true);
-        lsRequester->lsSubscribe(API_BLUETOOTH_GATT_GETSTATUS, statusParam.stringify().c_str(),
-                                 conn, MtuStatusSubscribeCb, &conn->mMtuStatusToken);
+        lsRequester->lsSubscribe(API_BLUETOOTH_GATT_GETSTATUS, statusParam.stringify().c_str(), conn, MtuStatusSubscribeCb,
+                                 &conn->mMtuStatusToken);
 
-        int waits = 0; // number of wait iterations actually performed
+        int waits              = 0; // number of wait iterations actually performed
         uint16_t negotiatedMtu = conn->mNegotiatedMtu.load(std::memory_order_acquire);
         for (; negotiatedMtu == 0 && waits < kMaxWaits; ++waits)
         {
@@ -1083,8 +1096,7 @@ static CHIP_ERROR ConfigureMtuImpl(WbsConnection * conn)
         {
             conn->mMtu = negotiatedMtu;
             ChipLogProgress(DeviceLayer, "MTU settled via subscribe: peer=%s mtu=%u (waits=%d, ~%dms)",
-                            conn->mpPeerAddress ? conn->mpPeerAddress : "null", negotiatedMtu,
-                            waits, waits * kWaitIntervalMs);
+                            conn->mpPeerAddress ? conn->mpPeerAddress : "null", negotiatedMtu, waits, waits * kWaitIntervalMs);
         }
         else
         {
@@ -1100,12 +1112,13 @@ static CHIP_ERROR ConfigureMtuImpl(WbsConnection * conn)
 CHIP_ERROR ConnectDevice(std::string address, WbsEndpoint * apEndpoint)
 {
     isNotSupportIndication = false;
-    CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
-    VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INCORRECT_STATE, BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL));
+    CHIP_ERROR err         = CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL));
     // GLibMatterContextInvokeSync() is synchronous, so the parameters can live on the stack.
     ConnectParams params(address.c_str(), apEndpoint);
 
-    while (params.mNumRetries ++ < kMaxConnectRetries)
+    while (params.mNumRetries++ < kMaxConnectRetries)
     {
         if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, &params) == CHIP_NO_ERROR)
         {

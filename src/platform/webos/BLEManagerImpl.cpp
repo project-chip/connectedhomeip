@@ -552,7 +552,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
@@ -599,8 +600,8 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
         mScanResultPending       = true;
     }
 
-    CHIP_ERROR err = PlatformMgr().ScheduleWork(
-        [](intptr_t arg) { reinterpret_cast<BLEManagerImpl *>(arg)->ProcessScanResult(); }, reinterpret_cast<intptr_t>(this));
+    CHIP_ERROR err = PlatformMgr().ScheduleWork([](intptr_t arg) { reinterpret_cast<BLEManagerImpl *>(arg)->ProcessScanResult(); },
+                                                reinterpret_cast<intptr_t>(this));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule scan result processing: %" CHIP_ERROR_FORMAT, err.Format());
@@ -625,11 +626,11 @@ void BLEManagerImpl::ProcessScanResult()
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
         auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(discriminator);
-        VerifyOrReturn(
-            isMatch,
-            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
-                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
-                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
+                                    mBLEScanConfig.mDiscriminator.IsShortDiscriminator()
+                                        ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                        : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)

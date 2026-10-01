@@ -28,7 +28,7 @@
 // How long lsCallSync() waits for the cancel to be processed on the lsTask thread after a timeout.
 #define LS_SYNC_CANCEL_WAIT_SEC 2
 
-std::atomic<LsRequester*> LsRequester::_singleton;
+std::atomic<LsRequester *> LsRequester::_singleton;
 std::mutex LsRequester::_mutex;
 
 namespace {
@@ -39,15 +39,16 @@ namespace {
 //  - Timeout path: the call is cancelled on the lsTask thread, which is the only thread that dispatches
 //    _callbackSync(), so no reply can be in flight once CancelOnLsTask() has run and the caller frees the
 //    context. If even that does not complete in time, the context is orphaned and CancelOnLsTask() frees it.
-struct SyncCallbackContext {
+struct SyncCallbackContext
+{
     std::mutex mutex;
     std::condition_variable cond;
     std::string result;
-    LSHandle * handle = nullptr;
+    LSHandle * handle    = nullptr;
     LSMessageToken token = LSMESSAGE_TOKEN_INVALID;
-    bool received = false;
-    bool cancelled = false;
-    bool orphaned = false;
+    bool received        = false;
+    bool cancelled       = false;
+    bool orphaned        = false;
 };
 
 gboolean CancelOnLsTask(gpointer data)
@@ -75,20 +76,22 @@ gboolean QuitLoop(gpointer data)
 
 } // namespace
 
-void *LsRequester::lsTask(void *arg)
+void * LsRequester::lsTask(void * arg)
 {
-    g_main_loop_run((GMainLoop*)arg);
+    g_main_loop_run((GMainLoop *) arg);
     return NULL;
 }
 
-LsRequester* LsRequester::getInstance()
+LsRequester * LsRequester::getInstance()
 {
-    LsRequester* inst = _singleton.load(std::memory_order_relaxed);
+    LsRequester * inst = _singleton.load(std::memory_order_relaxed);
     std::atomic_thread_fence(std::memory_order_acquire);
-    if(inst == 0) {
+    if (inst == 0)
+    {
         std::lock_guard<std::mutex> lock(_mutex);
         inst = _singleton.load(std::memory_order_relaxed);
-        if(inst == 0) {
+        if (inst == 0)
+        {
             inst = new LsRequester();
             std::atomic_thread_fence(std::memory_order_release);
             _singleton.store(inst, std::memory_order_relaxed);
@@ -99,17 +102,16 @@ LsRequester* LsRequester::getInstance()
 
 LsRequester::LsRequester()
 {
-    GMainContext *pCxt = g_main_context_new();
-    m_mainLoop = g_main_loop_new( pCxt, false);
+    GMainContext * pCxt = g_main_context_new();
+    m_mainLoop          = g_main_loop_new(pCxt, false);
     // g_main_loop_new() holds its own reference to the context.
     g_main_context_unref(pCxt);
     try
     {
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
-        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop*)m_mainLoop);
-    }
-    catch(const LS::Error& e)
+        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
+    } catch (const LS::Error & e)
     {
         ChipLogError(DeviceLayer, "Exception %s", e.what());
     }
@@ -126,10 +128,10 @@ void LsRequester::stop()
     GThread * thread = nullptr;
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        loop = m_mainLoop;
-        thread = m_thread;
+        loop       = m_mainLoop;
+        thread     = m_thread;
         m_mainLoop = nullptr;
-        m_thread = nullptr;
+        m_thread   = nullptr;
     }
     if (loop == nullptr)
         return;
@@ -149,8 +151,7 @@ void LsRequester::stop()
         try
         {
             m_handle.detach();
-        }
-        catch(const LS::Error& e)
+        } catch (const LS::Error & e)
         {
             ChipLogError(DeviceLayer, "Exception: %s", e.what());
         }
@@ -158,11 +159,11 @@ void LsRequester::stop()
     g_main_loop_unref(loop);
 }
 
-bool LsRequester::_callbackSync(LSHandle *sh, LSMessage *reply, void *ctx)
+bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
-    SyncCallbackContext *cc = static_cast<SyncCallbackContext *>(ctx);
-    const char * payload = LSMessageGetPayload(reply);
-    //ChipLogDetail(DeviceLayer, "Response: %s", payload);
+    SyncCallbackContext * cc = static_cast<SyncCallbackContext *>(ctx);
+    const char * payload     = LSMessageGetPayload(reply);
+    // ChipLogDetail(DeviceLayer, "Response: %s", payload);
 
     std::lock_guard<std::mutex> lock(cc->mutex);
     cc->result.assign(payload != nullptr ? payload : "");
@@ -172,14 +173,14 @@ bool LsRequester::_callbackSync(LSHandle *sh, LSMessage *reply, void *ctx)
     return true;
 }
 
-bool LsRequester::lsCallSync(const char* pAPI, const char* pParams, pbnjson::JValue &response, int timeout)
+bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::JValue & response, int timeout)
 {
-    if(pAPI == NULL || pParams == NULL)
+    if (pAPI == NULL || pParams == NULL)
         return false;
 
-    //ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
-    SyncCallbackContext *cc = new (std::nothrow) SyncCallbackContext();
+    SyncCallbackContext * cc = new (std::nothrow) SyncCallbackContext();
     if (cc == nullptr)
         return false;
 
@@ -234,15 +235,16 @@ bool LsRequester::lsCallSync(const char* pAPI, const char* pParams, pbnjson::JVa
     return true;
 }
 
-bool LsRequester::lsCallCancel(LSMessageToken& ulToken)
+bool LsRequester::lsCallCancel(LSMessageToken & ulToken)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    ChipLogProgress(DeviceLayer, "lsCallCancel %lu",ulToken);
+    ChipLogProgress(DeviceLayer, "lsCallCancel %lu", ulToken);
 
     bool bRet = false;
     if (ulToken != LSMESSAGE_TOKEN_INVALID)
     {
-        try {
+        try
+        {
             LSError lserror;
             LSErrorInit(&lserror);
             bRet = LSCallCancel(m_handle.get(), ulToken, &lserror);
@@ -252,42 +254,46 @@ bool LsRequester::lsCallCancel(LSMessageToken& ulToken)
                 LSErrorFree(&lserror);
             }
             ulToken = LSMESSAGE_TOKEN_INVALID;
-        } catch (std::exception& error) {
+        } catch (std::exception & error)
+        {
             ChipLogError(DeviceLayer, "Failed to CallCancel (%lu) : %s", ulToken, error.what());
         }
     }
-    else {
-        ChipLogDetail(DeviceLayer, "lsCallCancel2 ulToken == LSMESSAGE_TOKEN_INVALID (%lu)",ulToken);
+    else
+    {
+        ChipLogDetail(DeviceLayer, "lsCallCancel2 ulToken == LSMESSAGE_TOKEN_INVALID (%lu)", ulToken);
     }
     return bRet;
 }
 
-bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, LSFilterFunc func, LS::Call& call)
+bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LS::Call & call)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (call.isActive()) {
+    if (call.isActive())
+    {
         call.cancel();
     }
 
-    //ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
-    try {
+    try
+    {
         call = m_handle.callMultiReply(pAPI, pParams);
         call.continueWith(func, ctx);
-    }
-    catch (const LS::Error &e) {
+    } catch (const LS::Error & e)
+    {
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
         return false;
     }
     return true;
 }
 
-bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, LSFilterFunc func, LSMessageToken *pulToken)
+bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ctx, LSFilterFunc func, LSMessageToken * pulToken)
 {
     std::lock_guard<std::mutex> lock(_mutex);
     LSError lserror;
     LSErrorInit(&lserror);
-    if (*pulToken != LSMESSAGE_TOKEN_INVALID )
+    if (*pulToken != LSMESSAGE_TOKEN_INVALID)
     {
         if (!LSCallCancel(m_handle.get(), *pulToken, &lserror))
         {
@@ -297,7 +303,7 @@ bool LsRequester::lsSubscribe(const char* pAPI, const char* pParams, void* ctx, 
         *pulToken = LSMESSAGE_TOKEN_INVALID;
     }
 
-    //ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
     // LSCall() is a C API: failures are reported through the return value / LSError, not exceptions.
     LSErrorInit(&lserror);
