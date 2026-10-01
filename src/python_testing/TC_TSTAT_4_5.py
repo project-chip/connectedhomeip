@@ -47,6 +47,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, pics
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ INDIVIDUAL_DAYS = [
 
 
 @pics("TSTAT.S", "TSTAT.S.F07")
-class TC_TSTAT_4_5(ThermostatBaseTest):
+class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
     """[TC-TSTAT-4.5] Thermostat Schedules Test Cases with server as DUT"""
 
     def check_schedule_types_attribute(
