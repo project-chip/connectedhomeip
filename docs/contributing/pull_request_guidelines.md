@@ -159,8 +159,8 @@ Provide sufficient information for a reviewer to understand the change. Include:
         Reviewers may not be familiar with discussions from the many tiger teams
         that work on the matter SDK.
 -   If changing common code, check where any RAM/FLASH overhead comes from. You
-    can use [size tooling](../../scripts/tools/ELF_SIZE_TOOLING.md) to gather this
-    information.
+    can use [size tooling](../../scripts/tools/ELF_SIZE_TOOLING.md) to gather
+    this information.
 -   TIP: use the syntax of `Fixes #....` to mark issues completed on PR merge or
     use `#...` to reference issues that are addressed.
 -   TIP: prefer adding some brief description (especially about the content of
