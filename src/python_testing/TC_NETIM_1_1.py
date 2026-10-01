@@ -151,6 +151,8 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
             expected_identity.identifier, expected_network_identifier,
             "The active network identity Identifier does not match the identity derived from the imported NASS; the DUT "
             "did not perform the expected HKDF/ECDSA Network Identity derivation.")
+        matter_asserts.assert_int_in_range(expected_identity.index, 1, 65534, "ActiveNetworkIdentityStruct.Index")
+        active_identity_index = expected_identity.index
 
         self.step(8, "TH reads the Clients attribute and stores as clientsList.", expectation="DUT responds with a list.")
         clients_list = await self.read_single_attribute_check_success(
@@ -177,10 +179,11 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
                   expectation="clientsList contains an entry with the expected ClientIndex and ClientIdentifier.")
         matching_clients = [client for client in clients_list
                             if client.clientIndex == expected_client_index
-                            and client.clientIdentifier == expected_client_identifier]
+                            and client.clientIdentifier == expected_client_identifier
+                            and client.networkIdentityIndex == active_identity_index]
         asserts.assert_equal(len(matching_clients), 1,
-                             "clientsList does not contain the expected client (matching ClientIndex and "
-                             "ClientIdentifier configured during setup).")
+                             "clientsList does not contain the expected client (matching ClientIndex "
+                             "ClientIdentifier configured during setup and matching NetworkIdentityIndex of active network identity).")
 
         self.step(12, "TH reads the ClientTableSize attribute and stores as clientTableSize.",
                   expectation="DUT responds with a value.")
