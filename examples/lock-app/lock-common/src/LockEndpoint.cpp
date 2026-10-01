@@ -16,19 +16,22 @@
  *    limitations under the License.
  */
 #include "LockEndpoint.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <cstring>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using chip::ByteSpan;
+using chip::ErrorStr;
 using chip::MutableByteSpan;
 using chip::Optional;
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
+using namespace chip::app::Clusters::DoorLock;
 
 struct LockActionData
 {
@@ -44,16 +47,44 @@ struct LockActionData
 
 static LockActionData gCurrentAction;
 
+namespace {
+
+chip::app::Clusters::DoorLock::DoorLockCluster * FindCluster(chip::EndpointId endpointId)
+{
+    auto * cluster = chip::app::Clusters::DoorLock::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "Door Lock cluster not initialized [endpointId=%d]", endpointId);
+    }
+    return cluster;
+}
+
+} // namespace
+
+void LockEndpoint::InitializeClusterState()
+{
+    auto * cluster = FindCluster(mEndpointId);
+    if (cluster == nullptr)
+    {
+        return;
+    }
+
+    LogErrorOnFailure(cluster->SetLockState(mLockState, OperationSourceEnum::kUnspecified, NullNullable,
+                                            chip::Span<const CredentialStruct>(), NullNullable, NullNullable));
+    LogErrorOnFailure(cluster->SetDoorState(chip::app::DataModel::Nullable<DoorStateEnum>(mDoorState)));
+}
+
 bool LockEndpoint::Lock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                        const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+                        const Optional<ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
     return setLockState(fabricIdx, nodeId, DlLockState::kLocked, pin, err, opSource);
 }
 
 bool LockEndpoint::Unlock(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                          const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+                          const Optional<ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
+    auto * cluster = FindCluster(mEndpointId);
+    if (cluster != nullptr && cluster->Features().Has(Feature::kUnbolt))
     {
         // If Unbolt is supported Unlock is supposed to pull the latch
         return setLockState(fabricIdx, nodeId, DlLockState::kUnlatched, pin, err, opSource);
@@ -182,8 +213,10 @@ bool LockEndpoint::SetDoorState(DoorStateEnum newState)
         ChipLogProgress(Zcl, "Changing the door state to: %d [endpointId=%d,previousState=%d]", to_underlying(newState),
                         mEndpointId, to_underlying(mDoorState));
 
-        mDoorState = newState;
-        return DoorLockServer::Instance().SetDoorState(mEndpointId, mDoorState);
+        mDoorState     = newState;
+        auto * cluster = FindCluster(mEndpointId);
+        VerifyOrReturnValue(cluster != nullptr, false);
+        return cluster->SetDoorState(chip::app::DataModel::Nullable<DoorStateEnum>(mDoorState)) == CHIP_NO_ERROR;
     }
     return true;
 }
@@ -191,7 +224,9 @@ bool LockEndpoint::SetDoorState(DoorStateEnum newState)
 bool LockEndpoint::SendLockAlarm(AlarmCodeEnum alarmCode) const
 {
     ChipLogProgress(Zcl, "Sending the LockAlarm event [endpointId=%d,alarmCode=%u]", mEndpointId, to_underlying(alarmCode));
-    return DoorLockServer::Instance().SendLockAlarmEvent(mEndpointId, alarmCode);
+    auto * cluster = FindCluster(mEndpointId);
+    VerifyOrReturnValue(cluster != nullptr, false);
+    return cluster->SendLockAlarmEvent(alarmCode) == CHIP_NO_ERROR;
 }
 
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
@@ -560,9 +595,12 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
                                 DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
                                 OperationSourceEnum opSource)
 {
-    // Assume pin is required until told otherwise
-    bool requirePin = true;
-    chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(mEndpointId, &requirePin);
+    // Assume pin is not required until the cluster reports otherwise
+    bool requirePin = false;
+    if (auto * cluster = FindCluster(mEndpointId))
+    {
+        requirePin = cluster->RequirePINforRemoteOperation();
+    }
 
     // If a pin code is not given
     if (!pin.HasValue())
@@ -684,19 +722,25 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
 
 void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext)
 {
+    auto * cluster = FindCluster(gCurrentAction.endpointId);
+    if (cluster == nullptr)
+    {
+        gCurrentAction.moving = false;
+        return;
+    }
+
     if (gCurrentAction.userIndex.IsNull())
     {
-        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
-                                                NullNullable, NullNullable, gCurrentAction.fabricIdx, gCurrentAction.nodeId);
+        LogErrorOnFailure(cluster->SetLockState(gCurrentAction.lockState, gCurrentAction.opSource, NullNullable,
+                                                chip::Span<const CredentialStruct>(), NullNullable, NullNullable));
     }
     else
     {
-        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, gCurrentAction.credentialIndex } };
-        auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
+        CredentialStruct userCredential[] = { { CredentialTypeEnum::kPin, gCurrentAction.credentialIndex } };
 
-        DoorLockServer::Instance().SetLockState(gCurrentAction.endpointId, gCurrentAction.lockState, gCurrentAction.opSource,
-                                                gCurrentAction.userIndex, userCredentials, gCurrentAction.fabricIdx,
-                                                gCurrentAction.nodeId);
+        LogErrorOnFailure(cluster->SetLockState(gCurrentAction.lockState, gCurrentAction.opSource, gCurrentAction.userIndex,
+                                                chip::Span<const CredentialStruct>(userCredential), gCurrentAction.fabricIdx,
+                                                gCurrentAction.nodeId));
     }
 
     // move back to Unlocked after Unlatch

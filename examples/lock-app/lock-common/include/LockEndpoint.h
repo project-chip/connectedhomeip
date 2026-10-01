@@ -83,8 +83,7 @@ public:
         {
             lockUser.credentials.reserve(numberOfCredentialsPerUser);
         }
-        DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
-        DoorLockServer::Instance().SetLockState(endpointId, mLockState);
+        InitializeClusterState();
         VerifyOrDieWithMsg(chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier)) ==
                                CHIP_NO_ERROR,
                            NotSpecified, "Failed to generate Aliro reader group sub-identifier");
@@ -148,6 +147,7 @@ private:
     bool setLockState(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId, DlLockState lockState,
                       const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
                       OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
+    void InitializeClusterState();
     const char * lockStateToString(DlLockState lockState) const;
 
     // Returns true if week day schedules should apply to the user, there are

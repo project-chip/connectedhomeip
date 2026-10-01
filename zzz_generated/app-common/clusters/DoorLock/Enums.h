@@ -537,8 +537,8 @@ enum class DoorLockDayOfWeek : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPinCredential               = 0x1,
-    kRfidCredential              = 0x2,
+    kPINCredential               = 0x1,
+    kRFIDCredential              = 0x2,
     kFingerCredentials           = 0x4,
     kLogging                     = 0x8,
     kWeekDayAccessSchedules      = 0x10,

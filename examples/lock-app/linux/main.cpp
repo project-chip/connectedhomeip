@@ -18,7 +18,9 @@
 
 #include "AppMain.h"
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 
+#include "DoorLockClusterBridge.h"
 #include "Identify.h"
 #include "LockAppCommandDelegate.h"
 #include "LockManager.h"
@@ -30,6 +32,12 @@ namespace {
 // Variables for handling named pipe commands
 NamedPipeCommands sChipNamedPipeCommands;
 LockAppCommandDelegate sLockAppCommandDelegate;
+
+// The lock app .matter defines the DoorLock server on endpoint 1. The cluster
+// captures its delegate at construction (during server start), so the
+// forwarder must be installed on the main thread before the server starts.
+constexpr chip::EndpointId kLockEndpointId = 1;
+LockApp::LockAppDoorLockDelegate sDoorLockDelegate(kLockEndpointId);
 
 } // anonymous namespace
 
@@ -50,6 +58,7 @@ void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
+    Clusters::DoorLock::SetDelegate(kLockEndpointId, &sDoorLockDelegate);
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;

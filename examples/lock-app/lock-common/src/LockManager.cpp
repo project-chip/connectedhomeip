@@ -18,6 +18,7 @@
 
 #include "LockManager.h"
 
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <memory>
 
@@ -32,83 +33,47 @@ LockManager & LockManager::Instance()
 
 bool LockManager::InitEndpoint(chip::EndpointId endpointId)
 {
-    uint16_t numberOfSupportedUsers = 0;
-    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfSupportedUsers))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-                     endpointId);
-        numberOfSupportedUsers = 10;
-    }
+    // Capacities are read from the code-driven cluster instance, which was
+    // created (with the application server-config overrides applied) before
+    // this callback runs.
+    uint16_t numberOfSupportedUsers    = 10;
+    uint16_t numberOfPINCredentials    = 10;
+    uint16_t numberOfRFIDCredentials   = 10;
+    uint8_t numberOfCredentialsPerUser = 5;
+    uint8_t numberOfWeekDaySchedules   = 10;
+    uint8_t numberOfYearDaySchedules   = 10;
+    uint8_t numberOfHolidaySchedules   = 10;
 
-    uint16_t numberOfSupportedCredentials = 0;
-    // We're planning to use shared storage for PIN and RFID users so we will have the maximum of both sizes her to simplify logic
-    uint16_t numberOfPINCredentialsSupported  = 0;
-    uint16_t numberOfRFIDCredentialsSupported = 0;
-    if (!DoorLockServer::Instance().GetNumberOfPINCredentialsSupported(endpointId, numberOfPINCredentialsSupported) ||
-        !DoorLockServer::Instance().GetNumberOfRFIDCredentialsSupported(endpointId, numberOfRFIDCredentialsSupported))
+    auto * cluster = chip::app::Clusters::DoorLock::FindClusterOnEndpoint(endpointId);
+    if (cluster != nullptr)
     {
-        ChipLogError(
-            Zcl, "Unable to get number of supported credentials when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-            endpointId);
-        numberOfSupportedCredentials = 10;
+        numberOfSupportedUsers     = cluster->GetNumberOfUserSupported();
+        numberOfPINCredentials     = cluster->GetNumberOfPINCredentialsSupported();
+        numberOfRFIDCredentials    = cluster->GetNumberOfRFIDCredentialsSupported();
+        numberOfCredentialsPerUser = cluster->GetNumberOfCredentialsSupportedPerUser();
+        numberOfWeekDaySchedules   = cluster->GetNumberOfWeekDaySchedulesPerUserSupported();
+        numberOfYearDaySchedules   = cluster->GetNumberOfYearDaySchedulesPerUserSupported();
+        numberOfHolidaySchedules   = cluster->GetNumberOfHolidaySchedulesSupported();
     }
     else
     {
-        numberOfSupportedCredentials = std::max(numberOfPINCredentialsSupported, numberOfRFIDCredentialsSupported);
+        ChipLogError(Zcl, "Door Lock cluster not found on endpoint %d, using default capacities", endpointId);
     }
 
-    uint8_t numberOfCredentialsSupportedPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsSupportedPerUser))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
-                     "[endpointId=%d]",
-                     endpointId);
-        numberOfCredentialsSupportedPerUser = 5;
-    }
-
-    uint8_t numberOfWeekDaySchedulesPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekDaySchedulesPerUser))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of supported week day schedules per user when initializing lock endpoint, defaulting to "
-                     "10 [endpointId=%d]",
-                     endpointId);
-        numberOfWeekDaySchedulesPerUser = 10;
-    }
-
-    uint8_t numberOfYearDaySchedulesPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYearDaySchedulesPerUser))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of supported year day schedules per user when initializing lock endpoint, defaulting to "
-                     "10 [endpointId=%d]",
-                     endpointId);
-        numberOfYearDaySchedulesPerUser = 10;
-    }
-
-    uint8_t numberOfHolidaySchedules = 0;
-    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
-    {
-        ChipLogError(
-            Zcl,
-            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-            endpointId);
-        numberOfHolidaySchedules = 10;
-    }
+    // We're planning to use shared storage for PIN and RFID users so we will
+    // have the maximum of both sizes here to simplify logic
+    uint16_t numberOfSupportedCredentials = std::max(numberOfPINCredentials, numberOfRFIDCredentials);
 
     mEndpoints.emplace_back(std::make_unique<LockEndpoint>(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials,
-                                                           numberOfWeekDaySchedulesPerUser, numberOfYearDaySchedulesPerUser,
-                                                           numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules));
+                                                           numberOfWeekDaySchedules, numberOfYearDaySchedules,
+                                                           numberOfCredentialsPerUser, numberOfHolidaySchedules));
 
     ChipLogProgress(Zcl,
                     "Initialized new lock door endpoint "
                     "[id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d,"
                     "numberOfCredentialsSupportedPerUser=%d,holidaySchedules=%d]",
-                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
-                    numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules);
-    TEMPORARY_RETURN_IGNORED DoorLockServer::Instance().SetDelegate(endpointId, mEndpoints.back().get());
+                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedules,
+                    numberOfYearDaySchedules, numberOfCredentialsPerUser, numberOfHolidaySchedules);
 
     return true;
 }
@@ -313,4 +278,9 @@ LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
         }
     }
     return nullptr;
+}
+
+LockEndpoint * LockManager::GetLockEndpoint(chip::EndpointId endpointId)
+{
+    return getEndpoint(endpointId);
 }
