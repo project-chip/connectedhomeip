@@ -90,6 +90,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',
+    'window-covering',
     # keep-sorted: end
 ]
 
@@ -854,6 +855,8 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
+        TargetPart('tl3228x', board=TelinkBoard.TL3228X),
+        TargetPart('tl3228x_retention', board=TelinkBoard.TL3228X_RETENTION),
         TargetPart('tl3238x', board=TelinkBoard.TL3238X),
         TargetPart('tl3238x_retention', board=TelinkBoard.TL3238X_RETENTION),
         TargetPart('tl5218x', board=TelinkBoard.TL5218X),
