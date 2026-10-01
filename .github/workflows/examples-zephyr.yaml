@@ -36,6 +36,8 @@ jobs:
     zephyr:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
         strategy:
             matrix:
                 include:
@@ -49,13 +51,13 @@ jobs:
 
         steps:
             - name: Checkout Matter
-              uses: actions/checkout@v7
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
             - name: Set up Zephyr workspace
               shell: bash
               run: |
                   set -euxo pipefail
-                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr main /tmp/zephyrproject
+                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.4.2 /tmp/zephyrproject
                   cd /tmp/zephyrproject
                   west config manifest.project-filter -- \
                       '-.*,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot'
@@ -106,3 +108,9 @@ jobs:
                     -DZEPHYR_TOOLCHAIN_VARIANT="${ZEPHYR_TOOLCHAIN_VARIANT}" \
                     -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
                     "${{ matrix.extra_args }}"
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                  slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
