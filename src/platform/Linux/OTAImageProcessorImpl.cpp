@@ -57,6 +57,11 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
     return DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
 }
 
+CHIP_ERROR OTAImageProcessorImpl::SuspendDownload()
+{
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleSuspend, reinterpret_cast<intptr_t>(this));
+}
+
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if (!mOfs.is_open() || !mOfs.good())
@@ -120,11 +125,15 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    unlink(imageProcessor->mImageFile);
-
-    imageProcessor->mParams.downloadedBytes = 0;
-    imageProcessor->mParams.totalFileBytes  = 0;
-    imageProcessor->mHeaderParser.Init();
+    if (!imageProcessor->mSuspended)
+    {
+        unlink(imageProcessor->mImageFile);
+        imageProcessor->mParams.downloadedBytes = 0;
+        imageProcessor->mParams.totalFileBytes  = 0;
+        imageProcessor->mImageBytesReceived     = 0;
+        imageProcessor->mHeaderParser.Init();
+    }
+    imageProcessor->mSuspended = false;
     imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
@@ -179,7 +188,22 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     imageProcessor->mOfs.close();
     unlink(imageProcessor->mImageFile);
+    imageProcessor->mSuspended          = false;
+    imageProcessor->mImageBytesReceived = 0;
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+}
+
+void OTAImageProcessorImpl::HandleSuspend(intptr_t context)
+{
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    imageProcessor->mOfs.close();
+    imageProcessor->mSuspended = imageProcessor->mImageBytesReceived > 0;
+    LogErrorOnFailure(imageProcessor->ReleaseBlock());
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -196,8 +220,9 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    ByteSpan block   = imageProcessor->mBlock;
-    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    ByteSpan block       = imageProcessor->mBlock;
+    size_t receivedBytes = block.size();
+    CHIP_ERROR error     = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Image does not contain a valid header");
@@ -212,6 +237,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     imageProcessor->mParams.downloadedBytes += block.size();
+    imageProcessor->mImageBytesReceived += receivedBytes;
     TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 

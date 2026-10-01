@@ -36,6 +36,10 @@ using chip::bdx::TransferSession;
 
 namespace chip {
 
+namespace {
+constexpr uint8_t kMaxResumeAttemptsWithoutProgress = 3;
+} // namespace
+
 void TransferTimeoutCheckHandler(System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
@@ -102,12 +106,53 @@ CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::Transfe
 
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
+    chip::bdx::TransferSession::TransferInitData initData = bdxInitData;
+    initData.StartOffset                                  = ChooseStartOffset();
+    mRequestedOffset                                      = initData.StartOffset;
+
     // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
     // Otherwise it could be freed before we can use it.
-    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData,
+    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, initData,
                                                     /* TODO:(#12520) */ chip::System::Clock::Seconds16(30)));
 
     return CHIP_NO_ERROR;
+}
+
+void BDXDownloader::SetImageVersion(uint32_t softwareVersion)
+{
+    if (softwareVersion != mImageVersion)
+    {
+        DiscardPartialImage();
+    }
+    mImageVersion = softwareVersion;
+}
+
+void BDXDownloader::DiscardPartialImage()
+{
+    VerifyOrReturn(mImageProcessor != nullptr && mImageProcessor->GetResumeOffset() > 0);
+    LogErrorOnFailure(mImageProcessor->Abort());
+    mDiscardPending = true;
+}
+
+uint64_t BDXDownloader::ChooseStartOffset()
+{
+    uint64_t offset = (mImageProcessor != nullptr && !mDiscardPending) ? mImageProcessor->GetResumeOffset() : 0;
+    mDiscardPending = false;
+    if (offset == 0)
+    {
+        mAttemptsWithoutProgress = 0;
+        return 0;
+    }
+    mAttemptsWithoutProgress = (offset == mRequestedOffset) ? static_cast<uint8_t>(mAttemptsWithoutProgress + 1) : 0;
+    if (mAttemptsWithoutProgress >= kMaxResumeAttemptsWithoutProgress)
+    {
+        ChipLogProgress(BDX, "No progress resuming at offset 0x" ChipLogFormatX64 ", starting anew", ChipLogValueX64(offset));
+        LogErrorOnFailure(mImageProcessor->Abort());
+        mAttemptsWithoutProgress = 0;
+        return 0;
+    }
+    ChipLogProgress(BDX, "Resuming download at offset 0x" ChipLogFormatX64, ChipLogValueX64(offset));
+    return offset;
 }
 
 CHIP_ERROR BDXDownloader::BeginPrepareDownload()
@@ -178,7 +223,7 @@ void BDXDownloader::OnDownloadTimeout()
         mBdxTransfer.Reset();
         if (mImageProcessor != nullptr)
         {
-            TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
+            LogErrorOnFailure(mImageProcessor->SuspendDownload());
         }
         SetState(State::kIdle, OTAChangeReasonEnum::kTimeOut);
     }
@@ -216,6 +261,10 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
         // Now that we've sent our report, we're idle.
         SetState(State::kIdle, OTAChangeReasonEnum::kSuccess);
     }
+    else if (mImageProcessor != nullptr && mImageProcessor->GetResumeOffset() > 0)
+    {
+        DiscardPartialImage();
+    }
     else
     {
         ChipLogError(BDX, "No download in progress");
@@ -241,7 +290,15 @@ void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
     Reset();
     mBdxTransfer.Reset();
     SetState(State::kIdle, reason);
-    if (mImageProcessor)
+    if (mImageProcessor == nullptr)
+    {
+        return;
+    }
+    if (reason == OTAChangeReasonEnum::kTimeOut)
+    {
+        LogErrorOnFailure(mImageProcessor->SuspendDownload());
+    }
+    else
     {
         TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
     }
@@ -256,6 +313,13 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     case TransferSession::OutputEventType::kNone:
         break;
     case TransferSession::OutputEventType::kAcceptReceived:
+        if (outEvent.transferAcceptData.StartOffset != mRequestedOffset)
+        {
+            ChipLogError(BDX, "ReceiveAccept start offset does not match the request");
+            LogErrorOnFailure(mBdxTransfer.AbortTransfer(bdx::StatusCode::kBadMessageContents));
+            mDiscardPending = true;
+            break;
+        }
         ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQuery());
         // TODO: need to check ReceiveAccept parameters
         break;
