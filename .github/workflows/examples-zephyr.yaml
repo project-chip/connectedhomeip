@@ -34,14 +34,14 @@ env:
 
 jobs:
     zephyr:
-        name: All-Devices App (${{ matrix.board }}, ${{ matrix.toolchain }})
+        name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
         runs-on: ubuntu-latest
         strategy:
             matrix:
                 include:
                     - board: xg26_rb4118a
                       toolchain: zephyr
-                      build_dir: all-devices-zephyr-xg26-llvm
+                      build_dir: all-devices-zephyr-xg26-gcc
                       extra_args: -DFILE_SUFFIX=debug
         container:
             image: ghcr.io/zephyrproject-rtos/zephyr-build:v0.29.4
