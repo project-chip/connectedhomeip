@@ -186,12 +186,7 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
     mBoostTemporarySetpoint = temporarySetpoint.HasValue() ? std::make_optional(temporarySetpoint.Value()) : std::nullopt;
     SetHeatingEnabled(true);
 
-    CHIP_ERROR err =
-        GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "WaterHeater: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    LogErrorOnFailure(GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat));
 
     NotifyBoostStateChanged();
     return Status::Success;
@@ -248,11 +243,7 @@ void SimulatedWaterHeater::EndBoost()
 
     EvaluateHeatingDemand();
 
-    CHIP_ERROR err = GenerateBoostEndedEvent();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "WaterHeater: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    LogErrorOnFailure(GenerateBoostEndedEvent());
 
     NotifyBoostStateChanged();
 }
