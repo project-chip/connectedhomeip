@@ -91,6 +91,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',
+    'window-covering',
     # keep-sorted: end
 ]
 

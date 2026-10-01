@@ -259,6 +259,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
 #elif CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
     // The single-part PSA AEAD path uses a stack buffer sized for one UDP MTU, so it cannot
     // encrypt the large-payload chunks this test produces (see CHIPCryptoPALPSA.cpp).
+    // TODO(#74514): remove this skip once single-part AEAD can handle large payloads.
     GTEST_SKIP() << "Single-part PSA AEAD cannot encrypt large payloads.";
 #else
     LargeReportDataModel largeDataModel;
