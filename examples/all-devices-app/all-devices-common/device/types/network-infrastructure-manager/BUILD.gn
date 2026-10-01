@@ -41,8 +41,5 @@ source_set("simulated") {
     "impl/SimulatedNetworkInfrastructureManager.h",
   ]
 
-  public_deps = [
-    ":network-infrastructure-manager",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/breadcrumb",
-  ]
+  public_deps = [ ":network-infrastructure-manager" ]
 }

@@ -122,7 +122,8 @@ for an example of a simple fuzz test.
 ## `Google's FuzzTest`
 
 -   Google FuzzTest is integrated through Pigweed
-    [pw_fuzzer](https://pigweed.dev/pw_fuzzer/concepts.html).
+    [pw_fuzzer](https://pigweed.dev/pw_fuzzer/concepts.html); the GN build of
+    FuzzTest itself lives in `third_party/fuzztest/`.
 
 ### Use cases
 
@@ -370,20 +371,16 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 
 #### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?
 
--   Google FuzzTest is integrated into Matter using `pw_fuzzer`, which has
-    several dependencies. These dependencies are listed here:
-    [Step 0: Set up FuzzTest for your project](https://pigweed.dev/pw_fuzzer/guides/fuzztest.html#step-0-set-up-fuzztest-for-your-project).
--   Matter integrates these dependencies as submodules, including Google
-    FuzzTest and Abseil.
+-   Matter integrates Google FuzzTest and Abseil as submodules
+    (`third_party/fuzztest/repo` and `third_party/abseil-cpp/src`).
 -   Since FuzzTest and Abseil only support the `bazel` and `CMake` build systems
-    and do not support GN, Pigweed maintainers use a script to generate GN files
-    for these dependencies.
--   the revision of FuzzTest and Abseil submodules in Matter should match or at
-    least be as new as the specific version (SHA1) used when generating these GN
-    files.
--   You can find the version used for the generated GN files here:
-    [FuzzTest Version](https://pigweed.dev/third_party/fuzztest/#version) and
-    [Abseil Version](https://pigweed.dev/third_party/abseil-cpp/#version).
+    and do not support GN, their GN files are generated from the `bazel` build
+    with `bazel_to_gn.py` from Pigweed. Pigweed no longer ships these GN files,
+    so Matter keeps them in `third_party/fuzztest/` and
+    `third_party/abseil-cpp/`.
+-   The GN files list source files explicitly, so they only work with the
+    FuzzTest and Abseil revisions they were generated for. Bump both submodules
+    together with a regeneration of the GN files.
 
 #### TO ADD:
 

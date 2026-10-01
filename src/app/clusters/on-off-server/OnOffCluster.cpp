@@ -204,8 +204,12 @@ CHIP_ERROR OnOffCluster::ApplyScene(EndpointId endpoint, ClusterId cluster, cons
     {
         auto & decodePair = pair_iterator.GetValue();
 
-        // Match codegen strictness: verify attribute ID is strictly OnOff and value is present
-        VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an attribute
+        // that is not implemented on the endpoint is ignored rather than failing the recall.
+        if (decodePair.attributeID != Attributes::OnOff::Id)
+        {
+            continue;
+        }
         VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
         bool targetValue = static_cast<bool>(decodePair.valueUnsigned8.Value());

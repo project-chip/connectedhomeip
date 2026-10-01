@@ -949,7 +949,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn.IsNull())
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && (ctxt == nullptr || ctxt->conn.IsNull()))
     {
         ChipLogError(Inet, "Connection object is missing for received message.");
         return;
