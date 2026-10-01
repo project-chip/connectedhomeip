@@ -36,7 +36,7 @@ declare_args() {
   # See src/platform/silabs/tests/tests.gni as an example.
   chip_build_all_platform_tests = false
 
-  # Enabling useful support functions when building using GoogleTest framework (used in unit tests and pw_fuzzer FuzzTests)
+  # Enabling useful support functions when building using GoogleTest framework (used in unit tests and FuzzTest targets)
   # For unit tests: this should only be enabled through build_examples.py, see PR #36268
   chip_build_tests_googletest = false
 }

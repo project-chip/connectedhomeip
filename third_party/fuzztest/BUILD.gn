@@ -39,12 +39,17 @@ config("fuzztest_public_config") {
   }
 }
 
-# Applied to the FuzzTest and Abseil sources. Coverage-instrumenting them makes
-# FuzzTest trace its own comparisons, which recurses without bound. Under
-# OSS-Fuzz the instrumentation comes from $CFLAGS and is left as it is.
+# Applied to the FuzzTest and Abseil sources only.
 config("fuzztest_runtime") {
+  # These sources are compiled by whichever clang OSS-Fuzz ships, and a new
+  # warning there must not stop the fuzz build; chip code keeps -Werror.
+  cflags = [ "-Wno-error" ]
+
+  # Coverage-instrumenting them makes FuzzTest trace its own comparisons, which
+  # recurses without bound. Under OSS-Fuzz the instrumentation comes from
+  # $CFLAGS and is left as it is.
   if (!oss_fuzz) {
-    cflags = [ "-fno-sanitize-coverage=inline-8bit-counters,trace-cmp" ]
+    cflags += [ "-fno-sanitize-coverage=inline-8bit-counters,trace-cmp" ]
   }
 }
 

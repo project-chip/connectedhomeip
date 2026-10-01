@@ -24,7 +24,7 @@ declare_args() {
       (is_libfuzzer || oss_fuzz) && is_clang && chip_build_tests &&
       (current_os == "linux" || current_os == "mac")
 
-  #Fuzz testing using pw_fuzzer and FuzzTest Framework
+  #Fuzz testing using the FuzzTest Framework
   pw_enable_fuzz_test_targets = false
 }
 
