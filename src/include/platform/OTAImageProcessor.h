@@ -48,7 +48,7 @@ public:
 
     /**
      * Called to prepare for an OTA image download. This may include but not limited to opening the file, finding a block of space
-     * in persistent memory, and allocating a buffer. This must not be a blocking call.
+     * in persistent memory, and allocating a buffer. Any partial image is discarded. This must not be a blocking call.
      */
     virtual CHIP_ERROR PrepareDownload() = 0;
 
@@ -68,6 +68,39 @@ public:
      * everything that has been written and releasing buffers. This must not be a blocking call.
      */
     virtual CHIP_ERROR Abort() = 0;
+
+    /**
+     * Called to prepare for downloading the OTA image from byte `offset` of the file, header included. With an offset of 0 the
+     * image is downloaded anew and any partial image is discarded. With an offset above 0 the download continues the partial
+     * image kept by SuspendDownload(), and must fail if that image does not hold exactly `offset` bytes once the work queued before
+     * this call has completed. The offset is the one requested from the provider, so the processor never decides on its own
+     * whether to keep a partial image. The default supports offset 0 only.
+     */
+    virtual CHIP_ERROR PrepareDownloadFrom(uint64_t offset)
+    {
+        VerifyOrReturnError(offset == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        return PrepareDownload();
+    }
+
+    /**
+     * Called instead of Abort() when a stalled download may be resumed. A later PrepareDownloadFrom(GetResumeOffset()) continues
+     * the same image and ProcessBlock() then receives data from that offset on. The default discards the image like Abort(). A
+     * provider may serve data from another offset, and the stored partial image may change while the download is suspended,
+     * so an implementation that resumes must check the stored image, as it will be applied, against its header before Apply().
+     *
+     * SuspendDownload() and Abort() may complete asynchronously, after they return. Work they queue must complete before work
+     * queued by a later PrepareDownloadFrom(), PrepareDownload() or ProcessBlock() call. A platform that runs ProcessBlock() on
+     * another task or queue than these calls must keep that order, or a resumed download can append to the wrong data.
+     */
+    virtual CHIP_ERROR SuspendDownload() { return Abort(); }
+
+    /**
+     * Bytes of the OTA image file, header included, kept by SuspendDownload() and discarded by Abort(); 0 if there are none. Only
+     * completed work is reflected: right after SuspendDownload() returns this may still be 0, and right after Abort() returns it
+     * may still be above 0. The default of 0 means the processor never resumes; BDXDownloader then always requests offset 0 and
+     * calls PrepareDownloadFrom(0).
+     */
+    virtual uint64_t GetResumeOffset() { return 0; }
 
     /**
      * Called to process a downloaded block of data. This must not be a blocking call to support cases that require IO to elements

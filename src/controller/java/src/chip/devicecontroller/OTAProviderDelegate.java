@@ -110,7 +110,10 @@ public interface OTAProviderDelegate {
    * @param nodeId OTA Requester's Node ID
    * @param fileDesignator a variable-length identifier chosen by the Initiator to identify the
    *     payload to be transferred.
-   * @param offset image's offset
+   * @param offset byte offset in the image at which the requestor asks the transfer to start. The
+   *     data returned by {@link #handleBDXQuery} must start at this offset. A delegate that cannot
+   *     serve the image from a non-zero offset throws an exception, which rejects the transfer with
+   *     START_OFFSET_NOT_SUPPORTED.
    */
   public void handleBDXTransferSessionBegin(long nodeId, String fileDesignator, long offset);
 

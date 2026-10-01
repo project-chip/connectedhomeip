@@ -21,11 +21,42 @@
 
 #include "OTAImageProcessorImpl.h"
 
+#include <lib/core/CHIPSafeCasts.h>
+
 #include <sys/stat.h>
 
 namespace chip {
+namespace {
+
+size_t Sha256DigestLength(OTAImageDigestType type)
+{
+    switch (type)
+    {
+    case OTAImageDigestType::kSha256:
+        return 32;
+    case OTAImageDigestType::kSha256_128:
+        return 16;
+    case OTAImageDigestType::kSha256_120:
+        return 15;
+    case OTAImageDigestType::kSha256_96:
+        return 12;
+    case OTAImageDigestType::kSha256_64:
+        return 8;
+    case OTAImageDigestType::kSha256_32:
+        return 4;
+    default:
+        return 0;
+    }
+}
+
+} // namespace
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
+{
+    return PrepareDownloadFrom(0);
+}
+
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadFrom(uint64_t offset)
 {
     if (mImageFile == nullptr)
     {
@@ -33,6 +64,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
         return CHIP_ERROR_INTERNAL;
     }
 
+    mPrepareOffset = offset;
     return DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
 }
 
@@ -43,6 +75,16 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    if (!mPayloadVerified)
+    {
+        // The image is checked after the transfer completed, so this is where a corrupt or spliced image is found. Discard it so
+        // it cannot be applied or resumed. DefaultOTARequestorDriver reacts to the error by cancelling the update, which resets
+        // the requestor to idle without retrying; the next periodic query starts a new download.
+        ChipLogError(SoftwareUpdate, "Image does not match the payload size or digest in its header, discarding it");
+        LogErrorOnFailure(Abort());
+        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    }
+
     return DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
 }
 
@@ -55,6 +97,16 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
     }
 
     return DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+}
+
+uint64_t OTAImageProcessorImpl::GetResumeOffset()
+{
+    return (mSuspended && PartialImageIsIntact()) ? mImageBytesReceived : 0;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::SuspendDownload()
+{
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleSuspend, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
@@ -114,17 +166,34 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr)
+    if (imageProcessor->mDownloader == nullptr)
     {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
-    unlink(imageProcessor->mImageFile);
-
-    imageProcessor->mParams.downloadedBytes = 0;
-    imageProcessor->mParams.totalFileBytes  = 0;
-    imageProcessor->mHeaderParser.Init();
+    // Work queued before this, such as a suspend or an abort, has completed by now, so the partial image is checked against the
+    // offset the downloader requested from the provider. The image is kept only to continue it from exactly that offset.
+    const uint64_t offset = imageProcessor->mPrepareOffset;
+    const bool resume     = offset > 0 && imageProcessor->mSuspended && imageProcessor->mImageBytesReceived == offset &&
+        imageProcessor->PartialImageIsIntact();
+    if (!resume)
+    {
+        unlink(imageProcessor->mImageFile);
+        imageProcessor->mParams.downloadedBytes = 0;
+        imageProcessor->mParams.totalFileBytes  = 0;
+        imageProcessor->mImageBytesReceived     = 0;
+        imageProcessor->mPayloadDigestLength    = 0;
+        imageProcessor->mHeaderParser.Init();
+    }
+    imageProcessor->mSuspended       = false;
+    imageProcessor->mPayloadVerified = false;
+    if (offset > 0 && !resume)
+    {
+        ChipLogError(SoftwareUpdate, "No partial image to continue from offset 0x" ChipLogFormatX64, ChipLogValueX64(offset));
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
     imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
@@ -143,7 +212,13 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.close();
+    // Verify once, so a repeated Finalize() keeps the first result. VerifyPayload() reads the file back, so data that a failed
+    // close() did not write fails it.
+    if (imageProcessor->mOfs.is_open())
+    {
+        imageProcessor->mOfs.close();
+        imageProcessor->mPayloadVerified = imageProcessor->VerifyPayload();
+    }
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile);
@@ -179,7 +254,30 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     imageProcessor->mOfs.close();
     unlink(imageProcessor->mImageFile);
+    imageProcessor->mSuspended          = false;
+    imageProcessor->mPayloadVerified    = false;
+    imageProcessor->mImageBytesReceived = 0;
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+}
+
+void OTAImageProcessorImpl::HandleSuspend(intptr_t context)
+{
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    // A close() that fails to write buffered data leaves the file shorter than the bytes received, so GetResumeOffset() and the
+    // prepare that resumes find it is not intact.
+    imageProcessor->mOfs.close();
+    imageProcessor->mSuspended = imageProcessor->mPayloadDigestLength > 0;
+    if (!imageProcessor->mSuspended)
+    {
+        // Only an image with a SHA-256 digest in its header can be checked after resuming, so any other is downloaded anew.
+        ChipLogProgress(SoftwareUpdate, "Discarding the partial image: its header is incomplete or has no SHA-256 digest");
+    }
+    LogErrorOnFailure(imageProcessor->ReleaseBlock());
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -190,17 +288,25 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr)
+    if (imageProcessor->mDownloader == nullptr)
     {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
-    ByteSpan block   = imageProcessor->mBlock;
-    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    ByteSpan block       = imageProcessor->mBlock;
+    size_t receivedBytes = block.size();
+    CHIP_ERROR error     = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Image does not contain a valid header");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+        return;
+    }
+
+    if (block.size() > imageProcessor->mParams.totalFileBytes - imageProcessor->mParams.downloadedBytes)
+    {
+        ChipLogError(SoftwareUpdate, "Image is longer than the payload size in its header");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
@@ -212,6 +318,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     imageProcessor->mParams.downloadedBytes += block.size();
+    imageProcessor->mImageBytesReceived += receivedBytes;
     TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
@@ -226,11 +333,59 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        mParams.totalFileBytes = header.mPayloadSize;
+        mParams.totalFileBytes    = header.mPayloadSize;
+        const size_t digestLength = Sha256DigestLength(header.mImageDigestType);
+        if (digestLength > 0)
+        {
+            VerifyOrReturnError(header.mImageDigest.size() == digestLength, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            memcpy(mPayloadDigest, header.mImageDigest.data(), digestLength);
+        }
+        mPayloadDigestLength = digestLength;
         mHeaderParser.Clear();
     }
 
     return CHIP_NO_ERROR;
+}
+
+bool OTAImageProcessorImpl::PartialImageIsIntact() const
+{
+    // The image file holds the payload received so far. Between a suspend and the resume it may have been truncated, replaced or
+    // removed; opening it for appending would then recreate or extend it, and the image would miss data the counters include.
+    struct stat st;
+    return stat(mImageFile, &st) == 0 && S_ISREG(st.st_mode) && static_cast<uint64_t>(st.st_size) == mParams.downloadedBytes;
+}
+
+bool OTAImageProcessorImpl::VerifyPayload()
+{
+    if (mHeaderParser.IsInitialized() || mParams.downloadedBytes != mParams.totalFileBytes)
+    {
+        return false;
+    }
+
+    // Check the file that Apply() installs, not the blocks as they arrived: data that never reached the file, or a file changed
+    // between a suspend and the resume, must not pass.
+    std::ifstream file(mImageFile, std::ifstream::in | std::ifstream::binary);
+    VerifyOrReturnValue(file.good(), false);
+    Crypto::Hash_SHA256_stream hash;
+    VerifyOrReturnValue(hash.Begin() == CHIP_NO_ERROR, false);
+    uint64_t fileBytes = 0;
+    char buffer[1024];
+    while (file.read(buffer, sizeof(buffer)) || file.gcount() > 0)
+    {
+        const size_t count = static_cast<size_t>(file.gcount());
+        fileBytes += count;
+        VerifyOrReturnValue(hash.AddData(ByteSpan(Uint8::from_char(buffer), count)) == CHIP_NO_ERROR, false);
+    }
+    VerifyOrReturnValue(!file.bad() && fileBytes == mParams.totalFileBytes, false);
+    if (mPayloadDigestLength == 0)
+    {
+        return true;
+    }
+
+    uint8_t digest[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan digestSpan(digest);
+    VerifyOrReturnValue(hash.Finish(digestSpan) == CHIP_NO_ERROR, false);
+    return digestSpan.SubSpan(0, mPayloadDigestLength).data_equal(ByteSpan(mPayloadDigest, mPayloadDigestLength));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
