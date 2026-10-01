@@ -55,9 +55,10 @@ jobs:
 
             - name: Set up Zephyr workspace
               shell: bash
+              # The zephyr commit is ~4.5 rc1, will replace with official 4.5 tag once created
               run: |
                   set -euxo pipefail
-                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.4.2 /tmp/zephyrproject
+                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr fa4f8fb0e470210aee0ae6fb069a281bc6ac887a /tmp/zephyrproject
                   cd /tmp/zephyrproject
                   west config manifest.project-filter -- \
                       '-.*,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot'
