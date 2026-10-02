@@ -86,8 +86,9 @@ connects over PASE using default discriminator `3840` / manual code
 `34970112332`, and writes the dump files):
 
 ```bash
-rm -f /tmp/chip_* && ./scripts/run_in_python_env.sh out/python_env \
+./scripts/run_in_python_env.sh out/python_env \
   './scripts/tests/run_python_test.py \
+    --factory-reset \
     --app ./out/linux-x64-all-devices-boringssl/all-devices-app \
     --app-args "--device on-off-light" \
     --script src/python_testing/TC_DeviceBasicComposition.py \
@@ -96,10 +97,14 @@ rm -f /tmp/chip_* && ./scripts/run_in_python_env.sh out/python_env \
 
 ### 2. Running Standalone Against a Running Device
 
-If the Matter device or application is already running, invoke
-`TC_DeviceBasicComposition.py` directly inside the Python environment. By
-omitting `--commissioning-method`, the script connects directly over a PASE
-session without needing to commission the device:
+If an uncommissioned Matter device or application is already running in a
+commissioning window, invoke `TC_DeviceBasicComposition.py` directly inside the
+Python environment. When invoked directly without `--commissioning-method` (and
+without `--load-from-env`, which defaults to
+`commissioning-method: on-network`), `BasicCompositionTests` skips the
+commissioning step and connects over PASE using `--manual-code` (or add
+`--commissioning-method on-network` to perform full on-network commissioning
+first):
 
 ```bash
 ./scripts/run_in_python_env.sh out/python_env \
