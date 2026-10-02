@@ -55,8 +55,8 @@
 #endif
 #endif
 
-#include <platform/NetworkCommissioning.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
+#include <platform/NetworkCommissioning.h>
 #include <vector>
 
 namespace chip {

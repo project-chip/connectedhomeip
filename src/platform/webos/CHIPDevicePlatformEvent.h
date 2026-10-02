@@ -43,7 +43,7 @@ enum PublicPlatformSpecificEventTypes
 /**
  * Enumerates webOS platform-specific event types that are internal to the chip Device Layer.
  */
-enum InternalPlatformSpecificWbsEventTypes
+enum InternalPlatformSpecificEventTypes
 {
     kPlatformWebOSEvent = kRange_InternalPlatformSpecific,
     kPlatformWebOSBLEAdapterAdded,

@@ -17,33 +17,29 @@
 
 #include "ChipDeviceScanner.h"
 
-#include <algorithm>
-#include <cstring>
 #include <errno.h>
-#include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "lsrequester.h"
 #include <luna-service2++/handle.hpp>
+#include "lsrequester.h"
 
 #define CHIP_BLE_BASE_SERVICE_UUID_STRING "-0000-1000-8000-00805f9b34fb"
 #define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
 #define CHIP_BLE_BASE_SERVICE_PREFIX "0000"
 #define CHIP_BLE_UUID_SERVICE_SHORT_STRING "fff6"
-#define CHIP_BLE_UUID_SERVICE_SHORT 0xfff6
 
 #define CHIP_BLE_UUID_SERVICE_STRING                                                                                               \
     CHIP_BLE_BASE_SERVICE_PREFIX CHIP_BLE_UUID_SERVICE_SHORT_STRING CHIP_BLE_BASE_SERVICE_UUID_STRING
 
 #define API_BLUETOOTH_ADAPTER_GETSTATUS "luna://com.webos.service.bluetooth2/adapter/getStatus"
 #define API_BLUETOOTH_ADAPTER_SETSTATE "luna://com.webos.service.bluetooth2/adapter/setState"
-// #define API_BLUETOOTH_ADAPTER_START_DISCOVERY "luna://com.webos.service.bluetooth2/adapter/startDiscovery"
-// #define API_BLUETOOTH_ADAPTER_CANCEL_DISCOVERY "luna://com.webos.service.bluetooth2/adapter/cancelDiscovery"
-// #define API_BLUETOOTH_LE_INTERNAL_STARTSCAN "luna://com.webos.service.bluetooth2/le/internal/startScan"
-#define API_BLUETOOTH_LE_STARTSCAN "luna://com.webos.service.bluetooth2/le/startScan"
+#define API_BLUETOOTH_ADAPTER_START_DISCOVERY "luna://com.webos.service.bluetooth2/adapter/startDiscovery"
+#define API_BLUETOOTH_ADAPTER_CANCEL_DISCOVERY "luna://com.webos.service.bluetooth2/adapter/cancelDiscovery"
+#define API_BLUETOOTH_LE_INTERNAL_STARTSCAN "luna://com.webos.service.bluetooth2/le/internal/startScan"
 
 #define PARAM_BLANK "{}"
 
@@ -53,26 +49,22 @@ namespace Internal {
 
 namespace {
 
-// Max CHIPoBLE service data payload carried in a single AD structure (see ReportDevice()).
-constexpr size_t kMaxServiceDataLength = 32;
-
-static bool _HexToBytes(const std::string & octetString, uint8_t * dataBytes, size_t dataBytesSize)
+static bool _HexToBytes(std::string octetString, uint8_t * dataBytes)
 {
-    uint8_t buffer[kMaxServiceDataLength];
+    chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
     size_t argLen = octetString.length();
-    if (argLen == 0 || argLen > sizeof(buffer) * 2)
+    if(!buffer.Calloc(argLen))
     {
         return false;
     }
 
-    size_t octetCount = chip::Encoding::HexToBytes(octetString.c_str(), argLen, buffer, sizeof(buffer));
+    size_t octetCount = chip::Encoding::HexToBytes(octetString.c_str(), argLen, buffer.Get(), argLen );
 
     if (octetCount == 0)
     {
         return false;
     }
-    // Never copy more than the destination can hold (service data may carry extra bytes).
-    memcpy(dataBytes, buffer, std::min(octetCount, dataBytesSize));
+    memcpy(dataBytes, buffer.Get(), octetCount);
 
     return true;
 }
@@ -82,18 +74,18 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
 {
     VerifyOrReturnError(aDevice.hasKey("serviceData") == true, false);
     bool bChipDevice = false;
-    // origin > remove
-    // if (aDevice.hasKey("serviceUuid") == true)
-    // {
-    //     for (int i = 0 ; i < aDevice["serviceUuid"].arraySize() ; ++i)
-    //     {
-    //         if (aDevice["serviceUuid"][i].asString().compare(CHIP_BLE_UUID_SERVICE_SHORT_STRING) == 0)
-    //         {
-    //             bChipDevice = true;
-    //             break;
-    //         }
-    //     }
-    // }
+
+    if (aDevice.hasKey("serviceUuid") == true)
+    {
+        for (int i = 0 ; i < aDevice["serviceUuid"].arraySize() ; ++i)
+        {
+            if (aDevice["serviceUuid"][i].asString().compare(CHIP_BLE_UUID_SERVICE_SHORT_STRING) == 0)
+            {
+                bChipDevice = true;
+                break;
+            }
+        }
+    }
 
     if (aDevice.hasKey("serviceDataUuid") == true)
     {
@@ -104,9 +96,10 @@ bool WbsGetChipDeviceInfo(const pbnjson::JValue & aDevice, chip::Ble::ChipBLEDev
     }
 
     VerifyOrReturnError(bChipDevice == true, false);
-    VerifyOrReturnError(
-        _HexToBytes(aDevice["serviceData"].asString(), reinterpret_cast<uint8_t *>(&aDeviceInfo), sizeof(aDeviceInfo)) == true,
-        false);
+    // [Depend] Bound check: _HexToBytes() copies the whole service data into the 8-byte aDeviceInfo (stack overflow).
+    VerifyOrReturnError(aDevice["serviceData"].asString().length() == 2 * sizeof(aDeviceInfo), false);
+    VerifyOrReturnError( _HexToBytes(aDevice["serviceData"].asString(),
+                reinterpret_cast<uint8_t *>(&aDeviceInfo)) == true, false);
 
     return bChipDevice;
 }
@@ -118,7 +111,7 @@ CHIP_ERROR ChipDeviceScanner::Init(ChipDeviceScannerDelegate * delegate)
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    //    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(adapter)));
+//    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(adapter)));
     mDelegate = delegate;
 
     mScannerState = ChipDeviceScannerState::INITIALIZED;
@@ -128,21 +121,16 @@ CHIP_ERROR ChipDeviceScanner::Init(ChipDeviceScannerDelegate * delegate)
 
 void ChipDeviceScanner::Shutdown()
 {
-    if (mScannerState == ChipDeviceScannerState::UNINITIALIZED)
-    {
-        mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
-        return;
-    }
-    // VerifyOrReturn(mScannerState != ChipDeviceScannerState::UNINITIALIZED);
+    VerifyOrReturn(mScannerState != ChipDeviceScannerState::UNINITIALIZED);
 
-    TEMPORARY_RETURN_IGNORED StopScan();
+    StopScan();
 
     // Release resources on the glib thread. This is necessary because the D-Bus manager client
     // object handles D-Bus signals. Otherwise, we might face a race when the manager object is
     // released during a D-Bus signal being processed.
-    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
-            //            self->mAdapter.reset();
+//            self->mAdapter.reset();
             return CHIP_NO_ERROR;
         },
         this);
@@ -153,21 +141,9 @@ void ChipDeviceScanner::Shutdown()
 CHIP_ERROR ChipDeviceScanner::StartScan()
 {
     assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNING, CHIP_ERROR_INCORRECT_STATE);
 
-    // VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNING, CHIP_ERROR_INCORRECT_STATE);
-    if (mScannerState == ChipDeviceScannerState::SCANNING || mLeInternalStartScanToken != LSMESSAGE_TOKEN_INVALID)
-    {
-        ChipLogProgress(Ble, "StartScan() : already scanning! > stop.");
-        if (mLeInternalStartScanToken != LSMESSAGE_TOKEN_INVALID)
-        {
-            LsRequester * lsRequester = LsRequester::getInstance();
-            lsRequester->lsCallCancel(mLeInternalStartScanToken);
-            mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
-        }
-        mScannerState = ChipDeviceScannerState::INITIALIZED;
-    }
-
-    //    mCancellable.reset(g_cancellable_new());
+//    mCancellable.reset(g_cancellable_new());
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
     if (err != CHIP_NO_ERROR)
@@ -186,21 +162,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan()
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
     assertChipStackLockedByCurrentThread();
-
-    // VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNING, CHIP_NO_ERROR);
-    if (mScannerState != ChipDeviceScannerState::SCANNING)
-    {
-        ChipLogDetail(Ble, "StopScan() : ChipDeviceScanner status is not scanning");
-        if (mLeInternalStartScanToken == LSMESSAGE_TOKEN_INVALID)
-        {
-            ChipLogProgress(Ble, "StopScan() : ChipDeviceScanner is not scanning > skip stopScan");
-            return CHIP_NO_ERROR;
-        }
-        else
-        {
-            ChipLogDetail(Ble, "scanner is working");
-        }
-    }
+    VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNING, CHIP_NO_ERROR);
 
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) { return self->StopScanImpl(); }, this);
@@ -222,67 +184,38 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 
 CHIP_ERROR ChipDeviceScanner::StopScanImpl()
 {
-    bool ret                  = false;
-    LsRequester * lsRequester = LsRequester::getInstance();
+    bool ret = false;
+    LsRequester *lsRequester = LsRequester::getInstance();
     pbnjson::JValue responsePayload;
 
     ret = lsRequester->lsCallCancel(mLeInternalStartScanToken);
-    if (ret != true)
-    {
-        ChipLogProgress(DeviceLayer, "StopScanImpl error  : lsRequester->lsCallCancel");
-        // return CHIP_ERROR_INTERNAL; //do not need check
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "StopScanImpl lsRequester->lsCallCancel end.");
-    }
-    mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
+    if(ret != true)
+        return CHIP_ERROR_INTERNAL;
 
-    //    ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_CANCEL_DISCOVERY, PARAM_BLANK, responsePayload, 30);
-    //    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
-    //        return CHIP_ERROR_INTERNAL;
+    ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_CANCEL_DISCOVERY, PARAM_BLANK, responsePayload, 30);
+    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        return CHIP_ERROR_INTERNAL;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDeviceScanner::StartScanImpl()
 {
-    bool ret                         = false;
-    LsRequester * lsRequester        = LsRequester::getInstance();
-    pbnjson::JValue lunaParam        = pbnjson::JObject();
-    pbnjson::JValue serviceDataParam = pbnjson::JObject();
-    pbnjson::JValue dataJArray       = pbnjson::JArray();
-    pbnjson::JValue maskJArray       = pbnjson::JArray();
+    bool ret = false;
+    LsRequester *lsRequester = LsRequester::getInstance();
+    pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
-    // ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_START_DISCOVERY, lunaParam.stringify().c_str(), responsePayload);
-    // if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
-    //     return CHIP_ERROR_INTERNAL;
+    ret = lsRequester->lsCallSync(API_BLUETOOTH_ADAPTER_START_DISCOVERY, lunaParam.stringify().c_str(), responsePayload);
+    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        return CHIP_ERROR_INTERNAL;
 
-    dataJArray.append(0);
-    maskJArray.append(0);
-    serviceDataParam.put("uuid", "fff6");
-    serviceDataParam.put("data", dataJArray);
-    serviceDataParam.put("mask", maskJArray);
-    lunaParam.put("serviceData", serviceDataParam);
     lunaParam.put("subscribe", true);
+    LSMessageToken ulToken = LSMESSAGE_TOKEN_INVALID;
 
-    if (mLeInternalStartScanToken != LSMESSAGE_TOKEN_INVALID)
-    {
-        ChipLogProgress(DeviceLayer, "StartScanImpl() : scanner is working > try to stop");
-        lsRequester->lsCallCancel(mLeInternalStartScanToken);
-        mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
-    }
-    // LSMessageToken ulToken = LSMESSAGE_TOKEN_INVALID;
-
-    // ret = lsRequester->lsSubscribe(API_BLUETOOTH_LE_INTERNAL_STARTSCAN, lunaParam.stringify().c_str(), this, OnLeDeviceScanned,
-    // &ulToken); ChipLogDetail(DeviceLayer, "[%lu]Call %s '%s'", ulToken, API_BLUETOOTH_LE_INTERNAL_STARTSCAN,
-    // lunaParam.stringify().c_str()); mLeInternalStartScanToken = ulToken;
-    ret = lsRequester->lsSubscribe(API_BLUETOOTH_LE_STARTSCAN, lunaParam.stringify().c_str(), this, OnLeDeviceScanned,
-                                   &mLeInternalStartScanToken);
-    ChipLogDetail(DeviceLayer, "[%lu]Call %s '%s'", mLeInternalStartScanToken, API_BLUETOOTH_LE_STARTSCAN,
-                  lunaParam.stringify().c_str());
-
+    ret = lsRequester->lsSubscribe(API_BLUETOOTH_LE_INTERNAL_STARTSCAN, lunaParam.stringify().c_str(), this, OnLeDeviceScanned, &ulToken);
+    ChipLogDetail(DeviceLayer, "[%lu]Call %s '%s'", ulToken, API_BLUETOOTH_LE_INTERNAL_STARTSCAN, lunaParam.stringify().c_str());
+    mLeInternalStartScanToken = ulToken;
     VerifyOrReturnError(ret == true, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "StartScanImpl ret: %d", ret));
 
     ChipLogProgress(DeviceLayer, "Scan started");
@@ -292,44 +225,40 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
 
 void ChipDeviceScanner::ReportDevice(const pbnjson::JValue & device)
 {
-    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo = {};
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
 
     pbnjson::JValue bleDevice = pbnjson::JObject();
-    bleDevice                 = device;
+    bleDevice = device;
 
     //["scanRecord"] : luna://com.webos.service.bluetooth2/le/internal/startScan result
     pbnjson::JValueArrayElement scanRecordDataJObj = device["scanRecord"];
-    ssize_t scanRecordDataJSize                    = scanRecordDataJObj.arraySize();
+    ssize_t scanRecordDataJSize = scanRecordDataJObj.arraySize();
 
-    uint8_t aScanRecord[256] = {
-        0,
-    };
-    uint8_t * payload = &aScanRecord[0];
-    // Clamp to the local buffer (out-of-bounds write otherwise).
+    uint8_t aScanRecord[256] = {0,};
+    // [Depend] Bound check: clamp the scan record to aScanRecord (stack overflow).
     if (scanRecordDataJSize > static_cast<ssize_t>(sizeof(aScanRecord)))
         scanRecordDataJSize = static_cast<ssize_t>(sizeof(aScanRecord));
-    if (scanRecordDataJSize < 0)
-        scanRecordDataJSize = 0;
-    const size_t total_len = static_cast<size_t>(scanRecordDataJSize);
+    uint8_t* payload = &aScanRecord[0];
+    ssize_t total_len = scanRecordDataJSize;
 
-    for (ssize_t j = 0; j < scanRecordDataJSize; j++)
+    for(ssize_t j = 0; j < scanRecordDataJSize; j++)
     {
         int32_t v = scanRecordDataJObj[j].asNumber<int32_t>();
         if (chip::CanCastTo<uint8_t>(v))
             aScanRecord[j] = static_cast<uint8_t>(v);
     }
-    uint8_t adv_length  = 0;
-    uint8_t adv_type    = 0;
-    size_t sizeConsumed = 0; // uint8_t would wrap at 256
-    bool finished       = (total_len == 0);
+    uint8_t adv_length = 0;
+    uint8_t adv_type = 0;
+    uint8_t sizeConsumed = 0;
+    bool finished = false;
 
-    while (!finished)
-    {
+    while(!finished) {
         adv_length = *payload;
         payload++;
         sizeConsumed += 1 + adv_length;
-        // Stop if the AD structure runs past the scan record (out-of-bounds read otherwise).
-        if (sizeConsumed > total_len)
+
+        // [Depend] Bound check: stop on an AD structure running past the scan record (out-of-bounds read).
+        if ((payload - aScanRecord) + adv_length > total_len)
             break;
 
         if (adv_length != 0)
@@ -338,78 +267,74 @@ void ChipDeviceScanner::ReportDevice(const pbnjson::JValue & device)
             payload++;
             adv_length--;
 
-            switch (adv_type)
-            {
-            case 0x09 /* BLE_AD_TYPE_NAME_CMPL */: { // Adv Data Type: 0x09
-                std::string nameStr(reinterpret_cast<char *>(payload), adv_length);
-                // ChipLogDetail(DeviceLayer, "Type: name : %s",nameStr.c_str());
-                bleDevice.put("name", nameStr.c_str());
-                break;
-            } // BLE_AD_TYPE_NAME_CMPL
+            switch(adv_type) {
+                case 0x09 /* BLE_AD_TYPE_NAME_CMPL */: {   // Adv Data Type: 0x09
+                    std::string nameStr(reinterpret_cast<char*>(payload), adv_length);
+                    //ChipLogDetail(DeviceLayer, "Type: name : %s",nameStr.c_str());
+                    bleDevice.put("name", nameStr.c_str());
+                    break;
+                } // BLE_AD_TYPE_NAME_CMPL
 
-            case 0x03 /* BLE_AD_TYPE_16SRV_CMPL */:
-            case 0x02 /* BLE_AD_TYPE_16SRV_PART */: { // Adv Data Type: 0x02
-                pbnjson::JValue serviceUuidArray = pbnjson::JArray();
-                for (int var = 0; var < adv_length / 2; ++var)
-                {
-                    uint16_t serviceUuid       = (*(payload + var * 2 + 1) << 8) | *(payload + var * 2);
-                    char serviceUuidStr[4 + 1] = "";
-                    // ChipLogDetail(DeviceLayer, "Type: serviceUuid 16 : %u", serviceUuid);
-                    TEMPORARY_RETURN_IGNORED chip::Encoding::Uint16ToHex(serviceUuid, serviceUuidStr, sizeof(serviceUuidStr),
-                                                                         chip::Encoding::HexFlags::kNullTerminate);
+                case 0x03 /* BLE_AD_TYPE_16SRV_CMPL */:
+                case 0x02 /* BLE_AD_TYPE_16SRV_PART */: {   // Adv Data Type: 0x02
+                    pbnjson::JValue serviceUuidArray = pbnjson::JArray();
+                    for ( int var = 0 ; var < adv_length/2; ++var )
+                    {
+                        uint16_t serviceUuid = ( *(payload + var * 2 + 1) << 8) | *(payload + var * 2);
+                        char serviceUuidStr[4 + 1] = "";
+                        //ChipLogDetail(DeviceLayer, "Type: serviceUuid 16 : %u", serviceUuid);
+                        chip::Encoding::Uint16ToHex(serviceUuid, serviceUuidStr, sizeof(serviceUuidStr), chip::Encoding::HexFlags::kNullTerminate);
 
-                    serviceUuidArray.append(std::string(serviceUuidStr));
-                    bleDevice.put("serviceUuid", serviceUuidArray);
-                }
-                break;
-            } // BLE_AD_TYPE_16SRV_PART
+                        serviceUuidArray.append(std::string(serviceUuidStr));
+                        bleDevice.put("serviceUuid", serviceUuidArray);
+                    }
+                    break;
+                } // BLE_AD_TYPE_16SRV_PART
 
-            case 0x16 /* BLE_AD_TYPE_SERVICE_DATA */: { // Adv Data Type: 0x16 (Service Data) - 2 byte UUID
-                if (adv_length < 2)
-                {
-                    // ChipLogError(DeviceLayer, "Length too small for BLE_AD_TYPE_SERVICE_DATA");
+                case 0x16 /* BLE_AD_TYPE_SERVICE_DATA */: {  // Adv Data Type: 0x16 (Service Data) - 2 byte UUID
+                    if (adv_length < 2) {
+                        //ChipLogError(DeviceLayer, "Length too small for BLE_AD_TYPE_SERVICE_DATA");
+                        break;
+                    }
+                    uint16_t serviceDataUuid = ( *(payload+1) << 8) | *payload;
+                    char serviceDataUuidStr[4 + 1] = "";
+
+                    //ChipLogDetail(DeviceLayer, "Type: serviceData 16 : %u", serviceDataUuid );
+
+                    chip::Encoding::Uint16ToHex(serviceDataUuid, serviceDataUuidStr, sizeof(serviceDataUuidStr), chip::Encoding::HexFlags::kNullTerminate);
+                    bleDevice.put("serviceDataUuid", std::string(serviceDataUuidStr));
+                    if (adv_length > 2) {
+                        char serviceDataStr[64+1] = "";
+                        chip::Encoding::BytesToLowercaseHexString(payload + 2, adv_length - 2, &serviceDataStr[0], ArraySize(serviceDataStr));
+                        bleDevice.put("serviceData", std::string(serviceDataStr));
+                    }
+                    break;
+                } //BLE_AD_TYPE_SERVICE_DATA
+
+                default: {
+                    char buffer[256] = {0,};
+                    chip::Encoding::BytesToLowercaseHexString(payload, adv_length, &buffer[0], ArraySize(buffer));
+                    //ChipLogDetail(DeviceLayer, "Type: 0x%.2x, adv_length: %d, data: %s", adv_type, adv_length, buffer);
                     break;
                 }
-                uint16_t serviceDataUuid       = (*(payload + 1) << 8) | *payload;
-                char serviceDataUuidStr[4 + 1] = "";
-
-                if (serviceDataUuid != CHIP_BLE_UUID_SERVICE_SHORT)
-                    break;
-
-                // ChipLogDetail(DeviceLayer, "Type: serviceData 16 : %u", serviceDataUuid );
-
-                TEMPORARY_RETURN_IGNORED chip::Encoding::Uint16ToHex(
-                    serviceDataUuid, serviceDataUuidStr, sizeof(serviceDataUuidStr), chip::Encoding::HexFlags::kNullTerminate);
-                bleDevice.put("serviceDataUuid", std::string(serviceDataUuidStr));
-                if (adv_length > 2)
-                {
-                    char serviceDataStr[kMaxServiceDataLength * 2 + 1] = "";
-                    TEMPORARY_RETURN_IGNORED chip::Encoding::BytesToLowercaseHexString(
-                        payload + 2, adv_length - 2, &serviceDataStr[0], MATTER_ARRAY_SIZE(serviceDataStr));
-                    bleDevice.put("serviceData", std::string(serviceDataStr));
-                }
-                break;
-            } // BLE_AD_TYPE_SERVICE_DATA
-
-            default: {
-                // ChipLogDetail(DeviceLayer, "Type: 0x%.2x, adv_length: %d", adv_type, adv_length);
-                break;
-            }
             }
             payload += adv_length;
         }
 
-        if (sizeConsumed >= static_cast<size_t>(total_len))
+        if (sizeConsumed >= total_len)
             finished = true;
     }
 
+
     if (!WbsGetChipDeviceInfo(bleDevice, deviceInfo))
     {
-        ChipLogDetail(Ble, "Device %s does not look like a CHIP device.", device["address"].asString().c_str());
+        //ChipLogDetail(Ble, "Device %s does not look like a CHIP device.", device["address"].asString().c_str());
         return;
     }
 
-    mDelegate->OnDeviceScanned(bleDevice, deviceInfo);
+    mBleChipDevice  = chip::Platform::New<BLEChipDevice>(bleDevice, deviceInfo);
+    mDelegate->OnDeviceScanned(mBleChipDevice->mBleDevice, mBleChipDevice->mDeviceInfo);
+    chip::Platform::Delete(mBleChipDevice);
 }
 
 bool ChipDeviceScanner::OnLeDeviceScanned(LSHandle * sh, LSMessage * message, void * userData)
@@ -418,20 +343,21 @@ bool ChipDeviceScanner::OnLeDeviceScanned(LSHandle * sh, LSMessage * message, vo
 
     LS::Message response(message);
     pbnjson::JValue responsePayload;
-    ChipLogDetail(DeviceLayer, "receiveMessage = %s", response.getPayload());
+    std::string responseStr(response.getPayload());
+    //ChipLogDetail(DeviceLayer, "receiveMessage = %s", response.getPayload());
 
     responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
 
     if (responsePayload["returnValue"].asBool() == true)
     {
-        if (responsePayload.hasKey("adapterAddress") == true)
-        {
-            ChipLogProgress(DeviceLayer, "LeStartScan success");
+        if(responsePayload.hasKey("adapterAddress") == true) {
+            ChipLogDetail(DeviceLayer, "LeStartScan success");
         }
-        else if (responsePayload.hasKey("devices") == true)
-        {
-            pbnjson::JValueArrayElement devicesDataJObj = responsePayload["devices"];
-            ssize_t devicesDataSize                     = devicesDataJObj.arraySize();
+        else if(responsePayload.hasKey("devices") == true) {
+            pbnjson::JValue value = pbnjson::JDomParser::fromString(responseStr);
+
+            pbnjson::JValueArrayElement devicesDataJObj = value["devices"];
+            ssize_t devicesDataSize = devicesDataJObj.arraySize();
 
             for (ssize_t i = 0; i < devicesDataSize; ++i)
             {
@@ -450,7 +376,9 @@ bool ChipDeviceScanner::OnLeDeviceScanned(LSHandle * sh, LSMessage * message, vo
 void ChipDeviceScanner::RemoveDevice(const pbnjson::JValue & device)
 {
     ChipLogError(Ble, "RemoveDevice: Not implemented");
+
 }
+
 
 } // namespace Internal
 } // namespace DeviceLayer

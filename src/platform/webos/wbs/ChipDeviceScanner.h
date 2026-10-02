@@ -21,7 +21,7 @@
 
 #include <glib.h>
 
-#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
 
@@ -34,17 +34,12 @@ namespace Internal {
 
 struct BLEChipDevice
 {
-    BLEChipDevice(pbnjson::JValue & device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) :
-        mBleDevice(device), mDeviceInfo(deviceInfo)
-    {}
+    BLEChipDevice(pbnjson::JValue &device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) : mBleDevice(device), mDeviceInfo(deviceInfo) {}
     pbnjson::JValue mBleDevice;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceInfo;
 };
 
 /// Receives callbacks when chip devices are being scanned
-///
-/// OnDeviceScanned() is called on the LsRequester (lsTask) thread: implementations must not block it
-/// (e.g. with synchronous LS2 calls) and must not touch Matter stack state without a thread hop.
 class ChipDeviceScannerDelegate
 {
 public:
@@ -111,7 +106,8 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::UNINITIALIZED;
 
-    LSMessageToken mLeInternalStartScanToken = LSMESSAGE_TOKEN_INVALID;
+    BLEChipDevice * mBleChipDevice = nullptr;
+    uint32_t mLeInternalStartScanToken;
 };
 
 } // namespace Internal

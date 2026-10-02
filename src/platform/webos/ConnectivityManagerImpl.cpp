@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    Copyright (c) 2025 NXP
  *
@@ -24,11 +24,11 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/webos/ConnectivityUtils.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/webos/WirelessDefs.h>
+#include <platform/internal/BLEManager.h>
 
 #include <algorithm>
 #include <cstdlib>

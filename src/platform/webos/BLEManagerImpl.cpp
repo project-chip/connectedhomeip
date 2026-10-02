@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,22 +32,23 @@
  *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
 #include "platform/internal/BLEManager.h"
 
-#include <cassert>
+#include <new>
 #include <type_traits>
 #include <utility>
 
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <lib/support/CHIPMem.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
-#include "wbs/ChipDeviceScanner.h"
+// webOS: wbs layer instead of bluez/.
 #include "wbs/Helper.h"
+#include "wbs/WbsGattClient.h"
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 #include <platform/DeviceControlServer.h>
@@ -62,19 +63,36 @@ namespace Internal {
 
 namespace {
 
-#if defined(LGE_BLE_NEW_CONNECTION_SCAN_TIMEOUT)
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(LGE_BLE_NEW_CONNECTION_SCAN_TIMEOUT);
-#else
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+// webOS: 60 s (Linux: 20 s). The wbs connection includes retries and cannot be cancelled, and WBS gatt/connect alone
+// was measured at ~19 s: the timeout must cover the pre-connect (WEBOS_BLE_PRECONNECT_TIMEOUT_SEC) plus the wbs
+// ConnectDevice() (service discovery).
+static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(60);
+// webOS: see WEBOS_BLE_CONNECT_START_DELAY_MS in BlePlatformConfig.h.
+static constexpr System::Clock::Timeout kConnectStartDelay = System::Clock::Milliseconds32(WEBOS_BLE_CONNECT_START_DELAY_MS);
+static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+    System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+// The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time
+// starting from advertisement commencement. Since the extended advertisement timer is started after
+// the fast-to-slow transition, we have to subtract the time spent in fast advertising.
+static constexpr System::Clock::Timeout kSlowAdvertiseTimeout = System::Clock::Milliseconds32(
+    CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS >=
+                  CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME,
+              "The extended advertising interval change time must be greater than the fast advertising interval change time");
 #endif
-// wbs connection cannot be cancelled (CancelConnect is not implemented) and includes retries,
-// so the timeout is longer than on webOS (20 s).
-static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(40);
 
-// Parameters of a connection attempt executed on the Matter GLib context.
+// webOS: scan result handed over from the LsRequester (lsTask) thread to the Matter thread.
+struct ScannedDevice
+{
+    std::string mAddress;
+    uint16_t mDiscriminator;
+};
+
+// webOS: parameters of a connection attempt executed on the Matter GLib context.
 struct ConnectRequest
 {
-    ConnectRequest(const std::string & address, WbsEndpoint * endpoint) : mAddress(address), mEndpoint(endpoint) {}
     std::string mAddress;
     WbsEndpoint * mEndpoint;
 };
@@ -87,9 +105,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 
+    // webOS
+    mShuttingDown = false;
+
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    // Advertising (peripheral role) is not supported by the wbs layer.
-    mFlags.ClearAll();
+    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -98,28 +119,50 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
+    // webOS: stop handing work to the LsRequester / GLib threads, which keep running after the BLE manager is shut down.
+    mShuttingDown = true;
+
     // Make sure that timers are stopped before shutting down the BLE layer.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
     DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
-    CancelConnect(mpEndpoint);
+    DeviceLayer::SystemLayer().CancelTimer(HandleConnectStartTimer, this);
 
     mDeviceScanner.Shutdown();
+    // webOS: the wbs layer does not disconnect on shutdown: release every WBS client opened by this process, otherwise
+    // the peers stay connected after exit and are not discoverable by the next commissioning attempt.
+    WbsGattDisconnectAll(mpEndpoint);
+    mPreconnectClients.ReleaseAll();
     // Release BLE connection resources
     ReleaseEndpoint();
-    mFlags.Clear(Flags::kWBSManagerInitialized).Clear(Flags::kWBSAdapterAvailable).Clear(Flags::kWBSBLELayerInitialized);
+    mFlags.Clear(Flags::kWBSManagerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    VerifyOrReturnError(!val, CHIP_ERROR_NOT_IMPLEMENTED, ChipLogError(DeviceLayer, "BLE advertising is not supported on webOS"));
-    mFlags.Clear(Flags::kAdvertisingEnabled);
-    return CHIP_NO_ERROR;
+    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
+    {
+        mFlags.Set(Flags::kAdvertisingEnabled, val);
+    }
+
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    ChipLogError(DeviceLayer, "BLE advertising is not supported on webOS");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    switch (mode)
+    {
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -135,43 +178,33 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (deviceName != nullptr && deviceName[0] != 0)
     {
-        VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(strlen(deviceName) < kMaxDeviceNameLength, CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         mFlags.Set(Flags::kUseCustomDeviceName);
     }
     else
     {
         uint16_t discriminator;
-        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+        ReturnErrorOnFailure(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
         mFlags.Clear(Flags::kUseCustomDeviceName);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
+    // webOS: size of the wbs connection table.
     return (mpEndpoint != nullptr && mpEndpoint->mConnectionMap != nullptr)
         ? static_cast<uint16_t>(g_hash_table_size(mpEndpoint->mConnectionMap))
         : 0;
-}
-
-void BLEManagerImpl::ReleaseEndpoint()
-{
-    VerifyOrReturn(mpEndpoint != nullptr);
-    // The connection table is used on the Matter GLib context (Helper), so release it there.
-    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](WbsEndpoint * endpoint) { return ShutdownWbsLayer(endpoint); }, mpEndpoint);
-    mpEndpoint = nullptr;
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
@@ -185,8 +218,28 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
+    case DeviceEventType::kCHIPoBLESubscribe:
+        HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        NotifyCHIPoBLEConnectionEstablished();
+        break;
+    case DeviceEventType::kCHIPoBLEUnsubscribe:
+        HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        NotifyCHIPoBLEConnectionClosed();
+        break;
+    case DeviceEventType::kCHIPoBLEWriteReceived:
+        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_1_UUID,
+                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
+        break;
+    case DeviceEventType::kCHIPoBLEIndicateConfirm:
+        HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID);
+        break;
     case DeviceEventType::kCHIPoBLEConnectionError:
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
+        break;
+    case DeviceEventType::kServiceProvisioningChange:
+        // Force the advertising configuration to be refreshed to reflect new provisioning state.
+        mFlags.Clear(Flags::kAdvertisingConfigured);
+        DriveBLEState();
         break;
     default:
         HandlePlatformSpecificBLEEvent(event);
@@ -216,10 +269,14 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         {
             // Shutdown all BLE operations and release resources
             mDeviceScanner.Shutdown();
+            // webOS: frees the wbs endpoint (Linux: advertisement/endpoint shutdown and adapter release).
             ReleaseEndpoint();
             // Clear all flags related to WBS BLE operations
             mFlags.Clear(Flags::kWBSAdapterAvailable);
             mFlags.Clear(Flags::kWBSBLELayerInitialized);
+            mFlags.Clear(Flags::kAdvertisingConfigured);
+            mFlags.Clear(Flags::kAppRegistered);
+            ClearAdvertisingFlag();
             CleanScanConfig();
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
@@ -234,9 +291,10 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         else
         {
-            // The connection completed after the attempt timed out or was cancelled: nobody will use it.
+            // webOS: completed after the attempt timed out or was cancelled (wbs connect cannot be cancelled):
+            // nobody will use it, so release the link (otherwise the peer stays connected and cannot be discovered again).
             ChipLogProgress(Ble, "Releasing BLE connection completed after timeout/cancel");
-            TEMPORARY_RETURN_IGNORED CloseConnection(apEvent->Platform.BLECentralConnected.mConnection);
+            LogErrorOnFailure(CloseConnection(apEvent->Platform.BLECentralConnected.mConnection));
         }
         break;
     case DeviceEventType::kPlatformWebOSBLECentralConnectFailed:
@@ -261,10 +319,42 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &Ble::CHIP_BLE_CHAR_2_UUID,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
         break;
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete:
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStartComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        // Do not restart the timer if it is still active. This is to avoid the timer from being restarted
+        // if the advertising is stopped due to a premature release.
+        if (!DeviceLayer::SystemLayer().IsTimerActive(HandleAdvertisingTimer, this))
+        {
+            // Start a timer to make sure that the fast advertising is stopped after specified timeout.
+            SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
+        }
+        mFlags.Set(Flags::kAdvertising);
+        NotifyCHIPoBLEAdvertisingChange(kActivity_Started);
+        break;
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete:
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+        // Transition to the not Advertising state...
+        ClearAdvertisingFlag();
+        break;
+    case DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased:
+        // If the advertising was stopped due to a premature release, check if it needs to be restarted.
+        ClearAdvertisingFlag();
+        DriveBLEState();
+        break;
+    case DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete:
+        SuccessOrExit(err = apEvent->Platform.BLEPeripheralRegisterAppComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress);
+        mFlags.Set(Flags::kAppRegistered);
+        DriveBLEState();
+        break;
     default:
         break;
     }
 
+exit:
     if (err != CHIP_NO_ERROR)
     {
         DisableBLEService(err);
@@ -277,6 +367,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     uint16_t mtu = 0;
     VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    // webOS: the wbs layer does not report the ATT MTU (always 0): the peripheral picks the BTP fragment size.
     mtu = conId->mMtu;
 exit:
     return mtu;
@@ -293,6 +384,7 @@ CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, 
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_2_UUID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
+    // webOS: blocks the Matter thread (synchronous LS2 calls on the Matter GLib context).
     err = WbsSubscribeCharacteristic(conId);
 
 exit:
@@ -324,6 +416,8 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
     err = CloseWbsConnection(conId);
+    // webOS: also drop the client opened by the pre-connect, so that the link is actually released.
+    mPreconnectClients.ReleaseAll();
 
 exit:
     return err;
@@ -332,7 +426,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                           chip::System::PacketBufferHandle pBuf)
 {
-    // Peripheral (GATT server) role is not supported by the wbs layer.
+    // webOS: the wbs layer implements the central (GATT client) role only.
     ChipLogError(Ble, "SendIndication: Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
@@ -348,6 +442,11 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const B
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &Ble::CHIP_BLE_CHAR_1_UUID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+
+    // webOS: debug dump of every outgoing BTP fragment.
+    chip::Encoding::LogBufferAsHex(__func__, chip::ByteSpan(pBuf->Start(), pBuf->DataLength()));
+
+    // webOS: blocks the Matter thread until the LS2 write completes (synchronous call on the Matter GLib context).
     err = WbsSendWriteRequest(conId, std::move(pBuf));
 
 exit:
@@ -393,7 +492,9 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
     VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
 
-    // ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
+    ChipLogDetail(DeviceLayer, "Indication received: conn=%p", conId);
+    // webOS: debug dump of every incoming BTP fragment.
+    chip::Encoding::LogBufferAsHex(__func__, chip::ByteSpan(value, len));
 
     ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEIndicationReceived,
                            .Platform = {
@@ -401,11 +502,49 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     PlatformMgr().PostEventOrDie(&event);
 }
 
+void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
+{
+    // Copy the data to a packet buffer.
+    System::PacketBufferHandle buf(System::PacketBufferHandle::NewWithData(value, len));
+    VerifyOrReturn(!buf.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer in %s", __func__));
+
+    ChipLogProgress(Ble, "Write request received: conn=%p", conId);
+
+    // Post an event to the Chip queue to deliver the data into the Chip stack.
+    ChipDeviceEvent event{ .Type                  = DeviceEventType::kCHIPoBLEWriteReceived,
+                           .CHIPoBLEWriteReceived = { .ConId = conId, .Data = std::move(buf).UnsafeRelease() } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 void BLEManagerImpl::CHIPoWbs_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
+    ChipLogProgress(DeviceLayer, "Wbs notify CHIPoWbs connection disconnected");
+
     // If this was a CHIPoBLE connection, post an event to deliver a connection error to the CHIPoBLE layer.
     ChipDeviceEvent event{ .Type                    = DeviceEventType::kCHIPoBLEConnectionError,
                            .CHIPoBLEConnectionError = { .ConId = conId, .Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
+{
+    VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
+                   ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", conId->mIsNotify ? "subscribe" : "unsubscribe");
+
+    // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
+    // whether the client is enabling or disabling indications.
+    ChipDeviceEvent event{ .Type = conId->mIsNotify ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                    : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
+                           .CHIPoBLESubscribe = { .ConId = conId } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
+{
+    // Post an event to the Chip queue to process the indicate confirmation.
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEIndicateConfirm, .CHIPoBLEIndicateConfirm = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -444,6 +583,9 @@ void BLEManagerImpl::DriveBLEState()
         }
     }
 
+    // webOS: advertising (peripheral role) is not supported by the wbs layer: no GATT application registration
+    // and no advertising start/stop (Linux: BluezEndpoint::RegisterGattApplication() / BluezAdvertisement).
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -462,7 +604,9 @@ void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
     if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectStartTimer, this); // webOS
     }
 }
 
@@ -473,7 +617,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     if (mState == kState_NotInitialized)
     {
         // Close BLE GATT connections to disconnect WBS
-        TEMPORARY_RETURN_IGNORED CloseConnection(conId);
+        CloseConnection(conId);
         // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
         DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
     }
@@ -490,6 +634,28 @@ void BLEManagerImpl::CheckNonConcurrentBleClosing()
 #endif
 }
 
+void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appState)
+{
+    auto * self = static_cast<BLEManagerImpl *>(appState);
+
+    if (self->mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        TEMPORARY_RETURN_IGNORED self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+        self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        self->mFlags.Set(Flags::kExtAdvertisingEnabled);
+        // This will trigger advertising intervals update in the DriveBLEState() function.
+        TEMPORARY_RETURN_IGNORED self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+#endif
+    }
+}
+
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
     CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
@@ -500,12 +666,10 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
                  ChipLogError(Ble, "Invalid scan type requested: %d", to_underlying(scanType)));
     VerifyOrExit(!mDeviceScanner.IsScanning(), ChipLogError(Ble, "BLE scan already in progress"));
     VerifyOrExit(mFlags.Has(Flags::kWBSAdapterAvailable), err = BLE_ERROR_ADAPTER_UNAVAILABLE);
-    VerifyOrExit(mpEndpoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Ble, "mBleScanState (%d -> %d)", to_underlying(mBLEScanConfig.mBleScanState), to_underlying(scanType));
     mBLEScanConfig.mBleScanState = scanType;
 
-    err = mDeviceScanner.Init(this);
+    err = mDeviceScanner.Init(this); // webOS: no adapter object
     VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         ChipLogError(Ble, "Failed to create BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format());
@@ -541,9 +705,30 @@ void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
 void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+    {
         DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectStartTimer, this); // webOS
+    }
 
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+}
+
+void BLEManagerImpl::ClearAdvertisingFlag()
+{
+    VerifyOrReturn(mFlags.Has(Flags::kAdvertising));
+    mFlags.Clear(Flags::kAdvertising);
+    NotifyCHIPoBLEAdvertisingChange(kActivity_Stopped);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+}
+
+// webOS
+void BLEManagerImpl::ReleaseEndpoint()
+{
+    VerifyOrReturn(mpEndpoint != nullptr);
+    ShutdownWbsLayer(mpEndpoint);
+    // ShutdownWbsLayer() frees the endpoint; drop the pointer so that it is not released twice
+    // (e.g. adapter removal followed by shutdown) and is re-created by DriveBLEState().
+    mpEndpoint = nullptr;
 }
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
@@ -560,13 +745,16 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
     {
+        // webOS: a connection that has not been started yet can still be dropped.
+        // CancelConnect() is a no-op in the wbs layer: a started connection runs to completion.
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectStartTimer, this);
         CancelConnect(mpEndpoint);
     }
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-        TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
+        return mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
 }
@@ -587,50 +775,91 @@ void BLEManagerImpl::NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char
     PlatformMgr().PostEventOrDie(&event);
 }
 
+void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error)
+{
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralRegisterAppComplete,
+                           .Platform = { .BLEPeripheralRegisterAppComplete = { .mError = error } } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error)
+{
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStartComplete,
+                           .Platform = { .BLEPeripheralAdvStartComplete = { .mError = error } } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error)
+{
+    ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformWebOSBLEPeripheralAdvStopComplete,
+                           .Platform = { .BLEPeripheralAdvStopComplete = { .mError = error } } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kPlatformWebOSBLEPeripheralAdvReleased };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionEstablished()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionEstablished };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEConnectionClosed()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEConnectionClosed };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoBLEAdvertisingChange, .CHIPoBLEAdvertisingChange = { .Result = change } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    // Called on the LsRequester (lsTask) thread. Hand the result over to the Matter thread: connecting here would
-    // block the thread that delivers LS2 replies, and the scan state must not be touched without the stack lock.
-    {
-        std::lock_guard<std::mutex> lock(mScanResultMutex);
-        // The previous result is still being processed; the device keeps advertising, so it will be reported again.
-        VerifyOrReturn(!mScanResultPending);
-        mScanResultAddress       = device["address"].asString();
-        mScanResultDiscriminator = info.GetDeviceDiscriminator();
-        mScanResultPending       = true;
-    }
+    // webOS: called on the LsRequester (lsTask) thread, which also dispatches the replies of the synchronous LS2 calls:
+    // it must not block, and the scan state / system layer may only be used on the Matter thread.
+    // PlatformMgr().ScheduleWork() is thread-safe (posts an event), unlike SystemLayer().ScheduleLambda().
+    // Plain new/delete: this runs on threads that may outlive chip::Platform memory (MemoryShutdown()).
+    VerifyOrReturn(!mShuttingDown.load());
+    auto * scanned = new (std::nothrow) ScannedDevice{ device["address"].asString(), info.GetDeviceDiscriminator() };
+    VerifyOrReturn(scanned != nullptr, ChipLogError(Ble, "Failed to allocate scan result"));
 
-    CHIP_ERROR err = PlatformMgr().ScheduleWork([](intptr_t arg) { reinterpret_cast<BLEManagerImpl *>(arg)->ProcessScanResult(); },
-                                                reinterpret_cast<intptr_t>(this));
+    CHIP_ERROR err = PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            auto * result = reinterpret_cast<ScannedDevice *>(arg);
+            if (!sInstance.mShuttingDown.load())
+            {
+                sInstance.HandleScannedDevice(result->mAddress, result->mDiscriminator);
+            }
+            delete result;
+        },
+        reinterpret_cast<intptr_t>(scanned));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule scan result processing: %" CHIP_ERROR_FORMAT, err.Format());
-        std::lock_guard<std::mutex> lock(mScanResultMutex);
-        mScanResultPending = false;
+        delete scanned;
     }
 }
 
-void BLEManagerImpl::ProcessScanResult()
+// webOS: Matter-thread part of Linux OnDeviceScanned() (no LockChipStack(); connect runs on the Matter GLib context).
+void BLEManagerImpl::HandleScannedDevice(const std::string & address, uint16_t discriminator)
 {
-    std::string address;
-    uint16_t discriminator;
-    {
-        std::lock_guard<std::mutex> lock(mScanResultMutex);
-        address            = std::move(mScanResultAddress);
-        discriminator      = mScanResultDiscriminator;
-        mScanResultPending = false;
-    }
-
     ChipLogProgress(Ble, "New device scanned: %s discriminator : %u", address.c_str(), discriminator);
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
         auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(discriminator);
-        VerifyOrReturn(isMatch,
-                       ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
-                                    mBLEScanConfig.mDiscriminator.IsShortDiscriminator()
-                                        ? mBLEScanConfig.mDiscriminator.GetShortValue()
-                                        : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
+                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
@@ -643,28 +872,50 @@ void BLEManagerImpl::ProcessScanResult()
     }
     else
     {
-        // Late result of a scan that has already been stopped.
+        // Late result of a scan that has already been stopped (or a connection is in progress).
         ChipLogDetail(Ble, "No active discovery. Ignoring scanned device.");
         return;
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+    mBLEScanConfig.mAddress      = address;
 
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
     TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
 
+    ChipLogProgress(Ble, "Connecting to %s in %u ms", address.c_str(), static_cast<unsigned>(WEBOS_BLE_CONNECT_START_DELAY_MS));
+#if WEBOS_BLE_CONNECT_START_DELAY_MS == 0
     StartConnect(address);
+#else
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(kConnectStartDelay, HandleConnectStartTimer, this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed to delay BLE connect: %" CHIP_ERROR_FORMAT, err.Format());
+        StartConnect(address);
+    }
+#endif
 }
 
+// webOS
+void BLEManagerImpl::HandleConnectStartTimer(chip::System::Layer *, void * appState)
+{
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
+    // The attempt may have been cancelled or timed out in the meantime.
+    VerifyOrReturn(manager->mBLEScanConfig.mBleScanState == BleScanState::kConnecting,
+                   ChipLogDetail(Ble, "BLE connect no longer requested"));
+    manager->StartConnect(manager->mBLEScanConfig.mAddress);
+}
+
+// webOS
 void BLEManagerImpl::StartConnect(const std::string & address)
 {
-    // ConnectDevice() is blocking (synchronous LS2 calls with retries), so run it on the Matter GLib
-    // context instead of the Matter thread. The result is reported via HandleNewConnection() or
-    // HandleConnectFailed(). The source has the same priority as GLibMatterContextInvokeSync(), so a
-    // later ReleaseEndpoint() is executed after this connection attempt.
-    auto * request = Platform::New<ConnectRequest>(address, mpEndpoint);
+    // wbs ConnectDevice() blocks (synchronous LS2 calls with retries), so it runs on the Matter GLib context rather
+    // than on the Matter thread, which keeps the connect timer running. The result is reported asynchronously via
+    // HandleNewConnection() / HandleConnectFailed().
+    // Plain new/delete: released on the GLib context, which may outlive chip::Platform memory (MemoryShutdown()).
+    auto * request = new (std::nothrow) ConnectRequest{ address, mpEndpoint };
     VerifyOrReturn(request != nullptr, HandleConnectFailed(CHIP_ERROR_NO_MEMORY));
 
     GSource * source = g_idle_source_new();
@@ -672,24 +923,38 @@ void BLEManagerImpl::StartConnect(const std::string & address)
     g_source_set_callback(
         source,
         [](gpointer userData) -> gboolean {
-            auto * req     = static_cast<ConnectRequest *>(userData);
+            auto * req = static_cast<ConnectRequest *>(userData);
+            // The BLE manager (and the endpoint) may have been shut down since the request was queued.
+            VerifyOrReturnValue(!sInstance.mShuttingDown.load(), G_SOURCE_REMOVE);
+#if WEBOS_BLE_PRECONNECT_TIMEOUT_SEC > 0
+            std::string clientId = WbsGattConnect(req->mAddress, WEBOS_BLE_PRECONNECT_TIMEOUT_SEC);
+            if (!clientId.empty())
+            {
+                ChipLogProgress(Ble, "Pre-connected to %s (WBS client %s)", req->mAddress.c_str(), clientId.c_str());
+                sInstance.mPreconnectClients.Add(clientId);
+            }
+#endif
             CHIP_ERROR err = ConnectDevice(req->mAddress, req->mEndpoint);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format());
+                if (!sInstance.mShuttingDown.load())
+                {
+                    WbsGattLogStatus(req->mAddress);
+                }
+                sInstance.mPreconnectClients.ReleaseAll();
             }
             return G_SOURCE_REMOVE;
         },
-        request, [](gpointer userData) { Platform::Delete(static_cast<ConnectRequest *>(userData)); });
+        request, [](gpointer userData) { delete static_cast<ConnectRequest *>(userData); });
     PlatformMgrImpl().GLibMatterContextAttachSource(source);
     g_source_unref(source);
 }
 
 void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)
 {
-    ChipLogProgress(Ble, "BLE connect timeout");
     auto * manager = static_cast<BLEManagerImpl *>(appState);
-    CancelConnect(manager->mpEndpoint);
+    CancelConnect(manager->mpEndpoint); // webOS: no-op in the wbs layer
     BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,8 +66,7 @@ namespace Platform {
 PmLogContext getPmLogContext()
 {
     static PmLogContext logContext = 0;
-    if (0 == logContext)
-    {
+    if (0 == logContext) {
         PmLogGetContext(CHIP_CORE_LOG_CONTEXT, &logContext);
     }
     return logContext;
@@ -145,6 +144,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         break;
     }
 #endif // !CHIP_USE_PW_LOGGING
+
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();

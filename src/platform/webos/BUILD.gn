@@ -40,6 +40,14 @@ if (chip_mdns == "platform") {
   }
 }
 
+# The wbs layer (wbs/) is kept as provided; wbs/WbsCompat.h supplies what it needs from this SDK version.
+config("wbs_compat") {
+  cflags_cc = [
+    "-include",
+    rebase_path("wbs/WbsCompat.h", root_build_dir),
+  ]
+}
+
 config("enable_exceptions") {
   cflags_cc = [
     "-fexceptions",
@@ -108,10 +116,16 @@ static_library("webos") {
       "wbs/ChipDeviceScanner.h",
       "wbs/Helper.cpp",
       "wbs/Helper.h",
+      "wbs/WbsCompat.h",
+      "wbs/WbsGattClient.cpp",
+      "wbs/WbsGattClient.h",
       "wbs/lsrequester.cpp",
       "wbs/lsrequester.h",
     ]
-    configs += [ ":enable_exceptions" ]
+    configs += [
+      ":enable_exceptions",
+      ":wbs_compat",
+    ]
   }
 
   if (chip_with_trusty_os) {
