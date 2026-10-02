@@ -960,11 +960,13 @@ void ConnectivityManagerImpl::OnWiFiConnectTimeout(System::Layer *, void * aAppS
     // Nothing to do if the result already arrived.
     VerifyOrReturn(self->IsWiFiStationConnecting());
 
-    // wpa_supplicant can report 'completed' without 'associating' before it, and then no success
-    // result is queued. Report it here; a queued one finds the callback already used.
+    // wpa_supplicant can report 'completed' without 'associating' before it, and then neither the
+    // success result nor PostNetworkConnect() is queued. Do both here; a queued result finds the
+    // callback already used.
     if (self->IsWiFiStationConnected())
     {
         self->OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+        self->PostNetworkConnect();
         return;
     }
 
@@ -1670,8 +1672,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
     // The response carries only the first kMaxNetworksInScanResponse results, and the spec asks for
     // decreasing RSSI order so that the most reachable networks are the ones kept.
-    std::stable_sort(networkScanned->begin(), networkScanned->end(),
-                     [](const WiFiScanResponse & a, const WiFiScanResponse & b) { return a.signal.strength > b.signal.strength; });
+    std::sort(networkScanned->begin(), networkScanned->end(),
+              [](const WiFiScanResponse & a, const WiFiScanResponse & b) { return a.signal.strength > b.signal.strength; });
 
     CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, scanned = networkScanned.get()]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
