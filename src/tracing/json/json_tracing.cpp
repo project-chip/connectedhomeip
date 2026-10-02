@@ -518,6 +518,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
         while (splitter.Next(line))
         {
             constexpr size_t kMaxLogLineLength = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1;
+            static_assert(kMaxLogLineLength > 16, "Log message max size is too small");
             chip::ChunkSplitter<kMaxLogLineLength> chunkSplitter(line); // we try to log smaller chunks, to not allocate huge arrays
             chip::CharSpan chunk;
             while (chunkSplitter.Next(chunk))
