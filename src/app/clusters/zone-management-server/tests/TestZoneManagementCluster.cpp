@@ -408,6 +408,120 @@ TEST_F(TestZoneManagementCluster, StartupFailsForInvalidConfiguration)
 
     auto invalidUserDefined = CreateCluster(BitFlags<Feature>(Feature::kUserDefined), 4, kMaxZones, kSensitivityMax, kTwoDMaxPoint);
     ASSERT_EQ(invalidUserDefined.Startup(context.Get()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto remoteZonesWithoutUserDefined =
+        CreateCluster(BitFlags<Feature>(Feature::kRemoteZones), kMaxUserDefinedZones, kMaxZones, kSensitivityMax, kTwoDMaxPoint);
+    ASSERT_EQ(remoteZonesWithoutUserDefined.Startup(context.Get()), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestZoneManagementCluster, RemoteZonesRejectedWhenFeatureDisabled)
+{
+    auto cluster = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto vertices = MakeTriangle(0);
+    auto createWithNode = MakeCreateZoneRequest("Zone One", vertices);
+    createWithNode.nodeID.SetValue(DataModel::MakeNullable<NodeId>(0x1234));
+    auto createResult = tester.Invoke(createWithNode);
+    ASSERT_EQ(createResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
+
+    auto createLocal = MakeCreateZoneRequest("Zone One", vertices);
+    auto okCreate    = tester.Invoke(createLocal);
+    ASSERT_TRUE(okCreate.IsSuccess());
+
+    const auto updateVertices = MakeTriangle(50);
+    Commands::UpdateTwoDCartesianZone::Type updateWithNode;
+    updateWithNode.zoneID        = 1;
+    updateWithNode.zone.name     = "Zone Two"_span;
+    updateWithNode.zone.use      = ZoneUseEnum::kMotion;
+    updateWithNode.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
+    updateWithNode.nodeID.SetValue(DataModel::MakeNullable<NodeId>(0x1234));
+    auto updateResult = tester.Invoke(updateWithNode);
+    ASSERT_EQ(updateResult.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
+}
+
+TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventFields)
+{
+    auto cluster =
+        CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone, Feature::kRemoteZones));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    const auto vertices = MakeTriangle(0);
+
+    // Invalid NodeID (kUndefinedNodeId) -> ConstraintError
+    auto invalidNodeReq = MakeCreateZoneRequest("Invalid Node", vertices);
+    invalidNodeReq.nodeID.SetValue(DataModel::MakeNullable<NodeId>(kUndefinedNodeId));
+    ASSERT_EQ(tester.Invoke(invalidNodeReq).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+
+    // Non-null EndpointID with null NodeID -> ConstraintError
+    auto endpointWithoutNodeReq = MakeCreateZoneRequest("No Node", vertices);
+    endpointWithoutNodeReq.nodeID.SetValue(DataModel::NullNullable);
+    endpointWithoutNodeReq.endpointID.SetValue(DataModel::MakeNullable<EndpointId>(2));
+    ASSERT_EQ(tester.Invoke(endpointWithoutNodeReq).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+
+    // Invalid EndpointID (kInvalidEndpointId) -> ConstraintError
+    auto invalidEndpointReq = MakeCreateZoneRequest("Bad Endpoint", vertices);
+    invalidEndpointReq.nodeID.SetValue(DataModel::MakeNullable<NodeId>(0x1234));
+    invalidEndpointReq.endpointID.SetValue(DataModel::MakeNullable<EndpointId>(kInvalidEndpointId));
+    ASSERT_EQ(tester.Invoke(invalidEndpointReq).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+
+    // Valid remote zone creation with NodeID and EndpointID
+    auto createRemoteReq = MakeCreateZoneRequest("Remote Zone", vertices);
+    createRemoteReq.nodeID.SetValue(DataModel::MakeNullable<NodeId>(0x1234));
+    createRemoteReq.endpointID.SetValue(DataModel::MakeNullable<EndpointId>(2));
+    auto createResult = tester.Invoke(createRemoteReq);
+    ASSERT_TRUE(createResult.IsSuccess());
+    ASSERT_EQ(cluster.GetZones().size(), 1u);
+    ASSERT_TRUE(cluster.GetZones().front().nodeID.HasValue());
+    ASSERT_EQ(cluster.GetZones().front().nodeID.Value(), static_cast<NodeId>(0x1234));
+    ASSERT_TRUE(cluster.GetZones().front().endpointID.HasValue());
+    ASSERT_EQ(cluster.GetZones().front().endpointID.Value(), static_cast<EndpointId>(2));
+
+    // Event generation for remote zone populates nodeID and endpointID
+    ASSERT_EQ(cluster.GenerateZoneTriggeredEvent(1, ZoneEventTriggeredReasonEnum::kMotion),
+              Protocols::InteractionModel::Status::Success);
+    auto triggeredEvent = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(triggeredEvent.has_value());
+    Events::ZoneTriggered::DecodableType triggeredData;
+    ASSERT_EQ(triggeredEvent->GetEventData(triggeredData), CHIP_NO_ERROR);
+    ASSERT_EQ(triggeredData.zone, 1);
+    ASSERT_TRUE(triggeredData.nodeID.HasValue());
+    ASSERT_EQ(triggeredData.nodeID.Value(), static_cast<NodeId>(0x1234));
+    ASSERT_TRUE(triggeredData.endpointID.HasValue());
+    ASSERT_EQ(triggeredData.endpointID.Value(), static_cast<EndpointId>(2));
+
+    ASSERT_EQ(cluster.GenerateZoneStoppedEvent(1, ZoneEventStoppedReasonEnum::kActionStopped),
+              Protocols::InteractionModel::Status::Success);
+    auto stoppedEvent = tester.GetNextGeneratedEvent();
+    ASSERT_TRUE(stoppedEvent.has_value());
+    Events::ZoneStopped::DecodableType stoppedData;
+    ASSERT_EQ(stoppedEvent->GetEventData(stoppedData), CHIP_NO_ERROR);
+    ASSERT_EQ(stoppedData.zone, 1);
+    ASSERT_TRUE(stoppedData.nodeID.HasValue());
+    ASSERT_EQ(stoppedData.nodeID.Value(), static_cast<NodeId>(0x1234));
+    ASSERT_TRUE(stoppedData.endpointID.HasValue());
+    ASSERT_EQ(stoppedData.endpointID.Value(), static_cast<EndpointId>(2));
+
+    // Update remote zone to a new NodeID and null EndpointID
+    const auto updateVertices = MakeTriangle(50);
+    Commands::UpdateTwoDCartesianZone::Type updateRemoteReq;
+    updateRemoteReq.zoneID        = 1;
+    updateRemoteReq.zone.name     = "Updated Remote"_span;
+    updateRemoteReq.zone.use      = ZoneUseEnum::kMotion;
+    updateRemoteReq.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
+    updateRemoteReq.nodeID.SetValue(DataModel::MakeNullable<NodeId>(0x5678));
+    updateRemoteReq.endpointID.SetValue(DataModel::NullNullable);
+    ASSERT_TRUE(tester.Invoke(updateRemoteReq).IsSuccess());
+    ASSERT_TRUE(cluster.GetZones().front().nodeID.HasValue());
+    ASSERT_EQ(cluster.GetZones().front().nodeID.Value(), static_cast<NodeId>(0x5678));
+    ASSERT_FALSE(cluster.GetZones().front().endpointID.HasValue());
 }
 
 TEST_F(TestZoneManagementCluster, EventGenerationProducesTriggeredAndStoppedEvents)

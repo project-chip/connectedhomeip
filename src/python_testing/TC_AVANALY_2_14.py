@@ -130,21 +130,66 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
             self.skip_step(8)
             return
 
-        remote_node_id = self.user_params.get("remote_node_id", self.dut_node_id)
+        remote_node_id = self.user_params.get(
+            "camera_node_id", self.user_params.get("remote_node_id", self.dut_node_id)
+        )
+        remote_node_id = (
+            int(remote_node_id, 0)
+            if isinstance(remote_node_id, str)
+            else int(remote_node_id)
+        )
 
         self.step(2)
-        remote_zone_id = 1
         zones = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=zone_cluster,
             attribute=zone_cluster.Attributes.Zones,
         )
-        if zones:
-            remote_zone_id = zones[0].zoneID
-        else:
-            zone_ids = await self.get_zoneids_from_zone_management(endpoint, min_count=1)
-            if zone_ids:
-                remote_zone_id = zone_ids[0]
+        idx = (len(zones) if zones else 0) + 1
+        offset = idx * 15
+        zone_vertices = [
+            zone_cluster.Structs.TwoDCartesianVertexStruct(offset, offset),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(offset + 10, offset),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(offset + 10, offset + 10),
+            zone_cluster.Structs.TwoDCartesianVertexStruct(offset, offset + 10),
+        ]
+        zone_to_create = zone_cluster.Structs.TwoDCartesianZoneStruct(
+            name=f"RemoteZone{idx}",
+            use=zone_cluster.Enums.ZoneUseEnum.kMotion,
+            vertices=zone_vertices,
+            color="#00FFFF",
+        )
+        create_remote_zone_cmd = zone_cluster.Commands.CreateTwoDCartesianZone(
+            zone=zone_to_create,
+            nodeID=remote_node_id,
+        )
+        create_resp = await self.send_single_cmd(endpoint=endpoint, cmd=create_remote_zone_cmd)
+        asserts.assert_equal(
+            type(create_resp),
+            zone_cluster.Commands.CreateTwoDCartesianZoneResponse,
+            "Expected CreateTwoDCartesianZoneResponse",
+        )
+        asserts.assert_is_not_none(
+            create_resp.zoneID, "CreateTwoDCartesianZoneResponse must contain zoneID"
+        )
+        remote_zone_id = create_resp.zoneID
+
+        zones_after = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=zone_cluster,
+            attribute=zone_cluster.Attributes.Zones,
+        )
+        matching_zones = [z for z in zones_after if z.zoneID == remote_zone_id]
+        asserts.assert_equal(
+            len(matching_zones),
+            1,
+            f"Created remote zone {remote_zone_id} not found in Zones attribute",
+        )
+        asserts.assert_equal(
+            matching_zones[0].nodeID,
+            remote_node_id,
+            f"Expected remote zone nodeID {remote_node_id}, got {matching_zones[0].nodeID}",
+        )
         log.info(
             "Remote NodeId: %d, Remote Zone ID: %d", remote_node_id, remote_zone_id
         )
@@ -292,6 +337,14 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
         await self.send_disable_context_triggers_cmd(
             endpoint, context_triggers=NullValue
         )
+        if remote_zone_id is not None:
+            try:
+                await self.send_single_cmd(
+                    endpoint=endpoint,
+                    cmd=zone_cluster.Commands.RemoveZone(zoneID=remote_zone_id),
+                )
+            except Exception as e:
+                log.info("Cleanup RemoveZone: %s", e)
 
 
 if __name__ == "__main__":
