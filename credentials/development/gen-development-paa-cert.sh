@@ -70,7 +70,7 @@ for name in "${names[@]}"; do
             echo "Output path is a directory: $output" >&2
             exit 1
         fi
-        if [[ $overwrite == false && (-e "$output" || -L "$output" ) ]]; then
+        if [[ $overwrite == false && (-e "$output" || -L "$output") ]]; then
             echo "Refusing to overwrite: $output (back up existing roots, then use --overwrite)" >&2
             exit 1
         fi
