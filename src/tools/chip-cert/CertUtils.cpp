@@ -1390,6 +1390,11 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
     uint16_t pid = certConfig.IsSubjectPIDMismatch() ? static_cast<uint16_t>(subjectPID + 1) : subjectPID;
     bool isCA    = (attCertType != kAttCertType_DAC);
+    // Declared here (default-constructed, no OpenSSL call yet) so that the goto's below -
+    // via ReportOpenSSLErrorAndExit()/VerifyTrueOrExit() - don't jump over its initialization.
+    // The actual X509_NAME_dup() happens later, via reset(), which is a plain function call
+    // and not a declaration, so it's safe to jump over.
+    std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> subjectName(nullptr, &X509_NAME_free);
 
     VerifyOrReturnError(subjectCN != nullptr, false);
     VerifyOrReturnError(caCert != nullptr, false);
@@ -1422,7 +1427,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     // X509_set_subject_name(), not to cast away const and mutate the embedded one in place.
     // This dup/mutate/install-back pattern requires no const_cast and works identically on
     // OpenSSL 1.1.x/3.x/4.x and BoringSSL.
-    std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> subjectName(X509_NAME_dup(X509_get_subject_name(newCert)), &X509_NAME_free);
+    subjectName.reset(X509_NAME_dup(X509_get_subject_name(newCert)));
     if (!subjectName)
     {
         ReportOpenSSLErrorAndExit("X509_NAME_dup", res = false);
