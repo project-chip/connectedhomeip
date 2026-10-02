@@ -24,14 +24,24 @@ namespace {
 using namespace Clusters;
 
 // Spans over these are handed to the device, so they must outlive it.
-const EndpointComposition::SemanticTag kCabinetTag[] = { { .namespaceID = CommonNamespace::kClosureId,
-                                                           .tag         = to_underlying(Globals::ClosureTag::kCabinet) } };
-const EndpointComposition::SemanticTag kLiftTag[]    = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kLift) } };
-const EndpointComposition::SemanticTag kRotateTag[]  = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) } };
-const EndpointComposition::SemanticTag kSlideTag[]   = { { .namespaceID = CommonNamespace::kClosurePanelId,
-                                                           .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) } };
+const EndpointComposition::SemanticTag kCabinetTag[] = {
+    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
+};
+const EndpointComposition::SemanticTag kCabinetNoLtTag[] = {
+    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
+};
+const EndpointComposition::SemanticTag kCabinetNoPsNoSpTag[] = {
+    { .namespaceID = CommonNamespace::kClosureId, .tag = to_underlying(Globals::ClosureTag::kCabinet) },
+    { .namespaceID = CommonNamespace::kNumberId, .tag = 3 },
+};
+const EndpointComposition::SemanticTag kLiftTag[]   = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kLift) } };
+const EndpointComposition::SemanticTag kRotateTag[] = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kRotate) } };
+const EndpointComposition::SemanticTag kSlideTag[]  = { { .namespaceID = CommonNamespace::kClosurePanelId,
+                                                          .tag         = to_underlying(Globals::ClosurePanelTag::kSliding) } };
 
 constexpr Percent100ths kPanelResolution = 1;
 constexpr Percent100ths kPanelStepValue  = 1;
@@ -127,7 +137,7 @@ SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfigNoLT()
 {
     return {
         .closure = Closure::Config{
-            .tags                       = Span<const EndpointComposition::SemanticTag>(kCabinetTag),
+            .tags                       = Span<const EndpointComposition::SemanticTag>(kCabinetNoLtTag),
             .withPositioning            = true,
             .withInstantaneous          = false, // mutually exclusive with Speed below
             .withSpeed                  = true,
@@ -154,12 +164,12 @@ SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoS
 {
     return {
         .closure = Closure::Config{
-            .tags            = Span<const EndpointComposition::SemanticTag>(kCabinetTag),
+            .tags            = Span<const EndpointComposition::SemanticTag>(kCabinetNoPsNoSpTag),
             .withPositioning = false,
             .motionLatching  = BitFlags<ClosureControl::LatchControlModesBitmap>(
                 ClosureControl::LatchControlModesBitmap::kRemoteLatching,
                 ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
-            .withInstantaneous          = true,
+            .withInstantaneous          = true,  
             .withSpeed                  = false,
             .withVentilation            = false,
             .withPedestrian             = false,
