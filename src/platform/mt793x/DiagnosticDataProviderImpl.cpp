@@ -28,6 +28,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
+#include <lwip/netif.h>
 #include <lwip/tcpip.h>
 
 // #include "AppConfig.h"
@@ -212,11 +213,33 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
     ifp->type = InterfaceTypeEnum::kThread;
 #else
-    /* TODO */
+    if (Inet::InterfaceId(netif_default).GetInterfaceName(ifp->Name, sizeof(ifp->Name)) == CHIP_NO_ERROR)
+    {
+        ifp->name = CharSpan::fromCharString(ifp->Name);
+    }
+    ifp->isOperational = ConnectivityMgr().IsWiFiStationConnected();
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = InterfaceTypeEnum::kWiFi;
 #endif
+<<<<<<< HEAD
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+=======
+    // The caller encodes hardwareAddress after this function returns, so the MAC must live in ifp
+    // rather than in a local buffer. GetPrimaryMACAddress picks the Thread or Wi-Fi MAC for this
+    // build and shrinks the span to the length actually written.
+    static_assert(kMaxHardwareAddrSize >= ConfigurationManager::kPrimaryMACAddressLength, "MacAddress is too small");
+    MutableByteSpan macSpan(ifp->MacAddress, ConfigurationManager::kPrimaryMACAddressLength);
+    CHIP_ERROR macErr = ConfigurationMgr().GetPrimaryMACAddress(macSpan);
+    if (macErr != CHIP_NO_ERROR)
+    {
+        delete ifp;
+        return macErr;
+    }
+    ifp->hardwareAddress = macSpan;
+>>>>>>> f09997c ([MediaTek] Fix memory safety issues in mt793x DNS-SD and GeneralDiagnostics (Auto-merged by platform-bot) (#74389))
 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
