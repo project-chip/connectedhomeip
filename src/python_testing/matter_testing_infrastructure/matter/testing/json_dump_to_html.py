@@ -30,6 +30,8 @@ import json
 import pathlib
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
+from importlib.resources.abc import Traversable
 from typing import Any
 
 GLOBAL_ATTRIBUTE_IDS: dict[int, tuple[str, str]] = {
@@ -107,35 +109,51 @@ def find_repo_root() -> pathlib.Path | None:
     """Locate the connectedhomeip repository root directory."""
     script_path = pathlib.Path(__file__).resolve()
     for parent in script_path.parents:
-        if (parent / "data_model").is_dir():
+        if (parent / "data_model").is_dir() and (parent / "src").is_dir():
             return parent
     cwd = pathlib.Path.cwd()
     for candidate in [cwd, *cwd.parents]:
-        if (candidate / "data_model").is_dir():
+        if (candidate / "data_model").is_dir() and (candidate / "src").is_dir():
             return candidate
     return None
 
 
-def find_data_model_dir(spec_version: int | None) -> pathlib.Path | None:
-    """Locate the appropriate data_model/<version> directory in the repository."""
-    repo_root = find_repo_root()
-    if repo_root is None:
-        return None
-
-    dm_root = repo_root / "data_model"
+def find_data_model_dir(spec_version: int | None) -> Traversable | None:
+    """Locate the appropriate data_model/<version> directory in the repository or installed package."""
+    candidates: list[str] = []
     if isinstance(spec_version, int) and spec_version > 0:
         major = (spec_version >> 24) & 0xFF
         minor = (spec_version >> 16) & 0xFF
         dot = (spec_version >> 8) & 0xFF
-        candidates = [f"{major}.{minor}.{dot}", f"{major}.{minor}"]
+        candidates.extend([f"{major}.{minor}.{dot}", f"{major}.{minor}"])
+    candidates.extend(["1.7", "1.6.1", "1.6", "1.5.1", "1.5", "1.4.2", "1.4", "1.3", "1.2"])
+
+    repo_root = find_repo_root()
+    if repo_root is not None:
+        dm_root = repo_root / "data_model"
         for cand in candidates:
             if (dm_root / cand / "clusters").is_dir():
                 return dm_root / cand
 
-    for fallback in ("1.7", "1.6.1", "1.6", "1.5.1", "1.5", "1.4.2", "1.4", "1.3", "1.2"):
-        if (dm_root / fallback / "clusters").is_dir():
-            return dm_root / fallback
+    pkg_dm_root = pathlib.Path(__file__).resolve().parent / "data_model"
+    if pkg_dm_root.is_dir():
+        for cand in candidates:
+            zip_file = pkg_dm_root / cand / "allfiles.zip"
+            if zip_file.is_file():
+                return zipfile.Path(zip_file)
+
     return None
+
+
+def _iter_xml_files(directory: Traversable) -> list[Traversable]:
+    if not directory.is_dir():
+        return []
+    return sorted((f for f in directory.iterdir() if f.name.endswith(".xml")), key=lambda p: p.name)
+
+
+def _parse_xml_root(xml_file: Traversable) -> ET.Element:
+    with xml_file.open("r", encoding="utf-8") as f:
+        return ET.parse(f).getroot()
 
 
 def _parse_structs_from_element(parent: ET.Element) -> dict[str, dict[int, StructFieldDef]]:
@@ -173,140 +191,139 @@ def _parse_enums_from_element(parent: ET.Element) -> dict[str, dict[int, str]]:
     return enums
 
 
-def load_data_model_metadata(dm_dir: pathlib.Path | None) -> DataModelMetadata:
+def load_data_model_metadata(dm_dir: Traversable | None) -> DataModelMetadata:
     """Load cluster, device type, namespace, struct, and enum definitions from XML files."""
     meta = DataModelMetadata()
     if dm_dir is None or not dm_dir.is_dir():
         return meta
 
-    globals_dir = dm_dir / "globals"
-    if (globals_dir / "Structs.xml").is_file():
+    globals_dir = dm_dir.joinpath("globals")
+    structs_xml = globals_dir.joinpath("Structs.xml")
+    if structs_xml.is_file():
         try:
-            root = ET.parse(globals_dir / "Structs.xml").getroot()
+            root = _parse_xml_root(structs_xml)
             meta.global_structs.update(_parse_structs_from_element(root))
         except ET.ParseError:
             pass
 
-    if (globals_dir / "Enums.xml").is_file():
+    enums_xml = globals_dir.joinpath("Enums.xml")
+    if enums_xml.is_file():
         try:
-            root = ET.parse(globals_dir / "Enums.xml").getroot()
+            root = _parse_xml_root(enums_xml)
             meta.global_enums.update(_parse_enums_from_element(root))
         except ET.ParseError:
             pass
 
-    dt_dir = dm_dir / "device_types"
-    if dt_dir.is_dir():
-        for xml_path in sorted(dt_dir.glob("*.xml")):
-            try:
-                root = ET.parse(xml_path).getroot()
-                dt_id = parse_int(root.attrib.get("id"))
-                dt_name = root.attrib.get("name", "")
-                if dt_id is not None and dt_name:
-                    meta.device_types[dt_id] = dt_name
-            except ET.ParseError:
-                continue
+    dt_dir = dm_dir.joinpath("device_types")
+    for xml_path in _iter_xml_files(dt_dir):
+        try:
+            root = _parse_xml_root(xml_path)
+            dt_id = parse_int(root.attrib.get("id"))
+            dt_name = root.attrib.get("name", "")
+            if dt_id is not None and dt_name:
+                meta.device_types[dt_id] = dt_name
+        except ET.ParseError:
+            continue
 
-    ns_dir = dm_dir / "namespaces"
-    if ns_dir.is_dir():
-        for xml_path in sorted(ns_dir.glob("*.xml")):
-            try:
-                root = ET.parse(xml_path).getroot()
-                ns_id = parse_int(root.attrib.get("id"))
-                ns_name = root.attrib.get("name", "")
-                if ns_id is None or not ns_name:
-                    continue
-                tags: dict[int, str] = {}
-                for tag_el in root.findall("./tags/tag"):
-                    tid = parse_int(tag_el.attrib.get("id"))
-                    tname = tag_el.attrib.get("name", "")
-                    if tid is not None and tname:
-                        tags[tid] = tname
-                meta.namespaces[ns_id] = NamespaceDef(ns_id=ns_id, name=ns_name, tags=tags)
-            except ET.ParseError:
+    ns_dir = dm_dir.joinpath("namespaces")
+    for xml_path in _iter_xml_files(ns_dir):
+        try:
+            root = _parse_xml_root(xml_path)
+            ns_id = parse_int(root.attrib.get("id"))
+            ns_name = root.attrib.get("name", "")
+            if ns_id is None or not ns_name:
                 continue
+            tags: dict[int, str] = {}
+            for tag_el in root.findall("./tags/tag"):
+                tid = parse_int(tag_el.attrib.get("id"))
+                tname = tag_el.attrib.get("name", "")
+                if tid is not None and tname:
+                    tags[tid] = tname
+            meta.namespaces[ns_id] = NamespaceDef(ns_id=ns_id, name=ns_name, tags=tags)
+        except ET.ParseError:
+            continue
 
-    clusters_dir = dm_dir / "clusters"
+    clusters_dir = dm_dir.joinpath("clusters")
     base_templates: dict[str, ClusterDef] = {}
-    if clusters_dir.is_dir():
-        for xml_path in sorted(clusters_dir.glob("*.xml")):
-            try:
-                root = ET.parse(xml_path).getroot()
-            except ET.ParseError:
+    for xml_path in _iter_xml_files(clusters_dir):
+        try:
+            root = _parse_xml_root(xml_path)
+        except ET.ParseError:
+            continue
+
+        raw_cluster_name = root.attrib.get("name", "")
+        clean_base_name = raw_cluster_name[:-8].strip() if raw_cluster_name.endswith(" Cluster") else raw_cluster_name
+        cls_el = root.find("classification")
+        base_cluster_name = ""
+        if cls_el is not None and cls_el.attrib.get("hierarchy") == "derived":
+            base_cluster_name = cls_el.attrib.get("baseCluster", "")
+
+        features: dict[int, FeatureDef] = {}
+        for feat_el in root.findall("./features/feature"):
+            bit = parse_int(feat_el.attrib.get("bit"))
+            code = feat_el.attrib.get("code", "")
+            fname = feat_el.attrib.get("name", "")
+            if bit is not None and code:
+                mask = 1 << bit
+                features[mask] = FeatureDef(bit=bit, code=code, name=fname or code)
+
+        dtypes_el = root.find("dataTypes")
+        structs = _parse_structs_from_element(dtypes_el) if dtypes_el is not None else {}
+        enums = _parse_enums_from_element(dtypes_el) if dtypes_el is not None else {}
+
+        attributes: dict[int, AttributeDef] = {}
+        for attr_el in root.findall("./attributes/attribute"):
+            aid = parse_int(attr_el.attrib.get("id"))
+            aname = attr_el.attrib.get("name", "")
+            atype = attr_el.attrib.get("type", "")
+            entry_el = attr_el.find("entry")
+            etype = entry_el.attrib.get("type", "") if entry_el is not None else ""
+            if aid is not None and aname:
+                attributes[aid] = AttributeDef(attr_id=aid, name=aname, attr_type=atype, entry_type=etype)
+
+        accepted_cmds: dict[int, str] = {}
+        generated_cmds: dict[int, str] = {}
+        for cmd_el in root.findall("./commands/command"):
+            cmd_id = parse_int(cmd_el.attrib.get("id"))
+            cmd_name = cmd_el.attrib.get("name", "")
+            direction = cmd_el.attrib.get("direction", "")
+            if cmd_id is None or not cmd_name:
                 continue
-
-            raw_cluster_name = root.attrib.get("name", "")
-            clean_base_name = raw_cluster_name[:-8].strip() if raw_cluster_name.endswith(" Cluster") else raw_cluster_name
-            cls_el = root.find("classification")
-            base_cluster_name = ""
-            if cls_el is not None and cls_el.attrib.get("hierarchy") == "derived":
-                base_cluster_name = cls_el.attrib.get("baseCluster", "")
-
-            features: dict[int, FeatureDef] = {}
-            for feat_el in root.findall("./features/feature"):
-                bit = parse_int(feat_el.attrib.get("bit"))
-                code = feat_el.attrib.get("code", "")
-                fname = feat_el.attrib.get("name", "")
-                if bit is not None and code:
-                    mask = 1 << bit
-                    features[mask] = FeatureDef(bit=bit, code=code, name=fname or code)
-
-            dtypes_el = root.find("dataTypes")
-            structs = _parse_structs_from_element(dtypes_el) if dtypes_el is not None else {}
-            enums = _parse_enums_from_element(dtypes_el) if dtypes_el is not None else {}
-
-            attributes: dict[int, AttributeDef] = {}
-            for attr_el in root.findall("./attributes/attribute"):
-                aid = parse_int(attr_el.attrib.get("id"))
-                aname = attr_el.attrib.get("name", "")
-                atype = attr_el.attrib.get("type", "")
-                entry_el = attr_el.find("entry")
-                etype = entry_el.attrib.get("type", "") if entry_el is not None else ""
-                if aid is not None and aname:
-                    attributes[aid] = AttributeDef(attr_id=aid, name=aname, attr_type=atype, entry_type=etype)
-
-            accepted_cmds: dict[int, str] = {}
-            generated_cmds: dict[int, str] = {}
-            for cmd_el in root.findall("./commands/command"):
-                cmd_id = parse_int(cmd_el.attrib.get("id"))
-                cmd_name = cmd_el.attrib.get("name", "")
-                direction = cmd_el.attrib.get("direction", "")
-                if cmd_id is None or not cmd_name:
-                    continue
-                if direction == "responseFromServer":
-                    generated_cmds[cmd_id] = cmd_name
-                else:
-                    accepted_cmds[cmd_id] = cmd_name
-
-            template_def = ClusterDef(
-                cluster_id=-1,
-                name=clean_base_name,
-                base_cluster_name=base_cluster_name,
-                features=features,
-                attributes=attributes,
-                accepted_commands=accepted_cmds,
-                generated_commands=generated_cmds,
-                structs=structs,
-                enums=enums,
-            )
-            if clean_base_name:
-                base_templates[clean_base_name] = template_def
-
-            cluster_id_els = root.findall("./clusterIds/clusterId")
-            if cluster_id_els:
-                for cid_el in cluster_id_els:
-                    cid = parse_int(cid_el.attrib.get("id"))
-                    cname = cid_el.attrib.get("name") or clean_base_name
-                    if cid is not None:
-                        cdef = copy.deepcopy(template_def)
-                        cdef.cluster_id = cid
-                        cdef.name = cname
-                        meta.clusters[cid] = cdef
+            if direction == "responseFromServer":
+                generated_cmds[cmd_id] = cmd_name
             else:
-                cid = parse_int(root.attrib.get("id"))
+                accepted_cmds[cmd_id] = cmd_name
+
+        template_def = ClusterDef(
+            cluster_id=-1,
+            name=clean_base_name,
+            base_cluster_name=base_cluster_name,
+            features=features,
+            attributes=attributes,
+            accepted_commands=accepted_cmds,
+            generated_commands=generated_cmds,
+            structs=structs,
+            enums=enums,
+        )
+        if clean_base_name:
+            base_templates[clean_base_name] = template_def
+
+        cluster_id_els = root.findall("./clusterIds/clusterId")
+        if cluster_id_els:
+            for cid_el in cluster_id_els:
+                cid = parse_int(cid_el.attrib.get("id"))
+                cname = cid_el.attrib.get("name") or clean_base_name
                 if cid is not None:
                     cdef = copy.deepcopy(template_def)
                     cdef.cluster_id = cid
+                    cdef.name = cname
                     meta.clusters[cid] = cdef
+        else:
+            cid = parse_int(root.attrib.get("id"))
+            if cid is not None:
+                cdef = copy.deepcopy(template_def)
+                cdef.cluster_id = cid
+                meta.clusters[cid] = cdef
 
     # Resolve derived cluster inheritance from baseCluster templates
     for cdef in meta.clusters.values():
@@ -321,12 +338,12 @@ def load_data_model_metadata(dm_dir: pathlib.Path | None) -> DataModelMetadata:
             if sname not in cdef.structs:
                 cdef.structs[sname] = copy.deepcopy(sfields)
             else:
-                for fid, fdef in sfields.items():
-                    cdef.structs[sname].setdefault(fid, copy.deepcopy(fdef))
+                for fid, field_def in sfields.items():
+                    cdef.structs[sname].setdefault(fid, copy.deepcopy(field_def))
                     if not cdef.structs[sname][fid].field_type:
-                        cdef.structs[sname][fid].field_type = fdef.field_type
+                        cdef.structs[sname][fid].field_type = field_def.field_type
                     if not cdef.structs[sname][fid].entry_type:
-                        cdef.structs[sname][fid].entry_type = fdef.entry_type
+                        cdef.structs[sname][fid].entry_type = field_def.entry_type
         for ename, eitems in base_def.enums.items():
             if ename not in cdef.enums:
                 cdef.enums[ename] = dict(eitems)
@@ -523,15 +540,15 @@ def format_spec_version(spec_ver: int | None) -> str:
     return f"{major}.{minor}.{dot} (0x{spec_ver:08X})"
 
 
-def parse_dump(json_data: dict[str, Any]) -> dict[str, Any]:
+def parse_dump(json_data: dict[Any, Any]) -> dict[str, Any]:
     """Parse MatterTlvJson into enriched endpoint tree, cluster, attribute, and command metadata."""
     spec_version_raw: int | None = None
-    ep0 = json_data.get("0", {})
+    ep0 = json_data.get("0") or json_data.get(0) or {}
     if isinstance(ep0, dict):
         basic_info_raw = ep0.get("40:STRUCT", {})
         if isinstance(basic_info_raw, dict):
             for k, v in basic_info_raw.items():
-                if k.startswith("21:") and isinstance(v, int):
+                if str(k).startswith("21:") and isinstance(v, int):
                     spec_version_raw = v
                     break
 
@@ -573,11 +590,14 @@ def parse_dump(json_data: dict[str, Any]) -> dict[str, Any]:
     endpoints_out: list[dict[str, Any]] = []
     endpoints_by_id: dict[int, dict[str, Any]] = {}
 
-    for ep_str in sorted(json_data.keys(), key=lambda x: parse_int(x) or 0):
-        ep_id = parse_int(ep_str)
+    for ep_key in sorted(
+        json_data.keys(),
+        key=lambda x: x if isinstance(x, int) else (parse_int(str(x)) or 0),
+    ):
+        ep_id = ep_key if isinstance(ep_key, int) else parse_int(str(ep_key))
         if ep_id is None:
             continue
-        ep_clusters_raw = json_data[ep_str]
+        ep_clusters_raw = json_data[ep_key]
         if not isinstance(ep_clusters_raw, dict):
             continue
 
@@ -1840,10 +1860,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
-def generate_html_from_dump(json_path: pathlib.Path, html_path: pathlib.Path) -> None:
-    with open(json_path, encoding="utf-8") as f:
-        raw_dump = json.load(f)
-
+def generate_html_from_dump_dict(raw_dump: dict[Any, Any], html_path: pathlib.Path) -> None:
     enriched = parse_dump(raw_dump)
     safe_json = (
         json.dumps(enriched, separators=(",", ":"))
@@ -1855,6 +1872,12 @@ def generate_html_from_dump(json_path: pathlib.Path, html_path: pathlib.Path) ->
     html_path.parent.mkdir(parents=True, exist_ok=True)
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html_content)
+
+
+def generate_html_from_dump(json_path: pathlib.Path, html_path: pathlib.Path) -> None:
+    with open(json_path, encoding="utf-8") as f:
+        raw_dump = json.load(f)
+    generate_html_from_dump_dict(raw_dump, html_path)
 
 
 def main() -> int:
