@@ -28,13 +28,8 @@ from typing import Any
 import matter.tlv
 from matter.clusters.ClusterObjects import ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterObject
 from matter.clusters.Types import Nullable, NullValue
-from matter.testing.spec_parsing import (
-    PrebuiltDataModelDirectory,
-    build_xml_clusters,
-    build_xml_device_types,
-    build_xml_namespaces,
-    dm_from_spec_version,
-)
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
+                                         build_xml_namespaces, dm_from_spec_version)
 
 GLOBAL_ATTRIBUTE_IDS = {
     0xFFF8: "GeneratedCommandList",
