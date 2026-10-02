@@ -3,6 +3,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <functional>
+#include <lib/support/CodeUtils.h>
 #include <optional>
 #include <protocols/bdx/TransferFacilitator.h>
 #include <system/SystemClock.h>
@@ -137,7 +138,10 @@ public:
     // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void ScheduleImmediatePoll() { Initiator::ScheduleImmediatePoll(); }
 
+    bool CanHandleOutput() const override { return mCanHandleOutput; }
+
     std::optional<TransferSessionOutputHandler> mTransferSessionOutputHandler{ std::nullopt };
+    bool mCanHandleOutput = true;
 };
 
 TEST_F(TestTransferFacilitator, InitiatesTransfer)
@@ -215,4 +219,37 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
 
     // Check if the timer was started
     EXPECT_TRUE(timerStarted);
+}
+
+TEST_F(TestTransferFacilitator, LeavesOutputPendingWhileItCannotBeHandled)
+{
+    TestInitiator initiator;
+    initiator.mCanHandleOutput = false;
+
+    int timersStarted                    = 0;
+    gSystemLayerAndClock.mStartTimerHook = [&timersStarted](auto, auto, void *) { timersStarted++; };
+    auto resetHook                       = ScopeExit([] { gSystemLayerAndClock.mStartTimerHook = std::nullopt; });
+
+    std::optional<TransferSession::OutputEventType> handledEvent;
+    initiator.mTransferSessionOutputHandler = [&handledEvent](TransferSession::OutputEvent & event) {
+        handledEvent = event.EventType;
+    };
+
+    auto initData           = TransferSession::TransferInitData();
+    initData.MaxBlockSize   = 1024;
+    initData.FileDesignator = reinterpret_cast<const uint8_t *>("test_file.txt");
+    initData.FileDesLength  = static_cast<uint16_t>(strlen(reinterpret_cast<const char *>(initData.FileDesignator)));
+    EXPECT_EQ(initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, initData, System::Clock::Seconds16(60),
+                                         System::Clock::Milliseconds32(500)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(timersStarted, 1);
+
+    initiator.PollForOutput();
+    EXPECT_FALSE(handledEvent.has_value());
+    EXPECT_EQ(timersStarted, 2);
+
+    initiator.mCanHandleOutput = true;
+    initiator.PollForOutput();
+    EXPECT_EQ(handledEvent.value_or(TransferSession::OutputEventType::kNone), TransferSession::OutputEventType::kMsgToSend);
+    EXPECT_EQ(timersStarted, 3);
 }

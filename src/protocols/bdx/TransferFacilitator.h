@@ -91,6 +91,25 @@ protected:
     void PollForOutput();
 
     /**
+     * Whether PollForOutput may poll the TransferSession and call HandleTransferSessionOutput right now.
+     *
+     * PollForOutput calls this on every poll tick, so an override must be cheap and must not change the transfer state (other than,
+     * for example, a flag used only for logging).
+     *
+     * While this returns false, PollForOutput leaves all TransferSession output pending, timeouts included, and only
+     * re-arms the poll timer. Nothing is lost: a StatusReport or Block received in the meantime stays queued in the
+     * TransferSession and is handled on the first poll after this returns true.
+     *
+     * An override must only return false for a condition that is bounded and that ends without PollForOutput running,
+     * for example the wait for an MRP ack. That wait ends when the ack arrives, or when MRP exhausts its retransmissions of
+     * the message and drops it, which clears the wait. A condition that can last forever would stall the transfer forever,
+     * because the transfer timeout is not evaluated while this returns false.
+     *
+     * @return true if output can be handled (the default).
+     */
+    virtual bool CanHandleOutput() const { return true; }
+
+    /**
      * Starts the poll timer with a very short timeout.
      */
     void ScheduleImmediatePoll();
