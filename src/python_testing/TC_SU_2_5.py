@@ -346,7 +346,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         
         time_for_kApplying = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-            forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply},
+            forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
             timeout_sec=STEP_RESERVE_SEC,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
