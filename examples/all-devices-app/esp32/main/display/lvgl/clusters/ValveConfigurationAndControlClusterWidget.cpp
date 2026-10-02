@@ -114,7 +114,7 @@ uint8_t SnapToLevelStep(uint8_t level, uint8_t levelStep)
     VerifyOrReturnValue(level < kMaxLevel, kMaxLevel);
 
     const uint8_t snapped = static_cast<uint8_t>(((level + (levelStep / 2)) / levelStep) * levelStep);
-    return std::max(snapped, levelStep);
+    return std::min(kMaxLevel, std::max(snapped, levelStep));
 }
 
 lv_obj_t * CreateButtonRow(lv_obj_t * card)
