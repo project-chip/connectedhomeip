@@ -238,12 +238,6 @@ void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensi
     }
 }
 
-void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
-{
-    VerifyOrReturn(mConfig.optionalAttribs.IsSet(ExpiryDate::Id));
-    SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
-}
-
 bool SmokeCoAlarmCluster::SetUnmountedState(bool isUnmounted)
 {
     VerifyOrReturnValue(mConfig.optionalAttribs.IsSet(Unmounted::Id), false);
@@ -371,7 +365,7 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::ReadAttribute(const DataModel
     case SmokeSensitivityLevel::Id:
         return encoder.Encode(mSmokeSensitivityLevel);
     case ExpiryDate::Id:
-        return encoder.Encode(mExpiryDate);
+        return encoder.Encode(mConfig.expiryDate.value_or(0));
     case Unmounted::Id:
         return encoder.Encode(mUnmounted);
     default:
@@ -409,7 +403,7 @@ CHIP_ERROR SmokeCoAlarmCluster::Attributes(const ConcreteClusterPath & path,
         { mConfig.optionalAttribs.IsSet(InterconnectCOAlarm::Id), InterconnectCOAlarm::kMetadataEntry },
         { mConfig.featureMap.Has(Feature::kSmokeAlarm), ContaminationState::kMetadataEntry },
         { mConfig.featureMap.Has(Feature::kSmokeAlarm), SmokeSensitivityLevel::kMetadataEntry },
-        { mConfig.optionalAttribs.IsSet(ExpiryDate::Id), ExpiryDate::kMetadataEntry },
+        { mConfig.expiryDate.has_value(), ExpiryDate::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(Unmounted::Id), Unmounted::kMetadataEntry },
     };
 

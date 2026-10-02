@@ -145,12 +145,6 @@ void SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId endpoint, Sensitivi
                    ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
     Cluster().SetSmokeSensitivityLevel(v);
 }
-void SmokeCoAlarmServer::SetExpiryDate(EndpointId endpoint, uint32_t v)
-{
-    VerifyOrReturn(endpoint == mEndpointId,
-                   ChipLogError(Zcl, "%s: endpoint %d does not match cluster endpoint %d", __func__, endpoint, mEndpointId));
-    Cluster().SetExpiryDate(v);
-}
 bool SmokeCoAlarmServer::SetUnmountedState(EndpointId endpoint, bool v)
 {
     VerifyOrReturnValue(endpoint == mEndpointId, false,

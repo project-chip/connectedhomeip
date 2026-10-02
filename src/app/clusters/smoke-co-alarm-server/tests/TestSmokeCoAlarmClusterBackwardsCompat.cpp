@@ -45,6 +45,7 @@ SmokeCoAlarmCluster::Config MakeFullConfig()
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    cfg.expiryDate      = 1234567890;
     return cfg;
 }
 
@@ -168,7 +169,6 @@ TEST_F(TestSmokeCoAlarmBackwardsCompatInitialized, SettersViaInstance_RoundTrip)
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetContaminationState(kTestEndpointId, contamination));
     EXPECT_EQ(contamination, ContaminationStateEnum::kCritical);
 
-    SmokeCoAlarmServer::Instance().SetExpiryDate(kTestEndpointId, 1234567890);
     uint32_t expiry{};
     EXPECT_TRUE(SmokeCoAlarmServer::Instance().GetExpiryDate(kTestEndpointId, expiry));
     EXPECT_EQ(expiry, 1234567890u);

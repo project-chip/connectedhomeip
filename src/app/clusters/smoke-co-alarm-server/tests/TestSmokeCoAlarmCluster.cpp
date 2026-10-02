@@ -44,11 +44,14 @@ constexpr std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLeng
     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kInoperative,
 };
 
+constexpr uint32_t kTestExpiryDate = 3976214400;
+
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    cfg.expiryDate      = kTestExpiryDate;
     return cfg;
 }
 
@@ -95,6 +98,25 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
           Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
           Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry,
           Attributes::ContaminationState::kMetadataEntry, Attributes::SmokeSensitivityLevel::kMetadataEntry }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_AllOptionalAttribsWithoutExpiryDate)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(
+        cluster,
+        { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
+          Attributes::BatteryAlert::kMetadataEntry, Attributes::DeviceMuted::kMetadataEntry,
+          Attributes::TestInProgress::kMetadataEntry, Attributes::HardwareFaultAlert::kMetadataEntry,
+          Attributes::EndOfServiceAlert::kMetadataEntry, Attributes::InterconnectSmokeAlarm::kMetadataEntry,
+          Attributes::InterconnectCOAlarm::kMetadataEntry, Attributes::ContaminationState::kMetadataEntry,
+          Attributes::SmokeSensitivityLevel::kMetadataEntry, Attributes::Unmounted::kMetadataEntry }));
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -342,7 +364,7 @@ TEST_F(TestSmokeCoAlarmCluster, RemainingAlarmAttributes_ReadBack)
     cluster.SetContaminationState(ContaminationStateEnum::kCritical);
     EXPECT_EQ(cluster.GetContaminationState(), ContaminationStateEnum::kCritical);
 
-    EXPECT_EQ(cluster.GetExpiryDate(), 0u);
+    EXPECT_EQ(cluster.GetExpiryDate(), kTestExpiryDate);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_SmokeSensitivityLevel_OutOfRangeRejected)

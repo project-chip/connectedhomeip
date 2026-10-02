@@ -762,7 +762,15 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate);
+                // Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
+                // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
+                constexpr uint32_t kExampleExpiryDate = 3976214400;
+                Clusters::SmokeCoAlarmCluster::Config config;
+                config.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm).Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
+                config.optionalAttribs =
+                    Clusters::SmokeCoAlarmCluster::OptionalAttributeSet(Clusters::SmokeCoAlarmCluster::OptionalAttributeSet::All());
+                config.expiryDate = kExampleExpiryDate;
+                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }
 
