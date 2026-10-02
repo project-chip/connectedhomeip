@@ -25,11 +25,9 @@ namespace chip::app {
 class Thermostat : public SingleEndpoint
 {
 public:
-    using ThermostatClusterType =
-        Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::Delegate,
-                                                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
-                                                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
-                                                Clusters::Thermostat::ThermostatAutoSetpoints::Delegate>;
+    using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+        Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
+        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate, Clusters::Thermostat::ThermostatAutoSetpoints::Delegate>;
 
     struct Context
     {
