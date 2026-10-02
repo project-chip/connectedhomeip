@@ -40,6 +40,7 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
+from chiptest.results import RunSummary, TestResult, TestStatus
 from matter.testing.commissioning_types import CommissioningMethod
 from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
@@ -278,13 +279,15 @@ def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tupl
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
+@click.option("--summary-file", type=click.Path(dir_okay=False, path_type=pathlib.Path), default=None,
+              help="Path to a summary JSON file to append test results to.")
 @click.option("--internal-inside-unshare", hidden=True, is_flag=True, default=False,
               help="Internal flag for running inside a private mount namespace.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env: str | None, run: tuple[str, ...], ip_packet_capture: bool,
          ip_packet_capture_dir: pathlib.Path, app_filter: str | None, pre_existing_fabric: bool,
-         internal_inside_unshare: bool) -> None:
+         summary_file: pathlib.Path | None, internal_inside_unshare: bool) -> None:
     """Run the configured Matter Python test."""
     if load_from_env:
         reader = MetadataReader(load_from_env)
@@ -353,7 +356,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                       run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                       ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
-                      app_command_prefix, test_command_prefix)
+                      app_command_prefix, test_command_prefix, summary_file)
 
 
 class AppRestartMonitor:
@@ -426,7 +429,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
               run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
-              app_command_prefix: tuple[str, ...] = (), test_command_prefix: tuple[str, ...] = ()):
+              app_command_prefix: tuple[str, ...] = (), test_command_prefix: tuple[str, ...] = (),
+              summary_file: pathlib.Path | None = None):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -524,6 +528,18 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         commission_exit = commission_proc.wait(120)
         if commission_exit != 0:
             log.error("Commissioning run failed with exit code %d", commission_exit)
+            if summary_file is not None:
+                summary = (RunSummary.from_json(summary_file)
+                           if summary_file.exists()
+                           else RunSummary(iterations=1, tests_per_iteration=1))
+                summary.record(TestResult(
+                    name=os.path.basename(script),
+                    worker_id=0,
+                    iteration=0,
+                    status=TestStatus.FAILED,
+                    duration_seconds=0.0,
+                ))
+                summary.write_json(summary_file)
             sys.exit(commission_exit)
 
     script_command = [
@@ -545,6 +561,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     final_script_command = [*test_command_prefix, *(i.replace('|', ' ') for i in script_command)]
 
+    test_start_time = time.monotonic()
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
                                      output_cb=process_test_script_output,
                                      f_stdout=stream_output,
@@ -558,6 +575,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         except TimeoutError as e:
             log.exception("%r", e)
             test_script_exit_code = -1  # Trigger error codepath
+        finally:
+            test_duration = time.monotonic() - test_start_time
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
@@ -588,6 +607,23 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             else:
                 log.info("Test completed successfully")
+
+        if summary_file is not None:
+            summary = (RunSummary.from_json(summary_file)
+                       if summary_file.exists()
+                       else RunSummary(iterations=1, tests_per_iteration=1))
+            test_name = (os.path.basename(script)
+                         if run_name in ("cmd-run", "run1")
+                         else f"{os.path.basename(script)} ({run_name})")
+            status = TestStatus.PASSED if exit_code == 0 else TestStatus.FAILED
+            summary.record(TestResult(
+                name=test_name,
+                worker_id=0,
+                iteration=0,
+                status=status,
+                duration_seconds=round(test_duration, 3),
+            ))
+            summary.write_json(summary_file)
 
         if exit_code != 0:
             log.error("SUBPROCESS failure: ")
