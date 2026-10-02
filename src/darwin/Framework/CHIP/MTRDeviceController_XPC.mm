@@ -476,41 +476,41 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 // All pass through, we could do some fancy redirection here based on protocol, but that's that for another day
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ stateChanged: %lu   found device: %@", nodeID, (unsigned long) state, device);
     [device device:nodeID stateChanged:state];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
 
     [device device:nodeID receivedAttributeReport:attributeReport];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ receivedEventReport: %@     found device: %@", nodeID, eventReport, device);
 
     [device device:nodeID receivedEventReport:eventReport];
 }
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceBecameActive: %@ found device: %@", nodeID, device);
 
     [device deviceBecameActive:nodeID];
 }
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceCachePrimed: %@ found device: %@", nodeID, device);
 
     [device deviceCachePrimed:nodeID];
 }
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
 
     [device deviceConfigurationChanged:nodeID];
@@ -518,7 +518,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received internalStateUpdated: %@ found device: %@", nodeID, device);
 
     [device device:nodeID internalStateUpdated:dictionary];

@@ -364,17 +364,17 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (MTRDevice * _Nullable)_deviceForNodeID:(NSNumber *)nodeID createIfNeeded:(BOOL)createIfNeeded
 {
-    std::lock_guard lock(*self.deviceMapLock);
-    MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
-    if (!deviceToReturn && createIfNeeded) {
+    MTRDevice * deviceToReturn;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
+        if (deviceToReturn || !createIfNeeded) {
+            return deviceToReturn;
+        }
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
-                [delegate devicesChangedForController:self];
-            }
-        } logString:__PRETTY_FUNCTION__];
     }
 
+    [self _notifyDelegatesOfDevicesChanged];
     return deviceToReturn;
 }
 
@@ -422,11 +422,18 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)deviceDeallocated
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
-            [delegate devicesChangedForController:self];
+    [self _notifyDelegatesOfDevicesChanged];
+}
+
+- (void)_notifyDelegatesOfDevicesChanged
+{
+    [self _iterateDelegateInfoWithBlock:^(MTRDelegateInfo<id<MTRDeviceControllerDelegate>> * delegateInfo) {
+        if ([delegateInfo.delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+            [delegateInfo callDelegateWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+                [delegate devicesChangedForController:self];
+            }];
         }
-    } logString:__PRETTY_FUNCTION__];
+    }];
 }
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
