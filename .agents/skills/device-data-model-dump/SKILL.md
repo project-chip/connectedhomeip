@@ -19,9 +19,9 @@ or example application using two standard approaches:
 
 1. **Full Data Model Dump (`TC_IDM_12_1` in `TC_DeviceBasicComposition.py`)**:
    Performs a wildcard read across all endpoints, clusters, and attributes,
-   producing a machine-readable `MatterTlvJson` (`.json`) file, a
-   human-readable decoded summary (`.txt`), and a self-contained interactive
-   HTML viewer (`.html`).
+   producing a machine-readable `MatterTlvJson` (`.json`) file, a human-readable
+   decoded summary (`.txt`), and a self-contained interactive HTML viewer
+   (`.html`).
 2. **Interactive Runtime Discovery (`chip-tool` via the `Descriptor` Cluster
    `0x001D`)**: Queries active endpoints (`PartsList`), server/client clusters
    (`ServerList`, `ClientList`), device types (`DeviceTypeList`), and cluster
