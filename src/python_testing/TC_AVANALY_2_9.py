@@ -112,6 +112,8 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
         log.info("Using Zone 1 ID: %d, Zone 2 ID: %d", zone_1_id, zone_2_id)
 
         # Enable TrackingEnabled and enable context triggers for all zones
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
         await self.write_single_attribute(
             attributes.TrackingEnabled(True), endpoint_id=endpoint
         )
@@ -132,20 +134,21 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
         self.step(2)
         context_to_detect = supported_contexts[0]
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
-                    "Name": "AvAnalysisPerceivedContext",
-                    "NewContexts": [
-                        {
-                            "NamespaceId": context_to_detect.namespaceID,
-                            "Tag": context_to_detect.tag,
-                            "IdentifiedContextId": 10,
-                            "CurrentZone": zone_1_id,
-                            "PreviousZone": None,
-                        }
-                    ],
-                }
-            )
+            pipe_payload_1 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": 10,
+                        "CurrentZone": zone_1_id,
+                        "PreviousZone": None,
+                    }
+                ],
+            }
+            if self.has_feature_remcondetect:
+                pipe_payload_1["SourceNodeId"] = camera_node_id
+            self.write_to_app_pipe(pipe_payload_1)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity detection in Zone 1 (zoneID={zone_1_id}) on the DUT. Press Enter once initiated."
@@ -177,20 +180,21 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
 
         self.step(4)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
-                    "Name": "AvAnalysisPerceivedContext",
-                    "NewContexts": [
-                        {
-                            "NamespaceId": context_to_detect.namespaceID,
-                            "Tag": context_to_detect.tag,
-                            "IdentifiedContextId": 10,
-                            "CurrentZone": zone_2_id,
-                            "PreviousZone": zone_1_id,
-                        }
-                    ],
-                }
-            )
+            pipe_payload_2 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": 10,
+                        "CurrentZone": zone_2_id,
+                        "PreviousZone": zone_1_id,
+                    }
+                ],
+            }
+            if self.has_feature_remcondetect:
+                pipe_payload_2["SourceNodeId"] = camera_node_id
+            self.write_to_app_pipe(pipe_payload_2)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg=f"Simulate entity moving from Zone 1 (zoneID={zone_1_id}) to Zone 2 (zoneID={zone_2_id}) on the DUT. Press Enter once initiated."
@@ -232,6 +236,7 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
         await self.send_disable_context_triggers_cmd(
             endpoint, context_triggers=NullValue
         )
+        await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

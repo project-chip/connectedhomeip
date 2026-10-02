@@ -99,6 +99,9 @@ class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
         supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
         asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
 
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+
         self.step(2)
         # Enable context trigger for the first supported ambient context
         context_to_enable = supported_contexts[0]
@@ -116,7 +119,7 @@ class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
         self.step(3)
         start_payload = {"Name": "AvAnalysisSessionStart"}
         if self.has_feature_remcondetect:
-            start_payload["SourceNodeId"] = self.dut_node_id
+            start_payload["SourceNodeId"] = camera_node_id
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe(start_payload)
         elif not self.is_ci:
@@ -138,18 +141,18 @@ class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
             if self.has_feature_remcondetect:
                 asserts.assert_is_not_none(start_event_data.sourceNodeId,
                                            "SourceNodeID must be present when REMCONDETECT is supported")
-                asserts.assert_equal(start_event_data.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeID ({start_event_data.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
+                asserts.assert_equal(start_event_data.sourceNodeId, camera_node_id,
+                                     f"SourceNodeID ({start_event_data.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
                 source_node_id = start_event_data.sourceNodeId
         else:
             log.info("CI mode: skipping blocking event wait in Step 4")
             session_id = 0
-            source_node_id = self.dut_node_id if self.has_feature_remcondetect else None
+            source_node_id = camera_node_id if self.has_feature_remcondetect else None
 
         self.step(5)
         end_payload = {"Name": "AvAnalysisSessionEnd", "SessionId": session_id}
         if self.has_feature_remcondetect:
-            end_payload["SourceNodeId"] = self.dut_node_id
+            end_payload["SourceNodeId"] = camera_node_id
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe(end_payload)
         elif not self.is_ci:
@@ -174,6 +177,7 @@ class TC_AVANALY_2_6(MatterTestCommissionedDevice, AVANALYTestBase):
 
         self.step(7)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

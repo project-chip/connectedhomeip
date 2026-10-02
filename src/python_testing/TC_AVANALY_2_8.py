@@ -117,6 +117,8 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
         )
 
         # Also ensure at least one context trigger is enabled
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
         if self.has_feature_perzonedetect:
             trigger = cluster.Structs.ContextTriggerStruct(
                 context=supported_contexts[0], zoneIDs=NullValue
@@ -136,18 +138,19 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
         self.step(3)
         context_to_detect = supported_contexts[0]
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
-                    "Name": "AvAnalysisPerceivedContext",
-                    "NewContexts": [
-                        {
-                            "NamespaceId": context_to_detect.namespaceID,
-                            "Tag": context_to_detect.tag,
-                            "IdentifiedContextId": 42,
-                        }
-                    ],
-                }
-            )
+            pipe_payload_1 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": 42,
+                    }
+                ],
+            }
+            if self.has_feature_remcondetect:
+                pipe_payload_1["SourceNodeId"] = camera_node_id
+            self.write_to_app_pipe(pipe_payload_1)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate detection of a tracked entity (e.g., Person) on the DUT. Press Enter once detected."
@@ -179,18 +182,19 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
 
         self.step(5)
         if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
-                    "Name": "AvAnalysisPerceivedContext",
-                    "NewContexts": [
-                        {
-                            "NamespaceId": context_to_detect.namespaceID,
-                            "Tag": context_to_detect.tag,
-                            "IdentifiedContextId": id1,
-                        }
-                    ],
-                }
-            )
+            pipe_payload_2 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {
+                        "NamespaceId": context_to_detect.namespaceID,
+                        "Tag": context_to_detect.tag,
+                        "IdentifiedContextId": id1,
+                    }
+                ],
+            }
+            if self.has_feature_remcondetect:
+                pipe_payload_2["SourceNodeId"] = camera_node_id
+            self.write_to_app_pipe(pipe_payload_2)
         elif not self.is_ci:
             self.wait_for_user_input(
                 prompt_msg="Simulate the entity moving and being detected again (e.g., across zones). Press Enter once detected."
@@ -222,7 +226,7 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
         else:
             log.info("CI mode: skipping blocking event wait in Step 6")
 
-        # Cleanup: reset TrackingEnabled, end session, and disable context triggers
+        # Cleanup: reset TrackingEnabled, end session, disable context triggers, and remove stream if created
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
         await self.write_single_attribute(
@@ -231,6 +235,7 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
         await self.send_disable_context_triggers_cmd(
             endpoint, context_triggers=NullValue
         )
+        await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

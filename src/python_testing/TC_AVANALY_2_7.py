@@ -109,6 +109,9 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
                 self.skip_step(s)
             return
 
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+
         self.step(2)
         context_a = supported_contexts[0]
         context_b = supported_contexts[1]
@@ -138,7 +141,7 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             ]
         }
         if self.has_feature_remcondetect:
-            pipe_payload_1["SourceNodeId"] = self.dut_node_id
+            pipe_payload_1["SourceNodeId"] = camera_node_id
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe(pipe_payload_1)
         elif not self.is_ci:
@@ -158,8 +161,8 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             if self.has_feature_remcondetect:
                 asserts.assert_is_not_none(event1.sourceNodeId,
                                            "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event1.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event1.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
+                asserts.assert_equal(event1.sourceNodeId, camera_node_id,
+                                     f"SourceNodeId ({event1.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
                 asserts.assert_is_not_none(
                     event1.sourceStartTimestamp,
                     "SourceStartTimestamp must be present when REMCONDETECT is supported",
@@ -181,7 +184,7 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             ]
         }
         if self.has_feature_remcondetect:
-            pipe_payload_2["SourceNodeId"] = self.dut_node_id
+            pipe_payload_2["SourceNodeId"] = camera_node_id
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe(pipe_payload_2)
         elif not self.is_ci:
@@ -199,8 +202,8 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             if self.has_feature_remcondetect:
                 asserts.assert_is_not_none(event2.sourceNodeId,
                                            "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event2.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event2.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
+                asserts.assert_equal(event2.sourceNodeId, camera_node_id,
+                                     f"SourceNodeId ({event2.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
                 asserts.assert_is_not_none(
                     event2.sourceStartTimestamp,
                     "SourceStartTimestamp must be present when REMCONDETECT is supported",
@@ -227,7 +230,7 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             ]
         }
         if self.has_feature_remcondetect:
-            pipe_payload_3["SourceNodeId"] = self.dut_node_id
+            pipe_payload_3["SourceNodeId"] = camera_node_id
         if self.matter_test_config.pipe_name:
             self.write_to_app_pipe(pipe_payload_3)
         elif not self.is_ci:
@@ -245,8 +248,8 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             if self.has_feature_remcondetect:
                 asserts.assert_is_not_none(event3.sourceNodeId,
                                            "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event3.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event3.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
+                asserts.assert_equal(event3.sourceNodeId, camera_node_id,
+                                     f"SourceNodeId ({event3.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
                 asserts.assert_is_not_none(
                     event3.sourceStartTimestamp,
                     "SourceStartTimestamp must be present when REMCONDETECT is supported",
@@ -265,13 +268,14 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
             log.info("CI mode: skipping blocking event wait in Step 8")
 
         self.step(9)
-        # Cleanup: end analysis session and disable all context triggers
+        # Cleanup: end analysis session, disable all context triggers, and remove stream if created
         if self.matter_test_config.pipe_name:
             cleanup_payload = {"Name": "AvAnalysisSessionEnd", "SessionId": active_session_id}
             if self.has_feature_remcondetect:
-                cleanup_payload["SourceNodeId"] = self.dut_node_id
+                cleanup_payload["SourceNodeId"] = camera_node_id
             self.write_to_app_pipe(cleanup_payload)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

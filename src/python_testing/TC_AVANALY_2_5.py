@@ -171,17 +171,20 @@ class TC_AVANALY_2_5(MatterTestCommissionedDevice, AVANALYTestBase):
         invalid_camera_node_id = self.user_params.get("invalid_camera_node_id")
         if invalid_camera_node_id is not None:
             self.step(4)
-            await self.send_establish_analysis_stream_cmd(
-                endpoint, node_id=int(invalid_camera_node_id), expected_status=Status.NotFound
+            invalid_node_id = (
+                int(invalid_camera_node_id, 0)
+                if isinstance(invalid_camera_node_id, str)
+                else int(invalid_camera_node_id)
             )
-        elif self.is_ci:
-            self.skip_step(4)
-            log.info("CI mode: skipping invalid NodeID check (use --user-params invalid_camera_node_id:<id> to execute)")
+            await self.send_establish_analysis_stream_cmd(
+                endpoint, node_id=invalid_node_id, expected_status=Status.NotFound
+            )
         else:
             self.skip_step(4)
+            log.info("Skipping Step 4: invalid_camera_node_id not provided (use --int-arg invalid_camera_node_id:<id> to execute)")
 
         self.step(5)
-        node_id = self.dut_node_id
+        node_id = self.get_camera_node_id()
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStreamResponse: %s", resp)
         asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
@@ -214,29 +217,43 @@ class TC_AVANALY_2_5(MatterTestCommissionedDevice, AVANALYTestBase):
             endpoint, analysis_stream_id=unknown_stream_id, expected_status=Status.NotFound
         )
 
-        # Discover transport endpoint hosting WebRTCTransportProvider or PushAvStreamTransport
-        parts_list = await self.read_single_attribute_check_success(
-            endpoint=0, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList
-        )
-        all_endpoints = [0] + list(parts_list)
-        webrtc_endpoint = None
-        pushav_endpoint = None
+        # Discover transport endpoint hosting WebRTCTransportProvider or PushAvStreamTransport on the camera node
+        webrtc_endpoint = self.user_params.get("webrtc_endpoint_id")
+        if webrtc_endpoint is not None:
+            webrtc_endpoint = int(webrtc_endpoint, 0) if isinstance(webrtc_endpoint, str) else int(webrtc_endpoint)
+        pushav_endpoint = self.user_params.get("pushav_endpoint_id")
+        if pushav_endpoint is not None:
+            pushav_endpoint = int(pushav_endpoint, 0) if isinstance(pushav_endpoint, str) else int(pushav_endpoint)
         endpoints_without_transport = []
 
-        for ep in all_endpoints:
-            server_list = await self.read_single_attribute_check_success(
-                endpoint=ep, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList
+        try:
+            parts_list = await self.read_single_attribute_check_success(
+                endpoint=0,
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.PartsList,
+                node_id=node_id,
             )
-            has_webrtc = Clusters.WebRTCTransportProvider.id in server_list
-            has_pushav = Clusters.PushAvStreamTransport.id in server_list
-            if has_webrtc and webrtc_endpoint is None:
-                webrtc_endpoint = ep
-            if has_pushav and pushav_endpoint is None:
-                pushav_endpoint = ep
-            if not has_webrtc and not has_pushav:
-                endpoints_without_transport.append(ep)
+            all_endpoints = [0] + list(parts_list)
 
-        # Fallback to endpoint if no transport cluster was found on the device
+            for ep in all_endpoints:
+                server_list = await self.read_single_attribute_check_success(
+                    endpoint=ep,
+                    cluster=Clusters.Descriptor,
+                    attribute=Clusters.Descriptor.Attributes.ServerList,
+                    node_id=node_id,
+                )
+                has_webrtc = Clusters.WebRTCTransportProvider.id in server_list
+                has_pushav = Clusters.PushAvStreamTransport.id in server_list
+                if has_webrtc and webrtc_endpoint is None:
+                    webrtc_endpoint = ep
+                if has_pushav and pushav_endpoint is None:
+                    pushav_endpoint = ep
+                if not has_webrtc and not has_pushav:
+                    endpoints_without_transport.append(ep)
+        except Exception as e:
+            log.warning("Failed to discover transport endpoints on camera node %s: %s", node_id, e)
+
+        # Fallback to endpoint if no transport cluster was found on the camera node
         if webrtc_endpoint is None and pushav_endpoint is None:
             webrtc_endpoint = endpoint
 

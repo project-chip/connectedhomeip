@@ -85,6 +85,8 @@ class TC_AVANALY_2_11(MatterTestCommissionedDevice, AVANALYTestBase):
         supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
         asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
 
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+
         self.step(2)
         subset_context = supported_contexts[0]
         if self.has_feature_perzonedetect:
@@ -120,6 +122,7 @@ class TC_AVANALY_2_11(MatterTestCommissionedDevice, AVANALYTestBase):
         # Cleanup
         await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
         await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

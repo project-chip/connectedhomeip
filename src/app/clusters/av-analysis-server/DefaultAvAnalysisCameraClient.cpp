@@ -339,7 +339,8 @@ void DefaultAvAnalysisCameraClient::CompleteEndpointDiscovery()
         // Without a CameraAVStreamManagement endpoint there is nothing to send commands to
         ChipLogError(Zcl, "AvAnalysisCameraClient: no CameraAVStreamManagement endpoint on the camera (%" CHIP_ERROR_FORMAT ")",
                      mRequest.DiscoveryError().Format());
-        FinishRequest(Status::Failure, mRequest.VideoStreamId());
+        const Status status = (mRequest.DiscoveryError() == CHIP_NO_ERROR) ? Status::NotFound : Status::Failure;
+        FinishRequest(status, mRequest.VideoStreamId());
         return;
     }
 
