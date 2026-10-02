@@ -55,8 +55,8 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
     mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(smokeConfig)
 {}
 
