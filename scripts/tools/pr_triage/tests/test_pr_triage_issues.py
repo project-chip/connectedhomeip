@@ -296,6 +296,21 @@ class RenderAndState(unittest.TestCase):
             entry(77, "leave", "another open pull request is attached")]}
         return (40191, d1, j1), (39685, d2, j2)
 
+    def test_cost_footer_counts_this_pull_requests_work_only(self):
+        (pr1, d1, j1), (pr2, d2, j2) = self.two_prs()
+        self.write(pr1, d1, j1)
+        self.write(pr2, d2, j2)
+        (self.root / "cost.jsonl").write_text("\n".join(json.dumps(r) for r in (
+            {"command": "issues gather", "run": f"pr-{pr1}", "seconds": 4.0,
+                "graphql_calls": 3, "rest_calls": 1, "rate_limit_waits": 0},
+            {"command": "issues gather", "run": f"pr-{pr2}", "seconds": 50.0, "graphql_calls": 40, "rest_calls": 0, "rate_limit_waits": 0})) + "\n")
+        foot = mi.cost_footer(self.root, pr1)
+        self.assertEqual(foot[:3], ["", "---", ""])
+        self.assertIn(f"{len(d1['issues'])} issues read in full, 4s of tool time and 4 API calls.",
+                      foot[3])   # the other PR's rows stay out
+        self.assertTrue(foot[3].startswith("*Issue triage effort:") and foot[3].endswith(".*"))
+        self.assertEqual(len(mi.cost_rows(self.root)), 2)
+
     def test_render_one_pull_request_is_a_list_of_issues_to_close(self):
         (pr1, d1, j1), (pr2, d2, j2) = self.two_prs()
         d1["pr"]["state"], d1["pr"]["closed_at"] = "CLOSED", "2026-09-21T10:00:00Z"

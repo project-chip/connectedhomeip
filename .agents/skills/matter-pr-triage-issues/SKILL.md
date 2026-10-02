@@ -76,23 +76,25 @@ An agent without slash commands, Codex included, is handed this file and the sam
 Pass flags through verbatim when the user gives them. Translate plain English
 otherwise:
 
-| User says                                                       | Flag                                                                                            |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `#40191`, `40191`, a pull request URL                           | `gather --pr 40191`; a URL also names the repository                                            |
-| several numbers                                                 | one pull request per invocation. Say so, take the first, and name the ones left for next time   |
-| "the close ones", "the ones recommended for closing"            | `list --from-triage close`, show the pull requests not yet done, and stop: the user picks one   |
-| "report #40191", "the report for #40191"                        | `report --pr 40191`, then stop                                                                  |
-| "list", "status", "what has been done"                          | `list --from-triage close`, then stop                                                           |
-| "forget #40191", "redo #40191"                                  | `forget --pr 40191`, then stop and show what it would discard                                   |
-| "linked only", "skip the guesses", "no search"                  | `--no-search` on `gather`                                                                       |
-| "N candidates"                                                  | `--candidates N` on `gather`                                                                    |
-| "fetch again", "refresh the issues"                             | `--refetch` on `gather`                                                                         |
-| "read #123", "also look at #123", "include #123"                | `gather --pr <n> --read 123`, repeatable                                                        |
-| "sync", "build the corpus", "refresh the corpus"                | `sync`; "rebuild" or "from scratch" is `sync --full`                                            |     | "with the test plans", "sibling X", "also the spec repository" | `--sibling <owner/repo or clone path>` on `sync`; in project-chip/connectedhomeip the test plans are `CHIP-Specifications/chip-test-plans`, a private repository the token must cover |
-| "benchmark", "how good is the inference", "miss rate", "recall" | `benchmark`, then stop and show the numbers; "on 100" is `--sample 100`, "seed 2" is `--seed 2` |
-| "what did it cost", "how long did that take", "cost"            | the `cost` subcommand, with `--pr` when a pull request is named, then stop                      |
-| "save it to X", "write it to X"                                 | `--out X` on `report`                                                                           |
-| "for owner/repo", "on owner/repo", or a github.com URL          | `--repo` with what was given                                                                    |
+| User says                                                       | Flag                                                                                                                                                                                  |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `#40191`, `40191`, a pull request URL                           | `gather --pr 40191`; a URL also names the repository                                                                                                                                  |
+| several numbers                                                 | one pull request per invocation. Say so, take the first, and name the ones left for next time                                                                                         |
+| "the close ones", "the ones recommended for closing"            | `list --from-triage close`, show the pull requests not yet done, and stop: the user picks one                                                                                         |
+| "report #40191", "the report for #40191"                        | `report --pr 40191`, then stop                                                                                                                                                        |
+| "list", "status", "what has been done"                          | `list --from-triage close`, then stop                                                                                                                                                 |
+| "forget #40191", "redo #40191"                                  | `forget --pr 40191`, then stop and show what it would discard                                                                                                                         |
+| "linked only", "skip the guesses", "no search"                  | `--no-search` on `gather`                                                                                                                                                             |
+| "N candidates"                                                  | `--candidates N` on `gather`                                                                                                                                                          |
+| "fetch again", "refresh the issues"                             | `--refetch` on `gather`                                                                                                                                                               |
+| "read #123", "also look at #123", "include #123"                | `gather --pr <n> --read 123`, repeatable                                                                                                                                              |
+| "sync", "build the corpus", "refresh the corpus"                | `sync`; "rebuild" or "from scratch" is `sync --full`                                                                                                                                  |
+| "with the test plans", "sibling X", "also the spec repository"  | `--sibling <owner/repo or clone path>` on `sync`; in project-chip/connectedhomeip the test plans are `CHIP-Specifications/chip-test-plans`, a private repository the token must cover |
+| "benchmark", "how good is the inference", "miss rate", "recall" | `benchmark`, then stop and show the numbers; "on 100" is `--sample 100`, "seed 2" is `--seed 2`                                                                                       |
+| "what did it cost", "how long did that take", "cost"            | the `cost` subcommand, with `--pr` when a pull request is named, then stop                                                                                                            |
+| "save it to X", "write it to X"                                 | `--out X` on `report`                                                                                                                                                                 |
+| "put the cost in the report"                                    | `--with-cost` on `report`                                                                                                                                                             |
+| "for owner/repo", "on owner/repo", or a github.com URL          | `--repo` with what was given                                                                                                                                                          |
 
 `forget` destroys judgments and cannot be undone, so it never runs with `--yes`
 on the user's first ask. Run it without `--yes`, show what it would discard, and

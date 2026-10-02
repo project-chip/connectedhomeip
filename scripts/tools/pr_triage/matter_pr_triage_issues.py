@@ -1535,7 +1535,42 @@ def report_path(owner, name, number):
     return triage.reports_root(owner, name) / f"pr-{number}-related-issues.md"
 
 
-def report(checkout, repo, pr, strict, out):
+def cost_rows(root, number=None):
+    """Rows of this tool's own cost log, optionally only those of one pull request."""
+    path = root / "cost.jsonl"
+    rows = []
+    if path.exists():
+        with path.open(encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if line:
+                    try:
+                        rows.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+    if number is not None:
+        rows = [r for r in rows if r.get("run") == f"pr-{number}"]
+    return rows
+
+
+def cost_footer(root, number):
+    """One line under the report, for when the reader is the person who ran it. Off unless asked: a
+    maintainer deciding on issues is not helped by knowing what the gathering cost."""
+    rows = cost_rows(root, number)
+    seconds = sum(r.get("seconds") or 0 for r in rows)
+    calls = sum((r.get("graphql_calls") or 0) + (r.get("rest_calls") or 0) for r in rows)
+    dossier = triage.read_json(dossier_path(root, number)) or {}
+    read = len(dossier.get("issues") or {})
+    tokens = len(json.dumps(dossier)) // 4
+    spent = f"{int(seconds // 60)}m {int(seconds % 60)}s" if seconds >= 60 else f"{seconds:.0f}s"
+    effort = f"{spent} of tool time" + (f" and {calls} API calls" if calls else "")
+    per_issue = f", about {tokens // read:,} per issue" if read else ""
+    return ["", "---", "",
+            f"*Issue triage effort: {read} issue{'s' if read != 1 else ''} read in full, {effort}. "
+            f"Judging read roughly {tokens:,} tokens of gathered material{per_issue}.*", ""]
+
+
+def report(checkout, repo, pr, strict, out, with_cost=False):
     if not pr:
         raise RuntimeError("name the pull request: report --pr <n>")
     owner, name = resolve_repo(checkout, repo, [pr])
@@ -1554,6 +1589,8 @@ def report(checkout, repo, pr, strict, out):
     if not problems:
         fold_state(root)
     text, stats = render(root, full, number)
+    if with_cost:
+        text = text.rstrip("\n") + "\n" + "\n".join(cost_footer(root, number))
     path = report_path(owner, name, number)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
@@ -1608,23 +1645,11 @@ def forget(checkout, repo, pr, yes):
 
 
 def cost(checkout, repo, pr):
-    """Time and API calls per command, from the sibling's own log. Never in the report."""
+    """Time and API calls per command, from this tool's own log. In the report only with --with-cost."""
     owner, name = resolve_repo(checkout, repo, [pr] if pr else [])
     root = issues_root(owner, name)
     path = root / "cost.jsonl"
-    rows = []
-    if path.exists():
-        with path.open(encoding="utf-8") as fh:
-            for line in fh:
-                line = line.strip()
-                if line:
-                    try:
-                        rows.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        continue
-    if pr:
-        want = f"pr-{checked_number(pr)[0]}"
-        rows = [r for r in rows if r.get("run") == want]
+    rows = cost_rows(root, checked_number(pr)[0] if pr else None)
     by_command = {}
     for r in rows:
         c = by_command.setdefault(r.get("command"), {"runs": 0, "seconds": 0.0,
@@ -1722,6 +1747,8 @@ def build_parser():
     r.add_argument("--out", default=None, metavar="PATH", help="Also save a copy here, a file or a directory.")
     r.add_argument("--no-strict", dest="strict", action="store_false", default=True,
                    help="Render even when a judgment fails validation.")
+    r.add_argument("--with-cost", dest="with_cost", action="store_true", default=False,
+                   help="Add a one-line cost footer. Off by default: it is about the tool, not the issues.")
     li = common(sub.add_parser("list", help="What has been gathered and judged."), with_prs=False)
     li.add_argument("--from-triage", dest="from_triage", action="append", default=[], metavar="VERDICT",
                     help="Also list the pull requests the triage report gave this verdict and which are not done yet.")

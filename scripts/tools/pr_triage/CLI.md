@@ -179,7 +179,10 @@ above, and most take `--pr`.
 
 -   `--out PATH` - also save a copy at that path, a file or a directory. The
     copy in the reports folder is kept either way.
--   `--no-strict` - render even when a judgment fails validation.
+-   `--no-strict` - render even when a judgment fails validation. -
+    `--with-cost` - add a one-line cost footer: issues read, tool time, API
+    calls and the size of the material the judge read. Off by default: it is
+    about the tool, not the issues.
 
 ## list
 
