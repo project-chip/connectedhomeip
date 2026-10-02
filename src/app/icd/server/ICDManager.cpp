@@ -165,8 +165,12 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
         return;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    mCheckInMessagesSentCount++;
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
+#else
     VerifyOrDie(SupportsFeature(Feature::kCheckInProtocolSupport));
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -237,12 +241,10 @@ void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSub
             if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counterValue))
             {
                 ChipLogError(AppServer, "Failed to send ICD Check-In");
+                mICDSenderPool.ReleaseObject(sender);
             }
         }
     }
-#else
-    mCheckInMessagesSentCount++;
-#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
 }
 
 bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
@@ -890,7 +892,7 @@ void ICDManager::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 #if !(CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT)
     const bool hasPendingAction = mPendingActiveModeOnNetworkAttach;
 #else
-    const bool hasPendingAction  = (mPendingActiveModeOnNetworkAttach || mPendingCheckInType != PendingCheckInType::kNone);
+    const bool hasPendingAction = (mPendingActiveModeOnNetworkAttach || mPendingCheckInType != PendingCheckInType::kNone);
 #endif
     VerifyOrReturn(hasPendingAction);
 

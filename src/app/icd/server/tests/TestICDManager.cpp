@@ -117,7 +117,7 @@ class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
     TestSubscriptionsInfoProvider() = default;
-    ~TestSubscriptionsInfoProvider(){};
+    ~TestSubscriptionsInfoProvider() {};
 
     void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
     void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
@@ -277,6 +277,10 @@ public:
         mICDManager.HandlePlatformEvent(&event);
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    size_t GetICDSenderPoolAllocatedCount() const { return mICDManager.mICDSenderPool.Allocated(); }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     void UpdateOperationState(ICDManager::OperationalState state,
                               ICDManager::CheckInMsgsPolicy policy = ICDManager::CheckInMsgsPolicy::kSendOnEnterActive)
@@ -2486,13 +2490,61 @@ TEST_F(TestICDManager, TestColdBootImmediateCheckIn_AlreadyActiveSendsForcedChec
     UpdateOperationState(ICDManager::OperationalState::ActiveMode);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
     EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 1u);
+    EXPECT_EQ(GetICDSenderPoolAllocatedCount(), 0u);
 
     // Call TriggerCheckInMessages with kColdBoot while already Active -> forced Check-In (+1)
     mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
     EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 2u);
+    EXPECT_EQ(GetICDSenderPoolAllocatedCount(), 0u);
 
     EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+}
+
+TEST_F(TestICDManager, TestSendCheckInMsgs_ReleasesSenderPoolOnResolveFailureAcrossRepeatedCallsInActiveMode)
+{
+    // Verify that when RequestResolve fails inside SendCheckInMsgs (e.g. DNS-SD / AddressResolve not ready yet),
+    // the allocated ICDCheckInSender is immediately released back to mICDSenderPool rather than leaked until IdleMode.
+    // This ensures repeated Check-In attempts within the same ActiveMode window (such as an initial pre-DNS-SD
+    // attempt followed by a forced kColdBoot Check-In) do not accumulate leaked senders in mICDSenderPool.
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+
+    ICDMonitoringEntry entry1(&(mKeystore));
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId11;
+    EXPECT_EQ(CHIP_NO_ERROR, entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry1));
+
+    ICDMonitoringEntry entry2(&(mKeystore));
+    entry2.checkInNodeID    = kClientNodeId12;
+    entry2.monitoredSubject = kClientNodeId12;
+    EXPECT_EQ(CHIP_NO_ERROR, entry2.SetKey(ByteSpan(kKeyBuffer1b)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(1, entry2));
+
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
+    EXPECT_EQ(GetICDSenderPoolAllocatedCount(), 0u);
+
+    // 1st SendCheckInMsgs on entering ActiveMode: RequestResolve fails for both entries, and both
+    // ICDCheckInSender instances must be released back to mICDSenderPool immediately (while still in ActiveMode).
+    mICDManager.ResetCheckInMessagesSentCount();
+    UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 1u);
+    EXPECT_EQ(GetICDSenderPoolAllocatedCount(), 0u);
+
+    // 2nd SendCheckInMsgs in the same ActiveMode window via kColdBoot (CheckInMsgsPolicy::kForce):
+    // mICDSenderPool must remain at 0 allocated after RequestResolve fails again.
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(mICDManager.GetCheckInMessagesSentCount(), 2u);
+    EXPECT_EQ(GetICDSenderPoolAllocatedCount(), 0u);
+
+    EXPECT_EQ(CHIP_NO_ERROR, table.RemoveAll());
 }
 
 TEST_F(TestICDManager, TestRuntimeTriggerWhileActiveDoesNotSendCheckIn)
