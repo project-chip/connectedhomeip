@@ -748,4 +748,3 @@ TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryErrorReturnsFailure)
 }
 
 } // namespace
-

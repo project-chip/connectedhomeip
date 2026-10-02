@@ -306,4 +306,3 @@ class AVANALYTestBase:
             await self.send_remove_analysis_stream_cmd(
                 endpoint, analysis_stream_id=analysis_stream_id
             )
-
