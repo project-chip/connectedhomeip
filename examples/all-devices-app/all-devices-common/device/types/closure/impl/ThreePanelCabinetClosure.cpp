@@ -169,7 +169,7 @@ SimulatedClosure::Config SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoS
             .motionLatching  = BitFlags<ClosureControl::LatchControlModesBitmap>(
                 ClosureControl::LatchControlModesBitmap::kRemoteLatching,
                 ClosureControl::LatchControlModesBitmap::kRemoteUnlatching),
-            .withInstantaneous          = true,  
+            .withInstantaneous          = true,
             .withSpeed                  = false,
             .withVentilation            = false,
             .withPedestrian             = false,
