@@ -189,8 +189,7 @@ namespace Dnssd {
 #define SERVICE_DOMAIN ("local")
 
 MdnsContexts MdnsContexts::sInstance;
-static DNSServiceRef BrowseClient = NULL;
-static TaskHandle_t gResolveTask  = NULL;
+static TaskHandle_t gResolveTask = NULL;
 static EventGroupHandle_t gResolveTaskWakeEvent;
 
 void ChipDnssdMdnsLog(const char * level, const char * msg)
@@ -313,6 +312,7 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
     return CHIP_NO_ERROR;
 }
 
+<<<<<<< HEAD
 void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
                                const char * serviceName, const char * regtype, const char * replyDomain, void * context)
 {
@@ -325,10 +325,13 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
 
+=======
+>>>>>>> f09997c ([MediaTek] Fix memory safety issues in mt793x DNS-SD and GeneralDiagnostics (Auto-merged by platform-bot) (#74389))
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
+<<<<<<< HEAD
     CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
     char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
@@ -349,6 +352,11 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
         *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
     }
     return error;
+=======
+    // Browsing is not implemented on this platform. Report that to the caller, so that it releases the
+    // context it retained for the browse callback instead of waiting for a callback that never comes.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+>>>>>>> f09997c ([MediaTek] Fix memory safety issues in mt793x DNS-SD and GeneralDiagnostics (Auto-merged by platform-bot) (#74389))
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
