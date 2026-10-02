@@ -1416,6 +1416,18 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         ReportOpenSSLErrorAndExit("X509_set_pubkey", res = false);
     }
 
+    // Duplicate the cert's subject name into an owned copy before mutating it below. On
+    // OpenSSL 4.0, X509_get_subject_name() returns a const-qualified name embedded in newCert;
+    // the supported way to change it is to install a whole new name via
+    // X509_set_subject_name(), not to cast away const and mutate the embedded one in place.
+    // This dup/mutate/install-back pattern requires no const_cast and works identically on
+    // OpenSSL 1.1.x/3.x/4.x and BoringSSL.
+    std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> subjectName(X509_NAME_dup(X509_get_subject_name(newCert)), &X509_NAME_free);
+    if (!subjectName)
+    {
+        ReportOpenSSLErrorAndExit("X509_NAME_dup", res = false);
+    }
+
     // Encode Common Name (CN) Attribute.
     {
         char cnAttrStr[chip::Crypto::kMax_CommonNameAttr_Length];
@@ -1478,8 +1490,8 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         }
 
         // Add common name attribute to the certificate subject DN.
-        if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), NID_commonName, MBSTRING_UTF8,
-                                        reinterpret_cast<uint8_t *>(cnAttrStr), static_cast<int>(cnAttrStrLen), -1, 0))
+        if (!X509_NAME_add_entry_by_NID(subjectName.get(), NID_commonName, MBSTRING_UTF8, reinterpret_cast<uint8_t *>(cnAttrStr),
+                                        static_cast<int>(cnAttrStrLen), -1, 0))
         {
             ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
         }
@@ -1495,9 +1507,8 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrVID,
-                                            MBSTRING_UTF8, reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1,
-                                            0))
+            if (!X509_NAME_add_entry_by_NID(subjectName.get(), gNIDChipAttAttrVID, MBSTRING_UTF8,
+                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
@@ -1511,13 +1522,18 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(const_cast<X509_NAME *>(X509_get_subject_name(newCert)), gNIDChipAttAttrPID,
-                                            MBSTRING_UTF8, reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1,
-                                            0))
+            if (!X509_NAME_add_entry_by_NID(subjectName.get(), gNIDChipAttAttrPID, MBSTRING_UTF8,
+                                            reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
         }
+    }
+
+    // Install the mutated subject name back onto the certificate.
+    if (!X509_set_subject_name(newCert, subjectName.get()))
+    {
+        ReportOpenSSLErrorAndExit("X509_set_subject_name", res = false);
     }
 
     // Set the issuer name for the certificate. In the case of a self-signed cert, this will be
