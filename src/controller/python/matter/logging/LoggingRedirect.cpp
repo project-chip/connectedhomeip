@@ -15,12 +15,13 @@
  *    limitations under the License.
  */
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdio.h>
 
 namespace {
 
-constexpr size_t kMaxLogMessageLength = 256;
+constexpr size_t kMaxLogMessageLength = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
 
 using PythonLogCallback = void (*)(uint8_t category, const char * module, const char * message);
 
