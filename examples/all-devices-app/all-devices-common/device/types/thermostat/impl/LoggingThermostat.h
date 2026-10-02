@@ -20,6 +20,8 @@
 #include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/types/thermostat/Thermostat.h>
 
+#include <array>
+
 namespace chip::app {
 
 class LoggingThermostat : public Clusters::IdentifyDelegate,
@@ -27,6 +29,8 @@ class LoggingThermostat : public Clusters::IdentifyDelegate,
                           public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
                           public Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
                           public Clusters::Thermostat::ThermostatAutoSetpoints::Delegate,
+                          public Clusters::Thermostat::ThermostatPresets::Delegate,
+                          public Clusters::Thermostat::ThermostatHold::Delegate,
                           public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
                           public Thermostat
 {
@@ -40,6 +44,7 @@ public:
             Clusters::Thermostat::Feature::kHeating,
             Clusters::Thermostat::Feature::kCooling,
             Clusters::Thermostat::Feature::kAutoMode,
+            Clusters::Thermostat::Feature::kPresets,
         };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
@@ -91,6 +96,33 @@ public:
     // Optional Deadband Override
     Protocols::InteractionModel::Status GetMinDeadband(int16_t & value) const override;
 
+    Protocols::InteractionModel::Status GetCriticalFreezeProtection(bool & value) const override;
+    Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & value) const override;
+
+    // ThermostatPresets::Delegate
+    CHIP_ERROR GetPresetTypeAtIndex(size_t index, Clusters::Thermostat::Structs::PresetTypeStruct::Type & value) override;
+    uint8_t GetNumberOfPresets() override { return kPresetCapacity; }
+    CHIP_ERROR GetPresetAtIndex(size_t index, Clusters::Thermostat::PresetStructWithOwnedMembers & value) override;
+    CHIP_ERROR GetPendingPresetAtIndex(size_t index, Clusters::Thermostat::PresetStructWithOwnedMembers & value) override;
+    CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & value) override;
+    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & value) override;
+    void InitializePendingPresets() override;
+    void ClearPendingPresetList() override { mPendingPresetCount = 0; }
+    CHIP_ERROR AppendToPendingPresetList(const Clusters::Thermostat::PresetStructWithOwnedMembers & value) override;
+    CHIP_ERROR CommitPendingPresets() override;
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(AttributeId attributeId) override;
+
+    // ThermostatHold::Delegate
+    Clusters::Thermostat::TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override { return mSetpointHold; }
+    Protocols::InteractionModel::Status SetTemperatureSetpointHold(Clusters::Thermostat::TemperatureSetpointHoldEnum value,
+                                                                   bool & changed) override;
+    DataModel::Nullable<uint16_t> GetTemperatureSetpointHoldDuration() const override { return mSetpointHoldDuration; }
+    Protocols::InteractionModel::Status SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value,
+                                                                           bool & changed) override;
+    DataModel::Nullable<uint32_t> GetSetpointHoldExpiryTimestamp() const override { return mSetpointHoldExpiryTimestamp; }
+    Protocols::InteractionModel::Status SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value,
+                                                                       bool & changed) override;
+
     Protocols::InteractionModel::Status GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & value) const override;
     Protocols::InteractionModel::Status SetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum value,
                                                        bool & changed) override;
@@ -131,6 +163,18 @@ private:
     BitMask<Clusters::Thermostat::RelayStateBitmap> mRunningState;
     BitMask<Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing;
     int8_t mCalibration = 0;
+
+    // One preset per scenario, with bounded storage for committed and pending lists.
+    static constexpr uint8_t kPresetCapacity = 3;
+    std::array<Clusters::Thermostat::PresetStructWithOwnedMembers, kPresetCapacity> mPresets;
+    std::array<Clusters::Thermostat::PresetStructWithOwnedMembers, kPresetCapacity> mPendingPresets;
+    uint8_t mPresetCount        = 0;
+    uint8_t mPendingPresetCount = 0;
+    DataModel::Nullable<uint8_t> mActivePresetHandle;
+    Clusters::Thermostat::TemperatureSetpointHoldEnum mSetpointHold =
+        Clusters::Thermostat::TemperatureSetpointHoldEnum::kSetpointHoldOff;
+    DataModel::Nullable<uint16_t> mSetpointHoldDuration;
+    DataModel::Nullable<uint32_t> mSetpointHoldExpiryTimestamp;
 
     LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
     LazyRegisteredServerCluster<Clusters::ThermostatUserInterfaceConfigurationCluster> mUserInterfaceCluster;

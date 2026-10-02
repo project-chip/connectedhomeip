@@ -27,7 +27,8 @@ class Thermostat : public SingleEndpoint
 public:
     using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
         Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
-        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate, Clusters::Thermostat::ThermostatAutoSetpoints::Delegate>;
+        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate, Clusters::Thermostat::ThermostatAutoSetpoints::Delegate,
+        Clusters::Thermostat::ThermostatPresets::Delegate, Clusters::Thermostat::ThermostatHold::Delegate>;
 
     struct Context
     {
@@ -36,15 +37,20 @@ public:
             Clusters::Thermostat::Feature::kHeating,
             Clusters::Thermostat::Feature::kCooling,
             Clusters::Thermostat::Feature::kAutoMode,
+            Clusters::Thermostat::Feature::kPresets,
         };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
+    // Presets and hold delegates are required by this device's expanded cluster composition.
+    // Callers of the previous setpoint-only constructor must now supply both delegates.
     Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                Clusters::Thermostat::Delegate & thermostatDelegate,
                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-               Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate);
+               Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
+               Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
+               Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate);
     ~Thermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -73,6 +79,8 @@ private:
     Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & mHeatingDelegate;
     Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & mCoolingDelegate;
     Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & mAutoDelegate;
+    Clusters::Thermostat::ThermostatPresets::Delegate & mPresetsDelegate;
+    Clusters::Thermostat::ThermostatHold::Delegate & mHoldDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;

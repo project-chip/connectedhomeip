@@ -23,10 +23,12 @@ Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & ide
                        Clusters::Thermostat::Delegate & thermostatDelegate,
                        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
                        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-                       Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
-    mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
-    mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate)
+                       Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
+                       Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
+                       Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)), mContext(context),
+    mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate), mHeatingDelegate(heatingDelegate),
+    mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate), mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate)
 {}
 
 CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -39,9 +41,9 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mThermostatCluster.Create(endpoint, mContext.features,
-                              ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
-                              mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate);
+    mThermostatCluster.Create(
+        endpoint, mContext.features, ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
+        mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate, mPresetsDelegate, mHoldDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));

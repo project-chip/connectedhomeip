@@ -25,6 +25,12 @@ namespace {
 namespace thermostat = Clusters::Thermostat;
 using Protocols::InteractionModel::Status;
 
+constexpr thermostat::PresetScenarioEnum kPresetScenarios[] = {
+    thermostat::PresetScenarioEnum::kOccupied,
+    thermostat::PresetScenarioEnum::kUnoccupied,
+    thermostat::PresetScenarioEnum::kUserDefined,
+};
+
 bool IsSupportedMode(thermostat::SystemModeEnum mode, const BitFlags<thermostat::Feature> & features)
 {
     if (mode == thermostat::SystemModeEnum::kOff)
@@ -60,14 +66,38 @@ Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & contex
     loggingContext.optionalAttributes.MaxHeatSetpointLimit        = true;
     loggingContext.optionalAttributes.MinCoolSetpointLimit        = true;
     loggingContext.optionalAttributes.MaxCoolSetpointLimit        = true;
+    loggingContext.optionalAttributes.TemperatureSetpointHold         = true;
+    loggingContext.optionalAttributes.TemperatureSetpointHoldDuration = true;
+    loggingContext.optionalAttributes.CriticalFreezeProtection        = context.features.Has(thermostat::Feature::kHeating);
+    loggingContext.optionalAttributes.CriticalOverheatProtection      = context.features.Has(thermostat::Feature::kCooling);
     return loggingContext;
 }
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
+    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
     mGroupDataProvider(context.groupDataProvider)
-{}
+{
+    static_assert(MATTER_ARRAY_SIZE(kPresetScenarios) == kPresetCapacity);
+    // Start with two built-in presets, leaving room for a user-defined preset.
+    for (uint8_t index = 0; index < 2; ++index)
+    {
+        auto & preset          = mPresets[index];
+        const uint8_t handle[] = { to_underlying(kPresetScenarios[index]) };
+        VerifyOrDie(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))) == CHIP_NO_ERROR);
+        preset.SetPresetScenario(kPresetScenarios[index]);
+        preset.SetBuiltIn(DataModel::MakeNullable(true));
+        if (Features().Has(thermostat::Feature::kHeating))
+        {
+            preset.SetHeatingSetpoint(MakeOptional(thermostat::kDefaultHeatingSetpoint));
+        }
+        if (Features().Has(thermostat::Feature::kCooling))
+        {
+            preset.SetCoolingSetpoint(MakeOptional(thermostat::kDefaultCoolingSetpoint));
+        }
+        ++mPresetCount;
+    }
+}
 
 CHIP_ERROR LoggingThermostat::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
@@ -122,6 +152,14 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
                                       mMinCoolSetpointLimit, thermostat::kDefaultAbsMinCoolSetpointLimit);
     persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::MaxCoolSetpointLimit::Id },
                                       mMaxCoolSetpointLimit, thermostat::kDefaultAbsMaxCoolSetpointLimit);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::TemperatureSetpointHold::Id },
+                                      mSetpointHold, thermostat::TemperatureSetpointHoldEnum::kSetpointHoldOff);
+    persistence.LoadNativeEndianValue<uint16_t>(
+        { GetEndpointId(), thermostat::Id, thermostat::Attributes::TemperatureSetpointHoldDuration::Id }, mSetpointHoldDuration,
+        DataModel::NullNullable);
+    persistence.LoadNativeEndianValue<uint32_t>(
+        { GetEndpointId(), thermostat::Id, thermostat::Attributes::SetpointHoldExpiryTimestamp::Id }, mSetpointHoldExpiryTimestamp,
+        DataModel::NullNullable);
 
     if (!IsSupportedMode(mSystemMode, Features()))
     {
@@ -165,6 +203,167 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
 void LoggingThermostat::Shutdown(ClusterShutdownType type)
 {
     mAttributeStorage = nullptr;
+}
+
+Status LoggingThermostat::GetCriticalFreezeProtection(bool & value) const
+{
+    value = false;
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetCriticalOverheatProtection(bool & value) const
+{
+    value = false;
+    return Status::Success;
+}
+
+CHIP_ERROR LoggingThermostat::GetPresetTypeAtIndex(size_t index, thermostat::Structs::PresetTypeStruct::Type & value)
+{
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(kPresetScenarios), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value.presetScenario     = kPresetScenarios[index];
+    value.numberOfPresets    = 1;
+    value.presetTypeFeatures = BitMask<thermostat::PresetTypeFeaturesBitmap>(thermostat::PresetTypeFeaturesBitmap::kSupportsNames);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetPresetAtIndex(size_t index, thermostat::PresetStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(index < mPresetCount, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value = mPresets[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetPendingPresetAtIndex(size_t index, thermostat::PresetStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(index < mPendingPresetCount, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value = mPendingPresets[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & value)
+{
+    if (mActivePresetHandle.IsNull())
+    {
+        value.SetNull();
+        return CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(!value.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    const uint8_t handle[] = { mActivePresetHandle.Value() };
+    return CopySpanToMutableSpan(ByteSpan(handle), value.Value());
+}
+
+CHIP_ERROR LoggingThermostat::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & value)
+{
+    if (value.IsNull())
+    {
+        mActivePresetHandle.SetNull();
+    }
+    else
+    {
+        VerifyOrReturnError(value.Value().size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        mActivePresetHandle.SetNonNull(value.Value()[0]);
+    }
+    return CHIP_NO_ERROR;
+}
+
+void LoggingThermostat::InitializePendingPresets()
+{
+    mPendingPresets     = mPresets;
+    mPendingPresetCount = mPresetCount;
+}
+
+CHIP_ERROR LoggingThermostat::AppendToPendingPresetList(const thermostat::PresetStructWithOwnedMembers & value)
+{
+    VerifyOrReturnError(mPendingPresetCount < mPendingPresets.size(), CHIP_ERROR_NO_MEMORY);
+    auto & pending = mPendingPresets[mPendingPresetCount];
+    pending        = value;
+    if (pending.GetPresetHandle().IsNull())
+    {
+        // Do not derive new handles from the scenario: an existing preset can change scenarios.
+        // At most kPresetCapacity handles in each list are in use, so this search always has a free slot.
+        for (uint8_t handle = 1; handle <= 2 * kPresetCapacity + 1; ++handle)
+        {
+            const ByteSpan candidate(&handle, 1);
+            const auto containsHandle = [&](const auto & presets, uint8_t count) {
+                for (uint8_t index = 0; index < count; ++index)
+                {
+                    const auto existing = presets[index].GetPresetHandle();
+                    if (!existing.IsNull() && existing.Value().data_equal(candidate))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            if (!containsHandle(mPresets, mPresetCount) && !containsHandle(mPendingPresets, mPendingPresetCount))
+            {
+                ReturnErrorOnFailure(pending.SetPresetHandle(DataModel::MakeNullable(candidate)));
+                break;
+            }
+        }
+    }
+    ++mPendingPresetCount;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LoggingThermostat::CommitPendingPresets()
+{
+    mPresets     = mPendingPresets;
+    mPresetCount = mPendingPresetCount;
+    return CHIP_NO_ERROR;
+}
+
+std::optional<System::Clock::Milliseconds16> LoggingThermostat::GetMaxAtomicWriteTimeout(AttributeId attributeId)
+{
+    if (attributeId == thermostat::Attributes::Presets::Id)
+    {
+        return System::Clock::Milliseconds16(3000);
+    }
+    return std::nullopt;
+}
+
+Status LoggingThermostat::SetTemperatureSetpointHold(thermostat::TemperatureSetpointHoldEnum value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(mSetpointHold != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    ReturnValueOnFailure(AttributePersistence(*mAttributeStorage)
+                             .StoreNativeEndianValue(
+                                 { GetEndpointId(), thermostat::Id, thermostat::Attributes::TemperatureSetpointHold::Id }, value),
+                         Status::Failure);
+    mSetpointHold = value;
+    changed       = true;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetTemperatureSetpointHoldDuration(DataModel::Nullable<uint16_t> value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(mSetpointHoldDuration != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    ReturnValueOnFailure(
+        AttributePersistence(*mAttributeStorage)
+            .StoreNativeEndianValue(
+                { GetEndpointId(), thermostat::Id, thermostat::Attributes::TemperatureSetpointHoldDuration::Id }, value),
+        Status::Failure);
+    mSetpointHoldDuration = value;
+    changed               = true;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetSetpointHoldExpiryTimestamp(DataModel::Nullable<uint32_t> value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(mSetpointHoldExpiryTimestamp != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    ReturnValueOnFailure(
+        AttributePersistence(*mAttributeStorage)
+            .StoreNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::SetpointHoldExpiryTimestamp::Id },
+                                    value),
+        Status::Failure);
+    mSetpointHoldExpiryTimestamp = value;
+    changed                      = true;
+    return Status::Success;
 }
 
 void LoggingThermostat::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
