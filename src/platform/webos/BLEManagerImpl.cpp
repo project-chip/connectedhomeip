@@ -535,8 +535,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    ChipDeviceEvent event{ .Type = conId->mIsNotify ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
-                                                    : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
+    ChipDeviceEvent event{ .Type              = conId->mIsNotify ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                                 : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
                            .CHIPoBLESubscribe = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 }
@@ -855,11 +855,11 @@ void BLEManagerImpl::HandleScannedDevice(const std::string & address, uint16_t d
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
         auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(discriminator);
-        VerifyOrReturn(
-            isMatch,
-            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
-                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
-                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
+                                    mBLEScanConfig.mDiscriminator.IsShortDiscriminator()
+                                        ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                        : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)

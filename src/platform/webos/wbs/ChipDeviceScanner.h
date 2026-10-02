@@ -34,7 +34,9 @@ namespace Internal {
 
 struct BLEChipDevice
 {
-    BLEChipDevice(pbnjson::JValue &device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) : mBleDevice(device), mDeviceInfo(deviceInfo) {}
+    BLEChipDevice(pbnjson::JValue & device, chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo) :
+        mBleDevice(device), mDeviceInfo(deviceInfo)
+    {}
     pbnjson::JValue mBleDevice;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceInfo;
 };

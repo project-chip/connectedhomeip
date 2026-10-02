@@ -19,12 +19,12 @@
 
 #include <glib.h>
 
+#include "Helper.h"
+#include "lsrequester.h"
 #include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include "Helper.h"
-#include "lsrequester.h"
 
 #define API_BLUETOOTH_GATT_GETSTATUS "luna://com.webos.service.bluetooth2/gatt/getStatus"
 #define API_BLUETOOTH_GATT_CONNECT "luna://com.webos.service.bluetooth2/gatt/connect"

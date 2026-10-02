@@ -1,16 +1,16 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
-#include <lib/support/SafeInt.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <luna-service2++/handle.hpp>
-#include "lsrequester.h"
 #include "Helper.h"
+#include "lsrequester.h"
+#include <luna-service2++/handle.hpp>
 
 #define API_BLUETOOTH_GATT_GETSTATUS "luna://com.webos.service.bluetooth2/gatt/getStatus"
 #define API_BLUETOOTH_GATT_CONNECT "luna://com.webos.service.bluetooth2/gatt/connect"
@@ -53,16 +53,16 @@ void EndpointCleanup(WbsEndpoint * apEndpoint)
 
 CHIP_ERROR InitConnectionData(bool aIsCentral, WbsEndpoint *& apEndpoint)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool retval              = false;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    bool retval            = false;
     WbsEndpoint * endpoint = nullptr;
 
     // initialize server endpoint
     endpoint = g_new0(WbsEndpoint, 1);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
 
-    endpoint->mConnectionMap  = g_hash_table_new(g_str_hash, g_str_equal);
-    endpoint->mIsCentral = aIsCentral;
+    endpoint->mConnectionMap = g_hash_table_new(g_str_hash, g_str_equal);
+    endpoint->mIsCentral     = aIsCentral;
 
     retval = true;
 
@@ -100,18 +100,18 @@ static void WbsOTConnectionDestroy(WbsConnection * aConn)
 
 static bool GattGetStatus(std::string address)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSTATUS, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
-    if(!responsePayload.hasKey("connected") || !responsePayload["connected"].asBool())
+    if (!responsePayload.hasKey("connected") || !responsePayload["connected"].asBool())
     {
         return false;
     }
@@ -121,18 +121,18 @@ static bool GattGetStatus(std::string address)
 
 static bool GattGetServices(std::string address)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
     lunaParam.put("address", address);
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_GETSERVICES, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return false;
     }
-    if(responsePayload["services"].arraySize() == 0)
+    if (responsePayload["services"].arraySize() == 0)
     {
         return false;
     }
@@ -144,7 +144,7 @@ static bool GattGetServices(std::string address)
 static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, WbsEndpoint & aEndpoint)
 {
     WbsConnection * connection = static_cast<WbsConnection *>(g_hash_table_lookup(aEndpoint.mConnectionMap, remoteAddr.c_str()));
-    bool bConnected = GattGetStatus(remoteAddr);
+    bool bConnected            = GattGetStatus(remoteAddr);
 
     if (connection != nullptr && !bConnected)
     {
@@ -163,8 +163,7 @@ static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, 
         return;
     }
 
-    if (connection == nullptr && bConnected &&
-        (!aEndpoint.mIsCentral || GattGetServices(remoteAddr)))
+    if (connection == nullptr && bConnected && (!aEndpoint.mIsCentral || GattGetServices(remoteAddr)))
     {
         connection                = g_new0(WbsConnection, 1);
         connection->mpPeerAddress = g_strdup(remoteAddr.c_str());
@@ -180,8 +179,8 @@ static void UpdateConnectionTable(std::string remoteAddr, std::string clientId, 
 
 static CHIP_ERROR WbsDisconnect(WbsConnection * conn)
 {
-    bool ret = 0;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = 0;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
@@ -195,7 +194,7 @@ static CHIP_ERROR WbsDisconnect(WbsConnection * conn)
     lunaParam.put("clientId", conn->clientId);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -216,24 +215,24 @@ static ConnectionDataBundle * MakeConnectionDataBundle(BLE_CONNECTION_OBJECT apC
     // [Depend] Zero-fill: move-assigning buf into uninitialized memory frees a garbage pointer.
     ConnectionDataBundle * bundle = g_new0(ConnectionDataBundle, 1);
     bundle->mpConn                = static_cast<WbsConnection *>(apConn);
-    bundle->buf = std::move(apBuf);
+    bundle->buf                   = std::move(apBuf);
 
     return bundle;
 }
 
 static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
 
     lunaParam.put("clientId", data->mpConn->clientId);
     lunaParam.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     lunaParam.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
-    pbnjson::JValue valueParam = pbnjson::JObject();
+    pbnjson::JValue valueParam  = pbnjson::JObject();
     pbnjson::JValue bytesJArray = pbnjson::JArray();
-    uint8_t * bytes = data->buf->Start();
+    uint8_t * bytes             = data->buf->Start();
     for (uint16_t i = 0; i < data->buf->DataLength(); ++i)
     {
         bytesJArray.append(bytes[i]);
@@ -242,7 +241,7 @@ static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITECHRACTERISTIC, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         // [Depend] Release the packet buffer: g_free() does not run the handle destructor (leak per write).
         System::PacketBufferHandle release = std::move(data->buf);
@@ -275,17 +274,18 @@ static bool gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void
     responsePayload = pbnjson::JDomParser::fromString(response.getPayload());
 
     VerifyOrExit(responsePayload["returnValue"].asBool() == true,
-        ChipLogError(DeviceLayer, "FAIL: WbsSubscribeCharacteristic : %s (%d)", responsePayload["errorText"].asString().c_str(), responsePayload["errorCode"].asNumber<int32_t>()));
-    if (responsePayload.hasKey("changed") == true )
+                 ChipLogError(DeviceLayer, "FAIL: WbsSubscribeCharacteristic : %s (%d)",
+                              responsePayload["errorText"].asString().c_str(), responsePayload["errorCode"].asNumber<int32_t>()));
+    if (responsePayload.hasKey("changed") == true)
     {
         pbnjson::JValueArrayElement bytesDataJObj = responsePayload["changed"]["value"]["bytes"];
-        ssize_t bytesDataJSize = bytesDataJObj.arraySize();
+        ssize_t bytesDataJSize                    = bytesDataJObj.arraySize();
         int32_t v;
 
         buf = System::PacketBufferHandle::New(bytesDataJSize, 0);
         // [Depend] Allocation failure check.
         VerifyOrExit(!buf.IsNull(), ChipLogError(DeviceLayer, "No memory for indication in %s", __func__));
-        for(ssize_t i  = 0; i < bytesDataJSize; ++i)
+        for (ssize_t i = 0; i < bytesDataJSize; ++i)
         {
             bytesDataJObj[i].asNumber<int32_t>(v);
             if (chip::CanCastTo<uint8_t>(v))
@@ -302,10 +302,10 @@ exit:
 
 static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
 {
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
-    pbnjson::JValue lunaParam = pbnjson::JObject();
-    pbnjson::JValue valueParam = pbnjson::JObject();
+    bool ret                    = false;
+    LsRequester * lsRequester   = LsRequester::getInstance();
+    pbnjson::JValue lunaParam   = pbnjson::JObject();
+    pbnjson::JValue valueParam  = pbnjson::JObject();
     pbnjson::JValue charsJArray = pbnjson::JArray();
     pbnjson::JValue bytesJArray = pbnjson::JArray();
     pbnjson::JValue responsePayload;
@@ -320,7 +320,8 @@ static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
     lunaParam.put("characteristics", charsJArray);
     lunaParam.put("subscribe", true);
 
-    ret = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHRACTERISTICS, lunaParam.stringify().c_str(), conn, gattMonitorCharateristicsCb, &ulToken);
+    ret = lsRequester->lsSubscribe(API_BLUETOOTH_GATT_MONITORCHRACTERISTICS, lunaParam.stringify().c_str(), conn,
+                                   gattMonitorCharateristicsCb, &ulToken);
 
     conn->ulMonitorToken = ulToken;
 
@@ -338,7 +339,7 @@ static CHIP_ERROR SubscribeCharacteristicImpl(WbsConnection * conn)
     lunaParam.put("value", valueParam);
 
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_WRITEDESCRIPTOR, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         lsRequester->lsCallCancel(ulToken);
         return CHIP_ERROR_INTERNAL;
@@ -361,7 +362,8 @@ static CHIP_ERROR UnsubscribeCharacteristicImpl(WbsConnection * connection)
 
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "WbsConnection is NULL in %s", __func__));
 
-    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->ulMonitorToken) == true,  ChipLogError(DeviceLayer, "lsCallCancel failed") );
+    VerifyOrExit(LsRequester::getInstance()->lsCallCancel(connection->ulMonitorToken) == true,
+                 ChipLogError(DeviceLayer, "lsCallCancel failed"));
 
     result = CHIP_NO_ERROR;
     BLEManagerImpl::HandleSubscribeOpComplete(connection, false);
@@ -383,12 +385,12 @@ struct ConnectParams
     uint16_t mNumRetries;
 };
 
-static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
+static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams) // char * apAddress)
 {
-    char * deviceAddress    = apParams->mAddress;
-    WbsEndpoint * endpoint = apParams->mEndpoint;
-    bool ret = false;
-    LsRequester *lsRequester = LsRequester::getInstance();
+    char * deviceAddress      = apParams->mAddress;
+    WbsEndpoint * endpoint    = apParams->mEndpoint;
+    bool ret                  = false;
+    LsRequester * lsRequester = LsRequester::getInstance();
     pbnjson::JValue lunaParam = pbnjson::JObject();
     pbnjson::JValue responsePayload;
     std::string wbsAddress;
@@ -396,7 +398,7 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
 
     lunaParam.put("address", std::string(deviceAddress));
     ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_CONNECT, lunaParam.stringify().c_str(), responsePayload);
-    if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+    if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -410,24 +412,24 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
     }
 
     bool serviceAvailable = false;
-    for (int i = 0; i < kMaxConnectRetries ; ++i)
+    for (int i = 0; i < kMaxConnectRetries; ++i)
     {
-        if(GattGetServices(wbsAddress) == true)
+        if (GattGetServices(wbsAddress) == true)
         {
             serviceAvailable = true;
             break;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
-    if(serviceAvailable == false)
+    if (serviceAvailable == false)
     {
         ret = lsRequester->lsCallSync(API_BLUETOOTH_GATT_DISCOVERSERVICES, lunaParam.stringify().c_str(), responsePayload);
-        if(ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
+        if (ret != true || !responsePayload.hasKey(STR_RETURN_VALUE) || !responsePayload[STR_RETURN_VALUE].asBool())
         {
             return CHIP_ERROR_INTERNAL;
         }
 
-        if(GattGetServices(wbsAddress) != true)
+        if (GattGetServices(wbsAddress) != true)
             return CHIP_ERROR_INTERNAL;
     }
 
@@ -438,11 +440,11 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)//char * apAddress)
 
 CHIP_ERROR ConnectDevice(std::string address, WbsEndpoint * apEndpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     char * mRemoteAddress = chip::Platform::MemoryAllocString(address.c_str(), address.length());
-    auto params = chip::Platform::New<ConnectParams>(mRemoteAddress, apEndpoint);
+    auto params           = chip::Platform::New<ConnectParams>(mRemoteAddress, apEndpoint);
 
-    while (params->mNumRetries ++ < kMaxConnectRetries)
+    while (params->mNumRetries++ < kMaxConnectRetries)
     {
         if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) == CHIP_NO_ERROR)
         {

@@ -162,7 +162,7 @@ private:
 
     enum class Flags : uint16_t
     {
-        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kAsyncInitCompleted = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
         // webOS: kBluez* flags renamed to kWBS*.
         kWBSManagerInitialized    = 0x0002, /**< The WBS object manager has been initialized. */
         kWBSAdapterAvailable      = 0x0004, /**< Selected WBS adapter is available for use. */
