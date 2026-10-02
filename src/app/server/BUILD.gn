@@ -109,6 +109,7 @@ static_library("server") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
+    "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning:ids",
   ]
 
   if (chip_device_config_enable_thread_meshcop) {

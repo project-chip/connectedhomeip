@@ -22,7 +22,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/server/Server.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -45,16 +44,19 @@ using chip::Testing::IsAttributesListEqualTo;
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
-};
+    AdministratorCommissioningLogic::Context CreateContext()
+    {
+        return AdministratorCommissioningLogic::Context{
+            .commissioningWindowManager = mCommissioningWindowManager,
+            .fabricTable                = mFabricTable,
+            .failSafeContext            = mFailSafeContext,
+        };
+    }
 
-AdministratorCommissioningLogic::Context CreateContext()
-{
-    return AdministratorCommissioningLogic::Context{
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-    };
-}
+    CommissioningWindowManager mCommissioningWindowManager;
+    FabricTable mFabricTable;
+    FailSafeContext mFailSafeContext;
+};
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
@@ -136,7 +138,7 @@ private:
 // proves that the RevokeCommissioning command does not interfere with fail-safes that are not related to commissioning.
 TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpireFailSafeIfNotHeldByPASE)
 {
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext = mFailSafeContext;
     ScopedFailSafeDisarm disarmFailSafe(failSafeContext);
 
     // Arming the fail-safe outside of the commissioning context
