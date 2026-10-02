@@ -21,7 +21,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/api/SingleEndpoint.h>
+#include <device/api/Interface.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <optional>
@@ -32,7 +32,7 @@ namespace app {
 /// Generic smoke + CO alarm device. It wires up the clusters but is agnostic about behavior: the
 /// SmokeCoAlarmDelegate is injected, so concrete subclasses decide how the alarm actually behaves
 /// (see LoggingOnlySmokeCoAlarm for the example/no-hardware implementation).
-class SmokeCoAlarm : public SingleEndpoint
+class SmokeCoAlarm : public DeviceInterface
 {
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
@@ -61,9 +61,11 @@ public:
     SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate, const Config & config);
     ~SmokeCoAlarm() override = default;
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     ConcentrationCluster & GetCoConcentrationCluster();
     ConcentrationCluster & GetSmokeConcentrationCluster();
@@ -71,6 +73,10 @@ public:
     Clusters::IdentifyCluster & GetIdentifyCluster();
 
 protected:
+    virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;
+    virtual void UnregisterParts(CodeDrivenDataModelProvider & provider)                                      = 0;
+
+    EndpointId mEndpointId = kInvalidEndpointId;
     TimerDelegate & mTimerDelegate;
     Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
     Config mConfig;
