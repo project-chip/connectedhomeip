@@ -38,9 +38,9 @@ from pathlib import Path
 
 import click
 import coloredlogs
+from chiptest.results import RunSummary, TestResult, TestStatus
 from colorama import Fore, Style
 
-from chiptest.results import RunSummary, TestResult, TestStatus
 from matter.testing.commissioning_types import CommissioningMethod
 from matter.testing.defaults import TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
