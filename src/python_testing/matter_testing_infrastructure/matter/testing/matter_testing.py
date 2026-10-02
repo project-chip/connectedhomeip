@@ -88,10 +88,11 @@ DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 _SUMMARY_MAX_HEX_CHARS = 128
 # Redacted in the execution summary. Matches both MatterTestConfig fields
-# (wifi_ssid, wifi_passphrase) and the --string-arg PIXITs (wifi_ssid, wifi_password, 
+# (wifi_ssid, wifi_passphrase) and the --string-arg PIXITs (wifi_ssid, wifi_password,
 # PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS).
-_SUMMARY_REDACTED_KEYS = frozenset({"wifi_ssid", "wifi_passphrase", "wifi_password", 
-"PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"})
+_SUMMARY_REDACTED_KEYS = frozenset({"wifi_ssid", "wifi_passphrase", "wifi_password",
+                                    "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"})
+
 
 class TestError(Exception):
     pass
