@@ -176,6 +176,8 @@ class Misc(unittest.TestCase):
                              (3, 3, 3.0))   # the other run is left out
             self.assertEqual(m.cost_summary(root)["pull_requests"], 4)                                    # no run id: everything
             self.assertIn("3 pull requests", m.cost_footer(root, ["r1", "r2"])[3])
+        self.assertTrue(m.build_parser().parse_args(["report"]).with_cost)                 # footer on by default
+        self.assertFalse(m.build_parser().parse_args(["report", "--no-cost"]).with_cost)
 
     def test_render_body_links_missing_dossier(self):
         v = {7: {"verdict": "keep", "evidence": "still absent from master, see #8"}}

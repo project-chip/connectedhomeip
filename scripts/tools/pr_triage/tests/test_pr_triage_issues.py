@@ -303,13 +303,18 @@ class RenderAndState(unittest.TestCase):
         (self.root / "cost.jsonl").write_text("\n".join(json.dumps(r) for r in (
             {"command": "issues gather", "run": f"pr-{pr1}", "seconds": 4.0,
                 "graphql_calls": 3, "rest_calls": 1, "rate_limit_waits": 0},
-            {"command": "issues gather", "run": f"pr-{pr2}", "seconds": 50.0, "graphql_calls": 40, "rest_calls": 0, "rate_limit_waits": 0})) + "\n")
+            {"command": "issues gather", "run": f"pr-{pr2}", "seconds": 50.0,
+                "graphql_calls": 40, "rest_calls": 0, "rate_limit_waits": 0},
+            {"command": "issues forget", "run": f"pr-{pr1}", "seconds": 9.0, "graphql_calls": 5, "rest_calls": 0, "rate_limit_waits": 0})) + "\n")
         foot = mi.cost_footer(self.root, pr1)
+        self.assertTrue(mi.build_parser().parse_args(["report", "--pr", "1"]).with_cost)            # footer on by default
+        self.assertFalse(mi.build_parser().parse_args(["report", "--pr", "1", "--no-cost"]).with_cost)
         self.assertEqual(foot[:3], ["", "---", ""])
         self.assertIn(f"{len(d1['issues'])} issues read in full, 4s of tool time and 4 API calls.",
                       foot[3])   # the other PR's rows stay out
         self.assertTrue(foot[3].startswith("*Issue triage effort:") and foot[3].endswith(".*"))
-        self.assertEqual(len(mi.cost_rows(self.root)), 2)
+        # forget is logged but not billed to the footer
+        self.assertEqual(len(mi.cost_rows(self.root)), 3)
 
     def test_render_one_pull_request_is_a_list_of_issues_to_close(self):
         (pr1, d1, j1), (pr2, d2, j2) = self.two_prs()
@@ -337,7 +342,7 @@ class RenderAndState(unittest.TestCase):
                          "inferred_rejected": 1}, "to_close": [40190, 6]})
         text2, stats2 = mi.render(self.root, f"{OWNER}/{NAME}", 39685)
         self.assertNotIn(mi.UNLINKED_MARK, text2)                         # no legend when nothing is unlinked
-        self.assertIn("No issues addressed by this pull request were found.", text2)
+        self.assertIn("No issues ask for what this pull request fixes, linked on GitHub or found by content.", text2)
         linked = text2.split("### Related but not resolved by the PR")[1].split("### Already closed")[0]
         self.assertIn("[#77](", linked)
         self.assertIn("(OPEN): asks for more than the tests that landed\n", linked)   # each with its reason

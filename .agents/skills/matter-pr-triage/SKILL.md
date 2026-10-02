@@ -87,7 +87,7 @@ otherwise:
 | "start over", "forget everything", "wipe all runs"                       | `forget --all`, then stop and show what it would discard                                                                       |
 | "what did it cost", "how long did that take", "cost"                     | the `cost` subcommand, then stop                                                                                               |
 | "how many tokens", "real token usage", "what will this cost the account" | `cost --run X --session <the Claude Code transcript for this session>`, then stop                                              |
-| "put the cost in the report"                                             | `--with-cost` on `report`                                                                                                      |
+| "leave the cost out", "no cost line"                                     | `--no-cost` on `report`                                                                                                        |
 | "the undecided ones", "the unclear ones again"                           | `--revisit unclear`                                                                                                            |
 | "continue", "resume", "keep going"                                       | `--continue-from latest`, then keep going until `complete`                                                                     |
 | "one batch only", "just the first batch"                                 | stop after the first batch instead of running them all                                                                         |
@@ -398,10 +398,13 @@ re-render.
 Then show the rendered window report as is, and close with two things and
 nothing else:
 
-1. Its full path, which `report` returns as `rendered`. That is how the report
-   gets reopened, so it is never omitted. If the user asked for one batch only,
-   give that batch's path and say how many pull requests remain, from `select`'s
-   `remaining_after_this_batch`.
+1. Its full path, which `report` returns as `rendered`. Print it as a link whose
+   text is the full path and whose target is the same path as a `file://` URL,
+   `[<full path>](file://<full path>)`, so it is clickable where the chat
+   renders links and still reads as a path where it does not. That is how the
+   report gets reopened, so it is never omitted. If the user asked for one batch
+   only, give that batch's path and say how many pull requests remain, from
+   `select`'s `remaining_after_this_batch`.
 2. Only a fact about the run that the report cannot express, such as a narrowed
    date window, pull requests that could not be assessed, or a pair from the
    final pass you could not settle. One line, and usually there is none.

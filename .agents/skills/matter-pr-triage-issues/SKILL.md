@@ -93,7 +93,7 @@ otherwise:
 | "benchmark", "how good is the inference", "miss rate", "recall" | `benchmark`, then stop and show the numbers; "on 100" is `--sample 100`, "seed 2" is `--seed 2`                                                                                       |
 | "what did it cost", "how long did that take", "cost"            | the `cost` subcommand, with `--pr` when a pull request is named, then stop                                                                                                            |
 | "save it to X", "write it to X"                                 | `--out X` on `report`                                                                                                                                                                 |
-| "put the cost in the report"                                    | `--with-cost` on `report`                                                                                                                                                             |
+| "leave the cost out", "no cost line"                            | `--no-cost` on `report`                                                                                                                                                               |
 | "for owner/repo", "on owner/repo", or a github.com URL          | `--repo` with what was given                                                                                                                                                          |
 
 `forget` destroys judgments and cannot be undone, so it never runs with `--yes`
@@ -302,8 +302,11 @@ trace.
 
 Then show the rendered report as is, and close with two things and nothing else:
 
-1. Its full path, from `rendered`. That is how the report gets reopened, so it
-   is never omitted.
+1. Its full path, from `rendered`. Print it as a link whose text is the full
+   path and whose target is the same path as a `file://` URL,
+   `[<full path>](file://<full path>)`, so it is clickable where the chat
+   renders links and still reads as a path where it does not. That is how the
+   report gets reopened, so it is never omitted.
 2. Only a fact the report cannot express, such as a cross-repository reference
    that could not be read, a pull request that was never triaged, or a duplicate
    pair you could not settle. One line, and usually there is none.

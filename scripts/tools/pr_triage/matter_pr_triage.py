@@ -2470,13 +2470,12 @@ def build_parser():
                           "report, newest verdict per pull request.")
     rep.add_argument("--name", dest="label", default=None,
                      help="Name the window report, so it lands as pr-triage-<name>-as-of-<date>.md.")
-    rep.add_argument("--with-cost", dest="with_cost", action="store_true",
-                     help="Add a footer saying what the triage cost in time, calls and tokens. "
-                          "Off by default: it is about the tool, not the pull requests.")
+    rep.add_argument("--no-cost", dest="with_cost", action="store_false", default=True,
+                     help="Leave out the one-line cost footer every report ends with: the tool's time and API calls "
+                          "and the size of the material the judge read. For a report handed to someone else.")
     rep.add_argument("--out", default=None, metavar="PATH",
-                     help="Also save the report here, a file or a directory. The copy under "
-                          "~/.cache/matter-pr-triage/<owner>/<repo>/ is kept either way, because "
-                          "that is where runs and the combined report look for it.")
+                     help="Also save the report here, a file or a directory. The copy in the reports folder is kept "
+                          "either way, because that is where runs and the combined report look for it.")
 
     cst = common(sub.add_parser("cost", help="What a run cost: time, API calls, and the size of "
                                 "the material judging has to read."))

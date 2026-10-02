@@ -1468,7 +1468,7 @@ def render(root, full, number):
     if closing or to_close:
         lines += ["### Safe to close", ""]
         if not to_close:
-            lines += ["No issues addressed by this pull request were found.", ""]
+            lines += ["No issues ask for what this pull request fixes, linked on GitHub or found by content.", ""]
     any_unlinked = False
     for n, d, v, relation in sorted(to_close, key=lambda t: t[0]):
         reason = (v.get("reason") or "").strip()
@@ -1554,9 +1554,9 @@ def cost_rows(root, number=None):
 
 
 def cost_footer(root, number):
-    """One line under the report, for when the reader is the person who ran it. Off unless asked: a
-    maintainer deciding on issues is not helped by knowing what the gathering cost."""
-    rows = cost_rows(root, number)
+    """One line under the report: what gathering and rendering this pull request's issues cost the tool,
+    summed over every gather and report run for it. --no-cost leaves it out for a report handed on."""
+    rows = [r for r in cost_rows(root, number) if r.get("command") in ("issues gather", "issues report")]
     seconds = sum(r.get("seconds") or 0 for r in rows)
     calls = sum((r.get("graphql_calls") or 0) + (r.get("rest_calls") or 0) for r in rows)
     dossier = triage.read_json(dossier_path(root, number)) or {}
@@ -1645,7 +1645,7 @@ def forget(checkout, repo, pr, yes):
 
 
 def cost(checkout, repo, pr):
-    """Time and API calls per command, from this tool's own log. In the report only with --with-cost."""
+    """Time and API calls per command, from this tool's own log; the report's footer sums the same rows."""
     owner, name = resolve_repo(checkout, repo, [pr] if pr else [])
     root = issues_root(owner, name)
     path = root / "cost.jsonl"
@@ -1747,8 +1747,9 @@ def build_parser():
     r.add_argument("--out", default=None, metavar="PATH", help="Also save a copy here, a file or a directory.")
     r.add_argument("--no-strict", dest="strict", action="store_false", default=True,
                    help="Render even when a judgment fails validation.")
-    r.add_argument("--with-cost", dest="with_cost", action="store_true", default=False,
-                   help="Add a one-line cost footer. Off by default: it is about the tool, not the issues.")
+    r.add_argument("--no-cost", dest="with_cost", action="store_false", default=True,
+                   help="Leave out the one-line cost footer every report ends with: issues read, the tool's time and API "
+                        "calls and the size of the material the judge read. For a report handed to someone else.")
     li = common(sub.add_parser("list", help="What has been gathered and judged."), with_prs=False)
     li.add_argument("--from-triage", dest="from_triage", action="append", default=[], metavar="VERDICT",
                     help="Also list the pull requests the triage report gave this verdict and which are not done yet.")

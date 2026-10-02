@@ -85,8 +85,9 @@ means, grouped by the command that takes it.
     `pr-triage-<field>-before-<cutoff>-as-of-<date>.md`.
 -   `--out PATH` - also save a copy at that path, a file or a directory. The
     copy in the reports folder is kept either way.
--   `--with-cost` - add a one-line cost footer. Off by default: it is about the
-    tool, not the pull requests.
+-   `--no-cost` - leave out the one-line cost footer every report ends with: the
+    tool's time and API calls over the report's batches and the size of the
+    material the judge read. For a report handed to someone else.
 -   `--no-strict` - render even when the judgment fails validation.
 
 ## cost
@@ -179,10 +180,10 @@ above, and most take `--pr`.
 
 -   `--out PATH` - also save a copy at that path, a file or a directory. The
     copy in the reports folder is kept either way.
--   `--no-strict` - render even when a judgment fails validation. -
-    `--with-cost` - add a one-line cost footer: issues read, tool time, API
-    calls and the size of the material the judge read. Off by default: it is
-    about the tool, not the issues.
+-   `--no-strict` - render even when a judgment fails validation.
+-   `--no-cost` - leave out the one-line cost footer every report ends with:
+    issues read in full, the tool's time and API calls over every gather and
+    report for this pull request, and the size of the material the judge read.
 
 ## list
 
