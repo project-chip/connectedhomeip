@@ -31,6 +31,8 @@ class BatteryPowerSource : public SingleEndpoint
     constexpr static auto BatVoltageId          = Clusters::PowerSource::Attributes::BatVoltage::Id;
 
 public:
+    using SingleEndpoint::Register;
+
     // Simple battery-backed Power Source Cluster that exposes both BatPercentRemaining and BatVoltage
     // so commissioners (e.g. Home Assistant) can display a battery level and a battery voltage reading.
     using SimpleBatteryPowerSourceCluster =

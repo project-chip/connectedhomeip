@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/smoke-co-alarm-server/SmokeCoAlarmCluster.h>
+#include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/smoke-co-alarm/SmokeCoAlarm.h>
 #include <lib/support/TimerDelegate.h>
 
@@ -40,6 +41,8 @@ public:
     explicit LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate);
     ~LoggingOnlySmokeCoAlarm() override;
 
+    BatteryPowerSource & GetPowerSource() { return mPowerSource; }
+
     // SmokeCoAlarmDelegate
     void OnSelfTestRequested() override;
     void OnSmokeSensitivityLevelChanged(Clusters::SmokeCoAlarm::SensitivityEnum newLevel) override;
@@ -48,9 +51,15 @@ public:
     // TimerContext
     void TimerFired() override;
 
+protected:
+    CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
+
 private:
     static const std::array<Clusters::SmokeCoAlarm::ExpressedStateEnum, Clusters::SmokeCoAlarmCluster::kPriorityOrderLength>
         sPriorityOrder;
+
+    BatteryPowerSource mPowerSource;
 };
 
 } // namespace app
