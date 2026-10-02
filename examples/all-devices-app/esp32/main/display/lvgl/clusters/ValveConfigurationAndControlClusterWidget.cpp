@@ -113,7 +113,7 @@ uint8_t SnapToLevelStep(uint8_t level, uint8_t levelStep)
     VerifyOrReturnValue(levelStep > 1, level);
     VerifyOrReturnValue(level < kMaxLevel, kMaxLevel);
 
-    const uint8_t snapped = static_cast<uint8_t>((level / levelStep) * levelStep);
+    const uint8_t snapped = static_cast<uint8_t>(((level + (levelStep / 2)) / levelStep) * levelStep);
     return std::max(snapped, levelStep);
 }
 
@@ -192,6 +192,15 @@ lv_obj_t * CreateValveConfigurationAndControlClusterWidget(lv_obj_t * parent, Va
                     label, SnapToLevelStep(static_cast<uint8_t>(lv_slider_get_value(slider)), clusterPtr->GetLevelStep()));
             },
             LV_EVENT_VALUE_CHANGED, &cluster);
+        lv_obj_add_event_cb(
+            levelSlider,
+            [](lv_event_t * event) {
+                auto * clusterPtr = static_cast<ValveConfigurationAndControlCluster *>(lv_event_get_user_data(event));
+                auto * slider     = static_cast<lv_obj_t *>(lv_event_get_target(event));
+                uint8_t snapped   = SnapToLevelStep(static_cast<uint8_t>(lv_slider_get_value(slider)), clusterPtr->GetLevelStep());
+                lv_slider_set_value(slider, snapped, LV_ANIM_ON);
+            },
+            LV_EVENT_RELEASED, &cluster);
     }
 
     lv_obj_t * buttonRow = CreateButtonRow(card);
