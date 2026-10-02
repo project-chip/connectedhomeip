@@ -1927,6 +1927,20 @@ exit:
 }
 
 namespace {
+
+// X509_NAME_get0_der() takes a non-const X509_NAME* on BoringSSL (it is read-only regardless),
+// while OpenSSL 3.x/4.x declare it as taking const. This wrapper isolates the backend-specific
+// signature difference so callers can pass a const X509_NAME* on both backends without casting
+// away const in the OpenSSL build.
+inline int X509NameGet0Der(const X509_NAME * name, const uint8_t ** pDer, size_t * pDerLen)
+{
+#if CHIP_CRYPTO_BORINGSSL
+    return X509_NAME_get0_der(const_cast<X509_NAME *>(name), pDer, pDerLen);
+#else
+    return X509_NAME_get0_der(name, pDer, pDerLen);
+#endif // CHIP_CRYPTO_BORINGSSL
+}
+
 CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certificate, MutableByteSpan & dn)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
@@ -1953,9 +1967,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     }
     VerifyOrExit(distinguishedName != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    // X509_NAME_get0_der() takes a non-const X509_NAME* on BoringSSL (it is read-only regardless),
-    // while OpenSSL 3.x/4.x declare it as taking const. Cast to keep both backends compiling.
-    result = X509_NAME_get0_der(const_cast<X509_NAME *>(distinguishedName), &pDistinguishedName, &distinguishedNameLen);
+    result = X509NameGet0Der(distinguishedName, &pDistinguishedName, &distinguishedNameLen);
     VerifyOrExit(result == 1, err = CHIP_ERROR_INTERNAL);
     err = CopySpanToMutableSpan(ByteSpan(pDistinguishedName, distinguishedNameLen), dn);
 
