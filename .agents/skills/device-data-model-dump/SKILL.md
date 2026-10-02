@@ -145,6 +145,21 @@ device or running app:
     --string-arg test_from_file:/tmp/my_device_dump.json'
 ```
 
+### 5. Generating an Interactive HTML Viewer from a Dump File
+
+To convert a `.json` dump file into a single, self-contained, clickable `.html`
+file that visualizes the endpoint composition tree (including bridged nodes,
+child endpoints, `NodeLabel`, and `TagList` semantic tags), server/client
+clusters, feature bitmasks, accepted/generated commands, and decoded attribute
+values, run `json_dump_to_html.py` using standard `python3` (no third-party
+dependencies or virtual environment required):
+
+```bash
+python3 .agents/skills/device-data-model-dump/scripts/json_dump_to_html.py \
+  /tmp/my_device_dump.json \
+  -o /tmp/my_device_dump.html
+```
+
 ---
 
 ## Method 2: Interactive Runtime Discovery via `chip-tool` (`Descriptor` Cluster `0x001D`)
