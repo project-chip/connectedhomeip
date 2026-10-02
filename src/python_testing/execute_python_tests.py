@@ -308,6 +308,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
+    dedicated_runner_tests = {item["name"] for item in metadata.get("dedicated_runner", [])}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
@@ -328,8 +329,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         all_python_files = [path for path in all_python_files if match(path)]
 
     # If nightly flag is set, only run tests listed under the nightly section.
-    # Otherwise, exclude both not_automated tests and nightly tests from the regular CI run
-    # (nightly tests are reserved for the nightly workflow).
+    # Otherwise, exclude not_automated tests, nightly tests, and dedicated_runner tests
+    # from the regular CI run.
     if nightly and nightly_tests is not None:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
     else:
@@ -337,6 +338,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             file for file in all_python_files
             if os.path.basename(file) not in excluded_patterns
             and os.path.basename(file) not in nightly_tests
+            and os.path.basename(file) not in dedicated_runner_tests
         ]
 
     if len(python_files) == 0:
