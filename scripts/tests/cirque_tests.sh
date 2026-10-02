@@ -57,6 +57,7 @@ CIRQUE_TESTS=(
     "SubscriptionResumptionTest"
     "SubscriptionResumptionCapacityTest"
     "SubscriptionResumptionTimeoutTest"
+    "CaseServerPreemptionTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

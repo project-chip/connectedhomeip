@@ -105,6 +105,9 @@ public:
     const SessionParameters & GetLocalSessionParameters() const { return mLocalSessionParams; }
     void SetLocalSessionParameters(const SessionParameters & sessionParams) { mLocalSessionParams = sessionParams; }
 
+    const Optional<Messaging::ExchangeHandle> & GetExchangeContext() const { return mExchangeCtxt; }
+    void DiscardExchange();
+
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
@@ -127,8 +130,6 @@ protected:
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
 
     void Finish();
-
-    void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
 
