@@ -158,6 +158,25 @@ class Misc(unittest.TestCase):
                              c["judging_tokens_estimate"]), (0, 0, 0, 0))
             self.assertFalse(c["gathering_timed"])
 
+    def test_cost_summary_scoped_to_a_windows_runs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            (root / "pr").mkdir()
+            for run, prs in (("r1", [1, 2]), ("r2", [3]), ("other", [9])):
+                (root / "runs" / run).mkdir(parents=True)
+                m.write_json(root / "runs" / run / "selection.json", {"run": run, "prs": [{"number": n} for n in prs]})
+                for n in prs:
+                    m.write_json(root / "pr" / f"{n}.json", {"number": n, "title": "t" * 40})
+            (root / "cost.jsonl").write_text("\n".join(json.dumps(r) for r in (
+                {"command": "select", "run": "r1", "seconds": 1.0, "graphql_calls": 1, "rest_calls": 0, "rate_limit_waits": 0},
+                {"command": "collect", "run": "r2", "seconds": 2.0, "graphql_calls": 2, "rest_calls": 0, "rate_limit_waits": 0},
+                {"command": "collect", "run": "other", "seconds": 40.0, "graphql_calls": 30, "rest_calls": 0, "rate_limit_waits": 0})) + "\n")
+            c = m.cost_summary(root, ["r1", "r2"])
+            self.assertEqual((c["pull_requests"], c["api_calls"], c["wall_clock_seconds"]),
+                             (3, 3, 3.0))   # the other run is left out
+            self.assertEqual(m.cost_summary(root)["pull_requests"], 4)                                    # no run id: everything
+            self.assertIn("3 pull requests", m.cost_footer(root, ["r1", "r2"])[3])
+
     def test_render_body_links_missing_dossier(self):
         v = {7: {"verdict": "keep", "evidence": "still absent from master, see #8"}}
         text = "\n".join(m.render_body(v, {}, "o/r"))

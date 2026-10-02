@@ -1866,7 +1866,7 @@ def render_campaign(root, full, group, filename, with_cost=False, out_dir=None):
     lines += DISCLAIMER
     lines += render_body(verdicts, prs, full, deduped)
     if with_cost:
-        lines += cost_footer(root)
+        lines += cost_footer(root, [r[1] for r in group])   # this window's batches, not every run
 
     text = "\n".join(lines) + "\n"
     out_dir = out_dir or reports_root(*full.split("/", 1))
@@ -2058,7 +2058,9 @@ def cost_summary(root, run_id=None):
 
     Tokens are spent by the agent doing the judging, not by this script, so the only honest figure
     here is the payload handed over. It is a floor: investigating a pull request costs more.
+    run_id is one run, a list of runs (a window's batches), or None for everything on the repository.
     """
+    run_ids = None if run_id is None else ([run_id] if isinstance(run_id, str) else list(run_id))
     rows = []
     log = root / "cost.jsonl"
     if log.exists():
@@ -2067,7 +2069,7 @@ def cost_summary(root, run_id=None):
                 row = json.loads(line)
             except ValueError:
                 continue
-            if run_id is None or row.get("run") == run_id:
+            if run_ids is None or row.get("run") in run_ids:
                 rows.append(row)
 
     phases, seconds, calls, waits = {}, 0.0, 0, 0
@@ -2079,9 +2081,12 @@ def cost_summary(root, run_id=None):
 
     # The judging payload, measured rather than guessed.
     numbers = []
-    if run_id:
-        selection = read_json(root / "runs" / checked_run_id(run_id) / "selection.json")
-        numbers = [e["number"] for e in selection["prs"]] if selection else []
+    if run_ids:
+        seen = set()
+        for one in run_ids:
+            selection = read_json(root / "runs" / checked_run_id(one) / "selection.json")
+            seen.update(e["number"] for e in (selection["prs"] if selection else []))
+        numbers = sorted(seen)
     else:
         numbers = [int(f.stem) for f in (root / "pr").glob("*.json") if f.stem.isdigit()]
     chars = 0
@@ -2092,7 +2097,7 @@ def cost_summary(root, run_id=None):
     per_pr = chars // max(len(numbers), 1)
 
     return {
-        "run": run_id or "all runs",
+        "run": (run_id if isinstance(run_id, str) else ", ".join(run_ids)) if run_ids else "all runs",
         "wall_clock_seconds": round(seconds, 1),
         "by_phase_seconds": phases,
         "phases_recorded": sorted(phases),
@@ -2169,8 +2174,7 @@ def cost_footer(root, run_id=None):
     return ["", "---", "",
             f"*Triage effort: {c['pull_requests']} pull requests, {effort}. "
             f"Judging read roughly {c['judging_tokens_estimate']:,} tokens of gathered material, "
-            f"about {c['judging_tokens_estimate_per_pr']:,} per pull request. That is a floor: "
-            f"reading the base branch to settle a verdict costs more and is not counted here.*", ""]
+            f"about {c['judging_tokens_estimate_per_pr']:,} per pull request.*", ""]
 
 
 def forget(checkout, repo, run_id=None, everything=False, yes=False):
