@@ -48,6 +48,17 @@ etc.) to assist with development and code review in the Matter repository.
 -   **Triggers**: Use when implementing or migrating Matter server clusters to
     the code-driven pattern using Test-Driven Development (TDD).
 
+### Device Data Model Dump
+
+-   **Location**: `.agents/skills/device-data-model-dump/`
+-   **Purpose**: Guidelines for dumping and inspecting the runtime Matter Data
+    Model (endpoints, clusters, attributes, commands, and device types) using
+    `TC_IDM_12_1` (`TC_DeviceBasicComposition.py`) or `chip-tool` `Descriptor`
+    cluster queries.
+-   **Triggers**: Use when inspecting the runtime data model topology of a
+    Matter device or application, or generating `MatterTlvJson` device dumps for
+    conformance testing.
+
 ### Documentation Discovery
 
 -   **Location**: `.agents/skills/documentation-discovery/`
