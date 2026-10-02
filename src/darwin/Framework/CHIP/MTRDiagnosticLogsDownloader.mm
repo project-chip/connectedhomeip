@@ -357,15 +357,19 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
 
     [self cancelTimeoutTimer];
 
-    // If there is no abortHandler, it means that the BDX transfer has not
-    // started, so we can just call failure: directly.
-    //
-    // If there is an abortHandler, we need to call it to abort the transfer.
-    if (self.abortHandler == nil) {
-        [self failure:error];
-    } else {
+    // The abort handler does not finish the download: it only queues a BDX
+    // StatusReport for the peer. Once that is sent the BDX session ends with
+    // an error, so it calls failure: (never success) on this download if it
+    // is still in the list. Call failure: here as well, because a canceled
+    // download is removed from the list straight away and the session end
+    // would not find it. Calling both is safe: _callFinalize: runs the
+    // completion at most once, so the first call, this one, completes the
+    // download with this error and any later call does nothing.  And calling
+    // failure: here does not affect the BDX session sending its StatusReport.
+    if (self.abortHandler) {
         self.abortHandler(error);
     }
+    [self failure:error];
 }
 
 - (NSURL *)_toFileURL:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID

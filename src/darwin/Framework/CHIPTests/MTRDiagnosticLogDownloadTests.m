@@ -26,6 +26,22 @@ static MTRDeviceController * sDeviceController = nil;
 static const uint16_t kTimeoutInSeconds = 10;
 static NSString * shortLogContent = @"This is a short log\n";
 static NSString * longLogContent = nil;
+static NSString * crashLogContent = nil;
+
+// MTRDownload is private to MTRDiagnosticLogsDownloader.mm; these are the parts of it that
+// test006_AbortAndFailureCompleteOnce drives.
+@protocol MTRDiagnosticLogDownloadUnderTest <NSObject>
+@property (nonatomic) void (^abortHandler)(NSError * error);
+- (instancetype)initWithType:(MTRDiagnosticLogType)type
+                 fabricIndex:(NSNumber *)fabricIndex
+                      nodeID:(NSNumber *)nodeID
+                     timeout:(NSTimeInterval)timeout
+                       queue:(dispatch_queue_t)queue
+                  completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+                        done:(void (^)(id finishedDownload))done;
+- (void)failure:(NSError *)error;
+- (void)abort:(NSError *)error;
+@end
 
 @interface MTRDiagnosticLogDownloadTests : MTRTestCase
 
@@ -54,9 +70,15 @@ static NSString * longLogContent = nil;
     }
     longLogContent = mutableLongLogContent;
 
+    NSMutableString * mutableCrashLogContent = [NSMutableString string];
+    while (mutableCrashLogContent.length < 16 * 1024) {
+        [mutableCrashLogContent appendString:shortLogContent];
+    }
+    crashLogContent = mutableCrashLogContent;
+
     NSString * endUserSupportLog = [self _createLogFile:shortLogContent];
     NSString * networkDiagnosticsLog = [self _createLogFile:longLogContent];
-    NSString * crashLog = [self _createLogFile:longLogContent];
+    NSString * crashLog = [self _createLogFile:crashLogContent];
 
     sDeviceController = [self startCommissionedAppWithName:@"all-clusters"
                                                  arguments:@[
@@ -80,12 +102,6 @@ static NSString * longLogContent = nil;
                                                          attributes:nil];
     XCTAssertTrue(created);
     return logFilePath;
-}
-
-- (void)setUp
-{
-    [super setUp];
-    [self setContinueAfterFailure:NO];
 }
 
 - (void)_testDownloadLogWithContent:(NSString *)expectedLogContent type:(MTRDiagnosticLogType)type testName:(NSString *)testName
@@ -124,6 +140,15 @@ static NSString * longLogContent = nil;
     usleep(100 * 1000);
 }
 
+- (void)_checkPartialCrashLogAtURL:(NSURL * _Nullable)url
+{
+    XCTAssertNotNil(url);
+    NSString * partialLog = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
+    XCTAssertGreaterThan(partialLog.length, 0);
+    XCTAssertLessThan(partialLog.length, crashLogContent.length);
+    XCTAssertTrue(partialLog != nil && [crashLogContent hasPrefix:partialLog]);
+}
+
 - (void)test001_UserSupportLog
 {
     [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test001_UserSupportLog")];
@@ -136,7 +161,7 @@ static NSString * longLogContent = nil;
 
 - (void)test003_CrashLog
 {
-    [self _testDownloadLogWithContent:longLogContent type:MTRDiagnosticLogTypeCrash testName:@("test003_CrashLog")];
+    [self _testDownloadLogWithContent:crashLogContent type:MTRDiagnosticLogTypeCrash testName:@("test003_CrashLog")];
 }
 
 - (void)test004_CanceledDownload
@@ -164,6 +189,104 @@ static NSString * longLogContent = nil;
     [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test004_CanceledDownload")];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test005_CanceledDownloadAfterTransferStarted
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Download canceled mid-transfer completed"];
+
+    MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sDeviceController];
+    XCTAssertNotNil(device);
+
+    NSString * tempDir = NSTemporaryDirectory();
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSSet * existingFiles = [NSSet setWithArray:[fileManager contentsOfDirectoryAtPath:tempDir error:nil]];
+    NSString * crashLogSuffix = [NSString stringWithFormat:@"_%016llX_Crash", kDeviceId];
+
+    [device downloadLogOfType:MTRDiagnosticLogTypeCrash
+                      timeout:kTimeoutInSeconds
+                        queue:dispatch_get_main_queue()
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+                       XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+                       [self _checkPartialCrashLogAtURL:url];
+                       [expectation fulfill];
+                   }];
+
+    BOOL transferStarted = NO;
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:kTimeoutInSeconds];
+    while (!transferStarted && [deadline timeIntervalSinceNow] > 0) {
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+        for (NSString * file in [fileManager contentsOfDirectoryAtPath:tempDir error:nil]) {
+            if ([file hasSuffix:crashLogSuffix] && ![existingFiles containsObject:file]) {
+                transferStarted = YES;
+                break;
+            }
+        }
+    }
+    XCTAssertTrue(transferStarted);
+
+    [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test005_CanceledDownloadAfterTransferStarted")];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+// Aborting a download that has started its BDX transfer calls the abort
+// handler and then failure:, and the BDX session end that follows the abort
+// calls failure: again. In either order, the completion runs exactly once,
+// with the error of the first call.
+- (void)test006_AbortAndFailureCompleteOnce
+{
+    Class downloadClass = NSClassFromString(@"MTRDownload");
+    XCTAssertNotNil(downloadClass);
+    if (downloadClass == nil) {
+        return;
+    }
+
+    NSError * firstError = [NSError errorWithDomain:@"MTRDiagnosticLogDownloadTests" code:1 userInfo:nil];
+    NSError * secondError = [NSError errorWithDomain:@"MTRDiagnosticLogDownloadTests" code:2 userInfo:nil];
+    dispatch_queue_t queue = dispatch_queue_create("MTRDiagnosticLogDownloadTests.test006", DISPATCH_QUEUE_SERIAL);
+
+    for (NSNumber * abortFirst in @[ @YES, @NO ]) {
+        __block NSUInteger abortHandlerCalls = 0;
+        __block NSUInteger completionCalls = 0;
+        __block NSError * completionError = nil;
+
+        [sDeviceController syncRunOnWorkQueue:^{
+            id<MTRDiagnosticLogDownloadUnderTest> download = [(id<MTRDiagnosticLogDownloadUnderTest>) [downloadClass alloc]
+                initWithType:MTRDiagnosticLogTypeEndUserSupport
+                 fabricIndex:@(1)
+                      nodeID:@(kDeviceId)
+                     timeout:0
+                       queue:queue
+                  completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                      completionCalls++;
+                      completionError = error;
+                  }
+                        done:^(id finishedDownload) {}];
+            // As if the BDX transfer had started.
+            download.abortHandler = ^(NSError * error) {
+                abortHandlerCalls++;
+            };
+
+            if (abortFirst.boolValue) {
+                // The abort, then the BDX session end it leads to.
+                [download abort:firstError];
+                [download failure:secondError];
+            } else {
+                // The BDX session end, then an abort that races it.
+                [download failure:firstError];
+                [download abort:secondError];
+            }
+        } error:nil];
+
+        // The completion is dispatched to queue; let anything queued run.
+        dispatch_sync(queue, ^ {});
+
+        XCTAssertEqual(abortHandlerCalls, 1, "abortFirst: %@", abortFirst);
+        XCTAssertEqual(completionCalls, 1, "abortFirst: %@", abortFirst);
+        XCTAssertEqualObjects(completionError, firstError, "abortFirst: %@", abortFirst);
+    }
 }
 
 @end
