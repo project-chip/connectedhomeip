@@ -510,7 +510,8 @@ Status LoggingThermostat::SetMinHeatSetpointLimit(int16_t value, bool & changed)
     changed = false;
     // The cluster validates the complete setpoint state before saving it. Limit setters must not
     // compare against the other stored limit, which may still be awaiting its update.
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit && value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mMinHeatSetpointLimit != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
@@ -537,7 +538,8 @@ Status LoggingThermostat::GetMaxHeatSetpointLimit(int16_t & value) const
 Status LoggingThermostat::SetMaxHeatSetpointLimit(int16_t value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit && value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mMaxHeatSetpointLimit != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
@@ -577,7 +579,8 @@ Status LoggingThermostat::SetMinCoolSetpointLimit(int16_t value, bool & changed)
 {
     changed = false;
     // As with heating limits, the other stored limit may not yet reflect the validated state.
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit && value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mMinCoolSetpointLimit != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
@@ -604,7 +607,8 @@ Status LoggingThermostat::GetMaxCoolSetpointLimit(int16_t & value) const
 Status LoggingThermostat::SetMaxCoolSetpointLimit(int16_t value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit && value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mMaxCoolSetpointLimit != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
