@@ -97,14 +97,10 @@ connects over PASE using default discriminator `3840` / manual code
 
 ### 2. Running Standalone Against a Running Device
 
-If an uncommissioned Matter device or application is already running in a
-commissioning window, invoke `TC_DeviceBasicComposition.py` directly inside the
-Python environment. When invoked directly without `--commissioning-method` (and
-without `--load-from-env`, which defaults to
-`commissioning-method: on-network`), `BasicCompositionTests` skips the
-commissioning step and connects over PASE using `--manual-code` (or add
-`--commissioning-method on-network` to perform full on-network commissioning
-first):
+If the Matter device or application is already running, invoke
+`TC_DeviceBasicComposition.py` directly inside the Python environment. By
+omitting `--commissioning-method`, the script connects directly over a PASE
+session without needing to commission the device:
 
 ```bash
 ./scripts/run_in_python_env.sh out/python_env \
