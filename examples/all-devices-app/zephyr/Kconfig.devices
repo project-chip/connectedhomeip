@@ -156,6 +156,9 @@ config ALL_DEVICES_DEVICE_SPEAKER
 config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
 	bool "Temperature sensor"
 
+config ALL_DEVICES_DEVICE_THERMOSTAT
+	bool "Thermostat"
+
 config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
 	bool "Water freeze detector"
 

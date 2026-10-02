@@ -677,9 +677,9 @@ private:
         {
             RegisterCreator("thermostat", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingThermostat>(Thermostat::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
+                return MakeDevice<LoggingThermostat>(LoggingThermostat::Context{
                     .fabricTable       = mContext->fabricTable,
+                    .groupDataProvider = mContext->groupDataProvider,
                     .timerDelegate     = mContext->timerDelegate,
                 });
             });

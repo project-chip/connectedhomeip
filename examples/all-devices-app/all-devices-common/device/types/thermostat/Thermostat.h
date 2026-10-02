@@ -16,10 +16,8 @@
 
 #pragma once
 
-#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
-#include <app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.h>
 #include <device/api/SingleEndpoint.h>
 
 namespace chip::app {
@@ -30,16 +28,16 @@ public:
     using ThermostatClusterType =
         Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::Delegate,
                                                 Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
-                                                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate>;
+                                                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
+                                                Clusters::Thermostat::ThermostatAutoSetpoints::Delegate>;
 
     struct Context
     {
-        Credentials::GroupDataProvider & groupDataProvider;
-        FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
         BitFlags<Clusters::Thermostat::Feature> features = {
             Clusters::Thermostat::Feature::kHeating,
             Clusters::Thermostat::Feature::kCooling,
+            Clusters::Thermostat::Feature::kAutoMode,
         };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
@@ -47,7 +45,8 @@ public:
     Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                Clusters::Thermostat::Delegate & thermostatDelegate,
                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate);
+               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
+               Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate);
     ~Thermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -75,6 +74,7 @@ private:
     Clusters::Thermostat::Delegate & mThermostatDelegate;
     Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & mHeatingDelegate;
     Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & mCoolingDelegate;
+    Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & mAutoDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;

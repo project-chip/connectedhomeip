@@ -22,10 +22,11 @@ namespace chip::app {
 Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                        Clusters::Thermostat::Delegate & thermostatDelegate,
                        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
-    mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
-    mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate)
+                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
+                       Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)), mContext(context),
+    mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate), mHeatingDelegate(heatingDelegate),
+    mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate)
 {}
 
 CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -40,7 +41,7 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
 
     mThermostatCluster.Create(endpoint, mContext.features,
                               ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
-                              mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
+                              mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));

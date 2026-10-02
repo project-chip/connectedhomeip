@@ -67,7 +67,9 @@ void IncreasingTemperatureSensor::Unregister(CodeDrivenDataModelProvider & provi
 
 CHIP_ERROR IncreasingTemperatureSensor::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
-    mUserInterfaceCluster.Create(endpoint);
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>();
+    mUserInterfaceCluster.Create(endpoint, config);
     mUserInterfaceCluster.Cluster().SetDelegate(this);
     return provider.AddCluster(mUserInterfaceCluster.Registration());
 }

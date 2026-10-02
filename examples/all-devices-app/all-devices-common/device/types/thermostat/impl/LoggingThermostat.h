@@ -26,10 +26,24 @@ class LoggingThermostat : public Clusters::IdentifyDelegate,
                           public Clusters::Thermostat::Delegate,
                           public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
                           public Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate,
+                          public Clusters::Thermostat::ThermostatAutoSetpoints::Delegate,
                           public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
                           public Thermostat
 {
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+        Credentials::GroupDataProvider & groupDataProvider;
+        TimerDelegate & timerDelegate;
+        BitFlags<Clusters::Thermostat::Feature> features = {
+            Clusters::Thermostat::Feature::kHeating,
+            Clusters::Thermostat::Feature::kCooling,
+            Clusters::Thermostat::Feature::kAutoMode,
+        };
+        Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
+    };
+
     explicit LoggingThermostat(const Context & context);
     ~LoggingThermostat() override = default;
 
@@ -58,6 +72,24 @@ public:
     Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(int16_t value, bool & changed) override;
     Protocols::InteractionModel::Status GetOccupiedCoolingSetpoint(int16_t & value) const override;
     Protocols::InteractionModel::Status SetOccupiedCoolingSetpoint(int16_t value, bool & changed) override;
+
+    // Optional Setpoint Limit Getters/Setters
+    Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status GetMinHeatSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status SetMinHeatSetpointLimit(int16_t value, bool & changed) override;
+    Protocols::InteractionModel::Status GetMaxHeatSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(int16_t value, bool & changed) override;
+
+    Protocols::InteractionModel::Status GetAbsMinCoolSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status GetAbsMaxCoolSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status GetMinCoolSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status SetMinCoolSetpointLimit(int16_t value, bool & changed) override;
+    Protocols::InteractionModel::Status GetMaxCoolSetpointLimit(int16_t & value) const override;
+    Protocols::InteractionModel::Status SetMaxCoolSetpointLimit(int16_t value, bool & changed) override;
+
+    // Optional Deadband Override
+    Protocols::InteractionModel::Status GetMinDeadband(int16_t & value) const override;
 
     Protocols::InteractionModel::Status GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & value) const override;
     Protocols::InteractionModel::Status SetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum value,
@@ -91,6 +123,10 @@ private:
     Clusters::Thermostat::SystemModeEnum mSystemMode             = Clusters::Thermostat::SystemModeEnum::kOff;
     int16_t mHeatingSetpoint                                     = Clusters::Thermostat::kDefaultHeatingSetpoint;
     int16_t mCoolingSetpoint                                     = Clusters::Thermostat::kDefaultCoolingSetpoint;
+    int16_t mMinHeatSetpointLimit                                = Clusters::Thermostat::kDefaultAbsMinHeatSetpointLimit;
+    int16_t mMaxHeatSetpointLimit                                = Clusters::Thermostat::kDefaultAbsMaxHeatSetpointLimit;
+    int16_t mMinCoolSetpointLimit                                = Clusters::Thermostat::kDefaultAbsMinCoolSetpointLimit;
+    int16_t mMaxCoolSetpointLimit                                = Clusters::Thermostat::kDefaultAbsMaxCoolSetpointLimit;
     Clusters::Thermostat::ThermostatRunningModeEnum mRunningMode = Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
     BitMask<Clusters::Thermostat::RelayStateBitmap> mRunningState;
     BitMask<Clusters::Thermostat::RemoteSensingBitmap> mRemoteSensing;

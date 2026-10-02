@@ -42,9 +42,13 @@ bool IsSupportedMode(thermostat::SystemModeEnum mode, const BitFlags<thermostat:
     return false;
 }
 
-Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
+Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & context)
 {
-    Thermostat::Context loggingContext                            = context;
+    Thermostat::Context loggingContext{
+        .timerDelegate      = context.timerDelegate,
+        .features           = context.features,
+        .optionalAttributes = context.optionalAttributes,
+    };
     loggingContext.optionalAttributes.ThermostatRunningState      = true;
     loggingContext.optionalAttributes.RemoteSensing               = true;
     loggingContext.optionalAttributes.LocalTemperatureCalibration = true;
@@ -61,7 +65,7 @@ Thermostat::Context MakeLoggingContext(const Thermostat::Context & context)
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this), mFabricTable(context.fabricTable),
+    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
     mGroupDataProvider(context.groupDataProvider)
 {}
 
@@ -74,7 +78,9 @@ CHIP_ERROR LoggingThermostat::RegisterAdditionalClusters(EndpointId endpoint, Co
                           });
     ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
-    mUserInterfaceCluster.Create(endpoint);
+    Clusters::ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>();
+    mUserInterfaceCluster.Create(endpoint, config);
     mUserInterfaceCluster.Cluster().SetDelegate(this);
     ReturnErrorOnFailure(provider.AddCluster(mUserInterfaceCluster.Registration()));
 
@@ -108,20 +114,50 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
                                       mHeatingSetpoint, thermostat::kDefaultHeatingSetpoint);
     persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::OccupiedCoolingSetpoint::Id },
                                       mCoolingSetpoint, thermostat::kDefaultCoolingSetpoint);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::MinHeatSetpointLimit::Id },
+                                      mMinHeatSetpointLimit, thermostat::kDefaultAbsMinHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::MaxHeatSetpointLimit::Id },
+                                      mMaxHeatSetpointLimit, thermostat::kDefaultAbsMaxHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::MinCoolSetpointLimit::Id },
+                                      mMinCoolSetpointLimit, thermostat::kDefaultAbsMinCoolSetpointLimit);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), thermostat::Id, thermostat::Attributes::MaxCoolSetpointLimit::Id },
+                                      mMaxCoolSetpointLimit, thermostat::kDefaultAbsMaxCoolSetpointLimit);
+
     if (!IsSupportedMode(mSystemMode, Features()))
     {
         mSystemMode = thermostat::SystemModeEnum::kOff;
     }
-    if (mHeatingSetpoint < thermostat::kDefaultAbsMinHeatSetpointLimit ||
-        mHeatingSetpoint > thermostat::kDefaultAbsMaxHeatSetpointLimit)
+
+    if (mMinHeatSetpointLimit < thermostat::kDefaultAbsMinHeatSetpointLimit ||
+        mMinHeatSetpointLimit > thermostat::kDefaultAbsMaxHeatSetpointLimit)
+    {
+        mMinHeatSetpointLimit = thermostat::kDefaultAbsMinHeatSetpointLimit;
+    }
+    if (mMaxHeatSetpointLimit < thermostat::kDefaultAbsMinHeatSetpointLimit ||
+        mMaxHeatSetpointLimit > thermostat::kDefaultAbsMaxHeatSetpointLimit)
+    {
+        mMaxHeatSetpointLimit = thermostat::kDefaultAbsMaxHeatSetpointLimit;
+    }
+    if (mMinCoolSetpointLimit < thermostat::kDefaultAbsMinCoolSetpointLimit ||
+        mMinCoolSetpointLimit > thermostat::kDefaultAbsMaxCoolSetpointLimit)
+    {
+        mMinCoolSetpointLimit = thermostat::kDefaultAbsMinCoolSetpointLimit;
+    }
+    if (mMaxCoolSetpointLimit < thermostat::kDefaultAbsMinCoolSetpointLimit ||
+        mMaxCoolSetpointLimit > thermostat::kDefaultAbsMaxCoolSetpointLimit)
+    {
+        mMaxCoolSetpointLimit = thermostat::kDefaultAbsMaxCoolSetpointLimit;
+    }
+
+    if (mHeatingSetpoint < mMinHeatSetpointLimit || mHeatingSetpoint > mMaxHeatSetpointLimit)
     {
         mHeatingSetpoint = thermostat::kDefaultHeatingSetpoint;
     }
-    if (mCoolingSetpoint < thermostat::kDefaultAbsMinCoolSetpointLimit ||
-        mCoolingSetpoint > thermostat::kDefaultAbsMaxCoolSetpointLimit)
+    if (mCoolingSetpoint < mMinCoolSetpointLimit || mCoolingSetpoint > mMaxCoolSetpointLimit)
     {
         mCoolingSetpoint = thermostat::kDefaultCoolingSetpoint;
     }
+
     UpdateSimulatedRunningState();
     return CHIP_NO_ERROR;
 }
@@ -207,8 +243,8 @@ Status LoggingThermostat::GetOccupiedHeatingSetpoint(int16_t & value) const
 Status LoggingThermostat::SetOccupiedHeatingSetpoint(int16_t value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit &&
-                            value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
+    VerifyOrReturnValue(value >= mMinHeatSetpointLimit &&
+                            value <= mMaxHeatSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mHeatingSetpoint != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
@@ -236,8 +272,8 @@ Status LoggingThermostat::GetOccupiedCoolingSetpoint(int16_t & value) const
 Status LoggingThermostat::SetOccupiedCoolingSetpoint(int16_t value, bool & changed)
 {
     changed = false;
-    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit &&
-                            value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
+    VerifyOrReturnValue(value >= mMinCoolSetpointLimit &&
+                            value <= mMaxCoolSetpointLimit,
                         Status::ConstraintError);
     VerifyOrReturnValue(mCoolingSetpoint != value, Status::Success);
     VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
@@ -253,6 +289,148 @@ Status LoggingThermostat::SetOccupiedCoolingSetpoint(int16_t value, bool & chang
     changed          = true;
     ChipLogProgress(AppServer, "Thermostat: cooling setpoint changed to %d", value);
     UpdateSimulatedRunningState();
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetAbsMinHeatSetpointLimit(int16_t & value) const
+{
+    value = thermostat::kDefaultAbsMinHeatSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetAbsMaxHeatSetpointLimit(int16_t & value) const
+{
+    value = thermostat::kDefaultAbsMaxHeatSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetMinHeatSetpointLimit(int16_t & value) const
+{
+    value = mMinHeatSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetMinHeatSetpointLimit(int16_t value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinHeatSetpointLimit &&
+                            value <= mMaxHeatSetpointLimit,
+                        Status::ConstraintError);
+    VerifyOrReturnValue(mMinHeatSetpointLimit != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    CHIP_ERROR err = AttributePersistence(*mAttributeStorage)
+                         .StoreNativeEndianValue(
+                             { GetEndpointId(), thermostat::Id, thermostat::Attributes::MinHeatSetpointLimit::Id }, value);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Thermostat: persisting min heating setpoint limit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    mMinHeatSetpointLimit = value;
+    changed               = true;
+    ChipLogProgress(AppServer, "Thermostat: min heating setpoint limit changed to %d", value);
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetMaxHeatSetpointLimit(int16_t & value) const
+{
+    value = mMaxHeatSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetMaxHeatSetpointLimit(int16_t value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value >= mMinHeatSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxHeatSetpointLimit,
+                        Status::ConstraintError);
+    VerifyOrReturnValue(mMaxHeatSetpointLimit != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    CHIP_ERROR err = AttributePersistence(*mAttributeStorage)
+                         .StoreNativeEndianValue(
+                             { GetEndpointId(), thermostat::Id, thermostat::Attributes::MaxHeatSetpointLimit::Id }, value);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Thermostat: persisting max heating setpoint limit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    mMaxHeatSetpointLimit = value;
+    changed               = true;
+    ChipLogProgress(AppServer, "Thermostat: max heating setpoint limit changed to %d", value);
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetAbsMinCoolSetpointLimit(int16_t & value) const
+{
+    value = thermostat::kDefaultAbsMinCoolSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetAbsMaxCoolSetpointLimit(int16_t & value) const
+{
+    value = thermostat::kDefaultAbsMaxCoolSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetMinCoolSetpointLimit(int16_t & value) const
+{
+    value = mMinCoolSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetMinCoolSetpointLimit(int16_t value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value >= thermostat::kDefaultAbsMinCoolSetpointLimit &&
+                            value <= mMaxCoolSetpointLimit,
+                        Status::ConstraintError);
+    VerifyOrReturnValue(mMinCoolSetpointLimit != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    CHIP_ERROR err = AttributePersistence(*mAttributeStorage)
+                         .StoreNativeEndianValue(
+                             { GetEndpointId(), thermostat::Id, thermostat::Attributes::MinCoolSetpointLimit::Id }, value);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Thermostat: persisting min cooling setpoint limit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    mMinCoolSetpointLimit = value;
+    changed               = true;
+    ChipLogProgress(AppServer, "Thermostat: min cooling setpoint limit changed to %d", value);
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetMaxCoolSetpointLimit(int16_t & value) const
+{
+    value = mMaxCoolSetpointLimit;
+    return Status::Success;
+}
+
+Status LoggingThermostat::SetMaxCoolSetpointLimit(int16_t value, bool & changed)
+{
+    changed = false;
+    VerifyOrReturnValue(value >= mMinCoolSetpointLimit &&
+                            value <= thermostat::kDefaultAbsMaxCoolSetpointLimit,
+                        Status::ConstraintError);
+    VerifyOrReturnValue(mMaxCoolSetpointLimit != value, Status::Success);
+    VerifyOrReturnValue(mAttributeStorage != nullptr, Status::Failure);
+    CHIP_ERROR err = AttributePersistence(*mAttributeStorage)
+                         .StoreNativeEndianValue(
+                             { GetEndpointId(), thermostat::Id, thermostat::Attributes::MaxCoolSetpointLimit::Id }, value);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Thermostat: persisting max cooling setpoint limit failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    mMaxCoolSetpointLimit = value;
+    changed               = true;
+    ChipLogProgress(AppServer, "Thermostat: max cooling setpoint limit changed to %d", value);
+    return Status::Success;
+}
+
+Status LoggingThermostat::GetMinDeadband(int16_t & value) const
+{
+    value = thermostat::kDefaultDeadBand;
     return Status::Success;
 }
 
