@@ -41,8 +41,14 @@ config ALL_DEVICES_DEVICE_BRIDGED_NODE
 config ALL_DEVICES_DEVICE_CHIME
 	bool "Chime"
 
+config ALL_DEVICES_DEVICE_CLOSURE
+	bool "Closure"
+
 config ALL_DEVICES_DEVICE_COLOR_TEMPERATURE_LIGHT
 	bool "Color temperature light"
+
+config ALL_DEVICES_DEVICE_COMMISSIONING_PROXY
+	bool "Commissioning by proxy"
 
 config ALL_DEVICES_DEVICE_CONTACT_SENSOR
 	bool "Contact sensor"
@@ -79,6 +85,9 @@ config ALL_DEVICES_DEVICE_FLOW_SENSOR
 
 config ALL_DEVICES_DEVICE_GENERIC_SWITCH
 	bool "Generic switch"
+
+config ALL_DEVICES_DEVICE_HUMIDITY_CONDITIONER
+	bool "Humidity conditioner"
 
 config ALL_DEVICES_DEVICE_HUMIDITY_SENSOR
 	bool "Humidity sensor"
@@ -156,6 +165,9 @@ config ALL_DEVICES_DEVICE_SPEAKER
 config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
 	bool "Temperature sensor"
 
+config ALL_DEVICES_DEVICE_THREAD_BORDER_ROUTER
+	bool "Thread border router"
+
 config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
 	bool "Water freeze detector"
 
@@ -164,5 +176,8 @@ config ALL_DEVICES_DEVICE_WATER_LEAK_DETECTOR
 
 config ALL_DEVICES_DEVICE_WATER_VALVE
 	bool "Water valve"
+
+config ALL_DEVICES_DEVICE_WINDOW_COVERING
+	bool "WindowCovering"
 
 endmenu

@@ -83,13 +83,21 @@ SimulatedClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::T
     Clusters::ClosureControl::GenericOverallCurrentState fallback =
         overallCurrentState.IsNull() ? Clusters::ClosureControl::GenericOverallCurrentState() : overallCurrentState.Value();
 
-    auto newPosition =
-        position.HasValue() ? MakeOptional(DataModel::MakeNullable(MapToCurrentPosition(position.Value()))) : fallback.position;
-    auto newLatch = latch.HasValue() ? MakeOptional(DataModel::MakeNullable(latch.Value())) : fallback.latch;
+    const BitFlags<Clusters::ClosureControl::Feature> featureMap = ClosureControlCluster().GetFeatureMap();
+
+    // Fields for unsupported features are ignored, as the cluster does; carrying them into the
+    // pending state would make SetOverallCurrentState reject the whole update.
+    auto newPosition = (position.HasValue() && featureMap.Has(Clusters::ClosureControl::Feature::kPositioning))
+        ? MakeOptional(DataModel::MakeNullable(MapToCurrentPosition(position.Value())))
+        : fallback.position;
+    auto newLatch    = (latch.HasValue() && featureMap.Has(Clusters::ClosureControl::Feature::kMotionLatching))
+           ? MakeOptional(DataModel::MakeNullable(latch.Value()))
+           : fallback.latch;
+    auto newSpeed    = (speed.HasValue() && featureMap.Has(Clusters::ClosureControl::Feature::kSpeed)) ? MakeOptional(speed.Value())
+                                                                                                       : fallback.speed;
 
     // A closure is secure only when every supported securing mechanism is engaged.
-    const BitFlags<Clusters::ClosureControl::Feature> featureMap = ClosureControlCluster().GetFeatureMap();
-    bool isSecure                                                = true;
+    bool isSecure = true;
     if (featureMap.Has(Clusters::ClosureControl::Feature::kPositioning))
     {
         isSecure &= newPosition.HasValue() && !newPosition.Value().IsNull() &&
@@ -100,8 +108,8 @@ SimulatedClosure::HandleMoveToCommand(const Optional<Clusters::ClosureControl::T
         isSecure &= newLatch.HasValue() && !newLatch.Value().IsNull() && newLatch.Value().Value();
     }
 
-    mPendingCurrentState = Clusters::ClosureControl::GenericOverallCurrentState(
-        newPosition, newLatch, speed.HasValue() ? MakeOptional(speed.Value()) : fallback.speed, DataModel::MakeNullable(isSecure));
+    mPendingCurrentState =
+        Clusters::ClosureControl::GenericOverallCurrentState(newPosition, newLatch, newSpeed, DataModel::MakeNullable(isSecure));
     CancelTimer();
     VerifyOrReturnValue(mTimerDelegate.StartTimer(this, System::Clock::Seconds32(kTimeoutDurationSec)).Handle([](CHIP_ERROR err) {
         ChipLogError(DeviceLayer, "SimulatedClosure: failed to start move timer: %" CHIP_ERROR_FORMAT, err.Format());
