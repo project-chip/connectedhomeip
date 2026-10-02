@@ -26,6 +26,7 @@ static MTRDeviceController * sDeviceController = nil;
 static const uint16_t kTimeoutInSeconds = 10;
 static NSString * shortLogContent = @"This is a short log\n";
 static NSString * longLogContent = nil;
+static NSString * crashLogContent = nil;
 
 @interface MTRDiagnosticLogDownloadTests : MTRTestCase
 
@@ -54,9 +55,15 @@ static NSString * longLogContent = nil;
     }
     longLogContent = mutableLongLogContent;
 
+    NSMutableString * mutableCrashLogContent = [NSMutableString string];
+    while (mutableCrashLogContent.length < 16 * 1024) {
+        [mutableCrashLogContent appendString:shortLogContent];
+    }
+    crashLogContent = mutableCrashLogContent;
+
     NSString * endUserSupportLog = [self _createLogFile:shortLogContent];
     NSString * networkDiagnosticsLog = [self _createLogFile:longLogContent];
-    NSString * crashLog = [self _createLogFile:longLogContent];
+    NSString * crashLog = [self _createLogFile:crashLogContent];
 
     sDeviceController = [self startCommissionedAppWithName:@"all-clusters"
                                                  arguments:@[
@@ -124,6 +131,15 @@ static NSString * longLogContent = nil;
     usleep(100 * 1000);
 }
 
+- (void)_checkPartialCrashLogAtURL:(NSURL * _Nullable)url
+{
+    XCTAssertNotNil(url);
+    NSString * partialLog = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
+    XCTAssertGreaterThan(partialLog.length, 0);
+    XCTAssertLessThan(partialLog.length, crashLogContent.length);
+    XCTAssertTrue([crashLogContent hasPrefix:partialLog]);
+}
+
 - (void)test001_UserSupportLog
 {
     [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test001_UserSupportLog")];
@@ -136,7 +152,7 @@ static NSString * longLogContent = nil;
 
 - (void)test003_CrashLog
 {
-    [self _testDownloadLogWithContent:longLogContent type:MTRDiagnosticLogTypeCrash testName:@("test003_CrashLog")];
+    [self _testDownloadLogWithContent:crashLogContent type:MTRDiagnosticLogTypeCrash testName:@("test003_CrashLog")];
 }
 
 - (void)test004_CanceledDownload
@@ -162,6 +178,66 @@ static NSString * longLogContent = nil;
                    }];
 
     [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test004_CanceledDownload")];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test005_CanceledDownloadAfterTransferStarted
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Download canceled mid-transfer completed"];
+
+    MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sDeviceController];
+    XCTAssertNotNil(device);
+
+    NSString * tempDir = NSTemporaryDirectory();
+    NSFileManager * fileManager = [NSFileManager defaultManager];
+    NSSet * existingFiles = [NSSet setWithArray:[fileManager contentsOfDirectoryAtPath:tempDir error:nil]];
+    NSString * crashLogSuffix = [NSString stringWithFormat:@"_%016llX_Crash", kDeviceId];
+
+    [device downloadLogOfType:MTRDiagnosticLogTypeCrash
+                      timeout:kTimeoutInSeconds
+                        queue:dispatch_get_main_queue()
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+                       XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+                       [self _checkPartialCrashLogAtURL:url];
+                       [expectation fulfill];
+                   }];
+
+    BOOL transferStarted = NO;
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:kTimeoutInSeconds];
+    while (!transferStarted && [deadline timeIntervalSinceNow] > 0) {
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+        for (NSString * file in [fileManager contentsOfDirectoryAtPath:tempDir error:nil]) {
+            if ([file hasSuffix:crashLogSuffix] && ![existingFiles containsObject:file]) {
+                transferStarted = YES;
+                break;
+            }
+        }
+    }
+    XCTAssertTrue(transferStarted);
+
+    [self _testDownloadLogWithContent:shortLogContent type:MTRDiagnosticLogTypeEndUserSupport testName:@("test005_CanceledDownloadAfterTransferStarted")];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test006_TimedOutDownloadAfterTransferStarted
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Download timed out mid-transfer completed"];
+
+    MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sDeviceController];
+    XCTAssertNotNil(device);
+
+    [device downloadLogOfType:MTRDiagnosticLogTypeCrash
+                      timeout:2
+                        queue:dispatch_get_main_queue()
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+                       XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+                       [self _checkPartialCrashLogAtURL:url];
+                       [expectation fulfill];
+                   }];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }

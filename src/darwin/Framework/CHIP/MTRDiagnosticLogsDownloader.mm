@@ -357,15 +357,10 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
 
     [self cancelTimeoutTimer];
 
-    // If there is no abortHandler, it means that the BDX transfer has not
-    // started, so we can just call failure: directly.
-    //
-    // If there is an abortHandler, we need to call it to abort the transfer.
-    if (self.abortHandler == nil) {
-        [self failure:error];
-    } else {
+    if (self.abortHandler) {
         self.abortHandler(error);
     }
+    [self failure:error];
 }
 
 - (NSURL *)_toFileURL:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID
