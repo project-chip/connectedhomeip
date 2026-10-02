@@ -32,8 +32,8 @@ source_set("lock-cluster-service") {
   ]
   public_configs = [ ":config" ]
   sources = [
-    "include/Identify.h",
     "include/DoorLockClusterBridge.h",
+    "include/Identify.h",
     "include/LockEndpoint.h",
     "include/LockManager.h",
     "src/DoorLockDelegateImpl.cpp",
