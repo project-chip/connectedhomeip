@@ -145,32 +145,6 @@ device or running app:
     --string-arg test_from_file:/tmp/my_device_dump.json'
 ```
 
-### 5. Generating an Interactive HTML Viewer from a Dump File
-
-Because raw `.json` and `.txt` dumps contain numeric cluster, attribute,
-command, and device-type IDs that can be hard to read, this skill includes
-`scripts/dump_to_html.py` to convert any `MatterTlvJson` `.json` dump into a
-self-contained, interactive `.html` file.
-
-The HTML viewer automatically:
-
--   Reconstructs the parent-child **Endpoint Composition Tree** from
-    `Descriptor::PartsList` (handling both Full-Family and Tree patterns,
-    including bridged devices and multi-endpoint sub-devices).
--   Resolves Matter XML specification names and `ClusterObjects` types for all
-    device types, `BridgedDeviceBasicInformation::NodeLabel` labels,
-    `Descriptor::TagList` semantic tags, clusters, active `FeatureMap` flags,
-    accepted/generated commands, and decoded attribute values.
--   Provides a **Topology Tree Overview**, collapsible tree sidebar, breadcrumb
-    navigation, and instant search/filtering:
-
-```bash
-./scripts/run_in_python_env.sh out/python_env \
-  'python3 .agents/skills/device-data-model-dump/scripts/dump_to_html.py \
-    /tmp/my_device_dump.json \
-    -o /tmp/my_device_dump.html'
-```
-
 ---
 
 ## Method 2: Interactive Runtime Discovery via `chip-tool` (`Descriptor` Cluster `0x001D`)
