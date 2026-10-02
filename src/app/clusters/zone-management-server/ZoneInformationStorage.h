@@ -34,8 +34,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
                            const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage,
-                           const Optional<NodeId> & aNodeID         = NullOptional,
-                           const Optional<EndpointId> & aEndpointID = NullOptional)
+                           const Optional<NodeId> & aNodeID = NullOptional, const Optional<EndpointId> & aEndpointID = NullOptional)
     {
         Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage, aNodeID, aEndpointID);
     }

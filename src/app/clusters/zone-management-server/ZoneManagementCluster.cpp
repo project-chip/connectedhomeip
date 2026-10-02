@@ -88,8 +88,9 @@ CHIP_ERROR ZoneManagementCluster::ValidateConfiguration() const
 {
     if (HasFeature(Feature::kRemoteZones))
     {
-        VerifyOrReturnError(HasFeature(Feature::kUserDefined), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: RemoteZones requires UserDefined feature", mPath.mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kUserDefined), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: RemoteZones requires UserDefined feature", mPath.mEndpointId));
     }
 
     if (HasFeature(Feature::kUserDefined))
@@ -467,9 +468,10 @@ Status ZoneManagementCluster::ValidateTwoDCartesianZone(const TwoDCartesianZoneD
     return Status::Success;
 }
 
-Status ZoneManagementCluster::ValidateAndExtractRemoteZoneFields(
-    const Optional<DataModel::Nullable<NodeId>> & reqNodeId, const Optional<DataModel::Nullable<EndpointId>> & reqEndpointId,
-    Optional<NodeId> & outNodeId, Optional<EndpointId> & outEndpointId) const
+Status ZoneManagementCluster::ValidateAndExtractRemoteZoneFields(const Optional<DataModel::Nullable<NodeId>> & reqNodeId,
+                                                                 const Optional<DataModel::Nullable<EndpointId>> & reqEndpointId,
+                                                                 Optional<NodeId> & outNodeId,
+                                                                 Optional<EndpointId> & outEndpointId) const
 {
     outNodeId     = NullOptional;
     outEndpointId = NullOptional;
