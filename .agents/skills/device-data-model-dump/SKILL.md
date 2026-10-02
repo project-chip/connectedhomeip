@@ -2,11 +2,11 @@
 name: device-data-model-dump
 description:
     Dump and inspect the runtime Matter Data Model (endpoints, clusters,
-    attributes, commands, events, and device types) from a Matter device or
-    example application using TC_IDM_12_1 (TC_DeviceBasicComposition.py) or
-    chip-tool Descriptor cluster queries. Use when inspecting the live data
-    model topology of a Matter device or generating MatterTlvJson device dumps
-    for conformance testing.
+    attributes, commands, and device types) from a Matter device or example
+    application using TC_IDM_12_1 (TC_DeviceBasicComposition.py) or chip-tool
+    Descriptor cluster queries. Use when inspecting the live data model topology
+    of a Matter device or generating MatterTlvJson device dumps for conformance
+    testing.
 ---
 
 # Matter Device Data Model Dump & Runtime Discovery
@@ -14,8 +14,8 @@ description:
 ## Overview
 
 You can inspect or export the ground-truth runtime Data Model (endpoints,
-clusters, attributes, commands, events, and device types) from any running
-Matter device or example application using two standard approaches:
+clusters, attributes, commands, and device types) from any running Matter device
+or example application using two standard approaches:
 
 1. **Full Data Model Dump (`TC_IDM_12_1` in `TC_DeviceBasicComposition.py`)**:
    Performs a wildcard read across all endpoints, clusters, and attributes,
@@ -33,8 +33,7 @@ Matter device or example application using two standard approaches:
 The `test_TC_IDM_12_1` test in `src/python_testing/TC_DeviceBasicComposition.py`
 (implemented via `BasicCompositionTests.dump_wildcard` in
 `src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py`)
-performs a full wildcard attribute and event read of the device and writes
-**two** files:
+performs a full wildcard attribute read of the device and writes **two** files:
 
 -   **`<name>.json` (`MatterTlvJson` format)**: Raw TLV structure of all
     endpoints, clusters, and attributes. Used for CSA certification submission
@@ -70,15 +69,15 @@ This generates `/tmp/my_device_dump.json` and `/tmp/my_device_dump.txt`.
 
 ### 1. Running Locally Against an Example App (`run_python_test.py`)
 
-Ensure the Python testing environment (`out/python_env`) and target application
-(e.g., `all-devices-app`) are built:
+Ensure the Python testing environment (`out/venv`) and target application (e.g.,
+`all-devices-app`) are built:
 
 ```bash
-# Build python_env if not already present
-./scripts/build_python.sh -i out/python_env
+# Build venv if not already present
+./scripts/build_python.sh -i out/venv --enable_ipv4 true
 
 # Build all-devices-app if not already built
-source scripts/activate.sh && ./scripts/build/build_examples.py --target linux-x64-all-devices-boringssl build
+source scripts/activate.sh && ./scripts/build/build_examples.py --target linux-x64-all-devices-clang build
 ```
 
 Run `test_TC_IDM_12_1` using `run_python_test.py` (which launches the app,
@@ -86,11 +85,11 @@ connects over PASE using default discriminator `3840` / manual code
 `34970112332`, and writes the dump files):
 
 ```bash
-./scripts/run_in_python_env.sh out/python_env \
+./scripts/run_in_python_env.sh out/venv \
   './scripts/tests/run_python_test.py \
     --factory-reset \
-    --app ./out/linux-x64-all-devices-boringssl/all-devices-app \
-    --app-args "--device on-off-light" \
+    --app ./out/linux-x64-all-devices-clang/all-devices-app \
+    --app-args "--device on-off-light --KVS /tmp/chip_kvs_dump" \
     --script src/python_testing/TC_DeviceBasicComposition.py \
     --script-args "--storage-path /tmp/chip_admin_storage.json --manual-code 34970112332 --tests test_TC_IDM_12_1 --string-arg dump_device_composition_path:/tmp/my_device_dump"'
 ```
@@ -103,7 +102,7 @@ omitting `--commissioning-method`, the script connects directly over a PASE
 session without needing to commission the device:
 
 ```bash
-./scripts/run_in_python_env.sh out/python_env \
+./scripts/run_in_python_env.sh out/venv \
   'python3 src/python_testing/TC_DeviceBasicComposition.py \
     --manual-code 34970112332 \
     --storage-path /tmp/chip_admin_storage.json \
@@ -141,7 +140,7 @@ cluster and device-type conformance checks offline without needing the physical
 device or running app:
 
 ```bash
-./scripts/run_in_python_env.sh out/python_env \
+./scripts/run_in_python_env.sh out/venv \
   'python3 src/python_testing/TC_DeviceConformance.py \
     --string-arg test_from_file:/tmp/my_device_dump.json'
 ```
@@ -157,11 +156,11 @@ exposes the live topology of the node. You can query it directly with
 ### 1. Commission the Device
 
 Start the target device (e.g.,
-`./out/linux-x64-all-devices-boringssl/all-devices-app --device on-off-light`)
-and commission it with `chip-tool` using a chosen `<node-id>` (e.g., `1`):
+`./out/linux-x64-all-devices-clang/all-devices-app --device on-off-light`) and
+commission it with `chip-tool` using a chosen `<node-id>` (e.g., `1`):
 
 ```bash
-./out/linux-x64-chip-tool/chip-tool pairing onnetwork 1 20202021
+./out/linux-x64-chip-tool-clang/chip-tool pairing onnetwork 1 20202021
 ```
 
 ### 2. Discover All Active Endpoints (`PartsList`)
@@ -170,7 +169,7 @@ Read the `PartsList` attribute (`0x0003`) on the Root Node (**Endpoint `0`**) to
 list all active non-root endpoints on the device:
 
 ```bash
-./out/linux-x64-chip-tool/chip-tool descriptor read parts-list 1 0
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read parts-list 1 0
 ```
 
 Example output:
@@ -189,13 +188,13 @@ cluster list across **all** endpoints at once:
 
 ```bash
 # Server clusters on Endpoint 1
-./out/linux-x64-chip-tool/chip-tool descriptor read server-list 1 1
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read server-list 1 1
 
 # Server clusters across ALL endpoints (wildcard endpoint 0xFFFF)
-./out/linux-x64-chip-tool/chip-tool descriptor read server-list 1 0xFFFF
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read server-list 1 0xFFFF
 
 # Client clusters across ALL endpoints
-./out/linux-x64-chip-tool/chip-tool descriptor read client-list 1 0xFFFF
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read client-list 1 0xFFFF
 ```
 
 Example output:
@@ -217,10 +216,10 @@ using `0xFFFF`:
 
 ```bash
 # Device types on Endpoint 1
-./out/linux-x64-chip-tool/chip-tool descriptor read device-type-list 1 1
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read device-type-list 1 1
 
 # Device types across ALL endpoints
-./out/linux-x64-chip-tool/chip-tool descriptor read device-type-list 1 0xFFFF
+./out/linux-x64-chip-tool-clang/chip-tool descriptor read device-type-list 1 0xFFFF
 ```
 
 Example output:
@@ -241,15 +240,15 @@ and revision of any cluster on an endpoint (e.g., `onoff` on Endpoint `1`):
 
 ```bash
 # List all supported attribute IDs on the cluster
-./out/linux-x64-chip-tool/chip-tool onoff read attribute-list 1 1
+./out/linux-x64-chip-tool-clang/chip-tool onoff read attribute-list 1 1
 
 # List accepted (client-to-server) command IDs
-./out/linux-x64-chip-tool/chip-tool onoff read accepted-command-list 1 1
+./out/linux-x64-chip-tool-clang/chip-tool onoff read accepted-command-list 1 1
 
 # List generated (server-to-client) command IDs
-./out/linux-x64-chip-tool/chip-tool onoff read generated-command-list 1 1
+./out/linux-x64-chip-tool-clang/chip-tool onoff read generated-command-list 1 1
 
 # Read the FeatureMap bitmask and ClusterRevision
-./out/linux-x64-chip-tool/chip-tool onoff read feature-map 1 1
-./out/linux-x64-chip-tool/chip-tool onoff read cluster-revision 1 1
+./out/linux-x64-chip-tool-clang/chip-tool onoff read feature-map 1 1
+./out/linux-x64-chip-tool-clang/chip-tool onoff read cluster-revision 1 1
 ```
