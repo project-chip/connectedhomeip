@@ -58,7 +58,6 @@ WARNING: --overwrite will replace the selected development PAA certificates and 
 Back up these certificates and keys before running with --overwrite so you can restore the existing chains.
 Existing PAIs and DACs that chain to the current PAAs will not validate against the new PAA certificates.
 You will need to generate new PAIs and DACs chaining to the new PAA certificates.
-You will also need to add the new certificates to src/python_testing/matter_testing_infrastructure/credential_files.gni.
 EOF
 fi
 
@@ -77,31 +76,13 @@ for name in "${names[@]}"; do
     done
 done
 
-if [[ $pqc == true ]]; then
-    # Select OpenSSL through pkg-config, then use that installation at runtime too.
-    # Override discovery with PKG_CONFIG_PATH=/path/to/openssl/lib/pkgconfig.
-    if [[ -z ${PKG_CONFIG_PATH:-} && -f /opt/lib64/pkgconfig/openssl.pc ]]; then
-        export PKG_CONFIG_PATH=/opt/lib64/pkgconfig
-    fi
-    if ! pkg-config --atleast-version=3.5.0 openssl; then
-        echo 'OpenSSL 3.5+ required; set PKG_CONFIG_PATH to its pkgconfig directory.' >&2
-        exit 1
-    fi
-    openssl_libdir=$(pkg-config --variable=libdir libcrypto)
-    openssl_prefix=$(pkg-config --variable=prefix openssl)
-    [[ -d "$openssl_libdir" && -x "$openssl_prefix/bin/openssl" ]] || {
-        echo 'The pkg-config OpenSSL installation must contain libraries and bin/openssl.' >&2
-        exit 1
-    }
-    export LD_LIBRARY_PATH="$openssl_libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-    export PATH="$openssl_prefix/bin:$PATH"
-fi
-
 if ! command -v "$chip_cert_tool" >/dev/null 2>&1; then
     echo "Cannot execute chip-cert: $chip_cert_tool" >&2
     exit 1
 fi
 
+# Let chip-cert validate ML-DSA support using its actual runtime libraries.
+# Generate and convert all roots in staging before replacing existing files.
 staging_dir=$(mktemp -d "$here/.paa.XXXXXX")
 trap 'rm -rf -- "$staging_dir"' EXIT
 trap 'exit 129' HUP
@@ -118,7 +99,6 @@ for name in "${names[@]}"; do
     if [[ $pqc == true ]]; then
         variant=${name##*-}
         subject_cn="Matter Development PAA ML-DSA-$variant"
-        valid_from="2026-06-28 14:23:43"
         key_options=(--subject-vid FFF1 --key-type "ml-dsa-$variant")
     fi
 

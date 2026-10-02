@@ -49,21 +49,16 @@ class TestGenerateDevelopmentLegacyPaaCerts(unittest.TestCase):
             output.parent.mkdir(exist_ok=True)
         binary_dir = self.root / "bin"
         binary_dir.mkdir()
-        self.env = dict(os.environ, PATH=f"{binary_dir}:{os.environ['PATH']}", TEST_ROOT=str(self.root), FAIL_AT="0",
-                        OPENSSL_AVAILABLE="1" if self.pqc else "0")
+        self.env = dict(os.environ, PATH=f"{binary_dir}:{os.environ['PATH']}", TEST_ROOT=str(self.root), FAIL_AT="0")
         executables = {
             "pkg-config": '''#!/usr/bin/env bash
 echo "$*" >> "$TEST_ROOT/pkg-config-calls"
-if [[ $OPENSSL_AVAILABLE != 1 ]]; then
-    exit 1
-fi
-case "$1" in
-    --atleast-version=3.5.0) exit 0 ;;
-    --variable=libdir|--variable=prefix) echo "$TEST_ROOT" ;;
-    *) exit 1 ;;
-esac
+exit 1
 ''',
-            "openssl": "#!/usr/bin/env bash\nexit 0\n",
+            "openssl": '''#!/usr/bin/env bash
+echo "$*" >> "$TEST_ROOT/openssl-calls"
+exit 1
+''',
             "chip-cert": '''#!/usr/bin/env bash
 set -eu
 echo "$1" >> "$TEST_ROOT/calls"
@@ -118,7 +113,7 @@ fi
         self.assertFalse((self.root / "calls").exists())
 
     def test_success(self) -> None:
-        """Both modes publish only selected files with correct permissions and OpenSSL checks."""
+        """Both modes publish selected files with correct permissions without external OpenSSL checks."""
         other_names = ("Chip-Development-PAA",) if self.pqc else (
             "Chip-Development-PAA-ML-DSA-44", "Chip-Development-PAA-ML-DSA-65")
         other_cert_dir = "attestation" if self.pqc else "paa-root-certs"
@@ -141,28 +136,25 @@ fi
                 if overwrite:
                     for warning in ("WARNING", "Back up", "will not validate", "generate new PAIs and DACs"):
                         self.assertIn(warning, result.stderr)
-                    self.assertIn(
-                        "add the new certificates to src/python_testing/matter_testing_infrastructure/credential_files.gni",
-                        result.stderr,
-                    )
                 for output in self.outputs:
                     self.assertEqual(output.read_text(), f"new {output.name}\n")
                     self.assertEqual(stat.S_IMODE(output.stat().st_mode), 0o600 if "Key" in output.name else 0o644)
                 for output in other_outputs:
                     self.assertEqual(output.read_text(), "unselected")
                 self.assertEqual(list(self.root.glob(".paa.*")), [])
+                self.assertFalse((self.root / "pkg-config-calls").exists())
+                self.assertFalse((self.root / "openssl-calls").exists())
                 arguments = (self.root / "arguments").read_text()
+                for invocation in arguments.splitlines():
+                    if invocation.startswith("gen-att-cert "):
+                        self.assertIn("--valid-from 2021-06-28 14:23:43", invocation)
                 if self.pqc:
-                    self.assertIn("--atleast-version=3.5.0 openssl", (self.root / "pkg-config-calls").read_text())
                     for variant in (44, 65):
                         self.assertIn(f"--key-type ml-dsa-{variant}", arguments)
                     self.assertIn("--subject-vid FFF1", arguments)
-                    self.assertIn("--valid-from 2026-06-28 14:23:43", arguments)
                 else:
-                    self.assertFalse((self.root / "pkg-config-calls").exists())
                     self.assertNotIn("--key-type", arguments)
                     self.assertNotIn("--subject-vid", arguments)
-                    self.assertIn("--valid-from 2021-06-28 14:23:43", arguments)
 
     def test_generation_failure_preserves_all_targets(self) -> None:
         """Failure at any generation or conversion step must leave all targets untouched."""
@@ -194,21 +186,9 @@ fi
 
 
 class TestGenerateDevelopmentPqcPaaCerts(TestGenerateDevelopmentLegacyPaaCerts):
-    """Run the safeguards for both PQC roots and verify their OpenSSL requirement."""
+    """Run the safeguards for both PQC roots using chip-cert's runtime checks."""
 
     pqc = True
-
-    def test_rejects_unsupported_openssl(self) -> None:
-        """An unsupported OpenSSL must fail before any credential generation or replacement."""
-        self.env["OPENSSL_AVAILABLE"] = "0"
-        self._seed_outputs()
-        result = self._run("--overwrite", "chip-cert")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("OpenSSL 3.5+ required", result.stderr)
-        self.assertFalse((self.root / "calls").exists())
-        for output in self.outputs:
-            self.assertEqual(output.read_text(), f"old {output.name}\n")
-        self.assertEqual(list(self.root.glob(".paa.*")), [])
 
     def test_flags_in_reverse_order(self) -> None:
         """Overwrite and PQC flags may be supplied in either order."""
