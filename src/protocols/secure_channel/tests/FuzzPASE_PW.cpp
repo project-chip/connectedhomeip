@@ -415,14 +415,19 @@ void TestPASESession::FuzzHandlePBKDFParamRequest(vector<uint8_t> fuzzPBKDFLocal
     pairingAccessory.Init(sessionManager, 0, &delegateAccessory);
 
     // This was done to have an exchange context
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(LocalMRPConfig);
 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
 
+<<<<<<< HEAD
     pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(req));
+=======
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
+                                                             std::move(req));
+>>>>>>> c11ec17 (Fix exchange leaks that lead to unreachable devices (#74348))
 
     DrainAndServiceIO();
 }
@@ -466,7 +471,7 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     // This was done to have an exchange context
-    pairingCommissioner.mExchangeCtxt.Emplace(*contextCommissioner);
+    pairingCommissioner.AdoptExchange(*contextCommissioner);
 
     ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                  System::Clock::Milliseconds16(4000));
@@ -534,8 +539,13 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
 
+<<<<<<< HEAD
     pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(), payloadHeaderCommissioner,
                                           std::move(resp));
+=======
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(pairingCommissioner.mExchangeCtxt.Get(), payloadHeaderCommissioner,
+                                                                std::move(resp));
+>>>>>>> c11ec17 (Fix exchange leaks that lead to unreachable devices (#74348))
 
     DrainAndServiceIO();
 }
@@ -622,7 +632,7 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     // responder.
     ExchangeContext * contextAccessory = NewUnauthenticatedExchangeToBob(&pairingAccessory);
 
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -644,7 +654,12 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake1);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake1);
 
+<<<<<<< HEAD
     pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(msg));
+=======
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
+                                                             std::move(msg));
+>>>>>>> c11ec17 (Fix exchange leaks that lead to unreachable devices (#74348))
 
     DrainAndServiceIO();
 }
@@ -700,7 +715,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     // This was done to have an exchange context
-    pairingCommissioner.mExchangeCtxt.Emplace(*contextCommissioner);
+    pairingCommissioner.AdoptExchange(*contextCommissioner);
 
     pairingCommissioner.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -769,8 +784,13 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake2);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake2);
 
+<<<<<<< HEAD
     pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(), payloadHeaderCommissioner,
                                           std::move(msg2));
+=======
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(pairingCommissioner.mExchangeCtxt.Get(), payloadHeaderCommissioner,
+                                                                std::move(msg2));
+>>>>>>> c11ec17 (Fix exchange leaks that lead to unreachable devices (#74348))
 
     DrainAndServiceIO();
 }
@@ -850,7 +870,7 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     ExchangeContext * contextAccessory = NewUnauthenticatedExchangeToBob(&pairingAccessory);
 
     // This was done to have an exchange context
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -908,7 +928,12 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake3);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake3);
 
+<<<<<<< HEAD
     pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(msg3));
+=======
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
+                                                             std::move(msg3));
+>>>>>>> c11ec17 (Fix exchange leaks that lead to unreachable devices (#74348))
 
     DrainAndServiceIO();
 }

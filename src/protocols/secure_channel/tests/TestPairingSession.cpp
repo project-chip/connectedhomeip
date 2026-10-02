@@ -43,6 +43,12 @@ using namespace TLV;
 class TestPairingSession : public PairingSession, public ::testing::Test
 {
 public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+
     static void SetUpTestSuite()
     {
         CHIP_ERROR error = chip::Platform::MemoryInit();
@@ -408,6 +414,12 @@ namespace {
 class FakePairingSession : public PairingSession
 {
 public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
     ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
