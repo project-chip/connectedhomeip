@@ -26,9 +26,10 @@ Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & ide
                        Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
                        Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
                        Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)), mContext(context),
-    mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate), mHeatingDelegate(heatingDelegate),
-    mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate), mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
+    mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
+    mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate),
+    mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate)
 {}
 
 CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
