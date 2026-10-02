@@ -300,10 +300,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
         return chefOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
     default:
-        if (buffer != nullptr && maxReadLength > 0)
-        {
-            memset(buffer, 0, maxReadLength);
-        }
         break;
     }
     return Protocols::InteractionModel::Status::Success;

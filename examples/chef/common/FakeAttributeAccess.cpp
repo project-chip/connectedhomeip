@@ -110,25 +110,39 @@ public:
             }
             switch (path.mAttributeId)
             {
-            case WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id:
-            case WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id: {
+            case WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id: {
                 DataModel::Nullable<Percent100ths> value;
                 if (decoder.Decode(value) != CHIP_NO_ERROR)
                 {
                     return ::pw::Status::Internal();
                 }
                 cluster->SetTargetPositionLiftPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            case WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
                 cluster->SetCurrentPositionLiftPercent100ths(value);
                 return ::pw::OkStatus();
             }
-            case WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id:
-            case WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id: {
+            case WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id: {
                 DataModel::Nullable<Percent100ths> value;
                 if (decoder.Decode(value) != CHIP_NO_ERROR)
                 {
                     return ::pw::Status::Internal();
                 }
                 cluster->SetTargetPositionTiltPercent100ths(value);
+                return ::pw::OkStatus();
+            }
+            case WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id: {
+                DataModel::Nullable<Percent100ths> value;
+                if (decoder.Decode(value) != CHIP_NO_ERROR)
+                {
+                    return ::pw::Status::Internal();
+                }
                 cluster->SetCurrentPositionTiltPercent100ths(value);
                 return ::pw::OkStatus();
             }
