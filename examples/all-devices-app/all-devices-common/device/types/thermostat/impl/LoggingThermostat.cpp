@@ -281,9 +281,11 @@ CHIP_ERROR LoggingThermostat::AppendToPendingPresetList(const thermostat::Preset
     {
         // Do not derive new handles from the scenario: an existing preset can change scenarios.
         // At most kPresetCapacity handles in each list are in use, so this search always has a free slot.
-        for (uint8_t handle = 1; handle <= 2 * kPresetCapacity + 1; ++handle)
+        static_assert(2 * kPresetCapacity + 1 <= UINT8_MAX);
+        for (int handle = 1; handle <= 2 * kPresetCapacity + 1; ++handle)
         {
-            const ByteSpan candidate(&handle, 1);
+            const uint8_t handleByte = static_cast<uint8_t>(handle);
+            const ByteSpan candidate(&handleByte, 1);
             const auto containsHandle = [&](const auto & presets, uint8_t count) {
                 for (uint8_t index = 0; index < count; ++index)
                 {
