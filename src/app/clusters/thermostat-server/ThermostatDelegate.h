@@ -72,6 +72,17 @@ public:
 
     virtual Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const;
     virtual Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> remoteSensing, bool & changed) = 0;
+
+    /**
+     * @brief Get the source to report in SetpointChangeSource for the setpoint change currently being applied.
+     *        Called whenever one of the operational setpoints (Occupied/UnoccupiedHeating/CoolingSetpoint) changes.
+     *        The default implementation always reports Manual, since the cluster itself has no autonomous
+     *        mechanism (e.g. schedule application) that changes setpoints on its own; a delegate driving setpoints
+     *        from such a mechanism should override this to report the appropriate source.
+     *
+     * @return The SetpointChangeSourceEnum value to report.
+     */
+    virtual SetpointChangeSourceEnum GetSetpointChangeSource() { return SetpointChangeSourceEnum::kManual; }
 };
 
 } // namespace Thermostat
