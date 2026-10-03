@@ -99,8 +99,9 @@ protected:
     void StartWatchdogTimer();
     void StopWatchdogTimer();
     void StartSelectedTimer(SelectedTimer timer);
-    void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
-    void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
+    // Virtual so unit tests can intercept timer scheduling without standing up a SystemLayer.
+    virtual void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
+    virtual void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);
     bool ProviderLocationsEqual(const ProviderLocationType & a, const ProviderLocationType & b);
     // Return value of CHIP_NO_ERROR indicates a query retry has been successfully scheduled.
     CHIP_ERROR ScheduleQueryRetry(bool trySameProvider, System::Clock::Seconds32 delay);
@@ -115,10 +116,18 @@ protected:
     uint16_t maxDownloadBlockSize  = 1024;
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
+    // Maximum number of consecutive short retries to attempt when the provider explicitly
+    // aborts the in-progress BDX transfer before falling back to the periodic query timer.
+    static constexpr uint8_t kMaxAbortedByPeerRetryCount = 3;
     // Track retry count for the current provider
     uint8_t mProviderRetryCount = 0;
     // Track query image retry count on invalid session error
     uint8_t mInvalidSessionRetryCount = 0;
+    // Track consecutive peer-aborted download retries. Reset only on a clean kIdle entry,
+    // UpdateDownloaded(), or UpdateCancelled(). Intentionally NOT reset on kUnknown or
+    // kInvalidSession idle entries: a misbehaving provider could otherwise defeat the
+    // kMaxAbortedByPeerRetryCount cap by interleaving transient teardowns between aborts.
+    uint8_t mAbortedByPeerRetryCount = 0;
     // Track whether to send notify update applied after successful update
     bool mSendNotifyUpdateApplied = true;
 };
