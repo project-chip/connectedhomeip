@@ -204,6 +204,7 @@ private:
     std::optional<bool> IsListAttributePath(const ConcreteAttributePath & path);
 
     Messaging::ExchangeHolder mExchangeCtx;
+    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
 
