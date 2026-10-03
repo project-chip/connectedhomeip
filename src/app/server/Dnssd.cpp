@@ -52,6 +52,14 @@ namespace chip {
 namespace app {
 namespace {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+void LogThreadOperationalAdvertisingState()
+{
+    ChipLogError(Discovery, "Thread state at operational advertising failure: provisioned=%d attached=%d",
+                 ConnectivityMgr().IsThreadProvisioned(), ConnectivityMgr().IsThreadAttached());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     switch (event->Type)
@@ -242,7 +250,14 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                         ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
         // Should we keep trying to advertise the other operational
         // identities on failure?
-        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+        CHIP_ERROR err = mdnsAdvertiser.Advertise(advertiseParameters);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            LogThreadOperationalAdvertisingState();
+#endif
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
