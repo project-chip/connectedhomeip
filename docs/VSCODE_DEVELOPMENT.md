@@ -52,6 +52,10 @@ Tested on:
    select "Run Task..."
 1. Select the "Bootstrap" task
 
+## Fetching submodules
+
+1. For a clean checkout, consider running: `./scripts/checkout_submodules.py --shallow --platform <your-platform>` <br> OR for a full checkout:  `git submodule update -f --init --recursive`
+
 ## Building the Source Tree
 
 1. Under the "Terminal" menu select "Run Build Task..."
