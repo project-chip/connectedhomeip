@@ -2633,7 +2633,7 @@ CHIP_ERROR JointFabricDatastore::StartAclEntrySync(NodeId nodeId, uint16_t listI
     auto sameOperation  = [match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
     CHIP_ERROR startErr = mDelegate->SyncNode(
         nodeId, payload, superseded,
-        [this, nodeId, sameOperation, removal, sentValue = it->ACLEntry, generation = mSyncGeneration](CHIP_ERROR syncErr) {
+        [this, nodeId, match, sameOperation, removal, sentValue = it->ACLEntry, generation = mSyncGeneration](CHIP_ERROR syncErr) {
             VerifyOrReturn(generation == mSyncGeneration);
             if (syncErr != CHIP_NO_ERROR)
             {
@@ -2645,19 +2645,23 @@ CHIP_ERROR JointFabricDatastore::StartAclEntrySync(NodeId nodeId, uint16_t listI
             }
             else
             {
-                auto entry = std::find_if(mACLEntries.begin(), mACLEntries.end(), sameOperation);
+                // The node now holds the value sent here, also if the entry was marked for removal meanwhile: its
+                // removal must remove that value, not the one this sync replaced.
+                auto entry = std::find_if(mACLEntries.begin(), mACLEntries.end(), match);
                 if (entry != mACLEntries.end())
                 {
                     if (detail::AclEntryValueEquals(EncodeAccessControlEntry(entry->ACLEntry), EncodeAccessControlEntry(sentValue)))
                     {
-                        entry->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                        entry->statusEntry.failureCode = 0;
                         entry->supersededValue.reset();
+                        if (!HasRemovalIntent(*entry))
+                        {
+                            entry->statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                            entry->statusEntry.failureCode = 0;
+                        }
                     }
                     else
                     {
-                        // Updated again while this sync was in flight: the node now holds the value sent
-                        // here, which the queued sync replaces.
+                        // Changed while this sync was in flight: the queued sync replaces or removes the value sent here.
                         entry->supersededValue = sentValue;
                     }
                 }

@@ -3133,6 +3133,34 @@ TEST(JointFabricDatastoreTest, FailedCatRewriteIsRetriedAsReplaceAtRefresh)
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
+// An update that reaches the node after the entry was updated again and marked for removal: the node now holds the value
+// that update sent, and the removal removes it.
+TEST(JointFabricDatastoreTest, RemovalRemovesValueLeftByInFlightUpdate)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    SetUpCatGroup(store);
+    SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { NodeIdFromCASEAuthTag(0x2345'0001) }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 3, std::nullopt), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(); // the node now holds version 2
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0003) });
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0002) });
+
+    delegate.RunDeferred();
+    EXPECT_EQ(FindAcl(store, 123, 5), nullptr);
+}
+
 // Removing the joint fabric drops queued syncs. A sync in flight still completes, and its completion changes
 // nothing: it must not start an operation queued since, which would then run alongside the one in flight.
 TEST(JointFabricDatastoreTest, FabricRemovalIgnoresSyncCompletingAfterIt)
