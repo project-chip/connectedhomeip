@@ -34,7 +34,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_TLSCERT_Base import TC_TLSCERT_Base
+from support_modules.tlscert_testbase import TC_TLSCERT_Base
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

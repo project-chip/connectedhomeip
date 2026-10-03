@@ -38,8 +38,8 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
-from TC_PAVSTTestBase import PAVSTTestBase
+from support_modules.pavst_testbase import PAVSTTestBase
+from support_modules.pavsti_utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 
 import matter.clusters as Clusters
 from matter.clusters import Globals

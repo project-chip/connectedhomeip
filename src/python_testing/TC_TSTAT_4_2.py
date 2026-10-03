@@ -41,7 +41,7 @@ import random
 from collections import namedtuple
 
 from mobly import asserts
-from TC_TSTAT_Utils import ThermostatBaseTest
+from support_modules.tstat_utils import ThermostatBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
