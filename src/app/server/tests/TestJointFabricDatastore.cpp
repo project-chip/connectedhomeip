@@ -2221,9 +2221,46 @@ TEST(JointFabricDatastoreTest, RefreshWithFullAclListDoesNotWriteNodeAcls)
     EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
 }
 
-// A tombstoned value the node still holds is added back to be removed only if the ACL list has room. Otherwise the
-// refresh writes nothing and keeps the tombstone, so that a later refresh removes the value instead of adopting it.
-TEST(JointFabricDatastoreTest, RefreshWithFullAclListKeepsTombstone)
+// The node's entries whose add failed for good are dropped before the ACL write, which frees their room. With the ACL
+// list full, an entry the node holds that the datastore does not is adopted into that room, and the refresh writes.
+TEST(JointFabricDatastoreTest, RefreshWithFullAclListAdoptsIntoRoomOfDroppedEntry)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 7, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitFailed);
+    store.GetNodeACLList().back().statusEntry.failureCode = to_underlying(Protocols::InteractionModel::Status::ConstraintError);
+    FillAclList(store);
+
+    datastore::ACLEntryStruct held;
+    held.ACLEntry.privilege = Privilege::kAdminister;
+    held.ACLEntry.authMode  = AuthMode::kCase;
+    held.ACLEntry.subjects  = { 0x2222 };
+    delegate.aclListToFetch.push_back(held);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_EQ(delegate.aclListSyncs.size(), 1u);
+    const auto & written = delegate.aclListSyncs[0].second;
+    ASSERT_EQ(written.size(), 1u);
+    EXPECT_EQ(written[0].privilege, Privilege::kAdminister);
+    EXPECT_TRUE(written[0].subjects == std::vector<uint64_t>{ 0x2222 });
+
+    EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
+    EXPECT_EQ(store.GetNodeACLList().size(), kMaxAclEntries);
+    const auto adopted = std::find_if(store.GetNodeACLList().begin(), store.GetNodeACLList().end(),
+                                      [](const auto & entry) { return entry.nodeID == 123; });
+    ASSERT_NE(adopted, store.GetNodeACLList().end());
+    EXPECT_TRUE(adopted->ACLEntry.subjects == std::vector<uint64_t>{ 0x2222 });
+    EXPECT_EQ(adopted->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
+// A tombstoned value the node still holds is added back to be removed if the ACL list has room. Otherwise the ACL
+// write leaves the value out, which removes it as well, and the tombstone stays until the node no longer holds the
+// value: if the node still holds it at a later refresh, the value is removed again instead of being adopted.
+TEST(JointFabricDatastoreTest, RefreshWithFullAclListRemovesTombstonedValue)
 {
     JointFabricDatastore store;
     TrackingDelegate delegate;
@@ -2240,12 +2277,17 @@ TEST(JointFabricDatastoreTest, RefreshWithFullAclListKeepsTombstone)
     FillAclList(store);
     const size_t aclListWrites = delegate.aclListSyncs.size();
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
-    EXPECT_EQ(delegate.aclListSyncs.size(), aclListWrites);
+    ASSERT_EQ(delegate.aclListSyncs.size(), aclListWrites + 1);
+    for (const auto & written : delegate.aclListSyncs.back().second)
+    {
+        EXPECT_FALSE(written.subjects == std::vector<uint64_t>{ 0x1111 });
+    }
     EXPECT_EQ(store.GetNodeACLList().size(), kMaxAclEntries);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
 
     store.GetNodeACLList().pop_back();
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
-    ASSERT_EQ(delegate.aclListSyncs.size(), aclListWrites + 1);
+    ASSERT_EQ(delegate.aclListSyncs.size(), aclListWrites + 2);
     for (const auto & written : delegate.aclListSyncs.back().second)
     {
         EXPECT_FALSE(written.subjects == std::vector<uint64_t>{ 0x1111 });

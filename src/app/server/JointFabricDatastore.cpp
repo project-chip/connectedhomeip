@@ -1201,10 +1201,34 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 VerifyOrReturn(generation == mSyncGeneration);
                 if (err == CHIP_NO_ERROR)
                 {
+                    // The kRefreshingACLs triage drops the node's entries whose sync failed for good, other than updates
+                    // whose old value the node still holds, which the merge below restores. The merge counts their room
+                    // as free: otherwise a full ACL list would end every refresh of the node before that triage.
+                    size_t droppedEntries = 0;
+                    for (const auto & entry : mACLEntries)
+                    {
+                        if (entry.nodeID != mRefreshingNodeId || !IsUnrecoverableCommitFailure(entry.statusEntry))
+                        {
+                            continue;
+                        }
+                        const bool restored = !HasRemovalIntent(entry) && entry.supersededValue.has_value() &&
+                            std::any_of(acls.begin(), acls.end(), [&entry](const auto & acl) {
+                                return detail::AclEntryValueEquals(acl.ACLEntry, EncodeAccessControlEntry(*entry.supersededValue));
+                            });
+                        if (!restored)
+                        {
+                            ++droppedEntries;
+                        }
+                    }
+                    auto hasRoom = [this, droppedEntries]() { return mACLEntries.size() - droppedEntries < kMaxACLs; };
+
                     // A node's ACL entries carry no listID, so fetched entries are matched to datastore
                     // entries by value.
                     std::vector<uint16_t> seenListIds;
                     size_t notAdoptedCount = 0;
+                    // Fetched values with a tombstone that are not added back for lack of room.
+                    std::vector<const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type *>
+                        tombstonedValuesLeftOut;
                     for (const auto & acl : acls)
                     {
                         bool matched = false;
@@ -1228,9 +1252,11 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         });
                         if (tombstone != mAclTombstones.end())
                         {
-                            if (mACLEntries.size() >= kMaxACLs)
+                            if (!hasRoom())
                             {
-                                ++notAdoptedCount;
+                                // The ACL write replaces the node's whole list, so leaving the value out of it removes
+                                // the value too. The tombstone is kept until the node no longer holds the value.
+                                tombstonedValuesLeftOut.push_back(&acl);
                                 continue;
                             }
                             datastore::ACLEntryStruct readded;
@@ -1287,7 +1313,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         }
 
                         // Added to the node outside the datastore: adopted as Committed, as RefreshNode specifies.
-                        if (mACLEntries.size() >= kMaxACLs)
+                        if (!hasRoom())
                         {
                             ++notAdoptedCount;
                             continue;
@@ -1335,18 +1361,25 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     if (notAdoptedCount > 0)
                     {
                         // The ACL write replaces the node's whole list, so it would delete the entries that were not
-                        // adopted. Ending the refresh before the tombstones are dropped also keeps those of values
-                        // that were not added back.
+                        // adopted.
                         ChipLogError(AppServer, "ACL list full; %u ACL entries of node 0x" ChipLogFormatX64 " not adopted",
                                      static_cast<unsigned>(notAdoptedCount), ChipLogValueX64(mRefreshingNodeId));
                         FinishRefresh(CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
                         return;
                     }
 
-                    // The node no longer holds the values of the remaining tombstones.
-                    mAclTombstones.erase(std::remove_if(mAclTombstones.begin(), mAclTombstones.end(),
-                                                        [this](const auto & t) { return t.nodeId == mRefreshingNodeId; }),
-                                         mAclTombstones.end());
+                    // The node no longer holds the values of the remaining tombstones, other than those left out of the
+                    // write for lack of room.
+                    mAclTombstones.erase(
+                        std::remove_if(mAclTombstones.begin(), mAclTombstones.end(),
+                                       [this, &tombstonedValuesLeftOut](const auto & t) {
+                                           return t.nodeId == mRefreshingNodeId &&
+                                               std::none_of(tombstonedValuesLeftOut.begin(), tombstonedValuesLeftOut.end(),
+                                                            [this, &t](const auto * acl) {
+                                                                return AclTombstoneMatches(t, mRefreshingNodeId, acl->ACLEntry);
+                                                            });
+                                       }),
+                        mAclTombstones.end());
 
                     // Advance the state machine to process the ACLs.
                     mRefreshState = kRefreshingACLs;
