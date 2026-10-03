@@ -27,6 +27,8 @@
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
 
+#include <atomic>
+
 #define MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(NAME, TYPE, DEFAULT_VALUE, GETTER_NAME)                 \
     MTR_SIMPLE_REMOTE_XPC_GETTER(self.xpcConnection, NAME, TYPE, DEFAULT_VALUE, GETTER_NAME, deviceController \
                                  : self.uniqueIdentifier)
@@ -57,6 +59,7 @@ NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey 
 @implementation MTRDeviceController_XPC {
     // Protects access to the data set in controllerConfigurationUpdated:
     os_unfair_lock _configurationLock;
+    std::atomic<bool> _shutDown;
 }
 
 #pragma mark - Node ID Management
@@ -263,6 +266,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 - (void)_xpcConnectionRetry
 {
     MTR_LOG("%@: XPC Connection retry - timer hit", self);
+    if (_shutDown) {
+        MTR_LOG("%@: XPC Connection retry - controller is shut down, not reconnecting", self);
+        return;
+    }
     if (!self.xpcConnectedOrConnecting) {
         if (![self _setupXPCConnection]) {
 #if 0 // FIXME: Not sure why this retry is not working, but I will fix this later
@@ -547,8 +554,35 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (BOOL)isRunning
 {
-    // For XPC controller, always return yes
-    return YES;
+    return !_shutDown;
+}
+
+- (void)shutdown
+{
+    if (_shutDown.exchange(true)) {
+        return;
+    }
+
+    MTR_LOG("%@ shutdown called", self);
+
+    os_unfair_lock_lock(self.deviceMapLock);
+    auto * devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+    [self.nodeIDToDeviceMap removeAllObjects];
+    os_unfair_lock_unlock(self.deviceMapLock);
+
+    for (MTRDevice * device in devices) {
+        [device invalidate];
+    }
+
+    // Reconnect attempts run on the work queue, so clear the connection there.
+    __block NSXPCConnection * connection;
+    dispatch_sync(self.workQueue, ^{
+        connection = self.xpcConnection;
+        self.xpcConnection = nil;
+    });
+    [connection invalidate];
+
+    [super shutdown];
 }
 
 // Not Supported via XPC
