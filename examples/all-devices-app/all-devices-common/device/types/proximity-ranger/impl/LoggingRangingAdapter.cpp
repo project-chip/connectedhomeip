@@ -18,6 +18,7 @@
 #include "LoggingRangingAdapter.h"
 
 #include <app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -241,6 +242,25 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
         break;
     }
     return capabilities;
+}
+
+/// Get accessor for current RangingConstraints entries for current adapter technology.
+Span<const Structs::RangingConstraintStruct::Type> LoggingRangingAdapter::GetConstraints() const
+{
+    return Span<const Structs::RangingConstraintStruct::Type>(mConstraints.data(), mConstraints.size());
+}
+
+/// Set accessor for RangingConstraints updating the constraints list entries the current adapter publishes
+/// Generates an event for the attribute change
+void LoggingRangingAdapter::SetConstraints(Span<const Structs::RangingConstraintStruct::Type> constraints)
+{
+    mConstraints.assign(constraints.begin(), constraints.end());
+    ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] RangingConstraints updated: %u entries", LogTag(),
+                    static_cast<unsigned>(mConstraints.size()));
+    if (mCallback != nullptr)
+    {
+        mCallback->OnAttributeChanged(Attributes::RangingConstraints::Id);
+    }
 }
 
 // Constructor: binds the adapter to a single technology and, for BLE Beacon
