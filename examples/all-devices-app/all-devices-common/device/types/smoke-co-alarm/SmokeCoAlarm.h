@@ -35,7 +35,8 @@ class SmokeCoAlarm : public SingleEndpoint
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate);
+    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
+                 const Clusters::SmokeCoAlarmCluster::Config & smokeConfig);
     ~SmokeCoAlarm() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

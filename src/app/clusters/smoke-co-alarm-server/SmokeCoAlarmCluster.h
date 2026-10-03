@@ -49,13 +49,13 @@ public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         SmokeCoAlarm::Attributes::DeviceMuted::Id, SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
         SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id, SmokeCoAlarm::Attributes::ContaminationState::Id,
-        SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::ExpiryDate::Id,
-        SmokeCoAlarm::Attributes::Unmounted::Id>;
+        SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::Unmounted::Id>;
     struct Config
     {
         chip::BitFlags<SmokeCoAlarm::Feature> featureMap;
         OptionalAttributeSet optionalAttribs;
         bool inoperativeWhenUnmounted = false;
+        std::optional<uint32_t> expiryDate;
     };
 
     explicit SmokeCoAlarmCluster(EndpointId endpointId);
@@ -92,7 +92,6 @@ public:
     bool SetInterconnectCOAlarm(SmokeCoAlarm::AlarmStateEnum newInterconnectCOAlarm);
     void SetContaminationState(SmokeCoAlarm::ContaminationStateEnum newContaminationState);
     void SetSmokeSensitivityLevel(SmokeCoAlarm::SensitivityEnum newSmokeSensitivityLevel);
-    void SetExpiryDate(uint32_t newExpiryDate);
     /**
      * @brief Sets Unmounted attribute and updates ExpressedState accordingly.
      * @param isUnmounted new unmounted state
@@ -115,7 +114,7 @@ public:
     SmokeCoAlarm::AlarmStateEnum GetInterconnectCOAlarm() const { return mInterconnectCOAlarm; }
     SmokeCoAlarm::ContaminationStateEnum GetContaminationState() const { return mContaminationState; }
     SmokeCoAlarm::SensitivityEnum GetSmokeSensitivityLevel() const { return mSmokeSensitivityLevel; }
-    uint32_t GetExpiryDate() const { return mExpiryDate; }
+    uint32_t GetExpiryDate() const { return mConfig.expiryDate.value_or(0); }
     bool GetUnmountedState() const { return mUnmounted; }
 
     chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const { return mConfig.featureMap; }
@@ -161,7 +160,6 @@ private:
     SmokeCoAlarm::AlarmStateEnum mInterconnectCOAlarm        = SmokeCoAlarm::AlarmStateEnum::kNormal;
     SmokeCoAlarm::ContaminationStateEnum mContaminationState = SmokeCoAlarm::ContaminationStateEnum::kNormal;
     SmokeCoAlarm::SensitivityEnum mSmokeSensitivityLevel     = SmokeCoAlarm::SensitivityEnum::kStandard;
-    uint32_t mExpiryDate                                     = 0;
     bool mUnmounted                                          = false;
 };
 

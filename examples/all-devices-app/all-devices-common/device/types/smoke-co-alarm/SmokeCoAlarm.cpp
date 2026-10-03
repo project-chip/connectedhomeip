@@ -27,9 +27,6 @@ namespace app {
 
 namespace {
 
-// This is an example device, so it bakes in a representative, spec-valid configuration rather than taking one
-// from the factory. The factory only needs to pass in context (the timer delegate).
-
 // CO concentration: numeric + level indication, measured in air as ppm.
 SmokeCoAlarm::ConcentrationCluster::Config DefaultCoConfig()
 {
@@ -54,21 +51,13 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
     };
 }
 
-// Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
-SmokeCoAlarmCluster::Config DefaultSmokeConfig()
-{
-    SmokeCoAlarmCluster::Config config;
-    config.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm).Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    return config;
-}
-
 } // namespace
 
-SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
-    mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(DefaultSmokeConfig())
+SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
+                           const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
+    mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(smokeConfig)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
