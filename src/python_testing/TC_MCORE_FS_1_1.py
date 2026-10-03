@@ -134,7 +134,7 @@ class TC_MCORE_FS_1_1(MatterTestCommissionedDevice):
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done."),
             TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),

@@ -56,7 +56,7 @@ class TC_LVL_2_3(MatterTestCommissionedDevice):
     def steps_TC_LVL_2_3(self) -> list[TestStep]:
         THRead = "TH reads"
         THcommand = "TH sends the command"
-        return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required()),
                 TestStep(2, f"{THRead} FeatureMap attribute and the AttributeList value", test_plan_support.verify_success()),
                 TestStep(
                     "3a", f"If the MaxLevel attribute is in the AttributeList, {THRead} MaxLevel attribute and store value as maxLevel, otherwise set maxLevel to 254", test_plan_support.verify_success()),

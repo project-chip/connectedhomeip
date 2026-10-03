@@ -60,7 +60,7 @@ class TC_ZONEMGMT_2_4(MatterTestCommissionedDevice):
 
     def steps_TC_ZONEMGMT_2_4(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
                      " valid parameters",
                      "Verify that the DUT response contains a new zoneId and the corresponding zone information matches."),

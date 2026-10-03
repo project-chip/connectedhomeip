@@ -51,7 +51,7 @@ class TC_GC_2_1(MatterTestCommissionedDevice):
         return "[TC-GC-2.1] Attributes with DUT as Server - Provisional"
 
     def steps_TC_GC_2_1(self):
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute"),
                 TestStep("4a", "If PGA feature is not supported, TH reads from the DUT the MaxMcastAddrCount attribute, expecting it to be greater than or equal to 1"),

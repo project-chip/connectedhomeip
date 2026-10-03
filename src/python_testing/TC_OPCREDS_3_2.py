@@ -59,7 +59,7 @@ class TC_OPCREDS_3_2(MatterTestCommissionedDevice):
         return " Attribute-CurrentFabricIndex validation [DUTServer]"
 
     def steps_TC_OPCREDS_3_2(self):
-        return [TestStep(0, commission_if_required('CR1'), is_commissioning=True),
+        return [TestStep(0, commission_if_required('CR1')),
                 TestStep(1, f"{commission_from_existing('CR1', 'CR2')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR2`.",
                          verify_commissioning_successful()),
                 TestStep(2, f"{commission_from_existing('CR1', 'CR3')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR3`.",

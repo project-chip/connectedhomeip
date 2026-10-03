@@ -113,7 +113,7 @@ class TC_S_2_5(MatterTestCommissionedDevice):
         keyset1_key0 = bytes.fromhex("a0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
         keyset1_key1 = bytes.fromhex("b0b1b2b3b4b5b6b7b8b9babbbcbdbebf")
 
-        self.step(0, "Commissioning, already done", is_commissioning=True)
+        self.step(0, "Commissioning, already done")
         groupcast_enabled = await is_groupcast_on_root_node(self)
         # FabricSceneInfo is a fabric-scoped list; reports are matched on the TH's own entry.
         self._fabric_index = typing.cast(

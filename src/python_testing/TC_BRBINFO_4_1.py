@@ -102,7 +102,7 @@ class TC_BRBINFO_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         return [
-            TestStep("0",  "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("0",  "DUT commissioned and preconditions"),
             TestStep("1", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("2", "Setting up subscribe to ActiveChange event"),
             TestStep("3", "Check TimeoutMs too low fails"),

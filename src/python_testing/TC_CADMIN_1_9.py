@@ -94,7 +94,7 @@ class TC_CADMIN_1_9(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
             TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),

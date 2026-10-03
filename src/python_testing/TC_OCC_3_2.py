@@ -83,7 +83,7 @@ class TC_OCC_3_2(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH if not already done"),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
             TestStep("3a", "Prepare DUT to be unoccupied state."),
             TestStep("3b", "TH reads DUT Occupancy attribute."),

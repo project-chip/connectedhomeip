@@ -66,7 +66,7 @@ class TC_DRLK_2_13(MatterTestCommissionedDevice):
 
     def steps_TC_DRLK_2_13(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissoning with DUT is done", is_commissioning=True),
+            TestStep("0", "Commissoning with DUT is done"),
             TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex and save the attribute",
                      "TH Reads Attribute Successfully"),
             TestStep("1b", "TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users",

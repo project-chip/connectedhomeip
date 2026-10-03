@@ -53,7 +53,7 @@ class TC_CADMIN_1_10(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition-1", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition-1", "Commissioning, already done"),
             TestStep("precondition-2", "TH1 reads SpecificationVersion attribute from Basic Information cluster on DUT, to check if Matter version is 1.5.1 or above. If not, skip the test"),
             TestStep(1, "TH1 sends an OpenCommissioningWindow command, to allow TH2 to establish a PASE session with the DUT"),
             TestStep(2, "TH2 establishes a PASE session with DUT"),

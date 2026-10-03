@@ -56,7 +56,7 @@ class TC_WebRTCP_2_32(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_32(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned and audio/video streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned and audio/video streams allocated"),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer using old scalar VideoStreamID and AudioStreamID fields (no VideoStreams/AudioStreams) => expect SolicitOfferResponse with deferredOffer=False"),
             TestStep(3, "Read CurrentSessions => expect 1; verify session has new list fields and old scalar fields absent"),

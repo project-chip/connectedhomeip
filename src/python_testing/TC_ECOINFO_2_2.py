@@ -136,7 +136,7 @@ class TC_ECOINFO_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_ECOINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "Prepare"),
             TestStep("1a", "Read root endpoint's PartsList"),
             TestStep("1b", "For each endpoint in 1a read DeviceType list confirming aggregator endpoint exists"),

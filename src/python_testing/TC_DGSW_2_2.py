@@ -80,7 +80,7 @@ class TC_DGSW_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH subscribes to the SoftwareDiagnostics cluster in the DUT to receive SoftwareFault events. "
                      "The DUT is triggered to emit a SoftwareFault event. Wait for the SoftwareFault event to arrive.",
                      "Validate the SoftwareFault event fields."
