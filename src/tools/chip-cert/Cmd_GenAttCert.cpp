@@ -686,9 +686,15 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
             crlIssuerName = GENERAL_NAME_new();
             VerifyOrReturnError(crlIssuerName != nullptr, false);
-            crlIssuerName->type            = GEN_DIRNAME;
-            crlIssuerName->d.directoryName = X509_get_subject_name(cRLIssuerCert.get());
-            distPoint->CRLissuer           = GENERAL_NAMES_new();
+            crlIssuerName->type = GEN_DIRNAME;
+            // X509_get_subject_name() returns a name embedded in (and owned by) cRLIssuerCert; on
+            // OpenSSL 4.0 that embedded name is const-qualified. GENERAL_NAME's d.directoryName
+            // field expects to own what it points to, so duplicate into an owned copy rather than
+            // casting away const on a borrowed pointer - this works identically on OpenSSL
+            // 1.1.x/3.x/4.x and BoringSSL.
+            crlIssuerName->d.directoryName = X509_NAME_dup(X509_get_subject_name(cRLIssuerCert.get()));
+            VerifyOrReturnError(crlIssuerName->d.directoryName != nullptr, false);
+            distPoint->CRLissuer = GENERAL_NAMES_new();
             sk_GENERAL_NAME_push(distPoint->CRLissuer, crlIssuerName);
 
             if (gCertConfig.IsExtensionCDPCRLIssuerDuplicate())
