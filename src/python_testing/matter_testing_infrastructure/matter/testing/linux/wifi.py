@@ -333,6 +333,7 @@ class WpaSupplicantMock(TerminableThread):
             self.index = index
             self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{index}"
             self.network = WpaSupplicantMock.WpaNetwork(self, mock.ssid)
+            self.bss = WpaSupplicantMock.WpaBSS(self, mock.ssid)
             self.mock_mac = f"00:11:22:33:44:{index:02x}"  # Unique MAC per interface
             self.state = "disconnected"
             self.scanning = False
@@ -406,6 +407,7 @@ class WpaSupplicantMock(TerminableThread):
             log.debug("Scanning started")
 
             async def scan():
+                await asyncio.sleep(0.05)
                 await self.Scanning.set_async(False)
                 self.ScanDone.emit(True)
 
@@ -434,18 +436,22 @@ class WpaSupplicantMock(TerminableThread):
 
             await self.Scan({})
 
+            # WpaSupplicantClient derives NetworkInfo.connected from Network.Enabled.
+            await self.network.Enabled.set_async(True)
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path: str) -> None:
             log.debug("Interface[%d] RemoveNetwork: path=%s", self.index, path)
+            await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
             await self._leave_network()
 
         @sdbus.dbus_method_async()
         async def RemoveAllNetworks(self) -> None:
             log.debug("Interface[%d] RemoveAllNetworks", self.index)
+            await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
             await self._leave_network()
 
@@ -691,8 +697,38 @@ class WpaSupplicantMock(TerminableThread):
             return "WPA2-PSK"
 
         @sdbus.dbus_property_async("ao")
-        def BSSs(self) -> list:
-            return []
+        def BSSs(self) -> list[str]:
+            return [self.bss.path]
+
+    class WpaBSS(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1.BSS"):
+        def __init__(self, interface: WpaSupplicantMock.WpaInterface, ssid: str):
+            super().__init__()
+            self.ssid = ssid
+            self.path = interface.path + "/BSSs/1"
+
+        @sdbus.dbus_property_async("ay")
+        def SSID(self) -> bytes:
+            return self.ssid.encode("utf-8")
+
+        @sdbus.dbus_property_async("ay")
+        def BSSID(self) -> bytes:
+            return bytes([0x00, 0x11, 0x22, 0x33, 0x44, 0x55])
+
+        @sdbus.dbus_property_async("n")
+        def Signal(self) -> int:
+            return -50
+
+        @sdbus.dbus_property_async("q")
+        def Frequency(self) -> int:
+            return 2412
+
+        @sdbus.dbus_property_async("a{sv}")
+        def WPA(self) -> DictVariantT:
+            return {}
+
+        @sdbus.dbus_property_async("a{sv}")
+        def RSN(self) -> DictVariantT:
+            return {"KeyMgmt": ("as", ["wpa-psk"])}
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
@@ -704,7 +740,8 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_property_async("a{sv}")
         def Properties(self) -> DictVariantT:
-            return {"ssid": ("s", self.ssid)}
+            # wpa_supplicant exposes text SSIDs quoted in the network Properties map.
+            return {"ssid": ("s", f'"{self.ssid}"')}
 
         @sdbus.dbus_property_async("b")
         def Enabled(self) -> bool:
@@ -729,6 +766,7 @@ class WpaSupplicantMock(TerminableThread):
         for interface in self.interfaces:
             interface.export_to_dbus(interface.path)
             interface.network.export_to_dbus(interface.network.path)
+            interface.bss.export_to_dbus(interface.bss.path)
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
