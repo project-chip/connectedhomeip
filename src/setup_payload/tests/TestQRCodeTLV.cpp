@@ -50,19 +50,28 @@ TEST_F(TestQRCodeTLV, TestOptionalDataAddRemove)
     optionalData = payload.getAllOptionalVendorData();
     EXPECT_TRUE(optionalData.size());
 
-    err = payload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
+    err = payload.addOptionalVendorData(kOptionalDefaultSignedIntTag, kOptionalDefaultSignedIntValue);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = payload.addOptionalVendorData(kOptionalDefaultUnsignedIntTag, kOptionalDefaultUnsignedIntValue);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalVendorData();
-    EXPECT_EQ(optionalData.size(), 2u);
+    EXPECT_EQ(optionalData.size(), 3u);
 
     err = payload.removeOptionalVendorData(kOptionalDefaultStringTag);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalVendorData();
+    EXPECT_EQ(optionalData.size(), 2u);
+
+    err = payload.removeOptionalVendorData(kOptionalDefaultSignedIntTag);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    optionalData = payload.getAllOptionalVendorData();
     EXPECT_EQ(optionalData.size(), 1u);
 
-    EXPECT_SUCCESS(payload.removeOptionalVendorData(kOptionalDefaultIntTag));
+    err = payload.removeOptionalVendorData(kOptionalDefaultUnsignedIntTag);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalVendorData();
@@ -74,7 +83,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataAddRemove)
     optionalData = payload.getAllOptionalVendorData();
     EXPECT_TRUE(optionalData.empty());
 
-    err = payload.removeOptionalVendorData(kOptionalDefaultIntTag);
+    err = payload.removeOptionalVendorData(kOptionalDefaultSignedIntTag);
     EXPECT_EQ(err, CHIP_ERROR_KEY_NOT_FOUND);
 
     optionalData = payload.getAllOptionalVendorData();
@@ -210,7 +219,15 @@ TEST_F(TestQRCodeTLV, TestOptionalDataReadSerial)
 TEST_F(TestQRCodeTLV, TestOptionalDataReadVendorInt)
 {
     SetupPayload inPayload = GetDefaultPayload();
-    EXPECT_SUCCESS(inPayload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue));
+    EXPECT_SUCCESS(inPayload.addOptionalVendorData(kOptionalDefaultSignedIntTag, kOptionalDefaultSignedIntValue));
+
+    EXPECT_TRUE(CheckWriteRead(inPayload));
+}
+
+TEST_F(TestQRCodeTLV, TestOptionalDataReadVendorUnsignedInt)
+{
+    SetupPayload inPayload = GetDefaultPayload();
+    EXPECT_SUCCESS(inPayload.addOptionalVendorData(kOptionalDefaultUnsignedIntTag, kOptionalDefaultUnsignedIntValue));
 
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }

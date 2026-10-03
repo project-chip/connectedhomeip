@@ -125,18 +125,8 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
     if (payload.serialNumber) {
         NSLog(@"SerialNumber: %@", payload.serialNumber);
     }
-    NSError * error;
-    NSArray<MTROptionalQRCodeInfo *> * optionalVendorData = [payload getAllOptionalVendorData:&error];
-    if (error) {
-        LogNSError("Error: ", error);
-        return CHIP_ERROR_INTERNAL;
-    }
-    for (const MTROptionalQRCodeInfo * info : optionalVendorData) {
-        bool isTypeString = (info.type == MTROptionalQRCodeInfoTypeString);
-        bool isTypeInt32 = (info.type == MTROptionalQRCodeInfoTypeInt32);
-        VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
-
-        if (isTypeString) {
+    for (const MTROptionalQRCodeInfo * info : [payload vendorElements]) {
+        if (info.type == MTROptionalQRCodeInfoTypeString) {
             NSLog(@"OptionalQRCodeInfo: tag=%@,string value=%@", info.tag, info.stringValue);
         } else {
             NSLog(@"OptionalQRCodeInfo: tag=%@,int value=%@", info.tag, info.integerValue);
