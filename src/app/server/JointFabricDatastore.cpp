@@ -29,12 +29,13 @@ namespace app {
 
 namespace {
 /**
- * Validate that an input is the correct length to be an Epoch Key. Null keys are considered valid.
+ * True if `key` is null or exactly as long as an epoch key. Nodes reject any other length with CONSTRAINT_ERROR, which
+ * RefreshNode handles by dropping the node's entry for the key set.
  */
-bool EpochKeyFitsStorage(const DataModel::Nullable<ByteSpan> & key)
+bool IsValidEpochKey(const DataModel::Nullable<ByteSpan> & key)
 {
     using EpochKeyStorage = Crypto::SensitiveDataBuffer<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
-    return key.IsNull() || key.Value().size() <= EpochKeyStorage::Capacity();
+    return key.IsNull() || key.Value().size() == EpochKeyStorage::Capacity();
 }
 
 /**
@@ -94,8 +95,7 @@ CHIP_ERROR JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
     Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination)
 {
     // Validate before mutating any storage so a non-conformant input leaves existing entries untouched.
-    VerifyOrReturnError(EpochKeyFitsStorage(source.epochKey0) && EpochKeyFitsStorage(source.epochKey1) &&
-                            EpochKeyFitsStorage(source.epochKey2),
+    VerifyOrReturnError(IsValidEpochKey(source.epochKey0) && IsValidEpochKey(source.epochKey1) && IsValidEpochKey(source.epochKey2),
                         CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     auto & storage = mGroupKeySetStorage[source.groupKeySetID];
@@ -173,7 +173,7 @@ void JointFabricDatastore::RemoveEndpointFriendlyNameStorage(NodeId nodeId, Endp
 void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, EpochKeyStorage & storage,
                                                         DataModel::Nullable<ByteSpan> & destination)
 {
-    // Over-length epoch keys are rejected by CopyGroupKeySetWithOwnedSpans before reaching here, so the
+    // Epoch keys of the wrong length are rejected by CopyGroupKeySetWithOwnedSpans before reaching here, so the
     // SetLength below is expected to succeed; the failure branch remains as a defensive fallback only.
     if (!source.IsNull() && storage.SetLength(source.Value().size()) == CHIP_NO_ERROR)
     {

@@ -4,6 +4,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
+#include <array>
 #include <map>
 #include <optional>
 
@@ -26,6 +27,12 @@ using TargetType               = JointFabricCluster::Structs::DatastoreAccessCon
 using Privilege                = JointFabricCluster::DatastoreAccessControlEntryPrivilegeEnum;
 using AuthMode                 = JointFabricCluster::DatastoreAccessControlEntryAuthModeEnum;
 using State                    = JointFabricCluster::DatastoreStateEnum;
+
+// Nodes accept only epoch keys of exactly 16 bytes.
+using EpochKey                = std::array<uint8_t, 16>;
+constexpr EpochKey kEpochKeyA = { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF };
+constexpr EpochKey kEpochKeyB = { 0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF };
+constexpr EpochKey kEpochKeyC = { 0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF };
 
 void SeedAcl(JointFabricDatastore & store, NodeId nodeId, uint16_t listId, Privilege privilege, AuthMode authMode,
              std::vector<uint64_t> subjects, State state)
@@ -331,8 +338,8 @@ public:
     std::vector<EndpointEntryType> endpointsToFetch;
     std::vector<uint16_t> fetchedGroupKeySetIDs;
     GroupKeySetType fetchedGroupKeySet;
-    uint8_t epochKey0[3]          = { 0x10, 0x11, 0x12 };
-    uint8_t epochKey1[2]          = { 0x20, 0x21 };
+    EpochKey epochKey0            = kEpochKeyA;
+    EpochKey epochKey1            = kEpochKeyB;
     int fetchEndpointListCalls    = 0;
     int fetchGroupKeySetListCalls = 0;
     int fetchGroupKeySetCalls     = 0;
@@ -410,10 +417,8 @@ TEST(JointFabricDatastoreTest, AddGroupKeySetEntryOwnsSpanData)
 {
     JointFabricDatastore store;
 
-    uint8_t originalEpochKey0[] = { 0x01, 0x02, 0x03 };
-    uint8_t originalEpochKey1[] = { 0x11, 0x12 };
-    uint8_t expectedEpochKey0[] = { 0x01, 0x02, 0x03 };
-    uint8_t expectedEpochKey1[] = { 0x11, 0x12 };
+    EpochKey originalEpochKey0 = kEpochKeyA;
+    EpochKey originalEpochKey1 = kEpochKeyB;
 
     GroupKeySetType keySet;
     keySet.groupKeySetID = 11;
@@ -428,8 +433,8 @@ TEST(JointFabricDatastoreTest, AddGroupKeySetEntryOwnsSpanData)
 
     ASSERT_EQ(store.GetGroupKeySetList().size(), 1u);
     const auto & stored = store.GetGroupKeySetList()[0];
-    ExpectNullableByteSpanEquals(stored.epochKey0, ByteSpan(expectedEpochKey0));
-    ExpectNullableByteSpanEquals(stored.epochKey1, ByteSpan(expectedEpochKey1));
+    ExpectNullableByteSpanEquals(stored.epochKey0, ByteSpan(kEpochKeyA));
+    ExpectNullableByteSpanEquals(stored.epochKey1, ByteSpan(kEpochKeyB));
     EXPECT_TRUE(stored.epochKey2.IsNull());
 }
 
@@ -442,27 +447,85 @@ TEST(JointFabricDatastoreTest, UpdateKeySetStoresKeySetThenSyncsNodeEntries)
     ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
     ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
 
-    uint8_t epochKey0[]    = { 0x01, 0x02, 0x03 };
-    uint8_t newEpochKey0[] = { 0x04, 0x05, 0x06 };
     GroupKeySetType keySet;
     keySet.groupKeySetID = 11;
-    keySet.epochKey0.SetNonNull(ByteSpan(epochKey0));
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
     keySet.epochKey1.SetNull();
     keySet.epochKey2.SetNull();
     ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
     ASSERT_EQ(store.ForceAddNodeKeySetEntry(11, 123), CHIP_NO_ERROR);
 
-    keySet.epochKey0.SetNonNull(ByteSpan(newEpochKey0));
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
     delegate.deferKind = SyncKind::kNodeKeySet;
     ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
 
-    ExpectNullableByteSpanEquals(store.GetGroupKeySetList()[0].epochKey0, ByteSpan(newEpochKey0));
+    ExpectNullableByteSpanEquals(store.GetGroupKeySetList()[0].epochKey0, ByteSpan(kEpochKeyB));
     EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kPending);
     ASSERT_EQ(delegate.deferred.size(), 1u);
     EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 11u);
     EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kPending);
 
     delegate.RunDeferred();
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+}
+
+// Nodes reject an epoch key that is not exactly 16 bytes with CONSTRAINT_ERROR, a failure RefreshNode handles by
+// dropping the node's entry for the key set. AddKeySet and UpdateKeySet reject such a key set before anything is stored.
+TEST(JointFabricDatastoreTest, AddKeySetRejectsEpochKeyOfWrongLength)
+{
+    JointFabricDatastore store;
+
+    const uint8_t shortEpochKey[15] = { 0 };
+    const uint8_t longEpochKey[17]  = { 0 };
+    GroupKeySetType keySet;
+    keySet.groupKeySetID = 11;
+    keySet.epochStartTime0.SetNonNull(static_cast<uint64_t>(1));
+
+    keySet.epochKey0.SetNonNull(ByteSpan(shortEpochKey));
+    EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    keySet.epochKey0.SetNonNull(ByteSpan(longEpochKey));
+    EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    keySet.epochKey0.SetNonNull(ByteSpan(shortEpochKey, 0));
+    EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_TRUE(store.GetGroupKeySetList().empty());
+
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
+    ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetGroupKeySetList().size(), 1u);
+    ExpectNullableByteSpanEquals(store.GetGroupKeySetList()[0].epochKey0, ByteSpan(kEpochKeyA));
+    EXPECT_TRUE(store.GetGroupKeySetList()[0].epochKey1.IsNull());
+}
+
+TEST(JointFabricDatastoreTest, UpdateKeySetRejectsEpochKeyOfWrongLength)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+    GroupKeySetType keySet;
+    keySet.groupKeySetID = 11;
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
+    keySet.epochStartTime0.SetNonNull(static_cast<uint64_t>(1));
+    ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(store.ForceAddNodeKeySetEntry(11, 123), CHIP_NO_ERROR);
+
+    const uint8_t shortEpochKey[15] = { 0 };
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    keySet.epochKey1.SetNonNull(ByteSpan(shortEpochKey));
+    keySet.epochStartTime1.SetNonNull(static_cast<uint64_t>(2));
+    EXPECT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    ASSERT_EQ(store.GetGroupKeySetList().size(), 1u);
+    ExpectNullableByteSpanEquals(store.GetGroupKeySetList()[0].epochKey0, ByteSpan(kEpochKeyA));
+    EXPECT_TRUE(store.GetGroupKeySetList()[0].epochKey1.IsNull());
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+    EXPECT_TRUE(delegate.syncCalls.empty());
+
+    keySet.epochKey1.SetNonNull(ByteSpan(kEpochKeyC));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ExpectNullableByteSpanEquals(store.GetGroupKeySetList()[0].epochKey1, ByteSpan(kEpochKeyC));
     EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
 }
 
@@ -645,16 +708,14 @@ TEST(JointFabricDatastoreTest, RefreshNodeFetchesGroupKeySetsAndCommitsNode)
     EXPECT_EQ(delegate.fetchAclListCalls, 1);
 
     ASSERT_EQ(store.GetGroupKeySetList().size(), 1u);
-    uint8_t expectedEpochKey0[] = { 0x10, 0x11, 0x12 };
-    uint8_t expectedEpochKey1[] = { 0x20, 0x21 };
 
     delegate.epochKey0[0] = 0xAA;
     delegate.epochKey1[0] = 0xBB;
 
     const auto & storedKeySet = store.GetGroupKeySetList()[0];
     EXPECT_EQ(storedKeySet.groupKeySetID, 77);
-    ExpectNullableByteSpanEquals(storedKeySet.epochKey0, ByteSpan(expectedEpochKey0));
-    ExpectNullableByteSpanEquals(storedKeySet.epochKey1, ByteSpan(expectedEpochKey1));
+    ExpectNullableByteSpanEquals(storedKeySet.epochKey0, ByteSpan(kEpochKeyA));
+    ExpectNullableByteSpanEquals(storedKeySet.epochKey1, ByteSpan(kEpochKeyB));
 
     ASSERT_EQ(store.GetNodeInformationEntries().size(), 1u);
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state,
@@ -3240,10 +3301,9 @@ TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
     ASSERT_EQ(store.SetAnchorNodeId(0xABCD), CHIP_NO_ERROR);
 
     // A spread of records, including the secret-bearing group-key-set and admin (ICAC) entries.
-    uint8_t epoch0[] = { 0x01, 0x02, 0x03 };
     GroupKeySetType keySet;
     keySet.groupKeySetID = 11;
-    keySet.epochKey0.SetNonNull(ByteSpan(epoch0));
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
     keySet.epochKey1.SetNull();
     keySet.epochKey2.SetNull();
     ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
