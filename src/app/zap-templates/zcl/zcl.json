@@ -1106,18 +1106,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
-        "Localization Configuration": [
-            {
-                "name": "ActiveLocale",
-                "keepDefault": true
-            },
-            "SupportedLocales",
-            {
-                "name": "FeatureMap",
-                "keepDefault": true
-            },
-            "ClusterRevision"
-        ],
+        "Localization Configuration": ["SupportedLocales", "ClusterRevision"],
         "Smoke CO Alarm": [
             "ExpressedState",
             "SmokeState",
