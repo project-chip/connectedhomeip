@@ -17,9 +17,11 @@
  */
 
 #include "PairingCommand.h"
+#include "platform/CHIPDeviceLayer.h"
 #include "platform/PlatformManager.h"
 
 #include "RpcClientProcessor.h"
+#include "RpcConnection.h"
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 
 #include <app/CommandSender.h>
@@ -29,10 +31,16 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/PeerId.h>
 #include <lib/dnssd/Advertiser.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
+
 #include <protocols/secure_channel/PASESession.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -695,45 +703,54 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
             TEMPORARY_RETURN_IGNORED SetAnchorNodeId(nodeId);
 
-            _pw_protobuf_Empty request;
-
-            ::pw::rpc::NanopbClientReader<::RequestOptions> localStream =
-                rpcClient.GetStream(request, OnGetStreamOnNext, OnGetStreamOnDone);
-            if (!localStream.active())
+            if (RpcServerAddressProvidedManually())
             {
-                ChipLogError(JointFabric, "RPC: Opening GetStream Error");
-                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                // The RPC connection was already established at startup using the manually provided
+                // address, so we can open the GetStream immediately.
+                StartAnchorRpcStream(nodeId);
                 return;
             }
-            else
+
+            // No RPC server address was provided: discover the Anchor Administrator operational IPv6
+            // address via mDNS, then establish the RPC connection and open the GetStream from within the
+            // resolution callback. The command completion is deferred until then.
+            CHIP_ERROR resolveErr = ResolveAnchorRpcServerAddress(nodeId);
+            if (resolveErr != CHIP_NO_ERROR)
             {
-                rpcGetStream                = std::move(localStream);
-                pkiProviderCredentialIssuer = mCredIssuerCmds;
+                ChipLogError(JointFabric, "RPC: Unable to start Anchor Administrator address discovery: %s", resolveErr.AsString());
+                SetCommandExitStatus(resolveErr);
             }
+            return;
         }
+
         else
         {
             OwnershipContext request;
-            Credentials::P256PublicKeySpan adminICACPKSpan;
 
             memset(&request, 0, sizeof(request));
-            request.node_id                      = nodeId;
-            request.jcm                          = mJCM.ValueOr(false);
-            JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
-            JCMTrustVerificationInfo & info      = commissioner.GetTrustVerificationInfo();
-            /* extract and save the public key of the peer Admin ICAC */
-            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
-            if (err != CHIP_NO_ERROR)
+            request.node_id = nodeId;
+            request.jcm     = mJCM.ValueOr(false);
+
+            if (mJCM.ValueOr(false))
             {
-                ChipLogError(Controller, "Joint Commissioning Method Error parsing adminICAC Public Key");
-                SetCommandExitStatus(err);
-                return;
+                Credentials::P256PublicKeySpan adminICACPKSpan;
+
+                JCMDeviceCommissioner & commissioner = static_cast<JCMDeviceCommissioner &>(CurrentCommissioner());
+                JCMTrustVerificationInfo & info      = commissioner.GetTrustVerificationInfo();
+                /* extract and save the public key of the peer Admin ICAC */
+                err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Controller, "Joint Commissioning Method Error parsing adminICAC Public Key");
+                    SetCommandExitStatus(err);
+                    return;
+                }
+
+                memcpy(request.trustedIcacPublicKeyB.bytes, adminICACPKSpan.data(), adminICACPKSpan.size());
+                request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
+
+                request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
             }
-
-            memcpy(request.trustedIcacPublicKeyB.bytes, adminICACPKSpan.data(), adminICACPKSpan.size());
-            request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
-
-            request.peerAdminJFAdminClusterEndpointId = info.adminEndpointId;
 
             auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
@@ -747,8 +764,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error",
-                             nodeId);
+                ChipLogError(JointFabric, "OwnershipTransfer (nodeId=%ld) failed: RPC Timeout Error", nodeId);
             }
         }
     }
@@ -943,4 +959,149 @@ CHIP_ERROR PairingCommand::OnLookupOperationalTrustAnchor(VendorId vendorID, Cer
     globallyTrustedRootSpan = mRemoteAdminTrustedRoot;
 
     return err;
+}
+
+void PairingCommand::StartAnchorRpcStream(NodeId nodeId)
+{
+    _pw_protobuf_Empty request;
+
+    ::pw::rpc::NanopbClientReader<::RequestOptions> localStream =
+        rpcClient.GetStream(request, OnGetStreamOnNext, OnGetStreamOnDone);
+    if (!localStream.active())
+    {
+        ChipLogError(JointFabric, "RPC: Opening GetStream Error");
+        SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+        return;
+    }
+
+    rpcGetStream                = std::move(localStream);
+    pkiProviderCredentialIssuer = mCredIssuerCmds;
+
+    ChipLogProgress(JointFabric, "RPC: GetStream opened for Anchor Administrator (nodeId=" ChipLogFormatX64 ")",
+                    ChipLogValueX64(nodeId));
+
+    // The GetStream is now open and the command can complete successfully. Further RPC traffic is
+    // driven by the stream callbacks.
+    SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+CHIP_ERROR PairingCommand::ResolveAnchorRpcServerAddress(NodeId nodeId)
+{
+    CompressedFabricId compressedFabricId = CurrentCommissioner().GetCompressedFabricId();
+    VerifyOrReturnError(compressedFabricId != kUndefinedCompressedFabricId, CHIP_ERROR_INCORRECT_STATE);
+
+    PeerId peerId(compressedFabricId, nodeId);
+
+    ChipLogProgress(JointFabric, "RPC: Discovering Anchor Administrator operational address via mDNS for " ChipLogFormatX64,
+                    ChipLogValueX64(nodeId));
+
+    // Use AddressResolve rather than replacing the shared Dnssd::Resolver operational delegate. AddressResolve
+    // owns that delegate (registered by CASESessionManager), so hijacking it here would break later CASE
+    // session address lookups. AddressResolve applies its own max-lookup-time and reports the outcome via the
+    // NodeListener callbacks below.
+    ReturnErrorOnFailure(AddressResolve::Resolver::Instance().Init(&DeviceLayer::SystemLayer()));
+    ReturnErrorOnFailure(
+        AddressResolve::Resolver::Instance().LookupNode(AddressResolve::NodeLookupRequest(peerId), mAnchorRpcServerLookupHandle));
+
+    return CHIP_NO_ERROR;
+}
+
+void PairingCommand::StopAnchorRpcServerResolution()
+{
+    if (mAnchorRpcServerLookupHandle.IsActive())
+    {
+        // Skip the failure callback: the caller decides how to report the outcome. Only touch the
+        // AddressResolve lookup, never the shared Dnssd::Resolver operational delegate.
+        TEMPORARY_RETURN_IGNORED AddressResolve::Resolver::Instance().CancelLookup(mAnchorRpcServerLookupHandle,
+                                                                                   AddressResolve::Resolver::FailureCallback::Skip);
+    }
+}
+
+void PairingCommand::OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result)
+{
+    NodeId nodeId = peerId.GetNodeId();
+
+    const Inet::IPAddress & selectedAddress = result.address.GetIPAddress();
+
+    // The RPC contract to the jf-admin-app is IPv6-only (the jf-control-app and jf-admin-app targets are
+    // built with IPv4 disabled). Refuse anything that is not IPv6 so we never hand an unusable IPv4 address
+    // to RpcConnect, which would surface as a confusing CHIP_ERROR_NOT_CONNECTED and abort commissioning.
+    //
+    // This is a defensive guard. In the IPv6-only build, AddressResolve already drops IPv4 candidates
+    // (see AddressResolve_DefaultImpl.cpp, the `#if !INET_CONFIG_ENABLE_IPV4` skip in OnOperationalNodeResolved),
+    // so a resolved result is expected to be IPv6 already. The check is kept so an accidental IPv4-enabled
+    // build cannot silently connect over IPv4.
+    if (!selectedAddress.IsIPv6())
+    {
+        char addressString[Inet::IPAddress::kMaxStringLength];
+        selectedAddress.ToString(addressString);
+        ChipLogError(JointFabric, "RPC: Anchor Administrator resolved to non-IPv6 address %s; only IPv6 is supported",
+                     addressString);
+        SetCommandExitStatus(CHIP_ERROR_INVALID_ADDRESS);
+        return;
+    }
+
+    // The RPC client connects using a textual host. For an IPv6 link-local address, the operating system
+    // needs a scope zone (the interface) to route the connection, so we build "<address>%<interface>".
+    // Routable addresses are used as-is.
+    StringBuilder<Inet::IPAddress::kMaxStringLength + Inet::InterfaceId::kMaxIfNameLength + 1> rpcServerAddress;
+    char ipAddressString[Inet::IPAddress::kMaxStringLength];
+    selectedAddress.ToString(ipAddressString);
+
+    rpcServerAddress.Add(ipAddressString);
+
+    if (selectedAddress.IsIPv6LinkLocal())
+    {
+        Inet::InterfaceId interfaceId = result.address.GetInterface();
+        if (!interfaceId.IsPresent())
+        {
+            ChipLogError(JointFabric,
+                         "RPC: Anchor Administrator resolved to link-local address %s but no interface was provided; "
+                         "cannot scope the connection",
+                         ipAddressString);
+            SetCommandExitStatus(CHIP_ERROR_INVALID_ADDRESS);
+            return;
+        }
+
+        char interfaceName[Inet::InterfaceId::kMaxIfNameLength];
+        CHIP_ERROR interfaceErr = interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
+        if (interfaceErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "RPC: Unable to resolve interface name for link-local address %s: %s", ipAddressString,
+                         interfaceErr.AsString());
+            SetCommandExitStatus(interfaceErr);
+            return;
+        }
+
+        rpcServerAddress.Add("%").Add(interfaceName);
+    }
+
+    if (!rpcServerAddress.Fit())
+    {
+        ChipLogError(JointFabric, "RPC: Anchor Administrator address string was truncated");
+        SetCommandExitStatus(CHIP_ERROR_BUFFER_TOO_SMALL);
+        return;
+    }
+
+    ChipLogProgress(JointFabric, "RPC: Anchor Administrator (nodeId=" ChipLogFormatX64 ") resolved to %s", ChipLogValueX64(nodeId),
+                    rpcServerAddress.c_str());
+
+    CHIP_ERROR err = RpcConnect(rpcServerAddress.c_str(), RpcServerPort());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "RPC: Unable to connect to the jf-admin-app@%s:%u", rpcServerAddress.c_str(), RpcServerPort());
+        SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(JointFabric, "RPC: Connected to the jf-admin-app@%s:%u", rpcServerAddress.c_str(), RpcServerPort());
+
+    StartAnchorRpcStream(nodeId);
+}
+
+void PairingCommand::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
+{
+    ChipLogError(JointFabric, "RPC: Anchor Administrator (nodeId=" ChipLogFormatX64 ") address resolution failed: %s",
+                 ChipLogValueX64(peerId.GetNodeId()), reason.AsString());
+    SetCommandExitStatus(reason);
 }
