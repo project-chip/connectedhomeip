@@ -63,30 +63,48 @@ config BT_DEVICE_NAME
 config BT_HOST_CRYPTO
 	default y
 
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+	default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+	default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+	default 1000
+
+config BT_GATT_DYNAMIC_DB
+	default y
+
+config BT_DEVICE_NAME_DYNAMIC
+	default y
+
+config BT_DEVICE_NAME_MAX
+	default 15
+
+config BT_MAX_CONN
+	default 1
+
+config BT_L2CAP_TX_MTU
+	default 247
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+	default n
+
+config BT_GATT_CACHING
+	default n
+
 config MBEDTLS_ENTROPY_C
 	default y
 
 config MBEDTLS_PSA_DRIVER_GET_ENTROPY
 	default y
 
-config LOG
-	default y
-
-choice LOG_MODE
-	default LOG_MODE_DEFERRED
-endchoice
-
-config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 4096
-
 config THREAD_LOCAL_STORAGE
 	default y
-
-config MAIN_STACK_SIZE
-	default 12288
-
-config CHIP_TASK_STACK_SIZE
-	default 10240
 
 config HW_STACK_PROTECTION
 	default y
@@ -115,8 +133,9 @@ choice CHIP_CRYPTO
 	default CHIP_CRYPTO_PSA
 endchoice
 
-config MBEDTLS_HEAP_SIZE
-	default 8192
+# CHIPCryptoPALPSA.cpp uses mbedtls_md_info_from_type() for SPAKE2+.
+config MBEDTLS_MD_C
+	default y if CHIP_CRYPTO_SPAKE2P_MBEDTLS
 
 # Extend the maximum number of PSA key slots to fit Matter requirements
 config MBEDTLS_PSA_KEY_SLOT_COUNT
@@ -132,6 +151,23 @@ config SHELL
 config CHIP_LIB_SHELL
 	default y
 
+config CHIP_WIFI
+	default y if WIFI
+	imply NET_STATISTICS
+	imply NET_IPV6_ND
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_ENABLE_WIFI_STATION
+	default y if CHIP_WIFI
+
+if CHIP_WIFI
+config NET_IF_IPV6_PREFIX_COUNT
+	default NET_IF_UNICAST_IPV6_ADDR_COUNT
+config NET_BUF_DATA_SIZE
+	default 512
+endif
 
 if SHELL
 
