@@ -391,6 +391,7 @@ ALIAS_PICS = {0x040C: 'CMOCONC',
               0x0434: 'SMOKECONC',
               0x0071: 'HEPAFREMON',
               0x0072: 'ACFREMON',
+              0x0079: 'WTLREPMON',
               0x0405: 'RH',
               0x001C: 'PWM'}
 
