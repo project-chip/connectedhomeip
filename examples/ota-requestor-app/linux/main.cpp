@@ -82,6 +82,7 @@ constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
 constexpr uint16_t kSkipExecImageFile          = 's';
+constexpr uint16_t kOptionLargePayload         = 'l';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
@@ -103,6 +104,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
     { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
+    { "largePayload", chip::ArgParser::kNoArgument, kOptionLargePayload },
     {},
 };
 
@@ -140,6 +142,9 @@ OptionSet cmdLineOptions = {
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
     "  -s, --skipExecImageFile\n"
     "       To only check Notify Update Applied Command, skip the Image File execution.\n"
+    "  -l, --largePayload\n"
+    "       If supplied, enables support for large payloads.\n"
+    "       If a session is not open, it establishes a session using TCP to allow large data transmission.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
@@ -310,6 +315,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         {
             gMaxBDXBlockSize = blockSize;
         }
+        break;
+    }
+    case kOptionLargePayload: {
+        gRequestorCore.SetLargePayload(true);
         break;
     }
     default:

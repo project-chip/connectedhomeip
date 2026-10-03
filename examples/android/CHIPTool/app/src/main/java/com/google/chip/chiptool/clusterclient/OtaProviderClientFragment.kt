@@ -107,7 +107,7 @@ class OtaProviderClientFragment : Fragment() {
     binding.vendorIdEd.setText(ChipClient.VENDOR_ID.toString())
     binding.delayActionTimeEd.setText("0")
 
-    deviceController.startOTAProvider(otaProviderCallback)
+    deviceController.startOTAProvider(otaProviderCallback, 65535)
     return binding.root
   }
 
@@ -499,9 +499,15 @@ class OtaProviderClientFragment : Fragment() {
   private suspend fun sendAnnounceOTAProviderBtnClick() {
     requireActivity().runOnUiThread { updateOTAStatusBtnClick() }
 
+    val enableLargePayload = binding.enableLargePayload.isChecked
+
     val devicePtr =
       try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+        ChipClient.getConnectedDevicePointer(
+          requireContext(),
+          addressUpdateFragment.deviceId,
+          enableLargePayload
+        )
       } catch (e: IllegalStateException) {
         Log.d(TAG, "getConnectedDevicePointer exception", e)
         showMessage("Get DevicePointer fail!")
