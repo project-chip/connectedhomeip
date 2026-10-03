@@ -36,12 +36,28 @@ namespace app {
 // The device is its own delegate: SmokeCoAlarm only stores the reference, so passing *this
 // (the not-yet-fully-constructed SmokeCoAlarmDelegate base) is safe as long as it is not used until
 // the cluster is registered.
-LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate) : SmokeCoAlarm(timerDelegate, *this) {}
+LoggingOnlySmokeCoAlarm::LoggingOnlySmokeCoAlarm(TimerDelegate & timerDelegate) :
+    SmokeCoAlarm(timerDelegate, *this),
+    mPowerSource("Smoke CO Alarm Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
+{}
 
 LoggingOnlySmokeCoAlarm::~LoggingOnlySmokeCoAlarm()
 {
     // Cancel any pending self-test timer before the delegate goes away.
     mTimerDelegate.CancelTimer(this);
+}
+
+CHIP_ERROR LoggingOnlySmokeCoAlarm::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider)
+{
+    return mPowerSource.Register(allocator, provider, EndpointComposition::WithParent(GetEndpointId()));
+}
+
+void LoggingOnlySmokeCoAlarm::UnregisterParts(CodeDrivenDataModelProvider & provider)
+{
+    if (mPowerSource.GetEndpointId() != kInvalidEndpointId)
+    {
+        mPowerSource.Unregister(provider);
+    }
 }
 
 void LoggingOnlySmokeCoAlarm::OnSelfTestRequested()
