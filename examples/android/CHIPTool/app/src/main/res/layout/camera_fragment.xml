@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroupMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="8dp"
+        android:checkedButton="@+id/LiveViewLocalRadioButton"
+        app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <RadioButton
+            android:id="@+id/LiveViewLocalRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/camera_radio_liveview_local" />
+
+        <RadioButton
+            android:id="@+id/LiveViewRemoteRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/camera_radio_liveview_remote"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <RadioButton
+            android:id="@+id/SnapshotRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/camera_radio_snapshot" />
+    </RadioGroup>
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/videoView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/radioGroupMode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.3" />
+
+    <ScrollView
+        android:id="@+id/liveViewLocalScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/camera_liveview_local_video_stream_id"
+                    android:layout_marginEnd="10dp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/liveviewLocalVideoStreamIdTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/camera_liveview_local_webRTC_session_id"
+                    android:layout_marginEnd="10dp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/liveviewLocalWebRTCSessionIdTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/liveviewLocalAllocateVideoStreamBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_local_btn_allocate_video_stream"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/startLiveviewBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_local_btn_start_liveview"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/stopLiveviewBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_local_btn_stop_liveview"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/liveviewLocalDeallocateVideoStreamBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_local_btn_deallocate_video_stream"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+    <ScrollView
+        android:id="@+id/liveViewRemoteScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_title_session_state"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sessionStateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_text_waiting"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_title_ice_gathering"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/iceInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_text_waiting_ice"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_title_complete_offer_sdp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sdpInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_text_no_sdp_info"
+                android:textIsSelectable="true"
+                android:background="#EEEEEE"
+                android:padding="8dp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/createOfferBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_btn_create_offer" />
+
+            <EditText
+                android:id="@+id/answerSdpEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="Answer SDP"
+                android:hint="@string/camera_liveview_remote_hint_paste_answer_sdp"
+                android:inputType="text"
+                android:minLines="3"
+                android:gravity="top"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/setAnswerBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_liveview_remote_btn_set_answer"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+    <ScrollView
+        android:id="@+id/snapshotScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/camera_snapshot_stream_id"
+                    android:layout_marginEnd="10dp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/snapshotStreamIdTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/snapshotAllocateStreamBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_snapshot_btn_allocate_stream"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/snapshotCaptureSnapshotBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_snapshot_btn_capture_snapshot"
+                android:layout_marginTop="16dp"/>
+
+            <Button
+                android:id="@+id/snapshotDeallocateStreamBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/camera_snapshot_btn_deallocate_stream"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

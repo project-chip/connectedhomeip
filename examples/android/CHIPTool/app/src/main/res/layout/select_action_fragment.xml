@@ -151,6 +151,14 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/mode_select_btn_text" />
+
+        <Button
+            android:id="@+id/cameraBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/camera_btn_text" />
     </LinearLayout>
 
 </ScrollView>
