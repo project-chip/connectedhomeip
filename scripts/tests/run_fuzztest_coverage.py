@@ -56,7 +56,7 @@ FUZZTEST_BIN_PATTERN = f"{FUZZTEST_TOOLCHAIN_MARKER_DIR}/tests/*"
 def get_build_target_from_fuzztest_path(binary_path):
     """Extract build directory name (target name) from the given binary path, by using FUZZTEST_TOOLCHAIN_MARKER_DIR as a reference point.
 
-    This assumes the binary was built using the Pigweed FuzzTest toolchain, which GN places in a dedicated subdirectory with the toolchain name 'chip_pw_fuzztest' (as it is a secondary toolchain).
+    This assumes the binary was built using the chip_pw_fuzztest FuzzTest toolchain, which GN places in a dedicated subdirectory with the toolchain name 'chip_pw_fuzztest' (as it is a secondary toolchain).
     The build target is always the parent directory of 'chip_pw_fuzztest'.
  """
     path_directories = binary_path.split(os.sep)
