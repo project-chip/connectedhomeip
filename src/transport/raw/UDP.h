@@ -148,6 +148,7 @@ private:
                              const Inet::IPPacketInfo * pktInfo);
 
     static void OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo);
+    static void OnUdpPortUnreachable(Inet::UDPEndPoint * endPoint, const Inet::IPPacketInfo & pktInfo, ByteSpan quotedPayload);
 
     Inet::UDPEndPointHandle mUDPEndPoint;                                 ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type

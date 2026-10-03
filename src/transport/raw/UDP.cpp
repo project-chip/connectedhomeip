@@ -55,6 +55,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 
     err = mUDPEndPoint->Listen(OnUdpReceive, OnUdpError, this);
     SuccessOrExit(err);
+    mUDPEndPoint->SetPortUnreachableHandler(OnUdpPortUnreachable);
 
     mUDPEndpointType = params.GetAddressType();
 
@@ -130,6 +131,20 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
 void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
     ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+void UDP::OnUdpPortUnreachable(Inet::UDPEndPoint * endPoint, const Inet::IPPacketInfo & pktInfo, ByteSpan quotedPayload)
+{
+    UDP * udp                   = reinterpret_cast<UDP *>(endPoint->mAppState);
+    Transport::PeerAddress peer = Transport::PeerAddress::UDP(pktInfo.DestAddress, pktInfo.DestPort);
+
+#if CHIP_DETAIL_LOGGING
+    char peerStr[Transport::PeerAddress::kMaxToStringSize];
+    peer.ToString(peerStr, sizeof(peerStr));
+    ChipLogDetail(Inet, "Peer %s reported its port unreachable", peerStr);
+#endif // CHIP_DETAIL_LOGGING
+
+    udp->HandleConnectionExpired(peer, quotedPayload);
 }
 
 CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)

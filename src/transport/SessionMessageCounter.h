@@ -34,6 +34,7 @@ class SessionMessageCounter
 {
 public:
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
+    const LocalSessionMessageCounter & GetLocalSessionMessageCounter() const { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:

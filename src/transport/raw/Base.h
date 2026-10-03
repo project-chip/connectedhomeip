@@ -27,6 +27,7 @@
 #include <inet/TCPEndPoint.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -50,6 +51,8 @@ public:
     virtual ~RawTransportDelegate() {}
     virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
                                        MessageTransportContext * ctxt = nullptr) = 0;
+
+    virtual void OnConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload) {}
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
@@ -125,6 +128,14 @@ protected:
                                MessageTransportContext * ctxt = nullptr)
     {
         mDelegate->HandleMessageReceived(source, std::move(buffer), ctxt);
+    }
+
+    void HandleConnectionExpired(const PeerAddress & peer, ByteSpan quotedPayload)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnConnectionExpired(peer, quotedPayload);
+        }
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

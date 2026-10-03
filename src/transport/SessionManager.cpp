@@ -649,6 +649,52 @@ void SessionManager::MarkSessionsAsDefunct(const ScopedNodeId & node, const Opti
     });
 }
 
+void SessionManager::HandleConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload)
+{
+    PacketHeader quotedHeader;
+    uint16_t quotedHeaderSize = 0;
+    if (quotedHeader.Decode(quotedPayload.data(), quotedPayload.size(), &quotedHeaderSize) != CHIP_NO_ERROR ||
+        !quotedHeader.IsUnicastSession() || !quotedHeader.IsEncrypted())
+    {
+        return;
+    }
+
+    const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+
+    mSecureSessions.ForEachSession([&peer, &quotedHeader, now](auto session) {
+        if (!session->IsActiveSession() || !session->IsCASESession())
+        {
+            return Loop::Continue;
+        }
+
+        // Peer session IDs are allocated per peer node, so this assumes no two nodes share an address and port.
+        const Transport::PeerAddress & sessionPeer = session->GetPeerAddress();
+        if (sessionPeer.GetTransportType() != peer.GetTransportType() || sessionPeer.GetIPAddress() != peer.GetIPAddress() ||
+            sessionPeer.GetPort() != peer.GetPort())
+        {
+            return Loop::Continue;
+        }
+
+        // ICMPv6 is unauthenticated. Counters start at a random value per session, so only a sender that has seen our
+        // traffic can quote one this session sent recently.
+        if (session->GetPeerSessionId() != quotedHeader.GetSessionId() ||
+            !session->GetSessionMessageCounter().GetLocalSessionMessageCounter().WasRecentlyUsed(
+                quotedHeader.GetMessageCounter(), CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE))
+        {
+            return Loop::Continue;
+        }
+
+        if (now - session->GetLastActivityTime() > session->GetMRPBaseTimeout())
+        {
+            return Loop::Continue;
+        }
+
+        ChipLogProgress(Inet, "Session %u peer reported its port unreachable; marking defunct", session->GetLocalSessionId());
+        session->MarkAsDefunct();
+        return Loop::Continue;
+    });
+}
+
 void SessionManager::UpdateAllSessionsPeerAddress(const ScopedNodeId & node, const Transport::PeerAddress & addr)
 {
     mSecureSessions.ForEachSession([&node, &addr](auto session) {
@@ -709,6 +755,11 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(Transport::PeerMessageCounter::kInitialSyncValue);
     sessionHolder.Grab(session.Value());
     return CHIP_NO_ERROR;
+}
+
+void SessionManager::OnConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload)
+{
+    HandleConnectionExpired(peer, quotedPayload);
 }
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg,

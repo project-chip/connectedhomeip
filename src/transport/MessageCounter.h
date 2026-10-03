@@ -87,7 +87,11 @@ public:
      *
      * The mLastUsedValue is the predecessor of the initial value, it will be advanced before using, so don't need to add 1 here.
      */
-    LocalSessionMessageCounter() { mLastUsedValue = GetDefaultInitialValuePredecessor(); }
+    LocalSessionMessageCounter()
+    {
+        mLastUsedValue = GetDefaultInitialValuePredecessor();
+        mFirstValue    = mLastUsedValue + 1;
+    }
 
     Type GetType() const override { return Session; }
     CHIP_ERROR AdvanceAndConsume(uint32_t & fetch) override
@@ -104,8 +108,14 @@ public:
     // Test-only function to set the counter value
     void TestSetCounter(uint32_t value) { mLastUsedValue = value; }
 
+    bool WasRecentlyUsed(uint32_t counter, uint32_t window) const
+    {
+        return counter >= mFirstValue && counter <= mLastUsedValue && mLastUsedValue - counter < window;
+    }
+
 private:
     uint32_t mLastUsedValue;
+    uint32_t mFirstValue;
 };
 
 } // namespace chip

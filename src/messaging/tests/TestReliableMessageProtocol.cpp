@@ -515,6 +515,43 @@ TEST_F(TestReliableMessageProtocol, CheckResendApplicationMessage)
     exchange->Close();
 }
 
+TEST_F(TestReliableMessageProtocol, CheckAbandonRetransmitOnDefunctSession)
+{
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    ASSERT_FALSE(buffer.IsNull());
+
+    MockAppDelegate mockSender(*this);
+    ExchangeContext * exchange = NewExchangeToAlice(&mockSender);
+    ASSERT_NE(exchange, nullptr);
+
+    ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    ASSERT_NE(rm, nullptr);
+
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Timestamp(300),
+        System::Clock::Timestamp(300),
+    }));
+
+    auto & loopback               = GetLoopback();
+    loopback.mSentMessageCount    = 0;
+    loopback.mNumMessagesToDrop   = 4;
+    loopback.mDroppedMessageCount = 0;
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    EXPECT_EQ(exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_EQ(loopback.mSentMessageCount, 1u);
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+
+    exchange->GetSessionHandle()->AsSecureSession()->MarkAsDefunct();
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(loopback.mSentMessageCount, 1u);
+
+    exchange->Close();
+}
+
 TEST_F(TestReliableMessageProtocol, CheckCloseExchangeAndResendApplicationMessage)
 {
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));

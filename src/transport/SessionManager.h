@@ -406,6 +406,9 @@ public:
      */
     void MarkSessionsAsDefunct(const ScopedNodeId & node, const Optional<Transport::SecureSession::Type> & type);
 
+    /// Mark CASE sessions to @p peer defunct if @p quotedPayload is a message one of them recently sent.
+    void HandleConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload);
+
     /**
      * @brief
      *   Update all CASE sessions that match `node` with the provided transport peer address.
@@ -472,6 +475,8 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * ctxt = nullptr) override;
+
+    void OnConnectionExpired(const Transport::PeerAddress & peer, ByteSpan quotedPayload) override;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
