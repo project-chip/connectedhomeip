@@ -32,7 +32,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, EventReadResult, TypedAttributePath, ValueDecodeFailure
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
@@ -129,6 +129,22 @@ class ChangedAttribute:
     attribute: Any
     old_value: Any
     new_value: Any
+
+
+@dataclass(frozen=True)
+class EventRequestPaths:
+    """The six endpoint/cluster/event combinations an event request path can take.
+
+    Each field is an events argument in the form ReadEvent accepts, ordered from most
+    to least specific. Event subscribe test cases cover the same six shapes, so they
+    can reuse these by passing them to ReadEvent with a reportInterval.
+    """
+    specific_endpoint_specific_event: list
+    specific_endpoint_all_cluster_events: list
+    specific_endpoint_all_events: list
+    all_endpoints_specific_event: list
+    all_endpoints_all_cluster_events: list
+    all_endpoints_all_events: list
 
 
 # Clusters whose commands must never be auto-invoked by IDM constraint fuzzing.
@@ -287,6 +303,20 @@ def client_cmd(cmd_class):
     return None
 
 
+def _describe_event_result(result: EventReadResult) -> str:
+    """Render one read result as a single line for an assertion failure message."""
+    if result.Header is None:
+        return f"<no header> status {result.Status}"
+
+    path = (f"EP{result.Header.EndpointId} cluster 0x{result.Header.ClusterId:04X} "
+            f"event 0x{result.Header.EventId:02X}")
+    if isinstance(result.Data, ValueDecodeFailure):
+        return f"{path} reported but undecodable: {result.Data.Reason}"
+    if result.Data is None:
+        return f"{path} status {result.Status}"
+    return f"{path} {type(result.Data).__name__} EventNumber {result.Header.EventNumber}"
+
+
 # ============================================================================
 # IDMBaseTest - Main Base Class
 # ============================================================================
@@ -419,6 +449,212 @@ class IDMBaseTest(BasicCompositionTests):
             log.info("DUT supporting Matter specification version 0x%08X (pre-1.7) sent %d response frame(s) "
                      "when %s=True (allowed per pre-1.7 spec)",
                      spec_ver, snapshot.totalImResponseCount, action_name)
+
+    # ========================================================================
+    # Event Read Utilities
+    # ========================================================================
+
+    @staticmethod
+    def wildcard_event_paths(endpoint: int, cluster: type[ClusterObjects.Cluster],
+                             event: type[ClusterObjects.ClusterEvent]) -> EventRequestPaths:
+        """Build the six endpoint/cluster/event combinations an event request path can take.
+
+        Only the events argument is built here; the caller decides whether to issue a read
+        or a subscription with it.
+
+        Args:
+            endpoint: Endpoint to use for the concrete-endpoint paths
+            cluster: Cluster to use for the concrete-cluster paths
+            event: Event to use for the concrete-event paths
+        """
+        return EventRequestPaths(
+            specific_endpoint_specific_event=[(endpoint, event)],
+            specific_endpoint_all_cluster_events=[(endpoint, cluster)],
+            specific_endpoint_all_events=[endpoint],
+            all_endpoints_specific_event=[event],
+            all_endpoints_all_cluster_events=[cluster],
+            all_endpoints_all_events=['*'],
+        )
+
+    async def read_events(self, ctrl: ChipDeviceCtrl, events: list, event_number_filter: int | None = None,
+                          fabric_filtered: bool = False) -> list[EventReadResult]:
+        """Send a Read Request Message for the given event paths.
+
+        Args:
+            ctrl: Controller to read with
+            events: Event paths, in any form accepted by ReadEvent
+            event_number_filter: EventMin value, or None to apply no filter
+            fabric_filtered: Whether the DUT should filter events to the accessing fabric
+
+        Returns:
+            List of EventReadResult, one per reported event or event status
+        """
+        read_events = await ctrl.ReadEvent(
+            nodeId=self.dut_node_id,
+            events=events,
+            eventNumberFilter=event_number_filter,
+            fabricFiltered=fabric_filtered
+        )
+        log.info("Read of event paths %s (eventNumberFilter=%s) returned %d result(s)",
+                 events, event_number_filter, len(read_events))
+        return read_events
+
+    async def read_latest_event_number(self, ctrl: ChipDeviceCtrl, events: list) -> int | None:
+        """Read the given event paths and return the largest event number reported.
+
+        Args:
+            ctrl: Controller to read with
+            events: Event paths, in any form accepted by ReadEvent
+
+        Returns:
+            Largest EventNumber reported, or None when the DUT reported no events
+        """
+        read_events = await self.read_events(ctrl=ctrl, events=events)
+        event_numbers = [e.Header.EventNumber for e in read_events if e.Header is not None]
+        if not event_numbers:
+            return None
+        return max(event_numbers)
+
+    @staticmethod
+    def assert_event_reported(events: list[EventReadResult], cluster: type[ClusterObjects.Cluster],
+                              event: type[ClusterObjects.ClusterEvent], endpoint: int | None = None):
+        """Assert the report data contains decoded data for the given event.
+
+        Args:
+            events: Results returned by a read or subscription
+            cluster: Cluster the event is expected to come from
+            event: Event expected to be present
+            endpoint: Endpoint the event must come from, or None to accept any endpoint,
+                as the wildcard-endpoint paths require
+        """
+        for result in events:
+            if result.Header is None:
+                continue
+            if endpoint is not None and result.Header.EndpointId != endpoint:
+                continue
+            if result.Header.ClusterId != cluster.id:
+                continue
+            if isinstance(result.Data, event):
+                return
+
+        # Every result is listed, since a miss is usually the event arriving on another endpoint
+        # or carrying a status or undecodable payload instead of data.
+        expected = f"{cluster.__name__}.{event.__name__}"
+        if endpoint is not None:
+            expected = f"{expected} on endpoint {endpoint}"
+        reported = "\n  ".join(_describe_event_result(e) for e in events) if events else "<empty report>"
+        asserts.fail(f"Report data must contain event {expected}, got {len(events)} result(s):\n  {reported}")
+
+    @staticmethod
+    def assert_events_reported(events: list[EventReadResult]):
+        """Assert the report data carries data for at least one event.
+
+        Args:
+            events: Results returned by a read or subscription
+        """
+        with_data = [e for e in events if e.Data is not None]
+        asserts.assert_greater(
+            len(with_data), 0,
+            "Report data must contain data for at least one event"
+        )
+
+    @staticmethod
+    def assert_event_status_count(events: list[EventReadResult], status: Status, expected_count: int):
+        """Assert how many results in the report data carry a given status code.
+
+        Args:
+            events: Results returned by a read or subscription
+            status: Status code to count
+            expected_count: Number of results expected to carry that status
+        """
+        actual_count = len([e for e in events if e.Status == status])
+        asserts.assert_equal(
+            actual_count, expected_count,
+            f"Expected {expected_count} event(s) with status {status}, got {actual_count}"
+        )
+
+    @staticmethod
+    def assert_cluster_events_absent(events: list[EventReadResult], cluster: type[ClusterObjects.Cluster]):
+        """Assert the report data carries no entry at all for a cluster.
+
+        A wildcard path expands only to the events the reader is allowed to see, so an event
+        it lacks the privilege for is dropped silently: neither event data nor an event status
+        may appear for it.
+
+        Args:
+            events: Results returned by a read or subscription
+            cluster: Cluster expected to be absent from the report data
+        """
+        reported = [e for e in events if e.Header is not None and e.Header.ClusterId == cluster.id]
+        if not reported:
+            return
+
+        entries = "\n  ".join(_describe_event_result(e) for e in reported)
+        asserts.fail(f"Report data must not contain any entry for cluster {cluster.__name__}, "
+                     f"got {len(reported)}:\n  {entries}")
+
+    @staticmethod
+    def assert_event_numbers_at_least(events: list[EventReadResult], minimum: int):
+        """Assert every reported event number is greater than or equal to a bound.
+
+        Args:
+            events: Results returned by a read or subscription
+            minimum: Value every reported EventNumber must be at least
+        """
+        for event in events:
+            if event.Header is None:
+                continue
+            asserts.assert_greater_equal(
+                event.Header.EventNumber, minimum,
+                f"Event number {event.Header.EventNumber} is below the requested EventMin {minimum}"
+            )
+
+    async def emit_access_control_entry_changed(self, ctrl: ChipDeviceCtrl):
+        """Generate an AccessControlEntryChanged event by rewriting the ACL to its current value.
+
+        Every DUT supports this event and writing the ACL always emits one, so this gives a test
+        readable events without relying on a cluster only test applications implement.
+
+        Args:
+            ctrl: Controller to read and write the ACL with
+        """
+        dut_acl = await self.get_dut_acl(ctrl=ctrl)
+        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
+
+    @contextlib.asynccontextmanager
+    async def restricted_privilege_controller(self, cluster_id: int, privilege):
+        """Yield a second controller holding one privilege on a single cluster.
+
+        The controller is granted access to cluster_id only, so reads of any other cluster
+        exercise the DUT's access checking. The commissioner keeps its own administer privilege
+        throughout, so the original ACL is put back afterwards without needing a factory reset.
+
+        Args:
+            cluster_id: The only cluster the yielded controller may target
+            privilege: AccessControlEntryPrivilegeEnum value to grant on that cluster
+
+        Yields:
+            ChipDeviceCtrl for the restricted controller
+        """
+        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+        restricted_node_id = self.matter_test_config.controller_node_id + 1
+        restricted_ctrl = fabric_admin.NewController(
+            nodeId=restricted_node_id,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+        )
+        dut_acl_original = await self.get_dut_acl(ctrl=self.default_controller)
+        try:
+            ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=privilege,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=cluster_id)],
+                subjects=[restricted_node_id]
+            )
+            await self.add_ace_to_dut_acl(ctrl=self.default_controller, ace=ace, dut_acl_original=dut_acl_original)
+            yield restricted_ctrl
+        finally:
+            await self.write_dut_acl(ctrl=self.default_controller, acl=dut_acl_original)
+            restricted_ctrl.Shutdown()
 
     # ========================================================================
     # Attribute Path Utilities
