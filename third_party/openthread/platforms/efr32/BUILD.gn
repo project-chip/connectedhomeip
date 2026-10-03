@@ -30,9 +30,9 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${sl_ot_efr32_root}",
-    "${efr32_sdk_root}/openthread/platform-abstraction/efr32",
-    "${efr32_sdk_root}/openthread/platform-abstraction/",
-    "${efr32_sdk_root}/openthread/config",
+    "${efr32_sdk_root}/thread/platform-abstraction/efr32",
+    "${efr32_sdk_root}/thread/platform-abstraction/",
+    "${efr32_sdk_root}/thread/config",
     "${chip_root}/examples/platform/efr32",
     "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}",
     "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
@@ -63,10 +63,19 @@ source_set("libopenthread-efr32") {
     "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
     "${openthread_root}/examples/platforms/utils/settings_ram.c",
     "${sl_ot_efr32_root}/alarm.c",
-    "${sl_ot_efr32_root}/crypto.c",
     "${sl_ot_efr32_root}/entropy.c",
-    "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
+    "${sl_ot_efr32_root}/mac/frame-utils.cpp",
+    "${sl_ot_efr32_root}/mac/key-storage-ksu.cpp",
+    "${sl_ot_efr32_root}/mac/key-storage-plaintext.cpp",
+    "${sl_ot_efr32_root}/mac/sli-crypto-key-desc.cpp",
+    "${sl_ot_efr32_root}/mac/tx-aes-ccm-lpwaes.cpp",
+    "${sl_ot_efr32_root}/mac/tx-aes-ccm-radioaes.cpp",
+    "${sl_ot_efr32_root}/mac/tx-security.cpp",
+    "${sl_ot_efr32_root}/memory.c",
     "${sl_ot_efr32_root}/misc.c",
+    "${sl_ot_efr32_root}/radio.cpp",
+    "${sl_ot_efr32_root}/radio_channel_switching.cpp",
+
     "${sl_ot_efr32_root}/radio_coex.c",
     "${sl_ot_efr32_root}/radio_csl.cpp",
     "${sl_ot_efr32_root}/radio_energy_scan.cpp",
@@ -80,9 +89,6 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/sleep.c",
     "${sl_ot_efr32_root}/soft_source_match_table.c",
     "${sl_ot_efr32_root}/system.c",
-
-    # Temporary file until the files in the SI SDK is fixed
-    "${matter_support_root}/sdk-copies/openthread/platform-abstraction/efr32/radio.cpp",
   ]
 
   include_dirs = [ "${openthread_root}/examples/platforms/utils" ]
