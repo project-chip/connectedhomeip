@@ -1,0 +1,117 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - Zephyr
+
+on:
+    push:
+        branches:
+            - master
+            - "v*-branch"
+    pull_request:
+    merge_group:
+
+concurrency:
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+env:
+    CHIP_LOG_TIMESTAMPS: false
+
+jobs:
+    zephyr:
+        name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        strategy:
+            matrix:
+                include:
+                    - board: xg26_rb4118a
+                      toolchain: zephyr
+                      build_dir: all-devices-zephyr-xg26-gcc
+                      extra_args: -DFILE_SUFFIX=debug
+        container:
+            image: ghcr.io/zephyrproject-rtos/zephyr-build:v0.29.4
+            options: --user root
+
+        steps:
+            - name: Checkout Matter
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+            - name: Set up Zephyr workspace
+              shell: bash
+              # The zephyr commit is ~4.5 rc1, will replace with official 4.5 tag once created
+              run: |
+                  set -euxo pipefail
+                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr fa4f8fb0e470210aee0ae6fb069a281bc6ac887a /tmp/zephyrproject
+                  cd /tmp/zephyrproject
+                  west config manifest.project-filter -- \
+                      '-.*,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot'
+                  west update
+                  git config --global --add safe.directory "$GITHUB_WORKSPACE"
+                  git -C "$GITHUB_WORKSPACE" submodule update --init --depth 1 --jobs 4 -- \
+                      third_party/editline/repo \
+                      third_party/jsoncpp/repo \
+                      third_party/nlassert/repo \
+                      third_party/nlio/repo \
+                      third_party/uriparser/repo \
+                      third_party/pigweed/repo
+                  : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
+                  west blobs fetch
+
+            - name: Install GN from Matter's pinned CIPD version
+              shell: bash
+              working-directory: /tmp/zephyrproject
+              run: |
+                  set -euxo pipefail
+                  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools
+                  gn_version="$(python3 - <<'PY'
+                  import json
+                  import os
+                  from pathlib import Path
+
+                  config = Path(os.environ["GITHUB_WORKSPACE"]) / "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
+                  packages = json.loads(config.read_text())["packages"]
+                  gn = next(package for package in packages if package["path"] == "gn/gn/${platform}")
+                  print(gn["tags"][0])
+                  PY
+                  )"
+                  /opt/depot_tools/cipd install gn/gn/linux-amd64 "$gn_version" -root /opt/gn
+                  echo '/opt/gn' >> "$GITHUB_PATH"
+                  /opt/gn/gn --version
+
+            - name: Build All-Devices App
+              shell: bash
+              working-directory: /tmp/zephyrproject
+              env:
+                  ZEPHYR_TOOLCHAIN_VARIANT: ${{ matrix.toolchain }}
+                  ZEPHYR_SDK_INSTALL_DIR: /opt/toolchains/zephyr-sdk-1.0.1
+              run: |
+                  west build -p always -b "${{ matrix.board }}" --sysbuild \
+                    "${GITHUB_WORKSPACE}/examples/all-devices-app/zephyr" \
+                    -d "build/${{ matrix.build_dir }}" \
+                    -- \
+                    -DZEPHYR_TOOLCHAIN_VARIANT="${ZEPHYR_TOOLCHAIN_VARIANT}" \
+                    -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
+                    "${{ matrix.extra_args }}"
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                  slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
