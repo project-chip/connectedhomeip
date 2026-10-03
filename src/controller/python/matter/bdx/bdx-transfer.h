@@ -78,6 +78,7 @@ private:
 
     Delegate * mDelegate = nullptr;
     bool mAwaitingAccept = false;
+    bool mRejected       = false;
 
     System::Layer * mSystemLayer = nullptr;
 
