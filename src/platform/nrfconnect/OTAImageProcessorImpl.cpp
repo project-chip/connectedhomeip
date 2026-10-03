@@ -108,8 +108,21 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 #ifdef CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     dfu_image_writer cdWriter;
     cdWriter.image_id = CONFIG_CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID;
-    cdWriter.open     = [](int id, size_t size) { return size <= sizeof(sCdBuf) ? 0 : -EFBIG; };
-    cdWriter.write    = [](const uint8_t * chunk, size_t chunk_size) {
+    cdWriter.open     = [](int id, size_t size) {
+        if (size > sizeof(sCdBuf))
+        {
+            return -EFBIG;
+        }
+        // Reset the write offset for each download; it survives across PrepareDownloadImpl()
+        // calls otherwise, so a retried download would keep writing past the previous run.
+        sCdSavedBytes = 0;
+        return 0;
+    };
+    cdWriter.write = [](const uint8_t * chunk, size_t chunk_size) {
+        if (chunk_size > sizeof(sCdBuf) - sCdSavedBytes)
+        {
+            return -EFBIG;
+        }
         memcpy(&sCdBuf[sCdSavedBytes], chunk, chunk_size);
         sCdSavedBytes += chunk_size;
         return 0;
