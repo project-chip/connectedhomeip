@@ -1772,6 +1772,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     };
     auto aclChangeFor = [&](const datastore::ACLEntryStruct & acl) {
         AclChange change;
+        // An entry being removed keeps the value its removal is sent with. Splitting it would add the group's subjects
+        // back to the node in a new entry.
+        if (HasRemovalIntent(acl))
+        {
+            return change;
+        }
         change.groupSubjects = groupSubjectIndices(acl);
         if (!change.groupSubjects.empty())
         {

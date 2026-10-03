@@ -2917,6 +2917,68 @@ TEST(JointFabricDatastoreTest, UpdateGroupSplitsMixedEntryOnPermissionChange)
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
+// An entry being removed is left as it is. Splitting it would add the group's subjects back to the node in a new entry
+// that the removal does not cover.
+TEST(JointFabricDatastoreTest, UpdateGroupDoesNotSplitEntryBeingRemoved)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    SetUpCatGroup(store);
+    const NodeId catSubject = NodeIdFromCASEAuthTag(0x2345'0001);
+    SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { catSubject, 0xDEADBEEF }, State::kCommitted);
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, std::nullopt, Privilege::kManage), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+    const auto * entry = FindAcl(store, 123, 5);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_EQ(entry->statusEntry.state, State::kDeletePending);
+    EXPECT_TRUE(entry->pendingRemoval);
+    EXPECT_EQ(entry->ACLEntry.privilege, Privilege::kOperate);
+    EXPECT_TRUE(entry->ACLEntry.subjects == (std::vector<uint64_t>{ catSubject, 0xDEADBEEF }));
+    EXPECT_FALSE(entry->supersededValue.has_value());
+
+    delegate.RunDeferred(); // the removal
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+    EXPECT_TRUE(delegate.deferred.empty());
+}
+
+// A removal that failed while the node was offline is still pending, and a version bump leaves the entry as it is: the
+// removal is retried with the value the node holds.
+TEST(JointFabricDatastoreTest, UpdateGroupDoesNotRewriteEntryBeingRemoved)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    SetUpCatGroup(store);
+    const NodeId catSubject = NodeIdFromCASEAuthTag(0x2345'0001);
+    SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { catSubject }, State::kCommitted);
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    ASSERT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitFailed);
+    delegate.ResetCapturedSyncs();
+
+    delegate.deferKind = SyncKind::kAcl;
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(delegate.hasLastAclSync);
+    EXPECT_TRUE(delegate.deferred.empty());
+    const auto * entry = FindAcl(store, 123, 5);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_EQ(entry->statusEntry.state, State::kCommitFailed);
+    EXPECT_TRUE(entry->pendingRemoval);
+    EXPECT_TRUE(entry->ACLEntry.subjects == std::vector<uint64_t>{ catSubject });
+    EXPECT_FALSE(entry->supersededValue.has_value());
+    EXPECT_EQ(store.GetGroupEntries()[0].groupCATVersion.Value(), 2u);
+}
+
 TEST(JointFabricDatastoreTest, UpdateGroupStillUpdatesGroupAuthPrivilege)
 {
     JointFabricDatastore store;
