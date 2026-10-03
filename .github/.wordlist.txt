@@ -1803,3 +1803,7 @@ zigbeealliance
 zigbeethread
 zsdk
 ZXing
+astra
+gpt
+preflight
+xhigh
