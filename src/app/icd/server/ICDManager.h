@@ -77,6 +77,16 @@ public:
     };
 
     /**
+     * @brief Policy governing whether Check-In messages are transmitted during an OperationalState transition.
+     */
+    enum class CheckInMsgsPolicy : uint8_t
+    {
+        kSkip,              // Enter or extend ActiveMode without sending Check-In messages (e.g. SRP fast-poll while deferring).
+        kSendOnEnterActive, // Default behavior: send Check-In messages only when transitioning from IdleMode to ActiveMode.
+        kForce,             // Send Check-In messages even if already in ActiveMode (e.g. cold boot once kServerReady has fired).
+    };
+
+    /**
      * @brief This enum class represents all ICDStateObserver callbacks available from the
      *        mStateObserverPool for the ICDManager.
      *
@@ -275,6 +285,10 @@ public:
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    uint32_t GetCheckInMessagesSentCount() const { return mCheckInMessagesSentCount; }
+    void ResetCheckInMessagesSentCount() { mCheckInMessagesSentCount = 0; }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     // Implementation of ICDListener functions.
@@ -323,9 +337,9 @@ private:
      *        ActiveMode -> IdleMode   : Transition ICD to IdleMode and start the IdleMode timer.
      *
      * @param state requested OperationalState for the ICD to transition to
-     * @param sendCheckInMsgs true if Check-In messages should be sent when transitioning from IdleMode to ActiveMode
+     * @param policy CheckInMsgsPolicy governing Check-In message transmission during state update
      */
-    void UpdateOperationState(OperationalState state, bool sendCheckInMsgs = true);
+    void UpdateOperationState(OperationalState state, CheckInMsgsPolicy policy = CheckInMsgsPolicy::kSendOnEnterActive);
 
     /**
      * @brief Set or Remove a keep ActiveMode requirement for the given flag
@@ -456,6 +470,9 @@ private:
     SubscriptionsInfoProvider * mSubInfoProvider           = nullptr;
     ICDCheckInBackOffStrategy * mICDCheckInBackOffStrategy = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint32_t mCheckInMessagesSentCount = 0;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 };
 
