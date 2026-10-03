@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -573,6 +575,167 @@ public:
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
 };
 
+class MockSchedulesDelegate : public ThermostatSchedules::Delegate
+{
+public:
+    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override
+    {
+        bool shouldError = mGetScheduleTypeAtIndexError.has_value() &&
+            (!mGetScheduleTypeAtIndexErrorAfterCallCount.has_value() ||
+             mGetScheduleTypeAtIndexCallCount >= *mGetScheduleTypeAtIndexErrorAfterCallCount);
+        mGetScheduleTypeAtIndexCallCount++;
+        if (shouldError)
+        {
+            return *mGetScheduleTypeAtIndexError;
+        }
+        if (index >= mScheduleTypes.size())
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        scheduleType = mScheduleTypes[index];
+        return CHIP_NO_ERROR;
+    }
+
+    uint8_t GetNumberOfSchedules() override { return static_cast<uint8_t>(mMaxSchedules); }
+    uint8_t GetNumberOfScheduleTransitions() override { return mMaxScheduleTransitions; }
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override { return mMaxScheduleTransitionsPerDay; }
+
+    CHIP_ERROR GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override
+    {
+        if (mGetScheduleAtIndexError.has_value())
+        {
+            return *mGetScheduleAtIndexError;
+        }
+        if (index >= mSchedules.size())
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        schedule = mSchedules[index];
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule) override
+    {
+        if (mGetPendingScheduleAtIndexError.has_value())
+        {
+            return *mGetPendingScheduleAtIndexError;
+        }
+        if (index >= mPendingSchedules.size())
+        {
+            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+        }
+        schedule = mPendingSchedules[index];
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) override
+    {
+        if (mActiveScheduleHandle.IsNull())
+        {
+            activeScheduleHandle.SetNull();
+            return CHIP_NO_ERROR;
+        }
+        if (activeScheduleHandle.IsNull() || activeScheduleHandle.Value().size() < mActiveScheduleHandle.Value().size())
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        memcpy(activeScheduleHandle.Value().data(), mActiveScheduleHandle.Value().data(), mActiveScheduleHandle.Value().size());
+        activeScheduleHandle.Value().reduce_size(mActiveScheduleHandle.Value().size());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & activeScheduleHandle) override
+    {
+        ReturnErrorOnFailure(mSetActiveScheduleHandleError);
+        if (activeScheduleHandle.IsNull())
+        {
+            mActiveScheduleHandle.SetNull();
+        }
+        else
+        {
+            if (activeScheduleHandle.Value().size() > sizeof(mActiveScheduleHandleBuffer))
+            {
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
+            memcpy(mActiveScheduleHandleBuffer, activeScheduleHandle.Value().data(), activeScheduleHandle.Value().size());
+            mActiveScheduleHandle =
+                DataModel::MakeNullable(ByteSpan(mActiveScheduleHandleBuffer, activeScheduleHandle.Value().size()));
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void InitializePendingSchedules() override { mPendingSchedules = mSchedules; }
+
+    void ClearPendingScheduleList() override { mPendingSchedules.clear(); }
+
+    CHIP_ERROR AppendToPendingScheduleList(const ScheduleStructWithOwnedMembers & schedule) override
+    {
+        mPendingSchedules.push_back(schedule);
+        if (schedule.GetScheduleHandle().IsNull())
+        {
+            const uint8_t handle[] = { mNextHandleValue++ };
+            ReturnErrorOnFailure(mPendingSchedules.back().SetScheduleHandle(DataModel::MakeNullable(ByteSpan(handle))));
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommitPendingSchedules() override
+    {
+        ReturnErrorOnFailure(mCommitPendingSchedulesError);
+        mSchedules = mPendingSchedules;
+        mPendingSchedules.clear();
+        return CHIP_NO_ERROR;
+    }
+
+    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override
+    {
+        if (attributeId == Attributes::Schedules::Id)
+        {
+            return mMaxAtomicWriteTimeout;
+        }
+        return std::nullopt;
+    }
+
+    // Seeds a single built-in schedule with the given handle byte and no transitions, so a Precommit's
+    // "built-in schedules cannot be silently removed" rule has something to exercise.
+    void SeedBuiltInSchedule(uint8_t handleByte)
+    {
+        ScheduleStructWithOwnedMembers schedule;
+        schedule.SetSystemMode(SystemModeEnum::kHeat);
+        const uint8_t handle[] = { handleByte };
+        VerifyOrDie(schedule.SetScheduleHandle(DataModel::MakeNullable(ByteSpan(handle))) == CHIP_NO_ERROR);
+        VerifyOrDie(schedule.SetName(NullOptional) == CHIP_NO_ERROR);
+        VerifyOrDie(schedule.SetPresetHandle(NullOptional) == CHIP_NO_ERROR);
+        schedule.SetBuiltIn(DataModel::MakeNullable(true));
+        mSchedules.push_back(schedule);
+    }
+
+    size_t mMaxSchedules                                       = 10;
+    uint8_t mMaxScheduleTransitions                            = 10;
+    DataModel::Nullable<uint8_t> mMaxScheduleTransitionsPerDay = DataModel::NullNullable;
+    std::vector<Structs::ScheduleTypeStruct::Type> mScheduleTypes;
+    std::vector<ScheduleStructWithOwnedMembers> mSchedules;
+    std::vector<ScheduleStructWithOwnedMembers> mPendingSchedules;
+    uint8_t mActiveScheduleHandleBuffer[kScheduleHandleSize]            = { 0 };
+    DataModel::Nullable<ByteSpan> mActiveScheduleHandle                 = DataModel::NullNullable;
+    uint8_t mNextHandleValue                                            = 100;
+    CHIP_ERROR mSetActiveScheduleHandleError                            = CHIP_NO_ERROR;
+    CHIP_ERROR mCommitPendingSchedulesError                             = CHIP_NO_ERROR;
+    std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(9000);
+
+    // When set, the corresponding Get*AtIndex() unconditionally returns this error instead of consulting the
+    // backing vector, simulating a delegate-side failure partway through a list traversal.
+    std::optional<CHIP_ERROR> mGetScheduleTypeAtIndexError;
+    std::optional<CHIP_ERROR> mGetScheduleAtIndexError;
+    std::optional<CHIP_ERROR> mGetPendingScheduleAtIndexError;
+
+    // When set alongside mGetScheduleTypeAtIndexError, delays the injected error until after this many prior calls
+    // have succeeded, simulating a delegate that fails partway through a second scan of the schedule type list
+    // (e.g. one triggered by ScheduleTypeSupportsNames() after MaximumScheduleTypeCount() already scanned it).
+    std::optional<size_t> mGetScheduleTypeAtIndexErrorAfterCallCount;
+    size_t mGetScheduleTypeAtIndexCallCount = 0;
+};
+
 class MockSensorsDelegate : public ThermostatSensors::Delegate
 {
 public:
@@ -774,10 +937,27 @@ inline bool HasAttribute(ServerClusterInterface & cluster, AttributeId attrId)
                        [attrId](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attrId; });
 }
 
+class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+};
+
+inline TestDeviceTypeResolver gTestDeviceTypeResolver;
+
 struct ThermostatTestFixture : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        Access::AccessControl::Delegate * delegate = Access::Examples::GetAccessControlDelegate();
+        ASSERT_EQ(Access::GetAccessControl().Init(delegate, gTestDeviceTypeResolver), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        Access::GetAccessControl().Finish();
+        Platform::MemoryShutdown();
+    }
 
     ::chip::Testing::TestServerClusterContext mTestContext;
     ::chip::Testing::FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
@@ -792,6 +972,7 @@ struct ThermostatTestFixture : public ::testing::Test
     MockOccupancyDelegate mOccupancyDelegate;
     MockPresetsDelegate mPresetsDelegate;
     MockSuggestionsDelegate mSuggestionsDelegate;
+    MockSchedulesDelegate mSchedulesDelegate;
     MockSensorsDelegate mSensorsDelegate;
 
     void SetUp() override
@@ -799,10 +980,25 @@ struct ThermostatTestFixture : public ::testing::Test
         mThermostatDelegate.SetFabricTable(&mFabricHelper.GetFabricTable());
         FabricIndex fabricIndex = kTestFabricIndex;
         ASSERT_EQ(mFabricHelper.SetUpTestFabric(fabricIndex), CHIP_NO_ERROR);
+
+        Access::AccessControl::Entry entry;
+        ASSERT_EQ(Access::GetAccessControl().PrepareEntry(entry), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetFabricIndex(kTestFabricIndex), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetPrivilege(Access::Privilege::kAdminister), CHIP_NO_ERROR);
+        ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+        ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, entry), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
+        size_t count = 0;
+        if (Access::GetAccessControl().GetEntryCount(kTestFabricIndex, count) == CHIP_NO_ERROR)
+        {
+            for (size_t i = 0; i < count; ++i)
+            {
+                EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &kTestFabricIndex), CHIP_NO_ERROR);
+            }
+        }
         mSensorsDelegate.Reset();
         FabricIndex fabricIndex = kTestFabricIndex;
         EXPECT_EQ(mFabricHelper.TearDownTestFabric(fabricIndex), CHIP_NO_ERROR);

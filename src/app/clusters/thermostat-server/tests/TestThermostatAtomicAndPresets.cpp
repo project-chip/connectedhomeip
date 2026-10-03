@@ -314,6 +314,97 @@ TEST_F(ThermostatTestFixture, TestAtomicWriteTimerExpiration)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestAtomicWritePermissions)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Replace the default Administer ACL entry with an Operate-only entry for kTestNodeId
+    EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &Thermostat::kTestFabricIndex), CHIP_NO_ERROR);
+
+    {
+        Access::AccessControl::Entry operateEntry;
+        ASSERT_EQ(Access::GetAccessControl().PrepareEntry(operateEntry), CHIP_NO_ERROR);
+        ASSERT_EQ(operateEntry.SetFabricIndex(Thermostat::kTestFabricIndex), CHIP_NO_ERROR);
+        ASSERT_EQ(operateEntry.SetPrivilege(Access::Privilege::kOperate), CHIP_NO_ERROR);
+        ASSERT_EQ(operateEntry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+        ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, operateEntry), CHIP_NO_ERROR);
+    }
+
+    // Attempt BeginAtomicWrite requesting Presets::Id (which requires Manage privilege)
+    Commands::AtomicRequest::Type req;
+    req.requestType             = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Presets::Id };
+    req.attributeRequests       = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    req.timeout                 = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+
+    auto result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Failure));
+
+        auto iter = result.response.value().attributeStatus.begin();
+        ASSERT_TRUE(iter.Next());
+        EXPECT_EQ(iter.GetValue().attributeID, Presets::Id);
+        EXPECT_EQ(iter.GetValue().statusCode, to_underlying(Status::UnsupportedAccess));
+        EXPECT_FALSE(iter.Next());
+    }
+
+    // Atomic write should NOT have opened: writing a non-atomic attribute must succeed
+    EXPECT_EQ(tester.WriteAttribute(SystemMode::Id, SystemModeEnum::kHeat), Status::Success);
+
+    // Now update ACL entry to Manage privilege
+    EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &Thermostat::kTestFabricIndex), CHIP_NO_ERROR);
+
+    {
+        Access::AccessControl::Entry manageEntry;
+        ASSERT_EQ(Access::GetAccessControl().PrepareEntry(manageEntry), CHIP_NO_ERROR);
+        ASSERT_EQ(manageEntry.SetFabricIndex(Thermostat::kTestFabricIndex), CHIP_NO_ERROR);
+        ASSERT_EQ(manageEntry.SetPrivilege(Access::Privilege::kManage), CHIP_NO_ERROR);
+        ASSERT_EQ(manageEntry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+        ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, manageEntry), CHIP_NO_ERROR);
+    }
+
+    // Now BeginAtomicWrite should succeed
+    result = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+
+        auto successIter = result.response.value().attributeStatus.begin();
+        ASSERT_TRUE(successIter.Next());
+        EXPECT_EQ(successIter.GetValue().attributeID, Presets::Id);
+        EXPECT_EQ(successIter.GetValue().statusCode, to_underlying(Status::Success));
+        EXPECT_FALSE(successIter.Next());
+    }
+
+    // Rollback atomic write
+    req.requestType = AtomicRequestTypeEnum::kRollbackWrite;
+    result          = tester.Invoke(req);
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    if (result.response.has_value())
+    {
+        EXPECT_EQ(result.response.value().statusCode, to_underlying(Status::Success));
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestSetActivePresetRequestCommand)
 {
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kEvents);
