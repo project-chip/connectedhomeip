@@ -496,6 +496,32 @@ TEST(JointFabricDatastoreTest, AddKeySetRejectsEpochKeyOfWrongLength)
     EXPECT_TRUE(store.GetGroupKeySetList()[0].epochKey1.IsNull());
 }
 
+// Nodes answer a KeySetWrite with a security policy they do not know with CONSTRAINT_ERROR, which RefreshNode handles by
+// dropping the node's entry for the key set. AddKeySet rejects such a key set before it is stored, as UpdateKeySet does.
+TEST(JointFabricDatastoreTest, AddKeySetRejectsUnknownSecurityPolicy)
+{
+    JointFabricDatastore store;
+
+    GroupKeySetType keySet;
+    keySet.groupKeySetID          = 11;
+    keySet.groupKeySecurityPolicy = JointFabricCluster::DatastoreGroupKeySecurityPolicyEnum::kUnknownEnumValue;
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
+    keySet.epochStartTime0.SetNonNull(static_cast<uint64_t>(1));
+    EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_TRUE(store.GetGroupKeySetList().empty());
+
+    keySet.groupKeySecurityPolicy = JointFabricCluster::DatastoreGroupKeySecurityPolicyEnum::kTrustFirst;
+    ASSERT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetGroupKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetGroupKeySetList()[0].groupKeySecurityPolicy,
+              JointFabricCluster::DatastoreGroupKeySecurityPolicyEnum::kTrustFirst);
+
+    // As JFAManager adds a placeholder for the IPK: key set 0, with the default policy and no epoch keys.
+    GroupKeySetType ipkPlaceholder{ 0 };
+    EXPECT_EQ(store.AddGroupKeySetEntry(ipkPlaceholder), CHIP_NO_ERROR);
+    EXPECT_EQ(store.GetGroupKeySetList().size(), 2u);
+}
+
 TEST(JointFabricDatastoreTest, UpdateKeySetRejectsEpochKeyOfWrongLength)
 {
     JointFabricDatastore store;
