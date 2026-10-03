@@ -25,6 +25,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WebRTCTransp
         {
         case CurrentSessions::Id:
             return CurrentSessions::kMetadataEntry;
+        case SupportedSFrameCipherSuites::Id:
+            return SupportedSFrameCipherSuites::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -49,6 +51,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WebRTC
             return ProvideICECandidates::kMetadataEntry;
         case EndSession::Id:
             return EndSession::kMetadataEntry;
+        case UpdateSession::Id:
+            return UpdateSession::kMetadataEntry;
 
         default:
             return std::nullopt;

@@ -31,6 +31,9 @@
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cstring>
+#include <vector>
+
 namespace {
 
 using namespace chip;
@@ -57,6 +60,11 @@ public:
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession, bool & outDeferredOffer) override
     {
+        // Retain the configuration to verify it stays valid after the handler returns.
+        if (args.sFrameConfig.HasValue())
+        {
+            mCapturedSFrameConfig.SetValue(args.sFrameConfig.Value());
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -119,6 +127,8 @@ public:
         isNull = false;
         return CHIP_NO_ERROR;
     }
+
+    Optional<SFrameConfigStorage> mCapturedSFrameConfig;
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -133,7 +143,9 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
     MockWebRTCTransportProviderDelegate mockDelegate;
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
-    ASSERT_TRUE(IsAttributesListEqualTo(server, { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
+    ASSERT_TRUE(IsAttributesListEqualTo(server,
+                                        { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry,
+                                          WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::kMetadataEntry }));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
@@ -228,6 +240,123 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
     auto status = tester.ReadAttribute(0xFFFF /* Invalid attribute ID */, dummyValue);
     EXPECT_FALSE(status.IsSuccess());
     EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigIsDeepCopied)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportProviderDelegate mockDelegate;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(server);
+
+    // Mutable source buffers, scribbled over after the command returns to prove
+    // the delegate retained a deep copy rather than aliasing the input.
+    uint8_t senderKid[]      = { 0x01, 0x02, 0x03 };
+    uint8_t senderBaseKey[]  = { 0xAA, 0xBB, 0xCC, 0xDD };
+    uint8_t receiveKid[]     = { 0x0A, 0x0B };
+    uint8_t receiveBaseKey[] = { 0x11, 0x22, 0x33, 0x44, 0x55 };
+
+    Globals::Structs::SFrameKeyStruct::Type senderKey;
+    senderKey.kid     = ByteSpan(senderKid);
+    senderKey.baseKey = ByteSpan(senderBaseKey);
+
+    std::vector<Globals::Structs::SFrameKeyStruct::Type> receiveKeys(1);
+    receiveKeys[0].kid     = ByteSpan(receiveKid);
+    receiveKeys[0].baseKey = ByteSpan(receiveBaseKey);
+
+    Globals::Structs::SFrameStruct::Type sframeConfig;
+    sframeConfig.audioCipherSuite = 1;
+    sframeConfig.videoCipherSuite = 2;
+    sframeConfig.senderKey        = senderKey;
+    sframeConfig.receiveKeys =
+        DataModel::List<const Globals::Structs::SFrameKeyStruct::Type>(receiveKeys.data(), receiveKeys.size());
+    sframeConfig.ratchetBits = 5;
+
+    uint16_t videoStreamId = 7;
+    Commands::SolicitOffer::Type request;
+    request.streamUsage = StreamUsageEnum::kLiveView;
+    request.videoStreams.SetValue(DataModel::List<const uint16_t>(&videoStreamId, 1));
+    request.SFrameConfig.SetValue(sframeConfig);
+
+    auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
+    ASSERT_TRUE(result.status.has_value() && result.status->IsSuccess());
+
+    // Clobber the original input buffers now that the command has returned.
+    memset(senderKid, 0xFF, sizeof(senderKid));
+    memset(senderBaseKey, 0xFF, sizeof(senderBaseKey));
+    memset(receiveKid, 0xFF, sizeof(receiveKid));
+    memset(receiveBaseKey, 0xFF, sizeof(receiveBaseKey));
+
+    ASSERT_TRUE(mockDelegate.mCapturedSFrameConfig.HasValue());
+    const auto & captured = mockDelegate.mCapturedSFrameConfig.Value();
+    EXPECT_EQ(captured.audioCipherSuite, 1);
+    EXPECT_EQ(captured.videoCipherSuite, 2);
+    EXPECT_EQ(captured.ratchetBits, 5);
+
+    const uint8_t expectedSenderKid[]      = { 0x01, 0x02, 0x03 };
+    const uint8_t expectedSenderBaseKey[]  = { 0xAA, 0xBB, 0xCC, 0xDD };
+    const uint8_t expectedReceiveKid[]     = { 0x0A, 0x0B };
+    const uint8_t expectedReceiveBaseKey[] = { 0x11, 0x22, 0x33, 0x44, 0x55 };
+
+    EXPECT_TRUE(captured.senderKey.kid.data_equal(ByteSpan(expectedSenderKid)));
+    EXPECT_TRUE(captured.senderKey.baseKey.data_equal(ByteSpan(expectedSenderBaseKey)));
+
+    ASSERT_EQ(captured.receiveKeys.size(), 1u);
+    EXPECT_TRUE(captured.receiveKeys[0].kid.data_equal(ByteSpan(expectedReceiveKid)));
+    EXPECT_TRUE(captured.receiveKeys[0].baseKey.data_equal(ByteSpan(expectedReceiveBaseKey)));
+
+    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigRejectsTooManyReceiveKeys)
+{
+    TestServerClusterContext context;
+    MockWebRTCTransportProviderDelegate mockDelegate;
+    WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
+    ASSERT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(server);
+
+    uint8_t kid[]     = { 0x01, 0x02 };
+    uint8_t baseKey[] = { 0xAA, 0xBB };
+
+    Globals::Structs::SFrameKeyStruct::Type senderKey;
+    senderKey.kid     = ByteSpan(kid);
+    senderKey.baseKey = ByteSpan(baseKey);
+
+    // One more receive key than the data model permits (SFrameStruct.ReceiveKeys max length is 64).
+    std::vector<Globals::Structs::SFrameKeyStruct::Type> receiveKeys(SFrameConfigStorage::kMaxReceiveKeys + 1);
+    for (auto & key : receiveKeys)
+    {
+        key.kid     = ByteSpan(kid);
+        key.baseKey = ByteSpan(baseKey);
+    }
+
+    Globals::Structs::SFrameStruct::Type sframeConfig;
+    sframeConfig.audioCipherSuite = 1;
+    sframeConfig.videoCipherSuite = 2;
+    sframeConfig.senderKey        = senderKey;
+    sframeConfig.receiveKeys =
+        DataModel::List<const Globals::Structs::SFrameKeyStruct::Type>(receiveKeys.data(), receiveKeys.size());
+    sframeConfig.ratchetBits = 1;
+
+    uint16_t videoStreamId = 7;
+    Commands::SolicitOffer::Type request;
+    request.streamUsage = StreamUsageEnum::kLiveView;
+    request.videoStreams.SetValue(DataModel::List<const uint16_t>(&videoStreamId, 1));
+    request.SFrameConfig.SetValue(sframeConfig);
+
+    auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
+
+    ASSERT_TRUE(result.status.has_value() &&
+                (result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::InvalidCommand));
+
+    // The delegate must not have received a partial configuration.
+    EXPECT_FALSE(mockDelegate.mCapturedSFrameConfig.HasValue());
 
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

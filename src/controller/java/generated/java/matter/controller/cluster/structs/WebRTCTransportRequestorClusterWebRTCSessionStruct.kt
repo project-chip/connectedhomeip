@@ -29,11 +29,12 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
   val peerNodeID: ULong,
   val peerEndpointID: UShort,
   val streamUsage: UByte,
-  val videoStreamID: UShort?,
-  val audioStreamID: UShort?,
+  val videoStreamID: Optional<UShort>?,
+  val audioStreamID: Optional<UShort>?,
   val metadataEnabled: Boolean,
   val videoStreams: Optional<List<UShort>>,
   val audioStreams: Optional<List<UShort>>,
+  val SFrameConfig: Optional<WebRTCTransportRequestorClusterSFrameStruct>?,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -47,6 +48,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
     append("\tmetadataEnabled : $metadataEnabled\n")
     append("\tvideoStreams : $videoStreams\n")
     append("\taudioStreams : $audioStreams\n")
+    append("\tSFrameConfig : $SFrameConfig\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -59,12 +61,18 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
       put(ContextSpecificTag(TAG_PEER_ENDPOINT_ID), peerEndpointID)
       put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
-        put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
+        if (videoStreamID.isPresent) {
+          val optvideoStreamID = videoStreamID.get()
+          put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), optvideoStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       }
       if (audioStreamID != null) {
-        put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
+        if (audioStreamID.isPresent) {
+          val optaudioStreamID = audioStreamID.get()
+          put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), optaudioStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
@@ -85,6 +93,14 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         }
         endArray()
       }
+      if (SFrameConfig != null) {
+        if (SFrameConfig.isPresent) {
+          val optSFrameConfig = SFrameConfig.get()
+          optSFrameConfig.toTlv(ContextSpecificTag(TAG_S_FRAME_CONFIG), this)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_S_FRAME_CONFIG))
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -100,6 +116,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
     private const val TAG_METADATA_ENABLED = 6
     private const val TAG_VIDEO_STREAMS = 7
     private const val TAG_AUDIO_STREAMS = 8
+    private const val TAG_S_FRAME_CONFIG = 9
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
@@ -113,14 +130,22 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
           null
         }
       val audioStreamID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
@@ -154,6 +179,22 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         } else {
           Optional.empty()
         }
+      val SFrameConfig =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_S_FRAME_CONFIG))) {
+            Optional.of(
+              WebRTCTransportRequestorClusterSFrameStruct.fromTlv(
+                ContextSpecificTag(TAG_S_FRAME_CONFIG),
+                tlvReader,
+              )
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_S_FRAME_CONFIG))
+          null
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
@@ -168,6 +209,7 @@ class WebRTCTransportRequestorClusterWebRTCSessionStruct(
         metadataEnabled,
         videoStreams,
         audioStreams,
+        SFrameConfig,
         fabricIndex,
       )
     }

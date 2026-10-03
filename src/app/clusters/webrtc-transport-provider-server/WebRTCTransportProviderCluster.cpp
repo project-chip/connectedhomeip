@@ -74,22 +74,22 @@ NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
  *
  * @return true if all spec constraints are satisfied, false otherwise.
  */
-bool SFrameFollowsSpecConstraints(const Clusters::WebRTCTransportProvider::Structs::SFrameStruct::DecodableType & sframeConfig)
+bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::DecodableType & sframeConfig)
 {
     // Spec constraint: CipherSuite >= 1
-    if (sframeConfig.cipherSuite < 1)
+    if ((sframeConfig.videoCipherSuite < 1) || (sframeConfig.audioCipherSuite < 1))
     {
         return false;
     }
 
     // Spec constraint: BaseKey length <= 128
-    if (sframeConfig.baseKey.size() > 128)
+    if (sframeConfig.senderKey.baseKey.size() > 128)
     {
         return false;
     }
 
     // Spec constraint: KID length must be 2-8
-    if (sframeConfig.kid.size() < 2 || sframeConfig.kid.size() > 8)
+    if (sframeConfig.senderKey.kid.size() < 2 || sframeConfig.senderKey.kid.size() > 8)
     {
         return false;
     }
@@ -714,10 +714,20 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     if (req.SFrameConfig.HasValue())
     {
         const auto & sframeConfig = req.SFrameConfig.Value();
-        CHIP_ERROR err            = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+        CHIP_ERROR err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(
+                Zcl, "HandleSolicitOffer: SFrame configuration validation for the video cipher suite failed: %" CHIP_ERROR_FORMAT,
+                err.Format());
+            return Status::DynamicConstraintError;
+        }
+        err = mDelegate.ValidateSFrameConfig(sframeConfig.audioCipherSuite, sframeConfig.senderKey.baseKey.size());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(
+                Zcl, "HandleSolicitOffer: SFrame configuration validation for the audio cipher suite failed: %" CHIP_ERROR_FORMAT,
+                err.Format());
             return Status::DynamicConstraintError;
         }
     }
@@ -759,7 +769,14 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
 
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
+        SFrameConfigStorage ownedSFrameConfig;
+        err = SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value(), ownedSFrameConfig);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: Failed to decode SFrameConfig: %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::InvalidCommand;
+        }
+        args.sFrameConfig.SetValue(ownedSFrameConfig);
     }
 
     // ICEServers: copy the validated list
@@ -825,13 +842,13 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     // If VideoStreamID was in the request, it should be in the response
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID = outSession.videoStreamID;
     }
 
     // If AudioStreamID was in the request, it should be in the response
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID = outSession.audioStreamID;
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
@@ -856,11 +873,14 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
     // ===== Validate all conformance and constraint checks (data model validation) =====
 
-    // Validate the streamUsage field against the allowed enum values.
-    if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+    // Validate the streamUsage field if present against the allowed enum values.
+    if (req.streamUsage.HasValue())
     {
-        ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        return Status::ConstraintError;
+        if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage.Value()));
+            return Status::ConstraintError;
+        }
     }
 
     // At least one of Video Stream ID, Audio Stream ID, AudioStreamID or VideoStreams has to be present
@@ -954,17 +974,24 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     {
         // WebRTCSessionID is null - new session request
 
+        // Both stream usage and endpoint ID are mandated in this case. Verify their presence.
+        if ((!req.streamUsage.HasValue()) || (!req.originatingEndpointID.HasValue()))
+        {
+            return Status::InvalidCommand;
+        }
+
         // Check privacy modes (per spec: only for new sessions)
-        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
+        Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage.Value());
         if (status != Status::Success)
         {
             return status;
         }
 
         // Validate that the StreamUsage is in the StreamUsagePriorities list
-        if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
+        if (mDelegate.IsStreamUsageSupported(req.streamUsage.Value()) != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
+            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities",
+                         to_underlying(req.streamUsage.Value()));
             return Status::DynamicConstraintError;
         }
 
@@ -1018,7 +1045,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
         // If not able to meet the Resource Management and Stream Priorities conditions or unable to provide another WebRTC session:
         // Respond with a response status of RESOURCE_EXHAUSTED
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreams, audioStreams);
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage.Value(), videoStreams, audioStreams);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
@@ -1033,7 +1060,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         if (req.SFrameConfig.HasValue())
         {
             const auto & sframeConfig = req.SFrameConfig.Value();
-            err                       = mDelegate.ValidateSFrameConfig(sframeConfig.cipherSuite, sframeConfig.baseKey.size());
+            err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1061,17 +1088,24 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         args.sessionId = sessionId;
     }
 
-    args.streamUsage           = req.streamUsage;
+    args.streamUsage           = req.streamUsage.Value();
     args.videoStreams          = videoStreams;
     args.audioStreams          = audioStreams;
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID;
+    args.originatingEndpointId = req.originatingEndpointID.Value();
 
     if (req.SFrameConfig.HasValue())
     {
-        args.sFrameConfig.SetValue(req.SFrameConfig.Value());
+        SFrameConfigStorage ownedSFrameConfig;
+        CHIP_ERROR sframeErr = SFrameConfigStorage::FromDecodable(req.SFrameConfig.Value(), ownedSFrameConfig);
+        if (sframeErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: Failed to decode SFrameConfig: %" CHIP_ERROR_FORMAT, sframeErr.Format());
+            return Status::InvalidCommand;
+        }
+        args.sFrameConfig.SetValue(ownedSFrameConfig);
     }
 
     // ICEServers: copy the validated list
@@ -1117,13 +1151,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     // Set VideoStreamID only if present in the original request.
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID);
+        resp.videoStreamID.SetValue(outSession.videoStreamID.Value());
     }
 
     // Set AudioStreamID only if present in the original request.
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID);
+        resp.audioStreamID.SetValue(outSession.audioStreamID.Value());
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);
