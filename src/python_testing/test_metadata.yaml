@@ -55,6 +55,8 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_24.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_25.py
       reason:
           Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
