@@ -2890,6 +2890,65 @@ TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValu
     EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
 }
 
+// The node rejected an update for good and still holds the value from before it. The refresh restores the entry to
+// that value instead of dropping it, so the ACL write keeps the node's grant.
+TEST(JointFabricDatastoreTest, RefreshRestoresAclWhoseUpdateFailedForGood)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+    delegate.aclListToFetch = store.GetNodeACLList();
+
+    // A Group-auth entry cannot grant Administer, so the node rejects the update.
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kAdminister), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
+    ASSERT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    const auto * entry = FindAcl(store, 123, 7);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_EQ(entry->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(entry->statusEntry.failureCode, 0u);
+    EXPECT_EQ(entry->ACLEntry.privilege, Privilege::kView);
+    EXPECT_FALSE(entry->supersededValue.has_value());
+    EXPECT_EQ(store.GetNodeACLList().size(), 1u);
+    ASSERT_FALSE(delegate.aclListSyncs.empty());
+    const auto & written = delegate.aclListSyncs.back().second;
+    ASSERT_EQ(written.size(), 1u);
+    EXPECT_EQ(written[0].privilege, Privilege::kView);
+    EXPECT_TRUE(written[0].subjects == std::vector<uint64_t>{ 10 });
+}
+
+// The update and then the removal of an entry failed, so the node still holds the value from before the update. The
+// refresh does not take the removal as done: after a failed write the entry is still being removed, and a later
+// refresh removes the value instead of adopting it.
+TEST(JointFabricDatastoreTest, RefreshKeepsRemovalWhileNodeHoldsSupersededValue)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpGroupAcl(store, delegate);
+    delegate.aclListToFetch = store.GetNodeACLList(); // the node keeps the View entry until a write removes it
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+
+    delegate.completeWith[SyncKind::kAclList] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    const auto * entry = FindAcl(store, 123, 7);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_TRUE(entry->pendingRemoval);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_FALSE(delegate.aclListSyncs.empty());
+    EXPECT_TRUE(delegate.aclListSyncs.back().second.empty());
+    EXPECT_TRUE(store.GetNodeACLList().empty());
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
 // Endpoints without a Groups cluster fail the group fetch. The merge for that endpoint is skipped, and
 // the refresh still commits the node.
 TEST(JointFabricDatastoreTest, RefreshCommitsNodeWhenGroupFetchFails)

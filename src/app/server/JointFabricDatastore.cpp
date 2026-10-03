@@ -1208,12 +1208,30 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                             continue;
                         }
 
-                        // The value an entry had before its Pending update: the node has not applied the update
-                        // yet. Not adopted, so the write replaces it.
-                        if (std::any_of(mACLEntries.begin(), mACLEntries.end(), [this, &acl](const auto & entry) {
-                                return entry.nodeID == mRefreshingNodeId && entry.supersededValue.has_value() &&
-                                    detail::AclEntryValueEquals(acl.ACLEntry, EncodeAccessControlEntry(*entry.supersededValue));
-                            }))
+                        // The value an entry had before its update: the node has not applied the update. Not
+                        // adopted, so the write replaces it. The entry is seen: if it is being removed, the
+                        // removal has not taken effect.
+                        bool superseded = false;
+                        for (auto & entry : mACLEntries)
+                        {
+                            if (entry.nodeID != mRefreshingNodeId || !entry.supersededValue.has_value() ||
+                                !detail::AclEntryValueEquals(acl.ACLEntry, EncodeAccessControlEntry(*entry.supersededValue)))
+                            {
+                                continue;
+                            }
+                            superseded = true;
+                            seenListIds.push_back(entry.listID);
+                            if (IsUnrecoverableCommitFailure(entry.statusEntry) && !HasRemovalIntent(entry))
+                            {
+                                // The node rejected the update for good. Dropping the entry would make the write
+                                // delete the old value too, so the entry goes back to it.
+                                entry.ACLEntry = std::move(*entry.supersededValue);
+                                entry.supersededValue.reset();
+                                entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                                entry.statusEntry.failureCode = 0;
+                            }
+                        }
+                        if (superseded)
                         {
                             continue;
                         }
