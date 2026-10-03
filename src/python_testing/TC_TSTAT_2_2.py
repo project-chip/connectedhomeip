@@ -35,10 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import queue
-
 from mobly import asserts
-from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
+from TC_TSTAT_Utils import ThermostatBaseTest, ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
@@ -50,7 +48,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_2_2(MatterTestCommissionedDevice):
+class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def desc_TC_TSTAT_2_2(self) -> str:
         """Returns a description of this test"""
@@ -105,100 +103,6 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
             TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
         ]
-
-    async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
-        received_events = []
-        while len(received_events) < len(expected_events):
-            try:
-                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
-                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
-                    received_events.append(event_result.Data)
-            except queue.Empty:
-                break
-
-        # Read any extra unexpected events non-blockingly
-        while True:
-            try:
-                event_result = events_callback.get_event_from_queue(block=False, timeout=0)
-                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
-                    received_events.append(event_result.Data)
-            except queue.Empty:
-                break
-
-        # Verify that the number of received events matches the expected number
-        asserts.assert_equal(len(received_events), len(expected_events),
-                             f"Expected {len(expected_events)} events, but received {len(received_events)}: {received_events}")
-
-        # Verify each expected event matches one received event
-        for expected in expected_events:
-            matched = False
-            for idx, received in enumerate(received_events):
-                if (received.systemMode == expected['systemMode'] and
-                    received.occupancy == expected['occupancy'] and
-                        received.currentSetpoint == expected['currentSetpoint']):
-                    matched = True
-                    received_events.pop(idx)
-                    break
-            asserts.assert_true(matched, f"Could not find expected event: {expected} in received events: {received_events}")
-
-    async def read_and_verify_all_attributes(self, endpoint, cluster):
-        for attr_class, current_val in [
-            (cluster.Attributes.OccupiedHeatingSetpoint, self.state.occupiedHeatingSetpoint),
-            (cluster.Attributes.OccupiedCoolingSetpoint, self.state.occupiedCoolingSetpoint),
-            (cluster.Attributes.UnoccupiedHeatingSetpoint, self.state.unoccupiedHeatingSetpoint),
-            (cluster.Attributes.UnoccupiedCoolingSetpoint, self.state.unoccupiedCoolingSetpoint),
-            (cluster.Attributes.MinHeatSetpointLimit, self.state.minHeatSetpointLimit),
-            (cluster.Attributes.MaxHeatSetpointLimit, self.state.maxHeatSetpointLimit),
-            (cluster.Attributes.MinCoolSetpointLimit, self.state.minCoolSetpointLimit),
-            (cluster.Attributes.MaxCoolSetpointLimit, self.state.maxCoolSetpointLimit)
-        ]:
-            has_attr = False
-            match attr_class:
-                case cluster.Attributes.OccupiedHeatingSetpoint:
-                    has_attr = self.has_heating
-                case cluster.Attributes.OccupiedCoolingSetpoint:
-                    has_attr = self.has_cooling
-                case cluster.Attributes.UnoccupiedHeatingSetpoint:
-                    has_attr = self.has_heating and self.hasOccupancy
-                case cluster.Attributes.UnoccupiedCoolingSetpoint:
-                    has_attr = self.has_cooling and self.hasOccupancy
-                case cluster.Attributes.MinHeatSetpointLimit:
-                    has_attr = self.has_heating and self.has_min_heat_limit
-                case cluster.Attributes.MaxHeatSetpointLimit:
-                    has_attr = self.has_heating and self.has_max_heat_limit
-                case cluster.Attributes.MinCoolSetpointLimit:
-                    has_attr = self.has_cooling and self.has_min_cool_limit
-                case cluster.Attributes.MaxCoolSetpointLimit:
-                    has_attr = self.has_cooling and self.has_max_cool_limit
-
-            if has_attr:
-                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr_class)
-                asserts.assert_equal(val, current_val, f"Mismatch for {attr_class}")
-
-    async def write_setpoint(self, attribute, value):
-        endpoint = self.get_endpoint()
-        attr_id = attribute.attribute_id
-
-        old_state = self.state.copy()
-        expected_status, new_state, changed_ids = self.simulator.write(self.state, attr_id, value)
-
-        if expected_status != Status.Success:
-            status = await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint, expect_success=False)
-            asserts.assert_equal(status, expected_status)
-            return
-
-        if self.has_events:
-            self.events_callback.flush_events()
-
-        await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint)
-
-        self.state = new_state
-
-        if self.has_events:
-            expected_events = self.simulator.get_expected_events(old_state, self.state, changed_ids, attr_id)
-            await self.verify_events(expected_events, self.events_callback)
-
-        await self.read_and_verify_all_attributes(endpoint, cluster)
 
     async def send_raise_lower_and_verify(self, mode, amount):
         endpoint = self.get_endpoint()
