@@ -39,11 +39,18 @@ class TC_PICS_Checker(BasicCompositionTests):
         self.build_spec_xmls()
 
     def _check_and_record_errors(self, location, required, pics):
-        if required and not self.check_pics(pics):
+        # Scope the lookup to the endpoint under test: PICS are an endpoint-keyed
+        # tree, and the same cluster code (e.g. SWTCH.S) can legitimately be true
+        # on another endpoint's slice. Using the endpoint-agnostic check here
+        # would let those foreign codes leak into this endpoint's check. PICS
+        # inputs that carry no endpoint labels (a CI-format text file, or a
+        # directory of XMLs for a single endpoint) are attributed to the endpoint
+        # under test when they are read, so they are reachable here too.
+        if required and not self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
-        elif not required and self.check_pics(pics):
+        elif not required and self.check_pics(pics, endpoint=self.endpoint_id):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
 
@@ -112,6 +119,19 @@ class TC_PICS_Checker(BasicCompositionTests):
         asserts.assert_not_equal(self.matter_test_config.endpoint, None,
                                  "An explicit endpoint is required for this test, please use --endpoint")
         self.endpoint_id = self.get_endpoint()
+
+        # An unlabelled PICS input is attributed to the endpoint under test when
+        # it is read, so a missing slice here means an endpoint-structured tree
+        # that holds nothing for this endpoint. Every element on the endpoint
+        # would be reported as a missing PICS, so say why up front instead.
+        if self.endpoint_id not in self.matter_test_config.pics:
+            self.record_error("PICS check", location=UnknownProblemLocation(),
+                              problem=f"No PICS were supplied for endpoint {self.endpoint_id}. PICS are present for "
+                              f"endpoints {sorted(self.matter_test_config.pics)}")
+            self.fail_current_test(
+                f"No PICS were supplied for endpoint {self.endpoint_id}. An endpoint-structured PICS tree needs an "
+                f"endpoint{self.endpoint_id} subdirectory; a PICS file or directory for a single endpoint is "
+                "attributed to --endpoint automatically.")
 
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
@@ -230,7 +250,6 @@ class TC_PICS_Checker(BasicCompositionTests):
         base_facts, base_problems = derive_base_pics_facts_from_device_wildcard(wildcard, self.xml_clusters)
         for problem in base_problems:
             self.problems.append(problem)
-        derived_codes = base_pics_facts_to_pics_codes(base_facts)
 
         self.step(10)
         # Base/MCORE codes are device-wide but conventionally only declared

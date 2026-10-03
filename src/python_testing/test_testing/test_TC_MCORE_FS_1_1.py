@@ -152,7 +152,7 @@ def main(th_server_app: str):
     paa_path = get_default_paa_trust_store(root)
     print(f'paa = {paa_path}')
 
-    pics = {"PICS_SDK_CI_ONLY": True}
+    pics = {0: {"PICS_SDK_CI_ONLY": True}}
     test_runner = MyMock(Path(__file__).parent / '../TC_MCORE_FS_1_1.py',
                          'TC_MCORE_FS_1_1', 'test_TC_MCORE_FS_1_1', paa_trust_store_path=paa_path, pics=pics)
     config = MatterTestConfig()
