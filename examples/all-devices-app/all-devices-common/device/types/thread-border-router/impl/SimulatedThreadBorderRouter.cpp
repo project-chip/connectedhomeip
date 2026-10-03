@@ -81,6 +81,17 @@ CHIP_ERROR SimulatedThreadBorderRouter::Init(AttributeChangeCallback * attribute
     return CHIP_NO_ERROR;
 }
 
+void SimulatedThreadBorderRouter::Shutdown()
+{
+    // An activation still in flight is dropped without a report: nothing may reach the cluster from here on.
+    mTimerDelegate.CancelTimer(&mActiveDatasetTimerContext);
+    if (std::holds_alternative<Activating>(mActive))
+    {
+        mActive = NoActiveDataset{};
+    }
+    mAttributeChangeCallback = nullptr;
+}
+
 bool SimulatedThreadBorderRouter::GetPanChangeSupported()
 {
     ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::GetPanChangeSupported called");
@@ -141,19 +152,19 @@ CHIP_ERROR SimulatedThreadBorderRouter::GetDataset(Thread::OperationalDataset & 
     return dataset.Init(source->AsByteSpan());
 }
 
-void SimulatedThreadBorderRouter::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                   ActivateDatasetCallback * callback)
+void SimulatedThreadBorderRouter::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+                                                   ActivateDatasetCompleteCallback callback, void * context)
 {
-    ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::SetActiveDataset called (seq: %" PRIu32 ")", sequenceNum);
+    ChipLogProgress(AppServer, "SimulatedThreadBorderRouter::SetActiveDataset called");
     if (!std::holds_alternative<NoActiveDataset>(mActive))
     {
-        callback->OnActivateDatasetComplete(sequenceNum, CHIP_ERROR_INCORRECT_STATE);
+        callback(context, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
     Activating activating;
     activating.callback = callback;
-    activating.sequence = sequenceNum;
+    activating.context  = context;
     CHIP_ERROR err      = activating.dataset.Init(activeDataset.AsByteSpan());
     if (err == CHIP_NO_ERROR)
     {
@@ -161,7 +172,7 @@ void SimulatedThreadBorderRouter::SetActiveDataset(const Thread::OperationalData
     }
     if (err != CHIP_NO_ERROR)
     {
-        callback->OnActivateDatasetComplete(sequenceNum, err);
+        callback(context, err);
         return;
     }
 
@@ -225,14 +236,14 @@ void SimulatedThreadBorderRouter::OnActiveDatasetTimerFired()
     VerifyOrReturn(activating != nullptr);
 
     auto * callback = activating->callback;
-    auto sequence   = activating->sequence;
+    auto context    = activating->context;
     mActive         = ActiveUncommitted{ activating->dataset };
     ReportAttributeChange(ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);
     ReportAttributeChange(ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id);
 
     if (callback != nullptr)
     {
-        callback->OnActivateDatasetComplete(sequence, CHIP_NO_ERROR);
+        callback(context, CHIP_NO_ERROR);
     }
 }
 
@@ -276,11 +287,11 @@ void SimulatedThreadBorderRouter::CompleteActivation(CHIP_ERROR error)
     VerifyOrReturn(activating != nullptr);
 
     auto * callback = activating->callback;
-    auto sequence   = activating->sequence;
+    auto context    = activating->context;
     mActive         = NoActiveDataset{};
     if (callback != nullptr)
     {
-        callback->OnActivateDatasetComplete(sequence, error);
+        callback(context, error);
     }
 }
 

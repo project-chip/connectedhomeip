@@ -33,17 +33,10 @@ public:
     ThreadBorderRouterManagementDelegate()          = default;
     virtual ~ThreadBorderRouterManagementDelegate() = default;
 
-    class ActivateDatasetCallback
-    {
-    public:
-        ActivateDatasetCallback()          = default;
-        virtual ~ActivateDatasetCallback() = default;
-        // If the dataset is set successfully, OnActivateDatasetComplete should be called with CHIP_NO_ERROR when the
-        // Border Router is attached to the Thread network.
-        // If an error occurs while setting the active dataset, this callback should be called with the error.
-        // The error input of this function could be SDK-range error for CHIP error or OpenThread-range error for Thread error.
-        virtual void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) = 0;
-    };
+    // Reports the outcome of SetActiveDataset(): CHIP_NO_ERROR once the Border Router is attached to the Thread
+    // network, or the error that stopped it, SDK-range or OpenThread-range. `context` is what SetActiveDataset() was
+    // handed.
+    using ActivateDatasetCompleteCallback = void (*)(void * context, CHIP_ERROR error);
 
     class AttributeChangeCallback
     {
@@ -61,6 +54,10 @@ public:
     };
 
     virtual CHIP_ERROR Init(AttributeChangeCallback * attributeChangeCallback) = 0;
+
+    // The counterpart of Init(), called from the cluster's Shutdown(): release what Init() set up and drop the callbacks
+    // it was handed. Nothing may be reported to the cluster after this returns.
+    virtual void Shutdown() = 0;
 
     // Get whether PanChange feature is supported for the Thread BR.
     virtual bool GetPanChangeSupported() = 0;
@@ -88,9 +85,10 @@ public:
     virtual CHIP_ERROR GetDataset(Thread::OperationalDataset & dataset, DatasetType type) = 0;
 
     // There should be no active dataset configured when calling this API, otherwise we should use SetPendingDataset.
-    // The Delegate implementation must store the sequence number and pass it to OnActivateDatasetComplete.
-    virtual void SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                  ActivateDatasetCallback * callback) = 0;
+    // The outcome is reported through `callback` exactly once, from this call or later. RevertActiveDataset() withdraws
+    // a request still in flight: the delegate may report it from within that call, not after.
+    virtual void SetActiveDataset(const Thread::OperationalDataset & activeDataset, ActivateDatasetCompleteCallback callback,
+                                  void * context) = 0;
 
     // This function will check save whether there is active dataset configured.
     virtual CHIP_ERROR CommitActiveDataset() = 0;
@@ -99,8 +97,7 @@ public:
     // started but not disarmed before reboot. The delegate implementation should check whether there is a previous SetActiveDataset
     // request and revert the active dataset set by the previous SetActiveDataset. Since there should be no configured dataset when
     // calling SetActiveDataset, this function will clear the active dataset to allow trying again a new SetActiveDataset operation.
-    // The delegate is allowed to call OnActivateDatasetComplete for the previous SetActiveDataset request even after this function
-    // is called as the sequence number passed to OnActivateDatasetComplete will be different.
+    // A SetActiveDataset request still in flight is withdrawn: the delegate may report it from within this call, not after.
     virtual CHIP_ERROR RevertActiveDataset() = 0;
 
     virtual CHIP_ERROR SetPendingDataset(const Thread::OperationalDataset & pendingDataset) = 0;
