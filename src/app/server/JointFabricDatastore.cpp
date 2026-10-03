@@ -315,17 +315,16 @@ bool JointFabricDatastore::InRefreshWrite(const datastore::EndpointBindingEntryS
     });
 }
 
-CHIP_ERROR JointFabricDatastore::RunOrQueueEntrySync(const datastore::ACLEntryStruct & entry)
+std::function<CHIP_ERROR()> JointFabricDatastore::EntrySyncStart(const datastore::ACLEntryStruct & entry)
 {
-    return RunOrQueueNodeSync(entry.nodeID,
-                              [this, nodeId = entry.nodeID, listId = entry.listID]() { return StartAclEntrySync(nodeId, listId); });
+    return [this, nodeId = entry.nodeID, listId = entry.listID]() { return StartAclEntrySync(nodeId, listId); };
 }
 
-CHIP_ERROR JointFabricDatastore::RunOrQueueEntrySync(const datastore::EndpointBindingEntryStruct & entry)
+std::function<CHIP_ERROR()> JointFabricDatastore::EntrySyncStart(const datastore::EndpointBindingEntryStruct & entry)
 {
-    return RunOrQueueNodeSync(entry.nodeID, [this, nodeId = entry.nodeID, endpointId = entry.endpointID, listId = entry.listID]() {
+    return [this, nodeId = entry.nodeID, endpointId = entry.endpointID, listId = entry.listID]() {
         return StartBindingEntrySync(nodeId, endpointId, listId);
-    });
+    };
 }
 
 template <typename Entry>
@@ -348,7 +347,7 @@ void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, 
     };
     const bool attributable = std::count_if(entries.begin(), entries.end(), uncommittedInWrite) == 1;
 
-    std::vector<Entry> entriesToSync;
+    std::vector<std::function<CHIP_ERROR()>> entrySyncs;
     for (auto & entry : entries)
     {
         if (entry.nodeID != nodeId)
@@ -372,11 +371,11 @@ void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, 
             continue;
         }
         detail::MarkEntrySyncFailed(entry, unattributedErr);
-        entriesToSync.push_back(entry);
+        entrySyncs.push_back(EntrySyncStart(entry));
     }
 
     // The refresh holds the node's slot, so these syncs start once it ends.
-    for (const auto & entry : entriesToSync)
+    for (auto & start : entrySyncs)
     {
         if (!HasNodeSyncCapacity(nodeId))
         {
@@ -384,7 +383,7 @@ void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, 
                          ChipLogValueX64(nodeId));
             return;
         }
-        LogErrorOnFailure(RunOrQueueEntrySync(entry));
+        LogErrorOnFailure(RunOrQueueNodeSync(nodeId, std::move(start)));
     }
 }
 
