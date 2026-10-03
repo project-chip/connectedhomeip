@@ -214,7 +214,12 @@
 
 - (BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    __auto_type * exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    SEL updateConfiguration = @selector(deviceController:updateControllerConfiguration:);
+    NSMutableSet * configurationClasses = [[exportedInterface classesForSelector:updateConfiguration argumentIndex:1 ofReply:NO] mutableCopy];
+    [configurationClasses addObject:[MTRClusterPath class]];
+    [exportedInterface setClasses:configurationClasses forSelector:updateConfiguration argumentIndex:1 ofReply:NO];
+    newConnection.exportedInterface = exportedInterface;
     newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
 
     auto server = [[XPCServerImpl alloc] initWithClientProxy:[newConnection remoteObjectProxy] controllers:_controllers];

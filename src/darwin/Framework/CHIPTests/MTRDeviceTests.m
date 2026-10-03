@@ -7128,3 +7128,350 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 }
 
 @end
+
+@interface MTRDeviceInterestedPathsTests : MTRTestCase
+@end
+
+@implementation MTRDeviceInterestedPathsTests {
+    BOOL _localTestStorageEnabledBeforeTest;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    _localTestStorageEnabledBeforeTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
+}
+
+- (void)tearDown
+{
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeTest;
+    [super tearDown];
+}
+
+// Tests that the union covers every delegate, dedupes, and is nil while any delegate wants every path.
+- (void)test001_UnionAcrossDelegates
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], @[]);
+
+    __auto_type * attributePath1 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * attributePath2 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(112)];
+    __auto_type * eventPath1 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(11) eventID:@(111)];
+
+    __auto_type * delegate1 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate1.skipSetupSubscription = YES;
+    [device addDelegate:delegate1 queue:queue interestedPathsForAttributes:@[ attributePath1 ] interestedPathsForEvents:@[ eventPath1 ]];
+
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[ attributePath1 ]);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], @[ eventPath1 ]);
+
+    __auto_type * delegate2 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate2.skipSetupSubscription = YES;
+    [device addDelegate:delegate2 queue:queue interestedPathsForAttributes:@[ attributePath1, attributePath2 ] interestedPathsForEvents:nil];
+
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    __auto_type * attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+    XCTAssertTrue([attributeUnion containsObject:attributePath1]);
+    XCTAssertTrue([attributeUnion containsObject:attributePath2]);
+
+    __auto_type * delegate3 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate3.skipSetupSubscription = YES;
+    [device addDelegate:delegate3 queue:queue interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+
+    __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate4.skipSetupSubscription = YES;
+    [device addDelegate:delegate4 queue:queue];
+
+    XCTAssertNil([device unionOfInterestedPathsForAttributes]);
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    [device removeDelegate:delegate4];
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+    XCTAssertTrue([attributeUnion containsObject:attributePath1]);
+    XCTAssertTrue([attributeUnion containsObject:attributePath2]);
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    [device removeDelegate:delegate1];
+    [device removeDelegate:delegate2];
+    [device removeDelegate:delegate3];
+}
+
+// Tests that every element type an interested-paths array may hold survives the union and secure coding.
+- (void)test002_UnionElementTypes
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)];
+    __auto_type * attributePath = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)];
+    __auto_type * eventPath = [MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)];
+    NSNumber * endpointID = @(3);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate
+                               queue:queue
+        interestedPathsForAttributes:@[ clusterPath, attributePath, endpointID ]
+            interestedPathsForEvents:@[ clusterPath, eventPath, endpointID ]];
+
+    NSArray * attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 3);
+    XCTAssertTrue([attributeUnion containsObject:clusterPath]);
+    XCTAssertTrue([attributeUnion containsObject:attributePath]);
+    XCTAssertTrue([attributeUnion containsObject:endpointID]);
+
+    NSArray * eventUnion = [device unionOfInterestedPathsForEvents];
+    XCTAssertEqual(eventUnion.count, 3);
+    XCTAssertTrue([eventUnion containsObject:clusterPath]);
+    XCTAssertTrue([eventUnion containsObject:eventPath]);
+    XCTAssertTrue([eventUnion containsObject:endpointID]);
+
+    for (NSArray * paths in @[ attributeUnion, eventUnion ]) {
+        NSError * error = nil;
+        NSData * encoded = [NSKeyedArchiver archivedDataWithRootObject:paths requiringSecureCoding:YES error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(encoded);
+    }
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that a pending attribute-value waiter's paths are in the union, and leave it on satisfaction or release.
+- (void)test003_UnionIncludesAttributeValueWaiters
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegatePath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * waitedPath = [MTRAttributePath attributePathWithEndpointID:@(7) clusterID:@(77) attributeID:@(777)];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:queue interestedPathsForAttributes:@[ delegatePath ] interestedPathsForEvents:@[]];
+
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:waitedPath]);
+
+    XCTestExpectation * waiterCompleted = [self expectationWithDescription:@"attribute value waiter completed"];
+    __auto_type * waiter = [device waitForAttributeValues:@{ waitedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                  timeout:60
+                                                    queue:queue
+                                               completion:^(NSError * _Nullable waitError) {
+                                                   XCTAssertNil(waitError);
+                                                   [waiterCompleted fulfill];
+                                               }];
+    XCTAssertNotNil(waiter);
+
+    NSArray * attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertTrue([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    NSUInteger changesBeforeSatisfaction = [device unitTestInterestedPathsChangedCount];
+
+    [device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : waitedPath,
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ]
+                         fromSubscription:YES];
+
+    [self waitForExpectations:@[ waiterCompleted ] timeout:kTimeoutInSeconds];
+
+    XCTAssertGreaterThan([device unitTestInterestedPathsChangedCount], changesBeforeSatisfaction);
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertFalse([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    [waiter cancel];
+    [waiter cancel];
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertFalse([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(8) clusterID:@(88) attributeID:@(888)];
+    NSUInteger changesBeforeRelease;
+    @autoreleasepool {
+        __auto_type * releasedWaiter = [device waitForAttributeValues:@{ releasedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                              timeout:60
+                                                                queue:queue
+                                                           completion:^(NSError * _Nullable waitError) {}];
+        XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+        changesBeforeRelease = [device unitTestInterestedPathsChangedCount];
+        releasedWaiter = nil;
+    }
+    XCTAssertGreaterThan([device unitTestInterestedPathsChangedCount], changesBeforeRelease);
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that the union's order depends only on its contents, not on the order delegates added them.
+- (void)test004_UnionOrderIsIndependentOfInsertionOrder
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+
+    __auto_type * cluster = [MTRClusterPath clusterPathWithEndpointID:@(10) clusterID:@(6)];
+    NSArray * expectedAttributes = @[
+        @(2),
+        cluster,
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(2)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(10)],
+        [MTRAttributePath attributePathWithEndpointID:@(10) clusterID:@(6) attributeID:@(0)],
+    ];
+    NSArray * expectedEvents = @[
+        @(2),
+        cluster,
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(6) eventID:@(2)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(6) eventID:@(10)],
+    ];
+
+    NSMutableArray * delegates = [NSMutableArray array];
+    for (NSNumber * nodeID in @[ @(kDeviceId1), @(kDeviceId2) ]) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+        BOOL reversed = [nodeID isEqual:@(kDeviceId2)];
+        NSArray * attributes = reversed ? expectedAttributes.reverseObjectEnumerator.allObjects : expectedAttributes;
+        NSArray * events = reversed ? expectedEvents.reverseObjectEnumerator.allObjects : expectedEvents;
+        for (NSUInteger i = 0; i < attributes.count; i++) {
+            __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+            delegate.skipSetupSubscription = YES;
+            [device addDelegate:delegate
+                                       queue:queue
+                interestedPathsForAttributes:@[ attributes[i] ]
+                    interestedPathsForEvents:i < events.count ? @[ events[i] ] : @[]];
+            [delegates addObject:delegate];
+        }
+
+        XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedAttributes);
+        XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], expectedEvents);
+
+        for (id delegate in delegates) {
+            [device removeDelegate:delegate];
+        }
+        [delegates removeAllObjects];
+    }
+}
+
+// Tests that the change count moves once per waiter removal, and not for a waiter that was already removed.
+- (void)test005_WaiterRemovalChangesInterestedPathsOnce
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:queue interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    NSDictionary * expectedValue = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) };
+
+    __auto_type * cancelledPath = [MTRAttributePath attributePathWithEndpointID:@(9) clusterID:@(99) attributeID:@(999)];
+    XCTestExpectation * cancelledCompleted = [self expectationWithDescription:@"cancelled waiter completed"];
+    __auto_type * cancelledWaiter = [device waitForAttributeValues:@{ cancelledPath : expectedValue }
+                                                           timeout:60
+                                                             queue:queue
+                                                        completion:^(NSError * _Nullable waitError) {
+                                                            XCTAssertEqual(waitError.code, MTRErrorCodeCancelled);
+                                                            [cancelledCompleted fulfill];
+                                                        }];
+    XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:cancelledPath]);
+
+    NSUInteger changes = [device unitTestInterestedPathsChangedCount];
+    [cancelledWaiter cancel];
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:cancelledPath]);
+    [cancelledWaiter cancel];
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    [self waitForExpectations:@[ cancelledCompleted ] timeout:kTimeoutInSeconds];
+
+    __auto_type * satisfiedPath = [MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(55) attributeID:@(555)];
+    XCTestExpectation * satisfiedCompleted = [self expectationWithDescription:@"satisfied waiter completed"];
+    @autoreleasepool {
+        __auto_type * satisfiedWaiter = [device waitForAttributeValues:@{ satisfiedPath : expectedValue }
+                                                               timeout:60
+                                                                 queue:queue
+                                                            completion:^(NSError * _Nullable waitError) {
+                                                                XCTAssertNil(waitError);
+                                                                [satisfiedCompleted fulfill];
+                                                            }];
+        changes = [device unitTestInterestedPathsChangedCount];
+        [device unitTestInjectAttributeReport:@[ @{ MTRAttributePathKey : satisfiedPath, MTRDataKey : expectedValue } ] fromSubscription:YES];
+        [self waitForExpectations:@[ satisfiedCompleted ] timeout:kTimeoutInSeconds];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+
+        [satisfiedWaiter cancel];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+        satisfiedWaiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that a delegate released without removeDelegate: changes the interested paths once the device next calls its delegates.
+- (void)test006_ReleasedDelegateChangesInterestedPaths
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * keptPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)];
+
+    __auto_type * keptDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    keptDelegate.skipSetupSubscription = YES;
+    [device addDelegate:keptDelegate queue:queue interestedPathsForAttributes:@[ keptPath ] interestedPathsForEvents:@[]];
+
+    NSUInteger changes = [device unitTestInterestedPathsChangedCount];
+    __weak id weakReleasedDelegate;
+    @autoreleasepool {
+        __auto_type * releasedDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+        releasedDelegate.skipSetupSubscription = YES;
+        [device addDelegate:releasedDelegate queue:queue interestedPathsForAttributes:@[ releasedPath ] interestedPathsForEvents:@[]];
+        weakReleasedDelegate = releasedDelegate;
+    }
+    [self waitForExpectations:@[ [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        return weakReleasedDelegate == nil;
+    }]
+                                           evaluatedWithObject:self
+                                                       handler:nil] ]
+                      timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * reportReceived = [self expectationWithDescription:@"kept delegate received report"];
+    keptDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [reportReceived fulfill];
+    };
+    [device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : keptPath,
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ]
+                         fromSubscription:YES];
+    [self waitForExpectations:@[ reportReceived ] timeout:kTimeoutInSeconds];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[ keptPath ]);
+
+    [device removeDelegate:keptDelegate];
+}
+
+@end
