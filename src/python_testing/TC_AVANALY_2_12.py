@@ -90,18 +90,51 @@ class TC_AVANALY_2_12(MatterTestCommissionedDevice, AVANALYTestBase):
         asserts.assert_is_not_none(zones_before, "Failed to read Zones from Zone Management cluster on Analysis Node")
 
         camera_node_id = self.get_camera_node_id()
+        camera_zone_endpoint = self.user_params.get("camera_zone_endpoint_id")
+        if camera_zone_endpoint is not None:
+            camera_zone_endpoint = (
+                int(camera_zone_endpoint, 0)
+                if isinstance(camera_zone_endpoint, str)
+                else int(camera_zone_endpoint)
+            )
         camera_zones_before = None
         if camera_node_id != self.dut_node_id:
-            try:
+            if camera_zone_endpoint is None:
+                parts_list = await self.read_single_attribute_check_success(
+                    endpoint=0,
+                    cluster=Clusters.Descriptor,
+                    attribute=Clusters.Descriptor.Attributes.PartsList,
+                    node_id=camera_node_id,
+                )
+                for ep in [0] + list(parts_list):
+                    server_list = await self.read_single_attribute_check_success(
+                        endpoint=ep,
+                        cluster=Clusters.Descriptor,
+                        attribute=Clusters.Descriptor.Attributes.ServerList,
+                        node_id=camera_node_id,
+                    )
+                    if zone_cluster.id in server_list:
+                        camera_zone_endpoint = ep
+                        break
+
+            if camera_zone_endpoint is not None:
                 camera_zones_before = await self.read_single_attribute_check_success(
-                    endpoint=endpoint,
+                    endpoint=camera_zone_endpoint,
                     cluster=zone_cluster,
                     attribute=zone_cluster.Attributes.Zones,
                     node_id=camera_node_id,
                 )
-                log.info("Camera Node (%s) zones before: %s", camera_node_id, camera_zones_before)
-            except Exception as e:
-                log.info("Camera Node (%s) does not host Zone Management on endpoint %d: %s", camera_node_id, endpoint, e)
+                log.info(
+                    "Camera Node (%s, ep=%d) zones before: %s",
+                    camera_node_id,
+                    camera_zone_endpoint,
+                    camera_zones_before,
+                )
+            else:
+                log.info(
+                    "Camera Node (%s) does not host Zone Management on any endpoint",
+                    camera_node_id,
+                )
 
         self.step(3)
         created_zone_id = None
@@ -137,12 +170,17 @@ class TC_AVANALY_2_12(MatterTestCommissionedDevice, AVANALYTestBase):
 
             if camera_zones_before is not None:
                 camera_zones_after = await self.read_single_attribute_check_success(
-                    endpoint=endpoint,
+                    endpoint=camera_zone_endpoint,
                     cluster=zone_cluster,
                     attribute=zone_cluster.Attributes.Zones,
                     node_id=camera_node_id,
                 )
-                log.info("Camera Node (%s) zones after: %s", camera_node_id, camera_zones_after)
+                log.info(
+                    "Camera Node (%s, ep=%d) zones after: %s",
+                    camera_node_id,
+                    camera_zone_endpoint,
+                    camera_zones_after,
+                )
                 asserts.assert_equal(
                     camera_zones_after,
                     camera_zones_before,

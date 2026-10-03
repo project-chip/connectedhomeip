@@ -282,19 +282,20 @@ class AVANALYTestBase:
             return None
 
     async def ensure_analysis_stream_established(self, endpoint: int):
-        """Ensure at least one analysis stream is established when REMCONDETECT is supported.
+        """Ensure at least one analysis stream is established for the camera node when REMCONDETECT is supported.
 
         Returns the newly established analysisStreamID if one was created, or None if not needed.
         """
         if not self.has_feature_remcondetect:
             return None
         attributes = Clusters.Objects.AvAnalysis.Attributes
-        current_streams = await self.read_avanaly_attribute_expect_success(
-            endpoint, attributes.CurrentAnalysisStreamCount
+        camera_node_id = self.get_camera_node_id()
+        streams = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.AnalysisStreams
         )
-        if current_streams == 0:
+        if not any(s.nodeID == camera_node_id for s in (streams or [])):
             resp = await self.send_establish_analysis_stream_cmd(
-                endpoint, node_id=self.get_camera_node_id()
+                endpoint, node_id=camera_node_id
             )
             asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
             return resp.analysisStreamID

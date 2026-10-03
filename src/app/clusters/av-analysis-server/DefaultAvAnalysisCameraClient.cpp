@@ -190,7 +190,14 @@ void DefaultAvAnalysisCameraClient::StartCapabilitiesRead()
 void DefaultAvAnalysisCameraClient::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                                     const StatusIB & aStatus)
 {
-    VerifyOrReturn(aStatus.IsSuccess() && apData != nullptr);
+    if (!aStatus.IsSuccess() || apData == nullptr)
+    {
+        if (mRequest.GetPhase() == Request::Phase::kDiscoveringEndpoint)
+        {
+            mRequest.SetDiscoveryError(aStatus.IsSuccess() ? CHIP_ERROR_INCORRECT_STATE : aStatus.ToChipError());
+        }
+        return;
+    }
 
     switch (mRequest.GetPhase())
     {
@@ -212,7 +219,12 @@ void DefaultAvAnalysisCameraClient::HandleServerListReport(const ConcreteDataAtt
     VerifyOrReturn(mRequest.Profile().avsmEndpoint == kInvalidEndpointId);
 
     DataModel::DecodableList<ClusterId> serverList;
-    VerifyOrReturn(DataModel::Decode(aData, serverList) == CHIP_NO_ERROR);
+    CHIP_ERROR err = DataModel::Decode(aData, serverList);
+    if (err != CHIP_NO_ERROR)
+    {
+        mRequest.SetDiscoveryError(err);
+        return;
+    }
 
     auto iter = serverList.begin();
     while (iter.Next())
@@ -222,6 +234,12 @@ void DefaultAvAnalysisCameraClient::HandleServerListReport(const ConcreteDataAtt
             mRequest.Profile().avsmEndpoint = aPath.mEndpointId;
             return;
         }
+    }
+
+    err = iter.GetStatus();
+    if (err != CHIP_NO_ERROR)
+    {
+        mRequest.SetDiscoveryError(err);
     }
 }
 

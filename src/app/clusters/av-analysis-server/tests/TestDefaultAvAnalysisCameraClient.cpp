@@ -747,4 +747,42 @@ TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryErrorReturnsFailure)
     EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
 }
 
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryAttributeStatusFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, nullptr, StatusIB(Status::Failure));
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryDecodeFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Encode a scalar integer instead of a TLV array for ServerList
+    uint8_t buffer[32];
+    TLV::TLVReader reader;
+    ASSERT_TRUE(EncodeTlv(buffer, sizeof(buffer), reader,
+                          [](TLV::TLVWriter & w) { return w.Put(TLV::AnonymousTag(), static_cast<uint32_t>(42)); }));
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
 } // namespace
