@@ -776,8 +776,11 @@ template("efr32_sdk") {
 
     cflags += [ "-Wno-shadow" ]
 
-    if (is_series_2 || is_series_3) {
+    if (is_series_2) {
       cflags += [ "-mcmse" ]
+    }
+    if (is_series_3) {
+      cflags += [ "-mcmse", "-Wno-unreachable-code", "-Wno-shorten-64-to-32" ]
     }
 
     if (is_clang) {
@@ -1019,7 +1022,6 @@ template("efr32_sdk") {
     if (use_wstk_leds) {
       sources += [
         "${efr32_sdk_root}/platform_core/platform/driver/leddrv/src/sl_led.c",
-        "${efr32_sdk_root}/platform_core/platform/driver/leddrv/src/sl_pwm_led.c",
         "${efr32_sdk_root}/platform_core/platform/driver/leddrv/src/sl_simple_led.c",
       ]
       if (sl_enable_rgb_led) {
