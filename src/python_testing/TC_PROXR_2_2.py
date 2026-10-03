@@ -36,7 +36,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import test_plan_support
+import support_modules.test_plan_support as test_plan_support
 from support_modules.proxr_testbase import (DEVICE_IDENTITY_KEY_LEN, LTK_LEN, PMK_LEN, SESSION_KEY_LEN, BLTCSModeEnum,
                                             BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum,
                                             StatusCodeEnum)
