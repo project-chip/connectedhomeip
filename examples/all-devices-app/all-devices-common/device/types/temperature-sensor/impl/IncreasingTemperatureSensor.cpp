@@ -65,6 +65,25 @@ void IncreasingTemperatureSensor::Unregister(CodeDrivenDataModelProvider & provi
     TemperatureSensor::Unregister(provider);
 }
 
+CHIP_ERROR IncreasingTemperatureSensor::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>();
+    mUserInterfaceCluster.Create(endpoint, config);
+    mUserInterfaceCluster.Cluster().SetDelegate(this);
+    return provider.AddCluster(mUserInterfaceCluster.Registration());
+}
+
+void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mUserInterfaceCluster.IsConstructed())
+    {
+        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
+        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
+        mUserInterfaceCluster.Destroy();
+    }
+}
+
 void IncreasingTemperatureSensor::TimerFired()
 {
     // Simulate increasing temperature
@@ -85,6 +104,17 @@ void IncreasingTemperatureSensor::TimerFired()
     LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
+}
+
+void IncreasingTemperatureSensor::OnTemperatureDisplayModeChanged(
+    ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: TemperatureDisplayMode changed to %u", static_cast<unsigned>(value));
+}
+
+void IncreasingTemperatureSensor::OnKeypadLockoutChanged(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: KeypadLockout changed to %u", static_cast<unsigned>(value));
 }
 
 } // namespace app

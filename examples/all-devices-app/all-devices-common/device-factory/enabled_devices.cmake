@@ -122,6 +122,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thermostat/Thermostat.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thermostat/impl/LoggingThermostat.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/ThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/impl/SimulatedThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
@@ -222,6 +224,7 @@ foreach(_key
         soil-sensor
         speaker
         temperature-sensor
+        thermostat
         thread-border-router
         water-freeze-detector
         water-leak-detector
@@ -285,6 +288,7 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/binding-table.cpp"
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
+    "${CHIP_ROOT}/src/app/clusters/thermostat-user-interface-configuration-server/ThermostatUserInterfaceConfigurationCluster.cpp"
 )
 
 # No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
