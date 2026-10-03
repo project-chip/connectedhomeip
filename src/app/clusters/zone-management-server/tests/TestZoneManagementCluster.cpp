@@ -50,10 +50,18 @@ public:
     Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
                                                                 uint16_t & outZoneID) override
     {
+        return CreateTwoDCartesianZone(zone, NullOptional, NullOptional, outZoneID);
+    }
+
+    Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
+                                                                const Optional<NodeId> & nodeId,
+                                                                const Optional<EndpointId> & endpointId,
+                                                                uint16_t & outZoneID) override
+    {
         outZoneID = mNextZoneId++;
 
         ZoneInformationStorage zoneInfo;
-        zoneInfo.Set(outZoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(zone));
+        zoneInfo.Set(outZoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(zone), nodeId, endpointId);
         mPersistedZones.push_back(zoneInfo);
         mCreateZoneCalls++;
         return Protocols::InteractionModel::Status::Success;
@@ -61,11 +69,18 @@ public:
 
     Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneId, const TwoDCartesianZoneStorage & zone) override
     {
+        return UpdateTwoDCartesianZone(zoneId, zone, NullOptional, NullOptional);
+    }
+
+    Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneId, const TwoDCartesianZoneStorage & zone,
+                                                                const Optional<NodeId> & nodeId,
+                                                                const Optional<EndpointId> & endpointId) override
+    {
         for (auto & existing : mPersistedZones)
         {
             if (existing.zoneID == zoneId)
             {
-                existing.Set(zoneId, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(zone));
+                existing.Set(zoneId, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(zone), nodeId, endpointId);
                 mUpdateZoneCalls++;
                 return Protocols::InteractionModel::Status::Success;
             }
@@ -441,6 +456,11 @@ TEST_F(TestZoneManagementCluster, RemoteZonesRejectedWhenFeatureDisabled)
     auto updateResult = tester.Invoke(updateWithNode);
     ASSERT_EQ(updateResult.GetStatusCode(),
               Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
+
+    // Even when zoneID does not exist, update with remote fields when kRemoteZones is disabled must return InvalidCommand
+    updateWithNode.zoneID = 999;
+    ASSERT_EQ(tester.Invoke(updateWithNode).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
 }
 
 TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventFields)
@@ -509,6 +529,32 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     ASSERT_TRUE(stoppedData.endpointID.HasValue());
     ASSERT_EQ(stoppedData.endpointID.Value(), static_cast<EndpointId>(2));
 
+    // Updating geometry/name while omitting nodeID and endpointID preserves existing remote zone identifiers
+    const auto updatePreserveVertices = MakeTriangle(25);
+    Commands::UpdateTwoDCartesianZone::Type updatePreserveReq;
+    updatePreserveReq.zoneID        = 1;
+    updatePreserveReq.zone.name     = "Preserved Remote"_span;
+    updatePreserveReq.zone.use      = ZoneUseEnum::kMotion;
+    updatePreserveReq.zone.vertices =
+        DataModel::List<const TwoDCartesianVertexStruct>(updatePreserveVertices.data(), updatePreserveVertices.size());
+    ASSERT_TRUE(tester.Invoke(updatePreserveReq).IsSuccess());
+    ASSERT_TRUE(cluster.GetZones().front().nodeID.HasValue());
+    ASSERT_EQ(cluster.GetZones().front().nodeID.Value(), static_cast<NodeId>(0x1234));
+    ASSERT_TRUE(cluster.GetZones().front().endpointID.HasValue());
+    ASSERT_EQ(cluster.GetZones().front().endpointID.Value(), static_cast<EndpointId>(2));
+
+    // Clearing nodeID while keeping non-null endpointID (either omitted or explicitly provided) -> ConstraintError
+    const auto invalidUpdateVertices = MakeTriangle(35);
+    Commands::UpdateTwoDCartesianZone::Type clearNodeOnlyReq;
+    clearNodeOnlyReq.zoneID        = 1;
+    clearNodeOnlyReq.zone.name     = "Invalid Clear"_span;
+    clearNodeOnlyReq.zone.use      = ZoneUseEnum::kMotion;
+    clearNodeOnlyReq.zone.vertices =
+        DataModel::List<const TwoDCartesianVertexStruct>(invalidUpdateVertices.data(), invalidUpdateVertices.size());
+    clearNodeOnlyReq.nodeID.SetValue(DataModel::NullNullable);
+    ASSERT_EQ(tester.Invoke(clearNodeOnlyReq).GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
+
     // Update remote zone to a new NodeID and null EndpointID
     const auto updateVertices = MakeTriangle(50);
     Commands::UpdateTwoDCartesianZone::Type updateRemoteReq;
@@ -522,6 +568,16 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     ASSERT_TRUE(cluster.GetZones().front().nodeID.HasValue());
     ASSERT_EQ(cluster.GetZones().front().nodeID.Value(), static_cast<NodeId>(0x5678));
     ASSERT_FALSE(cluster.GetZones().front().endpointID.HasValue());
+
+    // Shutdown and restart cluster to verify remote zone fields were persisted via Delegate
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    auto reloadedCluster =
+        CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone, Feature::kRemoteZones));
+    ASSERT_EQ(reloadedCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(reloadedCluster.GetZones().size(), 1u);
+    ASSERT_TRUE(reloadedCluster.GetZones().front().nodeID.HasValue());
+    ASSERT_EQ(reloadedCluster.GetZones().front().nodeID.Value(), static_cast<NodeId>(0x5678));
+    ASSERT_FALSE(reloadedCluster.GetZones().front().endpointID.HasValue());
 }
 
 TEST_F(TestZoneManagementCluster, EventGenerationProducesTriggeredAndStoppedEvents)

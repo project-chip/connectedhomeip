@@ -473,25 +473,41 @@ Status ZoneManagementCluster::ValidateAndExtractRemoteZoneFields(const Optional<
                                                                  Optional<NodeId> & outNodeId,
                                                                  Optional<EndpointId> & outEndpointId) const
 {
-    outNodeId     = NullOptional;
-    outEndpointId = NullOptional;
-
     if (!HasFeature(Feature::kRemoteZones))
     {
         VerifyOrReturnError(!reqNodeId.HasValue() && !reqEndpointId.HasValue(), Status::InvalidCommand);
         return Status::Success;
     }
 
-    if (reqNodeId.HasValue() && !reqNodeId.Value().IsNull())
+    if (reqNodeId.HasValue())
     {
-        VerifyOrReturnError(IsOperationalNodeId(reqNodeId.Value().Value()), Status::ConstraintError);
-        outNodeId.SetValue(reqNodeId.Value().Value());
+        if (reqNodeId.Value().IsNull())
+        {
+            outNodeId = NullOptional;
+        }
+        else
+        {
+            VerifyOrReturnError(IsOperationalNodeId(reqNodeId.Value().Value()), Status::ConstraintError);
+            outNodeId.SetValue(reqNodeId.Value().Value());
+        }
     }
 
-    if (reqEndpointId.HasValue() && !reqEndpointId.Value().IsNull())
+    if (reqEndpointId.HasValue())
     {
-        VerifyOrReturnError(outNodeId.HasValue() && IsValidEndpointId(reqEndpointId.Value().Value()), Status::ConstraintError);
-        outEndpointId.SetValue(reqEndpointId.Value().Value());
+        if (reqEndpointId.Value().IsNull())
+        {
+            outEndpointId = NullOptional;
+        }
+        else
+        {
+            VerifyOrReturnError(IsValidEndpointId(reqEndpointId.Value().Value()), Status::ConstraintError);
+            outEndpointId.SetValue(reqEndpointId.Value().Value());
+        }
+    }
+
+    if (outEndpointId.HasValue())
+    {
+        VerifyOrReturnError(outNodeId.HasValue(), Status::ConstraintError);
     }
 
     return Status::Success;
@@ -503,6 +519,11 @@ ZoneManagementCluster::HandleCreateTwoDCartesianZone(const ConcreteCommandPath &
 {
     uint16_t zoneID           = 0;
     const auto & zoneToCreate = commandData.zone;
+
+    if (!HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnValue(!commandData.nodeID.HasValue() && !commandData.endpointID.HasValue(), Status::InvalidCommand);
+    }
 
     Status status = ValidateTwoDCartesianZone(zoneToCreate);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -549,7 +570,7 @@ ZoneManagementCluster::HandleCreateTwoDCartesianZone(const ConcreteCommandPath &
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
 
-    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, zoneID);
+    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, nodeId, endpointId, zoneID);
     VerifyOrReturnValue(status == Status::Success, status);
 
     ZoneInformationStorage zoneInfo;
@@ -568,6 +589,11 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
 {
     const uint16_t zoneID     = commandData.zoneID;
     const auto & zoneToUpdate = commandData.zone;
+
+    if (!HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnValue(!commandData.nodeID.HasValue() && !commandData.endpointID.HasValue(), Status::InvalidCommand);
+    }
 
     Status status = ValidateTwoDCartesianZone(zoneToUpdate);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -611,15 +637,15 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
         return Status::DynamicConstraintError;
     }
 
-    Optional<NodeId> nodeId;
-    Optional<EndpointId> endpointId;
+    Optional<NodeId> nodeId         = foundZone->nodeID;
+    Optional<EndpointId> endpointId = foundZone->endpointID;
     status = ValidateAndExtractRemoteZoneFields(commandData.nodeID, commandData.endpointID, nodeId, endpointId);
     VerifyOrReturnValue(status == Status::Success, status);
 
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
 
-    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
+    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage, nodeId, endpointId);
     VerifyOrReturnValue(status == Status::Success, status);
 
     ZoneInformationStorage zoneInfo;
