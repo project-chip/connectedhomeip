@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR WebOSEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
     return CHIP_NO_ERROR;
 }
 
-NetworkIterator * LinuxEthernetDriver::GetNetworks()
+NetworkIterator * WebOSEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
     ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
@@ -44,7 +44,7 @@ NetworkIterator * LinuxEthernetDriver::GetNetworks()
     return ret;
 }
 
-void LinuxEthernetDriver::Shutdown()
+void WebOSEthernetDriver::Shutdown()
 {
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }

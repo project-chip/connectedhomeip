@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace NetworkCommissioning {
 // TODO: The otbr-posix does not actually maintains its own networking states, it will always persist the last network connected.
 // This should not be an issue for most cases, but we should implement the code for maintaining the states by ourselves.
 
-CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR WebOSThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
@@ -53,12 +53,12 @@ CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * net
     return CHIP_NO_ERROR;
 }
 
-void LinuxThreadDriver::Shutdown()
+void WebOSThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
-CHIP_ERROR LinuxThreadDriver::CommitConfiguration()
+CHIP_ERROR WebOSThreadDriver::CommitConfiguration()
 {
     // Note: otbr-agent will persist the networks by their own, we don't have much to do for saving the networks (see Init() above,
     // we just loads the saved dataset from otbr-agent.)
@@ -66,13 +66,13 @@ CHIP_ERROR LinuxThreadDriver::CommitConfiguration()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxThreadDriver::RevertConfiguration()
+CHIP_ERROR WebOSThreadDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
     return CHIP_NO_ERROR;
 }
 
-Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
+Status WebOSThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
@@ -89,7 +89,7 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Mutabl
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
+Status WebOSThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -109,7 +109,7 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & ou
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
+Status WebOSThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
     uint8_t extpanid[kSizeExtendedPanId];
@@ -128,7 +128,7 @@ Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Muta
     return Status::kSuccess;
 }
 
-void LinuxThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
+void WebOSThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     NetworkCommissioning::Status status = Status::kSuccess;
     uint8_t extpanid[kSizeExtendedPanId];
@@ -154,7 +154,7 @@ exit:
     }
 }
 
-void LinuxThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
+void WebOSThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
     // The ThreadScan callback will always be invoked in CHIP mainloop, which is strictly after this function
@@ -164,12 +164,12 @@ void LinuxThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
     }
 }
 
-size_t LinuxThreadDriver::ThreadNetworkIterator::Count()
+size_t WebOSThreadDriver::ThreadNetworkIterator::Count()
 {
     return driver->mStagingNetwork.IsCommissioned() ? 1 : 0;
 }
 
-bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
+bool WebOSThreadDriver::ThreadNetworkIterator::Next(Network & item)
 {
     if (exhausted || !driver->mStagingNetwork.IsCommissioned())
     {
@@ -197,7 +197,7 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return true;
 }
 
-ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
+ThreadCapabilities WebOSThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
     capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable, CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER);
@@ -209,7 +209,7 @@ ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
     return capabilites;
 }
 
-uint16_t LinuxThreadDriver::GetThreadVersion()
+uint16_t WebOSThreadDriver::GetThreadVersion()
 {
     uint16_t version = 0;
     ThreadStackMgrImpl().GetThreadVersion(version);

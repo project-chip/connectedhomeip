@@ -1,6 +1,6 @@
 /* @@@LICENSE
  *
- * Copyright (c) 2017-2025 LG Electronics, Inc.
+ * Copyright (c) 2017 LG Electronics, Inc.
  *
  * Confidential computer software. Valid license from LG required for
  * possession, use or copying. Consistent with FAR 12.211 and 12.212,
@@ -10,13 +10,15 @@
  *
  * LICENSE@@@
  */
-#include "LsRequester.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+
 #include <lib/support/logging/CHIPLogging.h>
 
-#define LS_REQ_SERVICE_NAME "com.webos.service.unifiedmatter-req"
+#include "lsrequester.h"
+
+#define LS_REQ_SERVICE_NAME "com.webos.service.matter-req"
 
 std::atomic<LsRequester *> LsRequester::_singleton;
 std::mutex LsRequester::_mutex;
@@ -67,13 +69,6 @@ LsRequester * LsRequester::getInstance()
             _singleton.store(inst, std::memory_order_relaxed);
         }
     }
-    // GMainLoop 상태 점검
-    if (!g_main_loop_is_running(inst->m_mainLoop))
-    {
-        ChipLogError(DeviceLayer, "Main loop not running, restarting...");
-        inst->stop();
-        inst->restart();
-    }
     return inst;
 }
 
@@ -86,33 +81,15 @@ LsRequester::LsRequester()
         m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
         m_handle.attachToLoop(m_mainLoop);
         m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
-        ChipLogDetail(DeviceLayer, "LsRequester initialized, m_mainLoop: %p, m_thread: %p", m_mainLoop, m_thread);
     } catch (const LS::Error & e)
     {
-        ChipLogError(DeviceLayer, "LsRequester init failed: %s", e.what());
+        ChipLogError(DeviceLayer, "Exception %s", e.what());
     }
 }
 
 LsRequester::~LsRequester()
 {
     stop();
-}
-
-void LsRequester::restart()
-{
-    stop();
-    GMainContext * pCxt = g_main_context_new();
-    m_mainLoop          = g_main_loop_new(pCxt, false);
-    try
-    {
-        m_handle = LS::registerService(LS_REQ_SERVICE_NAME);
-        m_handle.attachToLoop(m_mainLoop);
-        m_thread = g_thread_new("lsTask", lsTask, (GMainLoop *) m_mainLoop);
-        ChipLogDetail(DeviceLayer, "LsRequester restarted");
-    } catch (const LS::Error & e)
-    {
-        ChipLogError(DeviceLayer, "LsRequester restart failed: %s", e.what());
-    }
 }
 
 void LsRequester::stop()
@@ -139,7 +116,9 @@ void LsRequester::stop()
 bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
 {
     LS::Message response(reply);
-    auto * cc = static_cast<SyncCallbackContext *>(ctx);
+    // ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
+
+    SyncCallbackContext * cc = static_cast<SyncCallbackContext *>(ctx);
     if (cc->timeOut || cc->error)
     {
         delete cc;
@@ -151,7 +130,7 @@ bool LsRequester::_callbackSync(LSHandle * sh, LSMessage * reply, void * ctx)
     cc->received = true;
     cc->cond.notify_all();
     cc->alive = false;
-    // ChipLogDetail(DeviceLayer, "Response: %s", response.getPayload());
+
     return true;
 }
 
@@ -159,11 +138,10 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
 {
     std::lock_guard<std::mutex> lock(_mutex);
     if (pAPI == NULL || pParams == NULL)
-    {
-        ChipLogError(DeviceLayer, "Invalid API or params: %s, %s", pAPI, pParams);
         return false;
-    }
-    // ChipLogDetail(DeviceLayer, "lsCallSync calling API: %s, params: %s, timeout: %d", pAPI, pParams, timeout);
+
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+
     SyncCallbackContext * cc = new SyncCallbackContext();
     bool retVal              = true;
     try
@@ -172,28 +150,23 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
         if (!cc->wait(timeout))
         {
             cc->timeOut = true;
-            ChipLogError(DeviceLayer, "lsCallSync timed out after %d seconds for API: %s", timeout, pAPI);
+            ChipLogError(DeviceLayer, "timeout: %d sec", timeout);
             call.cancel();
-            delete cc;
             return false;
-        }
-        else
-        {
-            // ChipLogDetail(DeviceLayer, "lsCallSync received response for API: %s, result: %s", pAPI, cc->result.c_str());
         }
     } catch (const LS::Error & e)
     {
-        ChipLogError(DeviceLayer, "LS::Error in lsCallSync for API: %s, error: %s", pAPI, e.what());
+        ChipLogError(DeviceLayer, "Exception %s", e.what());
         retVal = false;
     } catch (const std::system_error & e)
     {
         cc->error = true;
-        ChipLogError(DeviceLayer, "System error in lsCallSync for API: %s, error: %s", pAPI, e.what());
+        ChipLogError(DeviceLayer, "Exception %s", e.what());
         retVal = false;
     }
 
     response = pbnjson::JDomParser::fromString(cc->result);
-    // ChipLogDetail(DeviceLayer, "lsCallSync completed for API: %s, response: %s", pAPI, response.stringify().c_str());
+
     if (cc)
         delete cc;
     return retVal;
@@ -202,27 +175,17 @@ bool LsRequester::lsCallSync(const char * pAPI, const char * pParams, pbnjson::J
 bool LsRequester::lsCallCancel(LSMessageToken ulToken)
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (!m_mainLoop || !g_main_loop_is_running(m_mainLoop))
+    if (ulToken != LSMESSAGE_TOKEN_INVALID)
     {
-        ChipLogError(DeviceLayer, "LsRequester is not running");
-        return false;
+        LSError lserror;
+        LSErrorInit(&lserror);
+        if (!LSCallCancel(m_handle.get(), ulToken, &lserror))
+        {
+            ChipLogError(DeviceLayer, "Failed to CallCancel: %s", lserror.message);
+            LSErrorFree(&lserror);
+            return false;
+        }
     }
-
-    if (ulToken == LSMESSAGE_TOKEN_INVALID)
-    {
-        ChipLogError(DeviceLayer, "Invalid token");
-        return false;
-    }
-
-    LSError lserror;
-    LSErrorInit(&lserror);
-    if (!LSCallCancel(m_handle.get(), ulToken, &lserror))
-    {
-        ChipLogError(DeviceLayer, "Failed to CallCancel: %s", lserror.message);
-        LSErrorFree(&lserror);
-        return false;
-    }
-    ChipLogDetail(DeviceLayer, "Success to CallCancel Token %lu ", ulToken);
     return true;
 }
 
@@ -234,7 +197,7 @@ bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ct
         call.cancel();
     }
 
-    ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
     try
     {
@@ -262,7 +225,7 @@ bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ct
         }
     }
 
-    ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
+    // ChipLogDetail(DeviceLayer, "API : %s, params: %s", pAPI, pParams);
 
     try
     {
@@ -272,6 +235,5 @@ bool LsRequester::lsSubscribe(const char * pAPI, const char * pParams, void * ct
         ChipLogError(DeviceLayer, "Exception: %s", e.what());
         return false;
     }
-    ChipLogDetail(DeviceLayer, "lsSubscribe Success API : %s", pAPI);
     return true;
 }
