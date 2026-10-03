@@ -1417,11 +1417,12 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     return;
                 }
 
+                // The node now holds the written values, also those of entries updated or marked for removal while the
+                // write was in flight. The queued sync of such an entry must replace or remove the written value, not
+                // the value the write replaced, so the written value becomes its superseded value.
                 for (auto & entry : mACLEntries)
                 {
-                    if (entry.nodeID != refreshingNodeId ||
-                        (entry.statusEntry.state != Clusters::JointFabricDatastore::DatastoreStateEnum::kPending &&
-                         entry.statusEntry.state != Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed))
+                    if (entry.nodeID != refreshingNodeId)
                     {
                         continue;
                     }
@@ -1434,14 +1435,15 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     if (detail::AclEntryValueEquals(EncodeAccessControlEntry(entry.ACLEntry),
                                                                EncodeAccessControlEntry(written->second)))
                     {
-                        entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-                        entry.statusEntry.failureCode = 0;
                         entry.supersededValue.reset();
+                        if (!HasRemovalIntent(entry))
+                        {
+                            entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                            entry.statusEntry.failureCode = 0;
+                        }
                     }
                     else
                     {
-                        // Updated while the write was in flight: the node now holds the written value, which the
-                        // queued sync replaces.
                         entry.supersededValue = written->second;
                     }
                 }

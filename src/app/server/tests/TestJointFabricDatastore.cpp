@@ -3488,6 +3488,48 @@ TEST(JointFabricDatastoreTest, RemovalRemovesValueLeftByInFlightUpdate)
     EXPECT_EQ(FindAcl(store, 123, 5), nullptr);
 }
 
+// As above, with the update written by RefreshNode: the node holds the value the refresh's ACL write sent, and the
+// removal removes it.
+TEST(JointFabricDatastoreTest, RemovalRemovesValueLeftByRefreshAclWrite)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    SetUpCatGroup(store);
+    const NodeId version1 = NodeIdFromCASEAuthTag(0x2345'0001);
+    const NodeId version2 = NodeIdFromCASEAuthTag(0x2345'0002);
+    const NodeId version3 = NodeIdFromCASEAuthTag(0x2345'0003);
+    SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { version1 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList(); // the node holds version 1 until the refresh's write
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    ASSERT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitFailed);
+
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    ASSERT_EQ(delegate.aclListSyncs.size(), 1u);
+    ASSERT_EQ(delegate.aclListSyncs[0].second.size(), 1u);
+    ASSERT_TRUE(delegate.aclListSyncs[0].second[0].subjects == std::vector<uint64_t>{ version2 });
+
+    ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 3, std::nullopt), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kAcl;
+    delegate.RunDeferred(); // the refresh's write: the node now holds version 2
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastAclSyncState, State::kDeletePending);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ version3 });
+    ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
+    EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ version2 });
+
+    delegate.RunDeferred();
+    EXPECT_EQ(FindAcl(store, 123, 5), nullptr);
+}
+
 // Removing the joint fabric drops queued syncs. A sync in flight still completes, and its completion changes
 // nothing: it must not start an operation queued since, which would then run alongside the one in flight.
 TEST(JointFabricDatastoreTest, FabricRemovalIgnoresSyncCompletingAfterIt)
