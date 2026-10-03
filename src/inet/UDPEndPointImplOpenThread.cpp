@@ -37,6 +37,9 @@ using DeviceLayer::Internal::MapOpenThreadError;
 
 otInstance * globalOtInstance;
 
+// Head of the deferred endpoints list.
+static UDPEndPointImplOT * sDeferredEndpoint = nullptr;
+
 namespace {
 // We want to reserve space for an IPPacketInfo in our buffer, but it needs to
 // be 4-byte aligned.  We ensure the alignment by masking off the low bits of
@@ -127,6 +130,24 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port,
                                        [[maybe_unused]] InterfaceId interface)
 {
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // OT still not ready — defer the bind and return success so Server::Init() can proceed.
+    // CompleteDeferredOTBinds() must be called after OT is initialized.
+    if (mOTInstance == nullptr)
+    {
+        mDeferredAddr   = address;
+        mDeferredPort   = port;
+        mDeferredIntfId = interface;
+        if (!mDeferredBind)
+        {
+            mDeferredBind     = true;
+            mNextDeferred     = sDeferredEndpoint;
+            sDeferredEndpoint = this;
+        }
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     otError err = OT_ERROR_NONE;
     otSockAddr listenSockAddr;
 
@@ -242,6 +263,57 @@ CHIP_ERROR UDPEndPointImplOT::BindInterfaceImpl(IPAddressType addressType, Inter
     (void) addressType;
     (void) interfaceId;
     return CHIP_NO_ERROR;
+}
+
+UDPEndPointImplOT::~UDPEndPointImplOT()
+{
+    if (mDeferredBind)
+    {
+        if (sDeferredEndpoint == this)
+        {
+            sDeferredEndpoint = mNextDeferred;
+        }
+        else
+        {
+            UDPEndPointImplOT * curr = sDeferredEndpoint;
+            while (curr != nullptr && curr->mNextDeferred != this)
+            {
+                curr = curr->mNextDeferred;
+            }
+            if (curr != nullptr)
+            {
+                curr->mNextDeferred = mNextDeferred;
+            }
+        }
+        mDeferredBind = false;
+        mNextDeferred = nullptr;
+    }
+}
+
+CHIP_ERROR UDPEndPointImplOT::CompleteDeferredOTBinds(otInstance * otInst)
+{
+    globalOtInstance    = otInst;
+    CHIP_ERROR finalErr = CHIP_NO_ERROR;
+
+    while (sDeferredEndpoint != nullptr)
+    {
+        UDPEndPointImplOT * ep = sDeferredEndpoint;
+        sDeferredEndpoint      = ep->mNextDeferred;
+        ep->mNextDeferred      = nullptr;
+
+        if (ep->mDeferredBind)
+        {
+            ep->mOTInstance   = otInst;
+            CHIP_ERROR err    = ep->IPv6Bind(ep->mSocket, ep->mDeferredAddr, ep->mDeferredPort, ep->mDeferredIntfId);
+            ep->mDeferredBind = false;
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "CompleteDeferredOTBinds: bind failed: %" CHIP_ERROR_FORMAT, err.Format());
+                finalErr = err;
+            }
+        }
+    }
+    return finalErr;
 }
 
 CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
