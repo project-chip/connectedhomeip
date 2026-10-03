@@ -45,7 +45,7 @@ void LayerImplZephyr::Shutdown()
     mLayerState.ResetFromInitialized();
 }
 
-CriticalFailure LayerImplZephyr::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplZephyr::StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 

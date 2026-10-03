@@ -140,7 +140,7 @@ void LayerImplSelect::Signal()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
-CriticalFailure LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplSelect::StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
