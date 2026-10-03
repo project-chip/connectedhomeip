@@ -47,6 +47,11 @@ void test_task(void * pvParameters)
     assert(err == CHIP_NO_ERROR);
 
     chip::test::RunAllTests();
+
+    while (1)
+    {
+        vTaskDelay(1);
+    }
 }
 
 #if FSL_OSA_MAIN_FUNC_ENABLE
