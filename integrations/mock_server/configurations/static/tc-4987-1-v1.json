@@ -1,0 +1,121 @@
+{
+    "schemaVersion": 1,
+    "esfRevision": 1,
+    "defaultCountry": "US",
+    "countryEntries": {
+        "US": {
+            "defaultLanguage": "en",
+            "languageEntries": {
+                "en": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Conditions of Use",
+                        "text": "<h1>Acme Smart Home Conditions of Use</h1><p>By using Acme Smart Home Services, you agree to these conditions on behalf of yourself and all members of your household who use any Acme Service under your account.</p><h2>License and Access</h2><p>Acme grants you a limited, non-exclusive, non-transferable license to access and make personal and non-commercial use of Acme Smart Home Services. This license does not include any resale or commercial use of any Acme Service or its contents.</p><h2>Your Account</h2><p>You are responsible for maintaining the confidentiality of your account and password and for restricting access to your account. You agree to accept responsibility for all activities that occur under your account or password.</p><h2>Device Usage</h2><p>Acme Smart Home devices require an internet connection and may collect usage data to provide and improve services. You agree to use devices in accordance with applicable laws and regulations.</p><h2>Software Updates</h2><p>Acme may provide automatic software updates to your devices to improve functionality, security, and performance. These updates may occur without prior notice.</p><h2>Disclaimer of Warranties</h2><p>Acme Smart Home Services are provided on an AS IS and AS AVAILABLE basis. Acme makes no representations or warranties of any kind, express or implied, as to the operation of Acme Services.</p><h2>Limitation of Liability</h2><p>To the fullest extent permitted by law, Acme shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of Acme Smart Home Services.</p><p>For complete terms, visit: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Privacy Notice",
+                        "text": "<h1>Acme Smart Home Privacy Notice</h1><p>Acme respects your privacy and is committed to protecting your personal information. This notice explains how we collect, use, and safeguard your data.</p><h2>Information We Collect</h2><p><b>Account Information:</b> Name, email address, and account credentials when you create an account.</p><p><b>Device Information:</b> Device identifiers, network information, and usage patterns from your smart home devices.</p><p><b>Usage Data:</b> Information about how you interact with our services and devices.</p><h2>How We Use Your Information</h2><ul><li>Provide and maintain smart home services</li><li>Improve device functionality and user experience</li><li>Send important service notifications</li><li>Ensure security and prevent fraud</li><li>Comply with legal obligations</li></ul><h2>Data Sharing</h2><p>We do not sell your personal information. We may share data with service providers who help us operate our services, subject to confidentiality agreements.</p><h2>Data Security</h2><p>We implement industry-standard security measures to protect your information, including encryption and secure data storage.</p><h2>Your Rights</h2><p>You may access, correct, or delete your personal information through your account settings or by contacting us.</p><p>For complete privacy information, visit: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        },
+        "DE": {
+            "defaultLanguage": "de",
+            "languageEntries": {
+                "de": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Nutzungsbedingungen",
+                        "text": "<h1>Acme Smart Home Nutzungsbedingungen</h1><p>Durch die Nutzung von Acme Smart Home Diensten stimmen Sie diesen Bedingungen im Namen von sich selbst und allen Mitgliedern Ihres Haushalts zu, die Acme Dienste unter Ihrem Konto nutzen.</p><h2>Lizenz und Zugang</h2><p>Acme gewährt Ihnen eine eingeschränkte, nicht-exklusive, nicht übertragbare Lizenz für den Zugang und die persönliche, nicht-kommerzielle Nutzung der Acme Smart Home Dienste.</p><h2>Ihr Konto</h2><p>Sie sind für die Wahrung der Vertraulichkeit Ihres Kontos und Passworts sowie für die Beschränkung des Zugangs zu Ihrem Konto verantwortlich.</p><h2>Gerätenutzung</h2><p>Acme Smart Home Geräte erfordern eine Internetverbindung und können Nutzungsdaten erfassen, um Dienste bereitzustellen und zu verbessern.</p><h2>Software-Updates</h2><p>Acme kann automatische Software-Updates für Ihre Geräte bereitstellen, um Funktionalität, Sicherheit und Leistung zu verbessern.</p><h2>Haftungsausschluss</h2><p>Acme Smart Home Dienste werden ohne Mängelgewähr und nach Verfügbarkeit bereitgestellt.</p><p>Vollständige Bedingungen unter: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Datenschutzerklärung",
+                        "text": "<h1>Acme Smart Home Datenschutzerklärung</h1><p>Acme respektiert Ihre Privatsphäre und verpflichtet sich, Ihre persönlichen Daten zu schützen.</p><h2>Informationen, die wir erheben</h2><p><b>Kontoinformationen:</b> Name, E-Mail-Adresse und Kontodaten bei der Kontoerstellung.</p><p><b>Geräteinformationen:</b> Gerätekennungen, Netzwerkinformationen und Nutzungsmuster.</p><p><b>Nutzungsdaten:</b> Informationen über Ihre Interaktion mit unseren Diensten.</p><h2>Wie wir Ihre Informationen verwenden</h2><ul><li>Bereitstellung von Smart Home Diensten</li><li>Verbesserung der Gerätefunktionalität</li><li>Senden wichtiger Benachrichtigungen</li><li>Gewährleistung der Sicherheit</li></ul><h2>Datensicherheit</h2><p>Wir implementieren branchenübliche Sicherheitsmaßnahmen zum Schutz Ihrer Daten.</p><p>Vollständige Datenschutzinformationen unter: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        },
+        "IT": {
+            "defaultLanguage": "it",
+            "languageEntries": {
+                "it": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Condizioni di Utilizzo",
+                        "text": "<h1>Condizioni di Utilizzo Acme Smart Home</h1><p>Utilizzando i Servizi Acme Smart Home, accetti queste condizioni per te stesso e per tutti i membri della tua famiglia che utilizzano qualsiasi Servizio Acme con il tuo account.</p><h2>Licenza e Accesso</h2><p>Acme ti concede una licenza limitata, non esclusiva e non trasferibile per accedere e fare uso personale e non commerciale dei Servizi Acme Smart Home.</p><h2>Il Tuo Account</h2><p>Sei responsabile del mantenimento della riservatezza del tuo account e della tua password.</p><h2>Utilizzo dei Dispositivi</h2><p>I dispositivi Acme Smart Home richiedono una connessione internet e possono raccogliere dati di utilizzo per fornire e migliorare i servizi.</p><h2>Aggiornamenti Software</h2><p>Acme può fornire aggiornamenti software automatici per migliorare funzionalità, sicurezza e prestazioni.</p><h2>Esclusione di Garanzie</h2><p>I Servizi Acme Smart Home sono forniti così come sono e secondo disponibilità.</p><p>Termini completi su: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Informativa sulla Privacy",
+                        "text": "<h1>Informativa sulla Privacy Acme Smart Home</h1><p>Acme rispetta la tua privacy e si impegna a proteggere le tue informazioni personali.</p><h2>Informazioni che Raccogliamo</h2><p><b>Informazioni Account:</b> Nome, indirizzo email e credenziali quando crei un account.</p><p><b>Informazioni Dispositivo:</b> Identificatori dispositivo, informazioni di rete e modelli di utilizzo.</p><p><b>Dati di Utilizzo:</b> Informazioni su come interagisci con i nostri servizi.</p><h2>Come Utilizziamo le Tue Informazioni</h2><ul><li>Fornire servizi smart home</li><li>Migliorare la funzionalità dei dispositivi</li><li>Inviare notifiche importanti</li><li>Garantire la sicurezza</li></ul><h2>Sicurezza dei Dati</h2><p>Implementiamo misure di sicurezza standard del settore per proteggere i tuoi dati.</p><p>Informazioni complete sulla privacy su: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        },
+        "JP": {
+            "defaultLanguage": "ja",
+            "languageEntries": {
+                "ja": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "利用規約",
+                        "text": "<h1>Acme スマートホーム利用規約</h1><p>Acme スマートホームサービスを利用することにより、お客様は、ご自身およびお客様のアカウントでAcmeサービスを利用するすべての世帯員を代表して、これらの条件に同意するものとします。</p><h2>ライセンスとアクセス</h2><p>Acmeは、お客様に対し、Acme スマートホームサービスへのアクセスおよび個人的かつ非商業的な使用のための限定的、非独占的、譲渡不可のライセンスを付与します。</p><h2>お客様のアカウント</h2><p>お客様は、アカウントとパスワードの機密性を維持する責任があります。</p><h2>デバイスの使用</h2><p>Acme スマートホームデバイスはインターネット接続が必要であり、サービスの提供と改善のために使用データを収集する場合があります。</p><h2>ソフトウェアアップデート</h2><p>Acmeは、機能、セキュリティ、パフォーマンスを向上させるために、デバイスに自動ソフトウェアアップデートを提供する場合があります。</p><h2>保証の免責</h2><p>Acme スマートホームサービスは、現状有姿および利用可能な状態で提供されます。</p><p>完全な規約は: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "プライバシー通知",
+                        "text": "<h1>Acme スマートホーム プライバシー通知</h1><p>Acmeはお客様のプライバシーを尊重し、個人情報の保護に努めています。</p><h2>収集する情報</h2><p><b>アカウント情報:</b> アカウント作成時の名前、メールアドレス、認証情報。</p><p><b>デバイス情報:</b> デバイス識別子、ネットワーク情報、使用パターン。</p><p><b>使用データ:</b> サービスとの対話に関する情報。</p><h2>情報の利用方法</h2><ul><li>スマートホームサービスの提供</li><li>デバイス機能の改善</li><li>重要な通知の送信</li><li>セキュリティの確保</li></ul><h2>データセキュリティ</h2><p>当社は、お客様のデータを保護するために業界標準のセキュリティ対策を実施しています。</p><p>完全なプライバシー情報は: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        },
+        "ES": {
+            "defaultLanguage": "es",
+            "languageEntries": {
+                "es": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Condiciones de Uso",
+                        "text": "<h1>Condiciones de Uso de Acme Smart Home</h1><p>Al utilizar los Servicios de Acme Smart Home, aceptas estas condiciones en tu nombre y en el de todos los miembros de tu hogar que utilicen cualquier Servicio de Acme bajo tu cuenta.</p><h2>Licencia y Acceso</h2><p>Acme te otorga una licencia limitada, no exclusiva e intransferible para acceder y hacer uso personal y no comercial de los Servicios de Acme Smart Home.</p><h2>Tu Cuenta</h2><p>Eres responsable de mantener la confidencialidad de tu cuenta y contraseña.</p><h2>Uso de Dispositivos</h2><p>Los dispositivos Acme Smart Home requieren conexión a internet y pueden recopilar datos de uso para proporcionar y mejorar los servicios.</p><h2>Actualizaciones de Software</h2><p>Acme puede proporcionar actualizaciones automáticas de software para mejorar la funcionalidad, seguridad y rendimiento.</p><h2>Exención de Garantías</h2><p>Los Servicios de Acme Smart Home se proporcionan tal cual y según disponibilidad.</p><p>Términos completos en: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Aviso de Privacidad",
+                        "text": "<h1>Aviso de Privacidad de Acme Smart Home</h1><p>Acme respeta tu privacidad y se compromete a proteger tu información personal.</p><h2>Información que Recopilamos</h2><p><b>Información de Cuenta:</b> Nombre, dirección de correo electrónico y credenciales al crear una cuenta.</p><p><b>Información del Dispositivo:</b> Identificadores de dispositivo, información de red y patrones de uso.</p><p><b>Datos de Uso:</b> Información sobre cómo interactúas con nuestros servicios.</p><h2>Cómo Usamos tu Información</h2><ul><li>Proporcionar servicios de hogar inteligente</li><li>Mejorar la funcionalidad de los dispositivos</li><li>Enviar notificaciones importantes</li><li>Garantizar la seguridad</li></ul><h2>Seguridad de Datos</h2><p>Implementamos medidas de seguridad estándar de la industria para proteger tus datos.</p><p>Información completa de privacidad en: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        },
+        "FR": {
+            "defaultLanguage": "fr",
+            "languageEntries": {
+                "fr": [
+                    {
+                        "ordinal": 0,
+                        "required": true,
+                        "title": "Conditions d'Utilisation",
+                        "text": "<h1>Conditions d'Utilisation Acme Smart Home</h1><p>En utilisant les Services Acme Smart Home, vous acceptez ces conditions en votre nom et au nom de tous les membres de votre foyer qui utilisent tout Service Acme sous votre compte.</p><h2>Licence et Accès</h2><p>Acme vous accorde une licence limitée, non exclusive et non transférable pour accéder et faire un usage personnel et non commercial des Services Acme Smart Home.</p><h2>Votre Compte</h2><p>Vous êtes responsable du maintien de la confidentialité de votre compte et de votre mot de passe.</p><h2>Utilisation des Appareils</h2><p>Les appareils Acme Smart Home nécessitent une connexion internet et peuvent collecter des données d'utilisation pour fournir et améliorer les services.</p><h2>Mises à Jour Logicielles</h2><p>Acme peut fournir des mises à jour logicielles automatiques pour améliorer la fonctionnalité, la sécurité et les performances.</p><h2>Exclusion de Garanties</h2><p>Les Services Acme Smart Home sont fournis en l'état et selon disponibilité.</p><p>Conditions complètes sur: <b>acme.example.com/terms</b></p>"
+                    },
+                    {
+                        "ordinal": 1,
+                        "required": false,
+                        "title": "Politique de Confidentialité",
+                        "text": "<h1>Politique de Confidentialité Acme Smart Home</h1><p>Acme respecte votre vie privée et s'engage à protéger vos informations personnelles.</p><h2>Informations que Nous Collectons</h2><p><b>Informations de Compte:</b> Nom, adresse email et identifiants lors de la création d'un compte.</p><p><b>Informations sur l'Appareil:</b> Identifiants d'appareil, informations réseau et modèles d'utilisation.</p><p><b>Données d'Utilisation:</b> Informations sur votre interaction avec nos services.</p><h2>Comment Nous Utilisons Vos Informations</h2><ul><li>Fournir des services de maison intelligente</li><li>Améliorer la fonctionnalité des appareils</li><li>Envoyer des notifications importantes</li><li>Assurer la sécurité</li></ul><h2>Sécurité des Données</h2><p>Nous mettons en œuvre des mesures de sécurité standard de l'industrie pour protéger vos données.</p><p>Informations complètes sur la confidentialité sur: <b>acme.example.com/privacy</b></p>"
+                    }
+                ]
+            }
+        }
+    }
+}
