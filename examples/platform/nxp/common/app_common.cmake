@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -198,6 +198,7 @@ endif()
 if (CONFIG_CHIP_APP_CLI)
     target_compile_definitions(app PRIVATE
         ENABLE_CHIP_SHELL
+        CONFIG_OPENTHREAD_SHELL=1
     )
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
@@ -276,6 +277,7 @@ if (CONFIG_CHIP_APP_RPC)
     target_include_directories(app PRIVATE
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/rpc/include
     )
+    include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../Rpc.cmake)
 endif()
 
 if (CONFIG_CHIP_APP_UI_FEEDBACK)

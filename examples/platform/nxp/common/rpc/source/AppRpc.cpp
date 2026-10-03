@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,17 +15,21 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "AppRpc.h"
 
-#include <lib/core/CHIPError.h>
+#include "Rpc.h"
 
-namespace chip {
-namespace rpc {
+#include <lib/support/logging/CHIPLogging.h>
 
-class LightingService;
+#if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
+#include <platform/CHIPDeviceLayer.h>
+#endif
 
-CHIP_ERROR Init();
-void RunRpcService(void *);
+namespace chip::NXP::App::Rpc {
 
-} // namespace rpc
-} // namespace chip
+CHIP_ERROR Init()
+{
+    return chip::rpc::Init();
+}
+
+} // namespace chip::NXP::App::Rpc

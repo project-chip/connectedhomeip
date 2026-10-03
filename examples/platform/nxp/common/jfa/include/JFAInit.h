@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,18 @@
 #include <lib/core/CHIPError.h>
 
 namespace chip {
-namespace rpc {
+namespace NXP {
+namespace App {
+namespace JFA {
 
-class LightingService;
-
+// Wire up the Joint Fabric Administrator into the running Server:
+//  - initialize JFAManager and JFADatastoreSync
+//  - register them as the JointFabricAdministrator / JointFabricDatastore delegates
+//  - register a commissioning-complete event handler
+// Must be called after the Matter Server has been initialized.
 CHIP_ERROR Init();
-void RunRpcService(void *);
 
-} // namespace rpc
+} // namespace JFA
+} // namespace App
+} // namespace NXP
 } // namespace chip
