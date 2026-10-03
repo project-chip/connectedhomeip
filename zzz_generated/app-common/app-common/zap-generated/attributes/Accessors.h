@@ -14726,6 +14726,48 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ThreadNetworkDirectory
 
+namespace ThreadBorderRouterDiagnostics {
+namespace Attributes {
+
+namespace Status {
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum & value);
+inline void GetDefaultOr(EndpointId endpoint,
+                         chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum & value,
+                         chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace Status
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
+inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
+inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ThreadBorderRouterDiagnostics
+
 namespace CommissioningProxy {
 namespace Attributes {
 
