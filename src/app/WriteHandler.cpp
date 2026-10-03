@@ -820,8 +820,10 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
         std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
 
-        // path is valid based on above checks (we have an attribute entry)
-        VerifyOrDie(cluster_entry.has_value());
+        if (!cluster_entry.has_value())
+        {
+            return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::Failure);
+        }
         VerifyOrReturnValue(cluster_entry->dataVersion == aPath.mDataVersion.Value(), Status::DataVersionMismatch);
     }
 
