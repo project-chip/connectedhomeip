@@ -1547,6 +1547,132 @@ TEST(JointFabricDatastoreTest, FailedRemovalWhoseRefreshWriteFailsIsRetriedLater
     EXPECT_EQ(FindAcl(store, 123, 7), nullptr);
 }
 
+// A failed refresh write has one status for the whole list, which does not say which of several new entries caused
+// it. An unrecoverable status, on which RefreshNode drops an entry, is not recorded on each of them: each entry is
+// synced on its own once the refresh ends, and gets its own status.
+TEST(JointFabricDatastoreTest, FailedRefreshAclWriteSyncsEachNewEntryOnItsOwn)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kPending);
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kPending);
+
+    delegate.completeWith[SyncKind::kAclList] = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    delegate.deferKind                        = SyncKind::kAcl;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    for (const uint16_t listId : { uint16_t(5), uint16_t(6) })
+    {
+        const auto * entry = FindAcl(store, 123, listId);
+        ASSERT_NE(entry, nullptr);
+        EXPECT_EQ(entry->statusEntry.state, State::kCommitFailed);
+        EXPECT_EQ(entry->statusEntry.failureCode, to_underlying(Protocols::InteractionModel::Status::Failure));
+    }
+
+    // Entry 5 does not fit on the node, and entry 6 does.
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ 0x1111 });
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_TRUE(delegate.LastAclSync().subjects == std::vector<uint64_t>{ 0x2222 });
+    delegate.RunDeferred();
+
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.failureCode,
+              to_underlying(Protocols::InteractionModel::Status::ResourceExhausted));
+    ASSERT_NE(FindAcl(store, 123, 6), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 6)->statusEntry.state, State::kCommitted);
+
+    delegate.deferKind.reset();
+    delegate.aclListToFetch.push_back(*FindAcl(store, 123, 6));
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    EXPECT_EQ(FindAcl(store, 123, 5), nullptr);
+    ASSERT_NE(FindAcl(store, 123, 6), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 6)->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
+// With a single new entry in the failed write, the write's status is that entry's. An entry being removed was left
+// out of the write and did not cause it: it records a recoverable failure and keeps its removal intent.
+TEST(JointFabricDatastoreTest, FailedRefreshAclWriteRecordsStatusOnOnlyNewEntry)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 5, Privilege::kView, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    SeedAcl(store, 123, 7, Privilege::kManage, AuthMode::kCase, { 0x3333 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList();
+    SeedAcl(store, 123, 6, Privilege::kView, AuthMode::kCase, { 0x2222 }, State::kPending);
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+    auto aclSyncCount = [&delegate]() {
+        return std::count_if(delegate.syncCalls.begin(), delegate.syncCalls.end(),
+                             [](const auto & call) { return call.second == SyncKind::kAcl; });
+    };
+    const auto aclSyncsBefore = aclSyncCount();
+
+    delegate.completeWith[SyncKind::kAclList] = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_NE(FindAcl(store, 123, 6), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 6)->statusEntry.state, State::kCommitFailed);
+    EXPECT_EQ(FindAcl(store, 123, 6)->statusEntry.failureCode,
+              to_underlying(Protocols::InteractionModel::Status::ResourceExhausted));
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
+    EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.failureCode, to_underlying(Protocols::InteractionModel::Status::Failure));
+    EXPECT_TRUE(FindAcl(store, 123, 7)->pendingRemoval);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
+    EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
+    EXPECT_EQ(aclSyncCount(), aclSyncsBefore);
+}
+
+// As for ACLs: several new bindings in a failed binding write are each synced on their own.
+TEST(JointFabricDatastoreTest, FailedRefreshBindingWriteSyncsEachNewEntryOnItsOwn)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    for (const GroupId groupId : { GroupId(10), GroupId(11) })
+    {
+        BindingEntryType bindingEntry;
+        bindingEntry.nodeID     = 123;
+        bindingEntry.endpointID = kRootEndpointId;
+        bindingEntry.listID     = groupId;
+        bindingEntry.binding.group.SetValue(groupId);
+        bindingEntry.statusEntry.state = State::kPending;
+        store.GetEndpointBindingList().push_back({ bindingEntry });
+    }
+
+    delegate.completeWith[SyncKind::kBindingList] = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    delegate.deferKind                            = SyncKind::kBinding;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
+    for (const auto & entry : store.GetEndpointBindingList())
+    {
+        EXPECT_EQ(entry.statusEntry.state, State::kCommitFailed);
+        EXPECT_EQ(entry.statusEntry.failureCode, to_underlying(Protocols::InteractionModel::Status::Failure));
+    }
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastBindingSync.listID, 10u);
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastBindingSync.listID, 11u);
+    delegate.RunDeferred();
+
+    ASSERT_EQ(store.GetEndpointBindingList().size(), 2u);
+    EXPECT_EQ(store.GetEndpointBindingList()[0].statusEntry.failureCode,
+              to_underlying(Protocols::InteractionModel::Status::ConstraintError));
+    EXPECT_EQ(store.GetEndpointBindingList()[1].statusEntry.state, State::kCommitted);
+}
+
 TEST(JointFabricDatastoreTest, RefreshReleasesGuardOnFetchFailure)
 {
     JointFabricDatastore store;

@@ -315,9 +315,40 @@ bool JointFabricDatastore::InRefreshWrite(const datastore::EndpointBindingEntryS
     });
 }
 
+CHIP_ERROR JointFabricDatastore::RunOrQueueEntrySync(const datastore::ACLEntryStruct & entry)
+{
+    return RunOrQueueNodeSync(entry.nodeID,
+                              [this, nodeId = entry.nodeID, listId = entry.listID]() { return StartAclEntrySync(nodeId, listId); });
+}
+
+CHIP_ERROR JointFabricDatastore::RunOrQueueEntrySync(const datastore::EndpointBindingEntryStruct & entry)
+{
+    return RunOrQueueNodeSync(entry.nodeID, [this, nodeId = entry.nodeID, endpointId = entry.endpointID, listId = entry.listID]() {
+        return StartBindingEntrySync(nodeId, endpointId, listId);
+    });
+}
+
 template <typename Entry>
 void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, NodeId nodeId, CHIP_ERROR err)
 {
+    // The node reports one status for the whole list, and only an entry it did not hold yet can have caused the
+    // failure. An unrecoverable status, on which RefreshNode drops the entry, is recorded only when the write held a
+    // single such entry: recorded on several, it would drop all of them for the fault of one. They record FAILURE
+    // instead and are synced on their own to get their own status. Entries being removed, which the write leaves
+    // out, record FAILURE instead of an unrecoverable status too.
+    Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type writeStatus;
+    writeStatus.state                = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
+    writeStatus.failureCode          = to_underlying(Protocols::InteractionModel::ClusterStatusCode(err).GetStatus());
+    const bool unrecoverable         = IsUnrecoverableCommitFailure(writeStatus);
+    const CHIP_ERROR unattributedErr = unrecoverable ? CHIP_IM_GLOBAL_STATUS(Failure) : err;
+
+    auto uncommittedInWrite = [this, nodeId](const Entry & entry) {
+        return entry.nodeID == nodeId && InRefreshWrite(entry) &&
+            entry.statusEntry.state != Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    };
+    const bool attributable = std::count_if(entries.begin(), entries.end(), uncommittedInWrite) == 1;
+
+    std::vector<Entry> entriesToSync;
     for (auto & entry : entries)
     {
         if (entry.nodeID != nodeId)
@@ -328,13 +359,32 @@ void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, 
         {
             // Record the intent before the state stops saying DeletePending.
             MarkRemovalRequested(entry);
+            detail::MarkEntrySyncFailed(entry, unattributedErr);
+            continue;
+        }
+        if (!uncommittedInWrite(entry))
+        {
+            continue;
+        }
+        if (attributable || !unrecoverable)
+        {
             detail::MarkEntrySyncFailed(entry, err);
             continue;
         }
-        if (InRefreshWrite(entry) && entry.statusEntry.state != Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted)
+        detail::MarkEntrySyncFailed(entry, unattributedErr);
+        entriesToSync.push_back(entry);
+    }
+
+    // The refresh holds the node's slot, so these syncs start once it ends.
+    for (const auto & entry : entriesToSync)
+    {
+        if (!HasNodeSyncCapacity(nodeId))
         {
-            detail::MarkEntrySyncFailed(entry, err);
+            ChipLogError(AppServer, "Sync queue of node 0x" ChipLogFormatX64 " full; its next refresh retries the entries",
+                         ChipLogValueX64(nodeId));
+            return;
         }
+        LogErrorOnFailure(RunOrQueueEntrySync(entry));
     }
 }
 

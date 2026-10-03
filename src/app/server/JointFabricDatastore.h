@@ -794,8 +794,14 @@ private:
     bool InRefreshWrite(const datastore::ACLEntryStruct & entry) const;
     bool InRefreshWrite(const datastore::EndpointBindingEntryStruct & entry) const;
 
+    // Starts or queues the sync of `entry` alone, through StartAclEntrySync or StartBindingEntrySync.
+    CHIP_ERROR RunOrQueueEntrySync(const datastore::ACLEntryStruct & entry);
+    CHIP_ERROR RunOrQueueEntrySync(const datastore::EndpointBindingEntryStruct & entry);
+
     // Records a failed refresh write on `nodeId`'s entries that were in the write and not Committed, and
-    // on its entries being removed, which keep their removal intent.
+    // on its entries being removed, which keep their removal intent. An unrecoverable status is recorded only
+    // on the write's single entry that was not Committed. Otherwise it is recorded as FAILURE, and each such
+    // entry is synced on its own once the refresh ends.
     template <typename Entry>
     void MarkRefreshWriteFailed(std::vector<Entry> & entries, NodeId nodeId, CHIP_ERROR err);
 
