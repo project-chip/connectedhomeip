@@ -1006,14 +1006,16 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
     }
     break;
     case kRefreshingGroupKeySets: {
-        // 4. Ensure per-node key-set entries for each GroupKeySet are synced to devices.
+        // 4. Ensure the node's key-set entries are synced to it. Other nodes' entries are synced by their own refreshes
+        // and through their sync queues, which keep a node's key-set writes and removals in order.
         if (mRefreshingNodeKeySetDeletions.empty())
         {
             for (const auto & groupKeySet : mGroupKeySetList)
             {
                 for (auto nkIt = mNodeKeySetEntries.begin(); nkIt != mNodeKeySetEntries.end();)
                 {
-                    if (nkIt->groupKeySetID != groupKeySet.groupKeySetID || !HasRemovalIntent(*nkIt))
+                    if (nkIt->nodeID != mRefreshingNodeId || nkIt->groupKeySetID != groupKeySet.groupKeySetID ||
+                        !HasRemovalIntent(*nkIt))
                     {
                         ++nkIt;
                         continue;
@@ -1042,19 +1044,26 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             NodeId nodeIdToErase            = nodeKeySetDeletion.first;
             uint16_t groupKeySetIdToErase   = nodeKeySetDeletion.second;
 
+            auto stillRemoving = [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
+                return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase && HasRemovalIntent(entry);
+            };
+            // An add can cancel a collected removal while an earlier one is in flight. The add is queued behind the
+            // refresh, and sending the removal would undo it on the node.
+            if (std::none_of(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(), stillRemoving))
+            {
+                ++mRefreshingNodeKeySetDeletionIndex;
+                return ContinueRefresh();
+            }
+
             Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type entryToRemove;
             entryToRemove.nodeID            = nodeIdToErase;
             entryToRemove.groupKeySetID     = groupKeySetIdToErase;
             entryToRemove.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             CHIP_ERROR syncErr =
                 mDelegate->SyncNode(nodeIdToErase, entryToRemove,
-                                    [this, nodeIdToErase, groupKeySetIdToErase, generation = mSyncGeneration](CHIP_ERROR innerErr) {
+                                    [this, nodeIdToErase, stillRemoving, generation = mSyncGeneration](CHIP_ERROR innerErr) {
                                         VerifyOrReturn(generation == mSyncGeneration);
                                         // An add that cancelled the removal while it was in flight owns the entry now.
-                                        auto stillRemoving = [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
-                                            return entry.nodeID == nodeIdToErase && entry.groupKeySetID == groupKeySetIdToErase &&
-                                                HasRemovalIntent(entry);
-                                        };
                                         if (innerErr == CHIP_NO_ERROR)
                                         {
                                             auto erased =
@@ -1118,7 +1127,7 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
             for (auto nkIt = mNodeKeySetEntries.begin(); nkIt != mNodeKeySetEntries.end();)
             {
-                if (nkIt->groupKeySetID != groupKeySetId)
+                if (nkIt->nodeID != mRefreshingNodeId || nkIt->groupKeySetID != groupKeySetId)
                 {
                     ++nkIt;
                     continue;

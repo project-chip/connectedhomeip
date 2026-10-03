@@ -47,11 +47,33 @@ void SeedAcl(JointFabricDatastore & store, NodeId nodeId, uint16_t listId, Privi
     store.GetNodeACLList().push_back(std::move(entry));
 }
 
+void SeedNodeKeySet(JointFabricDatastore & store, NodeId nodeId, uint16_t groupKeySetId, State state, uint8_t failureCode = 0)
+{
+    datastore::NodeKeySetEntryStruct entry;
+    entry.nodeID                  = nodeId;
+    entry.groupKeySetID           = groupKeySetId;
+    entry.statusEntry.state       = state;
+    entry.statusEntry.failureCode = failureCode;
+    store.GetNodeKeySetList().push_back(entry);
+}
+
 const datastore::ACLEntryStruct * FindAcl(JointFabricDatastore & store, NodeId nodeId, uint16_t listId)
 {
     for (const auto & entry : store.GetNodeACLList())
     {
         if (entry.nodeID == nodeId && entry.listID == listId)
+        {
+            return &entry;
+        }
+    }
+    return nullptr;
+}
+
+const datastore::NodeKeySetEntryStruct * FindNodeKeySet(JointFabricDatastore & store, NodeId nodeId, uint16_t groupKeySetId)
+{
+    for (const auto & entry : store.GetNodeKeySetList())
+    {
+        if (entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetId)
         {
             return &entry;
         }
@@ -72,6 +94,33 @@ datastore::AccessControlEntryStruct ToOwned(const JointFabricCluster::Structs::D
     if (!source.targets.IsNull())
     {
         owned.targets.assign(source.targets.Value().begin(), source.targets.Value().end());
+    }
+    return owned;
+}
+
+// A key set sent to a node. Its keys are copied: the sent spans view the datastore's storage.
+struct SentKeySet
+{
+    NodeId nodeId          = kUndefinedNodeId;
+    uint16_t groupKeySetID = 0;
+    std::array<DataModel::Nullable<std::vector<uint8_t>>, 3> epochKeys;
+    std::array<DataModel::Nullable<uint64_t>, 3> epochStartTimes;
+};
+
+SentKeySet ToOwned(NodeId nodeId, const GroupKeySetType & source)
+{
+    SentKeySet owned;
+    owned.nodeId          = nodeId;
+    owned.groupKeySetID   = source.groupKeySetID;
+    owned.epochStartTimes = { source.epochStartTime0, source.epochStartTime1, source.epochStartTime2 };
+
+    const DataModel::Nullable<ByteSpan> * keys[] = { &source.epochKey0, &source.epochKey1, &source.epochKey2 };
+    for (size_t epoch = 0; epoch < owned.epochKeys.size(); ++epoch)
+    {
+        if (!keys[epoch]->IsNull())
+        {
+            owned.epochKeys[epoch].SetNonNull(keys[epoch]->Value().begin(), keys[epoch]->Value().end());
+        }
     }
     return owned;
 }
@@ -128,6 +177,7 @@ public:
     {
         lastNodeKeySetSync    = nodeKeySetEntry;
         hasLastNodeKeySetSync = true;
+        nodeKeySetSyncs.push_back(nodeKeySetEntry);
         return Dispatch(nodeId, SyncKind::kNodeKeySet, std::move(onSuccess));
     }
 
@@ -180,6 +230,7 @@ public:
 
     CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void(CHIP_ERROR)> onSuccess) override
     {
+        groupKeySetSyncs.push_back(ToOwned(nodeId, groupKeySet));
         return Dispatch(nodeId, SyncKind::kGroupKeySet, std::move(onSuccess));
     }
 
@@ -328,8 +379,10 @@ public:
     std::optional<SyncKind> deferKind;            // completions of this kind are captured, not run
     std::vector<std::function<void(CHIP_ERROR)>> deferred;
     std::vector<std::pair<NodeId, SyncKind>> syncCalls;
+    std::vector<NodeKeySetEntryType> nodeKeySetSyncs;
     std::vector<std::pair<NodeId, std::vector<datastore::AccessControlEntryStruct>>> aclListSyncs;
     std::vector<std::pair<NodeId, std::vector<BindingEntryType>>> bindingListSyncs;
+    std::vector<SentKeySet> groupKeySetSyncs;
     std::vector<BindingEntryType> bindingsToFetch;
     CHIP_ERROR fetchAclListResult   = CHIP_NO_ERROR;
     CHIP_ERROR fetchGroupListResult = CHIP_NO_ERROR;
@@ -2803,6 +2856,83 @@ TEST(JointFabricDatastoreTest, GroupRenamedDuringItsAddIsSyncedAgain)
     EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
 
     delegate.RunDeferred(); // the sync of the new name
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+// Adds key sets with the given IDs and no epoch keys.
+void AddKeySets(JointFabricDatastore & store, std::initializer_list<uint16_t> groupKeySetIds)
+{
+    for (const uint16_t groupKeySetId : groupKeySetIds)
+    {
+        GroupKeySetType keySet;
+        keySet.groupKeySetID = groupKeySetId;
+        EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    }
+}
+
+// RefreshNode syncs only the refreshing node's key set entries. Another node's entries are left to that node's own
+// refreshes and queued syncs, which keep its writes and removals in order.
+TEST(JointFabricDatastoreTest, RefreshSyncsOnlyTheRefreshingNodesKeySets)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(0xB, "node-b"_span), CHIP_NO_ERROR);
+    AddKeySets(store, { 55, 56, 57 });
+    SeedNodeKeySet(store, 123, 55, State::kPending);
+    SeedNodeKeySet(store, 0xB, 55, State::kPending);
+    SeedNodeKeySet(store, 0xB, 56, State::kDeletePending);
+    SeedNodeKeySet(store, 0xB, 57, State::kCommitFailed, to_underlying(Protocols::InteractionModel::Status::ConstraintError));
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    for (const auto & [nodeId, kind] : delegate.syncCalls)
+    {
+        EXPECT_NE(nodeId, 0xBu);
+    }
+    ASSERT_EQ(delegate.groupKeySetSyncs.size(), 1u);
+    EXPECT_EQ(delegate.groupKeySetSyncs[0].nodeId, 123u);
+    ASSERT_NE(FindNodeKeySet(store, 123, 55), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 55)->statusEntry.state, State::kCommitted);
+
+    ASSERT_NE(FindNodeKeySet(store, 0xB, 55), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 0xB, 55)->statusEntry.state, State::kPending);
+    ASSERT_NE(FindNodeKeySet(store, 0xB, 56), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 0xB, 56)->statusEntry.state, State::kDeletePending);
+    ASSERT_NE(FindNodeKeySet(store, 0xB, 57), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 0xB, 57)->statusEntry.state, State::kCommitFailed);
+}
+
+// RefreshNode collects the key set removals it sends before sending the first one. A removal cancelled by an add while
+// an earlier removal is in flight is not sent: the add, queued behind the refresh, would otherwise be undone.
+TEST(JointFabricDatastoreTest, RefreshDoesNotSendKeySetRemovalCancelledDuringIt)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddKeySets(store, { 55, 56 });
+    AddGroupTen(store, 56);
+    SeedNodeKeySet(store, 123, 55, State::kDeletePending);
+    SeedNodeKeySet(store, 123, 56, State::kDeletePending);
+
+    delegate.deferKind = SyncKind::kNodeKeySet;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u); // the removal of key set 55
+
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    delegate.RunDeferred();
+
+    for (const auto & sent : delegate.nodeKeySetSyncs)
+    {
+        EXPECT_FALSE(sent.groupKeySetID == 56 && sent.statusEntry.state == State::kDeletePending);
+    }
+    EXPECT_EQ(FindNodeKeySet(store, 123, 55), nullptr);
+    ASSERT_NE(FindNodeKeySet(store, 123, 56), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 56)->statusEntry.state, State::kCommitted);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
     EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
 }
 
