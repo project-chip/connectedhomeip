@@ -532,9 +532,9 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     // Updating geometry/name while omitting nodeID and endpointID preserves existing remote zone identifiers
     const auto updatePreserveVertices = MakeTriangle(25);
     Commands::UpdateTwoDCartesianZone::Type updatePreserveReq;
-    updatePreserveReq.zoneID        = 1;
-    updatePreserveReq.zone.name     = "Preserved Remote"_span;
-    updatePreserveReq.zone.use      = ZoneUseEnum::kMotion;
+    updatePreserveReq.zoneID    = 1;
+    updatePreserveReq.zone.name = "Preserved Remote"_span;
+    updatePreserveReq.zone.use  = ZoneUseEnum::kMotion;
     updatePreserveReq.zone.vertices =
         DataModel::List<const TwoDCartesianVertexStruct>(updatePreserveVertices.data(), updatePreserveVertices.size());
     ASSERT_TRUE(tester.Invoke(updatePreserveReq).IsSuccess());
@@ -546,9 +546,9 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     // Clearing nodeID while keeping non-null endpointID (either omitted or explicitly provided) -> ConstraintError
     const auto invalidUpdateVertices = MakeTriangle(35);
     Commands::UpdateTwoDCartesianZone::Type clearNodeOnlyReq;
-    clearNodeOnlyReq.zoneID        = 1;
-    clearNodeOnlyReq.zone.name     = "Invalid Clear"_span;
-    clearNodeOnlyReq.zone.use      = ZoneUseEnum::kMotion;
+    clearNodeOnlyReq.zoneID    = 1;
+    clearNodeOnlyReq.zone.name = "Invalid Clear"_span;
+    clearNodeOnlyReq.zone.use  = ZoneUseEnum::kMotion;
     clearNodeOnlyReq.zone.vertices =
         DataModel::List<const TwoDCartesianVertexStruct>(invalidUpdateVertices.data(), invalidUpdateVertices.size());
     clearNodeOnlyReq.nodeID.SetValue(DataModel::NullNullable);
