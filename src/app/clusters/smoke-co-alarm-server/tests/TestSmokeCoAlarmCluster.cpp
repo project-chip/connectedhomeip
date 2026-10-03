@@ -82,19 +82,103 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_MandatoryOnly)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
+TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeaturesOnly)
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster,
-        { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
-          Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
-          Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry,
-          Attributes::ContaminationState::kMetadataEntry, Attributes::SmokeSensitivityLevel::kMetadataEntry }));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::ExpressedState::kMetadataEntry,
+                                            Attributes::SmokeState::kMetadataEntry,
+                                            Attributes::COState::kMetadataEntry,
+                                            Attributes::BatteryAlert::kMetadataEntry,
+                                            Attributes::TestInProgress::kMetadataEntry,
+                                            Attributes::HardwareFaultAlert::kMetadataEntry,
+                                            Attributes::EndOfServiceAlert::kMetadataEntry,
+                                        }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_ContaminationStateOnly)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.featureMap.Set(Feature::kSmokeAlarm);
+    cfg.optionalAttribs.Set<Attributes::ContaminationState::Id>();
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::ExpressedState::kMetadataEntry,
+                                            Attributes::SmokeState::kMetadataEntry,
+                                            Attributes::BatteryAlert::kMetadataEntry,
+                                            Attributes::TestInProgress::kMetadataEntry,
+                                            Attributes::HardwareFaultAlert::kMetadataEntry,
+                                            Attributes::EndOfServiceAlert::kMetadataEntry,
+                                            Attributes::ContaminationState::kMetadataEntry,
+                                        }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeSensitivityLevelOnly)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.featureMap.Set(Feature::kSmokeAlarm);
+    cfg.optionalAttribs.Set<Attributes::SmokeSensitivityLevel::Id>();
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::ExpressedState::kMetadataEntry,
+                                            Attributes::SmokeState::kMetadataEntry,
+                                            Attributes::BatteryAlert::kMetadataEntry,
+                                            Attributes::TestInProgress::kMetadataEntry,
+                                            Attributes::HardwareFaultAlert::kMetadataEntry,
+                                            Attributes::EndOfServiceAlert::kMetadataEntry,
+                                            Attributes::SmokeSensitivityLevel::kMetadataEntry,
+                                        }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_SetOptionalAttributeWithoutSmokeFeature)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.optionalAttribs.Set<Attributes::SmokeSensitivityLevel::Id>();
+    cfg.optionalAttribs.Set<Attributes::ContaminationState::Id>();
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::ExpressedState::kMetadataEntry,
+                                            Attributes::BatteryAlert::kMetadataEntry,
+                                            Attributes::TestInProgress::kMetadataEntry,
+                                            Attributes::HardwareFaultAlert::kMetadataEntry,
+                                            Attributes::EndOfServiceAlert::kMetadataEntry,
+                                        }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, OptionalSmokeAttributeSetters_IgnoreUnconfiguredAttributes)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.featureMap.Set(Feature::kSmokeAlarm);
+
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetContaminationState(ContaminationStateEnum::kCritical);
+    EXPECT_EQ(cluster.GetContaminationState(), ContaminationStateEnum::kNormal);
+
+    cluster.SetSmokeSensitivityLevel(SensitivityEnum::kLow);
+    EXPECT_EQ(cluster.GetSmokeSensitivityLevel(), SensitivityEnum::kStandard);
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
