@@ -1728,7 +1728,16 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_HSM                                         CHIP_CORE_ERROR(0xbd)
 
-// AVAILABLE: 0xbe
+/**
+ *  @def CHIP_ERROR_DNS_SD_NXDOMAIN
+ *
+ *  @brief
+ *    DNS-SD operational discovery returned NXDOMAIN (the operational instance name does not
+ *    exist in the resolver's view). Distinct from CHIP_ERROR_TIMEOUT (no response within
+ *    window). Often indicates a stale fabric / node ID, or that the device has not yet
+ *    advertised on the operational network.
+ */
+#define CHIP_ERROR_DNS_SD_NXDOMAIN                            CHIP_CORE_ERROR(0xbe)
 
 /**
  *  @def CHIP_ERROR_REAL_TIME_NOT_SYNCED
@@ -1797,7 +1806,17 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
 
-// AVAILABLE: 0xc7
+/**
+ *  @def CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING
+ *
+ *  @brief
+ *    The platform's DNS-SD service (Bonjour daemon on Darwin / Avahi on Linux) is not
+ *    available — operational discovery cannot proceed. Distinct from
+ *    CHIP_ERROR_DNS_SD_UNAUTHORIZED (policy-denied) and CHIP_ERROR_TIMEOUT
+ *    (queryable-but-no-response). Indicates a system-level fault.
+ */
+#define CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING                 CHIP_CORE_ERROR(0xc7)
+
 // AVAILABLE: 0xc8
 
 /**

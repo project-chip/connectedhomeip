@@ -106,6 +106,17 @@ CHIP_ERROR ToChipError(DNSServiceErrorType errorCode)
         return CHIP_ERROR_NO_MEMORY;
     case kDNSServiceErr_NoAuth:
         return CHIP_ERROR_DNS_SD_UNAUTHORIZED;
+    case kDNSServiceErr_NoSuchName:
+    case kDNSServiceErr_NoSuchRecord:
+        // The queried operational instance / record does not exist on this network.
+        // Distinct from kDNSServiceErr_Timeout (queryable-but-no-response).
+        return CHIP_ERROR_DNS_SD_NXDOMAIN;
+    case kDNSServiceErr_ServiceNotRunning:
+        // Bonjour daemon (mDNSResponder) unavailable. System-level fault, not a peer issue.
+        return CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING;
+    case kDNSServiceErr_Timeout:
+        // Surface the spec-named timeout instead of CHIP_ERROR_INTERNAL.
+        return CHIP_ERROR_TIMEOUT;
     default:
         return CHIP_ERROR_INTERNAL;
     }
