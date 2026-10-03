@@ -17,6 +17,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <mutex>
 
 #include <ifaddrs.h>
@@ -264,6 +265,8 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
     Network configuredNetwork;
 
     VerifyOrReturn(IsWiFiStationEnabled());
+    // While a connect is waiting for its result, that result sets LastNetworkingStatus.
+    VerifyOrReturn(!IsWiFiStationConnecting());
 
     CHIP_ERROR err = WpaSupplicantClient::GetConfiguredNetwork(configuredNetwork);
     if (err != CHIP_NO_ERROR)
@@ -306,7 +309,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                       WPA_SUPPLICANT_CLIENT_LOG_PREFIX
                       "Disconnected with reason code=%d, assoc status code=%d, auth status code=%d (associationStarted=%d)",
                       reason, wpa_supplicant_1_interface_get_assoc_status_code(iface),
-                      wpa_supplicant_1_interface_get_auth_status_code(iface), mAssociationStarted);
+                      wpa_supplicant_1_interface_get_auth_status_code(iface), mAssociationStarted.load());
 
         if (delegate != nullptr)
         {
@@ -316,10 +319,16 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             });
         }
 
+        // Scheduled ahead of any connect result below, so it runs while the connect is still pending
+        // and leaves LastNetworkingStatus to that result.
+        LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); }));
+
         if (mAssociationStarted)
         {
             uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
             uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
+            // Reported as the ConnectNetworkResponse NetworkingStatus and so as LastNetworkingStatus.
+            NetworkCommissioning::Status connectStatus = NetworkCommissioning::Status::kOtherConnectionFailure;
 
             if (wpa_supplicant_1_interface_get_assoc_status_code(iface) == WLAN_STATUS_AUTH_TIMEOUT)
             {
@@ -360,9 +369,12 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             case WLAN_REASON_PREV_AUTH_NOT_VALID:
             case WLAN_REASON_DEAUTH_LEAVING:
+            case WLAN_REASON_4WAY_HANDSHAKE_TIMEOUT: // a wrong passphrase ends here
+            case WLAN_REASON_GROUP_KEY_UPDATE_TIMEOUT:
             case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
                 associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
                 status                  = wpa_supplicant_1_interface_get_auth_status_code(iface);
+                connectStatus           = NetworkCommissioning::Status::kAuthFailure;
                 break;
             default:
                 break;
@@ -375,8 +387,15 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             // frames out mid-association.
             OnAssociationFailed();
 
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
-                [this, reason]() { OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason); });
+            const uint32_t attemptId = mConnectAttemptId.load();
+            LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, attemptId, connectStatus, reason]() {
+                VerifyOrReturn(attemptId == mConnectAttemptId.load());
+                // A reconnect wpa_supplicant started by itself is not a ConnectNetwork failure, so leave its network enabled.
+                VerifyOrReturn(IsWiFiStationConnecting());
+                DeviceLayer::SystemLayer().CancelTimer(OnWiFiConnectTimeout, this);
+                DisableNetworkAfterConnectFailure();
+                OnConnectResult(connectStatus, CharSpan(), reason);
+            }));
             if (delegate != nullptr)
             {
                 TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, associationFailureCause, status]() {
@@ -385,7 +404,6 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             }
         }
 
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
         NotifyWiFiConnectivityChange(kConnectivity_Lost);
 
         mAssociationStarted = false;
@@ -407,10 +425,16 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
         if (mAssociationStarted)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            const uint32_t attemptId = mConnectAttemptId.load();
+            LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, attemptId]() {
+                // A reconnect with no connect pending also lands here, and still needs PostNetworkConnect().
+                if (attemptId == mConnectAttemptId.load())
+                {
+                    DeviceLayer::SystemLayer().CancelTimer(OnWiFiConnectTimeout, this);
+                    OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                }
                 ConnectivityMgrImpl().PostNetworkConnect();
-            });
+            }));
         }
         NotifyWiFiConnectivityChange(kConnectivity_Established);
         mAssociationStarted = false;
@@ -858,23 +882,38 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
-    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
-    // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
-    {
-        if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
-                                                                 &err.GetReceiver()))
-        {
-            ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop AP mode with error: %s", err->message);
-            return CHIP_ERROR_INTERNAL;
-        }
+    // An association started by an earlier attempt belongs to that attempt. Without this, the
+    // 'disconnected' event caused by removing its network below would be reported as this connect failing.
+    mAssociationStarted = false;
+    mConnectAttemptId++;
 
-        if (mWpaSupplicant.networkPath)
+    // Remove the network the previous connect added, and the one wpa_supplicant has selected if that is
+    // a different one. A network that was never found never becomes the current one, so both are needed
+    // to keep failed attempts from accumulating. A failed removal does not prevent the new connect.
+    WpaSupplicant1Interface * iface = mWpaSupplicant.iface.get();
+    auto removeNetwork              = [iface](const char * path) {
+        GAutoPtr<GError> removeErr;
+        if (wpa_supplicant_1_interface_call_remove_network_sync(iface, path, nullptr, &removeErr.GetReceiver()))
         {
-            ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Removed network: %s", mWpaSupplicant.networkPath.get());
-            mWpaSupplicant.networkPath.reset();
+            ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Removed network: %s", path);
         }
+        else
+        {
+            ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove network %s: %s", path, removeErr->message);
+        }
+    };
+
+    GCharPtr currentPath;
+    const bool haveCurrent = (GetCurrentNetworkPath(currentPath) == CHIP_NO_ERROR) && (strcmp(currentPath.get(), "/") != 0);
+    if (mWpaSupplicant.networkPath)
+    {
+        removeNetwork(mWpaSupplicant.networkPath.get());
     }
+    if (haveCurrent && (!mWpaSupplicant.networkPath || strcmp(currentPath.get(), mWpaSupplicant.networkPath.get()) != 0))
+    {
+        removeNetwork(currentPath.get());
+    }
+    mWpaSupplicant.networkPath.reset();
 
     OnAssociationStarting();
 
@@ -907,7 +946,64 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     NotifyWiFiConnectivityChange(kConnectivity_NoChange);
 
     SetOneShotConnectCallback(apCallback);
+
+    // wpa_supplicant reports a failure only once association has started. A network that is never
+    // found never gets that far, so bound the attempt by the advertised ConnectMaxTimeSeconds.
+    LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kWiFiConnectNetworkTimeoutSeconds),
+                                                            OnWiFiConnectTimeout, this));
     return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::OnWiFiConnectTimeout(System::Layer *, void * aAppState)
+{
+    auto * self = static_cast<ConnectivityManagerImpl *>(aAppState);
+    // Nothing to do if the result already arrived.
+    VerifyOrReturn(self->IsWiFiStationConnecting());
+
+    // wpa_supplicant can report 'completed' without 'associating' before it, and then neither the
+    // success result nor PostNetworkConnect() is queued. Do both here; a queued result finds the
+    // callback already used.
+    if (self->IsWiFiStationConnected())
+    {
+        self->OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+        self->PostNetworkConnect();
+        return;
+    }
+
+    const bool associationStarted = self->mAssociationStarted.exchange(false);
+    ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Connect timed out after %u s (associationStarted=%d)",
+                 static_cast<unsigned>(kWiFiConnectNetworkTimeoutSeconds), associationStarted);
+
+    // Clearing mAssociationStarted first keeps the 'disconnected' event this causes from reporting again.
+    self->DisableNetworkAfterConnectFailure();
+    self->OnAssociationFailed();
+    self->OnConnectResult(associationStarted ? NetworkCommissioning::Status::kOtherConnectionFailure
+                                             : NetworkCommissioning::Status::kNetworkNotFound,
+                          CharSpan(), 0);
+}
+
+void ConnectivityManagerImpl::DisableNetworkAfterConnectFailure()
+{
+    // wpa_supplicant keeps retrying a network it could not join. Those retries reject scans and their
+    // events would land in the next connect, so stop them once the failure has been reported.
+    // Disconnect cannot do this after an authentication failure, because wpa_supplicant no longer
+    // treats the network as current and ignores the call. Disabling the network works in both cases.
+    // Only a failed ConnectNetwork gets here. The network then stays disabled, so wpa_supplicant does not
+    // rejoin it by itself if the AP returns, until the next ConnectNetwork removes it and adds it again.
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturn(mWpaSupplicant.iface && mWpaSupplicant.networkPath);
+
+    GAutoPtr<GError> err;
+    GAutoPtr<GVariant> response(g_dbus_connection_call_sync(
+        g_dbus_proxy_get_connection(G_DBUS_PROXY(mWpaSupplicant.iface.get())), kWpaSupplicantServiceName,
+        mWpaSupplicant.networkPath.get(), "org.freedesktop.DBus.Properties", "Set",
+        g_variant_new("(ssv)", "fi.w1.wpa_supplicant1.Network", "Enabled", g_variant_new_boolean(FALSE)), nullptr,
+        G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+    if (!response)
+    {
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to disable network %s: %s",
+                     mWpaSupplicant.networkPath.get(), err->message);
+    }
 }
 
 CHIP_ERROR
@@ -1573,6 +1669,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
             }
         }
     }
+
+    // The response carries only the first kMaxNetworksInScanResponse results, and the spec asks for
+    // decreasing RSSI order so that the most reachable networks are the ones kept.
+    std::sort(networkScanned->begin(), networkScanned->end(),
+              [](const WiFiScanResponse & a, const WiFiScanResponse & b) { return a.signal.strength > b.signal.strength; });
 
     CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this, scanned = networkScanned.get()]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
