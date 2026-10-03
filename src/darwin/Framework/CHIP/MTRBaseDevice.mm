@@ -32,6 +32,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRSetupPayload_Internal.h"
+#import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
@@ -61,6 +62,7 @@
 
 #import <atomic>
 #import <memory>
+#import <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -3046,14 +3048,133 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 @end
 
+namespace {
+constexpr uint8_t kSharedPathWays = 12;
+constexpr unsigned kSharedPathSetBits = 5;
+
+struct SharedPathOverflow {
+    std::vector<uint8_t> tags;
+    std::vector<__weak MTRClusterPath *> paths;
+};
+
+struct SharedPathSet {
+    os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
+    uint8_t hand = 0;
+    uint16_t referenced = 0;
+    uint8_t tags[kSharedPathWays] = {};
+    MTRClusterPath * paths[kSharedPathWays];
+    SharedPathOverflow * overflow = nullptr;
+};
+
+struct SharedPathTable {
+    SharedPathSet sets[1 << kSharedPathSetBits];
+};
+static_assert(sizeof(void *) != 8 || sizeof(SharedPathTable) == 4096);
+
+SharedPathSet & SharedPathSetForHash(uint64_t hash)
+{
+    static auto * table = new SharedPathTable;
+    return table->sets[hash >> (64 - kSharedPathSetBits)];
+}
+
+uint32_t SharedPathEntity(MTRClusterPath *) { return 0; }
+uint32_t SharedPathEntity(MTRAttributePath * path) { return path.attribute.unsignedIntValue; }
+uint32_t SharedPathEntity(MTREventPath * path) { return path.event.unsignedIntValue; }
+uint32_t SharedPathEntity(MTRCommandPath * path) { return path.command.unsignedIntValue; }
+
+template <typename PathType>
+bool SharedPathMatches(__unsafe_unretained MTRClusterPath * path, EndpointId endpoint, ClusterId cluster, uint32_t entity)
+{
+    return [path class] == [PathType class] && path.endpoint.unsignedShortValue == endpoint && path.cluster.unsignedIntValue == cluster
+        && SharedPathEntity((PathType *) path) == entity;
+}
+
+void DemoteSharedPath(SharedPathSet & set, uint8_t tag, MTRClusterPath * path)
+{
+    if (set.overflow == nullptr) {
+        set.overflow = new SharedPathOverflow;
+    }
+    auto & overflow = *set.overflow;
+    if (overflow.paths.size() == overflow.paths.capacity()) {
+        size_t live = 0;
+        for (size_t i = 0; i < overflow.paths.size(); i++) {
+            if (overflow.paths[i] != nil) {
+                overflow.tags[live] = overflow.tags[i];
+                overflow.paths[live++] = overflow.paths[i];
+            }
+        }
+        overflow.tags.resize(live);
+        overflow.paths.resize(live);
+        if (live < overflow.paths.capacity() / 4) {
+            overflow.tags.shrink_to_fit();
+            overflow.paths.shrink_to_fit();
+        }
+    }
+    overflow.tags.push_back(tag);
+    overflow.paths.push_back(path);
+}
+
+template <typename PathType>
+PathType * SharedPath(PathType * candidate, EndpointId endpoint, ClusterId cluster, uint32_t entity)
+{
+    if (candidate == nil) {
+        return nil;
+    }
+    uint64_t hash = (((static_cast<uint64_t>(cluster) << 32) | entity) ^ (static_cast<uint64_t>(endpoint) << 20)) * 0x9E3779B97F4A7C15ull;
+    auto & set = SharedPathSetForHash(hash);
+    auto tag = static_cast<uint8_t>(hash >> 32);
+    MTRClusterPath * evicted;
+    std::lock_guard lock(set.lock);
+    for (uint8_t way = 0; way < kSharedPathWays; way++) {
+        if (set.tags[way] == tag && SharedPathMatches<PathType>(set.paths[way], endpoint, cluster, entity)) {
+            set.referenced |= 1 << way;
+            return (PathType *) set.paths[way];
+        }
+    }
+    if (set.overflow != nullptr) {
+        auto & overflow = *set.overflow;
+        for (size_t i = 0; i < overflow.tags.size(); i++) {
+            if (overflow.tags[i] == tag) {
+                MTRClusterPath * path = overflow.paths[i];
+                if (SharedPathMatches<PathType>(path, endpoint, cluster, entity)) {
+                    return (PathType *) path;
+                }
+            }
+        }
+    }
+    while (set.referenced & (1 << set.hand)) {
+        set.referenced &= ~(1 << set.hand);
+        set.hand = (set.hand + 1) % kSharedPathWays;
+    }
+    evicted = set.paths[set.hand];
+    if (evicted != nil) {
+        DemoteSharedPath(set, set.tags[set.hand], evicted);
+    }
+    set.paths[set.hand] = candidate;
+    set.tags[set.hand] = tag;
+    set.hand = (set.hand + 1) % kSharedPathWays;
+    return candidate;
+}
+} // anonymous namespace
+
+@interface MTRClusterPath ()
+- (instancetype)initWithUnsharedPath:(const ConcreteClusterPath &)path;
+@end
+
 @implementation MTRClusterPath
-- (instancetype)initWithPath:(const ConcreteClusterPath &)path
+- (instancetype)initWithUnsharedPath:(const ConcreteClusterPath &)path
 {
     if (self = [super init]) {
         _endpoint = @(path.mEndpointId);
         _cluster = @(path.mClusterId);
     }
     return self;
+}
+
+- (instancetype)initWithPath:(const ConcreteClusterPath &)path
+{
+    self = [self initWithUnsharedPath:path];
+    return SharedPath(self, path.mEndpointId, path.mClusterId, 0);
 }
 
 - (NSString *)description
@@ -3131,15 +3252,21 @@ static NSString * const sClusterKey = @"clusterKey";
     [coder encodeObject:_cluster forKey:sClusterKey];
 }
 
+- (id)awakeAfterUsingCoder:(NSCoder *)decoder
+{
+    MTRClusterPath * shared = [self copy];
+    return [shared isEqual:self] ? shared : self;
+}
+
 @end
 
 @implementation MTRAttributePath
 - (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
-    if (self = [super initWithPath:path]) {
+    if (self = [super initWithUnsharedPath:path]) {
         _attribute = @(path.mAttributeId);
     }
-    return self;
+    return SharedPath(self, path.mEndpointId, path.mClusterId, path.mAttributeId);
 }
 
 - (NSString *)description
@@ -3234,10 +3361,10 @@ static NSString * const sAttributeKey = @"attributeKey";
 @implementation MTREventPath
 - (instancetype)initWithPath:(const ConcreteEventPath &)path
 {
-    if (self = [super initWithPath:path]) {
+    if (self = [super initWithUnsharedPath:path]) {
         _event = @(path.mEventId);
     }
-    return self;
+    return SharedPath(self, path.mEndpointId, path.mClusterId, path.mEventId);
 }
 
 - (NSString *)description
@@ -3327,10 +3454,10 @@ static NSString * const sEventKey = @"eventKey";
 @implementation MTRCommandPath
 - (instancetype)initWithPath:(const ConcreteCommandPath &)path
 {
-    if (self = [super initWithPath:path]) {
+    if (self = [super initWithUnsharedPath:path]) {
         _command = @(path.mCommandId);
     }
-    return self;
+    return SharedPath(self, path.mEndpointId, path.mClusterId, path.mCommandId);
 }
 
 - (NSString *)description
