@@ -1,0 +1,62 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+config("openthread_headers_config") {
+  include_dirs = [ "${openthread_root}/include" ]
+}
+
+source_set("fake-openthread") {
+  sources = [
+    "FakeOpenThread.cpp",
+    "FakeOpenThread.h",
+  ]
+
+  public_configs = [ ":openthread_headers_config" ]
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libOpenThreadPlatformTests"
+
+  # The Linux ThreadStackManagerImpl does not derive from the generic class.
+  defines = [
+    "CHIP_GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_SKIP_INSTANTIATION=1",
+  ]
+
+  sources = [ "ThreadScanTestFixture.h" ]
+
+  test_sources = [
+    "TestThreadScanOpenThreadErrors.cpp",
+    "TestThreadScanSequencing.cpp",
+    "TestThreadScanStartFailure.cpp",
+    "TestThreadScanStateMatrix.cpp",
+  ]
+
+  public_deps = [
+    ":fake-openthread",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support/tests:pw-test-macros",
+    "${chip_root}/src/platform",
+  ]
+}

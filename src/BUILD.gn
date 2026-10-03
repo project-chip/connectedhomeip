@@ -21,6 +21,7 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 # chip_root relative to root_build_dir for macro-prefix-map.
@@ -287,6 +288,13 @@ if (chip_build_tests) {
 
     if (chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
+    }
+
+    # Fakes OpenThread and MapOpenThreadError(), so must not link
+    # OpenThreadUtils.cpp.
+    if (chip_device_platform == "linux" && chip_enable_thread &&
+        !chip_system_config_use_openthread_inet_endpoints) {
+      tests += [ "${chip_root}/src/platform/OpenThread/tests" ]
     }
 
     if (chip_config_network_layer_ble) {
