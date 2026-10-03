@@ -2859,6 +2859,116 @@ TEST(JointFabricDatastoreTest, GroupRenamedDuringItsAddIsSyncedAgain)
     EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
 }
 
+// The kinds of the syncs issued to `nodeId`, in order.
+std::vector<SyncKind> SyncKindsSentTo(const TrackingDelegate & delegate, NodeId nodeId)
+{
+    std::vector<SyncKind> kinds;
+    for (const auto & call : delegate.syncCalls)
+    {
+        if (call.first == nodeId)
+        {
+            kinds.push_back(call.second);
+        }
+    }
+    return kinds;
+}
+
+using SyncKinds = std::vector<SyncKind>;
+
+// Holds the endpoint group syncs issued while holdEndpointGroupSyncs is set.
+class EndpointGroupSyncHoldingDelegate : public TrackingDelegate
+{
+public:
+    CHIP_ERROR SyncNode(NodeId nodeId, const EndpointGroupIdEntryType & endpointGroupIDEntry,
+                        std::function<void(CHIP_ERROR)> onSuccess) override
+    {
+        if (holdEndpointGroupSyncs)
+        {
+            heldEndpointGroupSyncs.push_back(std::move(onSuccess));
+            return CHIP_NO_ERROR;
+        }
+        return TrackingDelegate::SyncNode(nodeId, endpointGroupIDEntry, std::move(onSuccess));
+    }
+
+    bool holdEndpointGroupSyncs = false;
+    std::vector<std::function<void(CHIP_ERROR)>> heldEndpointGroupSyncs;
+};
+
+// Starts a refresh of node 123 that retries the add of group 10, with key set 5, to endpoint 1, which failed while the
+// node was offline. The delegate holds the refresh's sync of the group, which the refresh does not wait for, and defers
+// the refresh's ACL write: the refresh holds the node's sync queue until that write completes.
+void StartRefreshWithGroupSyncInFlight(JointFabricDatastore & store, EndpointGroupSyncHoldingDelegate & delegate)
+{
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, 5);
+    delegate.completeWith[SyncKind::kEndpointGroup] = CHIP_IM_GLOBAL_STATUS(Timeout);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    ASSERT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitFailed);
+
+    delegate.holdEndpointGroupSyncs = true;
+    delegate.deferKind              = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    delegate.holdEndpointGroupSyncs = false;
+}
+
+// A refresh's group sync that succeeds after the group was renamed does not commit the entry: the sync of the new name,
+// queued behind the refresh, still runs.
+TEST(JointFabricDatastoreTest, RefreshGroupSyncDoesNotCommitRenameMadeDuringIt)
+{
+    JointFabricDatastore store;
+    EndpointGroupSyncHoldingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    StartRefreshWithGroupSyncInFlight(store, delegate);
+    ASSERT_EQ(delegate.heldEndpointGroupSyncs.size(), 1u);
+    ASSERT_EQ(delegate.deferred.size(), 1u); // the ACL write
+
+    delegate.syncCalls.clear();
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.friendlyName.SetNonNull("group-b"_span);
+    ASSERT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+
+    auto refreshGroupSync = std::move(delegate.heldEndpointGroupSyncs[0]);
+    refreshGroupSync(CHIP_NO_ERROR); // the add, with the old name
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
+
+    delegate.deferKind.reset();
+    delegate.RunDeferred(); // the ACL write, which ends the refresh
+    EXPECT_TRUE(SyncKindsSentTo(delegate, 123) == (SyncKinds{ SyncKind::kEndpointGroup }));
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+// A refresh's group sync that fails after a later sync of the entry succeeded does not mark the entry.
+TEST(JointFabricDatastoreTest, LateFailedRefreshGroupSyncDoesNotMarkUpdatedEntry)
+{
+    JointFabricDatastore store;
+    EndpointGroupSyncHoldingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    StartRefreshWithGroupSyncInFlight(store, delegate);
+    ASSERT_EQ(delegate.heldEndpointGroupSyncs.size(), 1u);
+    ASSERT_EQ(delegate.deferred.size(), 1u); // the ACL write
+
+    delegate.deferKind.reset();
+    delegate.RunDeferred(); // the ACL write, which ends the refresh
+
+    // The node's sync queue is free, so the sync of the new name runs at once and succeeds.
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.friendlyName.SetNonNull("group-b"_span);
+    ASSERT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    ASSERT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+
+    auto refreshGroupSync = std::move(delegate.heldEndpointGroupSyncs[0]);
+    refreshGroupSync(CHIP_IM_GLOBAL_STATUS(Timeout)); // the add, with the old name
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
 // Adds key sets with the given IDs and no epoch keys.
 void AddKeySets(JointFabricDatastore & store, std::initializer_list<uint16_t> groupKeySetIds)
 {

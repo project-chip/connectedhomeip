@@ -655,28 +655,32 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 entryToSync.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             auto match = [nodeId = entryToSync.nodeID, endpointId = entryToSync.endpointID, groupId = entryToSync.groupID](
                              const auto & e) { return e.nodeID == nodeId && e.endpointID == endpointId && e.groupID == groupId; };
-            // The result applies only if the entry is still being added or removed as when the sync started.
-            auto sameOperation = [match, removal](const auto & e) { return match(e) && HasRemovalIntent(e) == removal; };
+            // The refresh does not wait for its group syncs, so an entry can be marked for another sync before this one
+            // completes. The result applies only if the entry is still being added or removed as when the sync started, and
+            // its revision is unchanged.
+            auto sameSync = [match, removal, revision = entryToSync.syncRevision](const auto & e) {
+                return match(e) && HasRemovalIntent(e) == removal && e.syncRevision == revision;
+            };
             CHIP_ERROR syncErr = mDelegate->SyncNode(
                 mRefreshingNodeId, entryToSync,
-                [this, entryToSync, removal, sameOperation, generation = mSyncGeneration](CHIP_ERROR innerErr) {
+                [this, entryToSync, removal, sameSync, generation = mSyncGeneration](CHIP_ERROR innerErr) {
                     VerifyOrReturn(generation == mSyncGeneration);
                     if (innerErr != CHIP_NO_ERROR)
                     {
-                        detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, sameOperation, innerErr);
+                        detail::MarkEntrySyncFailedIfFound(mEndpointGroupIDEntries, sameSync, innerErr);
                         MarkRefreshFailed(entryToSync.nodeID, innerErr);
                         return;
                     }
                     if (removal)
                     {
-                        auto erased = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), sameOperation);
+                        auto erased = std::find_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(), sameSync);
                         if (erased != mEndpointGroupIDEntries.end())
                         {
                             mEndpointGroupIDEntries.erase(erased);
                         }
                         return;
                     }
-                    detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, sameOperation);
+                    detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, sameSync);
                 });
             if (syncErr != CHIP_NO_ERROR)
             {
