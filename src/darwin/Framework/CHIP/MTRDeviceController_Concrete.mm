@@ -1706,8 +1706,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    // Get the corresponding MTRDevice object for the node id
-    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
+    MTRDevice * device = [self _deviceForNodeID:@(nodeID) createIfNeeded:NO];
+    if (device == nil) {
+        MTRDeviceClusterData * networkCommissioningData = [_controllerDataStore getStoredClusterDataForNodeID:@(nodeID)
+                                                                                                   endpointID:@(chip::kRootEndpointId)
+                                                                                                    clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+        NSNumber * featureMap = MTR_SAFE_CAST(networkCommissioningData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey], NSNumber);
+        return (featureMap.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0;
+    }
 
     // TODO: Can we not just assume this isKindOfClass test is true?  Would be
     // really nice if we had compile-time checking for this somehow...
