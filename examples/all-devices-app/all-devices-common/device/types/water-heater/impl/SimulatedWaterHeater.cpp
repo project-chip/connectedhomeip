@@ -77,14 +77,17 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     mBoostRemainingTime = 0;
     mBoostOneShot       = false;
     mBoostTemporarySetpoint.reset();
-    SetHeatingEnabled(true);
-
-    WaterHeaterModeCluster().UpdateCurrentMode(kWaterHeaterModeManual);
     ThermostatCluster().SetLocalTemperature(mLocalTemperature);
-    ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
     SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
+    ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
+
+    const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
+    ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
+
+    // Both Manual and Timed modes enable normal heating; Off mode disables heating.
+    EvaluateHeatingDemand();
 
     CHIP_ERROR err = mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
     if (err != CHIP_NO_ERROR)
