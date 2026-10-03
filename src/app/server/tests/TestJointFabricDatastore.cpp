@@ -2046,6 +2046,87 @@ TEST(JointFabricDatastoreTest, UnrecoverableAclRemovalTombstoneDroppedWhenNodeIs
     EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.state, State::kCommitted);
 }
 
+// The datastore's limit on ACL entries, across all nodes (JointFabricDatastore::kMaxACLs).
+constexpr size_t kMaxAclEntries = 64;
+
+// Fills the datastore's ACL list with Committed entries of node 0xB.
+void FillAclList(JointFabricDatastore & store)
+{
+    ASSERT_EQ(store.AddPendingNode(0xB, "node-b"_span), CHIP_NO_ERROR);
+    for (uint16_t listId = 100; store.GetNodeACLList().size() < kMaxAclEntries; ++listId)
+    {
+        SeedAcl(store, 0xB, listId, Privilege::kView, AuthMode::kCase, { listId }, State::kCommitted);
+    }
+
+    JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+    aclEntry.privilege = Privilege::kManage;
+    aclEntry.authMode  = AuthMode::kCase;
+    ASSERT_EQ(store.AddACLToNode(0xB, aclEntry), CHIP_ERROR_NO_MEMORY);
+}
+
+// An entry the node holds that the full ACL list cannot adopt: the ACL write replaces the node's whole list and would
+// delete it, so the refresh fails without writing.
+TEST(JointFabricDatastoreTest, RefreshWithFullAclListDoesNotWriteNodeAcls)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    FillAclList(store);
+    const auto aclsBefore = store.GetNodeACLList();
+
+    datastore::ACLEntryStruct held;
+    held.ACLEntry.privilege = Privilege::kAdminister;
+    held.ACLEntry.authMode  = AuthMode::kCase;
+    held.ACLEntry.subjects  = { 0x1111 };
+    delegate.aclListToFetch.push_back(held);
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(delegate.aclListSyncs.empty());
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kPending);
+    ASSERT_EQ(store.GetNodeACLList().size(), aclsBefore.size());
+    for (size_t i = 0; i < aclsBefore.size(); ++i)
+    {
+        EXPECT_EQ(store.GetNodeACLList()[i].nodeID, aclsBefore[i].nodeID);
+        EXPECT_EQ(store.GetNodeACLList()[i].listID, aclsBefore[i].listID);
+        EXPECT_EQ(store.GetNodeACLList()[i].statusEntry.state, State::kCommitted);
+    }
+    EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+}
+
+// A tombstoned value the node still holds is added back to be removed only if the ACL list has room. Otherwise the
+// refresh writes nothing and keeps the tombstone, so that a later refresh removes the value instead of adopting it.
+TEST(JointFabricDatastoreTest, RefreshWithFullAclListKeepsTombstone)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedAcl(store, 123, 7, Privilege::kManage, AuthMode::kCase, { 0x1111 }, State::kCommitted);
+    delegate.aclListToFetch = store.GetNodeACLList(); // the node keeps the entry throughout
+
+    delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(FindAcl(store, 123, 7), nullptr);
+
+    FillAclList(store);
+    const size_t aclListWrites = delegate.aclListSyncs.size();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.aclListSyncs.size(), aclListWrites);
+    EXPECT_EQ(store.GetNodeACLList().size(), kMaxAclEntries);
+
+    store.GetNodeACLList().pop_back();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.aclListSyncs.size(), aclListWrites + 1);
+    for (const auto & written : delegate.aclListSyncs.back().second)
+    {
+        EXPECT_FALSE(written.subjects == std::vector<uint64_t>{ 0x1111 });
+    }
+    EXPECT_EQ(store.GetNodeACLList().size(), kMaxAclEntries - 1);
+}
+
 TEST(JointFabricDatastoreTest, UnrecoverableBindingRemovalFailureIsReaddedAsDeletePending)
 {
     JointFabricDatastore store;
