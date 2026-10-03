@@ -2634,6 +2634,178 @@ TEST(JointFabricDatastoreTest, GroupAddWaitsForFailedKeySet)
     EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
 }
 
+// Adds key set 11, with epoch key A, and returns it.
+GroupKeySetType AddKeySetEleven(JointFabricDatastore & store)
+{
+    GroupKeySetType keySet;
+    keySet.groupKeySetID = 11;
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyA));
+    keySet.epochStartTime0.SetNonNull(static_cast<uint64_t>(1));
+    EXPECT_EQ(store.AddGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    return keySet;
+}
+
+// Node 123's entry for key set 11, Pending: the next refresh of the node writes the key set.
+void AddPendingKeySetElevenEntry(JointFabricDatastore & store)
+{
+    NodeKeySetEntryType keySetEntry;
+    keySetEntry.nodeID            = 123;
+    keySetEntry.groupKeySetID     = 11;
+    keySetEntry.statusEntry.state = State::kPending;
+    store.GetNodeKeySetList().push_back({ keySetEntry });
+}
+
+// A key set updated while the node's write of its previous value is in flight is written again once that write
+// completes. The earlier write's success does not commit the entry.
+TEST(JointFabricDatastoreTest, KeySetUpdatedDuringItsWriteIsWrittenAgain)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    GroupKeySetType keySet = AddKeySetEleven(store);
+    ASSERT_EQ(store.ForceAddNodeKeySetEntry(11, 123), CHIP_NO_ERROR);
+
+    delegate.deferKind = SyncKind::kNodeKeySet;
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyC));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(); // the write of key B
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kPending);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the write of key C
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+}
+
+// A failed key set write still holds back the group add queued after it, although an update of the key set waits
+// behind the group add: the node holds neither value.
+TEST(JointFabricDatastoreTest, FailedKeySetWriteHoldsBackGroupAddDespiteQueuedUpdate)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    GroupKeySetType keySet = AddKeySetEleven(store);
+    AddGroupTen(store, 11);
+
+    delegate.deferKind = SyncKind::kNodeKeySet;
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout)); // the write of key A
+    EXPECT_FALSE(delegate.hasLastEndpointGroupSync);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(); // the write of key B
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
+}
+
+// Holds RefreshNode's key set writes, which the refresh does not wait for.
+class KeySetWriteHoldingDelegate : public TrackingDelegate
+{
+public:
+    CHIP_ERROR SyncNode(NodeId nodeId, const GroupKeySetType & groupKeySet, std::function<void(CHIP_ERROR)> onSuccess) override
+    {
+        heldKeySetWrites.push_back(std::move(onSuccess));
+        return CHIP_NO_ERROR;
+    }
+
+    std::vector<std::function<void(CHIP_ERROR)>> heldKeySetWrites;
+};
+
+// A refresh's key set write that succeeds after the key set was updated does not commit the entry: the update's write,
+// queued behind the refresh, still runs.
+TEST(JointFabricDatastoreTest, RefreshKeySetWriteDoesNotCommitUpdateMadeDuringIt)
+{
+    JointFabricDatastore store;
+    KeySetWriteHoldingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    GroupKeySetType keySet = AddKeySetEleven(store);
+    AddPendingKeySetElevenEntry(store);
+
+    // The refresh holds the node's sync queue until its ACL write completes.
+    delegate.deferKind = SyncKind::kAclList;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.heldKeySetWrites.size(), 1u);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    EXPECT_FALSE(delegate.hasLastNodeKeySetSync);
+
+    auto writeOfKeyA = std::move(delegate.heldKeySetWrites[0]);
+    writeOfKeyA(CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the ACL write, which ends the refresh
+    EXPECT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+}
+
+// A refresh's key set write that fails after a later write of the entry succeeded does not mark the entry.
+TEST(JointFabricDatastoreTest, LateFailedRefreshKeySetWriteDoesNotMarkUpdatedEntry)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    GroupKeySetType keySet = AddKeySetEleven(store);
+    AddPendingKeySetElevenEntry(store);
+
+    delegate.deferKind = SyncKind::kGroupKeySet;
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(store.GetNodeKeySetList().size(), 1u);
+    ASSERT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+
+    delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout)); // the refresh's write of key A
+    EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+}
+
+// A group renamed while its add is in flight is synced again once the add completes.
+TEST(JointFabricDatastoreTest, GroupRenamedDuringItsAddIsSyncedAgain)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddGroupTen(store, std::nullopt);
+
+    delegate.deferKind = SyncKind::kEndpointGroup;
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    JointFabricCluster::Commands::UpdateGroup::DecodableType updateGroup;
+    updateGroup.groupID = 10;
+    updateGroup.friendlyName.SetNonNull("group-b"_span);
+    ASSERT_EQ(store.UpdateGroup(updateGroup), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(); // the add
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the sync of the new name
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
 // Seeds `count` Committed ACL entries on node 123, with list IDs from 1.
 void SeedAcls(JointFabricDatastore & store, uint16_t count)
 {

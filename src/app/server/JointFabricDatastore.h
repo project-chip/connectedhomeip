@@ -80,18 +80,29 @@ struct EndpointGroupIDEntryStruct : Clusters::JointFabricDatastore::Structs::Dat
 {
     // As ACLEntryStruct::pendingRemoval.
     bool pendingRemoval = false;
+
+    // Changed when the entry is marked for a sync of a new value while an earlier sync may be in flight. A sync that
+    // adds the entry commits it only if this is unchanged since the sync started; otherwise the node holds an older
+    // value, which a later sync replaces.
+    uint32_t syncRevision = 0;
 };
 
 struct EndpointBindingEntryStruct : Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type
 {
     // As ACLEntryStruct::pendingRemoval.
     bool pendingRemoval = false;
+
+    // As EndpointGroupIDEntryStruct::syncRevision.
+    uint32_t syncRevision = 0;
 };
 
 struct NodeKeySetEntryStruct : Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type
 {
     // As ACLEntryStruct::pendingRemoval.
     bool pendingRemoval = false;
+
+    // As EndpointGroupIDEntryStruct::syncRevision. Changed when the key set is updated.
+    uint32_t syncRevision = 0;
 };
 
 } // namespace datastore

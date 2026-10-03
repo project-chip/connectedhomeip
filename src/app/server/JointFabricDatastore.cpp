@@ -1093,6 +1093,25 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             return CHIP_NO_ERROR;
         }
 
+        // The refresh does not wait for its key set writes, so an entry can be marked for another sync before its write
+        // completes. The write's result applies only if the entry is still being added with the value written.
+        auto keySetWriteCompletion = [this](NodeId entryNodeId, uint16_t groupKeySetId, uint32_t revision) {
+            return [this, entryNodeId, groupKeySetId, revision, generation = mSyncGeneration](CHIP_ERROR innerErr) {
+                VerifyOrReturn(generation == mSyncGeneration);
+                auto sameWrite = [&](const auto & e) {
+                    return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId && !HasRemovalIntent(e) &&
+                        e.syncRevision == revision;
+                };
+                if (innerErr != CHIP_NO_ERROR)
+                {
+                    detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, sameWrite, innerErr);
+                    MarkRefreshFailed(entryNodeId, innerErr);
+                    return;
+                }
+                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, sameWrite);
+            };
+        };
+
         for (auto gksIt = mGroupKeySetList.begin(); gksIt != mGroupKeySetList.end(); ++gksIt)
         {
             const uint16_t groupKeySetId = gksIt->groupKeySetID;
@@ -1109,23 +1128,9 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kPending)
                 {
                     // Make a copy of the group key set to send to the node.
-                    const NodeId entryNodeId = nkIt->nodeID;
-                    auto groupKeySet         = *gksIt;
-                    CHIP_ERROR syncErr =
-                        mDelegate->SyncNode(nkIt->nodeID, groupKeySet,
-                                            [this, entryNodeId, groupKeySetId, generation = mSyncGeneration](CHIP_ERROR innerErr) {
-                                                VerifyOrReturn(generation == mSyncGeneration);
-                                                auto match = [&](const auto & e) {
-                                                    return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
-                                                };
-                                                if (innerErr != CHIP_NO_ERROR)
-                                                {
-                                                    detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
-                                                    MarkRefreshFailed(entryNodeId, innerErr);
-                                                    return;
-                                                }
-                                                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, match);
-                                            });
+                    auto groupKeySet   = *gksIt;
+                    CHIP_ERROR syncErr = mDelegate->SyncNode(
+                        nkIt->nodeID, groupKeySet, keySetWriteCompletion(nkIt->nodeID, groupKeySetId, nkIt->syncRevision));
                     if (syncErr != CHIP_NO_ERROR)
                     {
                         detail::MarkEntrySyncFailed(*nkIt, syncErr);
@@ -1153,23 +1158,9 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     else
                     {
                         // Retry the failed commit by attempting to SyncNode again.
-                        const NodeId entryNodeId = nkIt->nodeID;
-                        auto groupKeySet         = *gksIt;
-                        CHIP_ERROR syncErr       = mDelegate->SyncNode(
-                            nkIt->nodeID, groupKeySet,
-                            [this, entryNodeId, groupKeySetId, generation = mSyncGeneration](CHIP_ERROR innerErr) {
-                                VerifyOrReturn(generation == mSyncGeneration);
-                                auto match = [&](const auto & e) {
-                                    return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
-                                };
-                                if (innerErr != CHIP_NO_ERROR)
-                                {
-                                    detail::MarkEntrySyncFailedIfFound(mNodeKeySetEntries, match, innerErr);
-                                    MarkRefreshFailed(entryNodeId, innerErr);
-                                    return;
-                                }
-                                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, match);
-                            });
+                        auto groupKeySet   = *gksIt;
+                        CHIP_ERROR syncErr = mDelegate->SyncNode(
+                            nkIt->nodeID, groupKeySet, keySetWriteCompletion(nkIt->nodeID, groupKeySetId, nkIt->syncRevision));
                         if (syncErr != CHIP_NO_ERROR)
                         {
                             detail::MarkEntrySyncFailed(*nkIt, syncErr);
@@ -1731,6 +1722,7 @@ CHIP_ERROR JointFabricDatastore::UpdateNodeKeySetList(uint16_t groupKeySetId)
         }
         entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
         entry.statusEntry.failureCode = 0;
+        ++entry.syncRevision;
         nodesToSync.push_back(entry.nodeID);
     }
 
@@ -1967,6 +1959,7 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
             if (epGroupEntry.groupID == updatedGroupId)
             {
                 epGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+                ++epGroupEntry.syncRevision;
                 updatedEndpoints.emplace_back(epGroupEntry.nodeID, epGroupEntry.endpointID);
             }
         }
@@ -2809,6 +2802,7 @@ CHIP_ERROR JointFabricDatastore::StartEntrySync(std::vector<Entry> & entries, No
     }
 
     const bool removal        = HasRemovalIntent(*it);
+    const uint32_t revision   = it->syncRevision;
     Wire payload              = *it;
     payload.statusEntry.state = removal ? Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending
                                         : Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
@@ -2816,10 +2810,13 @@ CHIP_ERROR JointFabricDatastore::StartEntrySync(std::vector<Entry> & entries, No
     // The result applies only if the entry is still being added or removed as when the sync started.
     auto sameOperation  = [match, removal](const auto & entry) { return match(entry) && HasRemovalIntent(entry) == removal; };
     CHIP_ERROR startErr = mDelegate->SyncNode(
-        nodeId, payload, [this, &entries, nodeId, sameOperation, removal, generation = mSyncGeneration](CHIP_ERROR syncErr) {
+        nodeId, payload,
+        [this, &entries, nodeId, sameOperation, removal, revision, generation = mSyncGeneration](CHIP_ERROR syncErr) {
             VerifyOrReturn(generation == mSyncGeneration);
             if (syncErr != CHIP_NO_ERROR)
             {
+                // Recorded even if the entry has been marked for another sync since, which still runs: the node holds
+                // neither value, and StartEndpointGroupEntrySync holds back a group add while its key set has failed.
                 detail::MarkEntrySyncFailedIfFound(entries, sameOperation, syncErr);
             }
             else if (removal)
@@ -2832,7 +2829,11 @@ CHIP_ERROR JointFabricDatastore::StartEntrySync(std::vector<Entry> & entries, No
             }
             else
             {
-                detail::MarkEntryCommittedIfFound(entries, sameOperation);
+                // An entry marked for another sync since has a newer value than the one the node now holds, which the
+                // queued sync sends.
+                detail::MarkEntryCommittedIfFound(entries, [&sameOperation, revision](const auto & entry) {
+                    return sameOperation(entry) && entry.syncRevision == revision;
+                });
             }
             FinishNodeSync(nodeId);
         });
