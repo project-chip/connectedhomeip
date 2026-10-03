@@ -53,8 +53,8 @@
 #include <mbedtls/error.h>
 #include <mbedtls/md.h>
 
+#include <algorithm>
 #include <string.h>
-#include <type_traits>
 
 #if CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 constexpr size_t kAeadMaxPlaintextSize = CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE;
