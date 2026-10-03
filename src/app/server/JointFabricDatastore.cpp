@@ -52,6 +52,16 @@ bool IsUnrecoverableCommitFailure(const Clusters::JointFabricDatastore::Structs:
         failureStatus == Protocols::InteractionModel::Status::ResourceExhausted;
 }
 
+/**
+ * True if a command may give a group `groupCat`: null, or 1 to 65534 other than the Administrator and Anchor CATs, which
+ * AddGroup and UpdateGroup reject with CONSTRAINT_ERROR (Matter Core R1.4.2 11.24.7.4, 11.24.7.5).
+ */
+bool IsAssignableGroupCat(const DataModel::Nullable<uint16_t> & groupCat)
+{
+    return groupCat.IsNull() ||
+        (groupCat.Value() != 0 && groupCat.Value() != kAdminCATIdentifier && groupCat.Value() != kAnchorCATIdentifier);
+}
+
 template <typename T>
 void PushTombstone(std::vector<T> & tombstones, T tombstone, size_t capacity)
 {
@@ -1633,11 +1643,11 @@ CHIP_ERROR JointFabricDatastore::AddGroup(const Clusters::JointFabricDatastore::
     VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_ERROR_NOT_FOUND,
                         CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    if (commandData.groupCAT.ValueOr(0) == kAdminCATIdentifier || commandData.groupCAT.ValueOr(0) == kAnchorCATIdentifier)
-    {
-        // If the group is an AdminCAT or AnchorCAT, we cannot add it
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
+    VerifyOrReturnError(IsAssignableGroupCat(commandData.groupCAT), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    // A CAT version of 0 is not a valid CASE Authenticated Tag, and AddGroup takes versions up to 65534.
+    VerifyOrReturnError(commandData.groupCATVersion.IsNull() ||
+                            (commandData.groupCATVersion.Value() >= 1 && commandData.groupCATVersion.Value() <= 65534),
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type groupEntry;
     groupEntry.groupID         = commandData.groupID;
@@ -1690,6 +1700,7 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
         // If the group is an AdminCAT or AnchorCAT, we cannot update it
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
+    VerifyOrReturnError(IsAssignableGroupCat(commandData.groupCAT), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // A CAT version of 0 is not a valid CASE Authenticated Tag.
     VerifyOrReturnError(commandData.groupCATVersion.IsNull() || commandData.groupCATVersion.Value() != 0,
@@ -1717,6 +1728,8 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
     const auto newVersion      = commandData.groupCATVersion.IsNull() ? previousVersion : commandData.groupCATVersion;
     const bool catChanged =
         !newCat.IsNull() && !newVersion.IsNull() && (!(previousCat == newCat) || !(previousVersion == newVersion));
+    // A command without a version keeps the stored one, which can be 0: ForceAddGroup does not check it.
+    VerifyOrReturnError(!catChanged || newVersion.Value() != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     const NodeId newCatSubject = catChanged
         ? NodeIdFromCASEAuthTag((static_cast<CASEAuthTag>(newCat.Value()) << kTagIdentifierShift) | newVersion.Value())
         : kUndefinedNodeId;

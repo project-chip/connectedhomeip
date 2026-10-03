@@ -2960,6 +2960,91 @@ TEST(JointFabricDatastoreTest, UpdateGroupRejectsCatVersionZero)
     EXPECT_EQ(group.groupPermission, Privilege::kOperate);
 }
 
+// GroupCAT values are 1 to 65534, and a group can't take the Administrator or Anchor CAT, which the specification
+// reserves.
+TEST(JointFabricDatastoreTest, UpdateGroupRejectsReservedCatAndChangesNothing)
+{
+    for (const uint16_t cat : { kAdminCATIdentifier, kAnchorCATIdentifier, static_cast<uint16_t>(0) })
+    {
+        JointFabricDatastore store;
+        TrackingDelegate delegate;
+        ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+        SetUpCatGroup(store);
+        const NodeId catSubject = NodeIdFromCASEAuthTag(0x2345'0001);
+        SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { catSubject }, State::kCommitted);
+
+        EXPECT_EQ(UpdateCatGroup(store, cat, 2, Privilege::kManage), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+        const auto & group = store.GetGroupEntries()[0];
+        EXPECT_EQ(group.groupCAT.Value(), 0x2345u);
+        EXPECT_EQ(group.groupCATVersion.Value(), 1u);
+        EXPECT_EQ(group.groupPermission, Privilege::kOperate);
+        ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+        const auto * entry = FindAcl(store, 123, 5);
+        ASSERT_NE(entry, nullptr);
+        EXPECT_TRUE(entry->ACLEntry.subjects == std::vector<uint64_t>{ catSubject });
+        EXPECT_EQ(entry->ACLEntry.privilege, Privilege::kOperate);
+        EXPECT_EQ(entry->statusEntry.state, State::kCommitted);
+        EXPECT_TRUE(delegate.syncCalls.empty());
+    }
+}
+
+// A group can be stored with CAT version 0: ForceAddGroup, which JFAManager uses, stores the group as given. A CAT change
+// that keeps that version would write an invalid CAT into the group's ACL entries.
+TEST(JointFabricDatastoreTest, UpdateGroupRejectsCatChangeKeepingStoredVersionZero)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    SetUpCatGroup(store);
+    ASSERT_EQ(store.GetGroupEntries().size(), 1u);
+    const_cast<GroupInfoEntryType &>(store.GetGroupEntries()[0]).groupCATVersion.SetNonNull(static_cast<uint16_t>(0));
+    const NodeId catSubject = NodeIdFromCASEAuthTag(0x2345'0001);
+    SeedAcl(store, 123, 5, Privilege::kOperate, AuthMode::kCase, { catSubject }, State::kCommitted);
+
+    EXPECT_EQ(UpdateCatGroup(store, 0x3456, std::nullopt, std::nullopt), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    EXPECT_EQ(store.GetGroupEntries()[0].groupCAT.Value(), 0x2345u);
+    const auto * entry = FindAcl(store, 123, 5);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_TRUE(entry->ACLEntry.subjects == std::vector<uint64_t>{ catSubject });
+    EXPECT_EQ(entry->statusEntry.state, State::kCommitted);
+    EXPECT_TRUE(delegate.syncCalls.empty());
+
+    // The same change with a valid version is applied.
+    EXPECT_EQ(UpdateCatGroup(store, 0x3456, 2, std::nullopt), CHIP_NO_ERROR);
+    entry = FindAcl(store, 123, 5);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_TRUE(entry->ACLEntry.subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x3456'0002) });
+}
+
+// AddGroup takes GroupCAT values 1 to 65534 other than the Administrator and Anchor CATs, and GroupCATVersion values
+// 1 to 65534.
+TEST(JointFabricDatastoreTest, AddGroupRejectsCatOrVersionOutOfRange)
+{
+    JointFabricDatastore store;
+    auto addGroup = [&store](GroupId groupId, uint16_t cat, uint16_t version) {
+        JointFabricCluster::Commands::AddGroup::DecodableType command;
+        command.groupID      = groupId;
+        command.friendlyName = "cat-group"_span;
+        command.groupCAT.SetNonNull(cat);
+        command.groupCATVersion.SetNonNull(version);
+        command.groupPermission = Privilege::kOperate;
+        return store.AddGroup(command);
+    };
+
+    EXPECT_EQ(addGroup(1, 0, 1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(addGroup(2, kAdminCATIdentifier, 1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(addGroup(3, kAnchorCATIdentifier, 1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(addGroup(4, 0x2345, 0), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(addGroup(5, 0x2345, 0xFFFF), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_TRUE(store.GetGroupEntries().empty());
+
+    EXPECT_EQ(addGroup(6, 0xFFFD, 0xFFFE), CHIP_NO_ERROR);
+    EXPECT_EQ(store.GetGroupEntries().size(), 1u);
+}
+
 // A rewrite whose sync failed is retried by RefreshNode as a replace: the node's old subject is not adopted.
 TEST(JointFabricDatastoreTest, FailedCatRewriteIsRetriedAsReplaceAtRefresh)
 {
