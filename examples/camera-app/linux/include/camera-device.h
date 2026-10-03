@@ -444,7 +444,8 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
     uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
-    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
+                                                            StreamUsageEnum::kAnalysis };
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;
