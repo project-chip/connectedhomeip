@@ -75,6 +75,10 @@ _available_devices = [
     "CHIME",
   ],
   [
+    "closure",
+    "CLOSURE",
+  ],
+  [
     "color-temperature-light",
     "COLOR_TEMPERATURE_LIGHT",
   ],
@@ -249,6 +253,11 @@ _available_devices = [
   [
     "water-valve",
     "WATER_VALVE",
+  ],
+
+  [
+    "window-covering",
+    "WINDOW_COVERING",
   ],
 ]
 

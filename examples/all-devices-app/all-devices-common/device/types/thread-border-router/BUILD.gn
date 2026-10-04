@@ -41,7 +41,6 @@ source_set("simulated") {
 
   public_deps = [
     ":thread-border-router",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/breadcrumb",
     "${chip_root}/src/app/clusters/thread-network-directory-server",
   ]
 }

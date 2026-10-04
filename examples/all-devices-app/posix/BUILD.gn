@@ -50,6 +50,8 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/closure",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/closure-panel",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/color-temperature-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
@@ -100,6 +102,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-dac-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
@@ -142,6 +145,7 @@ executable("all-devices-app") {
     defines += [
       "PW_RPC_ENABLED=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
     ]
 
     sources += [ "${chip_root}/examples/platform/linux/Rpc.cpp" ]
@@ -155,6 +159,7 @@ executable("all-devices-app") {
       # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into,
       # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/platform/linux:pw_rpc",
     ]
 

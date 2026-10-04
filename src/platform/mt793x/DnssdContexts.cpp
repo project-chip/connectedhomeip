@@ -61,8 +61,19 @@ std::string GetFullTypeWithoutSubTypes(std::string fullType)
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
 {
     uint16_t recordCount   = TXTRecordGetCount(len, data);
-    service.mTextEntrySize = recordCount;
+    service.mTextEntrySize = 0;
     service.mTextEntries   = static_cast<TextEntry *>(chip::Platform::MemoryCalloc(kDnssdTxtRecordMaxEntries, sizeof(TextEntry)));
+    VerifyOrReturn(service.mTextEntries != nullptr, ChipLogError(Discovery, "Failed to allocate TXT entries"));
+
+    // The entries array has a fixed size, but recordCount comes from the network. Clamp it before it
+    // is stored in mTextEntrySize, which ~InterfaceInfo also uses as the bound when freeing entries.
+    if (recordCount > kDnssdTxtRecordMaxEntries)
+    {
+        ChipLogError(Discovery, "TXT record count %u exceeds %u, ignoring the rest", static_cast<unsigned>(recordCount),
+                     static_cast<unsigned>(kDnssdTxtRecordMaxEntries));
+        recordCount = kDnssdTxtRecordMaxEntries;
+    }
+    service.mTextEntrySize = recordCount;
 
     for (uint16_t i = 0; i < recordCount; i++)
     {
