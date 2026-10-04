@@ -168,7 +168,47 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
 {
+    bool isSameNetwork = mSavedNetwork.Matches(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen)) &&
+        ByteSpan(mSavedNetwork.credentials, mSavedNetwork.credentialsLen)
+            .data_equal(ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen));
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    isSameNetwork = isSameNetwork && (mSavedNetwork.UsingPDC() == mStagingNetwork.UsingPDC()) &&
+        ByteSpan(mSavedNetwork.networkIdentity, mSavedNetwork.networkIdentityLen)
+            .data_equal(ByteSpan(mStagingNetwork.networkIdentity, mStagingNetwork.networkIdentityLen)) &&
+        ByteSpan(mSavedNetwork.clientIdentity, mSavedNetwork.clientIdentityLen)
+            .data_equal(ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     mStagingNetwork = mSavedNetwork;
+    ChipLogProgress(NetworkProvisioning, "RevertConfiguration(): Connect back last good ap if it exists");
+
+    // If the staging network differs from the saved network, the active connection may not match
+    // the restored configuration, so reconnect to the saved network if there is one.
+    //
+    // Note: if ConnectNetwork() is still connecting to the staging network at this point, the
+    // calls below will fail with CHIP_ERROR_INCORRECT_STATE because the platform rejects a new
+    // connection request while one is already in flight. That failure is intentionally ignored by
+    // the caller (NetworkCommissioningCluster::OnFailSafeTimerExpired), so revert simply skips the
+    // reconnect in that case, matching this function's pre-existing behavior of not reconnecting.
+    if (!isSameNetwork && (mSavedNetwork.ssidLen != 0))
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+        if (mSavedNetwork.UsingPDC())
+        {
+            ReturnErrorOnFailure(ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
+                ByteSpan(mSavedNetwork.ssid, mSavedNetwork.ssidLen),
+                ByteSpan(mSavedNetwork.networkIdentity, mSavedNetwork.networkIdentityLen),
+                ByteSpan(mSavedNetwork.clientIdentity, mSavedNetwork.clientIdentityLen), *mSavedNetwork.clientIdentityKeypair,
+                &mRevertConnectCallback));
+        }
+        else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+        {
+            ReturnErrorOnFailure(ConnectivityMgrImpl().ConnectWiFiNetworkAsync(
+                ByteSpan(mSavedNetwork.ssid, mSavedNetwork.ssidLen),
+                ByteSpan(mSavedNetwork.credentials, mSavedNetwork.credentialsLen), &mRevertConnectCallback));
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
