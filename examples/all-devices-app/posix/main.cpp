@@ -42,6 +42,9 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
+#include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
+#include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
@@ -82,6 +85,22 @@ using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
 void ApplicationShutdown();
 
 namespace {
+
+class PosixBridgedDeviceManager : public BridgedDeviceManager
+{
+public:
+    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator) :
+        BridgedDeviceManager(provider, endpointIdAllocator), mFactory(factory)
+    {}
+
+    DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
+    {
+        return mFactory.Create(deviceName, nodeLabel);
+    }
+private:
+    PosixDeviceFactory & mFactory;
+};
+
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
@@ -197,9 +216,9 @@ public:
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-        DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds());
-        endpointIdAllocator.ForceNext(kRootEndpointId);
-        ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+        mEndpointIdAllocator.emplace(GetReservedEndpointIds());
+        mEndpointIdAllocator->ForceNext(kRootEndpointId);
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(*mEndpointIdAllocator, mDataModelProvider));
 
         PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
             .groupDataProvider        = mContext.groupDataProvider,
@@ -226,10 +245,10 @@ public:
                             entry.endpoint, entry.parentId);
             if (entry.endpoint != kInvalidEndpointId)
             {
-                endpointIdAllocator.ForceNext(entry.endpoint);
+                mEndpointIdAllocator->ForceNext(entry.endpoint);
             }
             ReturnErrorOnFailure(
-                created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+                created.device->Register(*mEndpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
             if (created.onDeviceRegistered)
             {
                 created.onDeviceRegistered();
@@ -237,11 +256,18 @@ public:
             mConstructedDevices.push_back(std::move(created.device));
         }
 
+        mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
+        ReturnErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
+        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+
         return CHIP_NO_ERROR;
     }
 
     void Shutdown()
     {
+        mBridgedDeviceManager.reset();
+        mEndpointIdAllocator.reset();
         OOBAccessorRegistry::Instance().Clear();
         for (auto & device : mConstructedDevices)
         {
@@ -264,6 +290,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+
+    // using optional to defer creation
+    std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
+    std::optional<PosixBridgedDeviceManager> mBridgedDeviceManager;
 };
 
 void SetupNamedPipe(const char * namedPipePath)

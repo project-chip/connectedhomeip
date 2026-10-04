@@ -19,6 +19,9 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
+#include <device/types/aggregator/Aggregator.h>
+#include <device-factory/DeviceRegistrationEntry.h>
+#include <devices/Types.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <algorithm>
@@ -62,23 +65,26 @@ public:
         }
     }
     virtual DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) = 0;
-    BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator) : mProvider(provider), mEndpointIdAllocator(endpointIdAllocator), mDefaultAggregatorEntry(CreateDevice("aggregator", "Default aggregator for bridged devices"))
+    BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator) : mProvider(provider), mEndpointIdAllocator(endpointIdAllocator) {}
+    CHIP_ERROR InitializeDefaultAggregator()
     {
+        mDefaultAggregatorEntry = CreateDevice("aggregator", "Default aggregator for bridged devices");
         if (mDefaultAggregatorEntry.device == nullptr)
         {
             ChipLogError(AppServer, "Failed to create a default aggregator device");
-            return;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
         CHIP_ERROR err = mDefaultAggregatorEntry.device->Register(mEndpointIdAllocator, mProvider, {});
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to register the default aggregator device: %" CHIP_ERROR_FORMAT, err.Format());
-            return;
+            return err;
         }
         if (mDefaultAggregatorEntry.onDeviceRegistered)
         {
             mDefaultAggregatorEntry.onDeviceRegistered();
         }
+        return CHIP_NO_ERROR;
     }
     std::optional<DeviceId> AddBridgedDevice(const std::string & deviceName, EndpointComposition composition = {}, EndpointId aggregatorEndpointId = kInvalidEndpointId, const std::string & nodeLabel = "")
     {
@@ -92,7 +98,7 @@ public:
         }
         else
         {
-            auto defaultAggregator = mDefaultAggregatorEntry.device.get();
+            auto defaultAggregator = static_cast<Aggregator *>(mDefaultAggregatorEntry.device.get());
             if (defaultAggregator == nullptr)
             {
                 ChipLogError(AppServer, "No default aggregator available");
@@ -106,7 +112,7 @@ public:
             ChipLogError(AppServer, "Failed to create bridged node for device %s", deviceName.c_str());
             return std::nullopt;
         }
-        EndpointComposition bridgedNodeComposition{aggregatorEndpointId, EndpointCompositionPattern::kFullFamily};
+        EndpointComposition bridgedNodeComposition{aggregatorEndpointId, DataModel::EndpointCompositionPattern::kFullFamily};
         CHIP_ERROR err = bridgedNodeEntry.device->Register(mEndpointIdAllocator, mProvider, bridgedNodeComposition);
         if (err != CHIP_NO_ERROR)
         {
@@ -130,7 +136,7 @@ public:
         {
             deviceEntry.onDeviceRegistered();
         }
-        return mDeviceEntries.emplace_back(DeviceId(), deviceEntry, bridgedNodeEntry).id;
+        return mDeviceEntries.emplace_back(DeviceId(), std::move(deviceEntry), std::move(bridgedNodeEntry)).id;
     };
     DeviceInterface * GetDevice(DeviceId deviceId)
     {
@@ -160,7 +166,7 @@ public:
     };
 
 private:
-    auto GetDeviceStorageIterator(DeviceId deviceId)
+    std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceId deviceId)
     {
         return std::find_if(mDeviceEntries.begin(), mDeviceEntries.end(),
                             [deviceId](const auto & device) { return device.id == deviceId; });
@@ -168,11 +174,13 @@ private:
 
     bool IsValidAggregatorEndpoint(EndpointId endpointId)
     {
-        ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> endpointsList;
-        ReturnOnFailure(mProvider.DeviceTypes(endpointId, endpointsList));
+        ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
+        ReturnValueOnFailure(mProvider.DeviceTypes(endpointId, deviceTypesList), false);
 
-        return std::any_of(endpointsList.begin(), endpointsList.end(),
-                           [](const auto & deviceTypeEntry) { return deviceTypeEntry.type == Device::Type::kAggregator; });
+        auto deviceTypes = deviceTypesList.TakeBuffer();
+
+        return std::any_of(deviceTypes.begin(), deviceTypes.end(),
+                           [](const auto & deviceTypeEntry) { return deviceTypeEntry == Device::Type::kAggregator; });
     };
 
     std::vector<DeviceStorage> mDeviceEntries;

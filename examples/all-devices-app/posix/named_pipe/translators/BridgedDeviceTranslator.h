@@ -25,17 +25,19 @@ namespace chip::app::NamedPipe {
  * AddBridgedDevice:
  * {
  *    "Name": "AddBridgedDevice"
- *    "EndpointId" | "ParentEndpointId": EndpointId (uint16_t)
- *        Optional. An endpoint id of an existing device.
- *        If the device is `Bridged Node`, the new device will be added as a child of that device.
- *            `Bridged Node` at parentEndpointId
- *                    └── the new device
- *        If the device is `Aggregator`, a `Bridged Node` will be created as child, and the new device will be added as a child of
- * the latter device. `Aggregator` at parentEndpontId └── a new `Bridged Node` └── the new device If not a `Bridged Node` or
- * `Aggregator`, following layout will be created Some device at parentEndpointId └── a new `Aggregator` └── a new `Bridged Node`
- *                                    └── the new device
- *        If not present, will be same as if `kRootEndpointId` was specified.
- *        If there is no device interface under the specified endpoint, the command will fail.
+ *    "EndpointId" | "AggregatorEndpointId": EndpointId (uint16_t)
+ *        Optional. An endpoint id of an existing aggregator device.
+ *        If an aggregator is found, `Bridged Node` will be created as child,
+ *        and the new device will be added as a child of the latter device.
+ *
+ *    the `Aggregator`
+ *           |
+ *  a new `Bridged Node`
+ *           |
+ *     the new device
+ *
+ *        If not present,  or `kInvalidEndpointId` is specified, a default aggregator device will be used.
+ *        Otherwise if no aggregator is found on the specified endpoint, the command will fail.
  *
  *    "Device": String
  *        The device type name, e.g. "electrical-sensor". See `examples/all-devices-app/README.md` for the list of supported device
@@ -46,13 +48,13 @@ namespace chip::app::NamedPipe {
  * {
  *    "Name": String
  *        Must be "RemoveBridgedDevice"
- *    "EndpointId" : EndpointId (uint16_t)
- *        The endpointId of the bridged device to be removed. Must be a `Bridged Node` or a descendant of one.
+ *    "DeviceId" : BridgedDeviceManager::DeviceId (uint16_t)
+ *        The deviceId of the bridged device to be removed.
  * }
  *
  * Examples:
- *  echo '{"Name": "AddBridgedDevice", "ParentEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
- *  echo '{"Name": "RemoveBridgedDevice", "EndpointId": 5}'> /tmp/acs_fifo
+ *  echo '{"Name": "AddBridgedDevice", "AggregatorEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
+ *  echo '{"Name": "RemoveBridgedDevice", "DeviceId": 2}'> /tmp/acs_fifo
  */
 
 class BridgedDeviceTranslator : public CommandTranslator

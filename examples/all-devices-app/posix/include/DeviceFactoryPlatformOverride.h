@@ -151,7 +151,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
 
         const Clusters::CommissioningProxy::CommissioningProxyCluster::Config proxyConfig(proxyFeatures, proxyBands);
 
-        factory.RegisterCreator("commissioning-proxy", [proxyContext, proxyConfig]() -> typename Factory::DeviceRegistrationEntry {
+        factory.RegisterCreator("commissioning-proxy", [proxyContext, proxyConfig]() -> DeviceRegistrationEntry {
             // Refuse a second proxy. The drivers above are single instances because
             // the radios they drive are: one BLE scanner, one NAN subscribe slot.
             // Handing them to a second device would take them over from the first,
@@ -161,7 +161,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
             if (sProxyDeviceCreated)
             {
                 ChipLogError(AppServer, "Only one commissioning-proxy device is supported: its transports drive single radios");
-                return typename Factory::DeviceRegistrationEntry{};
+                return DeviceRegistrationEntry{};
             }
             sProxyDeviceCreated = true;
 
@@ -181,7 +181,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
             device->AddTransport(sPafProxyTransport);
 #endif
             auto * rawDevice = device.get();
-            return typename Factory::DeviceRegistrationEntry{
+            return DeviceRegistrationEntry{
                 std::move(device), Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice)
             };
         });

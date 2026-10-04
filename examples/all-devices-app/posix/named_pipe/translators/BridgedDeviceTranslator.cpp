@@ -29,14 +29,22 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        endpointId = ExtractUInt<EndpointId>(json, "ParentEndpointId").value_or(endpointId);
+        // By default if "EndpointId" not specified, TranslateAndExecute will provide `kRootEndpointId`,
+        // which is not the behaviour needed here.
+        endpointId = ExtractUInt<EndpointId>(json, "EndpointId").value_or(kInvalidEndpointId);
+        endpointId = ExtractUInt<EndpointId>(json, "AggregatorEndpointId").value_or(endpointId);
 
         const std::string device = json["Device"].asString();
         return DispatchStringAction(registry, "AddBridgedDevice"_span, endpointId, CharSpan(device.data(), device.size()));
     }
     if (action == "RemoveBridgedDevice")
     {
-        return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId);
+        auto deviceId = ExtractUInt<uint16_t>(json, "DeviceId");
+        if (!deviceId.has_value())
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return DispatchAction(registry, "RemoveBridgedDevice"_span, deviceId.value());
     }
     return CHIP_ERROR_NOT_FOUND;
 }
