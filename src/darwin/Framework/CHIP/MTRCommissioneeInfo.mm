@@ -110,7 +110,7 @@ MTR_DIRECT_MEMBERS
                 return CHIP_NO_ERROR;
             }
 
-            auto * mtrPath = [[MTRAttributePath alloc] initWithPath:path];
+            MTRAttributePath * mtrPath = [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:path]];
             attributes[mtrPath] = value;
             return CHIP_NO_ERROR;
         });
