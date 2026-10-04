@@ -70,6 +70,17 @@ public:
     virtual CHIP_ERROR Abort() = 0;
 
     /**
+     * Called instead of Abort() when a stalled download may be resumed. The next PrepareDownload() continues the same image and
+     * ProcessBlock() then receives data from GetResumeOffset() on. The default discards the image like Abort().
+     */
+    virtual CHIP_ERROR SuspendDownload() { return Abort(); }
+
+    /**
+     * Bytes of the OTA image file, header included, kept by SuspendDownload() and discarded by Abort(); 0 if there are none.
+     */
+    virtual uint64_t GetResumeOffset() { return 0; }
+
+    /**
      * Called to process a downloaded block of data. This must not be a blocking call to support cases that require IO to elements
      * such as external peripherals/radios. This must not be a blocking call.
      */

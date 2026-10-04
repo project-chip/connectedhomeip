@@ -22,11 +22,15 @@ chip_test_suite("tests") {
   output_name = "TestOTARequestorCluster"
 
   test_sources = [
+    "TestBDXDownloader.cpp",
     "TestOTARequestorAttributes.cpp",
     "TestOTARequestorCluster.cpp",
   ]
 
-  sources = []
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.h",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -35,5 +39,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/bdx",
   ]
 }

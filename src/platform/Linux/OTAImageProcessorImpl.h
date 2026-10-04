@@ -38,6 +38,8 @@ public:
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
+    CHIP_ERROR SuspendDownload() override;
+    uint64_t GetResumeOffset() override { return mSuspended ? mImageBytesReceived : 0; }
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
@@ -51,6 +53,7 @@ private:
     static void HandleFinalize(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
+    static void HandleSuspend(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
@@ -69,7 +72,9 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    const char * mImageFile = nullptr;
+    const char * mImageFile      = nullptr;
+    uint64_t mImageBytesReceived = 0;
+    bool mSuspended              = false;
 };
 
 } // namespace chip
