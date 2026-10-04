@@ -18,6 +18,8 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <cstdint>
+
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 
@@ -40,16 +42,15 @@ public:
         mAllocCount--;
         chip::Platform::MemoryFree(p);
     }
-    static void * MemoryAlloc(size_t size)
+    static void * MemoryAlloc(size_t num)
     {
         mAllocCount++;
-        return chip::Platform::MemoryAlloc(size);
+        return chip::Platform::MemoryAllocTyped<char>(num);
     }
-    static void * MemoryCalloc(size_t num, size_t size)
+    static void * MemoryCalloc(size_t num)
     {
-
         mAllocCount++;
-        return chip::Platform::MemoryCalloc(num, size);
+        return chip::Platform::MemoryCallocTyped<char>(num);
     }
 
 private:
@@ -139,6 +140,35 @@ TEST_F(TestScopedMemoryBuffer, TestCopyFromSpanMemcpyByteCountUsesSizeof)
     {
         EXPECT_EQ(buffer.Get()[i], source[i]);
     }
+}
+
+TEST_F(TestScopedMemoryBuffer, TestAllocSizeOverflow)
+{
+    constexpr size_t kMaxCount = SIZE_MAX / sizeof(uint32_t);
+
+    chip::Platform::ScopedMemoryBuffer<uint32_t> buffer;
+    EXPECT_FALSE(buffer.Alloc(kMaxCount + 1));
+    EXPECT_FALSE(buffer.Alloc(kMaxCount + 2));
+    EXPECT_FALSE(buffer.Alloc(kMaxCount));
+    EXPECT_TRUE(buffer.Alloc(4));
+
+    chip::Platform::ScopedMemoryBufferWithSize<uint32_t> sizedBuffer;
+    EXPECT_FALSE(sizedBuffer.Alloc(kMaxCount + 2));
+    EXPECT_EQ(sizedBuffer.AllocatedSize(), static_cast<size_t>(0));
+    EXPECT_TRUE(sizedBuffer.Alloc(4));
+    EXPECT_EQ(sizedBuffer.AllocatedSize(), static_cast<size_t>(4));
+}
+
+TEST_F(TestScopedMemoryBuffer, TestCallocSizeOverflow)
+{
+    constexpr size_t kMaxCount = SIZE_MAX / sizeof(uint32_t);
+
+    chip::Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
+    EXPECT_FALSE(buffer.Calloc(kMaxCount + 2));
+    EXPECT_EQ(buffer.AllocatedSize(), static_cast<size_t>(0));
+    EXPECT_FALSE(buffer.Calloc(kMaxCount));
+    EXPECT_TRUE(buffer.Calloc(4));
+    EXPECT_EQ(buffer.AllocatedSize(), static_cast<size_t>(4));
 }
 
 } // namespace
