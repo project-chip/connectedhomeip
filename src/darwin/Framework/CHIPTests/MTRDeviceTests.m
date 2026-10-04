@@ -40,6 +40,7 @@
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
+#import <malloc/malloc.h>
 #import <math.h> // For INFINITY
 #import <os/lock.h>
 
@@ -92,6 +93,42 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
+
+@interface MTRTestAttributePathSubclass : MTRAttributePath
+@end
+
+@implementation MTRTestAttributePathSubclass
+@end
+
+@protocol MTRTestAttributeReportXPCProtocol
+- (oneway void)receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
+@end
+
+@interface MTRTestAttributeReportXPCServer : NSObject <NSXPCListenerDelegate, MTRTestAttributeReportXPCProtocol>
+@property (atomic, copy, nullable) void (^onReport)(NSArray<NSDictionary<NSString *, id> *> * attributeReport);
+@end
+
+@implementation MTRTestAttributeReportXPCServer
+
+- (BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
+{
+    __auto_type * interface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRTestAttributeReportXPCProtocol)];
+    [interface setClasses:[NSSet setWithArray:@[ NSArray.class, NSDictionary.class, NSString.class, NSNumber.class, MTRAttributePath.class ]]
+              forSelector:@selector(receivedAttributeReport:)
+            argumentIndex:0
+                  ofReply:NO];
+    newConnection.exportedInterface = interface;
+    newConnection.exportedObject = self;
+    [newConnection activate];
+    return YES;
+}
+
+- (oneway void)receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    self.onReport(attributeReport);
+}
+
+@end
 
 @interface MTRDeviceTests : MTRTestCase
 
@@ -3205,6 +3242,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * clusterPath3 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
     __auto_type * clusterPath4 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
 
+    XCTAssertIdentical(commandPath1, commandPath5);
+    XCTAssertIdentical(eventPath1, eventPath5);
+    XCTAssertIdentical(attributePath1, attributePath5);
+    XCTAssertIdentical(clusterPath1, clusterPath4);
+    XCTAssertIdentical([attributePath1 copy], attributePath1);
+    for (MTRClusterPath * path in @[ commandPath1, eventPath1, attributePath1, clusterPath1 ]) {
+        NSData * archive = [NSKeyedArchiver archivedDataWithRootObject:path requiringSecureCoding:YES error:nil];
+        XCTAssertIdentical([NSKeyedUnarchiver unarchivedObjectOfClass:path.class fromData:archive error:nil], path);
+    }
+
     // Command paths
     XCTAssertTrue([commandPath1 isEqual:commandPath5]);
     XCTAssertEqualObjects(commandPath1, commandPath5);
@@ -3265,6 +3312,137 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertFalse([eventPath1 isEqual:attributePath1]);
     XCTAssertFalse([clusterPath1 isEqual:attributePath1]);
     XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
+}
+
+- (void)test029a_SharedPathsFollowObjectLifetime
+{
+    __weak MTRAttributePath * weakPath;
+    @autoreleasepool {
+        MTRAttributePath * path = [MTRAttributePath attributePathWithEndpointID:@(4) clusterID:@(0xFFF1FC02) attributeID:@(0)];
+        weakPath = path;
+        XCTAssertIdentical([MTRAttributePath attributePathWithEndpointID:@(4) clusterID:@(0xFFF1FC02) attributeID:@(0)], path);
+        XCTAssertNotIdentical([MTREventPath eventPathWithEndpointID:@(4) clusterID:@(0xFFF1FC02) eventID:@(0)], (id) path);
+    }
+    XCTAssertNil(weakPath);
+
+    MTRAttributePath * path = [MTRAttributePath attributePathWithEndpointID:@(4) clusterID:@(0xFFF1FC02) attributeID:@(1)];
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [archiver setClassName:NSStringFromClass(MTRTestAttributePathSubclass.class) forClass:MTRAttributePath.class];
+    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
+    MTRAttributePath * decoded1 = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRTestAttributePathSubclass.class fromData:archiver.encodedData error:nil];
+    MTRAttributePath * decoded2 = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRTestAttributePathSubclass.class fromData:archiver.encodedData error:nil];
+    XCTAssertEqual(decoded1.class, MTRTestAttributePathSubclass.class);
+    XCTAssertEqualObjects(decoded1, decoded2);
+    XCTAssertNotIdentical(decoded1, decoded2);
+}
+
+- (void)test029b_SharedPathsAcrossThreads
+{
+    const size_t kWorkers = 16;
+    const NSUInteger kKeys = 256;
+    NSMutableArray<NSArray<MTRAttributePath *> *> * tables = [NSMutableArray array];
+    __block NSUInteger mismatches = 0;
+    dispatch_apply(kWorkers, DISPATCH_APPLY_AUTO, ^(size_t worker) {
+        NSMutableArray<MTRAttributePath *> * table = [NSMutableArray arrayWithCapacity:kKeys];
+        NSUInteger workerMismatches = 0;
+        for (NSUInteger i = 0; i < 20000; i++) {
+            @autoreleasepool {
+                NSUInteger key = (i * 7919 + worker * 131) % kKeys;
+                MTRAttributePath * path = [MTRAttributePath attributePathWithEndpointID:@(key % 16) clusterID:@(0xFFF1FC06) attributeID:@(key / 16)];
+                workerMismatches += ![path.endpoint isEqual:@(key % 16)] || ![path.attribute isEqual:@(key / 16)];
+            }
+        }
+        for (NSUInteger key = 0; key < kKeys; key++) {
+            [table addObject:[MTRAttributePath attributePathWithEndpointID:@(key % 16) clusterID:@(0xFFF1FC06) attributeID:@(key / 16)]];
+        }
+        @synchronized(tables) {
+            [tables addObject:table];
+            mismatches += workerMismatches;
+        }
+    });
+    XCTAssertEqual(mismatches, 0);
+    XCTAssertEqual(tables.count, kWorkers);
+    for (NSArray<MTRAttributePath *> * table in tables) {
+        for (NSUInteger key = 0; key < kKeys; key++) {
+            XCTAssertIdentical(table[key], tables.firstObject[key]);
+        }
+    }
+}
+
+- (void)test029c_SharedPathsSurviveTableRebuild
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(0xFFF1FC07) attributeID:@(0)];
+    __weak MTRAttributePath * weakChurned;
+    for (NSUInteger i = 1; i <= 50000; i++) {
+        @autoreleasepool {
+            MTRAttributePath * churned = [MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(0xFFF1FC07) attributeID:@(i)];
+            weakChurned = churned;
+        }
+    }
+    XCTAssertNil(weakChurned);
+    XCTAssertIdentical([MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(0xFFF1FC07) attributeID:@(0)], held);
+}
+
+- (void)test029d_ReadDeliversSharedPath
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read DeviceTypeList"];
+    [GetConnectedDevice() readAttributesWithEndpointID:held.endpoint
+                                             clusterID:held.cluster
+                                           attributeID:held.attribute
+                                                params:nil
+                                                 queue:dispatch_get_main_queue()
+                                            completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                XCTAssertNil(error);
+                                                XCTAssertEqual([values count], 1);
+                                                XCTAssertIdentical([values firstObject][MTRAttributePathKey], held);
+                                                [expectation fulfill];
+                                            }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test029e_RepeatedPathTablesShareObjects
+{
+    const NSUInteger kPaths = 1000;
+    const NSUInteger kBuilds = 10;
+    NSMutableArray<MTRAttributePath *> * tables = [NSMutableArray arrayWithCapacity:kPaths * kBuilds];
+    for (NSUInteger build = 0; build < kBuilds; build++) {
+        for (NSUInteger i = 0; i < kPaths; i++) {
+            [tables addObject:[MTRAttributePath attributePathWithEndpointID:@(i % 20) clusterID:@(0xFFF1FC08) attributeID:@(i / 20)]];
+        }
+    }
+    NSHashTable * distinct = [NSHashTable hashTableWithOptions:NSPointerFunctionsObjectPointerPersonality];
+    size_t bytes = 0;
+    for (MTRAttributePath * path in tables) {
+        if (![distinct containsObject:path]) {
+            [distinct addObject:path];
+            bytes += malloc_size((__bridge const void *) path);
+        }
+    }
+    NSLog(@"Path table of %lu paths built %lu times: %lu path objects, %zu bytes", (unsigned long) kPaths, (unsigned long) kBuilds, (unsigned long) distinct.count, bytes);
+    XCTAssertEqual(distinct.count, kPaths);
+}
+
+- (void)test029f_XPCDecodedPathIsShared
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(6) clusterID:@(0xFFF1FC09) attributeID:@(0)];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"report received over XPC"];
+    __auto_type * server = [[MTRTestAttributeReportXPCServer alloc] init];
+    server.onReport = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        XCTAssertEqual(attributeReport.count, 1);
+        XCTAssertIdentical(attributeReport.firstObject[MTRAttributePathKey], held);
+        [expectation fulfill];
+    };
+    NSXPCListener * listener = [NSXPCListener anonymousListener];
+    listener.delegate = server;
+    [listener resume];
+    __auto_type * connection = [[NSXPCConnection alloc] initWithListenerEndpoint:listener.endpoint];
+    connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRTestAttributeReportXPCProtocol)];
+    [connection activate];
+    [[connection remoteObjectProxy] receivedAttributeReport:@[ @{ MTRAttributePathKey : held, MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1) } } ]];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+    [connection invalidate];
+    [listener invalidate];
 }
 
 - (void)test030_DeviceAndClusterProperties
