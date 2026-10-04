@@ -131,25 +131,25 @@ CHIP_ERROR DoorLockCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
         { mFeatures.Has(Feature::kUser), CredentialRulesSupport::kMetadataEntry },
         { mFeatures.Has(Feature::kUser), NumberOfCredentialsSupportedPerUser::kMetadataEntry },
         // PIN credentials [PIN]
-        { mFeatures.Has(Feature::kPINCredential), NumberOfPINUsersSupported::kMetadataEntry },
-        { mFeatures.Has(Feature::kPINCredential), MaxPINCodeLength::kMetadataEntry },
-        { mFeatures.Has(Feature::kPINCredential), MinPINCodeLength::kMetadataEntry },
+        { mFeatures.Has(Feature::kPinCredential), NumberOfPINUsersSupported::kMetadataEntry },
+        { mFeatures.Has(Feature::kPinCredential), MaxPINCodeLength::kMetadataEntry },
+        { mFeatures.Has(Feature::kPinCredential), MinPINCodeLength::kMetadataEntry },
         // RFID credentials [RID]
-        { mFeatures.Has(Feature::kRFIDCredential), NumberOfRFIDUsersSupported::kMetadataEntry },
-        { mFeatures.Has(Feature::kRFIDCredential), MaxRFIDCodeLength::kMetadataEntry },
-        { mFeatures.Has(Feature::kRFIDCredential), MinRFIDCodeLength::kMetadataEntry },
+        { mFeatures.Has(Feature::kRfidCredential), NumberOfRFIDUsersSupported::kMetadataEntry },
+        { mFeatures.Has(Feature::kRfidCredential), MaxRFIDCodeLength::kMetadataEntry },
+        { mFeatures.Has(Feature::kRfidCredential), MinRFIDCodeLength::kMetadataEntry },
         // Schedules
         { mFeatures.Has(Feature::kWeekDayAccessSchedules), NumberOfWeekDaySchedulesSupportedPerUser::kMetadataEntry },
         { mFeatures.Has(Feature::kYearDayAccessSchedules), NumberOfYearDaySchedulesSupportedPerUser::kMetadataEntry },
         { mFeatures.Has(Feature::kHolidaySchedules), NumberOfHolidaySchedulesSupported::kMetadataEntry },
         // Wrong-code handling [PIN or RID]
-        { mFeatures.Has(Feature::kPINCredential) || mFeatures.Has(Feature::kRFIDCredential), WrongCodeEntryLimit::kMetadataEntry },
-        { mFeatures.Has(Feature::kPINCredential) || mFeatures.Has(Feature::kRFIDCredential),
+        { mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential), WrongCodeEntryLimit::kMetadataEntry },
+        { mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential),
           UserCodeTemporaryDisableTime::kMetadataEntry },
         // SendPINOverTheAir is only available when the User feature is NOT
         // supported (with USR the credentials belong to user records).
-        { !mFeatures.Has(Feature::kUser) && mFeatures.Has(Feature::kPINCredential), SendPINOverTheAir::kMetadataEntry },
-        { mFeatures.Has(Feature::kCredentialsOverTheAirAccess) && mFeatures.Has(Feature::kPINCredential),
+        { !mFeatures.Has(Feature::kUser) && mFeatures.Has(Feature::kPinCredential), SendPINOverTheAir::kMetadataEntry },
+        { mFeatures.Has(Feature::kCredentialsOverTheAirAccess) && mFeatures.Has(Feature::kPinCredential),
           RequirePINforRemoteOperation::kMetadataEntry },
         { mFeatures.Has(Feature::kUser), ExpiringUserTimeout::kMetadataEntry },
         // Aliro reader provisioning [ALIRO]
@@ -562,7 +562,7 @@ CHIP_ERROR DoorLockCluster::HandleWrongCodeEntry()
 {
     // Wrong-code tracking only exists with PIN or RFID credentials
     // (legacy: the WrongCodeEntryLimit attribute is not present).
-    VerifyOrReturnError(mFeatures.Has(Feature::kPINCredential) || mFeatures.Has(Feature::kRFIDCredential), CHIP_NO_ERROR);
+    VerifyOrReturnError(mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential), CHIP_NO_ERROR);
 
     mWrongCodeEntryAttempts++;
     if (mWrongCodeEntryAttempts < mWrongCodeEntryLimit)

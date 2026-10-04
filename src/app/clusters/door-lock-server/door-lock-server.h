@@ -191,9 +191,9 @@ public:
 
     static chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 
-    static inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPINCredential); }
+    static inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
 
-    static inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRFIDCredential); }
+    static inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
 
     static inline bool SupportsFingers(chip::EndpointId endpointId)
     {
@@ -220,7 +220,7 @@ public:
     static inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(Feature::kPINCredential, Feature::kRFIDCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
                     Feature::kAliroProvisioning);
     }
 

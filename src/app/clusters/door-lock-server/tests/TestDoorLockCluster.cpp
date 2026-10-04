@@ -172,7 +172,7 @@ public:
 Config FeaturedConfig(TimerDelegate & timerDelegate)
 {
     Config config(timerDelegate);
-    config.features.Set(Feature::kPINCredential).Set(Feature::kUser).Set(Feature::kDoorPositionSensor).Set(Feature::kUnbolt);
+    config.features.Set(Feature::kPinCredential).Set(Feature::kUser).Set(Feature::kDoorPositionSensor).Set(Feature::kUnbolt);
     config.optionalAttributes.language       = true;
     config.optionalAttributes.ledSettings    = true;
     config.optionalAttributes.autoRelockTime = true;
@@ -189,7 +189,7 @@ Config FeaturedConfig(TimerDelegate & timerDelegate)
 Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
 {
     Config config(timerDelegate);
-    config.features.Set(Feature::kPINCredential);
+    config.features.Set(Feature::kPinCredential);
     config.numberOfPINUsersSupported    = 10;
     config.maxPINCodeLength             = 8;
     config.minPINCodeLength             = 4;

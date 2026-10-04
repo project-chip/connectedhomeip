@@ -372,7 +372,7 @@ CHIP_ERROR AppTask::Init()
     // FeatureMap to 0x181.
     doorLockOverrides.features                    = BitFlags<Clusters::DoorLock::Feature>(Clusters::DoorLock::Feature::kUser,
                                                                        Clusters::DoorLock::Feature::kCredentialsOverTheAirAccess,
-                                                                       Clusters::DoorLock::Feature::kPINCredential);
+                                                                       Clusters::DoorLock::Feature::kPinCredential);
     doorLockOverrides.numberOfTotalUsersSupported = CONFIG_LOCK_NUM_USERS;
     doorLockOverrides.numberOfPINUsersSupported   = CONFIG_LOCK_NUM_USERS;
     doorLockOverrides.numberOfRFIDUsersSupported  = 0;
