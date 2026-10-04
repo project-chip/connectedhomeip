@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -124,7 +125,14 @@ class SimplePlatformMemoryManagement
 {
 protected:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t num, size_t size) { return chip::Platform::MemoryAlloc(num * size); }
+    static void * MemoryAlloc(size_t num, size_t size)
+    {
+        if (num > std::numeric_limits<size_t>::max() / size)
+        {
+            return nullptr;
+        }
+        return chip::Platform::MemoryAlloc(num * size);
+    }
     static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
 };
 template <typename T>
