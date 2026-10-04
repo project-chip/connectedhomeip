@@ -1152,12 +1152,12 @@ private:
                       if (includeDataVersion && aAttributePath.mDataVersion.HasValue()) {
                           NSDictionary * dataValue = aData.GetDecodedObject();
                           [resultArray addObject:@{
-                              MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
+                              MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:aAttributePath]],
                               MTRDataKey : _MakeDataValueDictionary(dataValue[MTRTypeKey], dataValue[MTRValueKey], @(aAttributePath.mDataVersion.Value()))
                           }];
                       } else {
                           [resultArray addObject:@ {
-                              MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
+                              MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:aAttributePath]],
                               MTRDataKey : aData.GetDecodedObject()
                           }];
                       }
@@ -1172,12 +1172,12 @@ private:
                                    const app::ConcreteEventPath * aEventPath, CHIP_ERROR aError) {
                 if (aAttributePath != nullptr) {
                     [resultArray addObject:@ {
-                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*aAttributePath],
+                        MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:*aAttributePath]],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
                 } else if (aEventPath != nullptr) {
                     [resultArray addObject:@ {
-                        MTREventPathKey : [[MTREventPath alloc] initWithPath:*aEventPath],
+                        MTREventPathKey : [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:*aEventPath]],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
                 } else {
@@ -1295,7 +1295,7 @@ private:
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
             // failure callback, for a non-group session.
             auto onSuccessCb = [successCb, bridge](const app::ConcreteAttributePath & attribPath) {
-                auto resultArray = @[ @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] } ];
+                auto resultArray = @[ @ { MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:attribPath]] } ];
                 successCb(bridge, resultArray);
             };
 
@@ -1554,7 +1554,7 @@ private:
             return;
         }
 
-        auto * path = [[MTRCommandPath alloc] initWithPath:aResponseData.path];
+        MTRCommandPath * path = [MTRClusterPath _sharedPathForPath:[[MTRCommandPath alloc] initWithPath:aResponseData.path]];
         if (isDataResponse) {
             MTRDataValueDictionaryDecodableType response;
             CHIP_ERROR err = app::DataModel::Decode(*aResponseData.data, response);
@@ -1721,11 +1721,11 @@ private:
                 if (responseData.GetDecodedObject()) {
                     auto response = MTRResponseByAppendingAttestationChallenge(responseData.GetDecodedObject(), attestationChallenge);
                     [resultArray addObject:@ {
-                        MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
+                        MTRCommandPathKey : [MTRClusterPath _sharedPathForPath:[[MTRCommandPath alloc] initWithPath:commandPath]],
                         MTRDataKey : response,
                     }];
                 } else {
-                    [resultArray addObject:@ { MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
+                    [resultArray addObject:@ { MTRCommandPathKey : [MTRClusterPath _sharedPathForPath:[[MTRCommandPath alloc] initWithPath:commandPath]] }];
                 }
                 successCb(bridge, resultArray);
             };
@@ -2083,7 +2083,7 @@ private:
                        ConcreteAttributePath pathCopy(attributePath);
                        dispatch_async(queue, ^{
                            reportHandler(@[ @ {
-                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                               MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:pathCopy]],
                                MTRDataKey : valueObject
                            } ],
                                nil);
@@ -2104,7 +2104,7 @@ private:
                            ConcreteAttributePath pathCopy(*attributePath);
                            dispatch_async(queue, ^{
                                reportHandler(@[ @ {
-                                   MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                                   MTRAttributePathKey : [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:pathCopy]],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
                                } ],
                                    nil);
@@ -2113,7 +2113,7 @@ private:
                            ConcreteEventPath pathCopy(*eventPath);
                            dispatch_async(queue, ^{
                                reportHandler(@[ @ {
-                                   MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
+                                   MTREventPathKey : [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:pathCopy]],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
                                } ],
                                    nil);
@@ -2512,7 +2512,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 + (NSDictionary *)eventReportForHeader:(const chip::app::EventHeader &)header andData:(id _Nullable)data
 {
-    MTREventPath * eventPath = [[MTREventPath alloc] initWithPath:header.mPath];
+    MTREventPath * eventPath = [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:header.mPath]];
     if (data == nil) {
         MTR_LOG_ERROR("%@ could not decode event data", eventPath);
         return @{ MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
@@ -3056,6 +3056,57 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 @end
 
+static BOOL MTRIsSharedPathClass(Class pathClass)
+{
+    return pathClass == [MTRClusterPath class] || pathClass == [MTRAttributePath class] || pathClass == [MTREventPath class] || pathClass == [MTRCommandPath class];
+}
+
+@interface MTRSharedPathEntry : NSObject
+@property (nonatomic, weak) MTRClusterPath * path;
+@end
+
+@implementation MTRSharedPathEntry
+@end
+
+static const NSUInteger kSharedPathShardCount = 128;
+static os_unfair_lock sSharedPathLocks[kSharedPathShardCount];
+static NSMapTable<MTRClusterPath *, MTRSharedPathEntry *> * sSharedPaths[kSharedPathShardCount];
+
+static NSUInteger MTRSharedPathShard(MTRClusterPath * path)
+{
+    return (NSUInteger) (((uint64_t) path.hash * 0x9E3779B97F4A7C15ull) >> 57);
+}
+
+static NSNumber * _Nullable MTRSharedPathLeafID(__unsafe_unretained MTRClusterPath * path)
+{
+    Class pathClass = [path class];
+    if (pathClass == [MTRAttributePath class]) {
+        return ((MTRAttributePath *) path).attribute;
+    }
+    if (pathClass == [MTREventPath class]) {
+        return ((MTREventPath *) path).event;
+    }
+    if (pathClass == [MTRCommandPath class]) {
+        return ((MTRCommandPath *) path).command;
+    }
+    return nil;
+}
+
+// Keys stay unretained: under the shard lock a retain could end up releasing the last reference and re-enter -dealloc.
+static NSUInteger MTRSharedPathHash(const void * item, NSUInteger (*)(const void *))
+{
+    __unsafe_unretained MTRClusterPath * path = (__bridge MTRClusterPath *) item;
+    return path.hash;
+}
+
+static BOOL MTRSharedPathsEqual(const void * item1, const void * item2, NSUInteger (*)(const void *))
+{
+    __unsafe_unretained MTRClusterPath * first = (__bridge MTRClusterPath *) item1;
+    __unsafe_unretained MTRClusterPath * second = (__bridge MTRClusterPath *) item2;
+    return [first class] == [second class] && MTREqualObjects(first.endpoint, second.endpoint)
+        && MTREqualObjects(first.cluster, second.cluster) && MTREqualObjects(MTRSharedPathLeafID(first), MTRSharedPathLeafID(second));
+}
+
 @implementation MTRClusterPath
 - (instancetype)initWithPath:(const ConcreteClusterPath &)path
 {
@@ -3064,6 +3115,48 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
         _cluster = @(path.mClusterId);
     }
     return self;
+}
+
++ (__kindof MTRClusterPath *)_sharedPathForPath:(MTRClusterPath *)path
+{
+    NSUInteger shard = MTRSharedPathShard(path);
+    MTRClusterPath * shared;
+    os_unfair_lock_lock(&sSharedPathLocks[shard]);
+    NSMapTable<MTRClusterPath *, MTRSharedPathEntry *> * paths = sSharedPaths[shard];
+    if (paths == nil) {
+        NSPointerFunctions * keyFunctions = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsOpaqueMemory | NSPointerFunctionsOpaquePersonality];
+        keyFunctions.hashFunction = MTRSharedPathHash;
+        keyFunctions.isEqualFunction = MTRSharedPathsEqual;
+        paths = sSharedPaths[shard] = [[NSMapTable alloc] initWithKeyPointerFunctions:keyFunctions
+                                                                valuePointerFunctions:[NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsStrongMemory]
+                                                                             capacity:0];
+    }
+    shared = [paths objectForKey:path].path;
+    if (shared == nil) {
+        MTRSharedPathEntry * entry = [[MTRSharedPathEntry alloc] init];
+        entry.path = path;
+        [paths removeObjectForKey:path];
+        [paths setObject:entry forKey:path];
+        shared = path;
+    }
+    os_unfair_lock_unlock(&sSharedPathLocks[shard]);
+    return shared;
+}
+
+- (void)dealloc
+{
+    if (!MTRIsSharedPathClass([self class])) {
+        return;
+    }
+    // A weak load of a deallocating path is nil, so this drops only a dead entry and never a live equal one.
+    NSUInteger shard = MTRSharedPathShard(self);
+    __attribute__((objc_precise_lifetime)) MTRClusterPath * current;
+    os_unfair_lock_lock(&sSharedPathLocks[shard]);
+    current = [sSharedPaths[shard] objectForKey:self].path;
+    if (current == nil) {
+        [sSharedPaths[shard] removeObjectForKey:self];
+    }
+    os_unfair_lock_unlock(&sSharedPathLocks[shard]);
 }
 
 - (NSString *)description
@@ -3078,7 +3171,7 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
     ConcreteClusterPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]));
 
-    return [[MTRClusterPath alloc] initWithPath:path];
+    return [MTRClusterPath _sharedPathForPath:[[MTRClusterPath alloc] initWithPath:path]];
 }
 
 - (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
@@ -3102,6 +3195,9 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (id)copyWithZone:(NSZone *)zone
 {
+    if (MTRIsSharedPathClass([self class])) {
+        return [MTRClusterPath _sharedPathForPath:self];
+    }
     return [MTRClusterPath clusterPathWithEndpointID:_endpoint clusterID:_cluster];
 }
 
@@ -3141,6 +3237,11 @@ static NSString * const sClusterKey = @"clusterKey";
     [coder encodeObject:_cluster forKey:sClusterKey];
 }
 
+- (id)awakeAfterUsingCoder:(NSCoder *)decoder
+{
+    return MTRIsSharedPathClass([self class]) ? [MTRClusterPath _sharedPathForPath:self] : self;
+}
+
 @end
 
 @implementation MTRAttributePath
@@ -3169,7 +3270,7 @@ static NSString * const sClusterKey = @"clusterKey";
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
         static_cast<chip::AttributeId>([attributeID unsignedLongValue]));
 
-    return [[MTRAttributePath alloc] initWithPath:path];
+    return [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:path]];
 }
 
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
@@ -3192,6 +3293,9 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (id)copyWithZone:(NSZone *)zone
 {
+    if (MTRIsSharedPathClass([self class])) {
+        return [MTRClusterPath _sharedPathForPath:self];
+    }
     return [MTRAttributePath attributePathWithEndpointID:self.endpoint clusterID:self.cluster attributeID:_attribute];
 }
 
@@ -3265,7 +3369,7 @@ static NSString * const sAttributeKey = @"attributeKey";
     ConcreteEventPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
 
-    return [[MTREventPath alloc] initWithPath:path];
+    return [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:path]];
 }
 
 - (BOOL)isEqualToEventPath:(MTREventPath *)eventPath
@@ -3288,6 +3392,9 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (id)copyWithZone:(NSZone *)zone
 {
+    if (MTRIsSharedPathClass([self class])) {
+        return [MTRClusterPath _sharedPathForPath:self];
+    }
     return [MTREventPath eventPathWithEndpointID:self.endpoint clusterID:self.cluster eventID:_event];
 }
 
@@ -3356,7 +3463,7 @@ static NSString * const sEventKey = @"eventKey";
     ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));
 
-    return [[MTRCommandPath alloc] initWithPath:path];
+    return [MTRClusterPath _sharedPathForPath:[[MTRCommandPath alloc] initWithPath:path]];
 }
 
 - (BOOL)isEqualToCommandPath:(MTRCommandPath *)commandPath
@@ -3379,6 +3486,9 @@ static NSString * const sEventKey = @"eventKey";
 
 - (id)copyWithZone:(NSZone *)zone
 {
+    if (MTRIsSharedPathClass([self class])) {
+        return [MTRClusterPath _sharedPathForPath:self];
+    }
     return [MTRCommandPath commandPathWithEndpointID:self.endpoint clusterID:self.cluster commandID:_command];
 }
 
@@ -3540,7 +3650,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 - (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(id _Nullable)value error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
-        _path = [[MTRAttributePath alloc] initWithPath:path];
+        _path = [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:path]];
         _value = value;
         _error = error;
     }
@@ -3644,7 +3754,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
                        value:(id)value
 {
     if (self = [super init]) {
-        _path = [[MTREventPath alloc] initWithPath:path];
+        _path = [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:path]];
         _eventNumber = eventNumber;
         if (!MTRPriorityLevelIsValid(priority)) {
             return nil;
@@ -3669,7 +3779,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path error:(NSError *)error
 {
     if (self = [super init]) {
-        _path = [[MTREventPath alloc] initWithPath:path];
+        _path = [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:path]];
         // Use some sort of initialized values for our members, even though
         // those values are meaningless in this case.
         _eventNumber = @(0);
