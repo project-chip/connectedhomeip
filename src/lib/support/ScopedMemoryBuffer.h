@@ -45,7 +45,7 @@ namespace Impl {
  * the class will be stored in flash.
  */
 template <class Impl>
-class ScopedMemoryBufferBase : protected Impl
+class ScopedMemoryBufferBase
 {
 public:
     ScopedMemoryBufferBase() {}
@@ -105,31 +105,34 @@ private:
 
 /**
  * Helper class that forwards memory management tasks to Platform::Memory* calls.
- * When typed allocations are enabled, the MemoryAlloc and MemoryCalloc functions
- * only take the number of elements, and the type is passed through a template
- * parameter. When typed allocations are not enabled these functions also take
- * the size of the type as an additional argument.
  */
-#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
-template <typename T>
 class PlatformMemoryManagement
 {
-protected:
+public:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t num) { return chip::Platform::MemoryAllocTyped<T>(num); }
-    static void * MemoryCalloc(size_t num) { return chip::Platform::MemoryCallocTyped<T>(num); }
+    template <typename T>
+    static void * MemoryAlloc(size_t elementCount)
+    {
+        return chip::Platform::MemoryAllocTyped<T>(elementCount);
+    }
+    template <typename T>
+    static void * MemoryCalloc(size_t elementCount)
+    {
+        return chip::Platform::MemoryCallocTyped<T>(elementCount);
+    }
 };
-#else
-class SimplePlatformMemoryManagement
+
+template <class MemoryManagement, typename T, typename = void>
+struct HasElementCountAllocators : std::false_type
 {
-protected:
-    static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t num, size_t size) { return chip::Platform::MemoryAlloc(num * size); }
-    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
 };
-template <typename T>
-using PlatformMemoryManagement = SimplePlatformMemoryManagement;
-#endif
+
+template <class MemoryManagement, typename T>
+struct HasElementCountAllocators<MemoryManagement, T,
+                                 std::void_t<decltype(MemoryManagement::template MemoryAlloc<T>(size_t())),
+                                             decltype(MemoryManagement::template MemoryCalloc<T>(size_t()))>> : std::true_type
+{
+};
 
 } // namespace Impl
 
@@ -141,12 +144,10 @@ using PlatformMemoryManagement = SimplePlatformMemoryManagement;
  *
  * For a single element RAII with dtor, use Platform::UniquePtr<>
  *
- * The MemoryManagement type may support MemoryAllocTyped/MemoryCallocTyped that
- * only take the number of elements as an argument, in which case it needs to
- * determine the size of T in some other way, and do the necessary multiplication
- * itself.
+ * MemoryManagement provides static MemoryFree(void *) and static member templates
+ * MemoryAlloc<T>/MemoryCalloc<T>(size_t elementCount) that return nullptr on overflow.
  */
-template <typename T, typename MemoryManagement = Impl::PlatformMemoryManagement<T>>
+template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
 class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 {
     friend class Impl::ScopedMemoryBufferBase<MemoryManagement>;
@@ -155,6 +156,8 @@ public:
     using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
     static_assert(std::is_trivially_destructible<T>::value, "Destructors won't get run");
+    static_assert(Impl::HasElementCountAllocators<MemoryManagement, T>::value,
+                  "MemoryManagement must provide template <typename T> MemoryAlloc/MemoryCalloc(size_t elementCount)");
 
     T * Get() { return static_cast<T *>(Base::Ptr()); }
     T & operator[](size_t index) { return Get()[index]; }
@@ -172,14 +175,7 @@ public:
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
         Base::Free();
-        if constexpr (std::is_invocable_v<decltype(Base::MemoryCalloc), size_t>)
-        {
-            Base::SetPtr(Base::MemoryCalloc(elementCount));
-        }
-        else
-        {
-            Base::SetPtr(Base::MemoryCalloc(elementCount, sizeof(T)));
-        }
+        Base::SetPtr(MemoryManagement::template MemoryCalloc<T>(elementCount));
         ExecuteConstructors(elementCount);
         return *this;
     }
@@ -187,14 +183,7 @@ public:
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
         Base::Free();
-        if constexpr (std::is_invocable_v<decltype(Base::MemoryAlloc), size_t>)
-        {
-            Base::SetPtr(Base::MemoryAlloc(elementCount));
-        }
-        else
-        {
-            Base::SetPtr(Base::MemoryAlloc(elementCount, sizeof(T)));
-        }
+        Base::SetPtr(MemoryManagement::template MemoryAlloc<T>(elementCount));
         ExecuteConstructors(elementCount);
         return *this;
     }

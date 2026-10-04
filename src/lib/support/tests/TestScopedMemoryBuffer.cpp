@@ -18,6 +18,8 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <cstdint>
+
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 
@@ -40,21 +42,35 @@ public:
         mAllocCount--;
         chip::Platform::MemoryFree(p);
     }
-    static void * MemoryAlloc(size_t num)
+    template <typename T>
+    static void * MemoryAlloc(size_t elementCount)
     {
         mAllocCount++;
-        return chip::Platform::MemoryAllocTyped<char>(num);
+        return chip::Platform::MemoryAllocTyped<T>(elementCount);
     }
-    static void * MemoryCalloc(size_t num)
+    template <typename T>
+    static void * MemoryCalloc(size_t elementCount)
     {
         mAllocCount++;
-        return chip::Platform::MemoryCallocTyped<char>(num);
+        return chip::Platform::MemoryCallocTyped<T>(elementCount);
     }
 
 private:
     static int mAllocCount;
 };
 int TestCounterMemoryManagement::mAllocCount = 0;
+
+class ByteCountMemoryManagement
+{
+public:
+    static void MemoryFree(void * p);
+    static void * MemoryAlloc(size_t size);
+    static void * MemoryCalloc(size_t num, size_t size);
+};
+
+static_assert(chip::Platform::Impl::HasElementCountAllocators<chip::Platform::Impl::PlatformMemoryManagement, uint32_t>::value);
+static_assert(chip::Platform::Impl::HasElementCountAllocators<TestCounterMemoryManagement, uint32_t>::value);
+static_assert(!chip::Platform::Impl::HasElementCountAllocators<ByteCountMemoryManagement, uint32_t>::value);
 
 using TestCounterScopedBuffer = chip::Platform::ScopedMemoryBuffer<char, TestCounterMemoryManagement>;
 
@@ -138,6 +154,22 @@ TEST_F(TestScopedMemoryBuffer, TestCopyFromSpanMemcpyByteCountUsesSizeof)
     {
         EXPECT_EQ(buffer.Get()[i], source[i]);
     }
+}
+
+TEST_F(TestScopedMemoryBuffer, TestAllocSizeOverflow)
+{
+    constexpr size_t kMaxCount = SIZE_MAX / sizeof(uint32_t);
+
+    chip::Platform::ScopedMemoryBuffer<uint32_t> buffer;
+    EXPECT_FALSE(buffer.Alloc(kMaxCount + 1));
+    EXPECT_FALSE(buffer.Alloc(kMaxCount + 2));
+    EXPECT_TRUE(buffer.Alloc(4));
+
+    chip::Platform::ScopedMemoryBufferWithSize<uint32_t> sizedBuffer;
+    EXPECT_FALSE(sizedBuffer.Alloc(kMaxCount + 2));
+    EXPECT_EQ(sizedBuffer.AllocatedSize(), static_cast<size_t>(0));
+    EXPECT_TRUE(sizedBuffer.Alloc(4));
+    EXPECT_EQ(sizedBuffer.AllocatedSize(), static_cast<size_t>(4));
 }
 
 } // namespace
