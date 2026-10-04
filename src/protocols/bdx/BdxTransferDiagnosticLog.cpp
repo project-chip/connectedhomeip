@@ -120,6 +120,11 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageReceived(Messaging::ExchangeContex
     return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }
 
+bool BdxTransferDiagnosticLog::CanHandleOutput() const
+{
+    return mExchangeCtx == nullptr || !mExchangeCtx->IsWaitingForAck();
+}
+
 CHIP_ERROR BdxTransferDiagnosticLog::OnMessageToSend(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
