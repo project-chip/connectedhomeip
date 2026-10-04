@@ -47,7 +47,7 @@ public:
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    EndpointId GetEndpointId() const override { return mEndpointId; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     Clusters::OnOffCluster & OnOffCluster() { return mOnOffCluster.Cluster(); }

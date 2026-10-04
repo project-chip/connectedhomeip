@@ -52,13 +52,13 @@ source_set("oob-accessors") {
     "clusters/OnOffOOBAccessor.h",
     "clusters/RvcOOBAccessor.cpp",
     "clusters/RvcOOBAccessor.h",
-    "device-manager/AddBridgedDeviceOOBAccessor.h",
-    "device-manager/RemoveBridgedDeviceOOBAccessor.h",
+    "bridged-device-manager/AddBridgedDeviceOOBAccessor.h",
+    "bridged-device-manager/RemoveBridgedDeviceOOBAccessor.h",
   ]
 
   public_deps = [
     ":all_devices_config_buildconfig",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device-manager",
+    "${chip_root}/examples/all-devices-app/all-devices-common/bridged-device-manager",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/clusters/ambient-context-sensing-server",
     "${chip_root}/src/app/clusters/ambient-sensing-union-server",

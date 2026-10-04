@@ -61,7 +61,7 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    EndpointId GetEndpointId() const override { return mEndpointId; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
 protected:
     virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider) = 0;

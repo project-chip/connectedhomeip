@@ -24,7 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <device-manager/DeviceManager.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
@@ -37,8 +37,8 @@
 #include <oob-accessors/clusters/OccupancyOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 #include <oob-accessors/clusters/RvcOOBAccessor.h>
-#include <oob-accessors/device-manager/AddBridgedDeviceOOBAccessor.h>
-#include <oob-accessors/device-manager/RemoveBridgedDeviceOOBAccessor.h>
+#include <oob-accessors/bridged-device-manager/AddBridgedDeviceOOBAccessor.h>
+#include <oob-accessors/bridged-device-manager/RemoveBridgedDeviceOOBAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DefaultTimerDelegate.h>

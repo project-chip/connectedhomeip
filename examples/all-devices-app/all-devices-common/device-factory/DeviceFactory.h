@@ -80,6 +80,8 @@
 #include <functional>
 #include <map>
 
+#include "DeviceRegistrationEntry.h"
+
 namespace chip::app {
 
 /**
@@ -176,14 +178,6 @@ template <typename... Hooks>
 class DeviceFactory
 {
 public:
-    /// Bundles an allocated device with its post-registration hook callback.
-    struct DeviceRegistrationEntry
-    {
-        std::unique_ptr<DeviceInterface> device;
-        /// Hook that must be called after device->Register(...) completes while device is alive.
-        std::function<void()> onDeviceRegistered;
-    };
-
     template <typename TDevice>
     static void ExecuteHooks(TDevice & device)
     {
