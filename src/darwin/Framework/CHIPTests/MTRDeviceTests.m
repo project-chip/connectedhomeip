@@ -6948,6 +6948,78 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
 }
 
+- (void)test049d_TimeSynchronizationLossSurvivesOverlappingReportBegin
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
+
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    __block BOOL lossDetected = NO;
+    delegate.onTimeSynchronizationLossDetected = ^{
+        lossDetected = YES;
+    };
+    __weak __auto_type weakDevice = device;
+    __weak __auto_type weakController = controller;
+    delegate.onWillHandleReportEnd = ^{
+        if (!lossDetected) {
+            return;
+        }
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onWillHandleReportEnd = nil;
+        [weakDevice unitTestInjectAttributeReport:@[] fromSubscription:YES];
+        // The Matter queue is serial, so this returns once the empty report has begun.
+        [weakController syncRunOnWorkQueue:^{
+        } error:nil];
+    };
+
+    XCTestExpectation * repaired = [self expectationWithDescription:@"SetUTCTime for the loss"];
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [repaired fulfill];
+    };
+
+    [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+    [self waitForExpectations:@[ repaired ] timeout:60];
+    XCTAssertNil(delegate.onWillHandleReportEnd);
+}
+
 - (void)test050_readAttributePaths_withWildCardPath
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];

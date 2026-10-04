@@ -43,6 +43,7 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
+@property (atomic, copy, nullable) dispatch_block_t onWillHandleReportEnd;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
 @end
