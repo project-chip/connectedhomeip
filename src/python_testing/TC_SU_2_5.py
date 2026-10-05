@@ -305,7 +305,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
 
         logger.info('%s: Step #1.0 - OTA Download about to complete!', step_number_s1)
-         
         logger.info('%s: Step #1.0 - Waiting for kDelayedOnApply', step_number_s1)
         # Wait for the device to reach kDelayedOnApply (configured value: 60 seconds; specification value: 120 seconds).
         time_for_kDelayed_apply = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
@@ -628,7 +627,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
         subscription_attr_cluster.await_all_expected_report_matches(
             [download_progress_attr_matcher_obj], timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
-    
+
         logger.info("%s OTA download completed; reading the ApplyUpdateRequestActionResponse configured on the Provider",step_number_s3)
         # Use named pipes to confirm the ApplyUpdateAction
         await asyncio.sleep(0.1)
