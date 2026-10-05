@@ -125,6 +125,11 @@ SentKeySet ToOwned(NodeId nodeId, const GroupKeySetType & source)
     return owned;
 }
 
+std::vector<uint8_t> KeyBytes(const EpochKey & key)
+{
+    return std::vector<uint8_t>(key.begin(), key.end());
+}
+
 void ExpectCharSpanEquals(const CharSpan & actual, const char * expected)
 {
     EXPECT_TRUE(actual.data_equal(CharSpan::fromCharString(expected)));
@@ -238,6 +243,10 @@ public:
     CHIP_ERROR Dispatch(NodeId nodeId, SyncKind kind, std::function<void(CHIP_ERROR)> onCompletion)
     {
         syncCalls.emplace_back(nodeId, kind);
+        if (onSync)
+        {
+            onSync(nodeId, kind);
+        }
         if (auto it = failStartWith.find(kind); it != failStartWith.end())
         {
             CHIP_ERROR err = it->second;
@@ -377,6 +386,7 @@ public:
     std::map<SyncKind, CHIP_ERROR> completeWith;  // result for the next completion of that kind (consumed)
     std::map<SyncKind, CHIP_ERROR> failStartWith; // SyncNode returns this synchronously (consumed)
     std::optional<SyncKind> deferKind;            // completions of this kind are captured, not run
+    std::function<void(NodeId, SyncKind)> onSync; // runs as each sync is issued, before it completes
     std::vector<std::function<void(CHIP_ERROR)>> deferred;
     std::vector<std::pair<NodeId, SyncKind>> syncCalls;
     std::vector<NodeKeySetEntryType> nodeKeySetSyncs;
@@ -2734,6 +2744,57 @@ TEST(JointFabricDatastoreTest, KeySetUpdatedDuringItsWriteIsWrittenAgain)
 
     delegate.RunDeferred(); // the write of key C
     EXPECT_EQ(store.GetNodeKeySetList()[0].statusEntry.state, State::kCommitted);
+}
+
+// UpdateKeySet does not write a key set to a node it is being removed from. If the removal is then cancelled by a
+// re-add while a write from before the removal is in flight, that write's success does not commit the entry: the
+// node holds the old key, and the queued sync writes the updated one.
+TEST(JointFabricDatastoreTest, KeySetUpdatedWhileBeingRemovedIsWrittenOnReAdd)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    GroupKeySetType keySet = AddKeySetEleven(store);
+    AddGroupTen(store, 11);
+
+    // The delegate sends the key set stored when it writes a node's key set entry.
+    std::vector<std::vector<uint8_t>> keysWritten;
+    delegate.onSync = [&store, &delegate, &keysWritten](NodeId, SyncKind kind) {
+        if (kind != SyncKind::kNodeKeySet || delegate.lastNodeKeySetSync.statusEntry.state != State::kPending)
+        {
+            return;
+        }
+        for (const auto & stored : store.GetGroupKeySetList())
+        {
+            if (stored.groupKeySetID == 11 && !stored.epochKey0.IsNull())
+            {
+                keysWritten.emplace_back(stored.epochKey0.Value().begin(), stored.epochKey0.Value().end());
+            }
+        }
+    };
+
+    delegate.deferKind = SyncKind::kNodeKeySet;
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    keySet.epochKey0.SetNonNull(ByteSpan(kEpochKeyB));
+    ASSERT_EQ(store.UpdateGroupKeySetEntry(keySet), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+
+    delegate.RunDeferred(); // the write of key A
+
+    ASSERT_EQ(delegate.deferred.size(), 1u);
+    EXPECT_TRUE(keysWritten == (std::vector<std::vector<uint8_t>>{ KeyBytes(kEpochKeyA), KeyBytes(kEpochKeyB) }));
+    ASSERT_NE(FindNodeKeySet(store, 123, 11), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 11)->statusEntry.state, State::kPending);
+
+    delegate.RunDeferred(); // the write of key B
+    ASSERT_NE(FindNodeKeySet(store, 123, 11), nullptr);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 11)->statusEntry.state, State::kCommitted);
+    ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
+    EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
 }
 
 // A failed key set write still holds back the group add queued after it, although an update of the key set waits

@@ -101,7 +101,7 @@ struct NodeKeySetEntryStruct : Clusters::JointFabricDatastore::Structs::Datastor
     // As ACLEntryStruct::pendingRemoval.
     bool pendingRemoval = false;
 
-    // As EndpointGroupIDEntryStruct::syncRevision. Changed when the key set is updated.
+    // As EndpointGroupIDEntryStruct::syncRevision. Changed when the key set is updated, and by CancelRemoval.
     uint32_t syncRevision = 0;
 };
 
@@ -774,12 +774,21 @@ private:
     }
 
     // Adding an entry that is being removed cancels the removal: the entry is added again.
+    //
+    // The sync revision changes, so that an add in flight from before the removal was requested does not commit the
+    // entry. Updates made while the entry was being removed were not synced to it (UpdateKeySet and UpdateGroup skip
+    // such entries), so the node may hold an older value than the entry. ACL entries have no sync revision: their syncs
+    // compare the value sent with the entry's value, which UpdateGroup does not change while the entry is being removed.
     template <typename T>
     static void CancelRemoval(T & entry)
     {
         entry.pendingRemoval          = false;
         entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
         entry.statusEntry.failureCode = 0;
+        if constexpr (!std::is_same_v<T, datastore::ACLEntryStruct>)
+        {
+            ++entry.syncRevision;
+        }
     }
 
     // True if `entry` is DeletePending or has recorded removal intent.
