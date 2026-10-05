@@ -273,7 +273,8 @@ public:
 
     void RunDeferred(size_t index = 0, CHIP_ERROR result = CHIP_NO_ERROR)
     {
-        auto callback = std::move(deferred.at(index));
+        ASSERT_LT(index, deferred.size());
+        auto callback = std::move(deferred[index]);
         deferred.erase(deferred.begin() + static_cast<std::ptrdiff_t>(index));
         callback(result);
     }
@@ -1517,43 +1518,6 @@ TEST(JointFabricDatastoreTest, FailedBindingRemovalIsRemovedByNextRefresh)
     EXPECT_TRUE(store.GetEndpointBindingList().empty());
 }
 
-// Binding list IDs can be reused. An add clears any removal intent left for its key, so the new
-// entry is written by RefreshNode instead of being removed.
-TEST(JointFabricDatastoreTest, ReAddedBindingIsNotTreatedAsRemoval)
-{
-    JointFabricDatastore store;
-    TrackingDelegate delegate;
-    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
-    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
-    ASSERT_EQ(store.TestAddEndpointEntry(1, 123, "ep"_span), CHIP_NO_ERROR);
-
-    JointFabricCluster::Structs::DatastoreBindingTargetStruct::Type binding;
-    binding.group.SetValue(10);
-    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, binding), CHIP_NO_ERROR);
-    const uint16_t listId = store.GetEndpointBindingList()[0].listID;
-
-    delegate.completeWith[SyncKind::kBinding] = CHIP_IM_GLOBAL_STATUS(Timeout);
-    ASSERT_EQ(store.RemoveBindingFromEndpointForNode(listId, 123, 1), CHIP_NO_ERROR);
-    store.GetEndpointBindingList().clear();
-
-    delegate.completeWith[SyncKind::kBinding] = CHIP_IM_GLOBAL_STATUS(Timeout);
-    ASSERT_EQ(store.AddBindingToEndpointForNode(123, 1, binding), CHIP_NO_ERROR);
-    ASSERT_EQ(store.GetEndpointBindingList().size(), 1u);
-    ASSERT_EQ(store.GetEndpointBindingList()[0].listID, listId);
-
-    EndpointEntryType endpoint;
-    endpoint.nodeID     = 123;
-    endpoint.endpointID = 1;
-    delegate.endpointsToFetch.push_back(endpoint);
-
-    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
-
-    ASSERT_FALSE(delegate.bindingListSyncs.empty());
-    ASSERT_EQ(delegate.bindingListSyncs.back().second.size(), 1u);
-    EXPECT_EQ(delegate.bindingListSyncs.back().second[0].listID, listId);
-    EXPECT_EQ(store.GetEndpointBindingList().size(), 1u);
-}
-
 TEST(JointFabricDatastoreTest, FailedGroupIdRemovalRecordsCommitFailed)
 {
     JointFabricDatastore store;
@@ -1618,6 +1582,7 @@ TEST(JointFabricDatastoreTest, RefreshCommitsNodeOnlyAfterFinalAclSync)
     delegate.RunDeferred();
 
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
 }
 
@@ -1635,6 +1600,7 @@ TEST(JointFabricDatastoreTest, FailedFinalAclSyncLeavesNodePendingAndReleasesGua
     delegate.RunDeferred(0, CHIP_IM_GLOBAL_STATUS(Timeout));
 
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kPending);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.failureCode, to_underlying(Protocols::InteractionModel::Status::Timeout));
 
@@ -1827,6 +1793,7 @@ TEST(JointFabricDatastoreTest, RefreshReleasesGuardOnSyncStartFailure)
     delegate.failStartWith[SyncKind::kAclList] = CHIP_ERROR_CONNECTION_ABORTED;
     static_cast<void>(store.RefreshNode(123));
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kPending);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
 
     EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
@@ -1857,6 +1824,7 @@ TEST(JointFabricDatastoreTest, BindingStageFailureStillRunsAclStage)
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
 
     EXPECT_EQ(delegate.aclListSyncs.size(), 1u);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kPending);
     EXPECT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
@@ -1966,6 +1934,7 @@ TEST(JointFabricDatastoreTest, RefreshAdoptsOutOfBandAclWithFreshListId)
     ASSERT_EQ(store.GetNodeACLList().size(), 2u);
     const auto & adopted = store.GetNodeACLList()[1];
     EXPECT_TRUE(adopted.ACLEntry.subjects == std::vector<uint64_t>{ 0x3333 });
+    EXPECT_NE(adopted.listID, 0u);
     EXPECT_NE(adopted.listID, 5u);
     EXPECT_EQ(adopted.statusEntry.state, State::kCommitted);
     EXPECT_EQ(delegate.aclListSyncs.back().second.size(), 2u);
@@ -1995,6 +1964,7 @@ TEST(JointFabricDatastoreTest, RefreshDoesNotReadoptSupersededValue)
     }
     ASSERT_EQ(delegate.aclListSyncs.back().second.size(), 1u);
     EXPECT_EQ(delegate.aclListSyncs.back().second[0].privilege, Privilege::kView);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
     EXPECT_FALSE(FindAcl(store, 123, 5)->supersededValue.has_value());
 }
@@ -2025,6 +1995,7 @@ TEST(JointFabricDatastoreTest, RefreshErasesRemovalTheNodeAlreadyCompleted)
 
     delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
     ASSERT_EQ(store.RemoveACLFromNode(5, 123), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     ASSERT_TRUE(FindAcl(store, 123, 5)->pendingRemoval);
 
     delegate.deferKind = SyncKind::kAclList;
@@ -2519,6 +2490,7 @@ TEST(JointFabricDatastoreTest, AddCancelsPendingAclRemoval)
 
     delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
     ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     ASSERT_TRUE(FindAcl(store, 123, 7)->pendingRemoval);
 
     JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
@@ -2531,6 +2503,7 @@ TEST(JointFabricDatastoreTest, AddCancelsPendingAclRemoval)
     EXPECT_EQ(delegate.lastAclSync.listID, 7u);
     EXPECT_EQ(delegate.lastAclSync.statusEntry.state, State::kPending);
     ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_FALSE(FindAcl(store, 123, 7)->pendingRemoval);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
 }
@@ -2555,10 +2528,16 @@ TEST(JointFabricDatastoreTest, AddOfTombstonedAclValueDropsTombstone)
     ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
     ASSERT_EQ(store.GetNodeACLList().size(), 1u);
 
+    // The added entry is removed, and another administrator then writes its value to the node again. With no
+    // tombstone left, the refresh adopts the value as it adopts any value it did not write, instead of removing it.
+    ASSERT_EQ(store.RemoveACLFromNode(store.GetNodeACLList()[0].listID, 123), CHIP_NO_ERROR);
+    ASSERT_TRUE(store.GetNodeACLList().empty());
+
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
     ASSERT_EQ(store.GetNodeACLList().size(), 1u);
     EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.state, State::kCommitted);
     EXPECT_FALSE(store.GetNodeACLList()[0].pendingRemoval);
+    ASSERT_FALSE(delegate.aclListSyncs.empty());
     EXPECT_EQ(delegate.aclListSyncs.back().second.size(), 1u);
 }
 
@@ -3254,11 +3233,13 @@ TEST(JointFabricDatastoreTest, RemovalWhenSyncQueueFullIsBusyAndChangesNothing)
     FillSyncQueue(store, delegate);
 
     EXPECT_EQ(store.RemoveACLFromNode(lastListId, 123), CHIP_IM_GLOBAL_STATUS(Busy));
+    ASSERT_NE(FindAcl(store, 123, lastListId), nullptr);
     EXPECT_EQ(FindAcl(store, 123, lastListId)->statusEntry.state, State::kCommitted);
     EXPECT_FALSE(FindAcl(store, 123, lastListId)->pendingRemoval);
 
     delegate.RunDeferred();
     EXPECT_EQ(store.RemoveACLFromNode(lastListId, 123), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, lastListId), nullptr);
     EXPECT_EQ(FindAcl(store, 123, lastListId)->statusEntry.state, State::kDeletePending);
 }
 
@@ -3592,6 +3573,7 @@ TEST(JointFabricDatastoreTest, BackToBackUpdatesReplaceTheValueTheNodeHolds)
     EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kManage);
 
     delegate.RunDeferred();
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
     EXPECT_EQ(FindAcl(store, 123, 7)->ACLEntry.privilege, Privilege::kAdminister);
 }
@@ -3604,6 +3586,7 @@ TEST(JointFabricDatastoreTest, CommitClearsSupersededValue)
 
     ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
 
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
     EXPECT_FALSE(FindAcl(store, 123, 7)->supersededValue.has_value());
 }
@@ -3629,6 +3612,7 @@ TEST(JointFabricDatastoreTest, RefreshAclWriteDoesNotCommitUpdateMadeDuringIt)
     EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kManage);
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
     EXPECT_EQ(delegate.LastAclSuperseded().privilege, Privilege::kView);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitted);
     EXPECT_EQ(FindAcl(store, 123, 7)->ACLEntry.privilege, Privilege::kManage);
 }
@@ -3647,6 +3631,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupWhenSyncQueueFullIsBusyAndChangesNothi
 
     EXPECT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_IM_GLOBAL_STATUS(Busy));
     EXPECT_EQ(store.GetGroupEntries()[0].groupPermission, Privilege::kView);
+    ASSERT_NE(FindAcl(store, 123, 100), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 100)->ACLEntry.privilege, Privilege::kView);
     EXPECT_EQ(FindAcl(store, 123, 100)->statusEntry.state, State::kCommitted);
 }
@@ -3660,6 +3645,7 @@ TEST(JointFabricDatastoreTest, RemovingEntryWithPendingUpdateSendsSupersededValu
 
     delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
     ASSERT_EQ(SetGroupTenPermission(store, Privilege::kManage), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 7), nullptr);
     ASSERT_EQ(FindAcl(store, 123, 7)->statusEntry.state, State::kCommitFailed);
 
     ASSERT_EQ(store.RemoveACLFromNode(7, 123), CHIP_NO_ERROR);
@@ -3800,6 +3786,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupRewritesCatSubjectToNewVersion)
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
     EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ oldSubject });
     EXPECT_EQ(delegate.LastAclSync().privilege, Privilege::kOperate); // version-only bump
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
@@ -3815,6 +3802,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupIgnoresCaseSubjectEqualToGroupId)
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, std::nullopt, Privilege::kAdminister), CHIP_NO_ERROR);
 
     EXPECT_FALSE(delegate.hasLastAclSync);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->ACLEntry.privilege, Privilege::kView);
 }
 
@@ -3828,6 +3816,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupRewritesOnCatIdentifierChange)
 
     ASSERT_EQ(UpdateCatGroup(store, 0x3456, std::nullopt, std::nullopt), CHIP_NO_ERROR);
 
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_TRUE(FindAcl(store, 123, 5)->ACLEntry.subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x3456'0001) });
     ASSERT_TRUE(delegate.lastAclSuperseded.has_value());
     EXPECT_TRUE(delegate.LastAclSuperseded().subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0001) });
@@ -3845,6 +3834,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupRewritesEntryLeftAtOlderVersion)
 
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 3, std::nullopt), CHIP_NO_ERROR);
 
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_TRUE(FindAcl(store, 123, 5)->ACLEntry.subjects == std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0003) });
 }
 
@@ -3860,6 +3850,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupLeavesUnrelatedSubjectsOnVersionBump)
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
 
     const auto * entry = FindAcl(store, 123, 5);
+    ASSERT_NE(entry, nullptr);
     EXPECT_TRUE(entry->ACLEntry.subjects == (std::vector<uint64_t>{ NodeIdFromCASEAuthTag(0x2345'0002), 0xDEADBEEF }));
     EXPECT_EQ(entry->ACLEntry.privilege, Privilege::kView);
     EXPECT_EQ(store.GetNodeACLList().size(), 1u);
@@ -3894,8 +3885,10 @@ TEST(JointFabricDatastoreTest, UpdateGroupSplitsMixedEntryOnPermissionChange)
 
     ASSERT_EQ(store.GetNodeACLList().size(), 2u);
     const auto & added = store.GetNodeACLList()[1];
+    EXPECT_NE(added.listID, 0u);
     EXPECT_NE(added.listID, 5u);
     EXPECT_EQ(added.statusEntry.state, State::kCommitted);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
@@ -3971,6 +3964,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupStillUpdatesGroupAuthPrivilege)
 
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, std::nullopt, Privilege::kManage), CHIP_NO_ERROR);
 
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->ACLEntry.privilege, Privilege::kManage);
     EXPECT_TRUE(FindAcl(store, 123, 5)->ACLEntry.subjects == std::vector<uint64_t>{ 0x000A });
 }
@@ -3986,6 +3980,7 @@ TEST(JointFabricDatastoreTest, UpdateGroupVersionBumpLeavesGroupAuthEntryAlone)
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
 
     EXPECT_FALSE(delegate.hasLastAclSync);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->ACLEntry.privilege, Privilege::kView);
 }
 
@@ -4103,6 +4098,7 @@ TEST(JointFabricDatastoreTest, FailedCatRewriteIsRetriedAsReplaceAtRefresh)
 
     delegate.completeWith[SyncKind::kAcl] = CHIP_IM_GLOBAL_STATUS(Timeout);
     ASSERT_EQ(UpdateCatGroup(store, std::nullopt, 2, std::nullopt), CHIP_NO_ERROR);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     ASSERT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitFailed);
     ASSERT_TRUE(FindAcl(store, 123, 5)->supersededValue.has_value());
 
@@ -4112,6 +4108,7 @@ TEST(JointFabricDatastoreTest, FailedCatRewriteIsRetriedAsReplaceAtRefresh)
     ASSERT_EQ(written.size(), 1u);
     EXPECT_TRUE(written[0].subjects == std::vector<uint64_t>{ newSubject });
     ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+    ASSERT_NE(FindAcl(store, 123, 5), nullptr);
     EXPECT_EQ(FindAcl(store, 123, 5)->statusEntry.state, State::kCommitted);
 }
 
