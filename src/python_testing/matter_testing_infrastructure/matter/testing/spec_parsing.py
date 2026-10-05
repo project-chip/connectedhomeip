@@ -1368,6 +1368,7 @@ VERSION_TO_DM = {
     0x01050100: PrebuiltDataModelDirectory.k1_5_1,
     0x01060000: PrebuiltDataModelDirectory.k1_6,
     0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+    0x01070000: PrebuiltDataModelDirectory.k1_7,
 }
 
 
