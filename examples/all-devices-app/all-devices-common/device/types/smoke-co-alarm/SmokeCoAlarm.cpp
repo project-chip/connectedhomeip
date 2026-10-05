@@ -33,7 +33,7 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultCoConfig()
     return SmokeCoAlarm::ConcentrationCluster::Config{
         .clusterId = CarbonMonoxideConcentrationMeasurement::Id,
         .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                 ConcentrationMeasurement::Feature::kLevelIndication),
+                                                                ConcentrationMeasurement::Feature::kLevelIndication),
         .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
         .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
     };
@@ -45,7 +45,7 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
     return SmokeCoAlarm::ConcentrationCluster::Config{
         .clusterId = SmokeConcentrationMeasurement::Id,
         .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                 ConcentrationMeasurement::Feature::kLevelIndication),
+                                                                ConcentrationMeasurement::Feature::kLevelIndication),
         .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
         .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
     };
@@ -55,8 +55,8 @@ SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
     mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(smokeConfig)
 {}
 
