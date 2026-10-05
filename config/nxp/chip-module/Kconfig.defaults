@@ -97,8 +97,25 @@ config BOOTLOADER_MCUBOOT
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
 
+# MCXW70 runs OpenThread standalone (no NET L2); the rest of the MCXW7XX
+# series (e.g. MCXW72) keeps OpenThread as the Zephyr NET L2. Otherwise, 
+# the default stays n.
 config NET_L2_OPENTHREAD
+	default n if SOC_MCXW70AC
+	default y if SOC_SERIES_MCXW7XX
 	default n
+
+# MCXW70: standalone OpenThread (no NET L2). Thread is gated on OPENTHREAD.
+config OPENTHREAD
+	default y if SOC_MCXW70AC
+
+# Drop the Zephyr socket layer (also drops implied NETWORKING/NET_*/POSIX_API).
+config CHIP_USE_ZEPHYR_NETWORKING
+	default n if SOC_MCXW70AC
+
+# Keep the NET stack off; nothing pulls it in without the socket L2.
+config NETWORKING
+	default n if SOC_MCXW70AC
 
 config CHIP_LIB_SHELL
 	default n if SOC_MCXW70AC
@@ -281,6 +298,19 @@ config NET_BUF_DATA_SIZE
 	default 256
 
 if OPENTHREAD
+
+# MCXW70 has no RCP; use the in-SoC vendor radio (no default in upstream).
+# The vendor radio and the Zephyr NET-L2 radio.c both define otPlatRadio*;
+# they are mutually exclusive, so only enable the vendor impl when NET L2 is off.
+config OPENTHREAD_RADIO_VENDOR_IMPLEMENTATION
+	default y if SOC_MCXW70AC && !NET_L2_OPENTHREAD
+
+config OPENTHREAD_RADIO_VENDOR_IMPLEMENTATION_FILE
+	default "nxp_mcxw_radio.c" if SOC_MCXW70AC
+
+# OT alarm needs the counter driver; auto-select is DT-gated, so force it here.
+config COUNTER
+	default y if SOC_MCXW70AC
 
 config HDLC_RCP_IF
 	default y if SOC_FAMILY_NXP_RW
