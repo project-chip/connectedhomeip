@@ -463,6 +463,8 @@ private:
 
     static constexpr uint16_t kMaxTransitionTime         = 0xFFFE; // Max value as defined by the spec.
     static constexpr uint16_t kMaxColorTemperatureMireds = 0xFEFF; // Max value as defined by the spec.
+    static constexpr uint16_t kMinColorTemperatureMireds = 1;      // Min value as defined by the spec.
+
     // 10 distinct attribute IDs are scenable; CurrentHue and EnhancedCurrentHue are mutually exclusive,
     // so at most 9 are saved for any one device.
     static constexpr uint8_t kColorControlScenableAttributesCount = 10;
