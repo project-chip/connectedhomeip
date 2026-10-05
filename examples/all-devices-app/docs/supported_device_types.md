@@ -49,7 +49,7 @@ To update or validate this list manually, follow these steps:
         - **Blocked**: One or more mandatory clusters are missing (listed in the
           `Missing Clusters` column without an `[O]` suffix).
 
-## Implemented Device Types (52 total)
+## Implemented Device Types (53 total)
 
 | #   | Device Type Name               | ID            | Missing Clusters                                                                                                                                                                                            | Notes                       |
 | --- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -102,12 +102,12 @@ To update or validate this list manually, follow these steps:
 | 47  | Temperature Sensor             | 770 (0x0302)  |                                                                                                                                                                                                             |                             |
 | 48  | Thread Border Router           | 145 (0x0091)  | Thread Border Router Diagnostics [O]                                                                                                                                                                        | Minimally Ready             |
 | 49  | Water Freeze Detector          | 65 (0x0041)   |                                                                                                                                                                                                             |                             |
-| 50  | Water Heater                   | 1295 (0x050F) | Demand Response Load Control [O]                                                                                                                                                                            | Minimally Ready             |
+| 50  | Water Heater                   | 1295 (0x050F) | Device Energy Management [O], Power Source [O], Temperature Sensor [O], Electrical Sensor [O]                                                                                                                                                                            | Minimally Ready             |
 | 51  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                                                                                                             |                             |
 | 52  | Water Valve                    | 66 (0x0042)   |                                                                                                                                                                                                             |                             |
 | 53  | Window Covering                | 514 (0x0202)  |                                                                                                                                                                                                             |                             |
 
-## Unimplemented Device Types (53 total)
+## Unimplemented Device Types (52 total)
 
 | #   | Device Type Name                  | ID            | Ready Clusters                                                                                                                                                                                                                                            | Missing Clusters                                                                                                                                                                                                                     | Notes           |
 | --- | --------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |

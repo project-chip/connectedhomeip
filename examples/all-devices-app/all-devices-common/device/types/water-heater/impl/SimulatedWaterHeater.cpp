@@ -36,11 +36,9 @@ using ModeTagStructType                 = Clusters::detail::Structs::ModeTagStru
 
 constexpr uint8_t kWaterHeaterModeOff    = 0;
 constexpr uint8_t kWaterHeaterModeManual = 1;
-constexpr uint8_t kWaterHeaterModeTimed  = 2;
 
 const ModeTagStructType kWaterHeaterModeOffTags[]    = { { .value = to_underlying(WaterHeaterMode::ModeTag::kOff) } };
 const ModeTagStructType kWaterHeaterModeManualTags[] = { { .value = to_underlying(WaterHeaterMode::ModeTag::kManual) } };
-const ModeTagStructType kWaterHeaterModeTimedTags[]  = { { .value = to_underlying(WaterHeaterMode::ModeTag::kTimed) } };
 
 struct WaterHeaterModeOption
 {
@@ -51,7 +49,6 @@ struct WaterHeaterModeOption
 const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
     { "Manual"_span, kWaterHeaterModeManual, Span<const ModeTagStructType>(kWaterHeaterModeManualTags) },
     { "Off"_span, kWaterHeaterModeOff, Span<const ModeTagStructType>(kWaterHeaterModeOffTags) },
-    { "Timed"_span, kWaterHeaterModeTimed, Span<const ModeTagStructType>(kWaterHeaterModeTimedTags) },
 };
 } // namespace
 
@@ -258,7 +255,8 @@ void SimulatedWaterHeater::SetHeatingEnabled(bool enabled)
     {
         return;
     }
-
+    auto systemMode = enabled ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
+    ThermostatCluster().SetSystemMode(systemMode);
     mHeatingEnabled = enabled;
     mHeatDemand     = enabled ? mHeaterTypes : BitMask<WaterHeaterHeatSourceBitmap>();
     NotifyHeatDemandChanged();
@@ -362,21 +360,15 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetRunningState(BitMas
 
 ControlSequenceOfOperationEnum SimulatedWaterHeater::GetControlSequenceOfOperation() const
 {
-    return mControlSequenceOfOperation;
+    return ControlSequenceOfOperationEnum::kHeatingOnly;
 }
 
 Protocols::InteractionModel::Status SimulatedWaterHeater::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
                                                                                         bool & changed)
 {
     changed = false;
-    if (mControlSequenceOfOperation == seq)
-    {
-        return Status::Success;
-    }
-
-    mControlSequenceOfOperation = seq;
-    changed                     = true;
-    return Status::Success;
+    // This device has only heating capability.
+    return seq == ControlSequenceOfOperationEnum::kHeatingOnly ? Status::Success : Status::ConstraintError;
 }
 
 DataModel::Nullable<temperature> SimulatedWaterHeater::GetLocalTemperature() const
@@ -417,7 +409,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
         return Status::Success;
     }
 
-    if (occupiedHeatingSetpoint < kInitialTemperature || occupiedHeatingSetpoint > kMaxTemperature)
+    if (occupiedHeatingSetpoint < kMinTemperature || occupiedHeatingSetpoint > kMaxTemperature)
     {
         return Status::ConstraintError;
     }

@@ -24,6 +24,9 @@
 #include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
 
+#include <tuple>
+#include <type_traits>
+
 namespace chip::app {
 
 template <typename... ThermostatDelegates>
