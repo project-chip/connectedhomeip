@@ -51,63 +51,58 @@ To update or validate this list manually, follow these steps:
 
 ## Implemented Device Types (52 total)
 
-| #   | Device Type Name               | ID            | Missing Clusters                                                                                                                                                                                            | Notes                       |
-| --- | ------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| 1   | Aggregator                     | 14 (0x000E)   |                                                                                                                                                                                                             |                             |
-| 2   | Air Purifier                   | 45 (0x002D)   |                                                                                                                                                                                                             |                             |
-| 3   | Air Quality Sensor             | 44 (0x002C)   |                                                                                                                                                                                                             |                             |
-| 4   | Ambient Context Sensor         | 336 (0x0150)  |                                                                                                                                                                                                             |                             |
-| 5   | Bridged Node                   | 19 (0x0013)   |                                                                                                                                                                                                             |                             |
-| 6   | Chime                          | 326 (0x0146)  |                                                                                                                                                                                                             |                             |
-| 7   | Commissioning By Proxy         | 146 (0x0092)  |                                                                                                                                                                                                             |                             |
-| 8   | Contact Sensor                 | 21 (0x0015)   |                                                                                                                                                                                                             |                             |
-| 9   | Cook Surface                   | 119 (0x0077)  |                                                                                                                                                                                                             | Part of Cooktop             |
-| 10  | Cooktop                        | 120 (0x0078)  |                                                                                                                                                                                                             |                             |
-| 11  | Device Energy Management       | 1293 (0x050D) | Device Energy Management Mode [O]                                                                                                                                                                           | Minimally Ready             |
-| 12  | Dimmable Light                 | 257 (0x0101)  |                                                                                                                                                                                                             |                             |
-| 13  | Dimmable Plug-In Unit          | 267 (0x010B)  |                                                                                                                                                                                                             |                             |
-| 14  | Dishwasher                     | 117 (0x0075)  | Dishwasher Alarm [O], Dishwasher Mode [O], Temperature Control [O]                                                                                                                                          | Minimally Ready             |
+| #   | Device Type Name         | ID            | Missing Clusters                                                   | Notes           |
+| --- | ------------------------ | ------------- | ------------------------------------------------------------------ | --------------- |
+| 1   | Aggregator               | 14 (0x000E)   |                                                                    |                 |
+| 2   | Air Purifier             | 45 (0x002D)   |                                                                    |                 |
+| 3   | Air Quality Sensor       | 44 (0x002C)   |                                                                    |                 |
+| 4   | Ambient Context Sensor   | 336 (0x0150)  |                                                                    |                 |
+| 5   | Bridged Node             | 19 (0x0013)   |                                                                    |                 |
+| 6   | Chime                    | 326 (0x0146)  |                                                                    |                 |
+| 7   | Commissioning By Proxy   | 146 (0x0092)  |                                                                    |                 |
+| 8   | Contact Sensor           | 21 (0x0015)   |                                                                    |                 |
+| 9   | Cook Surface             | 119 (0x0077)  |                                                                    | Part of Cooktop |
+| 10  | Cooktop                  | 120 (0x0078)  |                                                                    |                 |
+| 11  | Device Energy Management | 1293 (0x050D) | Device Energy Management Mode [O]                                  | Minimally Ready |
+| 12  | Dimmable Light           | 257 (0x0101)  |                                                                    |                 |
+| 13  | Dimmable Plug-In Unit    | 267 (0x010B)  |                                                                    |                 |
+| 14  | Dishwasher               | 117 (0x0075)  | Dishwasher Alarm [O], Dishwasher Mode [O], Temperature Control [O] | Minimally Ready |
 
-| 15  | Doorbell                       | 328 (0x0148)  |                                                                                                                               
+| 15 | Doorbell | 328 (0x0148) |
 
-| 16  | Electrical Sensor              | 1296 (0x0510) | Electrical Alarm [O]                                                                                                                                                                                        | Minimally Ready             |
-| 17  | Extractor Hood                 | 122 (0x007A)  |                                                                                                                                                                                                             |                             |
-| 18  | Fan                            | 43 (0x002B)   |                                                                                                                                                                                                             |                             |
-| 19  | Flow Sensor                    | 774 (0x0306)  |                                                                                                                                                                                                             |                             |
-| 20  | Generic Switch                 | 15 (0x000F)   |                                                                                                                                                                                                             |                             |
-| 21  | Humidity Conditioner           | 125 (0x007D)  | Water Tank Level Monitoring [O], Fan Control [O], Relative Humidity Measurement [O]                                                                                                                         | Minimally Ready             |
-| 22  | Humidity Sensor                | 775 (0x0307)  |                                                                                                                                                                                                             |                             |
-| 23  | Laundry Dryer                  | 124 (0x007C)  | Laundry Dryer Controls [O], Laundry Washer Mode [O], Temperature Control [O]                                                                                                                                | Minimally Ready             |
-| 24  | Laundry Washer                 | 115 (0x0073)  | Temperature Control [O]                                                                                                                                                                                     | Minimally Ready             |
-| 25  | Light Sensor                   | 262 (0x0106)  |                                                                                                                                                                                                             |                             |
-| 26  | Microwave Oven                 | 121 (0x0079)  | Fan Control [O]                                                                                                                                                                                             | Minimally Ready             |
-| 27  | Mode Select                    | 39 (0x0027)   |                                                                                                                                                                                                             |                             |
-| 28  | Mounted Dimmable Load Control  | 272 (0x0110)  |                                                                                                                                                                                                             |                             |
-| 29  | Mounted On/Off Control         | 271 (0x010F)  |                                                                                                                                                                                                             |                             |
-| 30  | Network Infrastructure Manager | 144 (0x0090)  |                                                                                                                                                                                                             |                             |
-| 31  | Occupancy Sensor               | 263 (0x0107)  |                                                                                                                                                                                                             |                             |
-| 32  | On/Off Light                   | 256 (0x0100)  |                                                                                                                                                                                                             |                             |
-| 33  | On/Off Light Switch            | 259 (0x0103)  |                                                                                                                                                                                                             |                             |
-| 34  | On/Off Plug-In Unit            | 266 (0x010A)  |                                                                                                                                                                                                             |                             |
-| 35  | Oven                           | 123 (0x007B)  | Temperature Controlled Cabinet Topology [O]                                                                                                                                                                 | Minimally Ready             |
-| 36  | Power Source                   | 17 (0x0011)   |                                                                                                                                                                                                             |                             |
-| 37  | Pressure Sensor                | 773 (0x0305)  |                                                                                                                                                                                                             |                             |
-| 38  | Proximity Ranger               | 338 (0x0152)  |                                                                                                                                                                                                             |                             |
-| 39  | Rain Sensor                    | 68 (0x0044)   |                                                                                                                                                                                                             |                             |
-| 40  | Refrigerator                   | 112 (0x0070)  | Refrigerator And Temperature Controlled Cabinet Mode [O], Refrigerator Alarm [O], Temperature Controlled Cabinet Topology [O]                                                                               | Minimally Ready             |
-| 41  | Robotic Vacuum Cleaner         | 116 (0x0074)  |                                                                                                                                                                                                             |                             |
-| 42  | Room Air Conditioner           | 114 (0x0072)  | Groups [O], Scenes Management [O], Thermostat Mode [O], HEPA Filter Monitoring [O], Activated Carbon Filter Monitoring [O], Fan Control [O], Temperature Measurement [O], Relative Humidity Measurement [O] | Minimally Ready             |
-| 43  | Root Node                      | 22 (0x0016)   |                                                                                                                                                                                                             |                             |
-| 44  | Smoke CO Alarm                 | 118 (0x0076)  |                                                                                                                                                                                                             |                             |
-| 45  | Soil Sensor                    | 69 (0x0045)   |                                                                                                                                                                                                             |                             |
-| 46  | Speaker                        | 34 (0x0022)   |                                                                                                                                                                                                             |                             |
-| 47  | Temperature Controlled Cabinet | 113 (0x0071)  | Refrigerator And Temperature Controlled Cabinet Mode [O], Oven Mode [O], Temperature Alarm [O]                                                                                                              | Part of Refrigerator / Oven |
-| 48  | Temperature Sensor             | 770 (0x0302)  |                                                                                                                                                                                                             |                             |
-| 49  | Thread Border Router           | 145 (0x0091)  | Thread Border Router Diagnostics [O]                                                                                                                                                                        | Minimally Ready             |
-| 50  | Water Freeze Detector          | 65 (0x0041)   |                                                                                                                                                                                                             |                             |
-| 51  | Water Leak Detector            | 67 (0x0043)   |                                                                                                                                                                                                             |                             |
-| 52  | Water Valve                    | 66 (0x0042)   |                                                                                                                                                                                                             |                             |
-| 53  | Window Covering                | 514 (0x0202)  |                                                                                                                                                                                                             |                             |
+| 16 | Electrical Sensor | 1296 (0x0510) | Electrical Alarm [O] | Minimally
+Ready | | 17 | Extractor Hood | 122 (0x007A) | | | | 18 | Fan | 43 (0x002B) | |
+| | 19 | Flow Sensor | 774 (0x0306) | | | | 20 | Generic Switch | 15 (0x000F) |
+| | | 21 | Humidity Conditioner | 125 (0x007D) | Water Tank Level Monitoring
+[O], Fan Control [O], Relative Humidity Measurement [O] | Minimally Ready | | 22
+| Humidity Sensor | 775 (0x0307) | | | | 23 | Laundry Dryer | 124 (0x007C) |
+Laundry Dryer Controls [O], Laundry Washer Mode [O], Temperature Control [O] |
+Minimally Ready | | 24 | Laundry Washer | 115 (0x0073) | Temperature Control [O]
+| Minimally Ready | | 25 | Light Sensor | 262 (0x0106) | | | | 26 | Microwave
+Oven | 121 (0x0079) | Fan Control [O] | Minimally Ready | | 27 | Mode Select |
+39 (0x0027) | | | | 28 | Mounted Dimmable Load Control | 272 (0x0110) | | | | 29
+| Mounted On/Off Control | 271 (0x010F) | | | | 30 | Network Infrastructure
+Manager | 144 (0x0090) | | | | 31 | Occupancy Sensor | 263 (0x0107) | | | | 32 |
+On/Off Light | 256 (0x0100) | | | | 33 | On/Off Light Switch | 259 (0x0103) | |
+| | 34 | On/Off Plug-In Unit | 266 (0x010A) | | | | 35 | Oven | 123 (0x007B) |
+Temperature Controlled Cabinet Topology [O] | Minimally Ready | | 36 | Power
+Source | 17 (0x0011) | | | | 37 | Pressure Sensor | 773 (0x0305) | | | | 38 |
+Proximity Ranger | 338 (0x0152) | | | | 39 | Rain Sensor | 68 (0x0044) | | | |
+40 | Refrigerator | 112 (0x0070) | Refrigerator And Temperature Controlled
+Cabinet Mode [O], Refrigerator Alarm [O], Temperature Controlled Cabinet
+Topology [O] | Minimally Ready | | 41 | Robotic Vacuum Cleaner | 116 (0x0074) |
+| | | 42 | Room Air Conditioner | 114 (0x0072) | Groups [O], Scenes Management
+[O], Thermostat Mode [O], HEPA Filter Monitoring [O], Activated Carbon Filter
+Monitoring [O], Fan Control [O], Temperature Measurement [O], Relative Humidity
+Measurement [O] | Minimally Ready | | 43 | Root Node | 22 (0x0016) | | | | 44 |
+Smoke CO Alarm | 118 (0x0076) | | | | 45 | Soil Sensor | 69 (0x0045) | | | | 46
+| Speaker | 34 (0x0022) | | | | 47 | Temperature Controlled Cabinet | 113
+(0x0071) | Refrigerator And Temperature Controlled Cabinet Mode [O], Oven Mode
+[O], Temperature Alarm [O] | Part of Refrigerator / Oven | | 48 | Temperature
+Sensor | 770 (0x0302) | | | | 49 | Thread Border Router | 145 (0x0091) | Thread
+Border Router Diagnostics [O] | Minimally Ready | | 50 | Water Freeze Detector |
+65 (0x0041) | | | | 51 | Water Leak Detector | 67 (0x0043) | | | | 52 | Water
+Valve | 66 (0x0042) | | | | 53 | Window Covering | 514 (0x0202) | | |
 
 ## Unimplemented Device Types (53 total)
 
