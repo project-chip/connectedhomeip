@@ -102,17 +102,24 @@ ReturnErrorOnFailure(mProductDevice->Register(EndpointId(1), *mDataModelProvider
 
 ## 5. Production Providers
 
-Replace example providers in
-[`all-devices-common/providers/`](../all-devices-common/providers/) with
-hardware-backed implementations before starting the Matter server:
+Replace example and test providers (such as
+[`all-devices-common/providers/`](../all-devices-common/providers/) or
+`Examples::GetExampleDACProvider()`) with hardware-backed implementations before
+starting the Matter server:
 
 1. **`DeviceAttestationCredentialsProvider`**: Bind
    [`SetDeviceAttestationCredentialsProvider`](../../../src/credentials/DeviceAttestationCredsProvider.h)
    to the platform factory data partition or secure element instead of
-   `AllDevicesExampleDACProvider`.
+   `AllDevicesExampleDACProvider` / `GetExampleDACProvider()`.
 2. **`DeviceInstanceInfoProvider` & `DeviceInfoProvider`**: Register the
    platform factory data provider via `SetDeviceInstanceInfoProvider` and
    `SetDeviceInfoProvider`.
+3. **`CommissionableDataProvider`**: Bind
+   [`SetCommissionableDataProvider`](../../../src/include/platform/CommissionableDataProvider.h)
+   to factory-provisioned SPAKE2+ verifier, salt, iteration count, and
+   discriminator instead of test defaults
+   (`CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE` /
+   `CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR`).
 
 ---
 

@@ -13,7 +13,11 @@ for architecture and device class implementation.
     -   Remove `all-devices-common/device-factory` and
         `DeviceFactoryPlatformOverride.h` from `posix/BUILD.gn`,
         [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn), and
-        [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn).
+        [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn), and remove
+        `all-devices-common/device-factory` and `:device-type-parser` from
+        [`posix/app_options/BUILD.gn`](../posix/app_options/BUILD.gn) (along
+        with `--device` / `NoHooksDeviceFactory` handling in
+        [`AppOptions.cpp`](../posix/app_options/AppOptions.cpp)).
     -   Remove `oob-accessors`, `posix/named_pipe`, sample peripheral sources
         (`PosixAudioManager.cpp`, `PosixChime.cpp`, `PosixSpeaker.cpp`), unused
         `device/types/*` targets, and the `device/types/<device>:posix` logging

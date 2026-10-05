@@ -41,9 +41,16 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
     -   Platform initialization, persistence setup, `dataModelProvider`
         creation, and `gRootNode` (`WifiRootNode`) registration on
         `kRootEndpointId` (`0`) in `PopulateCodeDrivenDataModelProvider()`.
+    -   Factory data provider wiring (`ESP32FactoryDataProvider` and
+        `ESP32DeviceInfoProvider`), enabling
+        `CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER`,
+        `CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER`, and
+        `CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER` in production builds so
+        `app_main()` does not fall back to `Examples::GetExampleDACProvider()`.
 -   **Remove**:
-    -   All `AppDeviceFactory` registration, NVS `dev-type` device-selection
-        state, shell device-switching commands, and sample display UI hooks in
+    -   All `AppDeviceFactory` / `DeviceFactory` registration,
+        `<app_config/enabled_devices.h>`, NVS `dev-type` device-selection state,
+        shell device-switching commands, and sample display UI hooks in
         `main.cpp`.
 -   **Replace**:
     -   Immediately after `gRootNode->Register(...)` in
