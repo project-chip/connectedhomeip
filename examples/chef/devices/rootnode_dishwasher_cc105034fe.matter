@@ -1900,7 +1900,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -1954,7 +1954,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1983,8 +1983,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -1996,7 +1996,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2086,14 +2086,14 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 5000;
-    ram      attribute minTemperature default = 4900;
-    ram      attribute maxTemperature default = 8200;
-    ram      attribute step default = 100;
+    callback attribute temperatureSetpoint default = 5000;
+    callback attribute minTemperature default = 4900;
+    callback attribute maxTemperature default = 8200;
+    callback attribute step default = 100;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap default = 5;
     callback attribute clusterRevision;
 
     handle command SetTemperature;

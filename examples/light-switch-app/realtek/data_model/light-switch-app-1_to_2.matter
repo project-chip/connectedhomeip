@@ -2871,7 +2871,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2958,7 +2958,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2981,8 +2981,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2997,7 +2997,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -3011,20 +3011,20 @@ endpoint 0 {
     emits event MissingTrustedTimeSource;
     callback attribute UTCTime;
     callback attribute granularity;
-    ram      attribute timeSource default = 0x00;
+    callback attribute timeSource default = 0x00;
     callback attribute trustedTimeSource;
     callback attribute defaultNTP;
     callback attribute timeZone;
     callback attribute DSTOffset;
     callback attribute localTime;
-    ram      attribute timeZoneDatabase default = 0;
+    callback attribute timeZoneDatabase default = 0;
     callback attribute timeZoneListMaxSize;
     callback attribute DSTOffsetListMaxSize;
-    ram      attribute supportsDNSResolve default = false;
+    callback attribute supportsDNSResolve default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0B;
+    callback attribute featureMap default = 0x0B;
     callback attribute clusterRevision;
 
     handle command SetUTCTime;
@@ -3041,7 +3041,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3236,12 +3236,12 @@ endpoint 4 {
 
   server cluster Switch {
     emits event InitialPress;
-    ram      attribute numberOfPositions default = 2;
+    callback attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    callback attribute featureMap default = 2;
     callback attribute clusterRevision;
   }
 }

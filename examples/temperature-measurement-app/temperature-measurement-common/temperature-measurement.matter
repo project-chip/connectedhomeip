@@ -1857,7 +1857,7 @@ endpoint 0 {
 
   server cluster UnitLocalization {
     callback attribute temperatureUnit;
-    ram      attribute featureMap default = 0x1;
+    callback attribute featureMap default = 0x1;
     callback attribute clusterRevision;
   }
 
@@ -1911,7 +1911,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1943,8 +1943,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
   }
 
   server cluster EthernetNetworkDiagnostics {
@@ -1957,7 +1957,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -1967,7 +1967,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2032,8 +2032,8 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = -8500;
-    ram      attribute maxMeasuredValue default = 9900;
+    callback attribute minMeasuredValue default = -8500;
+    callback attribute maxMeasuredValue default = 9900;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }

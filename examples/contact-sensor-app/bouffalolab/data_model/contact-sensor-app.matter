@@ -2241,7 +2241,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2325,7 +2325,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2335,7 +2335,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2392,8 +2392,8 @@ endpoint 0 {
     callback attribute registeredClients;
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
-    ram      attribute userActiveModeTriggerHint default = 0x100;
-    ram      attribute userActiveModeTriggerInstruction default = "Push setup button for Active Mode";
+    callback attribute userActiveModeTriggerHint default = 0x100;
+    callback attribute userActiveModeTriggerInstruction default = "Push setup button for Active Mode";
     callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
