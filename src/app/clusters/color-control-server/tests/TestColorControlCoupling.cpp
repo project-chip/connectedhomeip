@@ -115,6 +115,9 @@ TEST_F(TestColorControlCoupling, InvalidArgumentsRejectedWhileOff)
     ColorControlCluster cluster(kTestEndpointId, config);
 
     ASSERT_EQ(onOff.SetOnOff(false), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kUp, 0, /*isEnhanced=*/false), Status::InvalidCommand);
+    EXPECT_EQ(cluster.MoveSaturation(MoveModeEnum::kUp, 0), Status::InvalidCommand);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 0, 0, 0), Status::InvalidCommand);
     // TransitionTime is constrained to max 0xFFFE.
     EXPECT_EQ(cluster.MoveToColorTemp(300, 0xFFFF, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::ConstraintError);
 
