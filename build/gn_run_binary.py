@@ -52,6 +52,11 @@ import subprocess
 import sys
 
 args = sys.argv[1:]
+# When GN actions invoke a Python helper via 'python', resolve to the active
+# Python interpreter running this script (sys.executable) to ensure consistent
+# venv environment resolution.
+if args and args[0] == 'python':
+    args[0] = sys.executable
 
 ret = subprocess.call(args)
 if ret != 0:

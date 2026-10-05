@@ -36,6 +36,7 @@ source_set("tv-common-sources") {
   deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/app/clusters/audio-control-server",
     "${chip_root}/src/app/clusters/media-file-management-server",
     "${chip_root}/src/lib",
   ]
@@ -75,6 +76,10 @@ source_set("tv-common-sources") {
     "clusters/media-playback/MediaPlaybackManager.h",
     "clusters/messages/MessagesManager.cpp",
     "clusters/messages/MessagesManager.h",
+    "clusters/speaker/SpeakerAudioCoordinator.cpp",
+    "clusters/speaker/SpeakerAudioCoordinator.h",
+    "clusters/speaker/SpeakerEndpoint.cpp",
+    "clusters/speaker/SpeakerEndpoint.h",
     "clusters/target-navigator/TargetNavigatorManager.cpp",
     "clusters/target-navigator/TargetNavigatorManager.h",
     "clusters/wake-on-lan/WakeOnLanManager.cpp",

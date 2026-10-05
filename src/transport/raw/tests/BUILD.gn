@@ -26,6 +26,7 @@ static_library("helpers") {
   sources = [
     "NetworkTestHelpers.cpp",
     "NetworkTestHelpers.h",
+    "TCPBaseTestAccess.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -42,6 +43,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestMessageHeader.cpp",
     "TestPeerAddress.cpp",
+    "TestProxyTransport.cpp",
     "TestUDP.cpp",
   ]
 
@@ -54,8 +56,6 @@ chip_test_suite("tests") {
   if (chip_config_network_layer_ble) {
     test_sources += [ "TestBLEReinitialization.cpp" ]
   }
-
-  sources = [ "TCPBaseTestAccess.h" ]
 
   public_deps = [
     ":helpers",

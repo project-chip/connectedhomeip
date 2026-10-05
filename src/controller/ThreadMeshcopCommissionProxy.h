@@ -118,11 +118,17 @@ private:
 
     uint64_t mJoinerId = 0;
 
+    bool mCurrentPacketIsResponse          = false;
+    bool mCurrentPacketHasMatterSrv        = false;
+    bool mCurrentPacketHasDiscriminator    = false;
+    bool mCurrentTxtRecordHasDiscriminator = false;
+
     std::recursive_mutex mMutex;
     bool mPromiseFulfilled = false;
     std::promise<Dnssd::DiscoveredNodeData> mDiscoveredNodePromise;
 
     std::shared_ptr<ot::commissioner::Commissioner> mCommissioner;
+    std::atomic<bool> mStopProxyThread{ false };
     std::thread mProxyThread;
     DiscoveryDiagnostic mLastDiscoveryDiagnostic;
 };

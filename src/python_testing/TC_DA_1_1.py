@@ -57,6 +57,25 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --vendor-id 0xFFF2
+#       --product-id 0x8002
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF2-8002.json
+#       --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       -q MT:86PS0KQS02-10648G00
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -68,7 +87,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import CommissioningInfo, SetupParameters, commission_device
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 from matter.tlv import TLVReader
 
@@ -85,7 +104,9 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/deviceatt
 '''
 
 
-class TC_DA_1_1(MatterBaseTest):
+class TC_DA_1_1(MatterTestCommissionedDevice):
+    # Step 3 factory resets the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
 
     def desc_TC_DA_1_1(self) -> str:
         return "The NOC SHALL be wiped on Factory Reset [DUT - Commissionee]"

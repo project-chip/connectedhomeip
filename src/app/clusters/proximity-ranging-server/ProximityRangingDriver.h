@@ -41,8 +41,8 @@ namespace ProximityRanging {
  * all adapters owned by a single ProximityRangingDriver instance. Sets the
  * capacity of the driver's internal session pool: a StartRanging request
  * accepted by its adapter but unable to claim a pool slot is immediately
- * stopped on the adapter and reported back to the cluster as
- * ResultCodeEnum::kBusySessionCapacityReached.
+ * stopped on the adapter and reported back to the cluster as a cluster-specific
+ * failure StatusCodeEnum::kBusySessionCapacityReached.
  *
  * The default of 16 is chosen to comfortably cover
  * typical multi-peer deployments while keeping the static pool footprint
@@ -78,10 +78,10 @@ static constexpr size_t kMaxConcurrentSessions = CHIP_CLUSTER_PROXIMITY_RANGING_
  * invocation.
  *
  * On HandleStartRanging:
- *   - The driver calls adapter->PrepareSession(sid, params). Non-Accepted
- *     return values are surfaced verbatim to the caller and no session
+ *   - The driver calls adapter->PrepareSession(sid, params). A cluster-specific
+ *     failure status is surfaced verbatim to the caller and no session
  *     record is committed.
- *   - On kAccepted, the driver allocates a Session pool slot, marks
+ *   - On a success status, the driver allocates a Session pool slot, marks
  *     SessionIDList dirty (so the sid is visible from acceptance), and arms
  *     the EndTime timer at endTime seconds.
  *   - The driver then arms the per-session NextTrigger timer:
@@ -164,8 +164,14 @@ public:
      * Route a StartRangingRequest to the adapter matching the requested
      * technology. The driver tags the new session with the provided ID; the
      * caller (cluster) is responsible for ID allocation.
+     *
+     * @return a success ClusterStatusCode when the session was staged and
+     *         scheduled; a cluster-specific failure (a StatusCodeEnum value)
+     *         when the adapter rejected the request or no session slot was
+     *         available.
      */
-    ResultCodeEnum HandleStartRanging(uint8_t sessionId, const Commands::StartRangingRequest::DecodableType & request);
+    Protocols::InteractionModel::ClusterStatusCode HandleStartRanging(uint8_t sessionId,
+                                                                      const Commands::StartRangingRequest::DecodableType & request);
 
     /**
      * Route a StopRangingRequest to the adapter that owns the session.

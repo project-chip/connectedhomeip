@@ -21,11 +21,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/av-analysis-server/AvAnalysisCluster.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCameraClient.h>
+#include <app/clusters/av-analysis-server/AvAnalysisCameraInteraction.h>
 #include <app/clusters/av-analysis-server/AvAnalysisStorage.h>
+#include <app/clusters/av-analysis-server/AvAnalysisStreamTable.h>
+#include <app/clusters/av-analysis-server/AvAnalysisWebRTCClient.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistenceProvider.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -42,7 +46,7 @@ class AvAnalysisDelegate;
 // Callback type for notifying attribute changes
 using MarkDirtyCallback = std::function<void(AttributeId)>;
 
-class AvAnalysisServerLogic
+class AvAnalysisServerLogic : public AvAnalysisCameraClient::Callback, public AvAnalysisWebRTCClient::Callback
 {
 public:
     /**
@@ -50,13 +54,15 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId               The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                 The bitflags value that identifies which features are supported by this instance.
-     * @param aSupportedAmbientContexts The set of Ambient Contextx that this server is capable of detecting
+     * @param aSupportedAmbientContexts The set of Ambient Contexts that this server is capable of detecting
      * @param aMaxZones                 The maximum number of zones present on the server. Shall be Null if PerZoneSensitivity is
      * not set. Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aMaxAnalysisStreamCount   The fixed value of the MaxAnalysisStreamCount attribute. Shall be non-zero if
+     * RemoteContextDetection is set, and 0 otherwise.
      */
     AvAnalysisServerLogic(EndpointId aEndpointId, BitFlags<AvAnalysis::Feature> aFeatures,
                           const std::vector<Descriptor::Structs::SemanticTagStruct::Type> & aSupportedAmbientContexts,
-                          DataModel::Nullable<uint8_t> aMaxZones);
+                          DataModel::Nullable<uint8_t> aMaxZones, uint8_t aMaxAnalysisStreamCount = 0);
     ~AvAnalysisServerLogic();
 
     void SetDelegate(AvAnalysisDelegate * delegate)
@@ -70,6 +76,28 @@ public:
 
     void SetMarkDirtyCallback(MarkDirtyCallback callback) { mMarkDirtyCallback = std::move(callback); }
 
+    /**
+     * Sets the camera client used by a RemoteContextDetection instance to allocate/deallocate analysis
+     * streams on the camera (not used with LocalContextDetection).
+     * Required before Startup; must outlive this instance.
+     */
+    void SetCameraClient(AvAnalysisCameraClient * aCameraClient) { mCameraClient = aCameraClient; }
+
+    /**
+     * Sets the WebRTC client used by a RemoteContextDetection instance to initiate/end the WebRTC
+     * sessions carrying analysis streams (not used with LocalContextDetection).
+     * Required before Startup; must outlive this instance, which cancels it on destruction.
+     */
+    void SetWebRTCClient(AvAnalysisWebRTCClient * aWebRTCClient) { mWebRTCClient = aWebRTCClient; }
+
+    void OnVideoStreamAllocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+    void OnVideoStreamDeallocated(Protocols::InteractionModel::Status aStatus, uint16_t aVideoStreamId) override;
+
+    void OnSessionInitiated(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId, bool aOfferSent) override;
+    void OnSessionActive(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnSessionFailed(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId) override;
+    void OnSessionEnded(Protocols::InteractionModel::Status aStatus, uint16_t aWebRTCSessionId) override;
+
     EndpointId mEndpointId = kInvalidEndpointId;
 
     BitFlags<AvAnalysis::Feature> mFeatures;
@@ -77,11 +105,11 @@ public:
     // Definitions of class variables that represent the Cluster attributes
     const std::vector<Descriptor::Structs::SemanticTagStruct::Type> mSupportedAmbientContexts;
     std::vector<AvAnalysis::AmbientContextStorage> mActiveAmbientContextTriggers;
-    uint8_t mMaxAnalysisStreamCount     = 0;
-    uint8_t mCurrentAnalysisStreamCount = 0;
-    std::vector<AvAnalysis::Structs::AnalysisStreamStruct::Type> mAnalysisStreams;
-    bool mTrackingEnabled = false;
+    uint8_t mMaxAnalysisStreamCount = 0;
+    bool mTrackingEnabled           = false;
     DataModel::Nullable<uint8_t> mMaxZones;
+
+    uint8_t GetCurrentAnalysisStreamCount() const { return mStreamTable.Count(); }
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
@@ -96,6 +124,9 @@ public:
     // Returns the commands accepted depending on the Feature Flags that are set
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
+    // Returns the commands generated depending on the Feature Flags that are set
+    CHIP_ERROR GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder);
+
     // Returns supported depending on the Feature Flags that are set
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
@@ -105,7 +136,6 @@ public:
     CHIP_ERROR ReadAndEncodeAnalysisStreams(AttributeValueEncoder & aEncoder);
 
     // Attribute mutators
-    CHIP_ERROR SetMaxAnalysisStreamCount(uint8_t aMaxAnalysisStreamCount);
     CHIP_ERROR SetTrackingEnabled(bool aTrackingEnabled);
 
     // Command handlers
@@ -128,9 +158,49 @@ public:
     HandleRemoveAnalysisStream(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                const AvAnalysis::Commands::RemoveAnalysisStream::DecodableType & commandData);
 
+    // Attribute interactions
+    bool IsTriggeringContextActive(const Globals::Structs::SemanticTagStruct::Type aContext,
+                                   Optional<DataModel::Nullable<std::vector<uint16_t>>> aZoneIds);
+
+    // Active context tracking and events
+    CHIP_ERROR CreateActiveSession(uint16_t & aSessionId, NodeId aSourceNodeId = kUndefinedNodeId,
+                                   uint64_t aSourceStartTimestampUs = 0, bool aUseSpecificSessionId = false);
+
+    CHIP_ERROR AnalysisSessionStart(uint16_t & aSessionId, const DataModel::Nullable<std::vector<uint16_t>> & aZoneList,
+                                    ServerClusterContext * aContext, NodeId aSourceNodeId = kUndefinedNodeId,
+                                    uint64_t aSourceStartTimestampUs = 0);
+
+    CHIP_ERROR InitialTriggeringContextDetected(uint16_t aSessionId,
+                                                const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aTriggeringContext,
+                                                ServerClusterContext * aContext);
+
+    CHIP_ERROR NewContextDetected(uint16_t aSessionId, const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aNewContext,
+                                  ServerClusterContext * aContext);
+
+    CHIP_ERROR ContextNoLongerDetected(uint16_t aSessionId,
+                                       const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aOldContext,
+                                       ServerClusterContext * aContext);
+
+    CHIP_ERROR AnalysisSessionEnd(uint16_t aSessionId, ServerClusterContext * aContext);
+
 private:
     AvAnalysisDelegate * mDelegate                               = nullptr;
+    AvAnalysisCameraClient * mCameraClient                       = nullptr;
+    AvAnalysisWebRTCClient * mWebRTCClient                       = nullptr;
     AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
+    uint16_t mNextAnalysisSessionID                              = 0;
+    std::vector<AvAnalysis::ActiveAmbientContextSession> mActiveSessions;
+
+    // Backing store for the AnalysisStreams attribute; only initialized when RemoteContextDetection is set.
+    AvAnalysis::AnalysisStreamTable mStreamTable;
+
+    // The single camera-bound interaction that may be in flight
+    AvAnalysis::CameraInteraction mCameraInteraction;
+
+    /**
+     * Applies a state transition to a stream entry and reports the AnalysisStreams attribute change.
+     */
+    void SetStreamState(AvAnalysis::AnalysisStreamEntry & aEntry, AvAnalysis::AnalysisStreamStateEnum aState);
 
     MarkDirtyCallback mMarkDirtyCallback;
 
@@ -140,25 +210,41 @@ private:
     void MarkDirty(AttributeId aAttributeId);
 
     /**
-     * Command sub-handlers
+     * Abandons the in-flight camera interaction, if any, and every tracked WebRTC session.
      */
-    std::optional<DataModel::ActionReturnStatus>
-    HandleLocalEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                     const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus>
-    HandleRemoteEnableContextTriggers(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                      const AvAnalysis::Commands::EnableContextTriggers::DecodableType & commandData);
+    void CancelCameraInteraction();
+
+    /**
+     * Answers a command parked on a camera interaction with Failure, for the paths that abandon the
+     * interaction rather than completing it.
+     */
+    void FailParkedCommand();
 
     /*
-     * Command handler helper methods
+     * Command and event handler helper methods
      */
+    // Session ids are assigned per camera, so the camera is part of the key
+    AvAnalysis::AnalysisStreamEntry * FindByWebRTCSession(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId);
+    // Assigns the next session id not currently in use
+    CHIP_ERROR AllocateSessionId(uint16_t & aSessionId);
+    // The active session with this id
+    std::vector<AvAnalysis::ActiveAmbientContextSession>::iterator FindSession(uint16_t aSessionId);
+    // Names the session's source stream on a PerceivedContext, under RemoteContextDetection
+    void SetEventSource(AvAnalysis::Events::PerceivedContext::Type & aEvent,
+                        const AvAnalysis::ActiveAmbientContextSession & aSession);
     bool ZoneIDListContains(const DataModel::DecodableList<uint16_t> list, uint16_t value);
+    bool AreAllZoneIdsFound(const std::vector<uint16_t> & subset, const std::vector<uint16_t> & target);
+    bool IsContextPartOfActiveContextTriggers(const std::vector<AvAnalysis::Structs::TrackedContext::Type> & aContext);
 
     /**
      * Helper functions to handle persistent data and the KVS.
      */
     CHIP_ERROR StoreActiveAmbientContextTriggers();
     CHIP_ERROR LoadActiveAmbientContextTriggers();
+    CHIP_ERROR StoreAnalysisStreams();
+    CHIP_ERROR LoadAnalysisStreams();
+    CHIP_ERROR StoreTrackingEnabled();
+    CHIP_ERROR LoadTrackingEnabled();
     void LoadPersistentAttributes();
 };
 

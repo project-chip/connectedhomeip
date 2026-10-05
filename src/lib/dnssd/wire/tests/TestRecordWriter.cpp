@@ -163,4 +163,32 @@ TEST(TestRecordWriter, TonsOfReferences)
     EXPECT_EQ(output.Needed(), 423u);
 }
 
+TEST(TestRecordWriter, UncompressedAvoidsPointers)
+{
+    const QNamePart kName1[] = { "some", "name" };
+    const QNamePart kName2[] = { "other", "name" };
+
+    uint8_t dataBuffer[128];
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.WriteQName(FullQName(kName1));
+    writer.WriteQNameUncompressed(FullQName(kName2));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        4, 's', 'o', 'm', 'e',      // QNAME part: some
+        4, 'n', 'a', 'm', 'e',      // QNAME part: name
+        0,                          // QNAME ends
+        5, 'o', 't', 'h', 'e', 'r', // QNAME part: other
+        4, 'n', 'a', 'm', 'e',      // QNAME part: name (not compressed)
+        0,                          // QNAME ends
+    };
+    // clang-format on
+
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
+}
+
 } // namespace

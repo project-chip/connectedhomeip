@@ -44,6 +44,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, trustedRootCertificates);
     case Attributes::CurrentFabricIndex::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentFabricIndex);
+    case Attributes::PQCDeviceAttestationProfile::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, PQCDeviceAttestationProfile);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

@@ -18,7 +18,6 @@
 #include <app/clusters/ambient-context-sensing-server/ambient-context-sensing-namespace.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <cassert>
 #include <chrono>
 #include <clusters/AmbientContextSensing/Metadata.h>
 
@@ -27,12 +26,32 @@ namespace chip::app::Clusters {
 using namespace AmbientContextSensing;
 using namespace AmbientContextSensing::Attributes;
 
+namespace {
+
+// Span deliberately has no operator== (see Span.h), so the Optional/Nullable comparison chain has
+// to be spelled out down to data_equal.
+bool IsLabelEqual(const Optional<DataModel::Nullable<CharSpan>> & a, const Optional<DataModel::Nullable<CharSpan>> & b)
+{
+    VerifyOrReturnValue(a.HasValue() == b.HasValue(), false);
+    VerifyOrReturnValue(a.HasValue(), true);
+    VerifyOrReturnValue(a.Value().IsNull() == b.Value().IsNull(), false);
+    return a.Value().IsNull() || a.Value().Value().data_equal(b.Value().Value());
+}
+
+bool IsSemanticTagEqual(const SemanticTagType & a, const SemanticTagType & b)
+{
+    return a.mfgCode == b.mfgCode && a.namespaceID == b.namespaceID && a.tag == b.tag && IsLabelEqual(a.label, b.label);
+}
+
+} // namespace
+
 AmbientContextSensingCluster::AmbientContextSensingCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, AmbientContextSensing::Id }), mFeatureMap(config.mFeatureMap),
     mOptionalAttributeSet(config.mOptionalAttributeBits), mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
-    assert(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
-           mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting));
+    VerifyOrDie(mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
+                mFeatureMap.Has(Feature::kSoundIdentification) || mFeatureMap.Has(Feature::kObjectCounting) ||
+                mFeatureMap.Has(Feature::kSensorFusion));
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -73,6 +92,7 @@ void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
     mAmbientContextTypeSupportedList = {};
     mAmbientContextTypeList.Clear();
     mAmbientContextTypeListSize = 0;
+    mSensorFusionSupportedList  = {};
     mHoldTimeDelegate.CancelTimer(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -106,6 +126,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const 
         return encoder.Encode(GetHoldTimeLimits());
     case PredictedActivity::Id:
         return ReadPredictedActivity(encoder);
+    case SensorFusionSupported::Id:
+        return ReadSensorFusionSupported(encoder);
     case FeatureMap::Id:
         return encoder.Encode(GetFeatures());
     case ClusterRevision::Id:
@@ -302,11 +324,34 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
         VerifyOrReturnError(inList, Protocols::InteractionModel::Status::ConstraintError);
     }
 
-    if (newObjectCountConfig.countingObject.namespaceID != mObjectCountConfig.countingObject.namespaceID ||
-        newObjectCountConfig.countingObject.tag != mObjectCountConfig.countingObject.tag ||
+    // The spec makes Label mandatory when the tag comes from a manufacturer namespace:
+    // SemanticTagStruct Label conformance is "MfgCode != NULL, O".
+    const auto & newLabelField = newObjectCountConfig.countingObject.label;
+    VerifyOrReturnError(newObjectCountConfig.countingObject.mfgCode.IsNull() || newLabelField.HasValue(),
+                        Protocols::InteractionModel::Status::ConstraintError);
+
+    const bool hasLabel = newLabelField.HasValue() && !newLabelField.Value().IsNull();
+    CharSpan newLabel;
+    if (hasLabel)
+    {
+        newLabel = newLabelField.Value().Value();
+        VerifyOrReturnError(newLabel.size() <= kMaxSemanticTagLabelLength, Protocols::InteractionModel::Status::ConstraintError);
+    }
+
+    if (!IsSemanticTagEqual(newObjectCountConfig.countingObject, mObjectCountConfig.countingObject) ||
         newObjectCountConfig.objectCountThreshold != mObjectCountConfig.objectCountThreshold)
     {
         mObjectCountConfig = newObjectCountConfig;
+
+        // Re-point the retained label at storage this cluster owns, so it stays valid once the
+        // write request payload is released.
+        if (hasLabel)
+        {
+            MutableCharSpan labelStorage(mObjectCountConfigLabel);
+            ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(newLabel, labelStorage));
+            mObjectCountConfig.countingObject.label = MakeOptional(DataModel::MakeNullable(CharSpan(labelStorage)));
+        }
+
         NotifyAttributeChanged(Attributes::ObjectCountConfig::Id);
 
         // Save the value to persistence
@@ -429,6 +474,24 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const Span<Predict
     ReturnErrorOnFailure(mACSDelegate->SetPredictedActivity(predictedActivityList));
     mPredictedActivityList = Span<PredictActivity>(mACSDelegate->GetPredictedActivityBuf(), predictedActivityList.size());
     NotifyAttributeChanged(Attributes::PredictedActivity::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmbientContextSensingCluster::SetSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sensorFusionSupportedList.size() <= kMaxSensorFusionSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrDie(mACSDelegate != nullptr);
+
+    ReturnErrorOnFailure(CheckSensorFusionSupported(sensorFusionSupportedList));
+    // Obtain delegate-owned buffer and copy
+    const size_t fusionListSize = sensorFusionSupportedList.size();
+    auto * buf                  = mACSDelegate->GetSensorFusionSupportedBuf(fusionListSize);
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    std::copy(sensorFusionSupportedList.begin(), sensorFusionSupportedList.end(), buf);
+    mSensorFusionSupportedList = Span<SemanticTagType>(buf, fusionListSize);
+    NotifyAttributeChanged(Attributes::SensorFusionSupported::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -835,6 +898,44 @@ CHIP_ERROR AmbientContextSensingCluster::ReadPredictedActivity(AttributeValueEnc
         for (const auto & item : mPredictedActivityList)
         {
             ReturnErrorOnFailure(encode.Encode(item.mInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+bool AmbientContextSensingCluster::IsSupportedType(const AmbientContextSensing::SemanticTagType & sensedType)
+{
+    const auto & supportedList = mAmbientContextTypeSupportedList;
+
+    return std::any_of(supportedList.begin(), supportedList.end(), [&sensedType](const auto & supported) {
+        return sensedType.namespaceID == supported.namespaceID && sensedType.tag == supported.tag;
+    });
+}
+
+CHIP_ERROR AmbientContextSensingCluster::CheckSensorFusionSupported(
+    const Span<AmbientContextSensing::SemanticTagType> & sensorFusionSupportedList)
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
+
+    // Sanitize the input parameters
+    for (const auto & item : sensorFusionSupportedList)
+    {
+        VerifyOrReturnError(IsSupportedType(item), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmbientContextSensingCluster::ReadSensorFusionSupported(AttributeValueEncoder & encoder)
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kSensorFusion), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnValue(!mSensorFusionSupportedList.empty(), encoder.EncodeEmptyList());
+    VerifyOrDie(mACSDelegate != nullptr);
+
+    return encoder.EncodeList([this](const auto & encode) -> CHIP_ERROR {
+        for (const auto & item : mSensorFusionSupportedList)
+        {
+            ReturnErrorOnFailure(encode.Encode(item));
         }
         return CHIP_NO_ERROR;
     });

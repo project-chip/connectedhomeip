@@ -26,7 +26,10 @@
 #include <clusters/CarbonDioxideConcentrationMeasurement/AttributeIds.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Enums.h>
 #include <clusters/CarbonDioxideConcentrationMeasurement/Metadata.h>
+#include <clusters/SmokeConcentrationMeasurement/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <algorithm>
 
 using namespace chip;
 using namespace chip::app;
@@ -373,4 +376,25 @@ TEST_F(TestNumericMeasurementCluster, FeatureImplication_PeakImpliesNumeric)
     EXPECT_TRUE((features & to_underlying(Feature::kNumericMeasurement)) != 0);
 
     peakCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestNumericMeasurementCluster, IncludesSmokeAndOpticalUnits)
+{
+    EXPECT_NE(std::find(AliasedClusters.begin(), AliasedClusters.end(), SmokeConcentrationMeasurement::Id), AliasedClusters.end());
+    EXPECT_EQ(AliasedClusters.size(), 11u);
+
+    ConcentrationMeasurementCluster::Config smokeConfig{
+        SmokeConcentrationMeasurement::Id, BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kLevelIndication),
+        MeasurementMediumEnum::kAir,       MeasurementUnitEnum::kPcft,
+        DataModel::MakeNullable(0.0f),     DataModel::MakeNullable(100.0f),
+    };
+    ConcentrationMeasurementCluster smokeCluster(kTestEndpointId, smokeConfig);
+    ClusterTester smokeTester(smokeCluster);
+    ASSERT_EQ(smokeCluster.Startup(smokeTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    MeasurementUnitEnum unit{};
+    ASSERT_EQ(smokeTester.ReadAttribute(Attributes::MeasurementUnit::Id, unit), CHIP_NO_ERROR);
+    EXPECT_EQ(unit, MeasurementUnitEnum::kPcft);
+
+    smokeCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
