@@ -105,10 +105,8 @@ Protocols::InteractionModel::Status ZoneManager::CreateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
@@ -117,10 +115,8 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTrigger
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
@@ -129,10 +125,8 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     {
         return Status::Success;
     }
-    else
-    {
-        return Status::Failure;
-    }
+
+    return Status::Failure;
 }
 
 bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)

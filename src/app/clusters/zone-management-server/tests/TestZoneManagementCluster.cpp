@@ -508,7 +508,11 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     ASSERT_EQ(cluster.GenerateZoneTriggeredEvent(1, ZoneEventTriggeredReasonEnum::kMotion),
               Protocols::InteractionModel::Status::Success);
     auto triggeredEvent = tester.GetNextGeneratedEvent();
-    ASSERT_TRUE(triggeredEvent.has_value());
+    if (!triggeredEvent.has_value())
+    {
+        FAIL() << "Expected triggeredEvent to have a value";
+        return;
+    }
     Events::ZoneTriggered::DecodableType triggeredData;
     ASSERT_EQ(triggeredEvent->GetEventData(triggeredData), CHIP_NO_ERROR);
     ASSERT_EQ(triggeredData.zone, 1);
@@ -520,7 +524,11 @@ TEST_F(TestZoneManagementCluster, RemoteZonesCreateUpdateValidationAndEventField
     ASSERT_EQ(cluster.GenerateZoneStoppedEvent(1, ZoneEventStoppedReasonEnum::kActionStopped),
               Protocols::InteractionModel::Status::Success);
     auto stoppedEvent = tester.GetNextGeneratedEvent();
-    ASSERT_TRUE(stoppedEvent.has_value());
+    if (!stoppedEvent.has_value())
+    {
+        FAIL() << "Expected stoppedEvent to have a value";
+        return;
+    }
     Events::ZoneStopped::DecodableType stoppedData;
     ASSERT_EQ(stoppedEvent->GetEventData(stoppedData), CHIP_NO_ERROR);
     ASSERT_EQ(stoppedData.zone, 1);
