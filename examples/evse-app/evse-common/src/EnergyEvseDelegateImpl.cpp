@@ -56,14 +56,12 @@ Status EnergyEvseDelegate::Disable()
         return Status::Failure;
     }
 
-    ReturnValueAndLogOnFailure(
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), int64_t(0)),
-        Status::Failure, AppServer, "Failed to persist disabled charging command current limit");
-    ReturnValueAndLogOnFailure(
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), int64_t(0)),
-        Status::Failure, AppServer, "Failed to persist disabled discharging command current limit");
+    ReturnValueAndLogOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+                                   ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), int64_t(0)),
+                               Status::Failure, AppServer, "Failed to persist disabled charging command current limit");
+    ReturnValueAndLogOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+                                   ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), int64_t(0)),
+                               Status::Failure, AppServer, "Failed to persist disabled discharging command current limit");
 
     DataModel::Nullable<uint32_t> disableTime(0);
     /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 */
@@ -265,8 +263,7 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSecond
         mMaximumChargingCurrentLimitFromCommand = 0;
         ComputeMaxChargeCurrentLimit();
         LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id),
-            mMaximumChargingCurrentLimitFromCommand));
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
         // Change to discharging-only if discharging is still enabled
         if (!dischargingExpired)
@@ -643,7 +640,7 @@ CHIP_ERROR EnergyEvseDelegate::InitializeUserMaximumChargeCurrent()
         return CHIP_NO_ERROR;
     }
 
-    const int64_t circuitCapacity                = mInstance->GetCircuitCapacity();
+    const int64_t circuitCapacity = mInstance->GetCircuitCapacity();
     ChipLogProgress(AppServer, "EVSE: defaulting UserMaximumChargeCurrent to CircuitCapacity %ld mA",
                     static_cast<long>(circuitCapacity));
     ReturnErrorOnFailure(mInstance->SetUserMaximumChargeCurrent(circuitCapacity));
@@ -1043,8 +1040,7 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     SupplyStateEnum currentSupplyState = GetSupplyState();
     switch (currentSupplyState)
     {
-    case SupplyStateEnum::kChargingEnabled:
-    {
+    case SupplyStateEnum::kChargingEnabled: {
         ComputeMaxChargeCurrentLimit();
         const Status status = SetStateFromHardwareState(StateEnum::kPluggedInCharging);
         if (status != Status::Success)
@@ -1054,8 +1050,7 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
         SendEnergyTransferStartedEvent();
         break;
     }
-    case SupplyStateEnum::kDischargingEnabled:
-    {
+    case SupplyStateEnum::kDischargingEnabled: {
         ComputeMaxDischargeCurrentLimit();
         const Status status = SetStateFromHardwareState(StateEnum::kPluggedInDischarging);
         if (status != Status::Success)
@@ -1065,8 +1060,7 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
         SendEnergyTransferStartedEvent();
         break;
     }
-    case SupplyStateEnum::kEnabled:
-    {
+    case SupplyStateEnum::kEnabled: {
         /* We are enabled for both charging and discharging
         since the vehicle is asking for demand, we should start charging
         NOTE: for discharging the PowerAdjustment feature of DEM is used.
@@ -1085,8 +1079,7 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     }
     case SupplyStateEnum::kDisabled:
     case SupplyStateEnum::kDisabledError:
-    case SupplyStateEnum::kDisabledDiagnostics:
-    {
+    case SupplyStateEnum::kDisabledDiagnostics: {
         /* We must be plugged in, and the event is asking for demand
          * but we can't charge or discharge now - leave it as kPluggedInDemand */
         const Status status = SetStateFromHardwareState(StateEnum::kPluggedInDemand);

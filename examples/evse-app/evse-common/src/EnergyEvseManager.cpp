@@ -149,8 +149,8 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     }
 
     int64_t maximumDischargingCurrent;
-    err = aProvider->ReadScalarValue(
-        ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumDischargeCurrent::Id), maximumDischargingCurrent);
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumDischargeCurrent::Id),
+                                     maximumDischargingCurrent);
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(maximumDischargingCurrent >= kMinimumChargeCurrentLimit, CHIP_ERROR_INVALID_ARGUMENT);
