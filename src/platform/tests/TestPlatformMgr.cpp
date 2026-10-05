@@ -29,6 +29,8 @@
 #include <string.h>
 
 #include <atomic>
+#include <csignal>
+#include <memory>
 
 #include <pw_unit_test/framework.h>
 
@@ -262,3 +264,30 @@ TEST_F(TestPlatformMgr, MockSystemLayerTest)
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN && CHIP_SYSTEM_CONFIG_USE_DISPATCH
+TEST_F(TestPlatformMgr, UnregisterSignalHandlerReleasesHandler)
+{
+    auto & platformMgr       = PlatformMgrImpl();
+    auto token               = std::make_shared<int>(0);
+    std::weak_ptr<int> first = token;
+    EXPECT_TRUE(platformMgr.RegisterSignalHandler(SIGUSR1, ^{
+        (void) token;
+    }));
+    token                     = std::make_shared<int>(0);
+    std::weak_ptr<int> second = token;
+    EXPECT_TRUE(platformMgr.RegisterSignalHandler(SIGUSR2, ^{
+        (void) token;
+    }));
+    token.reset();
+    EXPECT_FALSE(first.expired());
+    EXPECT_FALSE(second.expired());
+
+    EXPECT_TRUE(platformMgr.UnregisterSignalHandler(SIGUSR1));
+    EXPECT_TRUE(first.expired());
+    EXPECT_FALSE(second.expired());
+
+    platformMgr.UnregisterAllSignalHandlers();
+    EXPECT_TRUE(second.expired());
+}
+#endif

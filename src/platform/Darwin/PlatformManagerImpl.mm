@@ -180,6 +180,18 @@ namespace DeviceLayer {
 #endif // CONFIG_NETWORK_LAYER_BLE
     }
 
+    namespace {
+        void CancelAndWait(dispatch_source_t source)
+        {
+            __auto_type cancelled = dispatch_semaphore_create(0);
+            dispatch_source_set_cancel_handler(source, ^{
+                dispatch_semaphore_signal(cancelled);
+            });
+            dispatch_source_cancel(source);
+            dispatch_semaphore_wait(cancelled, DISPATCH_TIME_FOREVER);
+        }
+    } // namespace
+
     bool PlatformManagerImpl::RegisterSignalHandler(int sig, dispatch_block_t block)
     {
         VerifyOrReturnValue(CanCastTo<uintptr_t>(sig), false);
@@ -205,7 +217,7 @@ namespace DeviceLayer {
         __auto_type it = mSignalSources.find(sig);
         VerifyOrReturnValue(it != mSignalSources.end(), false); // Not registered
 
-        dispatch_source_cancel(it->second);
+        CancelAndWait(it->second);
         mSignalSources.erase(it);
         signal(sig, SIG_DFL);
 
@@ -215,7 +227,7 @@ namespace DeviceLayer {
     void PlatformManagerImpl::UnregisterAllSignalHandlers()
     {
         for (auto & [sig, source] : mSignalSources) {
-            dispatch_source_cancel(source);
+            CancelAndWait(source);
             signal(sig, SIG_DFL);
         }
         mSignalSources.clear();
