@@ -65,7 +65,7 @@ fi
 # Sync the installed matter.testing package with the source tree so that
 # run_python_test.py picks up any API additions not yet rebuilt into the venv.
 MATTER_TESTING_SRC="${CHIP_ROOT}/src/python_testing/matter_testing_infrastructure/matter/testing"
-MATTER_TESTING_VENV="${VENV}/lib/python3.12/site-packages/matter/testing"
+MATTER_TESTING_VENV="$(${VENV}/bin/python -c 'import sysconfig; print(sysconfig.get_path("purelib"))')/matter/testing"
 if [[ -d "$MATTER_TESTING_SRC" && -d "$MATTER_TESTING_VENV" ]]; then
     cp -r "${MATTER_TESTING_SRC}/." "${MATTER_TESTING_VENV}/"
 fi
