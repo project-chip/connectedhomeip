@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,14 +23,22 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
+#include <glib.h>
+
 #include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
+#include <system/SystemPacketBuffer.h>
 
-#include "wbs/WbsConnection.h"
-#include "wbs/WbsDeviceScanner.h"
+// webOS: wbs layer instead of bluez/. wbs/Helper.h relies on the includes above
+// (GHashTable, BLE_CONNECTION_OBJECT, PacketBufferHandle).
+#include "wbs/ChipDeviceScanner.h"
+#include "wbs/Helper.h"
+#include "wbs/WbsGattClient.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -66,7 +74,7 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate,
-                             private WbsDeviceScannerDelegate
+                             private ChipDeviceScannerDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -76,16 +84,19 @@ public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
     void OnScanError(CHIP_ERROR error) override;
 
+    // Driven by wbs IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
     static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     static void HandleRXCharWrite(BLE_CONNECTION_OBJECT user_data, const uint8_t * value, size_t len);
-    static void HandleConnectionClosed(BLE_CONNECTION_OBJECT user_data);
+    // webOS: called by name from wbs/Helper.cpp (Linux: HandleConnectionClosed).
+    static void CHIPoWbs_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
+    // Internal platform specific notifications
     static void NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress);
     static void NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress);
     static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
@@ -135,6 +146,8 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
+
+    // webOS: takes the LS2 scan record (Linux: BluezDevice1) and is called on the LsRequester (lsTask) thread.
     void OnDeviceScanned(const pbnjson::JValue & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
 
@@ -150,6 +163,7 @@ private:
     enum class Flags : uint16_t
     {
         kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        // webOS: kBluez* flags renamed to kWBS*.
         kWBSManagerInitialized    = 0x0002, /**< The WBS object manager has been initialized. */
         kWBSAdapterAvailable      = 0x0004, /**< Selected WBS adapter is available for use. */
         kWBSBLELayerInitialized   = 0x0008, /**< The WBS layer has been initialized. */
@@ -173,26 +187,42 @@ private:
 
     void DriveBLEState();
     void DisableBLEService(CHIP_ERROR err);
-    // BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
+    void ClearAdvertisingFlag();
+
+    // webOS: wbs endpoint release and the scan -> connect hand-over (Matter thread -> Matter GLib context).
+    void ReleaseEndpoint();
+    void HandleScannedDevice(const std::string & address, uint16_t discriminator);
+    void StartConnect(const std::string & address);
 
     static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     static void HandleScanTimer(chip::System::Layer *, void * appState);
     static void HandleConnectTimer(chip::System::Layer *, void * appState);
+    // webOS: fires after WEBOS_BLE_CONNECT_START_DELAY_MS.
+    static void HandleConnectStartTimer(chip::System::Layer *, void * appState);
+
+    // Public CHIPoBLE notifications
+    void NotifyCHIPoBLEConnectionEstablished();
+    void NotifyCHIPoBLEConnectionClosed();
+    void NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change);
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
     uint32_t mAdapterId = 0;
-
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral          = false;
-    WbsEndpoint * mEndpoint  = nullptr;
-    const char * mBLEAdvUUID = nullptr;
-
-    WbsDeviceScanner mDeviceScanner;
-    WbsConnection mConnection;
+    bool mIsCentral = false;
+    // webOS: wbs endpoint (Linux: BluezEndpoint), owned by this class and freed by ReleaseEndpoint().
+    WbsEndpoint * mpEndpoint = nullptr;
+    ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;
+
+    // webOS: WBS clients opened by the pre-connect. Added on the Matter GLib context,
+    // released on the Matter thread or the GLib context.
+    WbsPreconnectClients mPreconnectClients;
+
+    // webOS: set by _Shutdown(): read on the LsRequester and GLib threads, which outlive the BLE manager.
+    std::atomic<bool> mShuttingDown{ false };
 };
 
 /**

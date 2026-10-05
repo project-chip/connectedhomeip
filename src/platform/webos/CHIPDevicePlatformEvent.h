@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,24 +45,6 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
-    kPlatformLinuxBLEAdapterAdded,
-    kPlatformLinuxBLEAdapterRemoved,
-    kPlatformLinuxBLECentralConnected,
-    kPlatformLinuxBLECentralConnectFailed,
-    kPlatformLinuxBLEWriteComplete,
-    kPlatformLinuxBLESubscribeOpComplete,
-    kPlatformLinuxBLEIndicationReceived,
-    kPlatformLinuxBLEC1WriteEvent,
-    kPlatformLinuxBLEOutOfBuffersEvent,
-    kPlatformLinuxBLEPeripheralRegisterAppComplete,
-    kPlatformLinuxBLEPeripheralAdvStartComplete,
-    kPlatformLinuxBLEPeripheralAdvStopComplete,
-    kPlatformLinuxBLEPeripheralAdvReleased,
-};
-
-enum InternalPlatformSpecificWbsEventTypes
-{
     kPlatformWebOSEvent = kRange_InternalPlatformSpecific,
     kPlatformWebOSBLEAdapterAdded,
     kPlatformWebOSBLEAdapterRemoved,
@@ -78,6 +60,7 @@ enum InternalPlatformSpecificWbsEventTypes
     kPlatformWebOSBLEPeripheralAdvStopComplete,
     kPlatformWebOSBLEPeripheralAdvReleased,
 };
+
 } // namespace DeviceEventType
 
 /**

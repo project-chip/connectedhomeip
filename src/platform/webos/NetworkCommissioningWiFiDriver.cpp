@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <limits>
 #include <string>
@@ -57,12 +57,12 @@ inline CHIP_ERROR IgnoreNotFound(CHIP_ERROR err)
 // all changed are made on the staging network, and when the network is committed, it will update the mSavedNetwork to
 // mStagingNetwork and persist the changes.
 
-// NOTE: LinuxWiFiDriver uses network config with empty ssid (ssidLen = 0) for empty network config.
+// NOTE: WebOSWiFiDriver uses network config with empty ssid (ssidLen = 0) for empty network config.
 
-// NOTE: For now, the LinuxWiFiDriver only supports one network, this can be fixed by using the wpa_supplicant API directly (then
+// NOTE: For now, the WebOSWiFiDriver only supports one network, this can be fixed by using the wpa_supplicant API directly (then
 // wpa_supplicant will manage the networks for us.)
 
-CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR WebOSWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     WiFiNetwork network;
@@ -110,17 +110,17 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     return CHIP_NO_ERROR;
 
 exit:
-    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: Failed to load network configuration: %" CHIP_ERROR_FORMAT,
+    ChipLogProgress(NetworkProvisioning, "webOSWiFiDriver: Failed to load network configuration: %" CHIP_ERROR_FORMAT,
                     err.Format());
     return err;
 }
 
-void LinuxWiFiDriver::Shutdown()
+void WebOSWiFiDriver::Shutdown()
 {
     ConnectivityMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
-CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
+CHIP_ERROR WebOSWiFiDriver::CommitConfiguration()
 {
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
     ReturnErrorOnFailure(kvs.Put(kWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
@@ -154,13 +154,13 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
+CHIP_ERROR WebOSWiFiDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
     return CHIP_NO_ERROR;
 }
 
-Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+Status WebOSWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                            uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
@@ -186,7 +186,7 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     return Status::kSuccess;
 }
 
-Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
+Status WebOSWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -197,7 +197,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     return Status::kSuccess;
 }
 
-Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
+Status WebOSWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
     VerifyOrReturnError(mStagingNetwork.Matches(networkId), Status::kNetworkIDNotFound);
@@ -206,7 +206,7 @@ Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     return Status::kSuccess;
 }
 
-void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
+void WebOSWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
@@ -217,7 +217,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (network.UsingPDC())
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
+        ChipLogProgress(NetworkProvisioning, "webOSWiFiDriver: ConnectNetwork (PDC) '%s'",
                         NullTerminated(network.ssid, network.ssidLen).c_str());
         err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
             ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
@@ -226,7 +226,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
+        ChipLogProgress(NetworkProvisioning, "webOSWiFiDriver: ConnectNetwork '%s'",
                         NullTerminated(network.ssid, network.ssidLen).c_str());
 
         err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
@@ -246,7 +246,7 @@ exit:
     }
 }
 
-void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
+void WebOSWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().StartWiFiScan(ssid, callback);
     if (err != CHIP_NO_ERROR)
@@ -255,12 +255,12 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     }
 }
 
-size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
+size_t WebOSWiFiDriver::WiFiNetworkIterator::Count()
 {
     return driver->mStagingNetwork.Empty() ? 0 : 1;
 }
 
-bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
+bool WebOSWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
     if (exhausted || driver->mStagingNetwork.Empty())
     {
@@ -286,7 +286,7 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity,
+CHIP_ERROR WebOSWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity,
                                                       Optional<uint8_t> clientIdentityNetworkIndex, Status & outStatus,
                                                       MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
                                                       uint8_t & outNetworkIndex)
@@ -333,21 +333,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR LinuxWiFiDriver::GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity)
+CHIP_ERROR WebOSWiFiDriver::GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity)
 {
     VerifyOrReturnError(!mStagingNetwork.Empty() && networkIndex == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetwork.UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
     return CopySpanToMutableSpan(ByteSpan(mStagingNetwork.networkIdentity, mStagingNetwork.networkIdentityLen), outNetworkIdentity);
 }
 
-CHIP_ERROR LinuxWiFiDriver::GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
+CHIP_ERROR WebOSWiFiDriver::GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
 {
     VerifyOrReturnError(!mStagingNetwork.Empty() && networkIndex == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetwork.UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
     return CopySpanToMutableSpan(ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen), outClientIdentity);
 }
 
-CHIP_ERROR LinuxWiFiDriver::SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+CHIP_ERROR WebOSWiFiDriver::SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
                                                    P256ECDSASignature & outSignature)
 {
     VerifyOrReturnError(!mStagingNetwork.Empty() && networkIndex == 0, CHIP_ERROR_INVALID_ARGUMENT);
