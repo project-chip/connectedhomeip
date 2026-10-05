@@ -35,7 +35,7 @@ env:
 jobs:
     zephyr:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
@@ -50,19 +50,37 @@ jobs:
             options: --user root
 
         steps:
+            - name: Checkout Zephyr
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  repository: "zephyrproject-rtos/zephyr"
+                  ref: "fa4f8fb0e470210aee0ae6fb069a281bc6ac887a"
+                  path: "/tmp/zephyrproject"
+                  persist-credentials: false
+
+            - name: Set up Zephyr workspace and SDK
+              uses: zephyrproject-rtos/action-zephyr-setup@v1.0.15
+              with:
+                  app-path: app
+                  base-path: /tmp/zephyrproject
+                  sdk-version: "1.0.1"
+                  toolchains: arm-zephyr-eabi
+                  enable-ccache: "true"
+                  ccache-cache-key:
+                      all-devices-ubuntu-24.04-${{ matrix.board }}-${{
+                      matrix.toolchain }}
+                  ccache-max-size: 2G
+                  west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread"
+
             - name: Checkout Matter
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-            - name: Set up Zephyr workspace
+            - name: Configure Zephyr workspace and Matter submodules
               shell: bash
-              # The zephyr commit is ~4.5 rc1, will replace with official 4.5 tag once created
+              working-directory: zephyrproject
               run: |
                   set -euxo pipefail
-                  west init -m https://github.com/zephyrproject-rtos/zephyr --mr fa4f8fb0e470210aee0ae6fb069a281bc6ac887a /tmp/zephyrproject
-                  cd /tmp/zephyrproject
-                  west config manifest.project-filter -- \
-                      '-.*,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot'
-                  west update
+                  west zephyr-export
                   git config --global --add safe.directory "$GITHUB_WORKSPACE"
                   git -C "$GITHUB_WORKSPACE" submodule update --init --depth 1 --jobs 4 -- \
                       third_party/editline/repo \
@@ -70,16 +88,17 @@ jobs:
                       third_party/nlassert/repo \
                       third_party/nlio/repo \
                       third_party/uriparser/repo \
-                      third_party/pigweed/repo
+                      third_party/pigweed/repo \
+                      third_party/silabs/matter_support
                   : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
                   west blobs fetch
 
             - name: Install GN from Matter's pinned CIPD version
               shell: bash
-              working-directory: /tmp/zephyrproject
+              working-directory: zephyrproject
               run: |
-                  set -euxo pipefail
-                  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools
+                  set -euxo pipefail    
+                  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git "$RUNNER_TEMP/depot_tools"
                   gn_version="$(python3 - <<'PY'
                   import json
                   import os
@@ -91,9 +110,9 @@ jobs:
                   print(gn["tags"][0])
                   PY
                   )"
-                  /opt/depot_tools/cipd install gn/gn/linux-amd64 "$gn_version" -root /opt/gn
-                  echo '/opt/gn' >> "$GITHUB_PATH"
-                  /opt/gn/gn --version
+                  "$RUNNER_TEMP/depot_tools/cipd" install gn/gn/linux-amd64 "$gn_version" -root "$RUNNER_TEMP/gn"
+                  echo "$RUNNER_TEMP/gn" >> "$GITHUB_PATH"
+                  "$RUNNER_TEMP/gn/gn" --version
 
             - name: Build All-Devices App
               shell: bash
