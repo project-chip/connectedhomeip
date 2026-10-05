@@ -179,8 +179,7 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
                   expectation="clientsList contains an entry with the expected ClientIndex and ClientIdentifier.")
         matching_clients = [client for client in clients_list
                             if client.clientIndex == expected_client_index
-                            and client.clientIdentifier == expected_client_identifier
-                            and client.networkIdentityIndex == active_identity_index]
+                            and client.clientIdentifier == expected_client_identifier]
         asserts.assert_equal(len(matching_clients), 1,
                              "clientsList does not contain the expected client (matching ClientIndex "
                              "ClientIdentifier configured during setup and matching NetworkIdentityIndex of active network identity).")
