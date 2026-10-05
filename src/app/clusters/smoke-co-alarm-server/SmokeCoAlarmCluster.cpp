@@ -30,7 +30,8 @@ namespace Clusters {
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId, const Config & config) :
-    DefaultServerCluster({ endpointId, Id }), mConfig(config), mInoperativeWhenUnmounted(config.inoperativeWhenUnmounted)
+    DefaultServerCluster({ endpointId, Id }), mConfig(config), mInoperativeWhenUnmounted(config.inoperativeWhenUnmounted),
+    mExpiryDate(config.expiryDate.value_or(0))
 {}
 
 bool SmokeCoAlarmCluster::SetSmokeState(AlarmStateEnum newSmokeState)
@@ -238,6 +239,12 @@ void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensi
     }
 }
 
+void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
+{
+    VerifyOrReturn(mConfig.optionalAttribs.IsSet(ExpiryDate::Id) || mConfig.expiryDate.has_value());
+    SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
+}
+
 bool SmokeCoAlarmCluster::SetUnmountedState(bool isUnmounted)
 {
     VerifyOrReturnValue(mConfig.optionalAttribs.IsSet(Unmounted::Id), false);
@@ -365,7 +372,7 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::ReadAttribute(const DataModel
     case SmokeSensitivityLevel::Id:
         return encoder.Encode(mSmokeSensitivityLevel);
     case ExpiryDate::Id:
-        return encoder.Encode(mConfig.expiryDate.value_or(0));
+        return encoder.Encode(mExpiryDate);
     case Unmounted::Id:
         return encoder.Encode(mUnmounted);
     default:
@@ -403,7 +410,7 @@ CHIP_ERROR SmokeCoAlarmCluster::Attributes(const ConcreteClusterPath & path,
         { mConfig.optionalAttribs.IsSet(InterconnectCOAlarm::Id), InterconnectCOAlarm::kMetadataEntry },
         { mConfig.featureMap.Has(Feature::kSmokeAlarm), ContaminationState::kMetadataEntry },
         { mConfig.featureMap.Has(Feature::kSmokeAlarm), SmokeSensitivityLevel::kMetadataEntry },
-        { mConfig.expiryDate.has_value(), ExpiryDate::kMetadataEntry },
+        { mConfig.optionalAttribs.IsSet(ExpiryDate::Id) || mConfig.expiryDate.has_value(), ExpiryDate::kMetadataEntry },
         { mConfig.optionalAttribs.IsSet(Unmounted::Id), Unmounted::kMetadataEntry },
     };
 

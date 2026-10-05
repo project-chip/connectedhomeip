@@ -44,6 +44,7 @@ constexpr std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLeng
     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kInoperative,
 };
 
+// 2126-01-01 00:00:00 UTC in Matter epoch seconds (seconds since 2000-01-01 00:00:00 UTC).
 constexpr uint32_t kTestExpiryDate = 3976214400;
 
 SmokeCoAlarmCluster::Config MakeFullConfig()
@@ -101,22 +102,24 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestSmokeCoAlarmBase, AttributeList_AllOptionalAttribsWithoutExpiryDate)
+TEST_F(TestSmokeCoAlarmBase, AttributeList_ExpiryDateFromConfig)
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    cfg.expiryDate = kTestExpiryDate;
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_TRUE(IsAttributesListEqualTo(
-        cluster,
-        { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
-          Attributes::BatteryAlert::kMetadataEntry, Attributes::DeviceMuted::kMetadataEntry,
-          Attributes::TestInProgress::kMetadataEntry, Attributes::HardwareFaultAlert::kMetadataEntry,
-          Attributes::EndOfServiceAlert::kMetadataEntry, Attributes::InterconnectSmokeAlarm::kMetadataEntry,
-          Attributes::InterconnectCOAlarm::kMetadataEntry, Attributes::ContaminationState::kMetadataEntry,
-          Attributes::SmokeSensitivityLevel::kMetadataEntry, Attributes::Unmounted::kMetadataEntry }));
+    EXPECT_TRUE(
+        IsAttributesListEqualTo(cluster,
+                                { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry,
+                                  Attributes::COState::kMetadataEntry, Attributes::BatteryAlert::kMetadataEntry,
+                                  Attributes::TestInProgress::kMetadataEntry, Attributes::HardwareFaultAlert::kMetadataEntry,
+                                  Attributes::EndOfServiceAlert::kMetadataEntry, Attributes::ContaminationState::kMetadataEntry,
+                                  Attributes::SmokeSensitivityLevel::kMetadataEntry, Attributes::ExpiryDate::kMetadataEntry }));
+    uint32_t expiry{};
+    ASSERT_EQ(t.ReadAttribute(Attributes::ExpiryDate::Id, expiry), CHIP_NO_ERROR);
+    EXPECT_EQ(expiry, kTestExpiryDate);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
