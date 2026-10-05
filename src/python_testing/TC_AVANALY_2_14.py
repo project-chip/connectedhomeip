@@ -90,6 +90,8 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
     def pics_TC_AVANALY_2_14(self) -> list[str]:
         return [
             "AVANALY.S",
+            "ZONEMGMT.S.F00",
+            "ZONEMGMT.S.F02",
             "ZONEMGMT.S.F04",
         ]
 
@@ -103,6 +105,8 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
 
         await self.read_avanaly_features(endpoint)
         zone_cluster = Clusters.Objects.ZoneManagement
+        has_two_d_cart = self.check_pics("ZONEMGMT.S.F00")
+        has_user_defined = self.check_pics("ZONEMGMT.S.F02")
         has_remote_zones = self.check_pics("ZONEMGMT.S.F04")
         if hasattr(zone_cluster.Bitmaps.Feature, "kRemoteZones"):
             try:
@@ -111,15 +115,22 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
                     cluster=zone_cluster,
                     attribute=zone_cluster.Attributes.FeatureMap,
                 )
+                has_two_d_cart = (
+                    zone_feature_map
+                    & zone_cluster.Bitmaps.Feature.kTwoDimensionalCartesianZone
+                ) != 0
+                has_user_defined = (
+                    zone_feature_map & zone_cluster.Bitmaps.Feature.kUserDefined
+                ) != 0
                 has_remote_zones = (
                     zone_feature_map & zone_cluster.Bitmaps.Feature.kRemoteZones
                 ) != 0
             except InteractionModelError as e:
                 log.info("ZoneManagement cluster query exception: %s", e)
 
-        if not has_remote_zones:
+        if not (has_remote_zones and has_two_d_cart and has_user_defined):
             log.info(
-                "RemoteZones feature not supported on ZoneManagement, skipping TC-AVANALY-2.14"
+                "Required ZoneManagement features (TwoDimensionalCartesianZone, UserDefined, RemoteZones) not supported, skipping TC-AVANALY-2.14"
             )
             self.skip_step(2)
             self.skip_step(3)
@@ -130,14 +141,17 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
             self.skip_step(8)
             return
 
-        remote_node_id = self.user_params.get(
-            "camera_node_id", self.user_params.get("remote_node_id", self.dut_node_id)
-        )
-        remote_node_id = (
-            int(remote_node_id, 0)
-            if isinstance(remote_node_id, str)
-            else int(remote_node_id)
-        )
+        if hasattr(self, "get_camera_node_id"):
+            remote_node_id = self.get_camera_node_id()
+        else:
+            remote_node_id = self.user_params.get(
+                "camera_node_id", self.user_params.get("remote_node_id", self.dut_node_id)
+            )
+            remote_node_id = (
+                int(remote_node_id, 0)
+                if isinstance(remote_node_id, str)
+                else int(remote_node_id)
+            )
 
         self.step(2)
         zones = await self.read_single_attribute_check_success(
@@ -150,6 +164,19 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
             cluster=zone_cluster,
             attribute=zone_cluster.Attributes.TwoDCartesianMax,
         )
+        existing_motion_polygons = set()
+        for existing_zone in zones or []:
+            two_d_cart = getattr(existing_zone, "twoDCartesianZone", None)
+            if (
+                two_d_cart is not None
+                and getattr(two_d_cart, "use", None)
+                == zone_cluster.Enums.ZoneUseEnum.kMotion
+                and getattr(two_d_cart, "vertices", None)
+            ):
+                existing_motion_polygons.add(
+                    tuple((int(v.x), int(v.y)) for v in two_d_cart.vertices)
+                )
+
         idx = (len(zones) if zones else 0) + 1
         max_x = max(int(two_d_max.x), 1)
         max_y = max(int(two_d_max.y), 1)
@@ -157,14 +184,37 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
         box_h = min(10, max_y)
         max_offset_x = max(max_x - box_w, 0)
         max_offset_y = max(max_y - box_h, 0)
-        offset_x = ((idx - 1) * (box_w + 5)) % (max_offset_x + 1) if max_offset_x > 0 else 0
-        offset_y = ((idx - 1) * (box_h + 5)) % (max_offset_y + 1) if max_offset_y > 0 else 0
-        zone_vertices = [
-            zone_cluster.Structs.TwoDCartesianVertexStruct(offset_x, offset_y),
-            zone_cluster.Structs.TwoDCartesianVertexStruct(offset_x + box_w, offset_y),
-            zone_cluster.Structs.TwoDCartesianVertexStruct(offset_x + box_w, offset_y + box_h),
-            zone_cluster.Structs.TwoDCartesianVertexStruct(offset_x, offset_y + box_h),
-        ]
+        zone_vertices = None
+        for step_idx in range((max_offset_x + 1) * (max_offset_y + 1) + 1):
+            candidate_idx = idx + step_idx
+            offset_x = (
+                ((candidate_idx - 1) * (box_w + 5) + step_idx) % (max_offset_x + 1)
+                if max_offset_x > 0
+                else 0
+            )
+            offset_y = (
+                ((candidate_idx - 1) * (box_h + 5) + step_idx) % (max_offset_y + 1)
+                if max_offset_y > 0
+                else 0
+            )
+            candidate_coords = (
+                (offset_x, offset_y),
+                (offset_x + box_w, offset_y),
+                (offset_x + box_w, offset_y + box_h),
+                (offset_x, offset_y + box_h),
+            )
+            if candidate_coords not in existing_motion_polygons:
+                zone_vertices = [
+                    zone_cluster.Structs.TwoDCartesianVertexStruct(x, y)
+                    for x, y in candidate_coords
+                ]
+                break
+        if zone_vertices is None:
+            zone_vertices = [
+                zone_cluster.Structs.TwoDCartesianVertexStruct(0, 0),
+                zone_cluster.Structs.TwoDCartesianVertexStruct(max_x, 0),
+                zone_cluster.Structs.TwoDCartesianVertexStruct(0, max_y),
+            ]
         zone_to_create = zone_cluster.Structs.TwoDCartesianZoneStruct(
             name=f"RemoteZone{idx}",
             use=zone_cluster.Enums.ZoneUseEnum.kMotion,
@@ -175,20 +225,24 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
             zone=zone_to_create,
             nodeID=remote_node_id,
         )
-        create_resp = await self.send_single_cmd(endpoint=endpoint, cmd=create_remote_zone_cmd)
-        asserts.assert_equal(
-            type(create_resp),
-            zone_cluster.Commands.CreateTwoDCartesianZoneResponse,
-            "Expected CreateTwoDCartesianZoneResponse",
-        )
-        asserts.assert_is_not_none(
-            create_resp.zoneID, "CreateTwoDCartesianZoneResponse must contain zoneID"
-        )
-        remote_zone_id = create_resp.zoneID
+        remote_zone_id = None
         event_callback = None
         stream_id = None
 
         try:
+            create_resp = await self.send_single_cmd(
+                endpoint=endpoint, cmd=create_remote_zone_cmd
+            )
+            remote_zone_id = getattr(create_resp, "zoneID", None)
+            asserts.assert_equal(
+                type(create_resp),
+                zone_cluster.Commands.CreateTwoDCartesianZoneResponse,
+                "Expected CreateTwoDCartesianZoneResponse",
+            )
+            asserts.assert_is_not_none(
+                remote_zone_id, "CreateTwoDCartesianZoneResponse must contain zoneID"
+            )
+
             zones_after = await self.read_single_attribute_check_success(
                 endpoint=endpoint,
                 cluster=zone_cluster,
@@ -358,13 +412,10 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
             except Exception as e:
                 log.info("Cleanup DisableContextTriggers: %s", e)
             if remote_zone_id is not None:
-                try:
-                    await self.send_single_cmd(
-                        endpoint=endpoint,
-                        cmd=zone_cluster.Commands.RemoveZone(zoneID=remote_zone_id),
-                    )
-                except Exception as e:
-                    log.info("Cleanup RemoveZone: %s", e)
+                await self.send_single_cmd(
+                    endpoint=endpoint,
+                    cmd=zone_cluster.Commands.RemoveZone(zoneID=remote_zone_id),
+                )
 
 
 if __name__ == "__main__":
