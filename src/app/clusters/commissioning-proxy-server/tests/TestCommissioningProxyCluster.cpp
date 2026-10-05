@@ -32,6 +32,8 @@
 #include <clusters/CommissioningProxy/Metadata.h>
 #include <system/SystemClock.h>
 
+#include <cstring>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -1467,7 +1469,7 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_WithMessage)
     cmd.responseTimeout = 5;
     cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
 
-    // The mock transport delivers an immediate (null) commissionee reply.
+    // The mock transport delivers an immediate commissionee reply.
     auto result = tester.Invoke(cmd);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
@@ -2275,6 +2277,82 @@ TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_ResponseTimeout)
     // rather than rejected with BUSY.
     mockBle.SetAutoRespond(true);
     EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Spec, ProxyMessageResponse Message field: "The proxy SHALL NOT forward data received
+// from the Commissionee that does not conform to the Message Format." The field is also
+// constrained to max 1280.
+TEST_F(TestCommissioningProxyCluster, TestValidateCommissioneeMessage_AcceptsConformingMessages)
+{
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage)), CHIP_NO_ERROR);
+
+    // An encrypted message (non-zero Session ID) carries a 16-byte MIC after its header.
+    uint8_t encrypted[8 + 16] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(encrypted)), CHIP_NO_ERROR);
+
+    // Exactly the field maximum.
+    uint8_t largest[CommissioningProxySessionManager::kMaxProxyMessageLength] = {};
+    memcpy(largest, kMockCommissioneeMessage, sizeof(kMockCommissioneeMessage));
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(largest)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestValidateCommissioneeMessage_RejectsNonConformingMessages)
+{
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan()), CHIP_NO_ERROR);
+
+    // Version nibble 0xD in the message flags: not a Matter message.
+    static const uint8_t kNotMatter[] = { 0xde, 0xad, 0xbe, 0xef, 0x00, 0x00, 0x00, 0x00 };
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kNotMatter)), CHIP_NO_ERROR);
+
+    // Cut off inside the message counter.
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 6)), CHIP_NO_ERROR);
+
+    // Encrypted, but too short to hold the MIC.
+    uint8_t encryptedNoMic[8 + 15] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(encryptedNoMic)), CHIP_NO_ERROR);
+
+    // One byte over the field maximum, with a valid header.
+    uint8_t tooLong[CommissioningProxySessionManager::kMaxProxyMessageLength + 1] = {};
+    memcpy(tooLong, kMockCommissioneeMessage, sizeof(kMockCommissioneeMessage));
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(tooLong)), CHIP_NO_ERROR);
+}
+
+// Data that may not be forwarded never reaches the commissioner, even when a
+// ProxyMessageRequest is waiting for it. The request stays pending: answering it is the
+// transport teardown's job.
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_NonConformingCommissioneeDataNotForwarded)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    uint16_t sid = OpenSession(tester);
+
+    mockBle.SetAutoRespond(false);
+
+    static const uint8_t kMsg[] = { 0xAB };
+    Commands::ProxyMessageRequest::Type cmd;
+    cmd.sessionID       = sid;
+    cmd.responseTimeout = 5;
+    cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
+
+    [[maybe_unused]] auto pending = tester.Invoke(cmd);
+    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+
+    static const uint8_t kNotMatter[] = { 0xde, 0xad, 0xbe, 0xef };
+    mockBle.DeliverCommissioneeData(sid, ByteSpan(kNotMatter));
+    EXPECT_FALSE(tester.GetCommandHandler().HasResponse());
+    EXPECT_FALSE(tester.GetCommandHandler().HasStatus());
+    EXPECT_EQ(mockTimer.ActiveCount(), 1u); // still waiting
+
+    // A conforming message that follows is forwarded as normal.
+    mockBle.DeliverCommissioneeData(sid, ByteSpan(kMockCommissioneeMessage));
+    EXPECT_TRUE(tester.GetCommandHandler().HasResponse());
+    EXPECT_EQ(mockTimer.ActiveCount(), 0u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

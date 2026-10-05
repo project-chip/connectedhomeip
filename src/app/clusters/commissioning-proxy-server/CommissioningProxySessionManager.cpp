@@ -21,6 +21,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <system/SystemClock.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <utility>
 
@@ -208,8 +209,29 @@ void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
     mPendingPool.ReleaseObject(pm);
 }
 
+CHIP_ERROR CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan message)
+{
+    VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(message.size() <= kMaxProxyMessageLength, CHIP_ERROR_MESSAGE_TOO_LONG);
+
+    PacketHeader header;
+    uint16_t headerLength = 0;
+    ReturnErrorOnFailure(header.Decode(message.data(), message.size(), &headerLength));
+    VerifyOrReturnError(message.size() >= static_cast<size_t>(headerLength) + header.MICTagLength(),
+                        CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    return CHIP_NO_ERROR;
+}
+
 void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
 {
+    CHIP_ERROR err = ValidateCommissioneeMessage(ByteSpan(data, length));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: session %u commissionee data not forwarded: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        return;
+    }
+
     SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr || slot->pending == nullptr)
     {

@@ -318,6 +318,18 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointMessageReceived
 {
     if (EndpointSlot * slot = mOwner.FindSlot(endpoint))
     {
+        // Data that cannot be forwarded terminates the session. Close() fires
+        // OnEndPointConnectionClosed() synchronously, which tears the session down, so
+        // the slot must not be used after it.
+        CHIP_ERROR err = CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(msg->Start(), msg->DataLength()));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "ProxyBleDelegate: invalid message from commissionee on proxy session %u: %" CHIP_ERROR_FORMAT,
+                         slot->sessionId, err.Format());
+            endpoint->Close();
+            return;
+        }
+
         // DispatchMessageResponse copies the payload into the IM ProxyMessageResponse
         // synchronously, so msg can be released when this scope returns.
         if (mOwner.mHost != nullptr)
