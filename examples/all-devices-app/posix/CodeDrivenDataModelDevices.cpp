@@ -82,6 +82,7 @@ CodeDrivenDataModelDevices::GetReservedEndpointIds(const std::vector<DeviceTypeP
 
 CHIP_ERROR CodeDrivenDataModelDevices::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
 {
+    VerifyOrReturnError(mContext.testEventTriggerDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
     DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds(deviceEntries));
