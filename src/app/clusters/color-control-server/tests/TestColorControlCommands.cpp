@@ -1100,4 +1100,36 @@ TEST_F(TestColorControlCommands, ColorLoopStartKeepsSaturationTransition)
     EXPECT_EQ(loopDelegate.transitionStopped, 0);
 }
 
+// Counts hue frames that tell the hardware to stop moving the hue axis.
+struct HueStopFrameDelegate : public ColorControlDelegate
+{
+    void OnEnhancedHueChanged(uint16_t, bool transitionActive) override
+    {
+        if (!transitionActive)
+        {
+            hueStopFrames++;
+        }
+    }
+
+    int hueStopFrames = 0;
+};
+
+// A saturation transition re-asserts the enhanced hue on every tick. While a color loop drives the hue, that
+// frame must stay transitionActive == true: a false frame means stop, and would abort a native hardware loop.
+TEST_F(TestColorControlCommands, SaturationTransitionKeepsColorLoopHueFramesLive)
+{
+    HueStopFrameDelegate hueDelegate;
+    auto config        = LoopWithXyCtConfig(hueDelegate, mockTimer);
+    config.mColorValue = EnhancedHueSatColor{ 0x1000, 20 };
+    ColorControlCluster c(kEp, config);
+
+    ASSERT_EQ(ActivateColorLoop(c), Status::Success);
+    ASSERT_EQ(c.MoveToSaturation(200, 10), Status::Success); // 1 s transition
+
+    Tick(500);
+    Complete();
+    ASSERT_EQ(c.Saturation(), 200);
+    EXPECT_EQ(hueDelegate.hueStopFrames, 0);
+}
+
 } // namespace

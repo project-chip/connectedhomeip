@@ -2884,4 +2884,214 @@ TEST_F(TestCommissioningProxyCluster, TestGeneratedCommandsAdvertisesResponses)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// =============================================================================
+// CASE Session Requirement Tests
+//
+// Spec: ProxyConnectRequest, ProxyDisconnectRequest and ProxyMessageRequest SHALL fail
+// with UNSUPPORTED_ACCESS when not executed via a CASE session. The scan commands carry
+// no such requirement.
+// =============================================================================
+// A subject descriptor with a valid accessing fabric is passed through fabric scoping.
+// Only checking the auth mode can ensure CASE is in use. A group session always has a
+// fabric and a PASE session has one after AddNOC.
+static Access::SubjectDescriptor MakeSubjectDescriptor(Access::AuthMode authMode)
+{
+    Access::SubjectDescriptor descriptor;
+    descriptor.fabricIndex = 1;
+    descriptor.authMode    = authMode;
+    descriptor.subject     = kTestNodeId;
+    return descriptor;
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_GroupSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kGroup));
+
+    auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // No connection was started.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyConnectRequest_PaseSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kPase));
+
+    auto result = tester.Invoke(MakeConnectRequest(CapabilitiesBitmap::kBle));
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // No connection was started.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPDisconnected);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_GroupSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    const Access::SubjectDescriptor caseDescriptor = MakeSubjectDescriptor(Access::AuthMode::kCase);
+    tester.SetSubjectDescriptor(caseDescriptor);
+    uint16_t sid = OpenSession(tester);
+
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionID.SetNonNull(sid);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kGroup));
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // Rejected before the session lookup, so the session survives and a CASE
+    // disconnect still closes it.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+    tester.SetSubjectDescriptor(caseDescriptor);
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyDisconnectRequest_PaseSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    const Access::SubjectDescriptor caseDescriptor = MakeSubjectDescriptor(Access::AuthMode::kCase);
+    tester.SetSubjectDescriptor(caseDescriptor);
+    uint16_t sid = OpenSession(tester);
+
+    Commands::ProxyDisconnectRequest::Type cmd;
+    cmd.sessionID.SetNonNull(sid);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kPase));
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // Rejected before the session lookup, so the session survives and a CASE
+    // disconnect still closes it.
+    EXPECT_EQ(cluster.GetCPState(), CommissioningProxyCluster::kState_CPConnected);
+    tester.SetSubjectDescriptor(caseDescriptor);
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_GroupSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kCase));
+    uint16_t sid = OpenSession(tester);
+
+    static const uint8_t kMsg[] = { 0x01 };
+    Commands::ProxyMessageRequest::Type cmd;
+    cmd.sessionID       = sid;
+    cmd.responseTimeout = 5;
+    cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kGroup));
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // No pending request was left behind, so a CASE retry succeeds instead of
+    // answering BUSY.
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kCase));
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestCommissioningProxyCluster, TestProxyMessageRequest_PaseSession_UnsupportedAccess)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kCase));
+    uint16_t sid = OpenSession(tester);
+
+    static const uint8_t kMsg[] = { 0x01 };
+    Commands::ProxyMessageRequest::Type cmd;
+    cmd.sessionID       = sid;
+    cmd.responseTimeout = 5;
+    cmd.message.SetNonNull(chip::ByteSpan(kMsg, sizeof(kMsg)));
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kPase));
+    auto result = tester.Invoke(cmd);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+    // No pending request was left behind, so a CASE retry succeeds instead of
+    // answering BUSY.
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kCase));
+    EXPECT_TRUE(tester.Invoke(cmd).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The guard must not reach ProxyScanRequest. Without this test, guarding all six
+// commands would pass every other test in the file.
+TEST_F(TestCommissioningProxyCluster, TestProxyScanRequest_GroupSession_NotRejected)
+{
+    TestServerClusterContext context;
+    CommissioningProxyCluster cluster(kTestEndpointId, CommissioningProxyCluster::Config(BitMask<Feature>{}), mockTimer);
+    RegisterMocks(cluster);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    SKIP_IF_TRANSPORT_UNSUPPORTED(tester, CapabilitiesBitmap::kBle);
+
+    tester.SetSubjectDescriptor(MakeSubjectDescriptor(Access::AuthMode::kGroup));
+
+    Commands::ProxyScanRequest::Type command;
+    command.transport = CapabilitiesBitmap::kBle;
+    EXPECT_TRUE(tester.Invoke(Commands::ProxyScanRequest::Id, command).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace
