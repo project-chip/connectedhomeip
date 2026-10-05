@@ -116,7 +116,8 @@ public:
      * @brief Check that commissionee data may be forwarded in a ProxyMessageResponse.
      *
      * The data must fit the Message field and conform to the Matter Message Format: a
-     * message header that decodes and, for an encrypted message, room for the MIC.
+     * message header and a payload header that decode or, for an encrypted message, a
+     * message header and room for the smallest payload header and the MIC.
      * Data that fails is not permitted to be forwarded, and the spec then requires the
      * proxy to terminate the transport connection and remove the session. A transport
      * driver therefore calls this on every message from the commissionee and tears the

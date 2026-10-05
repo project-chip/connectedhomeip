@@ -2288,8 +2288,9 @@ TEST_F(TestCommissioningProxyCluster, TestValidateCommissioneeMessage_AcceptsCon
 {
     EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage)), CHIP_NO_ERROR);
 
-    // An encrypted message (non-zero Session ID) carries a 16-byte MIC after its header.
-    uint8_t encrypted[8 + 16] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
+    // An encrypted message (non-zero Session ID): an 8-byte message header, then at least a
+    // 6-byte encrypted payload header and a 16-byte MIC.
+    uint8_t encrypted[8 + 6 + 16] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
     EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(encrypted)), CHIP_NO_ERROR);
 
     // Exactly the field maximum.
@@ -2309,9 +2310,15 @@ TEST_F(TestCommissioningProxyCluster, TestValidateCommissioneeMessage_RejectsNon
     // Cut off inside the message counter.
     EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 6)), CHIP_NO_ERROR);
 
-    // Encrypted, but too short to hold the MIC.
-    uint8_t encryptedNoMic[8 + 15] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
-    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(encryptedNoMic)), CHIP_NO_ERROR);
+    // A whole unsecured message header with no payload header, with one cut short, and
+    // with one a byte short.
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 8)), CHIP_NO_ERROR);
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 12)), CHIP_NO_ERROR);
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 13)), CHIP_NO_ERROR);
+
+    // Encrypted, but too short to hold the smallest payload header and the MIC.
+    uint8_t encryptedOneShort[8 + 6 + 15] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(encryptedOneShort)), CHIP_NO_ERROR);
 
     // One byte over the field maximum, with a valid header.
     uint8_t tooLong[CommissioningProxySessionManager::kMaxProxyMessageLength + 1] = {};

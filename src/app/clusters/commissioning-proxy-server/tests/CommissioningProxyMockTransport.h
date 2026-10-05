@@ -32,7 +32,7 @@ namespace CommissioningProxy {
 /// passes CommissioningProxySessionManager::ValidateCommissioneeMessage(), and the mock
 /// delivers it as the commissionee's reply.
 inline constexpr uint8_t kMockCommissioneeMessage[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-                                                        0x00, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00 };
+                                                        0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
 
 /**
  * @brief Test double for a platform transport driver.

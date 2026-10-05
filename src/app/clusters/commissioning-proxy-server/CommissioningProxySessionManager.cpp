@@ -36,6 +36,9 @@ namespace {
 // Head-room so the IM exchange outlives our own response timer and can still carry
 // the Status::Timeout back to the commissioner.
 constexpr uint16_t kResponseTimeoutMarginSecs = 5;
+
+// Smallest payload header: exchange flags, opcode, exchange ID and protocol ID.
+constexpr size_t kMinPayloadHeaderLength = 6;
 } // namespace
 
 CommissioningProxySessionManager::SessionSlot * CommissioningProxySessionManager::FindSlot(uint16_t sessionId)
@@ -214,12 +217,23 @@ CHIP_ERROR CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpa
     VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(message.size() <= kMaxProxyMessageLength, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    PacketHeader header;
-    uint16_t headerLength = 0;
-    ReturnErrorOnFailure(header.Decode(message.data(), message.size(), &headerLength));
-    VerifyOrReturnError(message.size() >= static_cast<size_t>(headerLength) + header.MICTagLength(),
-                        CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    return CHIP_NO_ERROR;
+    PacketHeader packetHeader;
+    uint16_t packetHeaderLength = 0;
+    ReturnErrorOnFailure(packetHeader.Decode(message.data(), message.size(), &packetHeaderLength));
+    ByteSpan payload = message.SubSpan(packetHeaderLength);
+
+    // An encrypted payload header cannot be decoded here, so require room for the
+    // smallest one and the MIC.
+    if (packetHeader.IsEncrypted())
+    {
+        VerifyOrReturnError(payload.size() >= kMinPayloadHeaderLength + packetHeader.MICTagLength(),
+                            CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        return CHIP_NO_ERROR;
+    }
+
+    PayloadHeader payloadHeader;
+    uint16_t payloadHeaderLength = 0;
+    return payloadHeader.Decode(payload.data(), payload.size(), &payloadHeaderLength);
 }
 
 void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
