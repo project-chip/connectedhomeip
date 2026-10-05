@@ -71,7 +71,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::ArgParser;
 
-
 void ApplicationShutdown();
 
 namespace {

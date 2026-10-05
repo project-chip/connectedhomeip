@@ -109,8 +109,8 @@ CHIP_ERROR CodeDrivenDataModelDevices::Startup(const std::vector<DeviceTypeParse
         auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
 
         VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(),
-                        entry.endpoint, entry.parentId);
+        ChipLogProgress(AppServer, "Registering device %s on endpoint %u with parent 0x%04X", entry.type.c_str(), entry.endpoint,
+                        entry.parentId);
         if (entry.endpoint != kInvalidEndpointId)
         {
             endpointIdAllocator.ForceNext(entry.endpoint);
