@@ -280,6 +280,12 @@ def main():
     help="If set only run tests under the nightly section.",
 )
 @click.option(
+    "--dedicated-runner",
+    type=str,
+    default=None,
+    help="Run only tests assigned to this runner in test_metadata.yaml.",
+)
+@click.option(
     "--summary-file",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
@@ -297,7 +303,10 @@ def main():
     default="execute_python_tests script",
     help="Name for the JUnit XML test suite (default: execute_python_tests script).",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, dedicated_runner: str | None, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
+    if nightly and dedicated_runner is not None:
+        raise click.UsageError("--nightly and --dedicated-runner cannot be used together")
+
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -331,10 +340,15 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # If nightly flag is set, only run tests listed under the nightly section.
-    # Otherwise, exclude not_automated tests, nightly tests, and dedicated ble-wifi runner tests
-    # from the regular CI run.
-    if nightly and nightly_tests is not None:
+    # Dedicated and nightly runs select their metadata entries explicitly.
+    # Regular CI excludes not_automated, nightly, and dedicated BLE-WiFi tests.
+    if dedicated_runner is not None:
+        selected_tests = {
+            item["name"] for item in metadata.get("dedicated_runner", [])
+            if item.get("runner") == dedicated_runner
+        }
+        python_files = [file for file in all_python_files if os.path.basename(file) in selected_tests]
+    elif nightly:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
     else:
         python_files = [

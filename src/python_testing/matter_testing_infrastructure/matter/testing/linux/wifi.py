@@ -40,8 +40,9 @@ log = logging.getLogger(__name__)
 DISCOVERY_DELAY_S = 0.1
 
 if TYPE_CHECKING:
-    DbusAnyT: TypeAlias = (bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"]
-                           | "DictVariantT")
+    DbusAnyT: TypeAlias = (
+        bool | int | float | str | bytes | list["DbusAnyT"] | tuple["DbusAnyT", ...] | dict[str, "DbusAnyT"] | "DictVariantT"
+    )
     DictVariantT: TypeAlias = dict[str, tuple[str, DbusAnyT]]
 else:
     DbusAnyT = Any
@@ -75,15 +76,13 @@ class NANSimulator:
         with self._lock:
             self.interfaces[name] = interface
             interface.interface_name_in_sim = name
-            log.debug("NANSimulator: Registered interface '%s' with MAC %s",
-                      name, interface.mock_mac)
+            log.debug("NANSimulator: Registered interface '%s' with MAC %s", name, interface.mock_mac)
 
     def on_publish_started(self, iface_name: str, publish_id: int, args: dict):
         """Called when an interface starts publishing."""
         with self._lock:
             self.publishers[publish_id] = (iface_name, args)
-            log.debug("NANSimulator: Publisher started - iface=%s, pub_id=%d",
-                      iface_name, publish_id)
+            log.debug("NANSimulator: Publisher started - iface=%s, pub_id=%d", iface_name, publish_id)
 
     def track_task(self, task: asyncio.Task) -> None:
         """Hold a reference until the task finishes; the loop keeps only a weak one."""
@@ -127,16 +126,14 @@ class NANSimulator:
             # discovery pass yet; that pass will report this publisher.
             if not self._subscriber_is_armed(sub_id):
                 continue
-            self._match(sub_iface, sub_id, sub_args, sub_iface_name,
-                        pub_iface, pub_id, pub_args, pub_iface_name)
+            self._match(sub_iface, sub_id, sub_args, sub_iface_name, pub_iface, pub_id, pub_args, pub_iface_name)
 
     async def on_subscribe_started(self, iface_name: str, subscribe_id: int, args: dict):
         """Called when an interface starts subscribing. Triggers discovery after delay."""
         with self._lock:
             self.subscribers[subscribe_id] = (iface_name, args)
             self.subscribed_at[subscribe_id] = time.monotonic()
-            log.debug("NANSimulator: Subscriber started - iface=%s, sub_id=%d",
-                      iface_name, subscribe_id)
+            log.debug("NANSimulator: Subscriber started - iface=%s, sub_id=%d", iface_name, subscribe_id)
 
         await asyncio.sleep(DISCOVERY_DELAY_S)
         await self._process_discoveries(iface_name, subscribe_id, args)
@@ -165,11 +162,19 @@ class NANSimulator:
             pub_iface = interfaces_copy.get(pub_iface_name)
             if pub_iface is None:
                 continue
-            self._match(sub_iface, sub_id, sub_args, sub_iface_name,
-                        pub_iface, pub_id, pub_args, pub_iface_name)
+            self._match(sub_iface, sub_id, sub_args, sub_iface_name, pub_iface, pub_id, pub_args, pub_iface_name)
 
-    def _match(self, sub_iface, sub_id: int, sub_args: dict, sub_iface_name: str,
-               pub_iface, pub_id: int, pub_args: dict, pub_iface_name: str) -> None:
+    def _match(
+        self,
+        sub_iface,
+        sub_id: int,
+        sub_args: dict,
+        sub_iface_name: str,
+        pub_iface,
+        pub_id: int,
+        pub_args: dict,
+        pub_iface_name: str,
+    ) -> None:
         """Report one publisher to one subscriber, if the two match."""
         # Don't match same interface
         if sub_iface_name == pub_iface_name:
@@ -185,17 +190,20 @@ class NANSimulator:
             if (sub_id, pub_id) in self.announced:
                 return
 
-        log.debug("NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)",
-                  sub_iface_name, sub_id, pub_iface_name, pub_id)
+        log.debug(
+            "NANSimulator: Discovery match - sub=%s (id=%d) <-> pub=%s (id=%d)", sub_iface_name, sub_id, pub_iface_name, pub_id
+        )
 
         # Emit NANDiscoveryResult to subscriber
-        sub_iface.NANDiscoveryResult.emit({
-            "subscribe_id": ("u", sub_id),
-            "publish_id": ("u", pub_id),
-            "peer_addr": ("s", pub_iface.mock_mac),
-            "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
-            "ssi": ("ay", pub_args.get("ssi", b"")),
-        })
+        sub_iface.NANDiscoveryResult.emit(
+            {
+                "subscribe_id": ("u", sub_id),
+                "publish_id": ("u", pub_id),
+                "peer_addr": ("s", pub_iface.mock_mac),
+                "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
+                "ssi": ("ay", pub_args.get("ssi", b"")),
+            }
+        )
 
         # Recorded only after the emit: a pair marked before it would be
         # suppressed for good if the emit raised.
@@ -203,8 +211,7 @@ class NANSimulator:
             self.announced.add((sub_id, pub_id))
 
         if bool(sub_args.get("discovery_only", False)):
-            log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only",
-                      pub_iface.index, sub_id)
+            log.debug("Interface[%d] Suppressing NANReplied: subscriber %d is discovery-only", pub_iface.index, sub_id)
             return
 
         # Emit NANReplied to publisher
@@ -218,8 +225,9 @@ class NANSimulator:
         log.debug("Interface[%d] Emitting NANReplied: %s", pub_iface.index, replied_args)
         pub_iface.NANReplied.emit(replied_args)
 
-    async def on_transmit(self, sender_iface: WpaSupplicantMock.WpaInterface, handle: int,
-                          req_instance_id: int, peer_addr: str, ssi: bytes):
+    async def on_transmit(
+        self, sender_iface: WpaSupplicantMock.WpaInterface, handle: int, req_instance_id: int, peer_addr: str, ssi: bytes
+    ):
         """Route NAN transmit to the appropriate receiver."""
         with self._lock:
             interfaces_copy = dict(self.interfaces)
@@ -281,8 +289,7 @@ class WpaSupplicantMock(TerminableThread):
 
         dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceCreationFailed"
 
-    class Wpa(sdbus.DbusInterfaceCommonAsync,
-              interface_name="fi.w1.wpa_supplicant1"):
+    class Wpa(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
 
         def __init__(self, mock: WpaSupplicantMock):
@@ -300,10 +307,12 @@ class WpaSupplicantMock(TerminableThread):
             # The platform falls back to CreateInterface once GetInterface has
             # failed. The mock's interfaces are bound to links up front, so it cannot.
             registered = [i.interface_name_in_sim for i in self.mock.interfaces]
-            log.error("Cannot create mock interface '%s'; the mock serves %s only. "
-                      "Is the application in the right network namespace?", ifname, registered)
-            raise WpaSupplicantMock.InterfaceCreationUnsupportedError(
-                f"The mock cannot create '{ifname}'; it serves {registered}")
+            log.error(
+                "Cannot create mock interface '%s'; the mock serves %s only. Is the application in the right network namespace?",
+                ifname,
+                registered,
+            )
+            raise WpaSupplicantMock.InterfaceCreationUnsupportedError(f"The mock cannot create '{ifname}'; it serves {registered}")
 
         @sdbus.dbus_method_async("s", "o")
         async def GetInterface(self, name: str) -> str:
@@ -313,13 +322,14 @@ class WpaSupplicantMock(TerminableThread):
             # Handing back another application's interface would make a misplaced
             # application look like a NAN problem, and the two would share one link.
             registered = [i.interface_name_in_sim for i in self.mock.interfaces]
-            log.error("No mock interface matches '%s'; registered names are %s. "
-                      "Is the application in the right network namespace?", name, registered)
-            raise WpaSupplicantMock.InterfaceUnknownError(
-                f"No mock interface matches '{name}'; registered names are {registered}")
+            log.error(
+                "No mock interface matches '%s'; registered names are %s. Is the application in the right network namespace?",
+                name,
+                registered,
+            )
+            raise WpaSupplicantMock.InterfaceUnknownError(f"No mock interface matches '{name}'; registered names are {registered}")
 
-    class WpaInterface(sdbus.DbusInterfaceCommonAsync,
-                       interface_name="fi.w1.wpa_supplicant1.Interface"):
+    class WpaInterface(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1.Interface"):
         # NAN session tracking (class-level counters shared across all interfaces)
         _publish_id_counter = 0
         _subscribe_id_counter = 0
@@ -372,8 +382,7 @@ class WpaSupplicantMock(TerminableThread):
             if sender is None or sender == self.owner:
                 return
             if self.owner is not None:
-                log.debug("Interface[%d] owner changed from %s to %s; dropping stale association",
-                          self.index, self.owner, sender)
+                log.debug("Interface[%d] owner changed from %s to %s; dropping stale association", self.index, self.owner, sender)
                 await self._leave_network()
             self._cancel_nan_sessions(sender)
             self.owner = sender
@@ -385,12 +394,18 @@ class WpaSupplicantMock(TerminableThread):
             publishes before it scans, so its own are already recorded here.
             """
             simulator = self.mock.nan_simulator
-            stale = [session_id for session_id, session in self.nan_sessions.items()
-                     if session.get("owner") not in (None, current_owner)]
+            stale = [
+                session_id for session_id, session in self.nan_sessions.items() if session.get("owner") not in (None, current_owner)
+            ]
             for session_id in stale:
                 session = self.nan_sessions.pop(session_id)
-                log.debug("Interface[%d] cancelling %s session %d left by %s",
-                          self.index, session["type"], session_id, session.get("owner"))
+                log.debug(
+                    "Interface[%d] cancelling %s session %d left by %s",
+                    self.index,
+                    session["type"],
+                    session_id,
+                    session.get("owner"),
+                )
                 if simulator is None:
                     continue
                 if session["type"] == "publish":
@@ -424,27 +439,25 @@ class WpaSupplicantMock(TerminableThread):
             log.debug("SelectNetwork called with path=%s", path)
 
             async def associate():
-                try:
+                async with self.link_lock:
+                    if asyncio.current_task() is not self._associate_task:
+                        return
                     # Mock AP association process.
                     await self.State.set_async("associating")
                     await self.State.set_async("associated")
                     if self.link is not None:
                         # Bringing the link up waits on duplicate address detection,
                         # which would block this loop and stall NAN discovery.
-                        async with self.link_lock:
-                            await asyncio.get_running_loop().run_in_executor(None, self.link.up)
-                            self.associated = True
-                    await self.State.set_async("completed")
-                except asyncio.CancelledError:
-                    pass
+                        await asyncio.get_running_loop().run_in_executor(None, self.link.up)
+                        self.associated = True
+                    if asyncio.current_task() is self._associate_task:
+                        await self.State.set_async("completed")
 
             await self.Scan({})
 
             # WpaSupplicantClient derives NetworkInfo.connected from Network.Enabled.
             await self.network.Enabled.set_async(True)
             await self.CurrentNetwork.set_async(path)
-            if self._associate_task and not self._associate_task.done():
-                self._associate_task.cancel()
             self._associate_task = asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
@@ -472,16 +485,13 @@ class WpaSupplicantMock(TerminableThread):
             Real wpa_supplicant loses the interface's addresses on leaving a network;
             keeping them would leave an unprovisioned device reachable over IP.
             """
-            if self._associate_task and not self._associate_task.done():
-                self._associate_task.cancel()
+            self._associate_task = None
             async with self.link_lock:
                 if self.link is not None and self.associated:
                     await asyncio.get_running_loop().run_in_executor(None, self.link.down)
                     self.associated = False
-            # Disconnect() runs before every SelectNetwork and sdbus emits
-            # PropertiesChanged even when unchanged, so report only a real change.
-            if self.state != "disconnected":
-                await self.State.set_async("disconnected")
+                if self.state != "disconnected":
+                    await self.State.set_async("disconnected")
 
         @sdbus.dbus_method_async()
         async def SaveConfig(self) -> None:
@@ -528,11 +538,12 @@ class WpaSupplicantMock(TerminableThread):
 
             # Notify NANSimulator if connected
             if self.mock.nan_simulator and self.interface_name_in_sim:
-                self.mock.nan_simulator.on_publish_started(
-                    self.interface_name_in_sim, publish_id, args_dict)
-                self.mock.nan_simulator.track_task(asyncio.create_task(
-                    self.mock.nan_simulator.announce_publisher(
-                        self.interface_name_in_sim, publish_id, args_dict)))
+                self.mock.nan_simulator.on_publish_started(self.interface_name_in_sim, publish_id, args_dict)
+                self.mock.nan_simulator.track_task(
+                    asyncio.create_task(
+                        self.mock.nan_simulator.announce_publisher(self.interface_name_in_sim, publish_id, args_dict)
+                    )
+                )
 
             return publish_id
 
@@ -584,8 +595,8 @@ class WpaSupplicantMock(TerminableThread):
             # Notify NANSimulator to trigger discovery
             if self.mock.nan_simulator and self.interface_name_in_sim:
                 asyncio.create_task(
-                    self.mock.nan_simulator.on_subscribe_started(
-                        self.interface_name_in_sim, subscribe_id, args_dict))
+                    self.mock.nan_simulator.on_subscribe_started(self.interface_name_in_sim, subscribe_id, args_dict)
+                )
 
             return subscribe_id
 
@@ -619,12 +630,13 @@ class WpaSupplicantMock(TerminableThread):
                     handle=args_dict.get("handle", 0),
                     req_instance_id=args_dict.get("req_instance_id", 0),
                     peer_addr=args_dict.get("peer_addr", ""),
-                    ssi=args_dict.get("ssi", b"")
+                    ssi=args_dict.get("ssi", b""),
                 )
 
         def _extract_variant_dict(self, variant_dict: dict) -> dict:
             """Extract values from GVariant a{sv} format to plain dict."""
             return {k: v[1] for k, v in variant_dict.items()}
+
         # =====================================================================
         # NAN D-Bus Signals
         # =====================================================================
@@ -738,8 +750,7 @@ class WpaSupplicantMock(TerminableThread):
         def RSN(self) -> DictVariantT:
             return {"KeyMgmt": ("as", ["wpa-psk"])}
 
-    class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
-                     interface_name="fi.w1.wpa_supplicant1.Network"):
+    class WpaNetwork(sdbus.DbusInterfaceCommonAsync, interface_name="fi.w1.wpa_supplicant1.Network"):
         def __init__(self, interface: WpaSupplicantMock.WpaInterface, ssid: str):
             super().__init__()
             self.ssid = ssid
@@ -787,8 +798,7 @@ class WpaSupplicantMock(TerminableThread):
         self.nan_simulator = NANSimulator()
 
         for interface_idx, name in enumerate(interfaces_names):
-            self.interfaces.append(
-                interface := WpaSupplicantMock.WpaInterface(self, interface_idx))
+            self.interfaces.append(interface := WpaSupplicantMock.WpaInterface(self, interface_idx))
             interface.link = ns.link_for_name(name)
             if interface.link is None:
                 raise ValueError(f"No network link matches interface name '{name}'")
