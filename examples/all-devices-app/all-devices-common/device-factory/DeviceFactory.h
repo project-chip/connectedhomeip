@@ -808,10 +808,11 @@ private:
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                     .whmFeatures            = BitMask<Clusters::WaterHeaterManagement::Feature>(),
                     .thermostatFeatures     = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
-                    .thermostatOptionalAttributes = Clusters::Thermostat::OptionalAttributes{
-                        .AbsMinHeatSetpointLimit = true,
-                        .AbsMaxHeatSetpointLimit = true,
-                    },
+                    .thermostatOptionalAttributes =
+                        Clusters::Thermostat::OptionalAttributes{
+                            .AbsMinHeatSetpointLimit = true,
+                            .AbsMaxHeatSetpointLimit = true,
+                        },
                 });
             });
         }

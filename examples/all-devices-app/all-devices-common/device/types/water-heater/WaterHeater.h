@@ -67,8 +67,8 @@ public:
         std::apply(
             [&](auto &... delegates) {
                 mThermostatCluster.Create(endpoint, mConfig.thermostatFeatures,
-                                          Clusters::Thermostat::ThermostatClusterBase::Config(
-                                              mConfig.thermostatOptionalAttributes, mConfig.timerDelegate),
+                                          Clusters::Thermostat::ThermostatClusterBase::Config(mConfig.thermostatOptionalAttributes,
+                                                                                              mConfig.timerDelegate),
                                           delegates...);
             },
             mThermostatDelegates);

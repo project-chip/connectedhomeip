@@ -88,8 +88,10 @@ public:
     GetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature & occupiedHeatingSetpoint) const override;
     Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature occupiedHeatingSetpoint,
                                                                    bool & changed) override;
-    Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(Clusters::Thermostat::temperature & absMinHeatSetpointLimit) const override;
-    Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
+    Protocols::InteractionModel::Status
+    GetAbsMinHeatSetpointLimit(Clusters::Thermostat::temperature & absMinHeatSetpointLimit) const override;
+    Protocols::InteractionModel::Status
+    GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
 
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;
