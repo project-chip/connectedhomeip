@@ -16,10 +16,13 @@
 
 #import <XCTest/XCTest.h>
 
+#import <Matter/Matter.h>
 #import <Network/Network.h>
 #import <dns_sd.h>
 
 #import "MTRDeviceConnectivityMonitor.h"
+#import "MTRTestKeys.h"
+#import "MTRTestStorage.h"
 
 @interface MTRDeviceConnectivityMonitor (Test)
 - (instancetype)initWithInstanceName:(NSString *)instanceName;
@@ -28,6 +31,18 @@
 + (BOOL)unitTestHasActiveSharedConnection;
 #endif
 @end
+
+#ifdef DEBUG
+// Pure-ObjC view onto the DEBUG-only test seam implemented in MTRDeviceController_Concrete.mm.
+// Declared inline (no C++ types) so this .m test file can drive the production getSessionForNode:
+// Thread path without importing the C++ MTRDeviceController_Concrete.h.
+@interface MTRDeviceController (ConnectivityMonitorUnitTest)
+@property (nonatomic, weak, readonly, nullable) MTRDeviceConnectivityMonitor * unitTestLastConnectivityMonitor;
+- (void)unitTestSetConnectivityMonitorWatchdogInterval:(NSTimeInterval)interval;
+- (void)unitTestForceThreadGetSessionForNode:(uint64_t)nodeID;
+- (void)unitTestForceThreadGetSessionForNode:(uint64_t)nodeID completion:(void (^)(BOOL success))completion;
+@end
+#endif
 
 @interface MTRDeviceConnectivityMonitorTests : XCTestCase
 @end
@@ -418,6 +433,213 @@ static void TestRegisterCallback(
     DNSServiceRefDeallocate(testAdvertiser);
 #else
     XCTSkip(@"Test requires DEBUG build for accessing shared connection state");
+#endif
+}
+
+// === Regression coverage for the daemon-leak fix in MTRDeviceController_Concrete.mm ===
+//
+// These tests drive the *production* getSessionForNode: Thread path (via the DEBUG-only
+// -unitTestForceThreadGetSessionForNode: seam) against a node whose DNS-SD never resolves.  test008
+// asserts the MTRDeviceConnectivityMonitor the production code created deallocates after the
+// watchdog fires (the core leak regression); test009 asserts that shutting the controller down while
+// the watchdog is still pending is handled safely (no crash/hang/double-free).
+//
+// Against unmodified upstream -- which captured the monitor *strongly* in the DNS-SD handler and
+// had NO watchdog -- the handler never fires for an unreachable node, -stopMonitoring is never
+// called, and the handler->monitor cycle keeps the monitor alive forever (the reported daemon
+// leak).  In that world test008 times out waiting for the weak ref to clear and FAILS.  With the
+// fix (weak handler capture + a watchdog that stops the monitor and releases its strong reference)
+// the monitor deallocates and test008 PASSES.
+//
+// Note the throttle is intentionally preserved: the watchdog only stops the monitor, it does NOT
+// enqueue the CASE work item, so an unreachable node still generates no CASE traffic and the
+// caller completion still never fires on this path (matching pre-fix semantics).  We therefore do
+// not assert on the completion; we assert on the monitor's lifetime, which is the thing the fix
+// changes.
+
+#ifdef DEBUG
+- (MTRDeviceController *)startThrowawayControllerForLeakTest
+{
+    MTRDeviceControllerFactory * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    MTRTestStorage * storage = [[MTRTestStorage alloc] init];
+    MTRDeviceControllerFactoryParams * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:NULL]);
+
+    MTRTestKeys * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    MTRDeviceControllerStartupParams * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    XCTAssertNotNil(params);
+    params.vendorID = @(0xFFF1);
+
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:NULL];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+    return controller;
+}
+
+// Spins the run loop until weakRef is nil or the deadline passes; returns whether it cleared.
+- (BOOL)waitForWeakReferenceToClear:(MTRDeviceConnectivityMonitor * __weak *)weakRef timeout:(NSTimeInterval)timeout
+{
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:timeout];
+    while (*weakRef != nil && [deadline timeIntervalSinceNow] > 0) {
+        @autoreleasepool {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+        }
+    }
+    return (*weakRef == nil);
+}
+#endif
+
+// The core regression test: the controller's connectivity monitor must deallocate after the
+// watchdog fires for an unreachable node.  Fails against unmodified upstream (strong handler
+// capture, no watchdog); passes with the fix.
+//
+// The leak assertion is made robust against autorelease-pool timing in two ways: (1) the
+// getSessionForNode: call is wrapped in its own autorelease pool, and we capture the weak ref to
+// the production-created monitor *after* that pool drains, so no autoreleased strong reference from
+// the call itself can mask a leak; (2) the watchdog block carries its own @autoreleasepool, so the
+// monitor is released synchronously when the watchdog fires rather than at the next drain of the
+// long-lived work-queue thread's pool.  After the watchdog interval (0.5s) the ONLY thing that
+// could keep the monitor alive is the leaked handler->monitor cycle, so a non-nil weak ref here is
+// an unambiguous leak rather than a timing artifact.
+- (void)test008_GetSessionForNodeMonitorDeallocatesAfterWatchdog
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self startThrowawayControllerForLeakTest];
+
+    // Shorten the watchdog so the production lifetime bound runs fast.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0.5];
+
+    // An operational node id that does not exist on the network: DNS-SD never resolves, so only the
+    // watchdog can bound the monitor's lifetime.
+    uint64_t unreachableNodeID = 0x1122334455667788ULL;
+
+    __weak MTRDeviceConnectivityMonitor * weakMonitor = nil;
+    @autoreleasepool {
+        [controller unitTestForceThreadGetSessionForNode:unreachableNodeID];
+        weakMonitor = controller.unitTestLastConnectivityMonitor;
+    }
+    XCTAssertNotNil(weakMonitor,
+        @"getSessionForNode: should have created a connectivity monitor for the Thread path");
+
+    // With the fix, the 0.5s watchdog stops the monitor and drops the last strong reference inside
+    // its own autorelease pool, so the monitor deallocates well within this budget.  Against
+    // unmodified upstream nothing ever releases it for an unreachable node, so this FAILS.
+    BOOL cleared = [self waitForWeakReferenceToClear:&weakMonitor timeout:6.0];
+    XCTAssertTrue(cleared,
+        @"The connectivity monitor created by getSessionForNode: must deallocate after the "
+        @"watchdog fires.  If it stays alive, the handler is retaining it (or the watchdog is "
+        @"missing) and the daemon leak has regressed.");
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    // Reset the process-global watchdog override so it cannot leak into any future test in the suite.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+#else
+    XCTSkip(@"Test requires DEBUG build for the getSessionForNode unit-test seam");
+#endif
+}
+
+// Companion to test008, covering the shutdown/watchdog race for *safety* (not leak): shutting the
+// controller down while a watchdog is still pending must not crash, hang, or double-free.  Both the
+// shutdown path and the watchdog later call -stopMonitoring on the same monitor, and the watchdog
+// fires against an already-torn-down controller; -stopMonitoring is idempotent and the watchdog
+// captures everything weakly, so this must complete cleanly.  (The unbounded-leak regression itself
+// is pinned by test008; we do not re-assert deallocation here because post-shutdown teardown
+// involves asynchronous DNS-SD cleanup whose exact timing would make a dealloc assertion flaky.)
+- (void)test009_GetSessionForNodeShutdownRacingWatchdogIsSafe
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self startThrowawayControllerForLeakTest];
+
+    // Short watchdog so it is guaranteed to fire (against the torn-down controller) within the test.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0.5];
+
+    uint64_t unreachableNodeID = 0x99AABBCCDDEEFF00ULL;
+
+    __weak MTRDeviceConnectivityMonitor * weakMonitor = nil;
+    @autoreleasepool {
+        [controller unitTestForceThreadGetSessionForNode:unreachableNodeID];
+        weakMonitor = controller.unitTestLastConnectivityMonitor;
+    }
+    XCTAssertNotNil(weakMonitor, @"getSessionForNode: should have created a connectivity monitor");
+
+    // Tear the controller down immediately, while the 0.5s watchdog is still pending.  This must not
+    // crash or hang via a double -stopMonitoring or a watchdog firing against a torn-down controller.
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    // Reset the process-global watchdog override so it cannot leak into any future test in the suite.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0];
+    controller = nil;
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+
+    // Let the pending watchdog fire (and safely no-op) well past its interval.  Reaching here without
+    // a crash/hang is the assertion: the shutdown vs. watchdog race is handled safely.
+    XCTestExpectation * settle = [self expectationWithDescription:@"settle past watchdog"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [settle fulfill];
+    });
+    [self waitForExpectations:@[ settle ] timeout:5.0];
+#else
+    XCTSkip(@"Test requires DEBUG build for the getSessionForNode unit-test seam");
+#endif
+}
+
+// Pins the documented post-watchdog semantic delta: once the watchdog has fired and torn the monitor
+// down, the Thread getSessionForNode: path has nothing left to resolve the node, so the caller
+// completion must NOT have fired for an unreachable node.  This is the deliberate throttle being
+// preserved (a node that never resolves generates no CASE traffic and no completion), and it makes
+// the otherwise-implicit "after 60s this path stops driving recovery" behavior explicit and tested.
+// (Recovery for a node that returns late is driven independently by the device-level
+// MTRDevice _connectivityMonitor and the per-device resubscription timer, not by this path.)
+- (void)test010_GetSessionForNodeCompletionDoesNotFireForUnreachableNodePostWatchdog
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self startThrowawayControllerForLeakTest];
+
+    // Short watchdog so the monitor is torn down quickly.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0.5];
+
+    uint64_t unreachableNodeID = 0x0102030405060708ULL;
+
+    __block BOOL completionFired = NO;
+    __weak MTRDeviceConnectivityMonitor * weakMonitor = nil;
+    @autoreleasepool {
+        [controller unitTestForceThreadGetSessionForNode:unreachableNodeID
+                                              completion:^(BOOL success) {
+                                                  completionFired = YES;
+                                              }];
+        weakMonitor = controller.unitTestLastConnectivityMonitor;
+    }
+    XCTAssertNotNil(weakMonitor, @"getSessionForNode: should have created a connectivity monitor");
+
+    // Wait until the watchdog has torn the monitor down (it deallocates), then a bit more to give any
+    // (incorrectly) enqueued work item a chance to drive the completion.  Neither should happen.
+    BOOL cleared = [self waitForWeakReferenceToClear:&weakMonitor timeout:6.0];
+    XCTAssertTrue(cleared, @"The connectivity monitor must deallocate after the watchdog fires");
+
+    XCTestExpectation * settle = [self expectationWithDescription:@"settle past watchdog"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [settle fulfill];
+    });
+    [self waitForExpectations:@[ settle ] timeout:5.0];
+
+    XCTAssertFalse(completionFired,
+        @"For an unreachable node the Thread getSessionForNode: completion must never fire: the work "
+        @"item is enqueued only on DNS-SD resolve, and once the watchdog tears the monitor down "
+        @"nothing can resolve it.  If this fires, the throttle/post-watchdog contract has regressed.");
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    // Reset the process-global watchdog override so it cannot leak into any future test in the suite.
+    [controller unitTestSetConnectivityMonitorWatchdogInterval:0];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+#else
+    XCTSkip(@"Test requires DEBUG build for the getSessionForNode unit-test seam");
 #endif
 }
 
