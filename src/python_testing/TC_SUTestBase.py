@@ -43,7 +43,16 @@ AccessControlEntryAuthModeEnum = AccessControlCluster.Enums.AccessControlEntryAu
 
 log = logging.getLogger(__name__)
 
+# Upper bound for establishing a subscription to the DUT. On a reachable DUT this takes well
+# under a second; the bound exists because AttributeSubscriptionHandler.start() goes through
+# ReadAttribute(), whose autoResubscribe parameter defaults to True, so a DUT that has dropped
+# off the network makes it retry establishment indefinitely and the step stalls for the rest of
+# the test budget. Every step subscribes only after the DUT has already answered the controller,
+# so a minute is generous for the establishment itself.
 SUBSCRIPTION_START_TIMEOUT_SEC = 60
+# Bound for the reachability probe that runs when a subscription fails to establish. Only needs
+# to answer "does the DUT still talk to this controller at all", so it is kept short.
+SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):

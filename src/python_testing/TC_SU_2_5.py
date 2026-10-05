@@ -343,7 +343,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
-        
+
         time_for_kApplying = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
             forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
@@ -361,10 +361,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         subscription_attr_cluster.reset()
         subscription_attr_cluster.cancel()
 
-        
         # Verify that the software version remains unchanged because the second ApplyUpdateResponse was not sent.
-        new_software_version = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s1, current_sw_version,new_software_version)
+        new_software_version_s1 = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
+        asserts.assert_equal(new_software_version_s1,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s1}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s1, current_sw_version,new_software_version_s1)
 
         self.step(2)
         step_number_s2 = "[STEP 2] "
@@ -381,7 +381,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-        
+
         # Software Version attribute handler
         software_version_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -456,7 +456,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         subscription_attr_cluster.await_all_expected_report_matches(
             [matcher_combined_obj],
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
-        
+
         logger.info("%s Waiting for the DelayedApplyAction interval of %s seconds.", step_number_s2, delayed_apply_action_time)
         update_state_match = AttributeMatcher.from_callable(
             "UpdateState is kDelayedOnApply",
@@ -472,7 +472,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info("%s Provider pipe status after kDelayedOnApply %s", step_number_s2, pipe_data)
-        
+
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                                 Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
@@ -485,7 +485,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         # The device should remain in kDelayedOnApply and must not apply the software update during this 180-second interval.
         software_version_match = AttributeMatcher.from_callable(
-            f"Sofware Version should be: {current_sw_version}",
+            f"Software Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
         software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
@@ -511,13 +511,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         subscription_attr_cluster.cancel()
 
         # Verify that the software version remains unchanged because the second ApplyUpdateResponse was not sent.
-        software_version = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s2, current_sw_version,new_software_version)
+        new_software_version_s2 = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
+        asserts.assert_equal(new_software_version_s2,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s2}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s2, current_sw_version,new_software_version_s2)
 
         self.step(3)
         step_number_s3 = "[STEP 3]"
         extra_arguments = ['--applyUpdateAction', 'discontinue'] + self.provider_pipe_arguments
-        
+
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -528,7 +529,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
-               
+
         # Software Version attribute handler
         software_version_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -580,7 +581,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             step_name=step_number_s3,
         )
 
-        
         # Wait for the DUT to start downloading.
         logger.info("%s Waiting for the DUT to reach the kDownloading state.",step_number_s3)
         update_state_match = AttributeMatcher.from_callable(
@@ -614,7 +614,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             nonlocal progress_seen, last_progress, download_completed
             attribute = report.attribute
             value = report.value
-        
             # UpdateStateProgress
             if attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
                 if value is not None and isinstance(value, int) and 1 <= value <= 100:
@@ -650,7 +649,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         subscription_attr_cluster.await_all_expected_report_matches(
             [update_state_match], self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
-        
+
         subscription_attr_cluster.cancel()
 
         if self.is_pics_sdk_ci_only:
@@ -659,14 +658,14 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.assert_equal(ota_file_data['exists'], False, f"Downloaded file is still present {ota_file_data['path']}")
             asserts.assert_equal(ota_file_data['size'], 0, "File size is greater than 0")
 
-        
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
         logger.info("%s Current UpdateStateProgress is %s, as expected",step_number_s3, update_state_progress)
         # Verify that the software version is unchanged from the start of the test.
-        new_software_version = await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s3, current_sw_version, new_software_version)
+        new_software_version_s3 = await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
+        asserts.assert_equal(new_software_version_s3,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s3}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s3, current_sw_version, new_software_version_s3)
 
 
 if __name__ == "__main__":
