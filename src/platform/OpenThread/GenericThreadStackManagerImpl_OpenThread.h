@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <openthread/instance.h>
 #include <openthread/ip6.h>
 #include <openthread/link.h>
@@ -183,10 +185,22 @@ private:
     void * mRendezvousAnnouncementRequestContext                                 = nullptr;
     chip::Inet::InterfaceId mRendezvousInterface                                 = chip::Inet::InterfaceId::Null();
 
-    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver = nullptr;
-    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
-    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver                                = nullptr;
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback                                = nullptr;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback              = nullptr;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+
+    struct PendingAttach
+    {
+        Thread::OperationalDataset dataset;
+        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback = nullptr;
+    };
+    std::optional<PendingAttach> mPendingAttach;
+
+    static constexpr uint32_t kGracefulDetachTimeoutMs = 1500;
+
+    void _FinishGracefulDetach();
+    static void _OnGracefulDetachTimeout(System::Layer * aLayer, void * aAppState);
 
     void TryNextNetwork();
 
@@ -221,6 +235,14 @@ private:
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
+
+            // The slot stays occupied until the SRP server acknowledges the removal.
+            bool IsPendingRemoval() const
+            {
+                return (mService.mState == OT_SRP_CLIENT_ITEM_STATE_TO_REMOVE) ||
+                    (mService.mState == OT_SRP_CLIENT_ITEM_STATE_REMOVING);
+            }
+
             bool Matches(const char * instanceName, const char * name) const;
             bool Matches(const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
                          const Span<const Dnssd::TextEntry> & txtEntries) const;

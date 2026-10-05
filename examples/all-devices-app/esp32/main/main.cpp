@@ -152,7 +152,7 @@ chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProv
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<DeviceInterface> gRootNode;
+std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -314,6 +314,21 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
         return nullptr;
     }
+
+    AppDeviceFactory::GetInstance().Init(AppDeviceFactory::Context{
+        .groupDataProvider        = gGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = gTimerDelegate,
+        .storageDelegate          = *delegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
+    });
 
     auto & deviceFactory = AppDeviceFactory::GetInstance();
     gConstructedDevices.clear();
@@ -522,20 +537,6 @@ void InitServer(intptr_t context)
     // Initialize the test event trigger delegate
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-
-    AppDeviceFactory::GetInstance().Init(AppDeviceFactory::Context{
-        .groupDataProvider        = gGroupDataProvider,                     //
-        .fabricTable              = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate            = gTimerDelegate,                         //
-        .storageDelegate          = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager          = DeviceLayer::PlatformMgr(),
-        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable             = Clusters::Binding::Table::GetInstance(),
-        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
-        .identifyDelegate         = gIdentifyDelegate,
-    });
 
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED

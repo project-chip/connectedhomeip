@@ -190,8 +190,7 @@ namespace Dnssd {
 #define SERVICE_DOMAIN ("local")
 
 MdnsContexts MdnsContexts::sInstance;
-static DNSServiceRef BrowseClient = NULL;
-static TaskHandle_t gResolveTask  = NULL;
+static TaskHandle_t gResolveTask = NULL;
 static EventGroupHandle_t gResolveTaskWakeEvent;
 
 void ChipDnssdMdnsLog(const char * level, const char * msg)
@@ -314,58 +313,13 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
     return CHIP_NO_ERROR;
 }
 
-void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
-                               const char * serviceName, const char * regtype, const char * replyDomain, void * context)
-{
-    DnssdBrowseCallback ChipBrowseHandler = (DnssdBrowseCallback) context;
-    DnssdService service;
-
-    ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", StringOrNullMarker(serviceName));
-
-    chip::StringBuilderBase nameBuilder(service.mName, sizeof(service.mName));
-    nameBuilder.Add(serviceName);
-    if (!nameBuilder.Fit())
-    {
-        // A truncated name cannot be resolved later, so fail the browse instead of
-        // reporting the service under a different identifier.
-        ChipLogError(ServiceProvisioning, "serviceName truncated: %s", StringOrNullMarker(serviceName));
-        ChipBrowseHandler(NULL, NULL, 0, true, CHIP_ERROR_INVALID_ARGUMENT);
-        return;
-    }
-
-    ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
-}
-
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    DNSServiceErrorType err;
-    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
-
-    (void) addressType;
-    ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", StringOrNullMarker(type));
-    chip::StringBuilderBase typeBuilder(ServiceType, sizeof(ServiceType));
-    typeBuilder.Add(type).Add(".").Add(GetProtocolString(protocol));
-    if (!typeBuilder.Fit())
-    {
-        ChipLogError(ServiceProvisioning, "ServiceType too long, truncated: type=%s protocol=%s", StringOrNullMarker(type),
-                     GetProtocolString(protocol));
-        error = CHIP_ERROR_INVALID_ARGUMENT;
-        return error;
-    }
-    err = DNSServiceBrowse(&BrowseClient, 0, 0, ServiceType, SERVICE_DOMAIN, ChipDNSServiceBrowseReply, (void *) callback);
-    ChipLogProgress(ServiceProvisioning, "DNSServiceBrowse %d", (int) err);
-    if (err)
-    {
-        error = CHIP_ERROR_INTERNAL;
-    }
-    else
-    {
-        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
-    }
-    return error;
+    // Browsing is not implemented on this platform. Report that to the caller, so that it releases the
+    // context it retained for the browse callback instead of waiting for a callback that never comes.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)

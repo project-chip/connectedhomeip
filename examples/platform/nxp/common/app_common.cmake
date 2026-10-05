@@ -315,7 +315,7 @@ set_source_files_properties(
 )
 
 set_source_files_properties(
-     ${CHIP_ROOT}/src/app/clusters/door-lock-server/DoorLockCluster.cpp
+     ${CHIP_ROOT}/src/app/clusters/door-lock-server/CodegenIntegration.cpp
      PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized"
 )
 

@@ -234,6 +234,7 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     ConfigurationMgr().LogDeviceConfig();
