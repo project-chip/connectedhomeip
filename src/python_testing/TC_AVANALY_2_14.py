@@ -37,6 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import sys
 
 from mobly import asserts
 from TC_AVANALYTestBase import AVANALYTestBase
@@ -398,6 +399,7 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
         finally:
             if event_callback:
                 event_callback.cancel()
+            cleanup_error = None
             if stream_id is not None:
                 try:
                     await self.send_remove_analysis_stream_cmd(
@@ -405,17 +407,28 @@ class TC_AVANALY_2_14(MatterTestCommissionedDevice, AVANALYTestBase):
                     )
                 except Exception as e:
                     log.info("Cleanup RemoveAnalysisStream: %s", e)
+                    if cleanup_error is None:
+                        cleanup_error = e
             try:
                 await self.send_disable_context_triggers_cmd(
                     endpoint, context_triggers=NullValue
                 )
             except Exception as e:
                 log.info("Cleanup DisableContextTriggers: %s", e)
+                if cleanup_error is None:
+                    cleanup_error = e
             if remote_zone_id is not None:
-                await self.send_single_cmd(
-                    endpoint=endpoint,
-                    cmd=zone_cluster.Commands.RemoveZone(zoneID=remote_zone_id),
-                )
+                try:
+                    await self.send_single_cmd(
+                        endpoint=endpoint,
+                        cmd=zone_cluster.Commands.RemoveZone(zoneID=remote_zone_id),
+                    )
+                except Exception as e:
+                    log.info("Cleanup RemoveZone: %s", e)
+                    if cleanup_error is None:
+                        cleanup_error = e
+            if cleanup_error is not None and sys.exc_info()[0] is None:
+                raise cleanup_error
 
 
 if __name__ == "__main__":

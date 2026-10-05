@@ -72,10 +72,6 @@ public:
                                                                         const Optional<EndpointId> & endpointId,
                                                                         uint16_t & outZoneID)
     {
-        if (nodeId.HasValue() || endpointId.HasValue())
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
         return CreateTwoDCartesianZone(zone, outZoneID);
     }
 
@@ -106,10 +102,6 @@ public:
                                                                         const Optional<NodeId> & nodeId,
                                                                         const Optional<EndpointId> & endpointId)
     {
-        if (nodeId.HasValue() || endpointId.HasValue())
-        {
-            return Protocols::InteractionModel::Status::Failure;
-        }
         return UpdateTwoDCartesianZone(zoneID, zone);
     }
 
