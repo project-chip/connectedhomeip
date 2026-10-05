@@ -110,6 +110,12 @@ TEST_F(TestColorControlAttributes, OptionsWriteRoundTrip)
     BitMask<OptionsBitmap> none;
     EXPECT_TRUE(tester.WriteAttribute(Attributes::Options::Id, none).IsSuccess());
 
+    BitMask<OptionsBitmap> reserved;
+    reserved.SetRaw(0x02);
+    ASSERT_TRUE(tester.WriteAttribute(Attributes::Options::Id, reserved).IsSuccess());
+    ASSERT_TRUE(tester.ReadAttribute(Attributes::Options::Id, readBack).IsSuccess());
+    EXPECT_EQ(readBack.Raw(), reserved.Raw());
+
     c.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
