@@ -1030,7 +1030,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .search-input::placeholder { color: var(--muted-foreground); }
     .main-grid {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 380px 1fr;
       gap: 20px;
       align-items: start;
     }
@@ -1056,7 +1056,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .tree-scroll {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       max-height: 75vh;
       overflow-y: auto;
       padding-right: 4px;
@@ -1064,8 +1064,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .nav-item {
       width: 100%;
       text-align: left;
-      padding: 10px 12px;
-      border-radius: 10px;
+      padding: 7px 12px;
+      border-radius: 7px;
       background-color: var(--card);
       border: 1px solid var(--border);
       cursor: pointer;
@@ -1458,7 +1458,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const indentPx = depth * 14;
 
       return `
-        <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;flex-direction:column;gap:5px">
           <div
             onclick="selectEndpoint(${ep.id})"
             style="margin-left:${indentPx}px;width:calc(100% - ${indentPx}px)"
@@ -1474,32 +1474,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                   >${isCollapsed ? '▶' : '▼'}</button>
                 ` : `<span class="mono muted" style="width:14px;text-align:center;font-size:11px">•</span>`}
                 <span class="mono" style="font-weight:700;font-size:12px;flex-shrink:0">EP ${ep.id}</span>
-                <span class="truncate" style="font-size:12px;font-weight:600">${escapeHtml(dtNames)}</span>
-              </div>
-              <span class="pill-count">${ep.clusters.length}c</span>
-            </div>
-
-            ${ep.label ? `
-              <div style="margin-top:4px;padding-left:20px">
-                <span class="${isSelected ? 'pill-count' : 'badge-accent'}" style="font-size:11px">
-                  "${escapeHtml(ep.label)}"
-                </span>
-              </div>
-            ` : ''}
-
-            ${ep.semantic_tags.length > 0 ? `
-              <div class="flex-wrap-gap" style="margin-top:4px;padding-left:20px">
+                <span style="font-size:12px;font-weight:600;flex-shrink:0;margin-left:2px">${escapeHtml(dtNames)}</span>
+                ${ep.label ? `
+                  <span class="${isSelected ? 'pill-count' : 'badge-accent'} truncate" style="font-size:11px;padding:1px 7px;margin-left:6px;min-width:0;display:inline-block" title="${escapeHtml(ep.label)}">
+                    "${escapeHtml(ep.label)}"
+                  </span>
+                ` : ''}
                 ${ep.semantic_tags.map(t => `
-                  <span class="${isSelected ? 'pill-count' : 'badge mono'}" style="font-size:11px">
+                  <span class="${isSelected ? 'pill-count' : 'badge mono'} truncate" style="font-size:10px;padding:1px 6px;margin-left:6px;min-width:0;display:inline-block" title="${escapeHtml(t.display)}">
                     🏷 ${escapeHtml(t.tag_name)}
                   </span>
                 `).join('')}
               </div>
-            ` : ''}
+              <span class="pill-count">${ep.clusters.length}c</span>
+            </div>
           </div>
 
           ${(hasChildren && !isCollapsed) ? `
-            <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;flex-direction:column;gap:5px">
               ${ep.children.map(childId => renderSidebarTreeNode(childId, depth + 1)).join('')}
             </div>
           ` : ''}
