@@ -20,8 +20,9 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <app/static-cluster-config/DoorLock.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/DataModelTypes.h>
@@ -35,12 +36,19 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
+// NOTE: this integration does NOT use the generated
+// `app/static-cluster-config/DoorLock.h` (StaticApplicationConfig): the zap
+// emitter still writes the legacy `kPINCredential`/`kRFIDCredential` feature
+// constant names into .matter files while the generated Enums.h uses
+// `kPinCredential`/`kRfidCredential`, so the generated header currently does
+// not compile for Door Lock. Until the emitters agree, derive the
+// configuration from the ember endpoint tables instead (allowed inside the
+// CodegenIntegration layer).
 namespace {
 
 using namespace DoorLock;
 
-constexpr size_t kDoorLockFixedClusterCount = DoorLock::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kDoorLockMaxClusterCount   = kDoorLockFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kDoorLockMaxClusterCount = FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<DoorLock::DoorLockCluster> gServers[kDoorLockMaxClusterCount];
 
@@ -143,22 +151,26 @@ EndpointEntry & FindOrCreateEndpointEntry(EndpointId endpointId)
     VerifyOrDieWithMsg(false, NotSpecified, "DoorLock: no free endpoint entry for endpoint %u", endpointId);
 }
 
-DoorLock::OptionalAttributes CreateOptionalAttributes()
+DoorLock::OptionalAttributes CreateOptionalAttributes(EndpointId endpointId)
 {
     using namespace DoorLock::Attributes;
-    using DoorLock::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint;
 
     DoorLock::OptionalAttributes optionalAttributes;
-    optionalAttributes.language                     = IsAttributeEnabledOnSomeEndpoint(Language::Id);
-    optionalAttributes.ledSettings                  = IsAttributeEnabledOnSomeEndpoint(LEDSettings::Id);
-    optionalAttributes.autoRelockTime               = IsAttributeEnabledOnSomeEndpoint(AutoRelockTime::Id);
-    optionalAttributes.soundVolume                  = IsAttributeEnabledOnSomeEndpoint(SoundVolume::Id);
-    optionalAttributes.defaultConfigurationRegister = IsAttributeEnabledOnSomeEndpoint(DefaultConfigurationRegister::Id);
-    optionalAttributes.enableLocalProgramming       = IsAttributeEnabledOnSomeEndpoint(EnableLocalProgramming::Id);
-    optionalAttributes.enableOneTouchLocking        = IsAttributeEnabledOnSomeEndpoint(EnableOneTouchLocking::Id);
-    optionalAttributes.enableInsideStatusLED        = IsAttributeEnabledOnSomeEndpoint(EnableInsideStatusLED::Id);
-    optionalAttributes.enablePrivacyModeButton      = IsAttributeEnabledOnSomeEndpoint(EnablePrivacyModeButton::Id);
-    optionalAttributes.localProgrammingFeatures     = IsAttributeEnabledOnSomeEndpoint(LocalProgrammingFeatures::Id);
+    // DoorLock attribute IDs exceed the 32-bit range of the generic
+    // fetchOptionalAttributes bit-fetch in ClusterIntegration.cpp, so the
+    // optional attributes are detected with the same ember query the generic
+    // path uses, one attribute at a time.
+    optionalAttributes.language                     = emberAfContainsAttribute(endpointId, DoorLock::Id, Language::Id);
+    optionalAttributes.ledSettings                  = emberAfContainsAttribute(endpointId, DoorLock::Id, LEDSettings::Id);
+    optionalAttributes.autoRelockTime               = emberAfContainsAttribute(endpointId, DoorLock::Id, AutoRelockTime::Id);
+    optionalAttributes.soundVolume                  = emberAfContainsAttribute(endpointId, DoorLock::Id, SoundVolume::Id);
+    optionalAttributes.defaultConfigurationRegister =
+        emberAfContainsAttribute(endpointId, DoorLock::Id, DefaultConfigurationRegister::Id);
+    optionalAttributes.enableLocalProgramming    = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableLocalProgramming::Id);
+    optionalAttributes.enableOneTouchLocking     = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableOneTouchLocking::Id);
+    optionalAttributes.enableInsideStatusLED     = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableInsideStatusLED::Id);
+    optionalAttributes.enablePrivacyModeButton   = emberAfContainsAttribute(endpointId, DoorLock::Id, EnablePrivacyModeButton::Id);
+    optionalAttributes.localProgrammingFeatures  = emberAfContainsAttribute(endpointId, DoorLock::Id, LocalProgrammingFeatures::Id);
     return optionalAttributes;
 }
 
@@ -231,7 +243,7 @@ public:
     {
         DoorLock::Config config(gTimerDelegate);
         config.features           = BitFlags<DoorLock::Feature>(featureMap);
-        config.optionalAttributes = CreateOptionalAttributes();
+        config.optionalAttributes = CreateOptionalAttributes(endpointId);
         ApplyDefaultConfigValues(config);
 
         EndpointEntry * entry = GetEntryForEndpoint(endpointId);
@@ -271,7 +283,7 @@ void MatterDoorLockClusterInitCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = DoorLock::Id,
-            .fixedClusterInstanceCount = kDoorLockFixedClusterCount,
+            .fixedClusterInstanceCount = FIXED_ENDPOINT_COUNT,
             .maxClusterInstanceCount   = kDoorLockMaxClusterCount,
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
@@ -287,7 +299,7 @@ void MatterDoorLockClusterShutdownCallback(EndpointId endpointId, MatterClusterS
         {
             .endpointId                = endpointId,
             .clusterId                 = DoorLock::Id,
-            .fixedClusterInstanceCount = kDoorLockFixedClusterCount,
+            .fixedClusterInstanceCount = FIXED_ENDPOINT_COUNT,
             .maxClusterInstanceCount   = kDoorLockMaxClusterCount,
         },
         integrationDelegate, shutdownType);
@@ -330,7 +342,7 @@ DoorLockCluster * FindClusterOnEndpoint(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = DoorLock::Id,
-            .fixedClusterInstanceCount = kDoorLockFixedClusterCount,
+            .fixedClusterInstanceCount = FIXED_ENDPOINT_COUNT,
             .maxClusterInstanceCount   = kDoorLockMaxClusterCount,
         },
         integrationDelegate);
