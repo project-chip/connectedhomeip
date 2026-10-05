@@ -91,7 +91,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if self._test_budget_deadline is None:
             asserts.fail("remaining_test_budget_sec() called before start_test_budget_clock()")
         return max(minimum_sec, self._test_budget_deadline - monotonic() - reserve_sec)
-    
+
     async def _start_subscription_bounded(self, subscription, step_name: str, **start_kwargs) -> None:
         """Start ``subscription``, failing the step if it is not established in time.
 
