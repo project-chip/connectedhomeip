@@ -222,6 +222,7 @@ public:
     Status HwSetNominalMainsVoltage(int64_t voltage_mV);
     int64_t HwGetNominalMainsVoltage() { return mNominalMainsVoltage; }
     Status HwSetCircuitCapacity(int64_t currentmA);
+    CHIP_ERROR InitializeUserMaximumChargeCurrent();
     Status HwSetCableAssemblyLimit(int64_t currentmA);
     int64_t HwGetCableAssemblyLimit() { return mCableAssemblyCurrentLimit; }
     Status HwSetState(StateEnum state);
@@ -295,6 +296,8 @@ public:
     DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
 
 private:
+    friend class EnergyEvseManager;
+
     /* Constants */
     static constexpr int kDefaultMinChargeCurrent_mA                      = 6000;  /* 6A */
     static constexpr int kDefaultUserMaximumChargeCurrent_mA              = 80000; /* 80A */
@@ -311,11 +314,12 @@ private:
     int64_t mMaximumDischargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when discharging enabled */
     int64_t mActualDischargingCurrentLimit             = 0;
     int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage (mV) */
+    bool mCircuitCapacityInitialized                   = false;
+    bool mUserMaximumChargeCurrentNeedsInitialization  = false;
 
     StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */
 
     /* Variables to hold State and SupplyState in case a fault is raised */
-    StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;
     SupplyStateEnum mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
 
     /* Callback related */
@@ -338,6 +342,7 @@ private:
     Status HandleDisabledEvent();
     Status HandleFaultRaised();
     Status HandleFaultCleared();
+    Status SetStateFromHardwareState(StateEnum newState);
 
     /**
      * @brief Helper functions to work out the charge & discharge limits based on conditions and settings

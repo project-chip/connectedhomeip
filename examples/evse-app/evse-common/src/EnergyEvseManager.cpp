@@ -19,12 +19,34 @@
 #include <EnergyEvseManager.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/server/Server.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
+namespace {
+
+bool IsEnabledAtStartup(const chip::app::DataModel::Nullable<uint32_t> & enabledUntil)
+{
+    if (enabledUntil.IsNull())
+    {
+        return true;
+    }
+
+    if (enabledUntil.Value() == 0)
+    {
+        return false;
+    }
+
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = chip::System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
+    return err != CHIP_NO_ERROR || enabledUntil.Value() > matterEpochSeconds;
+}
+
+} // namespace
+
+CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
 {
 
     SafeAttributePersistenceProvider * aProvider = GetSafeAttributePersistenceProvider();
@@ -42,14 +64,25 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    // Restore ChargingEnabledUntil value - via Instance (which owns the data)
+    // Restore ChargingEnabledUntil value - via Instance (which owns the data).
+    // A fresh installation defaults to charging enabled indefinitely, while a
+    // stored zero is an explicit Disable that must persist across a restart.
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),
                                      tempChargingEnabledUntil);
+    bool chargingEnabledUntilStored = err == CHIP_NO_ERROR;
+    bool useDefaultChargingEnabled  = false;
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
         TEMPORARY_RETURN_IGNORED SetChargingEnabledUntil(tempChargingEnabledUntil);
+    }
+    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        tempChargingEnabledUntil = DataModel::NullNullable;
+        ReturnErrorOnFailure(SetChargingEnabledUntil(tempChargingEnabledUntil));
+        useDefaultChargingEnabled = true;
+        ChipLogProgress(AppServer, "EVSE: defaulting to charging enabled indefinitely");
     }
     else
     {
@@ -60,6 +93,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     DataModel::Nullable<uint32_t> tempDischargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::DischargingEnabledUntil::Id),
                                      tempDischargingEnabledUntil);
+    bool dischargingEnabledUntilStored = err == CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
@@ -70,6 +104,63 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
         ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
     }
 
+    const bool chargingEnabled =
+        (chargingEnabledUntilStored || useDefaultChargingEnabled) && IsEnabledAtStartup(tempChargingEnabledUntil);
+    const bool dischargingEnabled = dischargingEnabledUntilStored && IsEnabledAtStartup(tempDischargingEnabledUntil);
+    if (chargingEnabled && dischargingEnabled)
+    {
+        ReturnErrorOnFailure(SetSupplyState(SupplyStateEnum::kEnabled));
+    }
+    else if (chargingEnabled)
+    {
+        ReturnErrorOnFailure(SetSupplyState(SupplyStateEnum::kChargingEnabled));
+    }
+    else if (dischargingEnabled)
+    {
+        ReturnErrorOnFailure(SetSupplyState(SupplyStateEnum::kDischargingEnabled));
+    }
+
+    int64_t tempMinimumChargeCurrent;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MinimumChargeCurrent::Id),
+                                     tempMinimumChargeCurrent);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded MinimumChargeCurrent from NVM");
+        ReturnErrorOnFailure(SetMinimumChargeCurrent(tempMinimumChargeCurrent));
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted MinimumChargeCurrent value");
+    }
+
+    // These keys hold the raw command limits, not the derived maximum-current
+    // attributes. They are written only by the enable, disable, and expiry paths.
+    int64_t maximumChargingCurrent;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumChargeCurrent::Id),
+                                     maximumChargingCurrent);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(maximumChargingCurrent >= kMinimumChargeCurrentLimit, CHIP_ERROR_INVALID_ARGUMENT);
+        mDelegate->mMaximumChargingCurrentLimitFromCommand = maximumChargingCurrent;
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted charging command current limit");
+    }
+
+    int64_t maximumDischargingCurrent;
+    err = aProvider->ReadScalarValue(
+        ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumDischargeCurrent::Id), maximumDischargingCurrent);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(maximumDischargingCurrent >= kMinimumChargeCurrentLimit, CHIP_ERROR_INVALID_ARGUMENT);
+        mDelegate->mMaximumDischargingCurrentLimitFromCommand = maximumDischargingCurrent;
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted discharging command current limit");
+    }
+
     // Restore UserMaximumChargeCurrent value - via Instance (which owns the data)
     int64_t tempUserMaximumChargeCurrent;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),
@@ -78,6 +169,10 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
         TEMPORARY_RETURN_IGNORED SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+    }
+    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ReturnErrorOnFailure(mDelegate->InitializeUserMaximumChargeCurrent());
     }
     else
     {
@@ -128,7 +223,7 @@ CHIP_ERROR EnergyEvseManager::Init()
 
     ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage()));
 
-    return LoadPersistentAttributes();
+    return LoadPersistentValues();
 }
 
 void EnergyEvseManager::Shutdown()
