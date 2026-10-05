@@ -676,11 +676,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     "${escapeHtml(ep.label)}"
                   </span>
                 ` : ''}
-                ${ep.semantic_tags.map(t => `
-                  <span class="${isSelected ? 'pill-count' : 'badge mono'} truncate" style="font-size:10px;padding:1px 6px;margin-left:6px;min-width:0;display:inline-block" title="${escapeHtml(t.display)}">
-                    🏷 ${escapeHtml(t.tag_name)}
+                ${ep.semantic_tags.length > 0 ? `
+                  <span class="${isSelected ? 'pill-count' : 'badge mono'} truncate" style="font-size:10px;padding:1px 6px;margin-left:6px;min-width:0;display:inline-block" title="${escapeHtml(ep.semantic_tags.map(t => t.display).join(' • '))}">
+                    🏷 ${escapeHtml(ep.semantic_tags.map(t => t.tag_name).join(', '))}
                   </span>
-                `).join('')}
+                ` : ''}
               </div>
               <span class="pill-count">${ep.clusters.length}c</span>
             </div>
