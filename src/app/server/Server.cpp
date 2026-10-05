@@ -482,12 +482,18 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mUnsolicitedStatusHandler.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    SuccessOrExit(err = mCommissioningWindowManager.Init({
-        .fabricTable = mFabrics, .sessionManager = mSessions, .exchangeManager = mExchangeMgr, .failSafeContext = mFailSafeContext,
+    {
+        CommissioningWindowManager::Context commissioningWindowContext = {
+            .fabricTable     = mFabrics,
+            .sessionManager  = mSessions,
+            .exchangeManager = mExchangeMgr,
+            .failSafeContext = mFailSafeContext,
 #if CONFIG_NETWORK_LAYER_BLE
-        .bleLayer = mBleLayer,
+            .bleLayer = mBleLayer,
 #endif
-    }));
+        };
+        SuccessOrExit(err = mCommissioningWindowManager.Init(commissioningWindowContext));
+    }
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
