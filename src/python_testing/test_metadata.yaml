@@ -293,18 +293,22 @@ not_automated:
 # root and applications built with BLE and Wi-Fi.
 dedicated_runner:
     - name: TC_CNET_4_1.py
+      runner: ble-wifi
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_CNET_4_4.py
+      runner: ble-wifi
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_CNET_4_9.py
+      runner: ble-wifi
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_CNET_4_15.py
+      runner: ble-wifi
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.

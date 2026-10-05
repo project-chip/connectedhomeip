@@ -352,6 +352,7 @@ class WpaSupplicantMock(TerminableThread):
             # on the link off-loop, and each decides what to do from
             # self.associated, so interleaving them would strand the flag.
             self.link_lock = asyncio.Lock()
+            self._associate_task: asyncio.Task | None = None
 
         @staticmethod
         def _current_sender() -> str | None:
@@ -423,23 +424,28 @@ class WpaSupplicantMock(TerminableThread):
             log.debug("SelectNetwork called with path=%s", path)
 
             async def associate():
-                # Mock AP association process.
-                await self.State.set_async("associating")
-                await self.State.set_async("associated")
-                if self.link is not None:
-                    # Bringing the link up waits on duplicate address detection,
-                    # which would block this loop and stall NAN discovery.
-                    async with self.link_lock:
-                        await asyncio.get_running_loop().run_in_executor(None, self.link.up)
-                        self.associated = True
-                await self.State.set_async("completed")
+                try:
+                    # Mock AP association process.
+                    await self.State.set_async("associating")
+                    await self.State.set_async("associated")
+                    if self.link is not None:
+                        # Bringing the link up waits on duplicate address detection,
+                        # which would block this loop and stall NAN discovery.
+                        async with self.link_lock:
+                            await asyncio.get_running_loop().run_in_executor(None, self.link.up)
+                            self.associated = True
+                    await self.State.set_async("completed")
+                except asyncio.CancelledError:
+                    pass
 
             await self.Scan({})
 
             # WpaSupplicantClient derives NetworkInfo.connected from Network.Enabled.
             await self.network.Enabled.set_async(True)
             await self.CurrentNetwork.set_async(path)
-            asyncio.create_task(associate())
+            if self._associate_task and not self._associate_task.done():
+                self._associate_task.cancel()
+            self._associate_task = asyncio.create_task(associate())
 
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path: str) -> None:
@@ -466,6 +472,8 @@ class WpaSupplicantMock(TerminableThread):
             Real wpa_supplicant loses the interface's addresses on leaving a network;
             keeping them would leave an unprovisioned device reachable over IP.
             """
+            if self._associate_task and not self._associate_task.done():
+                self._associate_task.cancel()
             async with self.link_lock:
                 if self.link is not None and self.associated:
                     await asyncio.get_running_loop().run_in_executor(None, self.link.down)

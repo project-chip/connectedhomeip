@@ -532,6 +532,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 summary = (RunSummary.from_json(summary_file)
                            if summary_file.exists()
                            else RunSummary(iterations=1, tests_per_iteration=1))
+                summary.tests_per_iteration = max(summary.tests_per_iteration, len(summary.results) + 1)
                 summary.record(TestResult(
                     name=os.path.basename(script),
                     worker_id=0,
@@ -612,6 +613,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             summary = (RunSummary.from_json(summary_file)
                        if summary_file.exists()
                        else RunSummary(iterations=1, tests_per_iteration=1))
+            summary.tests_per_iteration = max(summary.tests_per_iteration, len(summary.results) + 1)
             test_name = (os.path.basename(script)
                          if run_name in ("cmd-run", "run1")
                          else f"{os.path.basename(script)} ({run_name})")

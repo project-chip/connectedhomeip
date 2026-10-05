@@ -308,7 +308,10 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
-    dedicated_runner_tests = {item["name"] for item in metadata.get("dedicated_runner", [])}
+    dedicated_runner_tests = {
+        item["name"] for item in metadata.get("dedicated_runner", [])
+        if item.get("runner") == "ble-wifi"
+    }
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
@@ -329,7 +332,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         all_python_files = [path for path in all_python_files if match(path)]
 
     # If nightly flag is set, only run tests listed under the nightly section.
-    # Otherwise, exclude not_automated tests, nightly tests, and dedicated_runner tests
+    # Otherwise, exclude not_automated tests, nightly tests, and dedicated ble-wifi runner tests
     # from the regular CI run.
     if nightly and nightly_tests is not None:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
