@@ -15,12 +15,13 @@ The light output is GPIO2 (`led0` alias in the board overlay).
 
 -   Follow [BUILDING.md](../../../docs/guides/BUILDING.md) to set up the Matter
     environment.
--   Install the Zephyr SDK (toolchain, version 1.0.1 or newer; separate from
-    the Zephyr RTOS version below) as described in the
+-   Install the Zephyr SDK (toolchain, version 1.0.1 or newer; separate from the
+    Zephyr RTOS version below) as described in the
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 -   Build [chip-tool](../../chip-tool/README.md).
 
-The Zephyr RTOS version used here is **v4.4.2**. It requires Python 3.12 or newer, so it uses its own venv.
+The Zephyr RTOS version used here is **v4.4.2**. It requires Python 3.12 or
+newer, so it uses its own venv.
 
 ### Setting up the Zephyr workspace
 
