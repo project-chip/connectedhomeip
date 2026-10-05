@@ -189,7 +189,8 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
     mBoostTemporarySetpoint = temporarySetpoint.HasValue() ? std::make_optional(temporarySetpoint.Value()) : std::nullopt;
     SetHeatingEnabled(true);
 
-    LogErrorOnFailure(GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat));
+    LogErrorOnFailure(
+        GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat));
 
     NotifyBoostStateChanged();
     return Status::Success;
