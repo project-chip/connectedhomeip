@@ -160,17 +160,17 @@ DoorLock::OptionalAttributes CreateOptionalAttributes(EndpointId endpointId)
     // fetchOptionalAttributes bit-fetch in ClusterIntegration.cpp, so the
     // optional attributes are detected with the same ember query the generic
     // path uses, one attribute at a time.
-    optionalAttributes.language                     = emberAfContainsAttribute(endpointId, DoorLock::Id, Language::Id);
-    optionalAttributes.ledSettings                  = emberAfContainsAttribute(endpointId, DoorLock::Id, LEDSettings::Id);
-    optionalAttributes.autoRelockTime               = emberAfContainsAttribute(endpointId, DoorLock::Id, AutoRelockTime::Id);
-    optionalAttributes.soundVolume                  = emberAfContainsAttribute(endpointId, DoorLock::Id, SoundVolume::Id);
+    optionalAttributes.language       = emberAfContainsAttribute(endpointId, DoorLock::Id, Language::Id);
+    optionalAttributes.ledSettings    = emberAfContainsAttribute(endpointId, DoorLock::Id, LEDSettings::Id);
+    optionalAttributes.autoRelockTime = emberAfContainsAttribute(endpointId, DoorLock::Id, AutoRelockTime::Id);
+    optionalAttributes.soundVolume    = emberAfContainsAttribute(endpointId, DoorLock::Id, SoundVolume::Id);
     optionalAttributes.defaultConfigurationRegister =
         emberAfContainsAttribute(endpointId, DoorLock::Id, DefaultConfigurationRegister::Id);
-    optionalAttributes.enableLocalProgramming    = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableLocalProgramming::Id);
-    optionalAttributes.enableOneTouchLocking     = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableOneTouchLocking::Id);
-    optionalAttributes.enableInsideStatusLED     = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableInsideStatusLED::Id);
-    optionalAttributes.enablePrivacyModeButton   = emberAfContainsAttribute(endpointId, DoorLock::Id, EnablePrivacyModeButton::Id);
-    optionalAttributes.localProgrammingFeatures  = emberAfContainsAttribute(endpointId, DoorLock::Id, LocalProgrammingFeatures::Id);
+    optionalAttributes.enableLocalProgramming   = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableLocalProgramming::Id);
+    optionalAttributes.enableOneTouchLocking    = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableOneTouchLocking::Id);
+    optionalAttributes.enableInsideStatusLED    = emberAfContainsAttribute(endpointId, DoorLock::Id, EnableInsideStatusLED::Id);
+    optionalAttributes.enablePrivacyModeButton  = emberAfContainsAttribute(endpointId, DoorLock::Id, EnablePrivacyModeButton::Id);
+    optionalAttributes.localProgrammingFeatures = emberAfContainsAttribute(endpointId, DoorLock::Id, LocalProgrammingFeatures::Id);
     return optionalAttributes;
 }
 
