@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -30,6 +31,10 @@ using namespace ::chip::app::Clusters;
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
+    ChipLogProgress(Zcl, "Attribute update: endpoint %u cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
+                    static_cast<unsigned>(attributePath.mEndpointId), ChipLogValueMEI(attributePath.mClusterId),
+                    ChipLogValueMEI(attributePath.mAttributeId));
+
     if (attributePath.mEndpointId == LIGHT_ENDPOINT_ID && attributePath.mClusterId == OnOff::Id &&
         attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
