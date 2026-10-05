@@ -13,19 +13,35 @@ for architecture and device class implementation.
     -   Remove `all-devices-common/device-factory` and
         `DeviceFactoryPlatformOverride.h` from `posix/BUILD.gn`,
         [`posix/linux/BUILD.gn`](../posix/linux/BUILD.gn), and
-        [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn), and remove
-        `all-devices-common/device-factory` and `:device-type-parser` from
-        [`posix/app_options/BUILD.gn`](../posix/app_options/BUILD.gn) (along
-        with `--device` / `NoHooksDeviceFactory` handling in
-        [`AppOptions.cpp`](../posix/app_options/AppOptions.cpp)).
+        [`posix/darwin/BUILD.gn`](../posix/darwin/BUILD.gn) (if your target
+        device relies on platform setup in
+        [`DeviceFactoryPlatformOverride.h`](../posix/include/DeviceFactoryPlatformOverride.h),
+        such as `PosixAudioManager` or `CommissioningProxy` transport adapters,
+        move that initialization into your entrypoint before removing the
+        header).
+    -   Remove `all-devices-common/device-factory` and `:device-type-parser`
+        from [`posix/app_options/BUILD.gn`](../posix/app_options/BUILD.gn),
+        remove `<app_options/DeviceTypeParser.h>` and `GetDeviceTypeEntries()`
+        from [`AppOptions.h`](../posix/app_options/AppOptions.h), and remove
+        `--device` / `NoHooksDeviceFactory` handling from
+        [`AppOptions.cpp`](../posix/app_options/AppOptions.cpp) (include
+        `<lib/support/BytesToHex.h>` directly in `AppOptions.cpp` if
+        `HexToBytes` is retained).
     -   Remove `oob-accessors`, `posix/named_pipe`, sample peripheral sources
         (`PosixAudioManager.cpp`, `PosixChime.cpp`, `PosixSpeaker.cpp`), unused
-        `device/types/*` targets, and the `device/types/<device>:posix` logging
-        sub-targets (excluding `device/types/root-node:posix`).
+        `device/types/*` targets, and all `:posix` sub-targets (which compile
+        `NamedPipeTranslators.cpp` and depend on `posix/named_pipe`; mock
+        delegates live in `:logging` or `:simulated` sub-targets). Also remove
+        unused `commissioning-proxy`, `miniaudio`, and `jsoncpp` dependencies
+        from `posix/BUILD.gn`, `posix/linux/BUILD.gn`, and
+        `posix/darwin/BUILD.gn`.
 -   **Keep Platform & Root Node Dependencies**:
-    -   Keep `posix/app_options:app-options`, `device/types/root-node`
-        (including `:posix` and `:wifi`), and the single base device target
-        (e.g., `device/types/speaker`):
+    -   Keep `posix/app_options:app-options`, `device/types/root-node` (and
+        `:wifi`), and the single base device target (e.g.,
+        `device/types/speaker`). If copying `posix/` into a standalone
+        directory, preserve the `build_overrides` and `third_party` symlinks and
+        update `//examples/all-devices-app/posix/...` paths in `args.gni` and
+        `BUILD.gn`:
 
 ```text
   sources = [
@@ -37,7 +53,6 @@ for architecture and device class implementation.
 
   deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
@@ -51,8 +66,11 @@ for architecture and device class implementation.
 
 -   **Keep**:
     -   Platform initialization, `mAttributePersistence`, `mDataModelProvider`,
-        and `mRootNode` (`AppRootNode`) construction in
-        `CodeDrivenDataModelDevices`.
+        and `mRootNode` ([`AppRootNode`](../posix/include/AppRootNode.h))
+        construction in `CodeDrivenDataModelDevices` (note that `AppRootNode`
+        only wraps plain and Wi-Fi root nodes by default; enabling OTA on POSIX
+        requires linking `device/types/root-node:ota` and composing
+        `OtaFeature`).
 -   **Remove**:
     -   All `PosixDeviceFactory` registration, CLI `--device` topology loops,
         named pipe setup, and sample audio manager hooks (including the

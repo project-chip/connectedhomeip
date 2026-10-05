@@ -57,7 +57,7 @@ for architecture and device class implementation.
         product device on `kDeviceEndpointId` (`EndpointId(1)`):
 
 ```cpp
-    ReturnErrorOnFailure(sRootNode->Register(rootAllocator, *sDataModelProvider));
+    ReturnErrorOnFailure(sRootNode->Register(kRootEndpointId, *sDataModelProvider));
 
     sProductDevice = std::make_unique<chip::app::MyProductSpeaker>(sTimerDelegate);
     VerifyOrReturnError(sProductDevice != nullptr, CHIP_ERROR_NO_MEMORY);

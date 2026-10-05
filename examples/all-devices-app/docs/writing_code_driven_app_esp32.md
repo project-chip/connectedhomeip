@@ -12,8 +12,10 @@ for architecture and device class implementation.
 -   **Remove Simulator & Example Scaffolding**:
     -   Delete
         `include("${ALL_DEVICES_COMMON_DIR}/device-factory/enabled_devices.cmake")`
-        and remove `${ALL_DEVICES_EXTRA_INCLUDE_DIRS}`,
-        `${ALL_DEVICES_DEVICE_SOURCES}`, and `${ALL_DEVICES_CLUSTER_SOURCES}`.
+        (and `include("${ALL_DEVICES_COMMON_DIR}/all_devices_config.cmake")`
+        when `oob-accessors` is omitted) and remove
+        `${ALL_DEVICES_EXTRA_INCLUDE_DIRS}`, `${ALL_DEVICES_DEVICE_SOURCES}`,
+        and `${ALL_DEVICES_CLUSTER_SOURCES}`.
     -   Remove simulator device-factory, shell device-switching, and example
         peripheral directories/files (such as `display/` and `devices/chime/`)
         from `esp32/main/` and `CMakeLists.txt`.
@@ -21,8 +23,12 @@ for architecture and device class implementation.
     -   Keep `APP_TOPLEVEL_EXTRA_SRCS` (which selects `ThreadFeature.cpp` or
         `WifiFeature.cpp` based on `CONFIG_ENABLE_MATTER_OVER_THREAD`) and
         append the `device/api/*` base sources, `RootNode.cpp`, and the single
-        base device `.cpp` (note that `config/esp32/components/chip` already
-        compiles the SDK cluster servers into `libCHIP.a`):
+        base device `.cpp` (plus any underlying
+        `device/capabilities/<capability>/*.cpp` source if the device wraps a
+        shared capability; check
+        [`enabled_devices.cmake`](../all-devices-common/device-factory/enabled_devices.cmake)
+        for each device's source list; note that `config/esp32/components/chip`
+        already compiles the SDK cluster servers into `libCHIP.a`):
 
 ```cmake
 list(APPEND APP_TOPLEVEL_EXTRA_SRCS
@@ -58,7 +64,7 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
         product device on `EndpointId(1)`:
 
 ```cpp
-    if (gRootNode->Register(rootAllocator, dataModelProvider) != CHIP_NO_ERROR)
+    if (gRootNode->Register(kRootEndpointId, dataModelProvider) != CHIP_NO_ERROR)
     {
         return nullptr;
     }

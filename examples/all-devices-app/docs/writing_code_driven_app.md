@@ -9,15 +9,15 @@ base classes (`all-devices-common/device/types/`) while stripping
 
 ## 1. Simulator vs. Product Architecture
 
-| Layer / Component                         | `all-devices-app` Simulator                                                                                                                                                                                                                                          | Product Application Baseline                                                                                                           |
-| :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| **Platform Entrypoint & Hardware Setup**  | `main.cpp` / `AppTask.cpp` initializes platform stack, storage, and `CodeDrivenDataModelProvider`.                                                                                                                                                                   | **Reuse**. Keep platform initialization, event loop, and `CodeDrivenDataModelProvider` setup.                                          |
-| **Endpoint 0 (Root Node)**                | [`RootNode`](../all-devices-common/device/types/root-node/RootNode.h) / [`RootNodeWith<Features...>`](../all-devices-common/device/types/root-node/RootNodeWith.h).                                                                                                  | **Reuse**. Compose `RootNodeWith<...>` with `WifiFeature` or `ThreadFeature` and optional `OtaFeature`.                                |
-| **Base Device Types**                     | [`all-devices-common/device/types/<device-name>/`](../all-devices-common/device/types/) (e.g., [`Speaker`](../all-devices-common/device/types/speaker/Speaker.h), [`TemperatureSensor`](../all-devices-common/device/types/temperature-sensor/TemperatureSensor.h)). | **Reuse**. Inherit from these base classes, which wire the Descriptor cluster and mandatory server clusters.                           |
-| **Hardware / Cluster Delegates**          | `impl/Logging*` and simulated classes (e.g., [`LoggingSpeaker`](../all-devices-common/device/types/speaker/impl/LoggingSpeaker.h)).                                                                                                                                  | **Replace**. Subclass the base device type and implement cluster `Delegate` interfaces to drive hardware (starting from `TODO` stubs). |
-| **Device Factory & Registries**           | [`DeviceFactory`](../all-devices-common/device-factory/DeviceFactory.h) mapping string names to creators.                                                                                                                                                            | **Remove**. Instantiate `RootNode` and product device objects directly.                                                                |
-| **Build-Time Multi-Device Lists**         | [`enabled_devices.cmake`](../all-devices-common/device-factory/enabled_devices.cmake) / [`enabled_devices.gni`](../all-devices-common/device-factory/enabled_devices.gni).                                                                                           | **Remove**. Compile and link only `RootNode`, `device/api/*`, and the single base device type.                                         |
-| **Runtime Topology & Sample Peripherals** | CLI `--device` flags, NVS/NVM3 `dev-type` keys, shell switches, OOB/named-pipe hooks, and sample display/audio code.                                                                                                                                                 | **Remove**. Register fixed `EndpointId` values (`kRootEndpointId` and `EndpointId(1)`) at startup.                                     |
+| Layer / Component                         | `all-devices-app` Simulator                                                                                                                                                                                                                                                                                                                                       | Product Application Baseline                                                                                                           |
+| :---------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| **Platform Entrypoint & Hardware Setup**  | `main.cpp` / `AppTask.cpp` initializes platform stack, storage, and `CodeDrivenDataModelProvider`.                                                                                                                                                                                                                                                                | **Reuse**. Keep platform initialization, event loop, and `CodeDrivenDataModelProvider` setup.                                          |
+| **Endpoint 0 (Root Node)**                | [`RootNode`](../all-devices-common/device/types/root-node/RootNode.h) / [`RootNodeWith<Features...>`](../all-devices-common/device/types/root-node/RootNodeWith.h).                                                                                                                                                                                               | **Reuse**. Compose `RootNodeWith<...>` with `WifiFeature` or `ThreadFeature` and optional `OtaFeature`.                                |
+| **Base Device Types**                     | [`all-devices-common/device/types/<device-name>/`](../all-devices-common/device/types/) and shared [`device/capabilities/<capability>/`](../all-devices-common/device/capabilities/) (e.g., [`Speaker`](../all-devices-common/device/types/speaker/Speaker.h), [`TemperatureSensor`](../all-devices-common/device/types/temperature-sensor/TemperatureSensor.h)). | **Reuse**. Inherit from these base classes, which wire the Descriptor cluster and mandatory server clusters.                           |
+| **Hardware / Cluster Delegates**          | `impl/Logging*` and simulated classes (e.g., [`LoggingSpeaker`](../all-devices-common/device/types/speaker/impl/LoggingSpeaker.h)).                                                                                                                                                                                                                               | **Replace**. Subclass the base device type and implement cluster `Delegate` interfaces to drive hardware (starting from `TODO` stubs). |
+| **Device Factory & Registries**           | [`DeviceFactory`](../all-devices-common/device-factory/DeviceFactory.h) mapping string names to creators.                                                                                                                                                                                                                                                         | **Remove**. Instantiate `RootNode` and product device objects directly.                                                                |
+| **Build-Time Multi-Device Lists**         | [`enabled_devices.cmake`](../all-devices-common/device-factory/enabled_devices.cmake) / [`enabled_devices.gni`](../all-devices-common/device-factory/enabled_devices.gni).                                                                                                                                                                                        | **Remove**. Compile and link only `RootNode`, `device/api/*`, and the single base device type (plus any underlying capability).        |
+| **Runtime Topology & Sample Peripherals** | CLI `--device` flags, NVS/NVM3 `dev-type` keys, shell switches, OOB/named-pipe hooks, and sample display/audio code.                                                                                                                                                                                                                                              | **Remove**. Register fixed `EndpointId` values (`kRootEndpointId` and `EndpointId(1)`) at startup.                                     |
 
 ---
 
@@ -26,10 +26,10 @@ base classes (`all-devices-common/device/types/`) while stripping
 Map Matter Base Device Type and Device Library requirements to C++ types before
 coding:
 
-| Endpoint                            | Role               | Code-Driven Class / Hook                                                                   | Configuration                                                                                                                                                                                                                                                                                             |
-| :---------------------------------- | :----------------- | :----------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `EndpointId(0)` (`kRootEndpointId`) | Root Node          | [`RootNodeWith<Features...>`](../all-devices-common/device/types/root-node/RootNodeWith.h) | Pass [`WifiFeature`](../all-devices-common/device/types/root-node/features/WifiFeature.h) or [`ThreadFeature`](../all-devices-common/device/types/root-node/features/ThreadFeature.h), plus optional [`OtaFeature`](../all-devices-common/device/types/root-node/features/OtaFeature.h).                  |
-| `EndpointId(1)`                     | Application Device | [`all-devices-common/device/types/<device>/`](../all-devices-common/device/types/)         | Mandatory clusters wired by base class. Pass feature maps and optional attributes via constructor config. Attach optional spec clusters via `RegisterAdditionalClusters()` / `UnregisterAdditionalClusters()` (if provided by the base class) or in `Register()` / `Unregister()` before `AddEndpoint()`. |
+| Endpoint                            | Role               | Code-Driven Class / Hook                                                                   | Configuration                                                                                                                                                                                                                                                                                                                                                                                                     |
+| :---------------------------------- | :----------------- | :----------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EndpointId(0)` (`kRootEndpointId`) | Root Node          | [`RootNodeWith<Features...>`](../all-devices-common/device/types/root-node/RootNodeWith.h) | Pass [`WifiFeature`](../all-devices-common/device/types/root-node/features/WifiFeature.h) or [`ThreadFeature`](../all-devices-common/device/types/root-node/features/ThreadFeature.h), plus optional [`OtaFeature`](../all-devices-common/device/types/root-node/features/OtaFeature.h).                                                                                                                          |
+| `EndpointId(1)` (or sequential IDs) | Application Device | [`all-devices-common/device/types/<device>/`](../all-devices-common/device/types/)         | Mandatory clusters wired by base class. Pass feature maps and optional attributes via constructor `Config` (inspect the base `Register()` implementation to check which `Config` fields gate cluster features). Attach optional spec clusters by calling `AddCluster()` before `AddEndpoint()` in `Register()`, and calling `UnregisterDescriptor(provider)` before `provider.RemoveCluster()` in `Unregister()`. |
 
 ---
 
@@ -40,19 +40,34 @@ device base class (`device/types/<device>/<Device>.h`) and implement its cluster
 `Delegate` interfaces to drive hardware peripherals (see
 [`device/types/README.md`](../all-devices-common/device/types/README.md)):
 
--   **Required Delegates**: Inspect `device/types/<device>/impl/Logging*.h`
-    (e.g.,
+-   **Required Delegates & Shared Capabilities**: Inspect
+    `device/types/<device>/impl/Logging*.h` (e.g.,
     [`LoggingSpeaker.h`](../all-devices-common/device/types/speaker/impl/LoggingSpeaker.h))
-    to see which cluster `Delegate` interfaces a base device type requires.
+    to see which cluster `Delegate` interfaces a base device type requires. Some
+    device types are thin wrappers around shared capabilities in
+    [`device/capabilities/<capability>/`](../all-devices-common/device/capabilities/)
+    (such as `OnOffLoad`, `DimmableLoad`, `ColorLight`, or `FanLoad`), where
+    their `Context`, `Delegates`, `Config`, and `impl/Logging*` classes are
+    defined.
 -   **Base Initialization Order**: When passing `*this` as a delegate reference
     to the `<BaseDevice>` constructor, declare the `private` `Delegate` bases
     **before** `public <BaseDevice>` (as in
     [`LoggingDimmableLight.h`](../all-devices-common/device/types/dimmable-light/impl/LoggingDimmableLight.h))
     so the delegate base classes initialize first.
+-   **Cluster Type Qualification & Access**: Capability and device classes
+    define `<Cluster>Cluster()` accessor methods (e.g., `IdentifyCluster()`),
+    which shadow unqualified cluster type names in derived classes; qualify
+    cluster parameter types in delegate overrides (e.g.,
+    `Clusters::IdentifyCluster &`). If a capability base class declares
+    `Register` and `Unregister` as `protected`, expose them with
+    `using <BaseDevice>::Register; using <BaseDevice>::Unregister;`.
 -   **Hardware Peripheral Reference**: See
     [`PosixSpeaker.h`](../posix/include/PosixSpeaker.h) or
     [`ESP32DimmableLight.h`](../esp32/main/ESP32DimmableLight.h) for compiled
     subclasses driving platform hardware.
+-   **Logic Beyond Hardware Bindings**: Keep the subclass to hardware calls.
+    Caching, session handling, or protocol state machines belong in the cluster
+    under `src/app/clusters/`, where they can be unit tested.
 
 ```cpp
 class MyProductSpeaker : private Clusters::LevelControlDelegate,
@@ -63,11 +78,6 @@ public:
     explicit MyProductSpeaker(TimerDelegate & timerDelegate) :
         Speaker(*this, *this, timerDelegate)
     {}
-
-protected:
-    // Optional (when declared virtual by the base device class): attach extra spec-optional clusters
-    // CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
-    // void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
     // Override virtual methods from LevelControlDelegate and OnOffDelegate with hardware TODOs
@@ -90,8 +100,15 @@ Platform entrypoints (`main.cpp` / `AppTask.cpp`) already construct
     `RootNodeWith<ThreadFeature, OtaFeature>`
 
 Keep `RootNode` registration on `kRootEndpointId` (`0`) and replace the
-`DeviceFactory` block with direct registration of the product device on
-`EndpointId(1)`:
+`DeviceFactory` block with direct registration of the product device.
+Single-endpoint devices (inheriting from
+[`SingleEndpoint`](../all-devices-common/device/api/SingleEndpoint.h)) take
+`EndpointId(1)` directly, whereas multi-endpoint composed devices (inheriting
+from [`DeviceInterface`](../all-devices-common/device/api/Interface.h), such as
+`Oven`, `Refrigerator`, or `RoomAirConditioner`) take an
+[`EndpointIdAllocator`](../all-devices-common/device/api/EndpointIdAllocator.h)
+(e.g.,
+[`SequentialEndpointIdAllocator`](../all-devices-common/device/api/SequentialEndpointIdAllocator.h)):
 
 ```cpp
 ReturnErrorOnFailure(mRootNode->Register(kRootEndpointId, *mDataModelProvider));
