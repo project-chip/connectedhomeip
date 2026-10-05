@@ -592,6 +592,10 @@ void DeviceControllerSystemState::Shutdown()
     // before PlatformMgr().Shutdown() shuts down Inet.
     if (mTransportMgr != nullptr)
     {
+        if (Transport::ProxyTransportBase * proxyTransport = GetDeviceProxyTransport(mTransportMgr))
+        {
+            proxyTransport->SetSessionVerifier(nullptr);
+        }
         mTransportMgr->Close();
         chip::Platform::Delete(mTransportMgr);
         mTransportMgr = nullptr;
