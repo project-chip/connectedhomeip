@@ -1014,30 +1014,36 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
         // and through their sync queues, which keep a node's key-set writes and removals in order.
         if (mRefreshingNodeKeySetDeletions.empty())
         {
-            for (const auto & groupKeySet : mGroupKeySetList)
+            for (auto nkIt = mNodeKeySetEntries.begin(); nkIt != mNodeKeySetEntries.end();)
             {
-                for (auto nkIt = mNodeKeySetEntries.begin(); nkIt != mNodeKeySetEntries.end();)
+                if (nkIt->nodeID != mRefreshingNodeId || !HasRemovalIntent(*nkIt))
                 {
-                    if (nkIt->nodeID != mRefreshingNodeId || nkIt->groupKeySetID != groupKeySet.groupKeySetID ||
-                        !HasRemovalIntent(*nkIt))
-                    {
-                        ++nkIt;
-                        continue;
-                    }
-
-                    if (IsUnrecoverableCommitFailure(nkIt->statusEntry))
-                    {
-                        // remove entry from the list
-                        RecordTombstoneIfRemoving(*nkIt);
-                        nkIt = mNodeKeySetEntries.erase(nkIt);
-                        continue;
-                    }
-
-                    // Retry the removal, including one that failed earlier.
-                    MarkRemovalRequested(*nkIt);
-                    mRefreshingNodeKeySetDeletions.emplace_back(nkIt->nodeID, nkIt->groupKeySetID);
                     ++nkIt;
+                    continue;
                 }
+
+                // The node answers a KeySetRemove of a key set it does not hold with NOT_FOUND, a recoverable failure, so
+                // the removal would be retried by every refresh. The node's key sets have not changed since they were
+                // fetched: the refresh holds the node's sync slot, and it writes key sets only after this.
+                if (std::find(mRefreshingGroupKeySetIDs.begin(), mRefreshingGroupKeySetIDs.end(), nkIt->groupKeySetID) ==
+                    mRefreshingGroupKeySetIDs.end())
+                {
+                    nkIt = mNodeKeySetEntries.erase(nkIt);
+                    continue;
+                }
+
+                if (IsUnrecoverableCommitFailure(nkIt->statusEntry))
+                {
+                    // remove entry from the list
+                    RecordTombstoneIfRemoving(*nkIt);
+                    nkIt = mNodeKeySetEntries.erase(nkIt);
+                    continue;
+                }
+
+                // Retry the removal, including one that failed earlier.
+                MarkRemovalRequested(*nkIt);
+                mRefreshingNodeKeySetDeletions.emplace_back(nkIt->nodeID, nkIt->groupKeySetID);
+                ++nkIt;
             }
         }
 

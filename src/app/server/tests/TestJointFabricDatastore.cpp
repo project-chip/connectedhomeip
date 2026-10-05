@@ -3126,6 +3126,7 @@ TEST(JointFabricDatastoreTest, RefreshDoesNotSendKeySetRemovalCancelledDuringIt)
     AddGroupTen(store, 56);
     SeedNodeKeySet(store, 123, 55, State::kDeletePending);
     SeedNodeKeySet(store, 123, 56, State::kDeletePending);
+    delegate.fetchedGroupKeySetIDs = { 55, 56 };
 
     delegate.deferKind = SyncKind::kNodeKeySet;
     ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
@@ -3143,6 +3144,81 @@ TEST(JointFabricDatastoreTest, RefreshDoesNotSendKeySetRemovalCancelledDuringIt)
     EXPECT_EQ(FindNodeKeySet(store, 123, 56)->statusEntry.state, State::kCommitted);
     ASSERT_EQ(store.GetEndpointGroupIDList().size(), 1u);
     EXPECT_EQ(store.GetEndpointGroupIDList()[0].statusEntry.state, State::kCommitted);
+}
+
+// Node 123's entry for key set 55 records a failed removal: the key set's write failed, then its group was removed
+// from the node's endpoint, and KeySetRemove failed with `removalErr`.
+void SetUpFailedKeySetRemoval(JointFabricDatastore & store, TrackingDelegate & delegate, CHIP_ERROR removalErr)
+{
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    AddEndpointOneToRefresh(store, delegate);
+    AddKeySets(store, { 55 });
+    AddGroupTen(store, 55);
+
+    delegate.completeWith[SyncKind::kNodeKeySet] = CHIP_ERROR_TIMEOUT;
+    ASSERT_EQ(store.AddGroupIDToEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+    delegate.completeWith[SyncKind::kNodeKeySet] = removalErr;
+    ASSERT_EQ(store.RemoveGroupIDFromEndpointForNode(123, 1, 10), CHIP_NO_ERROR);
+
+    const auto * entry = FindNodeKeySet(store, 123, 55);
+    ASSERT_NE(entry, nullptr);
+    EXPECT_EQ(entry->statusEntry.state, State::kCommitFailed);
+    EXPECT_TRUE(entry->pendingRemoval);
+}
+
+// A node answers KeySetRemove of a key set it does not hold with NOT_FOUND. RefreshNode erases a removal of a key set
+// missing from the node's key-set list without sending KeySetRemove, and the node is Committed.
+TEST(JointFabricDatastoreTest, RefreshErasesKeySetRemovalTheNodeDoesNotNeed)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpFailedKeySetRemoval(store, delegate, CHIP_IM_GLOBAL_STATUS(NotFound));
+
+    delegate.fetchedGroupKeySetIDs.clear();
+    delegate.completeWith[SyncKind::kNodeKeySet] = CHIP_IM_GLOBAL_STATUS(NotFound);
+    const size_t keySetSyncsBefore               = delegate.nodeKeySetSyncs.size();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_EQ(delegate.nodeKeySetSyncs.size(), keySetSyncsBefore);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 55), nullptr);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
+// A removal of a key set the node still holds is sent.
+TEST(JointFabricDatastoreTest, RefreshSendsKeySetRemovalTheNodeHolds)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    SetUpFailedKeySetRemoval(store, delegate, CHIP_IM_GLOBAL_STATUS(Timeout));
+
+    delegate.fetchedGroupKeySetIDs = { 55 };
+    delegate.ResetCapturedSyncs();
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(delegate.hasLastNodeKeySetSync);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.groupKeySetID, 55u);
+    EXPECT_EQ(delegate.lastNodeKeySetSync.statusEntry.state, State::kDeletePending);
+    EXPECT_EQ(FindNodeKeySet(store, 123, 55), nullptr);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
+}
+
+// As above when the key set is no longer in the datastore: a removal of a key set neither the datastore nor the node
+// holds is erased.
+TEST(JointFabricDatastoreTest, RefreshErasesRemovalOfKeySetNoLongerStored)
+{
+    JointFabricDatastore store;
+    TrackingDelegate delegate;
+    ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+    ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+    SeedNodeKeySet(store, 123, 55, State::kCommitFailed, to_underlying(Protocols::InteractionModel::Status::NotFound));
+    store.GetNodeKeySetList().back().pendingRemoval = true;
+
+    ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(delegate.nodeKeySetSyncs.empty());
+    EXPECT_EQ(FindNodeKeySet(store, 123, 55), nullptr);
+    EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
 }
 
 // Seeds `count` Committed ACL entries on node 123, with list IDs from 1.
