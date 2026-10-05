@@ -566,12 +566,15 @@ def parse_dump(json_data: dict[Any, Any]) -> dict[str, Any]:
         return f"DeviceType 0x{dt_id:04X}"
 
     def resolve_semantic_tag(tag_entry: dict[str, Any]) -> dict[str, Any]:
+        mfg_code = tag_entry.get("0:UINT")
         ns_id = tag_entry.get("1:UINT", 0)
         tag_id = tag_entry.get("2:UINT", 0)
         label_str = tag_entry.get("3:STRING")
         ns_name = f"Namespace 0x{ns_id:02X}"
         tag_name = f"Tag 0x{tag_id:02X}"
-        if ns_id in meta.namespaces:
+        if isinstance(mfg_code, int):
+            ns_name = f"Mfg 0x{mfg_code:04X} Namespace 0x{ns_id:02X}"
+        elif ns_id in meta.namespaces:
             ns_name = meta.namespaces[ns_id].name
             if tag_id in meta.namespaces[ns_id].tags:
                 tag_name = meta.namespaces[ns_id].tags[tag_id]
@@ -1860,10 +1863,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
+def _make_js_safe(obj: Any) -> Any:
+    if isinstance(obj, bool):
+        return obj
+    if isinstance(obj, int) and abs(obj) > 0x1FFFFFFFFFFFFF:
+        return f"{obj} (0x{obj:X})" if obj >= 0 else f"{obj} (-0x{-obj:X})"
+    if isinstance(obj, list):
+        return [_make_js_safe(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _make_js_safe(v) for k, v in obj.items()}
+    return obj
+
+
 def generate_html_from_dump_dict(raw_dump: dict[Any, Any], html_path: pathlib.Path) -> None:
     enriched = parse_dump(raw_dump)
     safe_json = (
-        json.dumps(enriched, separators=(",", ":"))
+        json.dumps(_make_js_safe(enriched), separators=(",", ":"))
         .replace("<", "\\u003c")
         .replace(">", "\\u003e")
         .replace("&", "\\u0026")
