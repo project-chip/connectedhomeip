@@ -245,6 +245,12 @@ public:
     virtual const SessionParameters & GetRemoteSessionParameters() const = 0;
     virtual System::Clock::Timestamp GetMRPBaseTimeout() const           = 0;
 
+    /**
+     * Returns the maximum application payload length (excluding MIC tag and header)
+     * that SessionManager::PrepareMessage will permit for this session.
+     */
+    size_t GetMaxAppMessageLen() const;
+
     // Returns true if `subjectDescriptor.IsCommissioning` (based on Core Specification
     // pseudocode in ACL Architecture chapter) should be true when computing a
     // subject descriptor for that session. This is only valid to call during

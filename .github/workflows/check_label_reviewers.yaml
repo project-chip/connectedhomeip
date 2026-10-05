@@ -17,8 +17,11 @@
 name: Check SME Label Reviewers
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+  # pull_request_target below has some annoyances we have not yet figured how to fix:
+  #    - conflicts with pull_request_review (so runs cancel each-other)
+  #    - requires approval every time due to secret leak possibility
+  # pull_request_target:
+  #   types: [opened, synchronize, reopened, labeled, unlabeled]
   pull_request_review:
     types: [submitted, edited, dismissed]
   issue_comment:
@@ -49,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
