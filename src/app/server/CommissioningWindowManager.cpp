@@ -578,8 +578,8 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
 
     TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
-    LogErrorOnFailure(mContext->exchangeManager.UnregisterUnsolicitedMessageHandlerForType(
-        Protocols::SecureChannel::MsgType::PBKDFParamRequest));
+    LogErrorOnFailure(
+        mContext->exchangeManager.UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest));
     mListeningForPASE = false;
     mPairingSession.Clear();
 

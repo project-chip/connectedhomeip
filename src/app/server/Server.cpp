@@ -483,14 +483,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     SuccessOrExit(err = mCommissioningWindowManager.Init({
-                      .fabricTable     = mFabrics,
-                      .sessionManager  = mSessions,
-                      .exchangeManager = mExchangeMgr,
-                      .failSafeContext = mFailSafeContext,
+        .fabricTable = mFabrics, .sessionManager = mSessions, .exchangeManager = mExchangeMgr, .failSafeContext = mFailSafeContext,
 #if CONFIG_NETWORK_LAYER_BLE
-                      .bleLayer = mBleLayer,
+        .bleLayer = mBleLayer,
 #endif
-                  }));
+    }));
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);

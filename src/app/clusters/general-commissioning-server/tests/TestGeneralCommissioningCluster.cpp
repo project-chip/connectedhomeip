@@ -51,12 +51,12 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     {
         return
         {
-            .commissioningWindowManager = mCommissioningWindowManager,                      //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                  //
+            .commissioningWindowManager = mCommissioningWindowManager,                          //
+                .configurationManager   = DeviceLayer::ConfigurationMgr(),                      //
                 .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(), //
-                .fabricTable            = mFabricTable,                                     //
-                .failSafeContext        = mFailSafeContext,                                 //
-                .platformManager        = DeviceLayer::PlatformMgr(),                       //
+                .fabricTable            = mFabricTable,                                         //
+                .failSafeContext        = mFailSafeContext,                                     //
+                .platformManager        = DeviceLayer::PlatformMgr(),                           //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

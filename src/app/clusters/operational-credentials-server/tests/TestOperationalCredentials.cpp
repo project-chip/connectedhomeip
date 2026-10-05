@@ -25,9 +25,9 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/GroupDataProviderImpl.h>
-#include <transport/SessionManager.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <algorithm>
