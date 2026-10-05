@@ -128,13 +128,30 @@ void MarkEntryCommittedIfFound(std::vector<T> & vec, Pred pred)
 }
 
 /**
- * Records a failed sync on `entry`, as CommitFailed with the IM status of `err`.
+ * The FailureCode, an IM status, recorded for a sync that failed with `err`. A transport timeout and a busy CASE session
+ * carry no IM status, and are recorded as TIMEOUT and BUSY instead of FAILURE.
+ */
+inline uint8_t SyncFailureCode(CHIP_ERROR err)
+{
+    if (err == CHIP_ERROR_TIMEOUT)
+    {
+        return to_underlying(Protocols::InteractionModel::Status::Timeout);
+    }
+    if (err == CHIP_ERROR_BUSY)
+    {
+        return to_underlying(Protocols::InteractionModel::Status::Busy);
+    }
+    return to_underlying(Protocols::InteractionModel::ClusterStatusCode(err).GetStatus());
+}
+
+/**
+ * Records a failed sync on `entry`, as CommitFailed with the IM status of `err` (see SyncFailureCode).
  */
 template <typename T>
 void MarkEntrySyncFailed(T & entry, CHIP_ERROR err)
 {
     entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
-    entry.statusEntry.failureCode = to_underlying(Protocols::InteractionModel::ClusterStatusCode(err).GetStatus());
+    entry.statusEntry.failureCode = SyncFailureCode(err);
 }
 
 /**

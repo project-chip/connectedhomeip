@@ -1387,6 +1387,44 @@ TEST(JointFabricDatastoreTest, FailedAclAddRecordsCommitFailed)
     EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.failureCode, to_underlying(Protocols::InteractionModel::Status::Busy));
 }
 
+// A transport timeout and a busy CASE session record TIMEOUT and BUSY, for a single-entry sync and for a refresh's list
+// write, and RefreshNode retries the entry.
+TEST(JointFabricDatastoreTest, SyncTimeoutAndBusyRecordMatchingFailureCode)
+{
+    const std::pair<CHIP_ERROR, Protocols::InteractionModel::Status> cases[] = {
+        { CHIP_ERROR_TIMEOUT, Protocols::InteractionModel::Status::Timeout },
+        { CHIP_ERROR_BUSY, Protocols::InteractionModel::Status::Busy },
+    };
+    for (const auto & [syncErr, expectedStatus] : cases)
+    {
+        JointFabricDatastore store;
+        TrackingDelegate delegate;
+        ASSERT_EQ(store.SetDelegate(&delegate), CHIP_NO_ERROR);
+        ASSERT_EQ(store.AddPendingNode(123, "node-a"_span), CHIP_NO_ERROR);
+
+        JointFabricCluster::Structs::DatastoreAccessControlEntryStruct::DecodableType aclEntry;
+        aclEntry.privilege = Privilege::kView;
+        aclEntry.authMode  = AuthMode::kCase;
+
+        delegate.completeWith[SyncKind::kAcl] = syncErr;
+        ASSERT_EQ(store.AddACLToNode(123, aclEntry), CHIP_NO_ERROR);
+
+        ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+        EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.state, State::kCommitFailed);
+        EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.failureCode, to_underlying(expectedStatus));
+
+        delegate.completeWith[SyncKind::kAclList] = syncErr;
+        ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+        ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+        EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.state, State::kCommitFailed);
+        EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.failureCode, to_underlying(expectedStatus));
+
+        ASSERT_EQ(store.RefreshNode(123), CHIP_NO_ERROR);
+        ASSERT_EQ(store.GetNodeACLList().size(), 1u);
+        EXPECT_EQ(store.GetNodeACLList()[0].statusEntry.state, State::kCommitted);
+    }
+}
+
 TEST(JointFabricDatastoreTest, SuccessfulAclRemovalStillErasesEntry)
 {
     JointFabricDatastore store;

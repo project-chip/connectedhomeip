@@ -337,7 +337,7 @@ void JointFabricDatastore::MarkRefreshWriteFailed(std::vector<Entry> & entries, 
     // out, record FAILURE instead of an unrecoverable status too.
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type writeStatus;
     writeStatus.state                = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
-    writeStatus.failureCode          = to_underlying(Protocols::InteractionModel::ClusterStatusCode(err).GetStatus());
+    writeStatus.failureCode          = detail::SyncFailureCode(err);
     const bool unrecoverable         = IsUnrecoverableCommitFailure(writeStatus);
     const CHIP_ERROR unattributedErr = unrecoverable ? CHIP_IM_GLOBAL_STATUS(Failure) : err;
 
