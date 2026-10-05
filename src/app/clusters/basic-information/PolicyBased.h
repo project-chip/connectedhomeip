@@ -422,9 +422,6 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
     case NodeLabel::Id: {
         CharSpan label;
         ReturnErrorOnFailure(decoder.Decode(label));
-        // SetContent clears the value on failure, so validate first to keep the old value on a constraint error.
-        VerifyOrReturnError(label.size() <= Attributes::NodeLabel::TypeInfo::MaxLength(),
-                            Protocols::InteractionModel::Status::ConstraintError);
         VerifyOrReturnError(mNodeLabel.SetContent(label), Protocols::InteractionModel::Status::ConstraintError);
         return persistence.StoreString(request.path, mNodeLabel);
     }
