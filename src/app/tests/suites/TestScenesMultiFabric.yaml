@@ -206,6 +206,7 @@ tests:
                     }
 
     - label: "Preparation step TH1 Map KeySets to GroupId."
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -218,10 +219,32 @@ tests:
               ]
 
     - label: "TH1 sends a RemoveAllGroups command to DUT."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "RemoveAllGroups"
 
+    - label: "TH1 reads the Groupcast membership attribute."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "readAttribute"
+      attribute: "Membership"
+      response:
+          saveAs: membershipList
+
+    - label: "TH1 leaves all Groupcast groups."
+      PICS: "GC.S"
+      runIf: membershipList
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "LeaveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0
+
     - label: "TH1 sends a AddGroup command to DUT for G1."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -237,7 +260,22 @@ tests:
               - name: "GroupID"
                 value: G1
 
+    - label: "TH1 sends a JoinGroup command to DUT for G1."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
+
     - label: "TH1 sends a AddGroup command to DUT for G2."
+      PICS: "!GC.S"
       cluster: "Groups"
       command: "AddGroup"
       arguments:
@@ -252,6 +290,20 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G2
+
+    - label: "TH1 sends a JoinGroup command to DUT for G2."
+      PICS: "GC.S"
+      endpoint: 0
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a1
 
     - label: "Preparation step : TH 2 Add Group KeySet."
       identity: "beta"
@@ -275,6 +327,7 @@ tests:
 
     - label: "Preparation step TH1 Map KeySets to GroupId."
       identity: "beta"
+      PICS: "!GC.S"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -283,6 +336,7 @@ tests:
           value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
 
     - label: "TH2 sends a AddGroup command to DUT for G1."
+      PICS: "!GC.S"
       identity: "beta"
       cluster: "Groups"
       command: "AddGroup"
@@ -298,6 +352,21 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
+
+    - label: "TH2 sends a JoinGroup command to DUT for G1."
+      PICS: "GC.S"
+      endpoint: 0
+      identity: "beta"
+      cluster: "Groupcast"
+      command: "JoinGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "Endpoints"
+                value: [endpoint]
+              - name: "KeySetID"
+                value: 0x01a2
 
     - label: "TH1 confirms the Fabric Capacity is Maximum"
       command: "GetSceneMembership"
@@ -390,7 +459,7 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -403,8 +472,17 @@ tests:
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
-          value: []
-          # TODO : Have FabricSceneInfo initialized on adding a new fabric
+          value:
+              [
+                  {
+                      SceneCount: 0,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
+                      FabricIndex: th2FabricIndex,
+                      SceneValid: false,
+                      RemainingCapacity: fabricCapacity,
+                  },
+              ]
 
     - label: "TH2 sends an AddScene command to DUT for Scene 1 G1"
       identity: "beta"
@@ -461,10 +539,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -478,7 +556,7 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -518,10 +596,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -536,7 +614,7 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -571,8 +649,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -587,7 +665,7 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -627,8 +705,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -643,7 +721,7 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x00,
+                      CurrentScene: 0xFF,
                       CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
@@ -669,8 +747,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -685,10 +763,10 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 4,
                   },
               ]
@@ -720,16 +798,18 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
 
     - label:
-          "TH1 confirms its FabricSceneInfo's field SceneValid remains unchanged"
+          "TH1 confirms its FabricSceneInfo's deprecated CurrentScene,
+          CurrentGroup and SceneValid fields remain fixed at 0xFF, 0x00 and
+          false (Scenes Management Revision 2)"
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -737,10 +817,10 @@ tests:
               [
                   {
                       SceneCount: 4,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 4,
                   },
               ]
@@ -767,10 +847,10 @@ tests:
               [
                   {
                       SceneCount: 1,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 1,
                   },
               ]
@@ -785,10 +865,10 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
@@ -820,8 +900,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -836,10 +916,10 @@ tests:
               [
                   {
                       SceneCount: 2,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
-                      SceneValid: true,
+                      SceneValid: false,
                       RemainingCapacity: fabricCapacity - 2,
                   },
               ]
@@ -866,8 +946,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x02,
-                      CurrentGroup: G1,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th2FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,
@@ -882,8 +962,8 @@ tests:
               [
                   {
                       SceneCount: 0,
-                      CurrentScene: 0x01,
-                      CurrentGroup: G2,
+                      CurrentScene: 0xFF,
+                      CurrentGroup: 0x00,
                       FabricIndex: th1FabricIndex,
                       SceneValid: false,
                       RemainingCapacity: fabricCapacity,

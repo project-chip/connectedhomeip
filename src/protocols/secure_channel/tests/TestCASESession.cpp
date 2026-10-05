@@ -60,6 +60,39 @@ using namespace chip::Crypto;
 namespace chip {
 class TestCASESecurePairingDelegate;
 
+constexpr CHIP_ERROR kFatalSendErrorNotRemappedToSuccessByMapSendError = CHIP_ERROR_BAD_REQUEST;
+
+class FailTheFirstStatusReportSend : public Testing::LoopbackTransportDelegate
+{
+public:
+    FailTheFirstStatusReportSend(Testing::LoopbackTransport & loopback) : mLoopback(loopback) {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        VerifyOrReturn(!mArmed);
+
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport));
+
+        mArmed                                   = true;
+        mLoopback.mNumMessagesToAllowBeforeError = 0;
+        mLoopback.mMessageSendError              = kFatalSendErrorNotRemappedToSuccessByMapSendError;
+    }
+
+    bool IsArmed() const { return mArmed; }
+
+private:
+    Testing::LoopbackTransport & mLoopback;
+    bool mArmed = false;
+};
+
 // Exposing CASESession's Protected members in order to be able to call the protected methods, and instantiate protected structures.
 // Also to be able to instantiate New CASESessions repeatedly inside a single TestCase (which is not possible if we inherit
 // CASESession in the Test Fixture)
@@ -479,6 +512,44 @@ TEST_F(TestCASESession, SecurePairingStartTest)
     loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
+TEST_F(TestCASESession, EstablishSessionWithInvalidFabricClosesTheExchange)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegate;
+
+    ASSERT_EQ(gCommissionerFabrics.FindFabricWithIndex(kMaxValidFabricIndex), nullptr);
+
+    struct
+    {
+        FabricTable * fabricTable;
+        FabricIndex fabricIndex;
+    } const invalidFabrics[] = {
+        { nullptr, gCommissionerFabricIndex },
+        { &gCommissionerFabrics, kUndefinedFabricIndex },
+        { &gCommissionerFabrics, kMaxValidFabricIndex },
+    };
+
+    for (const auto & invalid : invalidFabrics)
+    {
+        ASSERT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+        CASESession pairing;
+        pairing.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+        ExchangeContext * context = NewUnauthenticatedExchangeToBob(&pairing);
+        ASSERT_NE(context, nullptr);
+
+        EXPECT_EQ(pairing.EstablishSession(sessionManager, invalid.fabricTable, ScopedNodeId{ Node01_01, invalid.fabricIndex },
+                                           context, nullptr, nullptr, &delegate,
+                                           Optional<ReliableMessageProtocolConfig>::Missing()),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+        ServiceEvents();
+
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+        GetExchangeManager().CloseAllContextsForDelegate(&pairing);
+    }
+}
+
 void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
                                                        TestCASESecurePairingDelegate & delegateCommissioner)
 {
@@ -595,6 +666,122 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     chip::Platform::Delete(pairingCommissioner1);
 
     gPairingServer.Shutdown();
+}
+
+TEST_F(TestCASESession, SecurePairingHandshakeTCPParamsTest)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingAccessory;
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    SessionParameters commissionerSessionParams;
+    commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+    pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+    SessionParameters accessorySessionParams;
+    accessorySessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    accessorySessionParams.SetMaxTCPPayloadSize(50000);
+    pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), NullOptional),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                   nullptr, nullptr, &delegateCommissioner, NullOptional),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), GetDefaultMRPConfig());
+
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), GetDefaultMRPConfig());
+}
+
+TEST_F(TestCASESession, SecurePairingHandshakeCustomMRPAndTCPParamsTest)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingCommissioner;
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    CASESession pairingAccessory;
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    // Custom MRP configs
+    ReliableMessageProtocolConfig commissionerRmpConfig(System::Clock::Milliseconds32(1000), System::Clock::Milliseconds32(2000),
+                                                        System::Clock::Milliseconds16(300));
+    ReliableMessageProtocolConfig accessoryRmpConfig(System::Clock::Milliseconds32(5000), System::Clock::Milliseconds32(300),
+                                                     System::Clock::Milliseconds16(4000));
+
+    SessionParameters commissionerSessionParams;
+    commissionerSessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient));
+    commissionerSessionParams.SetMaxTCPPayloadSize(40000);
+    pairingCommissioner.SetLocalSessionParameters(commissionerSessionParams);
+
+    SessionParameters accessorySessionParams;
+    accessorySessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    accessorySessionParams.SetMaxTCPPayloadSize(50000);
+    pairingAccessory.SetLocalSessionParameters(accessorySessionParams);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr, &delegateAccessory,
+                                                              ScopedNodeId(), MakeOptional(accessoryRmpConfig)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(pairingCommissioner.EstablishSession(sessionManager, &gCommissionerFabrics,
+                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                   nullptr, nullptr, &delegateCommissioner, MakeOptional(commissionerRmpConfig)),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetSupportedTransports(),
+              commissionerSessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingAccessory.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              commissionerSessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingAccessory.GetRemoteMRPConfig(), commissionerRmpConfig);
+
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetSupportedTransports(),
+              accessorySessionParams.GetSupportedTransports());
+    EXPECT_EQ(pairingCommissioner.GetRemoteSessionParameters().GetMaxTCPPayloadSize(),
+              accessorySessionParams.GetMaxTCPPayloadSize());
+    EXPECT_EQ(pairingCommissioner.GetRemoteMRPConfig(), accessoryRmpConfig);
 }
 
 TEST_F(TestCASESession, ClientReceivesBusyTest)
@@ -1001,7 +1188,7 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     encodeParams.destinationId      = ByteSpan(destinationId);
 
     ReliableMessageProtocolConfig mrpConfig = GetDefaultMRPConfig();
-    encodeParams.initiatorMrpConfig         = &mrpConfig;
+    encodeParams.initiatorSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
@@ -1017,20 +1204,6 @@ TEST_F(TestCASESession, EncodeSigma1Test)
     {
         System::PacketBufferHandle msg;
         // EncodeSigma1 will Succeed when Public Key is provided
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma1(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma1 should fail when MRP config is missing
-        encodeParams.initiatorMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma1(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.initiatorMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma1(msg, encodeParams));
     }
 
@@ -1306,7 +1479,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                             System::Clock::Milliseconds16(4000));
 
-    encodeParams.responderMrpConfig = &mrpConfig;
+    encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
@@ -1356,27 +1529,10 @@ TEST_F(TestCASESession, EncodeSigma2Test)
     // Set encrypted2Length again
     encodeParams.encrypted2Length = kEncrypted2datalen + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma2 should fail when MRP config is missing
-        encodeParams.responderMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma2(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
-        // EncodeSigma2 frees msgR2Encrypted after encoding it
-        encodeParams.msgR2Encrypted.Alloc(encodeParams.encrypted2Length);
-    }
-
     // Round Trip Test: Encode then Parse Sigma2
     {
         System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2(msg, encodeParams));
 
         System::PacketBufferTLVReader tlvReader;
@@ -1391,7 +1547,7 @@ TEST_F(TestCASESession, EncodeSigma2Test)
         EXPECT_TRUE(parsedMessage.responderEphPubKey.data_equal(
             ByteSpan(encodeParams.responderEphPubKey->ConstBytes(), encodeParams.responderEphPubKey->Length())));
 
-        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), mrpConfig);
     }
 
     // Release EphemeralKeyPair
@@ -1575,32 +1731,17 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
     // Set responder MRP Parameters
     ReliableMessageProtocolConfig mrpConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                             System::Clock::Milliseconds16(4000));
-    encodeParams.responderMrpConfig = &mrpConfig;
+    encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
 
     {
         System::PacketBufferHandle msg;
-        EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // EncodeSigma2Resume should fail when MRP config is missing
-        encodeParams.responderMrpConfig = nullptr;
-        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
-    }
-
-    {
-        System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
     }
 
     // Round Trip Test: Encode Parse Sigma2Resume
     {
         System::PacketBufferHandle msg;
-        // Succeed when MRP Config is provided
-        encodeParams.responderMrpConfig = &mrpConfig;
+        encodeParams.responderSessionParams.SetMRPConfig(mrpConfig);
         EXPECT_EQ(CHIP_NO_ERROR, CASESessionAccess::EncodeSigma2Resume(msg, encodeParams));
 
         System::PacketBufferTLVReader tlvReader;
@@ -1613,7 +1754,7 @@ TEST_F(TestCASESession, EncodeSigma2ResumeTest)
         EXPECT_TRUE(parsedMessage.resumptionId.data_equal(encodeParams.resumptionId));
         EXPECT_TRUE(parsedMessage.sigma2ResumeMIC.data_equal(encodeParams.sigma2ResumeMIC));
         EXPECT_EQ(parsedMessage.responderSessionId, encodeParams.responderSessionId);
-        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), *encodeParams.responderMrpConfig);
+        EXPECT_EQ(parsedMessage.responderSessionParams.GetMRPConfig(), mrpConfig);
     }
 }
 
@@ -1655,10 +1796,12 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
     CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
                     const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override
     {
+        mSaveCount++;
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR DeleteAll(const FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
     CHIP_ERROR mFindMethodReturnCode;
+    uint32_t mSaveCount = 0;
     ScopedNodeId mPeerNodeId;
     ResumptionIdStorage * mResumptionId           = nullptr;
     Crypto::P256ECDHDerivedSecret * mSharedSecret = nullptr;
@@ -1760,6 +1903,138 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         chip::Platform::Delete(pairingCommissioner);
         gPairingServer.Shutdown();
     }
+}
+
+TEST_F(TestCASESession, Sigma3StatusReportSendFailureFailsResponderWithoutSavingResumption)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    TestCASESecurePairingDelegate delegateCommissioner;
+    SessionResumptionTestStorage responderStorage(CHIP_ERROR_KEY_NOT_FOUND);
+    CASESession pairingAccessory;
+    CASESession pairingCommissioner;
+
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, &responderStorage, nullptr,
+                                                              &delegateAccessory, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    FailTheFirstStatusReportSend failTheFirstStatusReportSend(loopback);
+    loopback.SetLoopbackTransportDelegate(&failTheFirstStatusReportSend);
+
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  nullptr, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_TRUE(failTheFirstStatusReportSend.IsArmed());
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(responderStorage.mSaveCount, 0u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    pairingCommissioner.Clear();
+    ServiceEvents();
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1),
+              CHIP_NO_ERROR);
+
+    GetExchangeManager().CloseAllContextsForDelegate(nullptr);
+}
+
+TEST_F(TestCASESession, Sigma2ResumeStatusReportSendFailureFailsInitiatorWithoutSavingResumption)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_NO_ERROR, initiator, &resumptionId, &sharedSecret);
+
+    TestCASESecurePairingDelegate delegateAccessory;
+    TestCASESecurePairingDelegate delegateCommissioner;
+    CASESession pairingAccessory;
+    CASESession pairingCommissioner;
+
+    pairingAccessory.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+
+    EXPECT_EQ(pairingAccessory.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, &responderStorage, nullptr,
+                                                              &delegateAccessory, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    FailTheFirstStatusReportSend failTheFirstStatusReportSend(loopback);
+    loopback.SetLoopbackTransportDelegate(&failTheFirstStatusReportSend);
+
+    EXPECT_EQ(pairingCommissioner.EstablishSession(
+                  sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                  &initiatorStorage, nullptr, &delegateCommissioner, Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_TRUE(failTheFirstStatusReportSend.IsArmed());
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(initiatorStorage.mSaveCount, 0u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+    loopback.mNumMessagesToAllowBeforeError = Testing::LoopbackTransport::kUnlimitedMessageCount;
+    loopback.mMessageSendError              = CHIP_NO_ERROR;
+
+    pairingAccessory.Clear();
+    ServiceEvents();
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(responderStorage.mSaveCount, 0u);
+
+    EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1),
+              CHIP_NO_ERROR);
+
+    GetExchangeManager().CloseAllContextsForDelegate(nullptr);
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

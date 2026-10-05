@@ -1046,6 +1046,48 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     }
 }
 
+JNI_METHOD(void, setThreadCredentialsNeededListener)
+(JNIEnv * env, jobject self, jlong handle, jobject listener)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = wrapper->SetThreadCredentialsNeededListener(listener);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set ThreadCredentialsNeeded listener: %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+}
+
+JNI_METHOD(void, setWiFiCredentialsNeededListener)
+(JNIEnv * env, jobject self, jlong handle, jobject listener)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = wrapper->SetWiFiCredentialsNeededListener(listener);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set WiFiCredentialsNeeded Listener. : %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+}
+
 JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
 (JNIEnv * env, jobject self, jlong handle, jobject icdRegistrationInfo)
 {

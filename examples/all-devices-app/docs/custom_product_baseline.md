@@ -55,7 +55,7 @@ Instantiate device classes (such as `LoggingDimmableLight`) directly.
 
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/types/dimmable-light/LoggingDimmableLight.h>
+#include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -84,7 +84,7 @@ public:
 private:
     DefaultAttributePersistenceProvider mAttributePersistence;
     std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
-    std::unique_ptr<DeviceInterface> mMainLightEndpoint;
+    std::unique_ptr<SingleEndpoint> mMainLightEndpoint;
     DeviceLayer::DefaultTimerDelegate mTimerDelegate;
 };
 

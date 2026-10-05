@@ -21,6 +21,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "CHIPDevicePlatformConfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,7 @@ struct FactoryData
     struct FactoryDataString product_url;
     struct FactoryDataString product_label;
     uint16_t hw_ver;
+    struct FactoryDataString mfg_date_str;
     struct FactoryDataString hw_ver_str;
     struct FactoryDataString rd_uid;
     struct FactoryDataString dac_cert;

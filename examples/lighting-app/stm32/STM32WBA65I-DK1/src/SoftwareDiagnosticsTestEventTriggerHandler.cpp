@@ -50,7 +50,7 @@ void SetTestEventTrigger_SoftwareFaultOccurred()
     // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
     if (localtime_r(&result, &timeInfo) != nullptr && std::strftime(timeChar, sizeof(timeChar), "%c", &timeInfo))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
     }
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);

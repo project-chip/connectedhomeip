@@ -113,18 +113,30 @@ tizen:
     - "examples/**/tizen/**"
     - "config/tizen/**"
 
-# --- Proposals / Opt-In Templates ---
+bouffalolab:
+   maintainers:
+     - wy-hh
+     - shchen-Lab
+     - stoneM2017
+   paths:
+     - "src/platform/bouffalolab/**"
+     - "examples/platform/bouffalolab/**"
+     - "examples/**/bouffalolab/**"
+     - "config/bouffalolab/**"
+     - "third_party/bouffalolab/**"
 
-# nrfconnect:
-#   maintainers:
-#     - ArekBalysNordic
-#     - adigie
-#     - kkasperczyk-no
-#   paths:
-#     - "src/platform/nrfconnect/**"
-#     - "examples/platform/nrfconnect/**"
-#     - "examples/**/nrfconnect/**"
-#     - "config/nrfconnect/**"
+nrfconnect:
+  maintainers:
+    - ArekBalysNordic
+    - adigie
+    - kkasperczyk-no
+  paths:
+    - "src/platform/nrfconnect/**"
+    - "examples/platform/nrfconnect/**"
+    - "examples/**/nrfconnect/**"
+    - "config/nrfconnect/**"
+
+# --- Proposals / Opt-In Templates ---
 # 
 # 
 # asr:
@@ -144,15 +156,6 @@ tizen:
 #     - "examples/platform/beken/**"
 #     - "examples/**/beken/**"
 #     - "config/beken/**"
-# 
-# bouffalolab:
-#   maintainers:
-#     - wy-hh
-#   paths:
-#     - "src/platform/bouffalolab/**"
-#     - "examples/platform/bouffalolab/**"
-#     - "examples/**/bouffalolab/**"
-#     - "config/bouffalolab/**"
 # 
 # qpg:
 #   maintainers:

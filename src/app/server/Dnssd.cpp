@@ -496,6 +496,17 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 
     if (!Dnssd::ServiceAdvertiser::Instance().IsInitialized())
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        // OpenThread DNS-SD initialization cannot complete before an unprovisioned
+        // device joins a Thread network. Start MeshCoP rendezvous so the device can
+        // be commissioned and DNS-SD initialization can complete afterwards.
+        if (mode != Dnssd::CommissioningMode::kDisabled && !DeviceLayer::ThreadStackMgr().IsThreadProvisioned())
+        {
+            SuccessOrLog(AdvertiseCommissionableNode(mode), Discovery, "Failed to advertise commissionable node");
+            return;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+
         // Somehow Init can succeed without being initialized...
         // Issue #13844
         ChipLogError(Discovery, "Advertiser not initialized");
