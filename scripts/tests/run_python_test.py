@@ -343,7 +343,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         from matter.testing.linux import ensure_namespace_availability, ensure_private_state
 
         if not internal_inside_unshare:
-            ensure_namespace_availability()
+            ensure_namespace_availability(isolate_root=True)
         ensure_private_state()
 
     for run, commissioning_method in runs_with_commissioning_method:

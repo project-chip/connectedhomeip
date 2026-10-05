@@ -24,6 +24,8 @@ class TestNamespaceAvailability(unittest.TestCase):
                 patch.object(namespace.os, "execvpe") as execvpe, \
                 patch.object(namespace.sys, "argv", ["runner.py", "--script", "test.py"]):
             namespace.ensure_namespace_availability()
+            execvpe.assert_not_called()
+            namespace.ensure_namespace_availability(isolate_root=True)
 
         execvpe.assert_called_once_with(
             "unshare",
@@ -49,7 +51,7 @@ class TestNamespaceAvailability(unittest.TestCase):
         with patch.object(namespace.os, "getuid", return_value=0), \
                 patch.object(namespace.os, "execvpe", side_effect=PermissionError("unshare denied")), \
                 self.assertRaises(PermissionError):
-            namespace.ensure_namespace_availability()
+            namespace.ensure_namespace_availability(isolate_root=True)
 
 
 if __name__ == "__main__":
