@@ -35,6 +35,7 @@ class SimulatedWaterHeater
       public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>
 {
 public:
+    static constexpr Clusters::Thermostat::temperature kMinTemperature     = 0;
     static constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
     static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
     static constexpr Clusters::Thermostat::temperature kMaxTemperature     = 10000;
@@ -87,6 +88,8 @@ public:
     GetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature & occupiedHeatingSetpoint) const override;
     Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature occupiedHeatingSetpoint,
                                                                    bool & changed) override;
+    Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(Clusters::Thermostat::temperature & absMinHeatSetpointLimit) const override;
+    Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
 
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;

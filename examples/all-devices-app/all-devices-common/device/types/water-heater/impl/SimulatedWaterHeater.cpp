@@ -429,6 +429,17 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
     return Status::Success;
 }
 
+Protocols::InteractionModel::Status SimulatedWaterHeater::GetAbsMinHeatSetpointLimit(temperature & absMinHeatSetpointLimit) const
+{
+    absMinHeatSetpointLimit = kMinTemperature;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status SimulatedWaterHeater::GetAbsMaxHeatSetpointLimit(temperature & absMaxHeatSetpointLimit) const
+{
+    absMaxHeatSetpointLimit = kMaxTemperature;
+    return Status::Success;
+}
 // Clusters::ModeBase::AppDelegate
 CHIP_ERROR SimulatedWaterHeater::Init()
 {

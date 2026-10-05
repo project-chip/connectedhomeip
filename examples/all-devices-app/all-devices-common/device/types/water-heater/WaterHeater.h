@@ -41,6 +41,7 @@ public:
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
         // Thermostat cluster
         BitMask<Clusters::Thermostat::Feature> thermostatFeatures;
+        Clusters::Thermostat::OptionalAttributes thermostatOptionalAttributes;
     };
 
     explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate,
@@ -67,7 +68,7 @@ public:
             [&](auto &... delegates) {
                 mThermostatCluster.Create(endpoint, mConfig.thermostatFeatures,
                                           Clusters::Thermostat::ThermostatClusterBase::Config(
-                                              Clusters::Thermostat::OptionalAttributes(), mConfig.timerDelegate),
+                                              mConfig.thermostatOptionalAttributes, mConfig.timerDelegate),
                                           delegates...);
             },
             mThermostatDelegates);
