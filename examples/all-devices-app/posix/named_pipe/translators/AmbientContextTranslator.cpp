@@ -95,6 +95,10 @@ CHIP_ERROR AmbientContextTranslator::TranslateAndExecute(EndpointId endpointId, 
     {
         return TranslateSetAmbientSensingUnionName(endpointId, json, registry);
     }
+    if (actionName == "SetAmbientSensingUnionHealth")
+    {
+        return TranslateSetAmbientSensingUnionHealth(endpointId, json, registry);
+    }
 
     return CHIP_ERROR_NOT_FOUND;
 }
@@ -424,6 +428,15 @@ CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientSensingUnionName(Endpoin
     VerifyOrReturnError(!name.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     return DispatchStringAction(registry, "SetAmbientSensingUnionName"_span, endpointId, CharSpan::fromCharString(name.c_str()));
+}
+
+CHIP_ERROR AmbientContextTranslator::TranslateSetAmbientSensingUnionHealth(EndpointId endpointId, const Json::Value & json,
+                                                                           OOBAccessorRegistry & registry) const
+{
+    auto healthOpt = ExtractUInt<uint8_t>(json, "UnionHealth");
+    VerifyOrReturnError(healthOpt.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    return DispatchAction(registry, "SetAmbientSensingUnionHealth"_span, endpointId, *healthOpt);
 }
 
 } // namespace chip::app::NamedPipe

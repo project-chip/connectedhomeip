@@ -5705,22 +5705,6 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGroupcastAdoptionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID) params:params];
-}
-
-- (void)writeAttributeGroupcastAdoptionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeGroupcastAdoptionWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeGroupcastAdoptionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupKeyManagementID) attributeID:@(MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID) params:params];
@@ -6233,6 +6217,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTROvenModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTROvenModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTROvenModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OvenMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROvenModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeSupportedModesID) params:params];
@@ -6241,6 +6252,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOvenModeID) attributeID:@(MTRAttributeIDTypeClusterOvenModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6510,6 +6526,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRLaundryWasherModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRLaundryWasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRLaundryWasherModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LaundryWasherMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRLaundryWasherModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeSupportedModesID) params:params];
@@ -6518,6 +6561,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeLaundryWasherModeID) attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6576,6 +6624,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeSupportedModesID) params:params];
@@ -6584,6 +6659,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID) attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6713,6 +6793,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRRVCRunModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCRunModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRRVCRunModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcRunMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCRunModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID) params:params];
@@ -6721,6 +6828,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCRunModeID) attributeID:@(MTRAttributeIDTypeClusterRVCRunModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6779,6 +6891,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRRVCCleanModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCCleanModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRRVCCleanModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcCleanMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCCleanModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCCleanModeID) attributeID:@(MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID) params:params];
@@ -6787,6 +6926,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCCleanModeID) attributeID:@(MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeRVCCleanModeID) attributeID:@(MTRAttributeIDTypeClusterRVCCleanModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -6979,6 +7123,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRDishwasherModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRDishwasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRDishwasherModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DishwasherMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDishwasherModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeSupportedModesID) params:params];
@@ -6987,6 +7158,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDishwasherModeID) attributeID:@(MTRAttributeIDTypeClusterDishwasherModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -7304,6 +7480,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMicrowaveOvenModeID) attributeID:@(MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -10392,6 +10573,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTREnergyEVSEModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTREnergyEVSEModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTREnergyEVSEModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = EnergyEvseMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTREnergyEVSEModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeSupportedModesID) params:params];
@@ -10400,6 +10608,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeEnergyEVSEModeID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -10458,6 +10671,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRWaterHeaterModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRWaterHeaterModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRWaterHeaterModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WaterHeaterMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRWaterHeaterModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeSupportedModesID) params:params];
@@ -10466,6 +10706,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeWaterHeaterModeID) attributeID:@(MTRAttributeIDTypeClusterWaterHeaterModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -10524,6 +10769,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)changeToModeByCoreTagWithParams:(MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRDeviceEnergyManagementModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRDeviceEnergyManagementModeClusterChangeToModeByCoreTagParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDeviceEnergyManagementModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeSupportedModesID) params:params];
@@ -10532,6 +10804,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCoreModeTagsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDeviceEnergyManagementModeID) attributeID:@(MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCoreModeTagsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -14162,36 +14439,36 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSensorsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAvailableSensorsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAvailableSensorHandlesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorHandlesID) params:params];
 }
 
-- (void)writeAttributeAvailableSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (void)writeAttributeAvailableSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeAvailableSensorsWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeAvailableSensorHandlesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeAvailableSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+- (void)writeAttributeAvailableSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorsID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeAvailableSensorHandlesID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEnabledSensorsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEnabledSensorHandlesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorHandlesID) params:params];
 }
 
-- (void)writeAttributeEnabledSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (void)writeAttributeEnabledSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeEnabledSensorsWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeEnabledSensorHandlesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeEnabledSensorsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+- (void)writeAttributeEnabledSensorHandlesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorsID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeEnabledSensorHandlesID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfSensorScheduleTransitionsWithParams:(MTRReadParams * _Nullable)params

@@ -44,6 +44,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/boolean-state-sensor/BooleanStateSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ThreePanelCabinetClosure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/impl/LoggingColorTemperatureLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/cooktop/Cooktop.cpp"
@@ -65,6 +70,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/FlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/flow-sensor/impl/IncreasingFlowSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/generic-switch/GenericSwitch.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/HumidityConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
@@ -80,8 +87,10 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/mounted-on-off-control/MountedOnOffControl.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/NetworkInfrastructureManager.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OccupancySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/impl/LoggingOccupancySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
@@ -99,6 +108,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingProximityRanger.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/impl/LoggingRangingAdapter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/RoomAirConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
@@ -110,7 +122,11 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/ThreadBorderRouter.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/impl/SimulatedThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/impl/SimulatedWindowCovering.cpp"
     # keep-sorted: end
 
     # Baseline for devices (not real device types)
@@ -119,12 +135,12 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/LoggingLightDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/ColorConverter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/DimmableLoad.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/dimmable-load/impl/LoggingDimmableDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/FanLoad.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/fan-load/impl/LoggingFanDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/identify/LoggingIdentifyDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/OnOffLoad.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffLoad.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/capabilities/on-off-load/impl/LoggingOnOffDelegate.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/allocator/DynamicEndpointIdAllocator.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/Interface.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/api/SingleEndpoint.cpp"
@@ -156,6 +172,7 @@ endif()
 #   - Keep list in sync with enabled_devices.gni
 #   - ensure enabled_devices_config.h.in contains required ALL_DEVICES_ENABLE* defines
 #   - Update scripts/build/build/targets.py to include the new device
+#   - Update examples/all-devices-app/zephyr/Kconfig.devices
 foreach(_key
         # keep-sorted: start
         aggregator
@@ -164,6 +181,7 @@ foreach(_key
         ambient-context-sensor
         bridged-node
         chime
+        closure
         color-temperature-light
         commissioning-proxy
         contact-sensor
@@ -178,6 +196,7 @@ foreach(_key
         fan
         flow-sensor
         generic-switch
+        humidity-conditioner
         humidity-sensor
         laundry-dryer
         laundry-washer
@@ -198,13 +217,16 @@ foreach(_key
         rain-sensor
         refrigerator
         robotic-vacuum-cleaner
+        room-air-conditioner
         smoke-co-alarm
         soil-sensor
         speaker
         temperature-sensor
+        thread-border-router
         water-freeze-detector
         water-leak-detector
         water-valve
+        window-covering
         # keep-sorted: end
     )
     string(REPLACE "-" "_" _suffix "${_key}")

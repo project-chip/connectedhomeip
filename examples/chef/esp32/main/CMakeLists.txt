@@ -29,6 +29,7 @@ set(CHIP_SHELL_DIR "${CHIP_ROOT}/examples/shell")
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CHIP_ROOT}/zzz_generated/app-common"
                       "${CHIP_ROOT}/examples/platform/esp32/"
+                      "${CHIP_ROOT}/examples/providers"
                       "${CHIP_ROOT}/third_party/nlio/repo/include"
                       "${CHEF}"
                       "${CHEF}/common"
@@ -39,6 +40,7 @@ set(PRIV_INCLUDE_DIRS_LIST
 set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
+                      "${CHIP_ROOT}/examples/providers"
                       "${CHEF}/common"
                       "${CHEF}/common/clusters/application-basic/"
                       "${CHEF}/common/clusters/application-launch/"

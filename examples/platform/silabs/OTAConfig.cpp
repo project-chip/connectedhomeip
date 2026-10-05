@@ -20,6 +20,12 @@
 #include "silabs_utils.h"
 #include <app/server/Server.h>
 
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h> // nogncheck
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>            // nogncheck
+#include <lib/core/CHIPError.h>
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
 #ifndef SLI_SI91X_MCU_INTERFACE
 
 #include "api/application_properties.h"
@@ -76,6 +82,38 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 };
 #endif // SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT
 #endif // SLI_SI91X_MCU_INTERFACE
+
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+// In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
+// which is where these singletons normally live. Provide local instances instead so that the
+// requestor init below can hand them to DefaultOTARequestor::Init. Events are dropped until
+// a code-driven OTARequestorCluster is composed on the root endpoint.
+namespace chip {
+namespace {
+
+class NoOpOtaRequestorEventGenerator : public DefaultOTARequestorEventGenerator
+{
+public:
+    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent &) override { return CHIP_NO_ERROR; }
+};
+
+} // namespace
+
+OTARequestorAttributes & GetOTARequestorAttributes()
+{
+    static OTARequestorAttributes gOtaRequestorAttributes;
+    return gOtaRequestorAttributes;
+}
+
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
+{
+    static NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
+    return gOtaRequestorEventGenerator;
+}
+
+} // namespace chip
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;

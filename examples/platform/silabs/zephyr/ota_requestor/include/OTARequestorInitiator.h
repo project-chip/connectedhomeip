@@ -24,7 +24,11 @@
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+#include <platform/silabs/zephyr/OTAImageProcessorImplSiWx.h>
+#else
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
 
 #include <stdint.h>
 
@@ -42,7 +46,13 @@ public:
     /* Initialize OTA components */
     static void InitOTA(intptr_t context);
     /* Handle update under test */
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+    // SiWx917 Security Bootloader installs the RPS from ota_swap on reboot.
+    // There is no MCUboot trial/confirm swap to finalize.
+    static void HandleSelfTest() {}
+#else
     static void HandleSelfTest();
+#endif
 
     /* OTA components */
     DefaultOTARequestor gRequestorCore;

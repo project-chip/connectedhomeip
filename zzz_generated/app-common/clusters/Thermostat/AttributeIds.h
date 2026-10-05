@@ -284,13 +284,13 @@ namespace Sensors {
 inline constexpr AttributeId Id = 0x00000059;
 } // namespace Sensors
 
-namespace AvailableSensors {
+namespace AvailableSensorHandles {
 inline constexpr AttributeId Id = 0x0000005A;
-} // namespace AvailableSensors
+} // namespace AvailableSensorHandles
 
-namespace EnabledSensors {
+namespace EnabledSensorHandles {
 inline constexpr AttributeId Id = 0x0000005B;
-} // namespace EnabledSensors
+} // namespace EnabledSensorHandles
 
 namespace NumberOfSensorScheduleTransitions {
 inline constexpr AttributeId Id = 0x0000005C;

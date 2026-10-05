@@ -28,7 +28,7 @@ namespace app {
 /**
  * @brief ICD Check-In Sender is responsible for resolving the NodeId and sending the check-in message
  */
-class ICDCheckInSender : public AddressResolve::NodeListener
+class ICDCheckInSender : public AddressResolve::NodeListener, public Messaging::ExchangeDelegate
 {
 public:
     ICDCheckInSender(Messaging::ExchangeManager * exchangeManager);
@@ -39,6 +39,14 @@ public:
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
     void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
+
+    // Messaging::ExchangeDelegate.  A check-in expects no response, so nothing arrives here;
+    // we are a delegate only so SendCheckInMsg()'s ExchangeHolder has one to wrap.
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
 
     bool mResolveInProgress = false;
 

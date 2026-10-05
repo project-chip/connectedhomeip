@@ -234,9 +234,13 @@ size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
         return kMaxSecureSduLengthBytes;
     }
 
-    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    auto sessionHandle = mExchangeCtx->GetSessionHandle();
+    if (sessionHandle->AllowsLargePayload())
     {
-        return kMaxLargeSecureSduLengthBytes;
+        // Clamp to the session's maximum permitted application message length
+        // to ensure the encoded command response does not exceed the limit enforced by SessionManager::PrepareMessage.
+        // Also clamp to PacketBuffer::kMaxAllocSize in case large packet buffers are not supported.
+        return std::min<size_t>(sessionHandle->GetMaxAppMessageLen() + kMaxTagLen, System::PacketBuffer::kMaxAllocSize);
     }
 
     return kMaxSecureSduLengthBytes;

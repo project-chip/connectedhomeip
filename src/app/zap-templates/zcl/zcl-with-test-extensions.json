@@ -193,8 +193,14 @@
         "Actions": [
             "ActionList",
             "EndpointLists",
-            { "name": "SetupURL", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
+            {
+                "name": "SetupURL",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "Administrator Commissioning": [
@@ -668,11 +674,26 @@
             "ClusterRevision"
         ],
         "Dishwasher Alarm": [
-            { "name": "Mask", "keepDefault": true },
-            { "name": "Latch", "keepDefault": true },
-            { "name": "State", "keepDefault": true },
-            { "name": "Supported", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
+            {
+                "name": "Mask",
+                "keepDefault": true
+            },
+            {
+                "name": "Latch",
+                "keepDefault": true
+            },
+            {
+                "name": "State",
+                "keepDefault": true
+            },
+            {
+                "name": "Supported",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -700,10 +721,22 @@
         "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator Alarm": [
-            { "name": "Mask", "keepDefault": true },
-            { "name": "State", "keepDefault": true },
-            { "name": "Supported", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
+            {
+                "name": "Mask",
+                "keepDefault": true
+            },
+            {
+                "name": "State",
+                "keepDefault": true
+            },
+            {
+                "name": "Supported",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
@@ -962,13 +995,32 @@
         ],
         "Valve Configuration and Control": [
             "OpenDuration",
+            {
+                "name": "DefaultOpenDuration",
+                "keepDefault": true
+            },
             "AutoCloseTime",
             "RemainingDuration",
             "CurrentState",
             "TargetState",
             "CurrentLevel",
             "TargetLevel",
-            "ValveFault",
+            {
+                "name": "DefaultOpenLevel",
+                "keepDefault": true
+            },
+            {
+                "name": "ValveFault",
+                "keepDefault": true
+            },
+            {
+                "name": "LevelStep",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "Boolean State Configuration": [
@@ -1056,9 +1108,15 @@
         "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Localization Configuration": [
-            { "name": "ActiveLocale", "keepDefault": true },
+            {
+                "name": "ActiveLocale",
+                "keepDefault": true
+            },
             "SupportedLocales",
-            { "name": "FeatureMap", "keepDefault": true },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "Smoke CO Alarm": [
@@ -1067,16 +1125,40 @@
             "COState",
             "BatteryAlert",
             "DeviceMuted",
-            { "name": "TestInProgress", "keepDefault": true },
+            {
+                "name": "TestInProgress",
+                "keepDefault": true
+            },
             "HardwareFaultAlert",
             "EndOfServiceAlert",
-            { "name": "InterconnectSmokeAlarm", "keepDefault": true },
-            { "name": "InterconnectCOAlarm", "keepDefault": true },
-            { "name": "ContaminationState", "keepDefault": true },
-            { "name": "SmokeSensitivityLevel", "keepDefault": true },
-            { "name": "ExpiryDate", "keepDefault": true },
-            { "name": "Unmounted", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
+            {
+                "name": "InterconnectSmokeAlarm",
+                "keepDefault": true
+            },
+            {
+                "name": "InterconnectCOAlarm",
+                "keepDefault": true
+            },
+            {
+                "name": "ContaminationState",
+                "keepDefault": true
+            },
+            {
+                "name": "SmokeSensitivityLevel",
+                "keepDefault": true
+            },
+            {
+                "name": "ExpiryDate",
+                "keepDefault": true
+            },
+            {
+                "name": "Unmounted",
+                "keepDefault": true
+            },
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
             "ClusterRevision"
         ],
         "TLS Certificate Management": [
@@ -1096,21 +1178,6 @@
             "FeatureMap"
         ],
         "Time Format Localization": ["ClusterRevision"],
-        "Valve Configuration and Control": [
-            "OpenDuration",
-            { "name": "DefaultOpenDuration", "keepDefault": true },
-            "AutoCloseTime",
-            "RemainingDuration",
-            "CurrentState",
-            "TargetState",
-            "CurrentLevel",
-            "TargetLevel",
-            { "name": "DefaultOpenLevel", "keepDefault": true },
-            { "name": "ValveFault", "keepDefault": true },
-            { "name": "LevelStep", "keepDefault": true },
-            { "name": "FeatureMap", "keepDefault": true },
-            "ClusterRevision"
-        ],
         "Window Covering": [
             "ClusterRevision",
             "OperationalStatus",
