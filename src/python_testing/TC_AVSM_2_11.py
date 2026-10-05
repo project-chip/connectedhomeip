@@ -173,11 +173,10 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         self.step(4)
         notSupportedStreamUsage = next(
             (e for e in Globals.Enums.StreamUsageEnum
-             if e not in aSupportedStreamUsages
-             and e not in (Globals.Enums.StreamUsageEnum.kInternal, Globals.Enums.StreamUsageEnum.kUnknownEnumValue)),
+             if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kUnknownEnumValue),
             None)
         if notSupportedStreamUsage is None:
-            # A DUT that supports every StreamUsage leaves no valid unsupported value to send;
+            # A DUT that lists every StreamUsage leaves no value to send;
             # the DYNAMIC_CONSTRAINT_ERROR path cannot be exercised on such a DUT.
             log.info("DUT supports every StreamUsage; no unsupported value exists to send, skipping step 4")
             self.mark_current_step_skipped()
