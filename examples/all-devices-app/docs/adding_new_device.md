@@ -424,6 +424,14 @@ foreach(_key
     )
 ```
 
+Also add a `bool` entry to `examples/all-devices-app/zephyr/Kconfig.devices`
+inside the `menu "Matter device types"` block (keep sorted):
+
+```kconfig
+config ALL_DEVICES_DEVICE_MY_SENSOR
+    bool "My sensor"
+```
+
 ### 4. Device Factory Dependency (`all-devices-common/device-factory/BUILD.gn`)
 
 Add your new device target to the `public_deps` of `device-factory` (keep

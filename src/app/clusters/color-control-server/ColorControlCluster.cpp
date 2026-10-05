@@ -850,20 +850,17 @@ bool ColorControlCluster::TickSat(SatTransition & tx, uint64_t now)
 
     const auto change = done ? AttributeChangeType::kReportable : AttributeChangeType::kQuiet;
 
-    // CurrentSaturation is one stored value shared by legacy and enhanced HS — no projection to signal.
     if (auto * ehs = std::get_if<EnhancedHueSatColor>(&mColorValue))
     {
         SetAttributeValue(ehs->saturation, sat, CurrentSaturation::Id, change);
-        // OnColorHSChanged is the only saturation channel, so it carries the 8-bit hue too. Re-assert
-        // the 16-bit hue afterwards: a hue transition running alongside this one feeds the hardware at
-        // full precision, and the truncated hue above must not be the last word between its ticks.
+        // OnColorHSChanged can only pass an 8-bit hue. Send the full 16-bit hue after it so the hardware
+        // does not keep the less precise value.
         //
-        // That re-assert describes the HUE axis, so it carries the hue axis's own liveness, not this
-        // axis's `done`: hardware fading the hue must not be snapped to the software position just
-        // because saturation arrived first. OnTick ticks hue before saturation and clears a finished
-        // axis right after its Tick* returns, so hsx->hue reads post-completion here.
+        // Reporting the hue as settled while it is still moving would make hardware that moves hue on
+        // its own stop. The color loop drives hue independently of mTransition, so it is checked
+        // separately from a hue transition.
         const auto * hsx     = std::get_if<HueSatTransition>(&mTransition);
-        const bool hueMoving = (hsx != nullptr) && hsx->hue.has_value();
+        const bool hueMoving = ((hsx != nullptr) && hsx->hue.has_value()) || LoopIsDriving();
         mDelegate.OnColorHSChanged(ehs->hue8(), ehs->saturation, !done);
         mDelegate.OnEnhancedHueChanged(ehs->enhancedHue, hueMoving);
     }
