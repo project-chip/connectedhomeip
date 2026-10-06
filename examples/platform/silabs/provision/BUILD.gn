@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
 declare_args() {
@@ -62,12 +63,17 @@ source_set("storage") {
     sources += [ "ProvisionCryptoPSA.cpp" ]
   }
 
-  if (sl_use_provision_channel) {
+  if (sl_use_provision_channel || chip_enable_multi_ota_requestor) {
     sources += [
       "${impl_folder}/ProvisionStorageWriter.cpp",
+      "ProvisionStorageWriter.h",
+    ]
+  }
+
+  if (sl_use_provision_channel) {
+    sources += [
       "ProvisionChannel.h",
       "ProvisionStorageCustom.cpp",
-      "ProvisionStorageWriter.h",
     ]
 
     if (wifi_soc) {

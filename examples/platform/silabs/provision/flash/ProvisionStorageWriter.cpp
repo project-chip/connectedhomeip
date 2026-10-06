@@ -192,13 +192,13 @@ CHIP_ERROR ProvisionStorageWriter::SetOtaTlvEncryptionKey(const ByteSpan & value
 }
 CHIP_ERROR ProvisionStorageWriter::SetTestEventTriggerKey(const ByteSpan & value)
 {
-#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     VerifyOrReturnError(value.size() == TestEventTriggerDelegate::kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
     return Flash::Set(Parameters::ID::kTestEventTriggerKey, value.data(), value.size());
 #else
     (void) value;
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 } // namespace Provision
 } // namespace Silabs

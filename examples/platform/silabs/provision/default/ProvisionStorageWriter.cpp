@@ -221,14 +221,14 @@ CHIP_ERROR ProvisionStorageWriter::SetProvisionVersion(const char * value, size_
 
 CHIP_ERROR ProvisionStorageWriter::SetTestEventTriggerKey(const ByteSpan & value)
 {
-#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = 16;
     VerifyOrReturnError(value.size() == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, value.data(), value.size());
 #else
     (void) value;
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 
 CHIP_ERROR ProvisionStorageWriter::SetOtaTlvEncryptionKey(const ByteSpan & value)

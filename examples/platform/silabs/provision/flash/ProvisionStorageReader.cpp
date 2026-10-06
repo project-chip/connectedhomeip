@@ -315,7 +315,7 @@ CHIP_ERROR ProvisionStorageReader::DecryptUsingOtaTlvEncryptionKey(MutableByteSp
 #endif
 CHIP_ERROR ProvisionStorageReader::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {
-#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = TestEventTriggerDelegate::kEnableKeyLength;
     size_t keyLength                  = 0;
     VerifyOrReturnError(keySpan.size() >= kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -331,8 +331,8 @@ CHIP_ERROR ProvisionStorageReader::GetTestEventTriggerKey(MutableByteSpan & keyS
         keyLength = kEnableKeyLength;
         err       = CHIP_NO_ERROR;
     }
-#endif
-#endif
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY
+#endif // NDEBUG
     ReturnErrorOnFailure(err);
     VerifyOrReturnError(keyLength == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
     keySpan.reduce_size(keyLength);
@@ -340,7 +340,7 @@ CHIP_ERROR ProvisionStorageReader::GetTestEventTriggerKey(MutableByteSpan & keyS
 #else
     (void) keySpan;
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 }
 } // namespace Provision
 } // namespace Silabs
