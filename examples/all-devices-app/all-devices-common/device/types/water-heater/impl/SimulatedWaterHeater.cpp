@@ -78,12 +78,12 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
     bool changed = false;
     SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
-    ThermostatCluster().SetSystemMode(SystemModeEnum::kHeat);
-
     const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
     ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
 
-    // Both Manual and Timed modes enable normal heating; Off mode disables heating.
+    const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
+    ThermostatCluster().SetSystemMode(initialSystemMode);
+
     EvaluateHeatingDemand();
 
     CHIP_ERROR err = mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
@@ -255,8 +255,6 @@ void SimulatedWaterHeater::SetHeatingEnabled(bool enabled)
     {
         return;
     }
-    auto systemMode = enabled ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
-    ThermostatCluster().SetSystemMode(systemMode);
     mHeatingEnabled = enabled;
     mHeatDemand     = enabled ? mHeaterTypes : BitMask<WaterHeaterHeatSourceBitmap>();
     NotifyHeatDemandChanged();
@@ -334,7 +332,15 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemMo
     mSystemMode = systemMode;
     changed     = true;
 
-    EvaluateHeatingDemand();
+    if (!mIsSyncingMode)
+    {
+        mIsSyncingMode           = true;
+        const uint8_t targetMode = (systemMode == SystemModeEnum::kHeat) ? kWaterHeaterModeManual : kWaterHeaterModeOff;
+        WaterHeaterModeCluster().UpdateCurrentMode(targetMode);
+        mIsSyncingMode = false;
+
+        EvaluateHeatingDemand();
+    }
     return Status::Success;
 }
 
@@ -480,6 +486,14 @@ void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBas
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
+
+    if (!mIsSyncingMode)
+    {
+        mIsSyncingMode              = true;
+        const auto targetSystemMode = (newMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
+        ThermostatCluster().SetSystemMode(targetSystemMode);
+        mIsSyncingMode = false;
+    }
 
     EvaluateHeatingDemand(newMode);
 }

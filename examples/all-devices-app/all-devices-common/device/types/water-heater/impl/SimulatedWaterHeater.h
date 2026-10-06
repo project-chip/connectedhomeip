@@ -120,6 +120,7 @@ private:
     std::optional<Clusters::Thermostat::temperature> mBoostTemporarySetpoint;
     bool mBoostOneShot   = false;
     bool mHeatingEnabled = false;
+    bool mIsSyncingMode  = false;
 
     // Thermostat attributes
     Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;

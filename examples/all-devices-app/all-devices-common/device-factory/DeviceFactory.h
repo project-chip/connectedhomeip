@@ -802,17 +802,16 @@ private:
         {
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
+                Clusters::Thermostat::OptionalAttributes optionalAttributes;
+                optionalAttributes.AbsMinHeatSetpointLimit = true;
+                optionalAttributes.AbsMaxHeatSetpointLimit = true;
                 return MakeDevice<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
-                    .fabricTable            = mContext->fabricTable,
-                    .timerDelegate          = mContext->timerDelegate,
-                    .diagnosticDataProvider = mContext->diagnosticDataProvider,
-                    .whmFeatures            = BitMask<Clusters::WaterHeaterManagement::Feature>(),
-                    .thermostatFeatures     = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
-                    .thermostatOptionalAttributes =
-                        Clusters::Thermostat::OptionalAttributes{
-                            .AbsMinHeatSetpointLimit = true,
-                            .AbsMaxHeatSetpointLimit = true,
-                        },
+                    .fabricTable                  = mContext->fabricTable,
+                    .timerDelegate                = mContext->timerDelegate,
+                    .diagnosticDataProvider       = mContext->diagnosticDataProvider,
+                    .whmFeatures                  = BitMask<Clusters::WaterHeaterManagement::Feature>(),
+                    .thermostatFeatures           = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
+                    .thermostatOptionalAttributes = optionalAttributes,
                 });
             });
         }
