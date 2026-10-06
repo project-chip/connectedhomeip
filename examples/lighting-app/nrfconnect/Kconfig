@@ -13,7 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-mainmenu "Matter nRF Connect Lighting Example Application"
+
+mainmenu "Matter nRF Connect Light Bulb Example Application"
 
 # Sample configuration used for Thread networking
 if OPENTHREAD
@@ -28,6 +29,8 @@ endchoice
 
 endif # OPENTHREAD
 
+config CHIP_WIFI
+	default y if SHIELD_NRF7002EB2
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

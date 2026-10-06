@@ -1,18 +1,18 @@
 # Matter nRF Connect Lighting Example Application
 
-> **Note:** This example is intended only to perform smoke tests of a Matter
+> **Important:** This example is intended only to perform smoke tests of a Matter
 > solution integrated with nRF Connect SDK platform. The example quality is not
 > production ready and it may contain minor bugs or use not optimal
 > configuration. It is not recommended to use this example as a basis for
 > creating a market ready product.
 >
 > For the production ready and optimized Matter samples, see
-> [nRF Connect SDK samples](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/matter.html).
-> The Matter samples in nRF Connect SDK use various additional software
+> [the Matter add-on for nRF Connect SDK samples](https://nrfconnectdocs.nordicsemi.com/addons/ncs-matter/latest/samples/index.html).
+> The Matter samples in nRF Connect SDK Matter add-on use various additional software
 > components and provide multiple optional features that improve the developer
 > and user experience. To read more about it, see
-> [Matter support in nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/matter/index.html#ug-matter)
-> page. Using Matter samples from nRF Connect SDK allows you to get a full
+> [Matter support in the Matter add-on for nRF Connect SDK](https://nrfconnectdocs.nordicsemi.com/addons/ncs-matter/latest/index.html)
+> page. Using Matter samples from the add-on allows you to get a full
 > Nordic technical support via [DevZone](https://devzone.nordicsemi.com/)
 > portal.
 
@@ -38,68 +38,31 @@ platform, so only one protocol can be supported for a specific light device.
 
 <hr>
 
-## Overview
+## Preparing nRF Connect environment
 
-This example is running on the nRF Connect platform, which is based on Nordic
-Semiconductor's
-[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
-and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
-[nRF Connect platform overview](../../../docs/platforms/nrf/nrfconnect_platform_overview.md)
-to read more about the platform structure and dependencies.
+Before building the example for an nRF Development Kit, prepare your environment
+using the automated setup script. See
+[nRF Connect development environment](../../../docs/platforms/nrf/nrfconnect_environment.md)
+for setup instructions, a detailed explanation of each setup phase, activation
+commands, and a summary of host and hardware requirements.
 
-By default, the Matter accessory device has IPv6 networking disabled. You must
-pair it with the Matter controller over Bluetooth® LE to get the configuration
-from the controller to use the device within a Thread or Wi-Fi network. The
-device starts advertising automatically and you can commission the device within
-60 minutes. If the advertising time elapsed you can re-enable it using buttons.
-See [Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do
-this. The controller must get the commissioning information from the Matter
-accessory device and provision the device into the network.
+Quick start from the connectedhomeip repository root:
 
-You can test this application remotely over the Thread or the Wi-Fi protocol,
-which in either case requires more devices, including a Matter controller that
-you can configure either on a PC or a mobile device.
+    python3 scripts/setup/nrfconnect/setup.py
 
-The sample uses buttons for changing LED states to show the state of these
-changes. You can test it in the following ways:
+> **Note**: The first run downloads several gigabytes of data (Matter submodules,
+> nRF Connect SDK, and toolchain). Later runs are much faster because already
+> installed components are detected and skipped.
 
--   Standalone, using a single DK that runs the lighting application.
+To restore the previous shell environment:
 
--   Remotely over the Thread or the Wi-Fi protocol, which in either case
-    requires more devices, including a Matter controller that you can configure
-    either on a PC or a mobile device.
+-   Linux / macOS / Git Bash:
 
-### Bluetooth LE advertising
+        source scripts/setup/nrfconnect/deactivate.sh
 
-In this example, to commission the device onto a Matter network, it must be
-discoverable over Bluetooth LE. The Bluetooth LE advertising is automatically
-started after powering up the device, but it may timeout and require re-starting
-by pressing:
+-   Windows Command Prompt:
 
--   On nRF52840 DK and nRF5340 DK: **Button 4**.
-
--   On nRF54L15 DK: **Button 3**.
-
--   On nRF7002 DK: **Button 2**.
-
-### Bluetooth LE rendezvous
-
-In Matter, the commissioning procedure is done over Bluetooth LE between a
-Matter device and the Matter controller, where the controller has the
-commissioner role.
-
-To start the rendezvous, the controller must get the commissioning information
-from the Matter device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. The emulation of the NFC tag
-emulation starts automatically when Bluetooth LE advertising is started and
-stays enabled until Bluetooth LE advertising timeout expires.
-
-#### Thread or Wi-Fi provisioning
-
-The provisioning operation, which is the Last part of the rendezvous procedure,
-involves sending the Thread or Wi-Fi network credentials from the Matter
-controller to the Matter device. As a result, the device joins the Thread or
-Wi-Fi network and can communicate with other devices in the network.
+        call scripts\setup\nrfconnect\deactivate.bat
 
 ### Device Firmware Upgrade
 
@@ -163,8 +126,9 @@ section to learn how to change MCUboot and flash configuration in this example.
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
-correctly. See [Setting up the environment](#setting-up-the-environment) for
-more information.
+correctly. See
+[nRF Connect development environment](../../../docs/platforms/nrf/nrfconnect_environment.md)
+for setup instructions.
 
 ### Supported devices
 
@@ -456,72 +420,92 @@ Now you can proceed with the [Building](#building) instruction.
 
 ## Building
 
-Complete the following steps to build the sample:
+Build from the connectedhomeip repository root with
+`scripts/build/build_examples.py`. Make sure the nRF Connect environment is
+active (see [Preparing nRF Connect environment](#preparing-nrf-connect-environment)).
 
-1.  Navigate to the example's directory:
+Run the following command with _build-target_ replaced by the `build_examples.py`
+target for your kit:
 
-        ```
-        $ cd examples/lighting-app/nrfconnect
-        ```
+    ```
+    $ ./scripts/build/build_examples.py --target nrf-<board>-light build
+    ```
 
-2.  Run the following command to build the example, with _build-target_ replaced
-    with the build target name of the Nordic Semiconductor's kit you own, for
-    example `nrf52840dk/nrf52840`:
+The table below maps supported kits to `build_examples.py` targets:
 
-        ```
-        $ west build -b build-target --sysbuild
-        ```
+| Kit build target | `build_examples.py` target |
+| ---------------- | -------------------------- |
+| `nrf52840dk/nrf52840` | `nrf-nrf52840dk-light` |
+| `nrf5340dk/nrf5340/cpuapp` | `nrf-nrf5340dk-light` |
+| `nrf54l15dk/nrf54l15/cpuapp` | `nrf-nrf54l15dk-light` |
+| `nrf54lm20dk/nrf54lm20b/cpuapp` | `nrf-nrf54lm20dk-light` |
+| `nrf52840dongle/nrf52840` | `nrf-nrf52840dongle-light` |
 
-    You only need to specify the build target on the first build. See
-    [Requirements](#requirements) for the build target names of compatible kits.
+Example:
 
-The output `zephyr.hex` file will be available in the `build/nrfconnect/zephyr/`
-directory.
+    ```
+    $ ./scripts/build/build_examples.py --target nrf-nrf52840dk-light build
+    ```
+
+The merged HEX file used for flashing is written to
+`out/nrf-<board>-light/merged_<kit-build-target>.hex` (with `/` replaced by `_`
+in the file name).
+
+Optional build modifiers can be appended to the target name:
+
+| Modifier | Description |
+| -------- | ----------- |
+| `-release` | Release configuration (`prj_release.conf`) |
+| `-bledfu` | Enable DFU over Bluetooth LE (SMP) |
+| `-wifi` | Enable Matter over Wi-Fi on nRF54LM20 DK with nRF7002 EB2 shield |
+| `-rpc` | Enable Pigweed RPC overlay |
+
+Modifiers can be combined. For example:
+
+    ```
+    $ ./scripts/build/build_examples.py --target nrf-nrf54lm20dk-light-wifi-release build
+    ```
 
 ### Removing build artifacts
 
 If you're planning to build the example for a different kit or make changes to
-the configuration, remove all build artifacts before building. To do so, use the
-following command:
+the configuration, remove the output directory before building. For example:
 
     ```
-    $ rm -r build
+    $ rm -rf out/nrf-nrf52840dk-light
     ```
 
 ### Building with release configuration
 
 To build the example with release configuration that disables the diagnostic
-features like logs and command-line interface, run the following command:
+features like logs and command-line interface:
 
     ```
-    $ west build -b build-target --sysbuild -- -DFILE_SUFFIX=release
+    $ ./scripts/build/build_examples.py --target nrf-<board>-light-release build
     ```
-
-Remember to replace _build-target_ with the build target name of the Nordic
-Semiconductor's kit you own.
 
 ### Building with Pigweed RPCs
 
-The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
-used to control various functionalities of the lighting app from a USB-connected
-host computer. To build the example with the RPC server, run the following
-command with _build-target_ replaced with the build target name of the Nordic
-Semiconductor's kit you own:
-
-    ```
-    $ west build -b build-target --sysbuild -- -DOVERLAY_CONFIG=rpc.overlay
-    ```
+Pigweed RPC support is not wired up in the refactored ncs-matter-based sample
+yet. The legacy `rpc.overlay` file is kept for reference only.
 
 ### Building with Device Firmware Upgrade support
 
 Support for DFU using Matter OTA is enabled by default.
 
-To enable DFU over Bluetooth LE, run the following command with _build-target_
-replaced with the build target name of the Nordic Semiconductor kit you are
-using (for example `nrf52840dk/nrf52840`):
+To enable DFU over Bluetooth LE (SMP):
 
     ```
-    $ west build -b build-target --sysbuild -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
+    $ ./scripts/build/build_examples.py --target nrf-<board>-light-bledfu build
+    ```
+
+### Building with Wi-Fi support
+
+Matter over Wi-Fi is supported on the nRF54LM20 DK with the nRF7002 EB2 shield
+attached. Build with the `wifi` modifier:
+
+    ```
+    $ ./scripts/build/build_examples.py --target nrf-nrf54lm20dk-light-wifi build
     ```
 
 > **Note**:
@@ -548,17 +532,7 @@ has its own configuration file.
 
 #### Changing flash memory settings
 
-In the default configuration, the MCUboot uses the
-[Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#partition-manager)
-to configure flash partitions used for the bootloader application image slot
-purposes. You can change these settings by defining
-[static partitions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static).
-This example uses this option to define using an external flash.
-
-To modify the flash settings of your board (that is, your _build-target_, for
-example `nrf52840dk/nrf52840`), edit the `pm_static_<build_target>.yml` file
-(for example `pm_static_nrf52840dk_nrf52840.yml`), located in the main
-application directory.
+The example uses a static partition layout. Partitions are located in the `third_party/nrfconnect/ncs-matter/board` nRF Connect Matter add-on directory. Each `.dts` file in the `board` folder in the example directory includes the relevant `.dtsi` file from the Matter add-on. You can provide modification for your purposes by editing the specific `.dts` file or adding a new overlay file to the build system by adding the `EXTRA_DTC_OVERLAY_FILE` CMake flag to the build.
 
 <hr>
 
@@ -567,17 +541,17 @@ application directory.
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
 using the menuconfig utility.
 
-To open the menuconfig utility, run the following command from the example
-directory:
+To open the menuconfig utility, run the following command after generating the
+build files with `build_examples.py`:
 
     ```
-    $ west build -b build-target --sysbuild -t menuconfig
+    $ west build -d out/nrf-<board>-light -t menuconfig
     ```
 
-Remember to replace _build-target_ with the build target name of the Nordic
-Semiconductor's kit you own.
+Remember to replace `<board>` with the board part of your
+`build_examples.py` target (for example `nrf52840dk`).
 
-Changes done with menuconfig will be lost if the `build` directory is deleted.
+Changes done with menuconfig will be lost if the output directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
 
 ### Example build types
@@ -619,22 +593,23 @@ the nRF52840 Dongle.
 
 ### Flashing on the development kits
 
-To flash the application to the device, use the west tool and run the following
-command from the example directory:
+To flash the application to the device, use `nrfutil` and the merged HEX file
+generated by the sysbuild (created automatically by
+`scripts/build/build_examples.py`). From the connectedhomeip repository root,
+run:
 
-        ```
-        $ west flash --erase
-        ```
+    nrfutil device program --firmware out/nrf-<board>-light/merged_<build-target>.hex --options chip_erase_mode=ERASE_ALL
 
-If you have multiple development kits connected, west will prompt you to pick
-the correct one.
+Replace `<board>` with the board part of your `build_examples.py` target and
+`<build-target>` with your kit build target name, using underscores instead of
+slashes. For example, for the nRF52840 DK use
+`out/nrf-nrf52840dk-light/merged_nrf52840dk_nrf52840.hex`.
 
-To debug the application on target, run the following command from the example
-directory:
+If more than one device is connected, list serial numbers with:
 
-        ```
-        $ west debug
-        ```
+    nrfutil device list
+
+Then add `--serial-number <serial_number>` to the flash command above.
 
 ### Flashing on the nRF52840 Dongle
 

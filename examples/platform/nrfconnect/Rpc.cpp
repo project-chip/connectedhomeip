@@ -16,9 +16,6 @@
  *    limitations under the License.
  */
 
-#if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
-#include "AppTask.h"
-#endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_nrfconnect/init.h"
@@ -42,6 +39,8 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 #endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+#include "app/task_executor.h"
+#include "board/board.h"
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
@@ -137,8 +136,14 @@ class NrfButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        AppTask::Instance().ButtonEventHandler(request.pushed << request.idx /* button_state */,
-                                               1 << request.idx /* has_changed */);
+        if (request.idx >= NUMBER_OF_BUTTONS) {
+            return pw::Status::InvalidArgument();
+        }
+
+        const Nrf::ButtonMask hasChanged = BIT(request.idx);
+        const Nrf::ButtonState buttonState = request.pushed ? hasChanged : 0;
+
+        Nrf::PostTask([buttonState, hasChanged]() { Nrf::GetBoard().DispatchButtonEvent(buttonState, hasChanged); });
         return pw::OkStatus();
     }
 };

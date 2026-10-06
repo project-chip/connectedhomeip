@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024 Nordic Semiconductor ASA
+ * Copyright (c) 2025 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <nrf54l15_cpuapp_partitions.dtsi>
+#include <nrf54lm20_cpuapp_partitions.dtsi>
 
 / {
 	chosen {
@@ -28,10 +28,6 @@
 	};
 };
 
-&mx25r64 {
-	status = "okay";
-};
-
 &pwm20 {
 	status = "okay";
 	pinctrl-0 = <&pwm_default>;
@@ -42,16 +38,20 @@
 &pinctrl {
 	pwm_default: pwm_default {
 		group1 {
-			psels = <NRF_PSEL(PWM_OUT1, 1, 10)>;
+			psels = <NRF_PSEL(PWM_OUT1, 1, 25)>;
 		};
 	};
 
 	pwm_sleep: pwm_sleep {
 		group1 {
-			psels = <NRF_PSEL(PWM_OUT1, 1, 10)>;
+			psels = <NRF_PSEL(PWM_OUT1, 1, 25)>;
 			low-power-enable;
 		};
 	};
+};
+
+&mx25r64 {
+	status = "okay";
 };
 
 &wdt31 {

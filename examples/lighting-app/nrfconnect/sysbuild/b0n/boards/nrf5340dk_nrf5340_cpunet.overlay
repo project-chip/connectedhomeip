@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
+#include <nrf5340_cpunet_partitions.dtsi>
+
 / {
 	chosen {
-		zephyr,code-partition = &boot_partition;
+		zephyr,code-partition = &b0n_partition;
 	};
 };

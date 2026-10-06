@@ -1,19 +1,10 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ * Copyright (c) 2021-2022 Nordic Semiconductor ASA
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf5340_cpuapp_partitions.dtsi>
 #include <zephyr/dt-bindings/ipc_service/static_vrings.h>
 
 / {
@@ -22,25 +13,26 @@
 	};
 
 	/*
-	* By default, PWM module is only configured for led0 (LED1 on the board).
-	* The lighting-app, however, uses LED2 to show the state of the lighting,
-	* including its brightness level.
-	*/
+	 * By default, PWM module is only configured for led0 (LED1 on the board).
+	 * The light bulb app, however, uses LED2 to show the state of the lighting,
+	 * including its brightness level.
+	 */
 	aliases {
 		pwm-led1 = &pwm_led1;
 	};
 
 	pwmleds {
 		compatible = "pwm-leds";
+
 		pwm_led1: pwm_led_1 {
-			pwms = < &pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
 		};
 	};
 };
 
 /* Set IPC thread priority to the highest value to not collide with other threads. */
 &ipc0 {
-    zephyr,priority = <0 PRIO_COOP>;
+	zephyr,priority = <0 PRIO_COOP>;
 };
 
 &pwm0 {
@@ -63,5 +55,25 @@
 			low-power-enable;
 		};
 	};
+};
 
+&mx25r64 {
+	status = "okay";
+};
+
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+
+&i2c1 {
+	status = "disabled";
+};
+
+&spi2 {
+	status = "disabled";
+};
+
+&usbd {
+	status = "disabled";
 };

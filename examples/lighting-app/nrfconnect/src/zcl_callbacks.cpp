@@ -15,19 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/logging/CHIPLogging.h>
 
-#include "AppTask.h"
-#include "PWMDevice.h"
+#include "app_task.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
 
-using namespace chip;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OnOff;
+using namespace ::chip;
+using namespace ::chip::app::Clusters;
+using namespace ::chip::app::Clusters::OnOff;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -37,22 +36,29 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        AppTask::Instance().GetPWMDevice().InitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                                          static_cast<int32_t>(AppEventType::Lighting), value);
+        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %" PRIu8 "", *value);
+
+#if defined(CONFIG_PWM)
+        AppTask::Instance().GetPWMDevice().InitiateAction(*value ? Nrf::PWMDevice::ON_ACTION : Nrf::PWMDevice::OFF_ACTION,
+                                                          static_cast<int32_t>(LightingActor::Remote), value);
+#else
+        Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(*value);
+#endif
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+        ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %" PRIu8 "", *value);
+#if defined(CONFIG_PWM)
         if (AppTask::Instance().GetPWMDevice().IsTurnedOn())
         {
-            AppTask::Instance().GetPWMDevice().InitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEventType::Lighting),
-                                                              value);
+            AppTask::Instance().GetPWMDevice().InitiateAction(Nrf::PWMDevice::LEVEL_ACTION,
+                                                              static_cast<int32_t>(LightingActor::Remote), value);
         }
         else
         {
             ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
         }
+#endif
     }
 }
 
@@ -76,14 +82,21 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     Protocols::InteractionModel::Status status;
     bool storedValue;
 
-    // Read storedValue on/off value
+    /* Read storedValue on/off value */
     status = Attributes::OnOff::Get(endpoint, &storedValue);
+
     if (status == Protocols::InteractionModel::Status::Success)
     {
-        // Set actual state to the cluster state that was last persisted
-        AppTask::Instance().GetPWMDevice().InitiateAction(storedValue ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                                          static_cast<int32_t>(AppEventType::Lighting),
+        /* Set actual state to the cluster state that was last persisted */
+#if defined(CONFIG_PWM)
+        AppTask::Instance().InitPWMDDevice();
+
+        AppTask::Instance().GetPWMDevice().InitiateAction(storedValue ? Nrf::PWMDevice::ON_ACTION : Nrf::PWMDevice::OFF_ACTION,
+                                                          static_cast<int32_t>(LightingActor::Remote),
                                                           reinterpret_cast<uint8_t *>(&storedValue));
+#else
+        Nrf::GetBoard().GetLED(Nrf::DeviceLeds::LED2).Set(storedValue);
+#endif
     }
 
     AppTask::Instance().UpdateClusterState();

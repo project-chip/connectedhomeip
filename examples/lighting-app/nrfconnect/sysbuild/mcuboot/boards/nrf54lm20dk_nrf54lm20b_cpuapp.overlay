@@ -14,8 +14,15 @@
  *    limitations under the License.
  */
 
+#include <nrf54lm20_cpuapp_partitions.dtsi>
+
 / {
 	chosen {
 		zephyr,code-partition = &boot_partition;
+		nordic,pm-ext-flash = &mx25r64;
 	};
+};
+
+&mx25r64 {
+	status = "okay";
 };

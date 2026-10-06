@@ -8,6 +8,7 @@
 *
 ```
 
+[nRFConnect Environment](./nrfconnect_environment.md)
 [Android Commissioning](./nrfconnect_android_commissioning.md)
 [Examples CLI](./nrfconnect_examples_cli.md)
 [Examples configuration](./nrfconnect_examples_configuration.md)

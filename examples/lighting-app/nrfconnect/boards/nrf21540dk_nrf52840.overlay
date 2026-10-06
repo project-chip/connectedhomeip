@@ -7,10 +7,6 @@
 #include <nrf52840_partitions.dtsi>
 
 / {
-	chosen {
-		nordic,pm-ext-flash = &mx25r64;
-	};
-
 	/*
 	 * By default, PWM module is only configured for led0 (LED1 on the board).
 	 * The light bulb app, however, uses LED2 to show the state of the lighting,
@@ -47,10 +43,6 @@
 			low-power-enable;
 		};
 	};
-};
-
-&mx25r64 {
-	status = "okay";
 };
 
 /* Disable unused peripherals to reduce power consumption */

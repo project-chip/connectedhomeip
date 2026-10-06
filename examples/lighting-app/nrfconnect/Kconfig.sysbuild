@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,24 +14,26 @@
 #    limitations under the License.
 #
 
+config MATTER_ADD_ON
+	default y
+
 #### Radio core selection
 config NRF_DEFAULT_IPC_RADIO
 	default y
 
 # Enable IEEE802.15.4 serialization to network core
+# This config automatically pulls in the `overlay-802154.conf` in the ipc_radio image
 config NETCORE_IPC_RADIO_IEEE802154
-	default y if (SOC_SERIES_NRF53) && !WIFI_NRF700X
+	default y if SOC_SERIES_NRF53 && !WIFI_NRF70
 
 # Enable Bluetooth serialization to network core
+# This config automatically pulls in the `overlay-bt_hci_ipc.conf` in the ipc_radio image
 config NETCORE_IPC_RADIO_BT_HCI_IPC
 	default y if SOC_SERIES_NRF53
 
-config MATTER_OTA
-	default n if BOARD_NRF52840DONGLE_NRF52840
-
 #### Bootloader
 choice BOOTLOADER
-	default BOOTLOADER_MCUBOOT if !BOARD_NRF52840DONGLE_NRF52840
+	default BOOTLOADER_MCUBOOT if !BOARD_NRF21540DK
 endchoice
 
 if BOOTLOADER_MCUBOOT
@@ -43,14 +45,8 @@ config DFU_MULTI_IMAGE_PACKAGE_BUILD
 config DFU_MULTI_IMAGE_PACKAGE_APP
 	default y
 
-config PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY
-	default y
-
 #### DFU network core configuration
 if SOC_SERIES_NRF53
-
-config MCUBOOT_UPDATEABLE_IMAGES
-	default 2
 
 choice MCUBOOT_MODE
 	default MCUBOOT_MODE_OVERWRITE_ONLY
@@ -70,18 +66,10 @@ config DFU_MULTI_IMAGE_PACKAGE_NET
 	default y
 
 endif # SOC_SERIES_NRF53
-
-if BOARD_NRF54L15DK
-
-config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
-	default y
-
-endif # BOARD_NRF54L15DK
-
 endif # BOOTLOADER_MCUBOOT
 
 #### Enable generating factory data
-config MATTER_FACTORY_DATA_GENERATE
-	default y if !BOARD_NRF52840DONGLE_NRF52840
+config MATTER_ADD_ON_FACTORY_DATA_GENERATE
+	default y if !BOARD_NRF21540DK
 
-source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"
+source "share/sysbuild/Kconfig"

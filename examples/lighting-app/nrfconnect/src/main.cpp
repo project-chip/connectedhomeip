@@ -16,32 +16,15 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
-
-#include <system/SystemError.h>
+#include "app_task.h"
 
 #include <zephyr/logging/log.h>
 
-#ifdef CONFIG_CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
-
-using namespace ::chip;
 
 int main()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#ifdef CONFIG_CHIP_PW_RPC
-    rpc::Init();
-#endif
-
-    if (err == CHIP_NO_ERROR)
-    {
-        err = AppTask::Instance().StartApp();
-    }
+    CHIP_ERROR err = AppTask::Instance().StartApp();
 
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;

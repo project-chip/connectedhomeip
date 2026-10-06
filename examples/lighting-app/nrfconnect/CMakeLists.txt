@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,24 +13,24 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20.0)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(NCS_MATTER_ROOT ${CHIP_ROOT}/third_party/nrfconnect/ncs-matter REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
-get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
-get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
-include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
+list(APPEND ZEPHYR_EXTRA_MODULES
+    ${CHIP_ROOT}/config/nrfconnect/chip-module
+    ${NCS_MATTER_ROOT}
+)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 project(chip-nrfconnect-lighting-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-sysbuild-use.cmake)
-include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
-include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+include(${NCS_MATTER_ROOT}/cmake/sample.cmake)
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
 # and chip::Optional.  Make it nonfatal.
@@ -38,41 +38,27 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
+ncs_get_zap_parent_dir(ZAP_PARENT_DIR)
+
 target_include_directories(app PRIVATE
-                           main/include
-                           ${LIGHTING_COMMON}
-                           ${GEN_DIR}
-                           ${GEN_DIR}/app-common
-                           ${GEN_DIR}/lighting-app
-                           ${NRFCONNECT_COMMON}/util/include
-                           ${NRFCONNECT_COMMON}/app/include)
-
-target_sources(app PRIVATE
-               main/AppTask.cpp
-               main/main.cpp
-               main/ZclCallbacks.cpp
-               ${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp
-               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
-
-chip_configure_data_model(app
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    src
+    ${ZAP_PARENT_DIR}
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
-    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
-endif()
+target_sources(app PRIVATE
+    src/app_task.cpp
+    src/main.cpp
+    src/zcl_callbacks.cpp
+    ${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp
+)
 
-if(CONFIG_MCUMGR_TRANSPORT_BT)
-    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
-    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
-endif()
-
-if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
-  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
-endif()
+ncs_configure_data_model()
 
 if (CONFIG_CHIP_PW_RPC)
+
+target_include_directories(app PRIVATE
+  ${NRFCONNECT_COMMON}/util/include
+)
 
 # Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
 link_libraries($<BUILD_INTERFACE:zephyr_interface>)
