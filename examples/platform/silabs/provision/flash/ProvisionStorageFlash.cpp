@@ -148,8 +148,8 @@ CHIP_ERROR Set(uint16_t id, Encoding::Buffer & in)
             // Size change, move to the end
             uint16_t temp_total = total - found.encoded_size;
             VerifyOrReturnError(temp_total + in.Size() <= kPageSize, CHIP_ERROR_INVALID_ARGUMENT);
-            // Remove the entry
-            memmove(page + found.offset, page + found.offset + found.encoded_size, temp_total);
+            // Remove the entry by shifting only the bytes that follow it
+            memmove(page + found.offset, page + found.offset + found.encoded_size, total - found.offset - found.encoded_size);
             // Add the entry
             ReturnErrorOnFailure(in.Get(page + temp_total, in.Size()));
             // Update total
