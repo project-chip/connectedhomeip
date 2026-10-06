@@ -191,7 +191,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
         wfx_rsi.scan_cb(nullptr);
         wfx_rsi.scan_cb = nullptr;
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-        osSemaphoreRelease(sScanCompleteSemaphore);
         return status_code;
     }
 
@@ -222,7 +221,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
             wfx_rsi.scan_cb(nullptr);
             wfx_rsi.scan_cb = nullptr;
             wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-            osSemaphoreRelease(sScanCompleteSemaphore);
             return SL_STATUS_OK;
         }
 
@@ -233,7 +231,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
             wfx_rsi.scan_cb(nullptr);
             wfx_rsi.scan_cb = nullptr;
             wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-            osSemaphoreRelease(sScanCompleteSemaphore);
             return SL_STATUS_ALLOCATION_FAILED;
         }
 
@@ -293,7 +290,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
         wfx_rsi.scan_cb(nullptr);
         wfx_rsi.scan_cb = nullptr;
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-        osSemaphoreRelease(sScanCompleteSemaphore);
         return status;
     }
 
@@ -302,7 +298,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
         wfx_rsi.scan_cb(nullptr);
         wfx_rsi.scan_cb = nullptr;
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-        osSemaphoreRelease(sScanCompleteSemaphore);
         return SL_STATUS_OK;
     }
 
@@ -350,7 +345,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_status_t status_cod
     wfx_rsi.scan_cb(nullptr);
     wfx_rsi.scan_cb = nullptr;
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
-    osSemaphoreRelease(sScanCompleteSemaphore);
 
     return SL_STATUS_OK;
 }
@@ -1087,12 +1081,6 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
         return CHIP_ERROR_INTERNAL;
     }
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, requestedSsidPtr, &wifi_scan_configuration);
-
-    if (SL_STATUS_IN_PROGRESS == status)
-    {
-        // NOTE: Intentional to wait for timeout here as the scan completion is indicated by the callback
-        osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
-    }
 
     osMutexRelease(sScanInProgressSemaphore);
 
