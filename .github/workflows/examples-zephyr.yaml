@@ -51,9 +51,6 @@ jobs:
                       toolchain: zephyr/llvm
                       build_dir: all-devices-zephyr-xg26-llvm
                       extra_args: -DFILE_SUFFIX=debug
-        container:
-            image: ghcr.io/zephyrproject-rtos/zephyr-build:v0.29.4
-            options: --user root
 
         steps:
             - name: Checkout Matter
