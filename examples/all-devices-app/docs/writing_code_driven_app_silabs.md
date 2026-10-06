@@ -28,13 +28,8 @@ for architecture and device class implementation.
   ]
 
   deps = [
-    ":sdk",
-    "${chip_root}/src/platform/logging:default",
-    "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
-    "${chip_root}/zzz_generated/app-common/devices",
+    # ... keep existing :sdk, codedriven, providers, and conditional root-node:wifi / :thread / :ota blocks ...
   ]
 ```
 
@@ -52,14 +47,20 @@ for architecture and device class implementation.
         (`enabled_devices.h`), KVS device-type selection, and shell
         device-switching code.
 -   **Replace**:
-    -   Immediately after `sRootNode->Register(...)` in
+    -   After the existing `sRootNode->Register(...)` call in
         `AppTask::InitCodeDrivenDataModel()`, instantiate and register the
-        product device on `kDeviceEndpointId` (`EndpointId(1)`):
+        product device on `kDeviceEndpointId` (`EndpointId(1)`), unregistering
+        `sRootNode` on failure:
 
 ```cpp
-    ReturnErrorOnFailure(sRootNode->Register(kRootEndpointId, *sDataModelProvider));
+    // ... keep existing sRootNode->Register(...) above ...
 
     sProductDevice = std::make_unique<chip::app::MyProductSpeaker>(sTimerDelegate);
     VerifyOrReturnError(sProductDevice != nullptr, CHIP_ERROR_NO_MEMORY);
-    return sProductDevice->Register(kDeviceEndpointId, *sDataModelProvider);
+    CHIP_ERROR err = sProductDevice->Register(kDeviceEndpointId, *sDataModelProvider);
+    if (err != CHIP_NO_ERROR)
+    {
+        sRootNode->Unregister(*sDataModelProvider);
+    }
+    return err;
 ```

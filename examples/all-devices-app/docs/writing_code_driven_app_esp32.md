@@ -20,7 +20,9 @@ for architecture and device class implementation.
         peripheral directories/files (such as `display/` and `devices/chime/`)
         from `esp32/main/` and `CMakeLists.txt`.
 -   **Append Base & Product Device Sources**:
-    -   Keep `APP_TOPLEVEL_EXTRA_SRCS` (which selects `ThreadFeature.cpp` or
+    -   Product `.cpp` files placed in `esp32/main/` are compiled automatically
+        via `SRC_DIRS_LIST` (`"${CMAKE_CURRENT_LIST_DIR}"`). Keep
+        `APP_TOPLEVEL_EXTRA_SRCS` (which selects `ThreadFeature.cpp` or
         `WifiFeature.cpp` based on `CONFIG_ENABLE_MATTER_OVER_THREAD`) and
         append the `device/api/*` base sources, `RootNode.cpp`, and the single
         base device `.cpp` (plus any underlying
@@ -59,19 +61,18 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
         shell device-switching commands, and sample display UI hooks in
         `main.cpp`.
 -   **Replace**:
-    -   Immediately after `gRootNode->Register(...)` in
+    -   After the existing `gRootNode->Register(...)` call in
         `PopulateCodeDrivenDataModelProvider()`, instantiate and register the
-        product device on `EndpointId(1)`:
+        product device on `EndpointId(1)` (unregistering `gRootNode` if
+        registration fails):
 
 ```cpp
-    if (gRootNode->Register(kRootEndpointId, dataModelProvider) != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
+    // ... keep existing gRootNode->Register(...) above ...
 
     gProductDevice = std::make_unique<MyProductSpeaker>(gTimerDelegate);
     if (gProductDevice->Register(EndpointId(1), dataModelProvider) != CHIP_NO_ERROR)
     {
+        gRootNode->Unregister(dataModelProvider);
         return nullptr;
     }
 
