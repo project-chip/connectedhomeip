@@ -463,7 +463,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         subscription_attr_cluster.await_all_expected_report_matches(
             [update_state_match], timeout_sec=STEP_RESERVE_SEC)
         time_for_kdelayed_apply_s2 = time.time()
-
         # Avoid race condition
         await asyncio.sleep(0.1)
 
@@ -492,7 +491,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Wait for the kApplying State
         update_state_match = AttributeMatcher.from_callable(
             "UpdateState is kApplying",
-            lambda report: Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
         subscription_attr_cluster.await_all_expected_report_matches(
             [update_state_match], timeout_sec=STEP_RESERVE_SEC)
         time_to_kapplying_s2 = time.time()
