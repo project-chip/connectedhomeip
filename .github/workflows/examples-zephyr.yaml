@@ -70,13 +70,13 @@ jobs:
                   app-path: zephyr
                   base-path: zephyrproject
                   sdk-version: "1.0.1"
-                  toolchains: arm-zephyr-eabi
+                  toolchains: arm-zephyr-eabi:llvm
                   enable-ccache: "true"
                   ccache-cache-key:
                       all-devices-ubuntu-24.04-${{ matrix.board }}-${{
                       matrix.toolchain }}
                   ccache-max-size: 2G
-                  west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread"
+                  west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
 
             - name: Configure Zephyr workspace and Matter submodules
               shell: bash
