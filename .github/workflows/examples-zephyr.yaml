@@ -47,9 +47,11 @@ jobs:
                       toolchain: zephyr
                       build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
+                      sysbuild: --sysbuild
                     - board: siwx917_rb4338a
                       toolchain: zephyr
                       build_dir: all-devices-zephyr-siwx917
+                      sysbuild: ""
 
         steps:
             - name: Checkout Matter
@@ -126,7 +128,7 @@ jobs:
               run: |
                   set -euxo pipefail
                   command -v ccache
-                  west build -p always -b "${{ matrix.board }}" --sysbuild --cmake-only \
+                  west build -p always -b "${{ matrix.board }}" "${{ matrix.sysbuild }}"--cmake-only \
                   "${GITHUB_WORKSPACE}/examples/all-devices-app/zephyr" \
                   -d "build/${{ matrix.build_dir }}" \
                   -- \
