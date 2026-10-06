@@ -152,7 +152,7 @@ void OTAConfig::Init()
     CHIP_ERROR err = imageProcessor.Init(&gDownloader, chip::DeviceLayer::Silabs::Provision::ProvisionStorageWriter::GetInstance(),
                                          chip::DeviceLayer::Silabs::Provision::ProvisionCrypto::GetInstance());
 #else
-    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+    CHIP_ERROR err        = imageProcessor.Init(&gDownloader);
 #endif
     if (err != CHIP_NO_ERROR)
     {
