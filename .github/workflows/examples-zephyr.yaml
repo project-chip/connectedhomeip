@@ -45,12 +45,11 @@ jobs:
                 include:
                     - board: xg26_rb4118a
                       toolchain: zephyr
-                      build_dir: all-devices-zephyr-xg26-gcc
+                      build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
-                    - board: xg26_rb4118a
-                      toolchain: zephyr/llvm
-                      build_dir: all-devices-zephyr-xg26-llvm
-                      extra_args: -DFILE_SUFFIX=debug
+                    - board: siwx917_rb4338a
+                      toolchain: zephyr
+                      build_dir: all-devices-zephyr-siwx917
 
         steps:
             - name: Checkout Matter
@@ -142,7 +141,12 @@ jobs:
                     printf '%s\n' --arg-string pw_command_launcher ccache >> "$gn_args_file"
                   done
                   west build -d "build/${{ matrix.build_dir }}"
-
+            - name: Show ccache statistics
+              shell: bash
+              run: |
+                  if command -v ccache >/dev/null 2>&1; then
+                      ccache --show-stats
+                  fi
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure
