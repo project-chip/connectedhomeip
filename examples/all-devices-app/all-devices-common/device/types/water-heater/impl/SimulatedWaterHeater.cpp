@@ -72,8 +72,9 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
     ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
 
-    // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster code)
-    // so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based on the CurrentMode.
+    // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster
+    // code) so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based
+    // on the CurrentMode.
     const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
     ThermostatCluster().SetSystemMode(initialSystemMode);
 
@@ -93,14 +94,15 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     VerifyOrReturnError(mAttributeStorage == nullptr, CHIP_NO_ERROR);
     mAttributeStorage = &context.attributeStorage;
     AttributePersistence persistence(*mAttributeStorage);
-    persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::SystemMode::Id }, mSystemMode,
-                                      SystemModeEnum::kOff);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::SystemMode::Id },
+                                      mSystemMode, SystemModeEnum::kOff);
     if (mSystemMode != SystemModeEnum::kOff && mSystemMode != SystemModeEnum::kHeat)
     {
         mSystemMode = SystemModeEnum::kOff;
     }
-    persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
-    mOccupiedHeatingSetpoint, kFinalTemperature);
+    persistence.LoadNativeEndianValue(
+        { GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
+        mOccupiedHeatingSetpoint, kFinalTemperature);
     if (mOccupiedHeatingSetpoint < kMinTemperature || mOccupiedHeatingSetpoint > kMaxTemperature)
     {
         mOccupiedHeatingSetpoint = kFinalTemperature;
@@ -168,7 +170,8 @@ void SimulatedWaterHeater::TimerFired()
 
         ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
-        if (newTemp <= kInitialTemperature  && newTemp < target && (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
+        if (newTemp <= kInitialTemperature && newTemp < target &&
+            (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
         {
             SetHeatingEnabled(true);
         }
@@ -421,15 +424,16 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
                                                                                      bool & changed)
 {
     changed = false;
-    VerifyOrReturnError(occupiedHeatingSetpoint >= kMinTemperature && occupiedHeatingSetpoint <= kMaxTemperature, Status::ConstraintError);
+    VerifyOrReturnError(occupiedHeatingSetpoint >= kMinTemperature && occupiedHeatingSetpoint <= kMaxTemperature,
+                        Status::ConstraintError);
     VerifyOrReturnError(mOccupiedHeatingSetpoint != occupiedHeatingSetpoint, Status::Success);
     VerifyOrReturnError(mAttributeStorage != nullptr, Status::Failure);
 
     AttributePersistence persistence(*mAttributeStorage);
-    VerifyOrReturnError(
-        persistence.StoreNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
-                                           occupiedHeatingSetpoint) == CHIP_NO_ERROR,
-        Status::Failure);
+    VerifyOrReturnError(persistence.StoreNativeEndianValue(
+                            { GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
+                            occupiedHeatingSetpoint) == CHIP_NO_ERROR,
+                        Status::Failure);
 
     mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
     changed                  = true;
