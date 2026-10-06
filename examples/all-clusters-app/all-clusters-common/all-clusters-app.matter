@@ -8731,6 +8731,7 @@ endpoint 1 {
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
     ram      attribute numberOfSchedules default = 0;
+    ram      attribute numberOfScheduleTransitions default = 0;
     ram      attribute numberOfScheduleTransitionPerDay default = 0xFF;
     ram      attribute activePresetHandle;
     ram      attribute activeScheduleHandle;
@@ -8751,7 +8752,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0F23;
+    ram      attribute featureMap default = 0x0FA3;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
