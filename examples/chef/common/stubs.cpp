@@ -824,9 +824,20 @@ void SmokeCoAlarmInit()
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
     {
         static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
+        // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+        constexpr uint32_t kExpiryDate = 3976214400;
         SmokeCoAlarmCluster::Config config;
-        config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        config
+            .WithSmokeAlarm({
+                .withContaminationState = true,
+                .sensitivityLevel       = SmokeCoAlarm::SensitivityEnum::kStandard,
+            })
+            .WithCOAlarm()
+            .WithDeviceMuted()
+            .WithInterconnectSmokeAlarm()
+            .WithInterconnectCOAlarm()
+            .WithExpiryDate(kExpiryDate)
+            .WithUnmounted();
         VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");
     }

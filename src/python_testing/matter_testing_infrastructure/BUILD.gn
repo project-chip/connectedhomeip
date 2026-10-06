@@ -65,6 +65,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/global_attribute_ids.py",
     "matter/testing/global_stash.py",
     "matter/testing/harness_params.py",
+    "matter/testing/json_dump_to_html.py",
     "matter/testing/linux/__init__.py",
     "matter/testing/linux/bluetooth.py",
     "matter/testing/linux/dbus.py",

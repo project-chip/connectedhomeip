@@ -15,6 +15,8 @@
  */
 #include <app/persistence/String.h>
 
+#include <lib/support/CodeUtils.h>
+
 namespace chip::app::Storage::Internal {
 
 bool ShortString::SetContent(CharSpan value)
@@ -22,12 +24,8 @@ bool ShortString::SetContent(CharSpan value)
 
     ShortPascalString view = AsPascal();
 
-    if (!view.SetValue(value))
-    {
-        view.SetValue(""_span);
-        NullTerminate();
-        return false;
-    }
+    // SetValue does not modify the buffer when the value does not fit, so the previous content is kept.
+    VerifyOrReturnValue(view.SetValue(value), false);
     NullTerminate();
     return true;
 }
