@@ -151,6 +151,24 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
         ChipLogError(AppServer, "EVSE: Unable to restore persisted discharging command current limit");
     }
 
+    // A stored deadline that elapsed while the EVSE was off disables that mode, so clear its deadline and
+    // current limits (the setters persist the deadline and minimum current) rather than restoring stale values.
+    if (chargingEnabledUntilStored && !chargingEnabled)
+    {
+        LogErrorOnFailure(SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        LogErrorOnFailure(SetMinimumChargeCurrent(0));
+        mDelegate->mMaximumChargingCurrentLimitFromCommand = 0;
+        LogErrorOnFailure(aProvider->WriteScalarValue(
+            ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumChargeCurrent::Id), int64_t(0)));
+    }
+    if (dischargingEnabledUntilStored && !dischargingEnabled)
+    {
+        LogErrorOnFailure(SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        mDelegate->mMaximumDischargingCurrentLimitFromCommand = 0;
+        LogErrorOnFailure(aProvider->WriteScalarValue(
+            ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumDischargeCurrent::Id), int64_t(0)));
+    }
+
     // Restore UserMaximumChargeCurrent value - via Instance (which owns the data)
     int64_t tempUserMaximumChargeCurrent;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),

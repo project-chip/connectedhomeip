@@ -135,6 +135,10 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
     LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
+    /* The setter only calls the persisting callback if the value changes, but a null value
+     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot */
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil));
     LogErrorOnFailure(mInstance->SetChargingEnabledUntil(chargingEnabledUntil));
     LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(minimumChargeCurrent));
 

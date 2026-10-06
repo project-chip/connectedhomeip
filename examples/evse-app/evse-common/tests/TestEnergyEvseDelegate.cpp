@@ -305,6 +305,53 @@ TEST_F(TestEnergyEvseManagerLoad, LoadsValidCommandLimits)
     EXPECT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
 }
 
+TEST_F(TestEnergyEvseManagerLoad, ExpiredChargingDeadlineClearsRestoredChargingValuesOnly)
+{
+    // Deadline 1 is long past (and 0 is an explicit disable); discharging stays enabled indefinitely
+    WritePersisted(Attributes::ChargingEnabledUntil::Id, DataModel::Nullable<uint32_t>(1u));
+    WritePersisted(Attributes::MinimumChargeCurrent::Id, kMinimumCurrent_mA);
+    WritePersisted(Attributes::MaximumChargeCurrent::Id, kMaximumChargeCurrent_mA);
+    WritePersisted(Attributes::DischargingEnabledUntil::Id, DataModel::Nullable<uint32_t>());
+    WritePersisted(Attributes::MaximumDischargeCurrent::Id, kMaximumDischargeCurrent_mA);
+
+    ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mManager.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(mManager.GetMinimumChargeCurrent(), 0);
+
+    DataModel::Nullable<uint32_t> enabledUntil;
+    ASSERT_EQ(ReadPersisted(Attributes::ChargingEnabledUntil::Id, enabledUntil), CHIP_NO_ERROR);
+    ASSERT_FALSE(enabledUntil.IsNull());
+    EXPECT_EQ(enabledUntil.Value(), 0u);
+
+    int64_t limit = -1;
+    ASSERT_EQ(ReadPersisted(Attributes::MaximumChargeCurrent::Id, limit), CHIP_NO_ERROR);
+    EXPECT_EQ(limit, 0);
+    ASSERT_EQ(ReadPersisted(Attributes::MaximumDischargeCurrent::Id, limit), CHIP_NO_ERROR);
+    EXPECT_EQ(limit, kMaximumDischargeCurrent_mA);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, IndefiniteChargingEnableSurvivesReload)
+{
+    ASSERT_EQ(mManagerDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA),
+              Status::Success);
+
+    // Simulate a reboot with a new delegate and manager reading the same storage
+    EvseTargetsDelegate targets;
+    EnergyEvseDelegate delegate(targets);
+    EnergyEvseManager manager(kEndpointId, delegate, BitMask<Feature, uint32_t>(Feature::kChargingPreferences, Feature::kV2x),
+                              BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent),
+                              EnergyEvseCluster::OptionalCommandSet());
+    delegate.SetInstance(&manager);
+
+    ASSERT_EQ(manager.LoadPersistentValues(), CHIP_NO_ERROR);
+    EXPECT_EQ(manager.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_TRUE(manager.GetChargingEnabledUntil().IsNull());
+
+    delegate.CancelActiveTimers();
+    delegate.SetInstance(nullptr);
+}
+
 TEST_F(TestEnergyEvseManagerLoad, RejectsNegativeDischargingLimit)
 {
     WritePersisted(Attributes::MaximumDischargeCurrent::Id, int64_t(-1));
