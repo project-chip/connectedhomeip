@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,14 @@ if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
+}
+
+# The wbs layer (wbs/) is kept as provided; wbs/WbsCompat.h supplies what it needs from this SDK version.
+config("wbs_compat") {
+  cflags_cc = [
+    "-include",
+    rebase_path("wbs/WbsCompat.h", root_build_dir),
+  ]
 }
 
 config("enable_exceptions") {
@@ -104,16 +112,20 @@ static_library("webos") {
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
       "BlePlatformConfig.h",
-      "wbs/LsRequester.cpp",
-      "wbs/LsRequester.h",
-      "wbs/WbsConnection.cpp",
-      "wbs/WbsConnection.h",
-      "wbs/WbsDeviceScanner.cpp",
-      "wbs/WbsDeviceScanner.h",
-      "wbs/WebosLockTracker.cpp",
-      "wbs/WebosLockTracker.h",
+      "wbs/ChipDeviceScanner.cpp",
+      "wbs/ChipDeviceScanner.h",
+      "wbs/Helper.cpp",
+      "wbs/Helper.h",
+      "wbs/WbsCompat.h",
+      "wbs/WbsGattClient.cpp",
+      "wbs/WbsGattClient.h",
+      "wbs/lsrequester.cpp",
+      "wbs/lsrequester.h",
     ]
-    configs += [ ":enable_exceptions" ]
+    configs += [
+      ":enable_exceptions",
+      ":wbs_compat",
+    ]
   }
 
   if (chip_with_trusty_os) {
@@ -155,6 +167,7 @@ static_library("webos") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_openthread) {

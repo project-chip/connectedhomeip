@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    Copyright 2023 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +34,11 @@ public:
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) override;
 
-private:
-    matter::TrustyMatter trusty_matter;
+    matter::TrustyMatter & GetTrustyMatter()
+    {
+        static matter::TrustyMatter instance;
+        return instance;
+    }
 };
 
 } // namespace Trusty
