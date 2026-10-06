@@ -112,6 +112,16 @@ source_set("code-driven-data-model-devices") {
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
+  if (chip_device_platform == "darwin") {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
+  } else {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
+  }
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
+  }
+
   public_configs = [ ":posix-includes" ]
 }
 

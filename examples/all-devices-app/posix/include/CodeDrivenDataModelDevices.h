@@ -47,8 +47,8 @@
 #include <transport/SessionManager.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-#include <app/server/TermsAndConditionsProvider.h>
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsProvider.h> // nogncheck
+#endif                                             // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 #include <cstdint>
 #include <memory>
