@@ -47,7 +47,12 @@ SmokeCoAlarmCluster::Config MakeFullConfig()
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    cfg.optionalAttribs.Set<Attributes::DeviceMuted::Id>()
+        .Set<Attributes::InterconnectSmokeAlarm::Id>()
+        .Set<Attributes::InterconnectCOAlarm::Id>()
+        .Set<Attributes::ContaminationState::Id>()
+        .Set<Attributes::SmokeSensitivityLevel::Id>()
+        .Set<Attributes::Unmounted::Id>();
     cfg.WithExpiryDate(kTestExpiryDate);
     return cfg;
 }

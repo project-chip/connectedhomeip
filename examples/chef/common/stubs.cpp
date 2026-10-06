@@ -826,7 +826,12 @@ void SmokeCoAlarmInit()
         static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
         SmokeCoAlarmCluster::Config config;
         config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        config.optionalAttribs.Set<SmokeCoAlarm::Attributes::DeviceMuted::Id>()
+            .Set<SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id>()
+            .Set<SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id>()
+            .Set<SmokeCoAlarm::Attributes::ContaminationState::Id>()
+            .Set<SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id>()
+            .Set<SmokeCoAlarm::Attributes::Unmounted::Id>();
         VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");
     }

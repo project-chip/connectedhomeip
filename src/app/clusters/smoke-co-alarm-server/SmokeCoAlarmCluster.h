@@ -46,6 +46,8 @@ public:
 class SmokeCoAlarmCluster : public DefaultServerCluster
 {
 public:
+    // Flag-only optional attributes (have valid default initial states).
+    // ExpiryDate is excluded because it requires a fixed initial value via Config::WithExpiryDate().
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         SmokeCoAlarm::Attributes::DeviceMuted::Id, SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
         SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id, SmokeCoAlarm::Attributes::ContaminationState::Id,

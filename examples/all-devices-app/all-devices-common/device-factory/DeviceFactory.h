@@ -769,8 +769,12 @@ private:
                 SmokeCoAlarm::Config config;
                 config.alarmConfig.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm)
                     .Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-                config.alarmConfig.optionalAttribs =
-                    Clusters::SmokeCoAlarmCluster::OptionalAttributeSet(Clusters::SmokeCoAlarmCluster::OptionalAttributeSet::All());
+                config.alarmConfig.optionalAttribs.Set<Clusters::SmokeCoAlarm::Attributes::DeviceMuted::Id>()
+                    .Set<Clusters::SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id>()
+                    .Set<Clusters::SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id>()
+                    .Set<Clusters::SmokeCoAlarm::Attributes::ContaminationState::Id>()
+                    .Set<Clusters::SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id>()
+                    .Set<Clusters::SmokeCoAlarm::Attributes::Unmounted::Id>();
                 config.alarmConfig.WithExpiryDate(kExampleExpiryDate);
                 config.coConcentrationConfig = SmokeCoAlarm::ConcentrationCluster::Config{
                     .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
