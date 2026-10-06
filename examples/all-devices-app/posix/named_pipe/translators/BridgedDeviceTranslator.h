@@ -48,13 +48,13 @@ namespace chip::app::NamedPipe {
  * {
  *    "Name": String
  *        Must be "RemoveBridgedDevice"
- *    "DeviceId" : BridgedDeviceManager::DeviceId (uint16_t)
- *        The deviceId of the bridged device to be removed.
+ *    "DeviceInterfaceId" : BridgedDeviceManager::DeviceInterfaceId (uint16_t)
+ *        The deviceInterfaceId of the bridged device to be removed.
  * }
  *
  * Examples:
  *  echo '{"Name": "AddBridgedDevice", "AggregatorEndpointId": 5, "Device": "electrical-sensor"}'> /tmp/acs_fifo
- *  echo '{"Name": "RemoveBridgedDevice", "DeviceId": 2}'> /tmp/acs_fifo
+ *  echo '{"Name": "RemoveBridgedDevice", "DeviceInterfaceId": 2}'> /tmp/acs_fifo
  */
 
 class BridgedDeviceTranslator : public CommandTranslator

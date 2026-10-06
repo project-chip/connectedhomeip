@@ -21,64 +21,23 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
+#include <optional>
+
 namespace chip::app {
 
 /**
  * Usage:
- *    Tag(2): BridgedDeviceManager::DeviceId deviceId (uint16_t)
- *       The deviceId of the bridged device to be removed.
+ *    Tag(2): BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId (uint16_t)
+ *       The deviceInterfaceId of the bridged device to be removed.
  *
- * Note: Here Tag(2) is used for the deviceId, because Tag(1) is commonly used for endpointId.
+ * Note: Here Tag(2) is used for the deviceInterfaceId, because Tag(1) is commonly used for endpointId.
  */
 
 class RemoveBridgedDeviceOOBAccessor : public OOBAccessor
 {
 public:
-    explicit RemoveBridgedDeviceOOBAccessor(BridgedDeviceManager & bridgedDeviceManager) : mBridgedDeviceManager(bridgedDeviceManager) {}
-
-    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override
-    {
-        if (!action.data_equal("RemoveBridgedDevice"_span))
-        {
-            return std::nullopt;
-        }
-
-        TLV::TLVReader reader;
-        reader.Init(tlvData);
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-        uint16_t deviceIdVal = 0;
-        bool hasDeviceId    = false;
-        CHIP_ERROR err        = CHIP_NO_ERROR;
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            TLV::Tag tag = reader.GetTag();
-            if (!TLV::IsContextTag(tag))
-            {
-                continue;
-            }
-            switch (TLV::TagNumFromTag(tag))
-            {
-            case 2:
-                ReturnErrorOnFailure(reader.Get(deviceIdVal));
-                hasDeviceId = true;
-                break;
-            default:
-                break;
-            }
-        }
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outerType));
-        VerifyOrReturnError(hasDeviceId, CHIP_ERROR_INVALID_ARGUMENT);
-        BridgedDeviceManager::DeviceId deviceId(deviceIdVal);
-
-        mBridgedDeviceManager.RemoveDevice(deviceId);
-        ChipLogProgress(AppServer, "Removed bridged device with id: %u", static_cast<uint16_t>(deviceId));
-        return CHIP_NO_ERROR;
-    }
+    explicit RemoveBridgedDeviceOOBAccessor(BridgedDeviceManager & bridgedDeviceManager);
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
     BridgedDeviceManager & mBridgedDeviceManager;

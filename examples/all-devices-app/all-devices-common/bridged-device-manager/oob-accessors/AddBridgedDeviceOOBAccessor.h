@@ -21,6 +21,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessor.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -50,60 +51,8 @@ namespace chip::app {
 class AddBridgedDeviceOOBAccessor : public OOBAccessor
 {
 public:
-    explicit AddBridgedDeviceOOBAccessor(BridgedDeviceManager & bridgedDeviceManager) : mBridgedDeviceManager(bridgedDeviceManager) {}
-
-    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override
-    {
-        if (!action.data_equal("AddBridgedDevice"_span))
-        {
-            return std::nullopt;
-        }
-
-        TLV::TLVReader reader;
-        reader.Init(tlvData);
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-        EndpointId aggregatorEndpointId = kInvalidEndpointId;
-        char deviceType[256]        = {};
-        bool hasDeviceType          = false;
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            TLV::Tag tag = reader.GetTag();
-            if (!TLV::IsContextTag(tag))
-            {
-                continue;
-            }
-            switch (TLV::TagNumFromTag(tag))
-            {
-            case 1:
-                ReturnErrorOnFailure(reader.Get(aggregatorEndpointId));
-                break;
-            case 2:
-                ReturnErrorOnFailure(reader.GetString(deviceType, sizeof(deviceType)));
-                hasDeviceType = true;
-                break;
-            default:
-                break;
-            }
-        }
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outerType));
-        VerifyOrReturnError(hasDeviceType, CHIP_ERROR_INVALID_ARGUMENT);
-
-        auto optionalDeviceId = mBridgedDeviceManager.AddBridgedDevice(deviceType, {}, aggregatorEndpointId);
-        if (!optionalDeviceId.has_value())
-        {
-            ChipLogError(AppServer, "Failed to add bridged device: %s", deviceType);
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        ChipLogProgress(AppServer, "Successfully added bridged device: %s with DeviceId: %u", deviceType, static_cast<uint16_t>(optionalDeviceId.value()));
-        return CHIP_NO_ERROR;
-    }
+    explicit AddBridgedDeviceOOBAccessor(BridgedDeviceManager & bridgedDeviceManager);
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
     BridgedDeviceManager & mBridgedDeviceManager;

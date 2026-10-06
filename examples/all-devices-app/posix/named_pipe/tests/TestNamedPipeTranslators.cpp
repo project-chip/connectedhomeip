@@ -398,13 +398,13 @@ TEST_F(TestNamedPipeTranslators, BridgedDeviceTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, missingDevice, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid RemoveBridgedDevice action
-    Json::Value validRemoveJson = ParseJson(R"({"Name": "RemoveBridgedDevice", "DeviceId": 10})");
+    Json::Value validRemoveJson = ParseJson(R"({"Name": "RemoveBridgedDevice", "DeviceInterfaceId": 10})");
     EXPECT_EQ(translator.TranslateAndExecute(1, validRemoveJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "RemoveBridgedDevice");
 
-    // Missing DeviceId field
-    Json::Value missingDeviceId = ParseJson(R"({"Name": "RemoveBridgedDevice"})");
-    EXPECT_EQ(translator.TranslateAndExecute(1, missingDeviceId, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+    // Missing DeviceInterfaceId field
+    Json::Value missingDeviceInterfaceId = ParseJson(R"({"Name": "RemoveBridgedDevice"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, missingDeviceInterfaceId, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Unknown action
     Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");

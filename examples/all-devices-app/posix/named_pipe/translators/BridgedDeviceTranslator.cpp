@@ -39,12 +39,12 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
     }
     if (action == "RemoveBridgedDevice")
     {
-        auto deviceId = ExtractUInt<uint16_t>(json, "DeviceId");
-        if (!deviceId.has_value())
+        auto deviceInterfaceId = ExtractUInt<uint16_t>(json, "DeviceInterfaceId");
+        if (!deviceInterfaceId.has_value())
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return DispatchAction(registry, "RemoveBridgedDevice"_span, deviceId.value());
+        return DispatchAction(registry, "RemoveBridgedDevice"_span, endpointId, deviceInterfaceId.value());
     }
     return CHIP_ERROR_NOT_FOUND;
 }
