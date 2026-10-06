@@ -542,7 +542,7 @@ class ChipDeviceControllerBase:
                 err = self._dmLib.pychip_GetCompletionError()
 
             if self._commissioning_context.future is None:
-                LOGGER.exception("HandleCommissioningComplete called unexpectedly")
+                LOGGER.error("HandleCommissioningComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -565,7 +565,7 @@ class ChipDeviceControllerBase:
                 LOGGER.warning("Failed to open commissioning window: %s", str(err))
 
             if self._open_window_context.future is None:
-                LOGGER.exception("HandleOpenWindowComplete called unexpectedly")
+                LOGGER.error("HandleOpenWindowComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -581,7 +581,7 @@ class ChipDeviceControllerBase:
                 LOGGER.warning("Failed to unpair device: %s", str(err))
 
             if self._unpair_device_context.future is None:
-                LOGGER.exception("HandleUnpairDeviceComplete called unexpectedly")
+                LOGGER.error("HandleUnpairDeviceComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -604,7 +604,7 @@ class ChipDeviceControllerBase:
                 return
 
             if self._pase_establishment_context.future is None:
-                LOGGER.exception("HandlePASEEstablishmentComplete called unexpectedly")
+                LOGGER.error("HandlePASEEstablishmentComplete called unexpectedly")
                 return
 
             if err.is_success:
@@ -1759,7 +1759,8 @@ class ChipDeviceControllerBase:
                                         timedRequestTimeoutMs: int | None = None,
                                         interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                         suppressResponse: bool = False, remoteMaxPathsPerInvoke: int | None = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None):
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: list[int] | None = None,
+                                        delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Please see SendBatchCommands for description.
         TestOnly overridable arguments:
@@ -1782,7 +1783,7 @@ class ChipDeviceControllerBase:
             timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
-            commandRefsOverride=commandRefsOverride).raise_on_error()
+            commandRefsOverride=commandRefsOverride, delayReportData=delayReportData).raise_on_error()
 
         if suppressResponse:
             return None
@@ -1885,7 +1886,8 @@ class ChipDeviceControllerBase:
                           timedRequestTimeoutMs: int | None = None,
                           interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                           suppressResponse: bool = False,
-                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                          delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
         the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1894,6 +1896,7 @@ class ChipDeviceControllerBase:
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
             command response or None. The type of the response is defined by the command.
@@ -1916,7 +1919,8 @@ class ChipDeviceControllerBase:
                     ClusterId=payload.cluster_id,
                     CommandId=payload.command_id,
                 ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse, allowLargePayload=allow_large_payload)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                allowLargePayload=allow_large_payload, delayReportData=delayReportData)
             res.raise_on_error()
 
             if suppressResponse:
@@ -1930,7 +1934,8 @@ class ChipDeviceControllerBase:
                                 timedRequestTimeoutMs: int | None = None,
                                 interactionTimeoutMs: int | None = None, busyWaitMs: int | None = None,
                                 suppressResponse: bool = False,
-                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD,
+                                delayReportData: ClusterCommand.DelayReportData | None = None):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
         the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1943,6 +1948,7 @@ class ChipDeviceControllerBase:
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
         busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
         suppressResponse: Do not send a response to this action
+        delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
             - None if suppressResponse is True. Otherwise, a list of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
@@ -1963,7 +1969,8 @@ class ChipDeviceControllerBase:
             res = await ClusterCommand.SendBatchCommands(
                 future, eventLoop, device.deviceProxy, commands,
                 timedRequestTimeoutMs=timedRequestTimeoutMs,
-                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+                interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+                delayReportData=delayReportData)
             res.raise_on_error()
             if suppressResponse:
                 return None
@@ -2814,6 +2821,18 @@ class ChipDeviceControllerBase:
                     "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
                     "Thread Meshcop commissioning is disabled.")
 
+            self._dmLib.pychip_DeviceController_CommissionViaProxy.argtypes = [
+                c_void_p,   # devCtrl
+                c_void_p,   # pairingDelegate
+                c_uint64,   # proxyNodeId
+                c_uint64,   # remoteNodeId
+                c_uint16,   # proxySessionId
+                c_uint16,   # proxyEndpoint
+                c_uint16,   # discriminator
+                c_uint32,   # setupPinCode
+            ]
+            self._dmLib.pychip_DeviceController_CommissionViaProxy.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
@@ -3531,6 +3550,41 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    async def CommissionViaProxy(self, *, proxyNodeId: int, proxySessionId: int,
+                                 remoteNodeId: int, discriminator: int,
+                                 setupPinCode: int, proxyEndpoint: int = 1) -> int:
+        '''Commission a device through a Commissioning Proxy.
+
+        The proxy CASE session must already exist (proxyNodeId is commissioned
+        to this controller's fabric) and a ProxyConnectRequest must have been
+        sent separately to obtain proxySessionId.
+
+        WiFi credentials must be set via SetWiFiCredentials() before calling
+        this method (same pattern as CommissionOnNetwork).
+
+        Args:
+            proxyNodeId:    Node ID of the Commissioning Proxy (DUT).
+            proxySessionId: SessionId from the ProxyConnectResponse.
+            remoteNodeId:   Node ID to assign to the commissioned ED.
+            discriminator:  Long discriminator of the ED.
+            setupPinCode:   PASE passcode of the ED.
+            proxyEndpoint:  Endpoint on which the CommissioningProxy cluster is hosted (default 1).
+
+        Returns:
+            Effective Node ID of the commissioned ED.
+        '''
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_CommissionViaProxy(
+                    self.devCtrl, self.pairingDelegate,
+                    proxyNodeId, remoteNodeId, proxySessionId, proxyEndpoint, discriminator, setupPinCode)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
     def get_rcac(self):
         '''
         Passes captured RCAC data back to Python test modules for validation
@@ -3558,7 +3612,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
             rcac_bytes = bytes(rcac_data)
         else:
-            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            LOGGER.error("RCAC returned from C++ did not contain any data")
             return None
         return rcac_bytes
 
@@ -3600,7 +3654,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             None
         '''
         if self._issue_node_chain_context.future is None:
-            LOGGER.exception("NOCChainCallback while not expecting a callback")
+            LOGGER.error("NOCChainCallback while not expecting a callback")
             return
         self._issue_node_chain_context.future.set_result(nocChain)
         return

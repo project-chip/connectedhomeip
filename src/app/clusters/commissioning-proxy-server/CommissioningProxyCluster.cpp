@@ -196,12 +196,20 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
     // Each handler returns its own std::optional result: std::nullopt when the
     // delegate has taken ownership of the response (sync or async AddResponse) so
     // the framework must not add a duplicate status, or a concrete status otherwise.
+
+    // ProxyConnectRequest, ProxyDisconnectRequest and ProxyMessageRequest must fail with
+    // UNSUPPORTED_ACCESS when not invoked over a CASE session. Fabric scoping does not cover
+    // this: the interaction model only rejects an undefined accessing fabric, and both a group
+    // session and a PASE session that has been through AddNOC carry a defined one. So the
+    // session has to be checked by auth mode. The scan commands carry no CASE requirement.
     switch (request.path.mCommandId)
     {
     case ProxyConnectRequest::Id:
+        VerifyOrReturnValue(request.subjectDescriptor.authMode == Access::AuthMode::kCase, Status::UnsupportedAccess);
         return HandleProxyConnectRequest(request, input_arguments, handler);
 
     case ProxyDisconnectRequest::Id:
+        VerifyOrReturnValue(request.subjectDescriptor.authMode == Access::AuthMode::kCase, Status::UnsupportedAccess);
         return HandleProxyDisconnectRequest(request, input_arguments, handler);
 
     case ProxyScanRequest::Id:
@@ -214,6 +222,7 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
         return HandleProxyBackGroundScanStopRequest(request, input_arguments, handler);
 
     case ProxyMessageRequest::Id:
+        VerifyOrReturnValue(request.subjectDescriptor.authMode == Access::AuthMode::kCase, Status::UnsupportedAccess);
         return HandleProxyMessageRequest(request, input_arguments, handler);
 
     default:
@@ -338,15 +347,21 @@ CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeR
         {
             mTransports[i]->OnAllSessionsClosed();
         }
-
-        CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
-        if (stateErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "HandleProxyDisconnectRequest: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
-        }
     }
+    SetDisconnectedIfLastSession();
 
     return Status::Success;
+}
+
+void CommissioningProxyCluster::SetDisconnectedIfLastSession()
+{
+    VerifyOrReturn(GetActiveSessionCount() == 0);
+
+    CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
+    if (stateErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "SetDisconnectedIfLastSession: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
+    }
 }
 
 std::optional<DataModel::ActionReturnStatus>

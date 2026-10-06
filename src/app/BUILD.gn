@@ -87,6 +87,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT=${chip_enable_server_restart_support}",
     "CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED=${chip_terms_and_conditions_required}",
     "CHIP_CONFIG_ENABLE_GROUPCAST=${chip_config_enable_groupcast}",
+    "CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER=${chip_config_use_stubbed_groups_cluster}",
   ]
 
   visibility = [ ":app_config" ]

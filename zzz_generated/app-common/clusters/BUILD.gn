@@ -144,6 +144,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/TemperatureMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/TestHiddenManufacturerSpecific" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Thermostat" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/ThermostatMode" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ThermostatUserInterfaceConfiguration" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ThreadBorderRouterManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ThreadNetworkDiagnostics" + invoker.target,

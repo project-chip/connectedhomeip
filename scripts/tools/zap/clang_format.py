@@ -70,7 +70,7 @@ def getClangFormatBinary():
                 print(f'   ACTUAL VERSION: {version_string}')
         except Exception:
             print("Failed to validate clang version.")
-            traceback.print_last()
+            traceback.print_exc()
 
         return binary
 

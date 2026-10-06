@@ -179,7 +179,6 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
                     print(f"Image footer is written to {dfu_output_name}")
 
                 print("Image for DFU over BLE SMP is ready!")
-                os.remove('empty.txt')
 
     if build_conf.getboolean('CONFIG_TELINK_OTA_BUTTON_TEST'):
         merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],

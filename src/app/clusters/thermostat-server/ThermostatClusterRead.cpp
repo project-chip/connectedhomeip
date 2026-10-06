@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,10 +33,9 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                               AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus ThermostatClusterBase::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                   AttributeValueEncoder & encoder)
 {
-
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
@@ -49,220 +47,54 @@ DataModel::ActionReturnStatus ThermostatCluster::ReadAttribute(const DataModel::
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mLocalTemperature);
-    case OutdoorTemperature::Id:
-        // TODO: implement outdoor temperature
-        return Status::UnsupportedAttribute;
-    case Occupancy::Id:
-        // TODO: implement occupancy
-        return Status::UnsupportedAttribute;
+        return encoder.Encode(GetLocalTemperature());
+    case OutdoorTemperature::Id: {
+        DataModel::Nullable<temperature> outdoorTemp;
+        if (auto status = mDelegate.GetOutdoorTemperature(outdoorTemp); status != Status::Success)
+        {
+            return status;
+        }
+        return encoder.Encode(outdoorTemp);
+    }
     case SystemMode::Id:
-        return encoder.Encode(mSystemMode);
-    case ThermostatRunningMode::Id:
-        return encoder.Encode(mRunningMode);
+        return encoder.Encode(GetSystemMode());
+    case ThermostatRunningMode::Id: {
+        ThermostatRunningModeEnum runningMode;
+        if (auto status = mDelegate.GetRunningMode(runningMode); status != Status::Success)
+        {
+            return status;
+        }
+        return encoder.Encode(runningMode);
+    }
+    case ThermostatRunningState::Id: {
+        BitMask<RelayStateBitmap> runningState;
+        if (auto status = mDelegate.GetRunningState(runningState); status != Status::Success)
+        {
+            return status;
+        }
+        return encoder.Encode(runningState);
+    }
     case RemoteSensing::Id: {
-        BitMask<RemoteSensingBitmap> valueRemoteSensing = mRemoteSensing;
+        BitMask<RemoteSensingBitmap> remoteSensing;
+        if (auto status = mDelegate.GetRemoteSensing(remoteSensing); status != Status::Success)
+        {
+            return status;
+        }
         if (mFeatures.Has(Feature::kLocalTemperatureNotExposed))
         {
-            valueRemoteSensing.ClearAll();
+            remoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
         }
-        return encoder.Encode(valueRemoteSensing);
+        return encoder.Encode(remoteSensing);
     }
     case ControlSequenceOfOperation::Id:
-        return encoder.Encode(mControlSequenceOfOperation);
+        return encoder.Encode(mDelegate.GetControlSequenceOfOperation());
     case LocalTemperatureCalibration::Id:
-        return encoder.Encode(mLocalTemperatureCalibration);
-    case OccupiedHeatingSetpoint::Id:
-        return encoder.Encode(mSetpoints.occupiedRange.heating.Temperature());
-    case OccupiedCoolingSetpoint::Id:
-        return encoder.Encode(mSetpoints.occupiedRange.cooling.Temperature());
-    case UnoccupiedHeatingSetpoint::Id:
-        return encoder.Encode(mSetpoints.unoccupiedRange.heating.Temperature());
-    case UnoccupiedCoolingSetpoint::Id:
-        return encoder.Encode(mSetpoints.unoccupiedRange.cooling.Temperature());
-    case AbsMinHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.minimum.Temperature());
-    case AbsMaxHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteHeatLimits.maximum.Temperature());
-    case AbsMinCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.minimum.Temperature());
-    case AbsMaxCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.absoluteCoolLimits.maximum.Temperature());
-    case MinHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userHeatLimits.minimum.Temperature());
-    case MaxHeatSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userHeatLimits.maximum.Temperature());
-    case MinCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userCoolLimits.minimum.Temperature());
-    case MaxCoolSetpointLimit::Id:
-        return encoder.Encode(mSetpoints.userCoolLimits.maximum.Temperature());
-    case MinSetpointDeadBand::Id: {
-        auto deadband = static_cast<int8_t>(mSetpoints.deadBand / 10);
-        return encoder.Encode(deadband);
-    }
-    case TemperatureSetpointHold::Id: {
-        return encoder.Encode(mTemperatureSetpointHold);
-    }
-    case TemperatureSetpointHoldDuration::Id: {
-        return encoder.Encode(mTemperatureSetpointHoldDuration);
-    }
-    case ThermostatRunningState::Id:
-        // TODO: implement thermostat running state
-        return Status::UnsupportedAttribute;
-    case SetpointChangeSource::Id:
-    case SetpointChangeAmount::Id:
-    case SetpointChangeSourceTimestamp::Id:
-        // TODO: implement setpoint change attributes
-        return Status::UnsupportedAttribute;
-    case PresetTypes::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+        return encoder.Encode(mDelegate.GetLocalTemperatureCalibration());
 
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetTypeStruct::Type presetType;
-                auto err = delegate->GetPresetTypeAtIndex(i, presetType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(presetType));
-            }
-        });
-    }
-    break;
-    case ScheduleTypes::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                ScheduleTypeStruct::Type scheduleType;
-                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(scheduleType));
-            }
-        });
-    }
-    break;
-    case NumberOfPresets::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetNumberOfPresets()));
-    }
-    break;
-    case NumberOfSchedules::Id:
-    case NumberOfScheduleTransitions::Id:
-    case NumberOfScheduleTransitionPerDay::Id:
-        // TODO: implement number of schedules
-        return Status::UnsupportedAttribute;
-    case ActivePresetHandle::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        uint8_t buffer[kPresetHandleSize];
-        MutableByteSpan activePresetHandleSpan(buffer);
-        auto activePresetHandle = DataModel::MakeNullable(activePresetHandleSpan);
-
-        CHIP_ERROR err = mDelegate->GetActivePresetHandle(activePresetHandle);
-        ReturnErrorOnFailure(err);
-
-        ReturnErrorOnFailure(encoder.Encode(activePresetHandle));
-    }
-    break;
-    case ActiveScheduleHandle::Id:
-        // TODO: implement active schedule handle
-        return Status::UnsupportedAttribute;
-    case Presets::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        auto & delegate          = mDelegate;
-        auto & subjectDescriptor = encoder.GetSubjectDescriptor();
-        if (mAtomicWriteSession.InAtomicWrite(subjectDescriptor, MakeOptional(request.path.mAttributeId)))
-        {
-            return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-                for (uint8_t i = 0; true; i++)
-                {
-                    PresetStructWithOwnedMembers preset;
-                    auto err = delegate->GetPendingPresetAtIndex(i, preset);
-                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    ReturnErrorOnFailure(err);
-                    ReturnErrorOnFailure(enc.Encode(preset));
-                }
-            });
-        }
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
-            {
-                PresetStructWithOwnedMembers preset;
-                auto err = delegate->GetPresetAtIndex(i, preset);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(preset));
-            }
-        });
-    }
-    break;
     case Schedules::Id: {
         // TODO: Implement schedule list
         return encoder.EncodeList([](const auto & enc) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
-    break;
-    case SetpointHoldExpiryTimestamp::Id: {
-        ReturnErrorOnFailure(encoder.Encode(mSetpointHoldExpiryTimestamp));
-    }
-    break;
-    case MaxThermostatSuggestions::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetMaxThermostatSuggestions()));
-    }
-    break;
-    case ThermostatSuggestions::Id: {
-        auto & delegate = mDelegate;
-        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        return encoder.EncodeList([delegate](const auto & enc) -> CHIP_ERROR {
-            for (size_t i = 0; true; i++)
-            {
-                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
-                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
-                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                ReturnErrorOnFailure(err);
-                ReturnErrorOnFailure(enc.Encode(thermostatSuggestion));
-            }
-        });
-    }
-    break;
-    case CurrentThermostatSuggestion::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-
-        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
-
-        mDelegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
-        ReturnErrorOnFailure(encoder.Encode(currentThermostatSuggestion));
-    }
-    break;
-    case ThermostatSuggestionNotFollowingReason::Id: {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
-        ReturnErrorOnFailure(encoder.Encode(mDelegate->GetThermostatSuggestionNotFollowingReason()));
-    }
-    break;
     default:
         ChipLogError(Zcl, "Unsupported Attribute:" ChipLogFormatMEI, ChipLogValueMEI(request.path.mAttributeId));
         return Status::UnsupportedAttribute;

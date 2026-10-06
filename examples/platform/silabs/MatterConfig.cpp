@@ -353,7 +353,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // App is using code-driven data model - initialize it
-    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider,
+                                                        initParams.sessionKeystore);
     if (dmErr == CHIP_NO_ERROR)
     {
         initParams.dataModelProvider = AppTask::GetDataModelProvider();
@@ -407,12 +408,14 @@ void OnEM4Trigger(uint32_t duration)
     BURTC_CounterReset();
     BURTC_CompareSet(0, duration);
 
-    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
-    NVIC_EnableIRQ(BURTC_IRQn);
     BURTC_Enable(true);
     EMU_EM4Init_TypeDef em4Init = EMU_EM4INIT_DEFAULT;
     EMU_EM4Init(&em4Init);
     BURTC_CounterReset();
+
+    BURTC_IntClear(BURTC_IF_COMP);
+    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
+    NVIC_EnableIRQ(BURTC_IRQn);
     EMU_EnterEM4();
 }
 

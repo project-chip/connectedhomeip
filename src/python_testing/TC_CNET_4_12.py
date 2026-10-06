@@ -28,13 +28,13 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_12(MatterBaseTest):
+class TC_CNET_4_12(MatterTestCommissionedDevice):
     """
     This test verifies the DUT connectivity to the Thread network using the ConnectNetwork Command,
     including validation for two Thread operational datasets.
@@ -53,6 +53,14 @@ class TC_CNET_4_12(MatterBaseTest):
     CLUSTER_DESC = Clusters.Descriptor
     CLUSTER_CGEN = Clusters.GeneralCommissioning
     failsafe_expiration_seconds = 900
+
+    # The test repeatedly switches the DUT between two Thread networks (steps 7, 16, 21)
+    # and expires the TH's CASE sessions to it (self.default_controller.ExpireSessions)
+    # while waiting on mDNS/SRP for the new address. A background wildcard subscription
+    # cannot survive those DUT-side network transitions and only adds noise/instability,
+    # similar to the issue avoided in TC_CGEN_2_2
+    # (https://github.com/project-chip/connectedhomeip/issues/72732).
+    disable_wildcard_subscription = True
 
     def get_dut_instance_name(self) -> str:
         # TODO: Consolidate this with other tests after SVE

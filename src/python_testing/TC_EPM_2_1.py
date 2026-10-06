@@ -37,6 +37,25 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device electrical-sensor:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -46,7 +65,7 @@ from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -55,7 +74,7 @@ MIN_INT64_ALLOWED = -pow(2, 62)  # -(2^62)
 MAX_INT64_ALLOWED = pow(2, 62)  # (2^62)
 
 
-class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EPM_2_1(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def desc_TC_EPM_2_1(self) -> str:
         """Returns a description of this test"""

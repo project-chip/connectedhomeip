@@ -78,7 +78,10 @@ static_library("realtek_zephyr") {
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   if (chip_enable_factory_data) {
     sources += [

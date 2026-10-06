@@ -226,6 +226,41 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestWiFiPAFLayer, CheckPafSessionKeyedOnDiscriminator)
+{
+    // A discriminator of 0 is in range, and it is also the value of kUndefinedNodeId,
+    // so a caller that has only a discriminator must not borrow the nodeId key to
+    // register the session.
+    WiFiPAF::WiFiPAFSession sessionInfo = { .role = kWiFiPafRole_Subscriber, .discriminator = 0 };
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccDisc, sessionInfo), CHIP_NO_ERROR);
+
+    // Adding the same discriminator again finds the existing slot rather than taking
+    // a second one.
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccDisc, sessionInfo), CHIP_NO_ERROR);
+
+    WiFiPAFSession * pSession = GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    ASSERT_NE(pSession, nullptr);
+    EXPECT_EQ(pSession->discriminator, 0);
+    EXPECT_EQ(pSession->role, kWiFiPafRole_Subscriber);
+    EXPECT_EQ(pSession->nodeId, kUndefinedNodeId);
+    EXPECT_EQ(pSession->id, kUndefinedWiFiPafSessionId);
+
+    // A second discriminator takes the other slot, and a third has nowhere to go.
+    WiFiPAF::WiFiPAFSession secondInfo = { .role = kWiFiPafRole_Subscriber, .discriminator = 0xF01 };
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccDisc, secondInfo), CHIP_NO_ERROR);
+    WiFiPAF::WiFiPAFSession thirdInfo = { .role = kWiFiPafRole_Subscriber, .discriminator = 0xF02 };
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccDisc, thirdInfo), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+
+    // Removing by discriminator frees the slot it was added under.
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccDisc, sessionInfo), CHIP_NO_ERROR);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccDisc, sessionInfo), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo), nullptr);
+
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccDisc, thirdInfo), CHIP_NO_ERROR);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccDisc, secondInfo), CHIP_NO_ERROR);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccDisc, thirdInfo), CHIP_NO_ERROR);
+}
+
 // Run under ASan to catch regressions of the heap-buffer-overflow read.
 TEST_F(TestWiFiPAFLayer, GetPktSnRejectsShortFragment)
 {
