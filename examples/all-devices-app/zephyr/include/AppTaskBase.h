@@ -135,7 +135,8 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver mWifiDriver =
+    // Must be the singleton: WiFiManager completion callbacks call ZephyrWifiDriver::Instance().
+    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver & mWifiDriver =
         DeviceLayer::NetworkCommissioning::ZephyrWifiDriver::Instance();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
