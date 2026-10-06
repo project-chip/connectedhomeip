@@ -40,8 +40,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
+            fail-fast: false
             matrix:
-                fail-fast: false
                 include:
                     - board: xg26_rb4118a
                       toolchain: zephyr
