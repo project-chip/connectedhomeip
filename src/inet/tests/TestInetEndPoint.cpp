@@ -696,3 +696,291 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     ShutdownSystemLayer();
 }
 #endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE && INET_CONFIG_ENABLE_UDP_ENDPOINT
+
+#include <algorithm>
+#include <dirent.h>
+#include <netinet/in.h>
+#include <poll.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+namespace {
+
+struct PortUnreachableProbe
+{
+    bool fired = false;
+    int count  = 0;
+    IPAddress peerAddr;
+    uint16_t peerPort = 0;
+    uint8_t quoted[UDPEndPoint::kMaxQuotedPayloadLen];
+    size_t quotedLen = 0;
+};
+
+void HandlePortUnreachable(UDPEndPoint * endPoint, const IPPacketInfo & pktInfo, ByteSpan quotedPayload)
+{
+    auto * probe = static_cast<PortUnreachableProbe *>(endPoint->mAppState);
+    ASSERT_NE(probe, nullptr);
+    probe->fired = true;
+    probe->count++;
+    probe->peerAddr  = pktInfo.DestAddress;
+    probe->peerPort  = pktInfo.DestPort;
+    probe->quotedLen = std::min(quotedPayload.size(), sizeof(probe->quoted));
+    memcpy(probe->quoted, quotedPayload.data(), probe->quotedLen);
+}
+
+void HandleDatagram(UDPEndPoint * endPoint, PacketBufferHandle && msg, const IPPacketInfo * pktInfo)
+{
+    *static_cast<bool *>(endPoint->mAppState) = true;
+}
+
+void IgnoreDatagram(UDPEndPoint * endPoint, PacketBufferHandle && msg, const IPPacketInfo * pktInfo) {}
+
+uint16_t ClosedLoopbackPort(const IPAddress & loopback)
+{
+    UDPEndPointHandle scratch;
+    VerifyOrReturnValue(gUDP.NewEndPoint(scratch) == CHIP_NO_ERROR, 0);
+    VerifyOrReturnValue(scratch->Bind(IPAddressType::kIPv6, loopback, 0) == CHIP_NO_ERROR, 0);
+    uint16_t port = scratch->GetBoundPort();
+    scratch->Close();
+    scratch.Release();
+    return port;
+}
+
+// The open IPv6 socket bound to port, or -1.
+int SocketBoundTo(uint16_t port)
+{
+    int found = -1;
+    DIR * dir = opendir("/proc/self/fd");
+    VerifyOrReturnValue(dir != nullptr, -1);
+    while (const dirent * entry = readdir(dir))
+    {
+        const int fd      = atoi(entry->d_name);
+        sockaddr_in6 addr = {};
+        socklen_t len     = sizeof(addr);
+        if (getsockname(fd, reinterpret_cast<sockaddr *>(&addr), &len) == 0 && addr.sin6_family == AF_INET6 &&
+            ntohs(addr.sin6_port) == port)
+        {
+            found = fd;
+            break;
+        }
+    }
+    closedir(dir);
+    return found;
+}
+
+// IPV6_RECVERR on the IPv6 socket bound to port, or -1 if there is none.
+int RecvErrOnSocketBoundTo(uint16_t port)
+{
+    const int fd       = SocketBoundTo(port);
+    int value          = 0;
+    socklen_t valueLen = sizeof(value);
+    VerifyOrReturnValue(fd >= 0 && getsockopt(fd, IPPROTO_IPV6, IPV6_RECVERR, &value, &valueLen) == 0, -1);
+    return value;
+}
+
+void ListenForPortUnreachable(UDPEndPointHandle & ep, const IPAddress & loopback, PortUnreachableProbe & probe,
+                              bool setHandlerBeforeBind = false)
+{
+    ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
+    if (setHandlerBeforeBind)
+    {
+        ep->SetPortUnreachableHandler(HandlePortUnreachable);
+    }
+    ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Listen(IgnoreDatagram, nullptr /*OnReceiveError*/, &probe), CHIP_NO_ERROR);
+    if (!setHandlerBeforeBind)
+    {
+        ep->SetPortUnreachableHandler(HandlePortUnreachable);
+    }
+}
+
+} // namespace
+
+static void ExpectPortUnreachable(bool setHandlerBeforeBind)
+{
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    const uint16_t closedPort = ClosedLoopbackPort(loopback);
+    ASSERT_NE(closedPort, 0);
+
+    PortUnreachableProbe probe;
+    UDPEndPointHandle ep;
+    ListenForPortUnreachable(ep, loopback, probe, setHandlerBeforeBind);
+
+    static const char kPayload[] = "unreachable";
+    IPPacketInfo pktInfo;
+    pktInfo.Clear();
+    pktInfo.DestAddress = loopback;
+    pktInfo.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&pktInfo, PacketBufferHandle::NewWithData(kPayload, sizeof(kPayload) - 1)), CHIP_NO_ERROR);
+
+    for (int i = 0; i < 50 && !probe.fired; i++)
+    {
+        ServiceEvents(10);
+    }
+
+    EXPECT_TRUE(probe.fired);
+    EXPECT_EQ(probe.peerPort, closedPort);
+    EXPECT_TRUE(probe.peerAddr == loopback);
+    ASSERT_EQ(probe.quotedLen, sizeof(kPayload) - 1);
+    EXPECT_EQ(memcmp(probe.quoted, kPayload, probe.quotedLen), 0);
+
+    ep->Close();
+    ep.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUdpPortUnreachable)
+{
+    ExpectPortUnreachable(false);
+}
+
+TEST_F(TestInetEndPoint, TestUdpPortUnreachableHandlerSetBeforeBind)
+{
+    ExpectPortUnreachable(true);
+}
+
+TEST_F(TestInetEndPoint, TestUdpPortUnreachableReportsEveryQueuedError)
+{
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    const uint16_t closedPort = ClosedLoopbackPort(loopback);
+    ASSERT_NE(closedPort, 0);
+
+    PortUnreachableProbe probe;
+    UDPEndPointHandle ep;
+    ListenForPortUnreachable(ep, loopback, probe);
+
+    IPPacketInfo pktInfo;
+    pktInfo.Clear();
+    pktInfo.DestAddress = loopback;
+    pktInfo.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&pktInfo, PacketBufferHandle::NewWithData("one", 3)), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->SendMsg(&pktInfo, PacketBufferHandle::NewWithData("two", 3)), CHIP_NO_ERROR);
+    pollfd queued = { SocketBoundTo(ep->GetBoundPort()), 0, 0 };
+    ASSERT_EQ(poll(&queued, 1, 1000), 1);
+    ASSERT_TRUE(queued.revents & POLLERR);
+
+    ServiceEvents(10);
+    EXPECT_EQ(probe.count, 2);
+
+    ep->Close();
+    ep.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUdpSendSurvivesPendingPortUnreachable)
+{
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    const uint16_t closedPort = ClosedLoopbackPort(loopback);
+    ASSERT_NE(closedPort, 0);
+
+    bool received = false;
+    UDPEndPointHandle live;
+    ASSERT_EQ(gUDP.NewEndPoint(live), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Listen(HandleDatagram, nullptr /*OnReceiveError*/, &received), CHIP_NO_ERROR);
+
+    PortUnreachableProbe probe;
+    UDPEndPointHandle ep;
+    ListenForPortUnreachable(ep, loopback, probe);
+    EXPECT_EQ(RecvErrOnSocketBoundTo(ep->GetBoundPort()), 1);
+
+    IPPacketInfo toClosed;
+    toClosed.Clear();
+    toClosed.DestAddress = loopback;
+    toClosed.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&toClosed, PacketBufferHandle::NewWithData("gone", 4)), CHIP_NO_ERROR);
+    pollfd queued = { SocketBoundTo(ep->GetBoundPort()), 0, 0 };
+    ASSERT_EQ(poll(&queued, 1, 1000), 1);
+    ASSERT_TRUE(queued.revents & POLLERR);
+
+    IPPacketInfo toLive;
+    toLive.Clear();
+    toLive.DestAddress = loopback;
+    toLive.DestPort    = live->GetBoundPort();
+    EXPECT_EQ(ep->SendMsg(&toLive, PacketBufferHandle::NewWithData("alive", 5)), CHIP_NO_ERROR);
+
+    for (int i = 0; i < 50 && !(received && probe.fired); i++)
+    {
+        ServiceEvents(10);
+    }
+    EXPECT_TRUE(received);
+    EXPECT_TRUE(probe.fired);
+    EXPECT_EQ(probe.peerPort, closedPort);
+
+    ep->Close();
+    ep.Release();
+    live->Close();
+    live.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUdpSendWithoutHandlerIgnoresPortUnreachable)
+{
+    if (!gSystemLayer.IsInitialized())
+    {
+        InitSystemLayer();
+        InitNetwork();
+    }
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    const uint16_t closedPort = ClosedLoopbackPort(loopback);
+    ASSERT_NE(closedPort, 0);
+
+    bool received = false;
+    UDPEndPointHandle live;
+    ASSERT_EQ(gUDP.NewEndPoint(live), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(live->Listen(HandleDatagram, nullptr /*OnReceiveError*/, &received), CHIP_NO_ERROR);
+
+    UDPEndPointHandle ep;
+    ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
+    ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(RecvErrOnSocketBoundTo(ep->GetBoundPort()), 0);
+
+    IPPacketInfo toClosed;
+    toClosed.Clear();
+    toClosed.DestAddress = loopback;
+    toClosed.DestPort    = closedPort;
+    ASSERT_EQ(ep->SendMsg(&toClosed, PacketBufferHandle::NewWithData("gone", 4)), CHIP_NO_ERROR);
+
+    IPPacketInfo toLive;
+    toLive.Clear();
+    toLive.DestAddress = loopback;
+    toLive.DestPort    = live->GetBoundPort();
+    EXPECT_EQ(ep->SendMsg(&toLive, PacketBufferHandle::NewWithData("alive", 5)), CHIP_NO_ERROR);
+
+    for (int i = 0; i < 50 && !received; i++)
+    {
+        ServiceEvents(10);
+    }
+    EXPECT_TRUE(received);
+
+    ep->Close();
+    ep.Release();
+    live->Close();
+    live.Release();
+}
+
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE && INET_CONFIG_ENABLE_UDP_ENDPOINT
