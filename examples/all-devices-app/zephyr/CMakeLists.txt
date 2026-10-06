@@ -50,14 +50,6 @@ if(DEFINED BOARD)
 
 endif()
 
-# CONFIG_CHIP and CONFIG_CHIP_PROJECT_CONFIG are defined by the connectedhomeip
-# Zephyr module (zephyr/module.yml at the repository root). This application
-# lives inside that repository. Register it before find_package(Zephyr), which
-# parses Kconfig. A west project with the same module name is replaced by this
-# tree, so the symbols come from the sources being built.
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT})
-
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # Matter is the Zephyr module "connectedhomeip"; it must be in the west manifest.

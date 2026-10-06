@@ -80,27 +80,6 @@ Flash the resulting images with:
 west flash -d build/all-devices-zephyr-xg26
 ```
 
-### Si917 Matter-over-Wi-Fi
-
-Build the Si917 target with its SoC qualifier so the Si917 Wi-Fi configuration
-fragment is selected:
-
-```sh
-west build -p always -b siwx917_rb4338a/siwg917m111mgtba \
-    modules/lib/matter/examples/all-devices-app/zephyr \
-    -d build/all-devices-siwx917
-```
-
-The Si917 app is Wi-Fi-only: its devicetree does not select OpenThread. The
-Matter root endpoint exposes Network Commissioning and Wi-Fi Network Diagnostics
-through `ZephyrWifiDriver`. Commission over BLE, provide the AP credentials
-using Network Commissioning, then verify IPv6/mDNS operational connectivity.
-Wi-Fi credentials and fabric state use Zephyr settings storage; factory data
-remains in its separate factory-flash partition.
-
-For first bring-up, retain the Matter shell and use its Wi-Fi commands to
-inspect scan/connect status. The final release profile can disable the shell.
-
 The app supports MCUboot through Zephyr sysbuild. For debugging, use
 `west debug`. Use `west attach` when debugging an image that is already signed.
 
