@@ -329,8 +329,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(context.sessionManager, verifier, iterationCount, saltSpan,
-                                                            GetLocalMRPConfig(), this));
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(context.sessionManager, verifier, iterationCount, saltSpan, GetLocalMRPConfig(), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
