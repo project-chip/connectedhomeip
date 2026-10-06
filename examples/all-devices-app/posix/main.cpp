@@ -260,7 +260,9 @@ public:
         }
 
         mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
-        ReturnErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
+        // no need to fail the startup if the default aggregator fails to initialize,
+        // since the aggregator device type creation may not be even compiled in into the factory.
+        LogErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
         ReturnErrorOnFailure(
             OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
         ReturnErrorOnFailure(
