@@ -42,6 +42,20 @@ public:
         Clusters::SmokeCoAlarmCluster::Config alarmConfig;
         std::optional<ConcentrationCluster::Config> coConcentrationConfig;
         std::optional<ConcentrationCluster::Config> smokeConcentrationConfig;
+
+        Config & WithCoConcentration(ConcentrationCluster::Config config)
+        {
+            config.clusterId      = Clusters::CarbonMonoxideConcentrationMeasurement::Id;
+            coConcentrationConfig = config;
+            return *this;
+        }
+
+        Config & WithSmokeConcentration(ConcentrationCluster::Config config)
+        {
+            config.clusterId         = Clusters::SmokeConcentrationMeasurement::Id;
+            smokeConcentrationConfig = config;
+            return *this;
+        }
     };
 
     SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate, const Config & config);

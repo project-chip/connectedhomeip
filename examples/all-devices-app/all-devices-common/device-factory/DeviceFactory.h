@@ -776,22 +776,21 @@ private:
                     .Set<Clusters::SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id>()
                     .Set<Clusters::SmokeCoAlarm::Attributes::Unmounted::Id>();
                 config.alarmConfig.WithExpiryDate(kExampleExpiryDate);
-                config.coConcentrationConfig = SmokeCoAlarm::ConcentrationCluster::Config{
-                    .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
-                    .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
-                        Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
-                        Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
-                    .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                    .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-                };
-                config.smokeConcentrationConfig = SmokeCoAlarm::ConcentrationCluster::Config{
-                    .clusterId = Clusters::SmokeConcentrationMeasurement::Id,
-                    .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
-                        Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
-                        Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
-                    .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                    .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
-                };
+                config
+                    .WithCoConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    })
+                    .WithSmokeConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+                    });
                 return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }

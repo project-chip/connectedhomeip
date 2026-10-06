@@ -27,8 +27,8 @@ namespace app {
 
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
                            const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
-    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
+    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -45,12 +45,16 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
 
     if (mConfig.coConcentrationConfig.has_value())
     {
+        VerifyOrReturnError(mConfig.coConcentrationConfig->clusterId == CarbonMonoxideConcentrationMeasurement::Id,
+                            CHIP_ERROR_INVALID_ARGUMENT);
         mCoMeasurementCluster.Create(endpoint, *mConfig.coConcentrationConfig);
         ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
     }
 
     if (mConfig.smokeConcentrationConfig.has_value())
     {
+        VerifyOrReturnError(mConfig.smokeConcentrationConfig->clusterId == SmokeConcentrationMeasurement::Id,
+                            CHIP_ERROR_INVALID_ARGUMENT);
         mSmokeConcentrationCluster.Create(endpoint, *mConfig.smokeConcentrationConfig);
         ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
     }
