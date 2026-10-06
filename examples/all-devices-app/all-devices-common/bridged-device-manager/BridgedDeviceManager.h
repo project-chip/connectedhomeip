@@ -18,9 +18,9 @@
 #pragma once
 
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device-factory/DeviceRegistrationEntry.h>
 #include <device/api/Interface.h>
 #include <device/api/allocator/EndpointIdAllocator.h>
-#include <device-factory/DeviceRegistrationEntry.h>
 
 #include <cstdint>
 #include <optional>
@@ -37,6 +37,7 @@ public:
         DeviceInterfaceId();
         DeviceInterfaceId(uint16_t id) : mId(id) {}
         operator uint16_t() const { return mId; }
+
     private:
         uint16_t mId;
         inline static uint16_t nextId = 1;
@@ -48,7 +49,7 @@ public:
     CHIP_ERROR InitializeDefaultAggregator();
     std::optional<DeviceInterfaceId> AddBridgedDevice(const std::string & deviceName, EndpointComposition composition = {},
                                                       EndpointId aggregatorEndpointId = kInvalidEndpointId,
-                                                      const std::string & nodeLabel = "");
+                                                      const std::string & nodeLabel   = "");
     DeviceInterface * GetDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveAllDevices();

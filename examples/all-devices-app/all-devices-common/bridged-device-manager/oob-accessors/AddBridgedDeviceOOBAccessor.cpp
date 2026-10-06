@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
- #include "AddBridgedDeviceOOBAccessor.h"
+#include "AddBridgedDeviceOOBAccessor.h"
 
 #include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>

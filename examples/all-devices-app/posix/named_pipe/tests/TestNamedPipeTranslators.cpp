@@ -387,7 +387,6 @@ TEST_F(TestNamedPipeTranslators, BridgedDeviceTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, validAddJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "AddBridgedDevice");
 
-
     // With AggregatorEndpointId
     Json::Value parentJson = ParseJson(R"({"Name": "AddBridgedDevice", "Device": "electrical-sensor", "AggregatorEndpointId": 5})");
     EXPECT_EQ(translator.TranslateAndExecute(1, parentJson, mRegistry), CHIP_NO_ERROR);

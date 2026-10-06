@@ -181,9 +181,8 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
             device->AddTransport(sPafProxyTransport);
 #endif
             auto * rawDevice = device.get();
-            return DeviceRegistrationEntry{
-                std::move(device), Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice)
-            };
+            return DeviceRegistrationEntry{ std::move(device),
+                                            Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice) };
         });
     }
 #endif // defined(__linux__) && (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF)

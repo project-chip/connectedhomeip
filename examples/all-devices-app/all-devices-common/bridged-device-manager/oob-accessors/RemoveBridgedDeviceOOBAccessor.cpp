@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
- #include "RemoveBridgedDeviceOOBAccessor.h"
+#include "RemoveBridgedDeviceOOBAccessor.h"
 
 #include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -40,7 +40,7 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
     uint16_t deviceInterfaceIdVal = 0;
-    bool hasDeviceInterfaceId    = false;
+    bool hasDeviceInterfaceId     = false;
     CHIP_ERROR err                = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {

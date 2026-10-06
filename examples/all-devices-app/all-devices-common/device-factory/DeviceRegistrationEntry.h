@@ -17,11 +17,10 @@
 
 #pragma once
 #include <device/api/Interface.h>
-#include <memory>
 #include <functional>
+#include <memory>
 
-namespace chip::app
-{
+namespace chip::app {
 
 /// Bundles an allocated device with its post-registration hook callback.
 struct DeviceRegistrationEntry

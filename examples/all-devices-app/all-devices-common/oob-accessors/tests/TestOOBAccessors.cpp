@@ -725,8 +725,8 @@ public:
 class MockBridgedDeviceManager : public BridgedDeviceManager
 {
 public:
-    MockBridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & allocator)
-        : BridgedDeviceManager(provider, allocator)
+    MockBridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & allocator) :
+        BridgedDeviceManager(provider, allocator)
     {}
     DeviceRegistrationEntry CreateDevice(const std::string & deviceTypeArg, const std::string & nodeLabel) override
     {
@@ -770,8 +770,7 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
     EXPECT_EQ(deviceManager.InitializeDefaultAggregator(), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
-    EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager)),
-                CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
 
     // Device creation successful
     {
@@ -788,7 +787,6 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
 
         EXPECT_EQ(registry.HandleAction("AddBridgedDevice"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     }
-
 
     // Device creation failed
     {

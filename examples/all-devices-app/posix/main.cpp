@@ -89,14 +89,17 @@ namespace {
 class PosixBridgedDeviceManager : public BridgedDeviceManager
 {
 public:
-    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator) :
-        BridgedDeviceManager(provider, endpointIdAllocator), mFactory(factory)
+    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider,
+                              EndpointIdAllocator & endpointIdAllocator) :
+        BridgedDeviceManager(provider, endpointIdAllocator),
+        mFactory(factory)
     {}
 
     DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
     {
         return mFactory.Create(deviceName, nodeLabel);
     }
+
 private:
     PosixDeviceFactory & mFactory;
 };
@@ -247,8 +250,8 @@ public:
             {
                 mEndpointIdAllocator->ForceNext(entry.endpoint);
             }
-            ReturnErrorOnFailure(
-                created.device->Register(*mEndpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+            ReturnErrorOnFailure(created.device->Register(*mEndpointIdAllocator, mDataModelProvider,
+                                                          EndpointComposition::WithParent(entry.parentId)));
             if (created.onDeviceRegistered)
             {
                 created.onDeviceRegistered();
@@ -258,8 +261,10 @@ public:
 
         mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
         ReturnErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
-        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
-        ReturnErrorOnFailure(OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
 
         return CHIP_NO_ERROR;
     }

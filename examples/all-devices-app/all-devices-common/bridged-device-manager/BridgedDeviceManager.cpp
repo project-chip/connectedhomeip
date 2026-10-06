@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
- #include "BridgedDeviceManager.h"
+#include "BridgedDeviceManager.h"
 
-#include <devices/Types.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/bridged-node/BridgedNode.h>
+#include <devices/Types.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -67,8 +67,10 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator()
     return CHIP_NO_ERROR;
 }
 
-std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::AddBridgedDevice(
-    const std::string & deviceName, EndpointComposition composition, EndpointId aggregatorEndpointId, const std::string & nodeLabel)
+std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::AddBridgedDevice(const std::string & deviceName,
+                                                                                              EndpointComposition composition,
+                                                                                              EndpointId aggregatorEndpointId,
+                                                                                              const std::string & nodeLabel)
 {
     if (aggregatorEndpointId != kInvalidEndpointId)
     {
@@ -98,7 +100,8 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     CHIP_ERROR err = bridgedNodeEntry.device->Register(mEndpointIdAllocator, mProvider, bridgedNodeComposition);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed to register bridged node for device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(), err.Format());
+        ChipLogError(AppServer, "Failed to register bridged node for device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(),
+                     err.Format());
         return std::nullopt;
     }
     auto deviceEntry = CreateDevice(deviceName, nodeLabel);
@@ -108,7 +111,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
         return std::nullopt;
     }
     composition.parentId = static_cast<BridgedNode *>(bridgedNodeEntry.device.get())->GetEndpointId();
-    err = deviceEntry.device->Register(mEndpointIdAllocator, mProvider, composition);
+    err                  = deviceEntry.device->Register(mEndpointIdAllocator, mProvider, composition);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(), err.Format());
@@ -150,7 +153,8 @@ void BridgedDeviceManager::RemoveAllDevices()
     mDeviceEntries.clear();
 }
 
-std::vector<BridgedDeviceManager::DeviceStorage>::iterator BridgedDeviceManager::GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId)
+std::vector<BridgedDeviceManager::DeviceStorage>::iterator
+BridgedDeviceManager::GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId)
 {
     return std::find_if(mDeviceEntries.begin(), mDeviceEntries.end(),
                         [deviceInterfaceId](const auto & device) { return device.id == deviceInterfaceId; });
