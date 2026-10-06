@@ -309,8 +309,7 @@ class TestCleanupFramework(MatterTestCommissionedDevice):
     async def test_icd_client_cleanup(self):
         logger.info("--- Scenario: ICD client registration ---")
         await self._populate_wildcard()
-        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0,
-                              attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
+        if not _has_attribute(wildcard=self.stored_global_wildcard, endpoint=0, attribute=Clusters.IcdManagement.Attributes.RegisteredClients):
             logger.info("ICD Management cluster not present on DUT — skipping")
             return
 
