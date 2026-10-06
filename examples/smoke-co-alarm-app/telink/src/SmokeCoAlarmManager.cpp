@@ -37,13 +37,16 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
     SmokeCoAlarmCluster::Config config;
-    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    config.optionalAttribs.Set<Attributes::DeviceMuted::Id>()
-        .Set<Attributes::InterconnectSmokeAlarm::Id>()
-        .Set<Attributes::InterconnectCOAlarm::Id>()
-        .Set<Attributes::ContaminationState::Id>()
-        .Set<Attributes::SmokeSensitivityLevel::Id>()
-        .Set<Attributes::Unmounted::Id>();
+    config
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithUnmounted();
     return SmokeCoAlarmServer::Instance().Init(1, config, this);
 }
 

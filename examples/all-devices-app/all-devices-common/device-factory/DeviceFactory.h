@@ -767,15 +767,17 @@ private:
                 // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
                 constexpr uint32_t kExampleExpiryDate = 3976214400;
                 SmokeCoAlarm::Config config;
-                config.alarmConfig.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm)
-                    .Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-                config.alarmConfig.optionalAttribs.Set<Clusters::SmokeCoAlarm::Attributes::DeviceMuted::Id>()
-                    .Set<Clusters::SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id>()
-                    .Set<Clusters::SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id>()
-                    .Set<Clusters::SmokeCoAlarm::Attributes::ContaminationState::Id>()
-                    .Set<Clusters::SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id>()
-                    .Set<Clusters::SmokeCoAlarm::Attributes::Unmounted::Id>();
-                config.alarmConfig.WithExpiryDate(kExampleExpiryDate);
+                config.alarmConfig
+                    .WithSmokeAlarm({
+                        .withContaminationState = true,
+                        .sensitivityLevel       = Clusters::SmokeCoAlarm::SensitivityEnum::kStandard,
+                    })
+                    .WithCOAlarm()
+                    .WithDeviceMuted()
+                    .WithInterconnectSmokeAlarm()
+                    .WithInterconnectCOAlarm()
+                    .WithExpiryDate(kExampleExpiryDate)
+                    .WithUnmounted();
                 config
                     .WithCoConcentration({
                         .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
