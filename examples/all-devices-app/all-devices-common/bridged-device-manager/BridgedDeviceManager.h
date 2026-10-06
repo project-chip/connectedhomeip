@@ -29,9 +29,13 @@
 
 namespace chip::app {
 
+/**
+ * @brief Manages bridged device additoin and deletion at runtime.
+ */
 class BridgedDeviceManager
 {
 public:
+    // A unique identifier for a device interface managed by the BridgedDeviceManager.
     struct DeviceInterfaceId
     {
         DeviceInterfaceId();
@@ -44,12 +48,53 @@ public:
     };
 
     virtual ~BridgedDeviceManager();
+
+    /**
+     * @brief Creates a new device instance of the specified type.
+     *
+     * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
+     * @param nodeLabel The label for the new device.
+     *
+     * If deviceName is "bridged-node", a BridgedNode device SHOULD be created.
+     * If deviceName is "aggregator", an Aggregator device SHOULD be created.
+     */
     virtual DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) = 0;
     BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator);
+
+    /**
+     * @brief Initializes the default aggregator device.
+     *
+     * If this function is not called, there will not be a default aggregator device.
+     * This means that a valid aggregator endpoint must be specified when calling `AddBridgedDevice`, or the operation will fail.
+     *
+     * @return CHIP_ERROR indicating the success or failure of the operation.
+     */
     CHIP_ERROR InitializeDefaultAggregator();
+
+    /**
+     * @brief Adds a new bridged device to the DataModelProvider.
+     *
+     * This will create a new device with the hierarchy:
+     *
+     *       Aggregator (specified or default)
+     *                     |
+     *       Bridged Node (created automatically)
+     *                     |
+     *       New Device (created based on deviceName)
+     *
+     * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
+     * @param composition The composition of the device. The parentId will be overridden.
+     * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be used.
+     * @param nodeLabel The label for the new device.
+     *
+     * @return An optional DeviceInterfaceId of the newly added device. If the operation fails, returns std::nullopt.
+     *
+     * This DeviceInterfaceId can be used to retrieve or remove the device later.
+     */
     std::optional<DeviceInterfaceId> AddBridgedDevice(const std::string & deviceName, EndpointComposition composition = {},
                                                       EndpointId aggregatorEndpointId = kInvalidEndpointId,
                                                       const std::string & nodeLabel   = "");
+
     DeviceInterface * GetDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveAllDevices();
