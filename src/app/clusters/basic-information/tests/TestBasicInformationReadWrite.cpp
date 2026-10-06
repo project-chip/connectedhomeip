@@ -237,13 +237,6 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelConstraintErrorKeepsOldValue)
 {
-    const BasicInformationOptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
-                                    chip::DeviceLayer::PlatformMgr(),
-                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-    chip::Testing::ClusterTester tester(cluster);
-
     CharSpan validLabel = "Valid Label"_span;
     ASSERT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, validLabel), CHIP_NO_ERROR);
 
@@ -256,8 +249,6 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelConstraintErrorKeepsOldValue)
     CharSpan readSpan(readBuffer);
     ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(validLabel));
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
