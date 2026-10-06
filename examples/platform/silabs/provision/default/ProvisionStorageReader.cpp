@@ -27,7 +27,7 @@
 #include <provision/ProvisionStorageReader.h>
 #include <silabs_creds.h>
 
-#ifndef NDEBUG`
+#ifndef NDEBUG
 #if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
 #include <sl_matter_test_event_trigger_config.h>
 #endif
