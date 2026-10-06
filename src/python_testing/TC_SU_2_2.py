@@ -1095,7 +1095,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         else:
             asserts.fail("More or one DownloadError events gathered %s", download_error_events)
 
-
         if update_state_progress is NullValue:
             # If the UpdateState is Unknow the value can be Null
             asserts.assert_equal(event_download_error.progressPercent, NullValue,
@@ -1111,7 +1110,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(event_download_error.platformCode, NullValue,
                              f"Expected NullValue for platformCode, found {event_download_error.platformCode}")
         logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error)
-        
+
         # Validate the transition to kIdle after the DownloadError
         state_transition_events = await controller.ReadEvent(
             requestor_node_id,
@@ -1119,7 +1118,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             fabricFiltered=True
         )
         kIdleEventData = None
-        #There must be a state transition Event to kIdle
+        # There must be a state transition Event to kIdle
         for event in state_transition_events:
             if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.previousState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading and event.Data.reason == Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kTimeOut:
                 kIdleEventData = event.Data
@@ -1128,7 +1127,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # If the event was not found fail the test as the event should have beed triggered at this point.
         if kIdleEventData is None:
             asserts.fail("%s : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.")
-    
+
         # [End of Step #6 TC_SU_2_7]
 
         self.step(5)
