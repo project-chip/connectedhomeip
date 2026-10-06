@@ -187,6 +187,8 @@ template <typename... Hooks>
 class DeviceFactory
 {
 public:
+    using DeviceRegistrationEntry = chip::app::DeviceRegistrationEntry;
+
     template <typename TDevice>
     static void ExecuteHooks(TDevice & device)
     {

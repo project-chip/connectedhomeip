@@ -121,7 +121,8 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     {
         deviceEntry.onDeviceRegistered();
     }
-    return mDeviceEntries.emplace_back(DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry)).id;
+    mDeviceEntries.push_back(DeviceStorage(DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry)));
+    return mDeviceEntries.back().id;
 }
 
 DeviceInterface * BridgedDeviceManager::GetDevice(DeviceInterfaceId deviceInterfaceId)
