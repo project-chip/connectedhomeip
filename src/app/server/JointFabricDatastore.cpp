@@ -2939,21 +2939,6 @@ void JointFabricDatastore::FinishRefresh(CHIP_ERROR err)
     FinishNodeSync(finishedNodeId);
 }
 
-void JointFabricDatastore::ResetRefreshState()
-{
-    mRefreshingNodeId           = kUndefinedNodeId;
-    mRefreshState               = kIdle;
-    mRefreshingEndpointIndex    = 0;
-    mRefreshingGroupKeySetIndex = 0;
-    mRefreshHadFailure          = false;
-    mRefreshingEndpointsList.clear();
-    mRefreshingBindingEntries.clear();
-    mRefreshingACLEntries.clear();
-    mRefreshingGroupKeySetIDs.clear();
-    mRefreshingNodeKeySetDeletions.clear();
-    mRefreshingNodeKeySetDeletionIndex = 0;
-}
-
 CHIP_ERROR
 JointFabricDatastore::AddACLToNode(
     NodeId nodeId, const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry)

@@ -877,7 +877,23 @@ private:
 
     // Ends the active refresh, if any, and resets all refresh state. The only place a refresh ends.
     void FinishRefresh(CHIP_ERROR err);
-    void ResetRefreshState();
+
+    // Defined here because ClearAllRecords calls it: Server.h reaches ClearAllRecords through OnFabricRemoved in builds
+    // that define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC but don't link JointFabricDatastore.cpp.
+    void ResetRefreshState()
+    {
+        mRefreshingNodeId           = kUndefinedNodeId;
+        mRefreshState               = kIdle;
+        mRefreshingEndpointIndex    = 0;
+        mRefreshingGroupKeySetIndex = 0;
+        mRefreshHadFailure          = false;
+        mRefreshingEndpointsList.clear();
+        mRefreshingBindingEntries.clear();
+        mRefreshingACLEntries.clear();
+        mRefreshingGroupKeySetIDs.clear();
+        mRefreshingNodeKeySetDeletions.clear();
+        mRefreshingNodeKeySetDeletionIndex = 0;
+    }
 
     // The result views the subject and target storage of `entry`, so it is valid only while `entry` is
     // unchanged.
