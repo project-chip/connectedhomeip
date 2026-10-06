@@ -93,6 +93,8 @@ public:
     Protocols::InteractionModel::Status
     GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
@@ -110,6 +112,8 @@ private:
     Clusters::Thermostat::temperature GetHeatingTargetTemperature() const;
     void NotifyHeatDemandChanged();
     void NotifyBoostStateChanged();
+
+    AttributePersistenceProvider * mAttributeStorage = nullptr;
 
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
         Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1

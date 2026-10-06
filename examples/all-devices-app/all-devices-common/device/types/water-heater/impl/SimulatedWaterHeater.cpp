@@ -69,18 +69,11 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
 
     // Setup initial values
-    mLocalTemperature.SetNonNull(kInitialTemperature);
-    mBoostState         = BoostStateEnum::kInactive;
-    mBoostRemainingTime = 0;
-    mBoostOneShot       = false;
-    mBoostTemporarySetpoint.reset();
-    ThermostatCluster().SetLocalTemperature(mLocalTemperature);
-    ThermostatCluster().SetControlSequenceOfOperation(ControlSequenceOfOperationEnum::kHeatingOnly);
-    bool changed = false;
-    SetOccupiedHeatingSetpoint(kFinalTemperature, changed);
     const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
     ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
 
+    // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster code)
+    // so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based on the CurrentMode.
     const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
     ThermostatCluster().SetSystemMode(initialSystemMode);
 
@@ -91,6 +84,26 @@ CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenD
     {
         Unregister(provider);
         return err;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
+{
+    VerifyOrReturnError(mAttributeStorage == nullptr, CHIP_NO_ERROR);
+    mAttributeStorage = &context.attributeStorage;
+    AttributePersistence persistence(*mAttributeStorage);
+    persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::SystemMode::Id }, mSystemMode,
+                                      SystemModeEnum::kOff);
+    if (mSystemMode != SystemModeEnum::kOff && mSystemMode != SystemModeEnum::kHeat)
+    {
+        mSystemMode = SystemModeEnum::kOff;
+    }
+    persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
+    mOccupiedHeatingSetpoint, kFinalTemperature);
+    if (mOccupiedHeatingSetpoint < kMinTemperature || mOccupiedHeatingSetpoint > kMaxTemperature)
+    {
+        mOccupiedHeatingSetpoint = kFinalTemperature;
     }
     return CHIP_NO_ERROR;
 }
@@ -130,8 +143,7 @@ void SimulatedWaterHeater::TimerFired()
     if (mHeatingEnabled)
     {
         const int32_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
-        const int32_t ceiling         = std::min(static_cast<int32_t>(std::max(currentTemp, target)),
-                                                 static_cast<int32_t>(std::numeric_limits<temperature>::max()));
+        const int32_t ceiling         = std::max(currentTemp, target);
         const int32_t nextTemp        = std::min(static_cast<int32_t>(currentTemp) + temperatureStep, ceiling);
         const temperature newTemp     = static_cast<temperature>(nextTemp);
 
@@ -156,7 +168,7 @@ void SimulatedWaterHeater::TimerFired()
 
         ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
         ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
-        if (newTemp <= kInitialTemperature && (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
+        if (newTemp <= kInitialTemperature  && newTemp < target && (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
         {
             SetHeatingEnabled(true);
         }
@@ -319,15 +331,14 @@ SystemModeEnum SimulatedWaterHeater::GetSystemMode() const
 Protocols::InteractionModel::Status SimulatedWaterHeater::SetSystemMode(SystemModeEnum systemMode, bool & changed)
 {
     changed = false;
-    if (systemMode != SystemModeEnum::kOff && systemMode != SystemModeEnum::kHeat)
-    {
-        return Status::ConstraintError;
-    }
-
-    if (mSystemMode == systemMode)
-    {
-        return Status::Success;
-    }
+    VerifyOrReturnError(systemMode == SystemModeEnum::kOff || systemMode == SystemModeEnum::kHeat, Status::ConstraintError);
+    VerifyOrReturnError(mSystemMode != systemMode, Status::Success);
+    VerifyOrReturnError(mAttributeStorage != nullptr, Status::Failure);
+    AttributePersistence persistence(*mAttributeStorage);
+    VerifyOrReturnError(
+        persistence.StoreNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::SystemMode::Id },
+                                           systemMode) == CHIP_NO_ERROR,
+        Status::Failure);
 
     mSystemMode = systemMode;
     changed     = true;
@@ -410,15 +421,15 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
                                                                                      bool & changed)
 {
     changed = false;
-    if (mOccupiedHeatingSetpoint == occupiedHeatingSetpoint)
-    {
-        return Status::Success;
-    }
+    VerifyOrReturnError(occupiedHeatingSetpoint >= kMinTemperature && occupiedHeatingSetpoint <= kMaxTemperature, Status::ConstraintError);
+    VerifyOrReturnError(mOccupiedHeatingSetpoint != occupiedHeatingSetpoint, Status::Success);
+    VerifyOrReturnError(mAttributeStorage != nullptr, Status::Failure);
 
-    if (occupiedHeatingSetpoint < kMinTemperature || occupiedHeatingSetpoint > kMaxTemperature)
-    {
-        return Status::ConstraintError;
-    }
+    AttributePersistence persistence(*mAttributeStorage);
+    VerifyOrReturnError(
+        persistence.StoreNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
+                                           occupiedHeatingSetpoint) == CHIP_NO_ERROR,
+        Status::Failure);
 
     mOccupiedHeatingSetpoint = occupiedHeatingSetpoint;
     changed                  = true;

@@ -172,7 +172,7 @@ config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
 	bool "Water freeze detector"
 
 config ALL_DEVICES_DEVICE_WATER_HEATER
-	bool "Water Heater"
+	bool "Water heater"
 
 config ALL_DEVICES_DEVICE_WATER_LEAK_DETECTOR
 	bool "Water leak detector"
