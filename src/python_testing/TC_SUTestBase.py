@@ -112,7 +112,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             return
         except TimeoutError:
             log.info('%s: no subscription after %ss; probing whether the DUT answers at all.',
-                        step_name, SUBSCRIPTION_START_TIMEOUT_SEC)
+                     step_name, SUBSCRIPTION_START_TIMEOUT_SEC)
 
         controller = start_kwargs.get('dev_ctrl', self.default_controller)
         node_id = start_kwargs.get('node_id', self.dut_node_id)
@@ -188,15 +188,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 # Expected while the DUT is recovering from an aborted transfer: its session to
                 # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
                 log.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
-                            step_name, e)
+                         step_name, e)
 
             if proc.wait_for_output(timeout=min(retry_interval_sec, remaining)):
                 log.info('%s: provider received a QueryImage %.0fs after the first announce.',
-                            step_name, time.time() - t_start)
+                         step_name, time.time() - t_start)
                 return
 
             log.info('%s: no QueryImage reached the provider in %.0fs (elapsed %.0fs / %.0fs); re-announcing.',
-                        step_name, retry_interval_sec, time.time() - t_start, timeout_sec)
+                     step_name, retry_interval_sec, time.time() - t_start, timeout_sec)
 
     async def _wait_until_idle_before_announce(self, controller, requestor_node_id: int, subscription,
                                                timeout_sec: float, step_name: str) -> None:
@@ -226,7 +226,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             return
 
         log.info('%s: DUT is in %s; waiting up to %.0fs for it to reach kIdle before announcing.',
-                    step_name, state, timeout_sec)
+                 step_name, state, timeout_sec)
         subscription.await_first_value_asserting_no_forbidden(
             target_value=kIdle,
             forbidden_values=set(),
@@ -234,7 +234,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
         )
         log.info('%s: DUT reached kIdle — the announce will be acted on.', step_name)
-
 
     def start_provider(self,
                        provider_app_path: str = "",

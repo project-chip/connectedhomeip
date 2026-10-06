@@ -67,6 +67,7 @@ logger = logging.getLogger(__name__)
 
 STEP_RESERVE_SEC = 60
 
+
 class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
     provider_kvs_path = None
@@ -185,7 +186,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         update_state_match = AttributeMatcher.from_callable(
             "UpdateState is Idle",
-            lambda  report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and  report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
+            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
         update_state_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
         update_state_handler.cancel()
 
@@ -254,7 +255,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         downloading_seen = False
         progress_seen = False
         download_completed = False
-        step_number_matcher  = step_number_s1
+        step_number_matcher = step_number_s1
 
         def matcher_combined(report):
             """
@@ -284,7 +285,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                         progress_seen = True
                         progress_values.append(val)
                         logger.info('%s: Progress observed: %s at %s', step_number_matcher, val, current_time)
-                    if progress_seen and  val is not None and isinstance(val, int) and val >=  99:
+                    if progress_seen and val is not None and isinstance(val, int) and val >= 99:
                         download_completed = True
 
             return downloading_seen and progress_seen and download_completed
@@ -311,7 +312,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
             forbidden_values=set(),
             timeout_sec=self.remaining_test_budget_sec(
-            reserve_sec=STEP_RESERVE_SEC),
+                reserve_sec=STEP_RESERVE_SEC),
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         logger.info('%s: Step #1.0 - kDelayedOnApply observed after the download completed', step_number_s1)
@@ -345,14 +346,15 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         time_for_kApplying = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-            forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
+            forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                              Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
             timeout_sec=STEP_RESERVE_SEC,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         time_taken_from_delay_to_apply_s1 = time_for_kApplying - time_for_kDelayed_apply
-        logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",step_number_s1,time_taken_from_delay_to_apply_s1)
-        asserts.assert_greater_equal(time_taken_from_delay_to_apply_s1, 120 , "Time for kApplying is lower than 120 seconds")
-
+        logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",
+                    step_number_s1, time_taken_from_delay_to_apply_s1)
+        asserts.assert_greater_equal(time_taken_from_delay_to_apply_s1, 120, "Time for kApplying is lower than 120 seconds")
 
         logger.info("%s Waiting for the device to return to kIdle after kApplying because the Provider was terminated.", step_number_s1)
         # The Requestor does not receive the second ApplyUpdateResponse because the Provider is terminated before resending it.
@@ -362,8 +364,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # Verify that the software version remains unchanged because the second ApplyUpdateResponse was not sent.
         new_software_version_s1 = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-        asserts.assert_equal(new_software_version_s1,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s1}")
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s1, current_sw_version,new_software_version_s1)
+        asserts.assert_equal(new_software_version_s1, current_sw_version,
+                             f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s1}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d",
+                    step_number_s1, current_sw_version, new_software_version_s1)
 
         self.step(2)
         step_number_s2 = "[STEP 2] "
@@ -419,7 +423,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             controller=self.controller,
             requestor_node_id=self.requestor_node_id,
             subscription=subscription_attr_cluster,
-            #timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
+            # timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
             timeout_sec=120,
             step_name=step_number_s2,
         )
@@ -438,7 +442,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         downloading_seen = False
         progress_seen = False
         download_completed = False
-        step_number_matcher  = step_number_s2
+        step_number_matcher = step_number_s2
 
         # Use matcher_combined to track download progress until it reaches 99%.
         matcher_combined_obj = AttributeMatcher.from_callable(
@@ -472,14 +476,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s Provider pipe status after kDelayedOnApply %s", step_number_s2, pipe_data)
 
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
-                                Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
+                             Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
-                                1, "Only one request should be sent from the Provider")
+                             1, "Only one request should be sent from the Provider")
 
         # The Provider must be terminated just before it tries to send the second ApplyUpdateRequest.
         logger.info("%s Terminating the Provider to prevent the device from completing the update", step_number_s2)
         self.terminate_provider()
-
 
         # The device should remain in kDelayedOnApply and must not apply the software update during this 180-second interval.
         software_version_match = AttributeMatcher.from_callable(
@@ -497,8 +500,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         time_to_kapplying_s2 = time.time()
         time_taken_from_delay_to_apply_s2 = time_to_kapplying_s2 - time_for_kdelayed_apply_s2
 
-        logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",step_number_s2,time_taken_from_delay_to_apply_s2)
-        asserts.assert_greater_equal(time_taken_from_delay_to_apply_s2, delayed_apply_action_time , "Time for kApplying is lower than 180 seconds")
+        logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",
+                    step_number_s2, time_taken_from_delay_to_apply_s2)
+        asserts.assert_greater_equal(time_taken_from_delay_to_apply_s2, delayed_apply_action_time,
+                                     "Time for kApplying is lower than 180 seconds")
 
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
@@ -510,8 +515,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # Verify that the software version remains unchanged because the second ApplyUpdateResponse was not sent.
         new_software_version_s2 = await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=current_sw_version)
-        asserts.assert_equal(new_software_version_s2,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s2}")
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s2, current_sw_version,new_software_version_s2)
+        asserts.assert_equal(new_software_version_s2, current_sw_version,
+                             f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s2}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d",
+                    step_number_s2, current_sw_version, new_software_version_s2)
 
         self.step(3)
         step_number_s3 = "[STEP 3]"
@@ -566,7 +573,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             controller=self.controller,
             requestor_node_id=self.requestor_node_id,
             subscription=subscription_attr_cluster,
-            #timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
+            # timeout_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC,
             timeout_sec=120,
             step_name=step_number_s3,
         )
@@ -580,15 +587,15 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
 
         # Wait for the DUT to start downloading.
-        logger.info("%s Waiting for the DUT to reach the kDownloading state.",step_number_s3)
+        logger.info("%s Waiting for the DUT to reach the kDownloading state.", step_number_s3)
         update_state_match = AttributeMatcher.from_callable(
             "Waiting UpdateState is Downloading",
-            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and  report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         subscription_attr_cluster.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         # This can only be tested in CI or locally because real devices might not expose this path.
         if self.is_pics_sdk_ci_only:
-            logger.info("%s Verifying OTA image information.",step_number_s3)
+            logger.info("%s Verifying OTA image information.", step_number_s3)
             # The state is kDownloading; let it run for a few seconds to produce data to check.
             await asyncio.sleep(3)
             # Verify the default download path and file size.
@@ -617,29 +624,29 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 if value is not None and isinstance(value, int) and 1 <= value <= 100:
                     if not progress_seen:
                         progress_seen = True
-                if progress_seen and  value ==  NullValue:
-                        download_completed = True
+                if progress_seen and value == NullValue:
+                    download_completed = True
             return download_completed
 
-        logger.info("%s Waiting for the OTA download to complete.",step_number_s3)
+        logger.info("%s Waiting for the OTA download to complete.", step_number_s3)
         download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
             description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
         subscription_attr_cluster.await_all_expected_report_matches(
             [download_progress_attr_matcher_obj], timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
 
-        logger.info("%s OTA download completed; reading the ApplyUpdateRequestActionResponse configured on the Provider",step_number_s3)
+        logger.info("%s OTA download completed; reading the ApplyUpdateRequestActionResponse configured on the Provider", step_number_s3)
         # Use named pipes to confirm the ApplyUpdateAction
         await asyncio.sleep(0.1)
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info("%s Provider pipe status after kDownload and kDiscontinue enabled %s", step_number_s3 ,pipe_data)
+        logger.info("%s Provider pipe status after kDownload and kDiscontinue enabled %s", step_number_s3, pipe_data)
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kDiscontinue, "Action from the provider is not kDiscontinue")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
                              1, "Only one request should be sent from the Provider")
 
         # The DUT does not apply the update and returns to kIdle because the action is set to Discontinue.
-        logger.info("%s Waiting for the DUT to return to kIdle because ApplyUpdateAction is Discontinue",step_number_s3)
+        logger.info("%s Waiting for the DUT to return to kIdle because ApplyUpdateAction is Discontinue", step_number_s3)
         subscription_attr_cluster.await_all_expected_report_matches(
             [update_state_match], timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
         update_state_match = AttributeMatcher.from_callable(
@@ -659,11 +666,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         update_state_progress = await self.read_single_attribute_check_success(
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
-        logger.info("%s Current UpdateStateProgress is %s, as expected",step_number_s3, update_state_progress)
+        logger.info("%s Current UpdateStateProgress is %s, as expected", step_number_s3, update_state_progress)
         # Verify that the software version is unchanged from the start of the test.
         new_software_version_s3 = await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
-        asserts.assert_equal(new_software_version_s3,current_sw_version,f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s3}")
-        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d", step_number_s3, current_sw_version, new_software_version_s3)
+        asserts.assert_equal(new_software_version_s3, current_sw_version,
+                             f"Software versions must match Start: {current_sw_version}, End:{new_software_version_s3}")
+        logger.info("%s Software version is unchanged and the DUT has returned to kIdle. Start version: %d; end version: %d",
+                    step_number_s3, current_sw_version, new_software_version_s3)
 
 
 if __name__ == "__main__":
