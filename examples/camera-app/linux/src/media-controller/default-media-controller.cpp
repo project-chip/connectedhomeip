@@ -56,15 +56,10 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
                     static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
 
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
-                                      [transport](const Connection & c) { return c.transport == transport; }),
-                       mConnections.end());
-    auto existingIt = mSinkMap.find(transport);
-    if (existingIt != mSinkMap.end())
-    {
-        mPreRollBuffer.DeregisterTransportFromBuffer(existingIt->second.get());
-        mSinkMap.erase(existingIt);
-    }
+    // Clean up any existing registration for this transport before adding the new one.
+    // Overwriting mSinkMap[transport] without first deregistering from mPreRollBuffer
+    // would leave a dangling BufferSink* in mPreRollBuffer and duplicate mConnections entries.
+    UnregisterTransportLocked(transport);
 
     mConnections.push_back({ transport, videoStreams, audioStreams });
 
@@ -110,6 +105,11 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
 void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    UnregisterTransportLocked(transport);
+}
+
+void DefaultMediaController::UnregisterTransportLocked(Transport * transport)
+{
     mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
                                       [transport](const Connection & c) { return c.transport == transport; }),
                        mConnections.end());

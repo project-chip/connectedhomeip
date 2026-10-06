@@ -22,6 +22,7 @@
 #include <media-controller.h>
 #include <memory>
 #include <mutex>
+#include <system/SystemMutex.h>
 #include <vector>
 
 namespace Camera {
@@ -53,9 +54,12 @@ public:
     void ResetTransportSinkState(Transport * transport) override;
 
 private:
-    std::unordered_map<Transport *, std::unique_ptr<BufferSink>> mSinkMap; // map of transport to sink
+    void UnregisterTransportLocked(Transport * transport) CHIP_REQUIRES(mConnectionsMutex);
+
+    std::unordered_map<Transport *, std::unique_ptr<BufferSink>>
+        mSinkMap CHIP_GUARDED_BY(mConnectionsMutex); // map of transport to sink
     PreRollBuffer mPreRollBuffer;
-    std::vector<Connection> mConnections;
+    std::vector<Connection> mConnections CHIP_GUARDED_BY(mConnectionsMutex);
     std::mutex mConnectionsMutex;
     Camera::CameraDevice * mCameraDevice = nullptr; // pointer to parent camera device
 };
