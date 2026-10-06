@@ -96,6 +96,8 @@ public:
                                                       EndpointId aggregatorEndpointId = kInvalidEndpointId,
                                                       const std::string & nodeLabel   = "");
 
+    // The pointer returned by GetDevice is valid until RemoveDevice is called for the same deviceInterfaceId.
+    // Returns nullptr if no device is found for the given deviceInterfaceId.
     DeviceInterface * GetDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveDevice(DeviceInterfaceId deviceInterfaceId);
     void RemoveAllDevices();
