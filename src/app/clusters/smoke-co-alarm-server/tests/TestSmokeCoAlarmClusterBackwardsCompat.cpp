@@ -82,7 +82,7 @@ struct TestSmokeCoAlarmBackwardsCompatNoOptionals : public TestSmokeCoAlarmBackw
     void SetUp() override
     {
         SmokeCoAlarmCluster::Config cfg;
-        cfg.WithSmokeAlarm().WithCOAlarm();
+        cfg.WithSmokeAlarm({}).WithCOAlarm();
         // optional attributes left unset
         ASSERT_EQ(SmokeCoAlarmServer::Instance().Init(kTestEndpointId, cfg), CHIP_NO_ERROR);
     }

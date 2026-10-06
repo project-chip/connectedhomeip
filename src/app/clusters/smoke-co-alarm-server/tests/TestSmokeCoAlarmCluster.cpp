@@ -95,7 +95,7 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_MandatoryOnly)
 TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
 {
     SmokeCoAlarmCluster::Config cfg;
-    cfg.WithSmokeAlarm().WithCOAlarm();
+    cfg.WithSmokeAlarm({}).WithCOAlarm();
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -132,7 +132,7 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAlarmOptionalAttributes)
 TEST_F(TestSmokeCoAlarmBase, AttributeList_ExpiryDateFromConfig)
 {
     SmokeCoAlarmCluster::Config cfg;
-    cfg.WithSmokeAlarm().WithCOAlarm().WithExpiryDate(kTestExpiryDate);
+    cfg.WithSmokeAlarm({}).WithCOAlarm().WithExpiryDate(kTestExpiryDate);
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);

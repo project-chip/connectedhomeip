@@ -54,12 +54,6 @@ public:
 
     struct Config
     {
-        Config & WithSmokeAlarm()
-        {
-            mFeatureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm);
-            return *this;
-        }
-
         Config & WithSmokeAlarm(const SmokeAlarmConfig & smokeConfig)
         {
             mFeatureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm);
