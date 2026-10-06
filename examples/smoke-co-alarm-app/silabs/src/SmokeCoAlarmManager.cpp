@@ -53,6 +53,8 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
+    // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+    constexpr uint32_t kExpiryDate = 3976214400;
     SmokeCoAlarmCluster::Config config;
     config
         .WithSmokeAlarm({
@@ -63,7 +65,7 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
         .WithDeviceMuted()
         .WithInterconnectSmokeAlarm()
         .WithInterconnectCOAlarm()
-        .WithExpiryDate(0)
+        .WithExpiryDate(kExpiryDate)
         .WithUnmounted();
     ReturnErrorOnFailure(SmokeCoAlarmServer::Instance().Init(kSmokeCoAlarmEndpointId, config, this));
 
