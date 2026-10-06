@@ -31,6 +31,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
+    CCACHE_SLOPPINESS: time_macros
 
 jobs:
     zephyr:
@@ -45,6 +46,10 @@ jobs:
                       toolchain: zephyr
                       build_dir: all-devices-zephyr-xg26-gcc
                       extra_args: -DFILE_SUFFIX=debug
+                    - board: xg26_rb4118a
+                      toolchain: zephyr/llvm
+                      build_dir: all-devices-zephyr-xg26-llvm
+                      extra_args: -DFILE_SUFFIX=debug
         container:
             image: ghcr.io/zephyrproject-rtos/zephyr-build:v0.29.4
             options: --user root
@@ -55,14 +60,14 @@ jobs:
               with:
                   repository: "zephyrproject-rtos/zephyr"
                   ref: "fa4f8fb0e470210aee0ae6fb069a281bc6ac887a"
-                  path: "/tmp/zephyrproject"
+                  path: "zephyrproject/zephyr"
                   persist-credentials: false
 
             - name: Set up Zephyr workspace and SDK
               uses: zephyrproject-rtos/action-zephyr-setup@v1.0.15
               with:
-                  app-path: app
-                  base-path: /tmp/zephyrproject
+                  app-path: zephyr
+                  base-path: zephyrproject
                   sdk-version: "1.0.1"
                   toolchains: arm-zephyr-eabi
                   enable-ccache: "true"
@@ -97,7 +102,7 @@ jobs:
               shell: bash
               working-directory: zephyrproject
               run: |
-                  set -euxo pipefail    
+                  set -euxo pipefail
                   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git "$RUNNER_TEMP/depot_tools"
                   gn_version="$(python3 - <<'PY'
                   import json
@@ -116,18 +121,29 @@ jobs:
 
             - name: Build All-Devices App
               shell: bash
-              working-directory: /tmp/zephyrproject
+              working-directory: zephyrproject
               env:
                   ZEPHYR_TOOLCHAIN_VARIANT: ${{ matrix.toolchain }}
-                  ZEPHYR_SDK_INSTALL_DIR: /opt/toolchains/zephyr-sdk-1.0.1
+                  ZEPHYR_SDK_INSTALL_DIR:
+                      ${{ github.workspace }}/zephyrproject/zephyr-sdk
               run: |
-                  west build -p always -b "${{ matrix.board }}" --sysbuild \
-                    "${GITHUB_WORKSPACE}/examples/all-devices-app/zephyr" \
-                    -d "build/${{ matrix.build_dir }}" \
-                    -- \
-                    -DZEPHYR_TOOLCHAIN_VARIANT="${ZEPHYR_TOOLCHAIN_VARIANT}" \
-                    -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
-                    "${{ matrix.extra_args }}"
+                  set -euxo pipefail
+                  command -v ccache
+                  west build -p always -b "${{ matrix.board }}" --sysbuild --cmake-only \
+                  "${GITHUB_WORKSPACE}/examples/all-devices-app/zephyr" \
+                  -d "build/${{ matrix.build_dir }}" \
+                  -- \
+                  -DZEPHYR_TOOLCHAIN_VARIANT="${ZEPHYR_TOOLCHAIN_VARIANT}" \
+                  -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
+                  -DUSE_CCACHE=1 \
+                  "${{ matrix.extra_args }}"
+
+                  mapfile -t gn_args_files < <(find "build/${{ matrix.build_dir }}" -type f -path '*/modules/connectedhomeip/args.tmp')
+                  test "${#gn_args_files[@]}" -gt 0
+                  for gn_args_file in "${gn_args_files[@]}"; do
+                    printf '%s\n' --arg-string pw_command_launcher ccache >> "$gn_args_file"
+                  done
+                  west build -d "build/${{ matrix.build_dir }}"
 
             - name: Notify Slack on Failure
               if: failure()
