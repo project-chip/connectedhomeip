@@ -41,10 +41,10 @@
 #include "thermostat-hold-delegate-impl.h"
 #include "thermostat-mode-delegate-impl.h"
 #include "thermostat-presets-delegate-impl.h"
+#include "thermostat-schedules-delegate-impl.h"
 #include "thermostat-sensors-delegate-impl.h"
 #include "thermostat-setpoints-delegate-impl.h"
 #include "thermostat-suggestions-delegate-impl.h"
-#include "thermostat-schedules-delegate-impl.h"
 #include <app/AttributeAccessInterfaceRegistry.h>
 
 #include "tls-client-management-instance.h"
