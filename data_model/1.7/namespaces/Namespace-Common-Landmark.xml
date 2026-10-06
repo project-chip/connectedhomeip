@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0011" name="Common Landmark">
+  <tags>
+    <tag id="0x0000" name="AirConditioner"/>
+    <tag id="0x0001" name="AirPurifier"/>
+    <tag id="0x0002" name="BackDoor"/>
+    <tag id="0x0003" name="BarStool"/>
+    <tag id="0x0004" name="BathMat"/>
+    <tag id="0x0005" name="Bathtub"/>
+    <tag id="0x0006" name="Bed"/>
+    <tag id="0x0007" name="Bookshelf"/>
+    <tag id="0x0008" name="Chair"/>
+    <tag id="0x0009" name="ChristmasTree"/>
+    <tag id="0x000A" name="CoatRack"/>
+    <tag id="0x000B" name="CoffeeTable"/>
+    <tag id="0x000C" name="CookingRange"/>
+    <tag id="0x000D" name="Couch"/>
+    <tag id="0x000E" name="Countertop"/>
+    <tag id="0x000F" name="Cradle"/>
+    <tag id="0x0010" name="Crib"/>
+    <tag id="0x0011" name="Desk"/>
+    <tag id="0x0012" name="DiningTable"/>
+    <tag id="0x0013" name="Dishwasher"/>
+    <tag id="0x0014" name="Door"/>
+    <tag id="0x0015" name="Dresser"/>
+    <tag id="0x0016" name="LaundryDryer"/>
+    <tag id="0x0017" name="Fan"/>
+    <tag id="0x0018" name="Fireplace"/>
+    <tag id="0x0019" name="Freezer"/>
+    <tag id="0x001A" name="FrontDoor"/>
+    <tag id="0x001B" name="HighChair"/>
+    <tag id="0x001C" name="KitchenIsland"/>
+    <tag id="0x001D" name="Lamp"/>
+    <tag id="0x001E" name="LitterBox"/>
+    <tag id="0x001F" name="Mirror"/>
+    <tag id="0x0020" name="Nightstand"/>
+    <tag id="0x0021" name="Oven"/>
+    <tag id="0x0022" name="PetBed"/>
+    <tag id="0x0023" name="PetBowl"/>
+    <tag id="0x0024" name="PetCrate">
+      <description>An indoor furnishing for pets to rest or sleep inside</description>
+    </tag>
+    <tag id="0x0025" name="Refrigerator"/>
+    <tag id="0x0026" name="ScratchingPost"/>
+    <tag id="0x0027" name="ShoeRack"/>
+    <tag id="0x0028" name="Shower">
+      <description>An area where a showerhead dispenses water for people to shower</description>
+    </tag>
+    <tag id="0x0029" name="SideDoor"/>
+    <tag id="0x002A" name="Sink"/>
+    <tag id="0x002B" name="Sofa"/>
+    <tag id="0x002C" name="Stove"/>
+    <tag id="0x002D" name="Table"/>
+    <tag id="0x002E" name="Toilet"/>
+    <tag id="0x002F" name="TrashCan"/>
+    <tag id="0x0030" name="LaundryWasher"/>
+    <tag id="0x0031" name="Window"/>
+    <tag id="0x0032" name="WineCooler">
+      <description>A type of refrigerator that is shelved to hold wine bottles and (typically) display them through a glass front</description>
+    </tag>
+  </tags>
+</namespace>

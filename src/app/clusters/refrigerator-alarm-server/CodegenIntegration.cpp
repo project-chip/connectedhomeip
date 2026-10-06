@@ -72,7 +72,7 @@ public:
     {
         AlarmBase::AlarmMap supported{};
         BitMask<RefrigeratorAlarm::AlarmBitmap> supportedDefault{};
-        if (Supported::GetDefault(endpointId, &supportedDefault) == Status::Success)
+        if (Supported::GetDefault(endpointId, supportedDefault) == Status::Success)
         {
             supported = AlarmBase::AlarmMap(supportedDefault.Raw());
         }
@@ -89,13 +89,13 @@ public:
         RefrigeratorAlarmCluster & cluster = gRefrigeratorAlarmClusters[clusterInstanceIndex].cluster.Cluster();
 
         BitMask<RefrigeratorAlarm::AlarmBitmap> maskDefault{};
-        if (Mask::GetDefault(endpointId, &maskDefault) == Status::Success)
+        if (Mask::GetDefault(endpointId, maskDefault) == Status::Success)
         {
             cluster.SetMask(AlarmBase::AlarmMap(maskDefault.Raw()));
         }
 
         BitMask<RefrigeratorAlarm::AlarmBitmap> stateDefault{};
-        if (State::GetDefault(endpointId, &stateDefault) == Status::Success)
+        if (State::GetDefault(endpointId, stateDefault) == Status::Success)
         {
             cluster.SetState(AlarmBase::AlarmMap(stateDefault.Raw()));
         }

@@ -24,6 +24,77 @@
 #include <string>
 #include <vector>
 
+namespace {
+
+TEST(TestAppOptionsPortNumber, AcceptsPortsAcrossTheWholeRange)
+{
+    uint16_t port = 0;
+
+    EXPECT_TRUE(AppOptions::ParsePortNumber("5540", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(5540));
+
+    EXPECT_TRUE(AppOptions::ParsePortNumber("33000", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(33000));
+
+    // 0 stays acceptable: --port already allowed it before the parsing was shared.
+    EXPECT_TRUE(AppOptions::ParsePortNumber("0", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(0));
+
+    EXPECT_TRUE(AppOptions::ParsePortNumber("65535", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(65535));
+}
+
+TEST(TestAppOptionsPortNumber, AcceptsHexadecimalAndOctalNotation)
+{
+    uint16_t port = 0;
+
+    EXPECT_TRUE(AppOptions::ParsePortNumber("0x80e8", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(33000));
+
+    EXPECT_TRUE(AppOptions::ParsePortNumber("010", port));
+    EXPECT_EQ(port, static_cast<uint16_t>(8));
+}
+
+TEST(TestAppOptionsPortNumber, RejectsValuesOutsideAUint16)
+{
+    uint16_t port = 1;
+
+    EXPECT_FALSE(AppOptions::ParsePortNumber("65536", port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("70000", port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("-1", port));
+
+    // Rejected input must leave the caller's value untouched.
+    EXPECT_EQ(port, static_cast<uint16_t>(1));
+}
+
+TEST(TestAppOptionsPortNumber, RejectsInputThatIsNotEntirelyNumeric)
+{
+    uint16_t port = 1;
+
+    EXPECT_FALSE(AppOptions::ParsePortNumber(nullptr, port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("", port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("abc", port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("5540x", port));
+    EXPECT_FALSE(AppOptions::ParsePortNumber("5540 ", port));
+
+    EXPECT_EQ(port, static_cast<uint16_t>(1));
+}
+
+TEST(TestAppOptionsRpcServerPort, IsUnsetUntilTheOptionIsGiven)
+{
+    // Left unset so that a non-PW_RPC build can tell "--rpc-server-port 33000" apart from the
+    // option not being passed at all, and warn in the former case.
+    const AppOptions::AppConfig defaults;
+    EXPECT_FALSE(defaults.rpcServerPort.has_value());
+
+    // Keep in sync with LinuxDeviceOptions::rpcServerPort so that tooling which does not pass
+    // --rpc-server-port keeps reaching the app.
+    EXPECT_EQ(AppOptions::kDefaultRpcServerPort, static_cast<uint16_t>(33000));
+    EXPECT_EQ(defaults.rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort), AppOptions::kDefaultRpcServerPort);
+}
+
+} // namespace
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 namespace {

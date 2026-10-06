@@ -23,6 +23,7 @@
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -381,6 +382,57 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestLegacyModeIgnoresP
     EXPECT_EQ(result.response->certificate.size(), 32u);
     EXPECT_FALSE(result.response->totalDocumentSize.HasValue());
     EXPECT_FALSE(result.response->nextSegmentID.HasValue());
+}
+
+TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
+{
+    class CertificateSizeProvider : public TestDACProvider
+    {
+    public:
+        size_t documentSize = Credentials::kMaxDERCertLengthMlDsa65;
+
+        CHIP_ERROR GetDeviceAttestationDocumentSegment(Credentials::DeviceAttestationDocumentType documentType,
+                                                       Credentials::DeviceAttestationCertProfile profile, size_t offset,
+                                                       MutableByteSpan & buffer, size_t & totalSize) override
+        {
+            totalSize = documentSize;
+            memset(buffer.data(), 0, buffer.size());
+            return CHIP_NO_ERROR;
+        }
+    } provider;
+    auto context     = MakeContext(BitFlags<Feature>(Feature::kPQCDeviceAttestation));
+    auto sizeContext = OperationalCredentialsCluster::Context{ context.fabricTable,
+                                                               context.failSafeContext,
+                                                               context.sessionManager,
+                                                               context.dnssdServer,
+                                                               context.commissioningWindowManager,
+                                                               provider,
+                                                               context.groupDataProvider,
+                                                               context.accessControl,
+                                                               context.platformManager,
+                                                               context.eventManagement,
+                                                               context.featureMap };
+    OperationalCredentialsCluster cluster(kRootEndpointId, sizeContext);
+    ClusterTester tester(cluster);
+    Commands::CertificateChainRequest::Type request;
+    request.certificateType = CertificateChainTypeEnum::kPAICertificate;
+    request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+
+    auto accepted = tester.Invoke(request);
+    ASSERT_TRUE(accepted.IsSuccess());
+    ASSERT_TRUE(accepted.response.has_value());
+    if (!accepted.response.has_value())
+    {
+        return;
+    }
+    ASSERT_TRUE(accepted.response->totalDocumentSize.HasValue());
+    EXPECT_EQ(accepted.response->totalDocumentSize.Value(), Credentials::kMaxDERCertLengthMlDsa65);
+
+    // Provider metadata larger than the supported DER certificate limit must be rejected.
+    ++provider.documentSize;
+    auto rejected = tester.Invoke(request);
+    EXPECT_FALSE(rejected.IsSuccess());
+    EXPECT_FALSE(rejected.response.has_value());
 }
 
 TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCFeatureServesLegacyRequest)

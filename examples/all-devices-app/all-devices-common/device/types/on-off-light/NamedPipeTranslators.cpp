@@ -19,7 +19,7 @@
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffLoad & device, NamedPipe::Dispatcher & dispatcher)
+void RegisterNamedPipeTranslators(OnOffLight & device, NamedPipe::Dispatcher & dispatcher)
 {
     LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::OnOffTranslator>());
 }

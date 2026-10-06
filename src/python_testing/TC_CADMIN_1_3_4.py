@@ -56,6 +56,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 
@@ -65,7 +66,7 @@ opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN(CADMINBaseTest):
+class TC_CADMIN(MatterTestCommissionedDevice, CADMINBaseTest):
     # Opt out of the framework background subscription: it joins the existing fabric as a
     # second operational node (controller_node_id + 123456), which adds a second operational
     # mDNS SRV record per fabric. Combined with the fabrics this test commissions, that pushes

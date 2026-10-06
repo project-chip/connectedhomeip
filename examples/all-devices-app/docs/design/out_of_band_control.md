@@ -56,6 +56,13 @@ flowchart LR
         error.
     -   If no registered accessor handles the action (all return
         `std::nullopt`), `HandleAction` returns `CHIP_ERROR_NOT_FOUND`.
+-   **Standardized Attribute Writes**: To reduce boilerplate and unify handling,
+    attribute updates use the standardized `"SetAttribute"` action name along
+    with the standard TLV payload format (encoding Endpoint ID, Cluster ID,
+    Attribute ID, and Value) defined by `OOBDataSerializer`. Cluster OOB
+    accessors handle `"SetAttribute"` for the attributes they support and return
+    `std::nullopt` for unrecognized attributes so other registered accessors can
+    process them.
 -   **Transport Translation**: External protocols and transports (Named Pipe
     JSON, Pigweed RPC, Test Event Triggers) parse incoming requests, convert
     them into an action name and TLV payload, and forward them to
@@ -104,6 +111,7 @@ examples/all-devices-app/
 │       ├── InMemoryOOBAccessorRegistry.h/.cpp          # Container of registered OOBAccessors
 │       ├── NoopOOBAccessorRegistry.h                   # Zero-cost inline stub for disabled targets
 │       └── clusters/
+│           ├── BUILD.gn                                # Per-cluster GN targets (e.g. :on-off, :occupancy)
 │           └── <Cluster>OOBAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOOBAccessor, OccupancyOOBAccessor)
 └── posix/
     └── named_pipe/
@@ -488,7 +496,7 @@ source_set("<device-name>") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
   ]
 }
 

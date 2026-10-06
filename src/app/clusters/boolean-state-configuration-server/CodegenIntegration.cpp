@@ -71,22 +71,16 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         uint8_t supportedSensitivityLevels{};
-        if (SupportedSensitivityLevels::GetDefault(endpointId, &supportedSensitivityLevels) != Status::Success)
-        {
-            supportedSensitivityLevels = BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels;
-        }
+        SupportedSensitivityLevels::GetDefaultOr(endpointId, supportedSensitivityLevels,
+                                                 BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels);
+
+        // the fallback assumes min is at least 2
         uint8_t defaultSensitivityLevel{};
-        if (DefaultSensitivityLevel::GetDefault(endpointId, &defaultSensitivityLevel) != Status::Success)
-        {
-            // this assumes min is at least 2
-            defaultSensitivityLevel = static_cast<uint8_t>(supportedSensitivityLevels - 1);
-        }
+        DefaultSensitivityLevel::GetDefaultOr(endpointId, defaultSensitivityLevel,
+                                              static_cast<uint8_t>(supportedSensitivityLevels - 1));
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsSupported{};
-        if (AlarmsSupported::GetDefault(endpointId, &alarmsSupported) != Status::Success)
-        {
-            alarmsSupported.ClearAll();
-        }
+        AlarmsSupported::GetDefaultOr(endpointId, alarmsSupported, BooleanStateConfigurationCluster::AlarmModeBitMask{});
 
         gServers[clusterInstanceIndex].Create(endpointId, BitMask<BooleanStateConfiguration::Feature>(featureMap),
                                               BooleanStateConfigurationCluster::OptionalAttributesSet(optionalAttributeBits),

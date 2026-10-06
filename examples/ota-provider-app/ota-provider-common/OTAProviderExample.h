@@ -47,6 +47,8 @@ public:
     static constexpr size_t kUriMaxLen               = 256;
     static constexpr size_t kMaxLocation             = 3;
     static constexpr size_t kMaxProtocolsSupported   = 4;
+    // Update token is up to 32 bytes; hex-encoded string needs 2 chars per byte + null terminator.
+    static constexpr size_t kUpdateTokenStrLen = 65;
 
     size_t kProtocolsSupportedCount = 0;
 
@@ -123,6 +125,14 @@ public:
     }
     uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
     uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    // Update token that was generated and sent in the most recent QueryImageResponse.
+    // Empty string if no UpdateAvailable response has been sent yet.
+    const char * GetUpdateToken() const { return mUpdateToken; }
+    // Update token received in the most recent ApplyUpdateRequest from the requestor.
+    // Empty string if no ApplyUpdateRequest has been received yet.
+    const char * GetApplyUpdateRequestToken() const { return mApplyUpdateRequestUpdateToken; }
+    // NewVersion field received in the most recent ApplyUpdateRequest from the requestor.
+    uint32_t GetApplyUpdateRequestNewVersion() const { return mApplyUpdateRequestNewVersion; }
     // End of variables used for named pipes
     chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
     {
@@ -188,4 +198,10 @@ private:
     OTAApplyUpdateAction mApplyUpdateRequestActionSent;
     uint32_t mApplyUpdateRequestDelaySent;
     u_int16_t mApplyUpdateRequestCount = 0;
+    // Hex-encoded update token issued in the most recent QueryImageResponse.
+    char mUpdateToken[kUpdateTokenStrLen] = { 0 };
+    // Hex-encoded update token received in the most recent ApplyUpdateRequest.
+    char mApplyUpdateRequestUpdateToken[kUpdateTokenStrLen] = { 0 };
+    // NewVersion field received in the most recent ApplyUpdateRequest.
+    uint32_t mApplyUpdateRequestNewVersion = 0;
 };

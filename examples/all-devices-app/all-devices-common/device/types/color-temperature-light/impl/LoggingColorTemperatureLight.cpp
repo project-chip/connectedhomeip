@@ -16,22 +16,12 @@
  */
 
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
-#include <devices/Types.h>
-
-#include <clusters/ColorControl/Enums.h>
 
 namespace chip {
 namespace app {
 
-// NOTE: ColorTemperatureLight.cpp builds this same Conformance for device type 0x010C against
-// ColorLight. Keep the two literals in sync if this ever changes.
 LoggingColorTemperatureLight::LoggingColorTemperatureLight(const Context & context) :
-    LoggingLightDriver(
-        Span<const DataModel::DeviceTypeEntry>(&Device::Type::kColorTemperatureLight, 1), context,
-        Conformance{
-            .colorFeatures = BitMask<Clusters::ColorControl::Feature>(Clusters::ColorControl::Feature::kColorTemperature),
-            .initialColor  = Clusters::ColorControl::CTColor{},
-        })
+    ColorTemperatureLight(LoggingLightDriver::GetDelegates(), context)
 {}
 
 } // namespace app

@@ -171,12 +171,12 @@ TEST_F(TestNamedPipeTranslators, OccupancyTranslator)
     // SetOccupancy
     Json::Value occJson = ParseJson(R"({"Name": "SetOccupancy", "Occupancy": true})");
     EXPECT_EQ(translator.TranslateAndExecute(1, occJson, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetOccupancy");
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // SetHoldTime
     Json::Value holdJson = ParseJson(R"({"Name": "SetHoldTime", "HoldTime": 120})");
     EXPECT_EQ(translator.TranslateAndExecute(1, holdJson, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetHoldTime");
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // Invalid HoldTime
     Json::Value invalidHold = ParseJson(R"({"Name": "SetHoldTime", "HoldTime": -1})");
@@ -194,15 +194,17 @@ TEST_F(TestNamedPipeTranslators, BooleanStateTranslator)
     // SetBooleanState with StateValue
     Json::Value json1 = ParseJson(R"({"Name": "SetBooleanState", "StateValue": true})");
     EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
-    EXPECT_EQ(mMockAccessor->mLastAction, "SetBooleanState");
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // SetBooleanState with NewState
     Json::Value json2 = ParseJson(R"({"Name": "SetBooleanState", "NewState": false})");
     EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // SetStateValue with BooleanState
     Json::Value json3 = ParseJson(R"({"Name": "SetStateValue", "BooleanState": 1})");
     EXPECT_EQ(translator.TranslateAndExecute(1, json3, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "SetAttribute");
 
     // Missing state field
     Json::Value invalid = ParseJson(R"({"Name": "SetBooleanState"})");
