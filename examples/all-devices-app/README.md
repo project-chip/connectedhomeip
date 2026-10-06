@@ -35,9 +35,12 @@ The [`docs/`](docs/) directory contains documentation for this application:
 -   **[How to Add a New Simulated Device](docs/adding_new_device.md)**:
     Instructions for implementing Matter devices, binding code-driven clusters,
     and updating build configurations.
--   **[Custom Product Baseline Guide](docs/custom_product_baseline.md)**: Guide
-    on transitioning from this simulator baseline to a custom product
-    application.
+-   **[Writing a Code-Driven Application](docs/writing_code_driven_app.md)**:
+    Guide on using `all-devices-app` as a baseline for a standalone product
+    application, with build-system and platform-specific guides:
+    -   [Silicon Labs (GN)](docs/writing_code_driven_app_silabs.md)
+    -   [POSIX (GN)](docs/writing_code_driven_app_posix.md)
+    -   [ESP32 (CMake)](docs/writing_code_driven_app_esp32.md)
 
 ## Architecture and File Structure
 
@@ -46,13 +49,13 @@ implementations:
 
 -   **`all-devices-common/`**: Contains platform-agnostic code, including:
     -   Core cluster logic and device interfaces.
-    -   Base device implementations.
+    -   Base device implementations (`device/types/`).
     -   The **`DeviceFactory`** (in
         `all-devices-common/device-factory/DeviceFactory.h`), which enables
         runtime registration and creation of supported device types.
--   **`esp32/`, `posix/`**: Contain platform-specific implementations (with
-    `posix/` containing `linux/` and `darwin/` subdirectories), entry points,
-    and build configurations.
+-   **`esp32/`, `posix/`, `silabs/`, `telink/`**: Contain platform-specific
+    implementations (with `posix/` containing `linux/` and `darwin/`
+    subdirectories), entry points, and build configurations.
     -   For example, `posix/include/DeviceFactoryPlatformOverride.h` registers
         platform-specific overrides for devices at build-time.
 
