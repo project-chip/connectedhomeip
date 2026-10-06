@@ -400,8 +400,22 @@ private:
             RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                    SimulatedClosure::ThreePanelDoorClosureConfig(), mContext->groupDataProvider,
+                                                    SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
                                                     mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-ps-no-sp", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-lt", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)

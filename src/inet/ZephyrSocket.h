@@ -34,6 +34,12 @@
 #include <sys/select.h>
 #endif
 
+#include <zephyr/version.h>
+
+// Zephyr >= 4.4 declares recvmsg() itself; a static shim would clash ("declared
+// 'extern' and later 'static'"). Only shim it for older versions that lack it.
+#if ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 0)
+
 static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 {
     // Older Zephyr version doesn't implement recvmsg at all, but if the message vector size is > 0 we can simply
@@ -54,6 +60,8 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 
     return ret;
 }
+
+#endif // ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 0)
 
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
