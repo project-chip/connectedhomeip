@@ -19,7 +19,6 @@
 #include <lib/support/CodeUtils.h>
 
 #include <algorithm>
-#include <limits>
 
 using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters;
@@ -52,41 +51,13 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 };
 } // namespace
 
-SimulatedWaterHeater::SimulatedWaterHeater(const Config & config) :
-    WaterHeater(config, static_cast<Clusters::WaterHeaterManagement::Delegate &>(*this),
-                static_cast<Clusters::ModeBase::AppDelegate &>(*this), static_cast<Clusters::Thermostat::Delegate &>(*this),
-                static_cast<Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate &>(*this))
+SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable, DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+    WaterHeater( WaterHeater::Config{ .timerDelegate = timerDelegate, .fabricTable = fabricTable, .diagnosticDataProvider = diagnosticDataProvider, .waterHeaterManagementDelegate = *this, .thermostatDelegate = *this, .heatingDelegate = *this, .waterHeaterModeDelegate = *this })
 {}
 
 SimulatedWaterHeater::~SimulatedWaterHeater()
 {
-    mConfig.timerDelegate.CancelTimer(this);
-}
-
-CHIP_ERROR SimulatedWaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                          EndpointComposition composition)
-{
-    ReturnErrorOnFailure(WaterHeater::Register(endpoint, provider, composition));
-
-    // Setup initial values
-    const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
-    ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
-
-    // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster
-    // code) so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based
-    // on the CurrentMode.
-    const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
-    ThermostatCluster().SetSystemMode(initialSystemMode);
-
-    EvaluateHeatingDemand();
-
-    CHIP_ERROR err = mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(provider);
-        return err;
-    }
-    return CHIP_NO_ERROR;
+    mTimerDelegate.CancelTimer(this);
 }
 
 CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
@@ -106,6 +77,24 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     if (mOccupiedHeatingSetpoint < kMinTemperature || mOccupiedHeatingSetpoint > kMaxTemperature)
     {
         mOccupiedHeatingSetpoint = kFinalTemperature;
+    }
+    // Setup initial values
+    const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
+    ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
+
+    // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster
+    // code) so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based
+    // on the CurrentMode.
+    const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
+    ThermostatCluster().SetSystemMode(initialSystemMode);
+
+    EvaluateHeatingDemand();
+
+    CHIP_ERROR err = mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
+    if (err != CHIP_NO_ERROR)
+    {
+        Unregister(*mProvider);
+        return err;
     }
     return CHIP_NO_ERROR;
 }

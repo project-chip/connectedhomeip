@@ -32,7 +32,7 @@ class SimulatedWaterHeater
       public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
       public Clusters::ModeBase::AppDelegate,
       public TimerContext,
-      public WaterHeater<Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>
+      public WaterHeater
 {
 public:
     static constexpr Clusters::Thermostat::temperature kMinTemperature     = 0;
@@ -40,11 +40,9 @@ public:
     static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
     static constexpr Clusters::Thermostat::temperature kMaxTemperature     = 10000;
 
-    explicit SimulatedWaterHeater(const Config & config);
+    explicit SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable, DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
     ~SimulatedWaterHeater() override;
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // TimerContext

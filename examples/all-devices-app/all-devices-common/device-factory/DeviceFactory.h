@@ -805,14 +805,11 @@ private:
                 Clusters::Thermostat::OptionalAttributes optionalAttributes;
                 optionalAttributes.AbsMinHeatSetpointLimit = true;
                 optionalAttributes.AbsMaxHeatSetpointLimit = true;
-                return MakeDevice<SimulatedWaterHeater>(SimulatedWaterHeater::Config{
-                    .fabricTable                  = mContext->fabricTable,
-                    .timerDelegate                = mContext->timerDelegate,
-                    .diagnosticDataProvider       = mContext->diagnosticDataProvider,
-                    .whmFeatures                  = BitMask<Clusters::WaterHeaterManagement::Feature>(),
-                    .thermostatFeatures           = BitMask<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
-                    .thermostatOptionalAttributes = optionalAttributes,
-                });
+                return MakeDevice<SimulatedWaterHeater>(
+                    mContext->timerDelegate,
+                    mContext->fabricTable,
+                    mContext->diagnosticDataProvider
+                );
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)

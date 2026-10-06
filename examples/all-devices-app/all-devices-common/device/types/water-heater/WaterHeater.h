@@ -24,57 +24,57 @@
 #include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
 
-#include <tuple>
-#include <type_traits>
-
 namespace chip::app {
 
-template <typename... ThermostatDelegates>
 class WaterHeater : public SingleEndpoint
 {
 public:
-    using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<ThermostatDelegates...>;
+    using HeatingThermostat = Clusters::Thermostat::ThermostatCluster<Clusters::Thermostat::Delegate,
+                                                                      Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate>;
 
     struct Config
     {
-        FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        FabricTable & fabricTable;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         // WaterHeaterManagement cluster
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
+        Clusters::WaterHeaterManagement::Delegate & waterHeaterManagementDelegate;
         // Thermostat cluster
         BitMask<Clusters::Thermostat::Feature> thermostatFeatures;
         Clusters::Thermostat::OptionalAttributes thermostatOptionalAttributes;
+        Clusters::Thermostat::Delegate & thermostatDelegate;
+        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate;
+        // ModeBase cluster
+        Clusters::ModeBase::AppDelegate & waterHeaterModeDelegate;
     };
 
-    explicit WaterHeater(const Config & config, Clusters::WaterHeaterManagement::Delegate & whmDelegate,
-                         Clusters::ModeBase::AppDelegate & waterHeaterModeDelegate, ThermostatDelegates &... thermostatDelegates) :
+    explicit WaterHeater(const Config & config) :
         SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)),
-        mConfig(config), mThermostatDelegates(thermostatDelegates...), mWhmDelegate(whmDelegate),
-        mWaterHeaterModeDelegate(waterHeaterModeDelegate)
+        mConfig(config), mTimerDelegate(config.timerDelegate), mWhmDelegate(config.waterHeaterManagementDelegate),
+        mWaterHeaterModeDelegate(config.waterHeaterModeDelegate),
+        mThermostatDelegate(config.thermostatDelegate),
+        mHeatingDelegate(config.heatingDelegate)
     {}
     ~WaterHeater() = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override
     {
-        VerifyOrReturnError(SingleEndpoint::mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
         DeviceRegistrationTransaction transaction(*this, provider);
 
-        mProvider = &provider;
         ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+        mProvider = &provider;
+        mEndpointId = endpoint;
 
         mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
 
-        std::apply(
-            [&](auto &... delegates) {
-                mThermostatCluster.Create(endpoint, mConfig.thermostatFeatures,
-                                          Clusters::Thermostat::ThermostatClusterBase::Config(mConfig.thermostatOptionalAttributes,
-                                                                                              mConfig.timerDelegate),
-                                          delegates...);
-            },
-            mThermostatDelegates);
+        mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kCooling),
+        HeatingThermostat::Config({}, mTimerDelegate), mThermostatDelegate, mHeatingDelegate);
+ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
+
 
         ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
@@ -122,7 +122,7 @@ public:
         return mWaterHeaterManagementCluster.Cluster();
     }
 
-    ThermostatClusterType & ThermostatCluster()
+    HeatingThermostat & ThermostatCluster()
     {
         VerifyOrDie(mThermostatCluster.IsConstructed());
         return mThermostatCluster.Cluster();
@@ -145,21 +145,17 @@ protected:
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider = nullptr;
 
-    template <typename DelegateType>
-    DelegateType & GetThermostatDelegate()
-    {
-        return std::get<std::add_lvalue_reference_t<DelegateType>>(mThermostatDelegates);
-    }
-
     // Delegates
-    std::tuple<ThermostatDelegates &...> mThermostatDelegates;
+    TimerDelegate & mTimerDelegate;
     Clusters::WaterHeaterManagement::Delegate & mWhmDelegate;
     Clusters::ModeBase::AppDelegate & mWaterHeaterModeDelegate;
+    Clusters::Thermostat::Delegate & mThermostatDelegate;
+    Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & mHeatingDelegate;
 
 private:
     // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
-    LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
+    LazyRegisteredServerCluster<HeatingThermostat> mThermostatCluster;
     LazyRegisteredServerCluster<Clusters::ModeBaseCluster> mWaterHeaterModeCluster;
 };
 
