@@ -1263,8 +1263,6 @@ TEST(JointFabricDatastoreTest, AddBindingBackReferenceMarksWrongEntry)
     EXPECT_TRUE(found);
 }
 
-// When removing the anchor fabric, every record must be wiped and the anchor identity must be reset.
-// When other fabrics are removed, nothing should happen (the datastore holds no records owned by other fabrics.)
 // statusEntry.failureCode holds an IM status code, so the triage compares it as one. ConstraintError
 // is unrecoverable: the entry is dropped.
 TEST(JointFabricDatastoreTest, RefreshDropsUnrecoverableCommitFailedAcl)
@@ -4249,6 +4247,8 @@ TEST(JointFabricDatastoreTest, FabricRemovalDuringRefreshReleasesIt)
     EXPECT_EQ(store.GetNodeInformationEntries()[0].commissioningStatusEntry.state, State::kCommitted);
 }
 
+// When removing the anchor fabric, every record must be wiped and the anchor identity must be reset.
+// When other fabrics are removed, nothing should happen (the datastore holds no records owned by other fabrics.)
 TEST(JointFabricDatastoreTest, OnFabricRemovedWipesDatastoreOnlyForAnchorFabric)
 {
     JointFabricDatastore store;
