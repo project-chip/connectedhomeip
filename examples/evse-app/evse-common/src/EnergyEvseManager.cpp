@@ -75,7 +75,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
-        TEMPORARY_RETURN_IGNORED SetChargingEnabledUntil(tempChargingEnabledUntil);
+        LogErrorOnFailure(SetChargingEnabledUntil(tempChargingEnabledUntil));
     }
     else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -97,7 +97,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
-        TEMPORARY_RETURN_IGNORED SetDischargingEnabledUntil(tempDischargingEnabledUntil);
+        LogErrorOnFailure(SetDischargingEnabledUntil(tempDischargingEnabledUntil));
     }
     else
     {
@@ -168,7 +168,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
-        TEMPORARY_RETURN_IGNORED SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+        LogErrorOnFailure(SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent));
     }
     else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -186,7 +186,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded RandomizationDelayWindow from NVM");
-        TEMPORARY_RETURN_IGNORED SetRandomizationDelayWindow(tempRandomizationDelayWindow);
+        LogErrorOnFailure(SetRandomizationDelayWindow(tempRandomizationDelayWindow));
     }
     else
     {
@@ -200,7 +200,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
-        TEMPORARY_RETURN_IGNORED SetApproximateEVEfficiency(tempApproxEVEfficiency);
+        LogErrorOnFailure(SetApproximateEVEfficiency(tempApproxEVEfficiency));
     }
     else
     {
@@ -217,6 +217,7 @@ CHIP_ERROR EnergyEvseManager::Init()
     // Set up the EnergyEvseTargetsStore and persistent storage delegate
     EnergyEvseDelegate * dg = GetDelegate();
     VerifyOrReturnLogError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+    dg->SetInstance(this);
 
     EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
     VerifyOrReturnLogError(targetsStore != nullptr, CHIP_ERROR_UNINITIALIZED);
@@ -231,6 +232,7 @@ void EnergyEvseManager::Shutdown()
     EnergyEvseDelegate * dg = GetDelegate();
     if (dg)
     {
+        dg->SetInstance(nullptr);
         EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
         if (targetsStore)
         {

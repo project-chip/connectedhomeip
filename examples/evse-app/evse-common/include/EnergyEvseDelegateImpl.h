@@ -321,6 +321,7 @@ private:
 
     /* Variables to hold State and SupplyState in case a fault is raised */
     SupplyStateEnum mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+    StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;
 
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
