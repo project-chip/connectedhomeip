@@ -25,8 +25,7 @@ on:
 concurrency:
     group:
         ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
-        'pull_request' && github.event.number) || (github.event_name ==
-        'workflow_dispatch' && github.run_number) || github.sha }}
+        'pull_request' && github.event.number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -48,10 +47,11 @@ jobs:
                       build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
                       sysbuild: --sysbuild
-                    - board: siwx917_rb4338a
-                      toolchain: zephyr
-                      build_dir: all-devices-zephyr-siwx917
-                      sysbuild: ""
+                    # Uncomment after #74530
+                    # - board: siwx917_rb4338a
+                    #   toolchain: zephyr
+                    #   build_dir: all-devices-zephyr-siwx917
+                    #   sysbuild: ""
 
         steps:
             - name: Checkout Matter
