@@ -63,8 +63,7 @@ list(APPEND APP_TOPLEVEL_EXTRA_SRCS
 -   **Replace**:
     -   After the existing `gRootNode->Register(...)` call in
         `PopulateCodeDrivenDataModelProvider()`, instantiate and register the
-        product device on `EndpointId(1)` (unregistering `gRootNode` if
-        registration fails):
+        product device on `EndpointId(1)`:
 
 ```cpp
     // ... keep existing gRootNode->Register(...) above ...

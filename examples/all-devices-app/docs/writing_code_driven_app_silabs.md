@@ -49,8 +49,7 @@ for architecture and device class implementation.
 -   **Replace**:
     -   After the existing `sRootNode->Register(...)` call in
         `AppTask::InitCodeDrivenDataModel()`, instantiate and register the
-        product device on `kDeviceEndpointId` (`EndpointId(1)`), unregistering
-        `sRootNode` on failure:
+        product device on `kDeviceEndpointId` (`EndpointId(1)`):
 
 ```cpp
     // ... keep existing sRootNode->Register(...) above ...
