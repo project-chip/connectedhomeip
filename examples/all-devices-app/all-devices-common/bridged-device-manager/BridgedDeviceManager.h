@@ -84,7 +84,8 @@ public:
      *
      * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
      * @param composition The composition of the device. The parentId will be overridden.
-     * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be used.
+     * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be
+     * used.
      * @param nodeLabel The label for the new device.
      *
      * @return An optional DeviceInterfaceId of the newly added device. If the operation fails, returns std::nullopt.
