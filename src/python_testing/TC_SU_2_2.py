@@ -142,7 +142,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         return 7200
 
     def desc_TC_SU_2_2(self) -> str:
-        return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor"
+        return "[TC-SU-2.2] Handling Different QueryImageResponse Scenarios on Requestor and Verifying Events on OTA-R(DUT)"
 
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
@@ -851,11 +851,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
 
-        subscription_state_transition = EventSubscriptionHandler(
-            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id
-        )
-
         await self._start_subscription_bounded(
             subscription_attr_state_busy_180s, step_number_s3,
             dev_ctrl=controller,
@@ -866,21 +861,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             max_interval_sec=30,
             keepSubscriptions=False
         )
-
-        # Subscription for StateTransition
-        await self._start_subscription_bounded(
-            subscription_state_transition, step_number_s3,
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=30,
-        )
-        # Drop any StateTransition events left over from the previous steps, then cancel the
-        # subscription: left running it competes with the attribute subscription used below.
-        subscription_state_transition.flush_events()
-        subscription_state_transition.cancel()
 
         # Announce until this provider confirms it received the query. The provider process was
         # just replaced, so the DUT's first query can die in the session it cached for Step 2's
@@ -1115,6 +1095,14 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         else:
             asserts.fail("More or one DownloadError events gathered %s", download_error_events)
 
+
+        if update_state_progress is NullValue:
+            # If the UpdateState is Unknow the value can be Null
+            asserts.assert_equal(event_download_error.progressPercent, NullValue,
+                                 "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")
+        else:
+            asserts.assert_greater_equal(event_download_error.progressPercent, 0, "Download progress was 0")
+
         asserts.assert_is_not_none(event_download_error, f"{step_number_s4}: no DownloadError was found")
         logger.info("DownloadError event: %s", event_download_error)
         asserts.assert_equal(event_download_error.softwareVersion, ota_image_version,
@@ -1123,11 +1111,25 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(event_download_error.platformCode, NullValue,
                              f"Expected NullValue for platformCode, found {event_download_error.platformCode}")
         logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error)
-        asserts.assert_greater_equal(event_download_error.progressPercent, 0, "Download progress was 0")
-        if update_state_progress is NullValue:
-            # If the UpdateState is Unknow the value can be Null
-            asserts.assert_equal(event_download_error.progressPercent, NullValue,
-                                 "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")
+        
+        # Validate the transition to kIdle after the DownloadError
+        state_transition_events = await controller.ReadEvent(
+            requestor_node_id,
+            events=[(0, Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, urgent)],
+            fabricFiltered=True
+        )
+        kIdleEventData = None
+        #There must be a state transition Event to kIdle
+        for event in state_transition_events:
+            if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.previousState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
+                kIdleEventData = event.Data
+
+        # kIdle Event found check the values
+        logger.info("Found kIdle event for after DownloadErrorEvent%s",kIdleEventData)
+        asserts.assert_equal(kIdleEventData.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,)
+        asserts.assert_equal(kIdleEventData.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,"Previous State for kIdle State transition was not kDownloading")
+        asserts.assert_equal(kIdleEventData.reason, Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure,"Reason is not kTimeout")
+
         # [End of Step #6 TC_SU_2_7]
 
         self.step(5)
