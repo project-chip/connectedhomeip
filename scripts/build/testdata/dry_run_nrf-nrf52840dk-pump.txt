@@ -2,11 +2,9 @@
 cd "{root}"
 
 # Generating nrf-nrf52840dk-pump
-bash -c 'source "$ZEPHYR_BASE/../.zephyrrc";
-source scripts/activate.sh;
+bash -c 'NRFCONNECT_SKIP_ENV_STATE=1 source scripts/setup/nrfconnect/activate.sh;
 west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk/nrf52840 --sysbuild {root}/examples/pump-app/nrfconnect'
 
 # Building nrf-nrf52840dk-pump
-bash -c 'source "$ZEPHYR_BASE/../.zephyrrc";
-source scripts/activate.sh;
+bash -c 'NRFCONNECT_SKIP_ENV_STATE=1 source scripts/setup/nrfconnect/activate.sh;
 ninja -C {out}/nrf-nrf52840dk-pump'

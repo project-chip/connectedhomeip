@@ -459,7 +459,10 @@ def BuildNrfTarget():
     target.AppendFixedTargets([
         TargetPart('nrf5340dk', board=NrfBoard.NRF5340DK),
         TargetPart('nrf52840dk', board=NrfBoard.NRF52840DK),
-        TargetPart('nrf52840dongle').OnlyIfRe('-(all-clusters|light)'),
+        TargetPart('nrf54l15dk', board=NrfBoard.NRF54L15DK),
+        TargetPart('nrf54l15t', board=NrfBoard.NRF54L15TAG),
+        TargetPart('nrf54lm20dk', board=NrfBoard.NRF54LM20DK),
+        TargetPart('nrf52840dongle', board=NrfBoard.NRF52840DONGLE).OnlyIfRe('-(all-clusters|light)'),
     ])
 
     # apps
@@ -476,6 +479,9 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('wifi', enable_wifi=True).OnlyIfRe('nrf54lm20dk')
+    target.AppendModifier('bledfu', enable_bledfu=True)
+    target.AppendModifier('release', enable_release=True)
 
     return target
 

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os
 import shlex
+import sys
 from enum import Enum, auto
 
 from runner.runner import Runner
@@ -118,6 +120,9 @@ class NrfBoard(Enum):
     NRF52840DK = auto()
     NRF52840DONGLE = auto()
     NRF5340DK = auto()
+    NRF54L15DK = auto()
+    NRF54L15TAG = auto()
+    NRF54LM20DK = auto()
     NATIVE_SIM = auto()
 
     def GnArgName(self):
@@ -126,7 +131,13 @@ class NrfBoard(Enum):
         if self == NrfBoard.NRF52840DONGLE:
             return 'nrf52840dongle/nrf52840'
         if self == NrfBoard.NRF5340DK:
-            return 'nrf5340dk/nrf5340cpuapp'
+            return 'nrf5340dk/nrf5340/cpuapp'
+        if self == NrfBoard.NRF54L15DK:
+            return 'nrf54l15dk/nrf54l15/cpuapp'
+        if self == NrfBoard.NRF54L15TAG:
+            return 'nrf54l15t/nrf54l15/cpuapp'
+        if self == NrfBoard.NRF54LM20DK:
+            return 'nrf54lm20dk/nrf54lm20b/cpuapp'
         if self == NrfBoard.NATIVE_SIM:
             return 'native_sim'
         raise Exception(f'Unknown board type: {self!r}')
@@ -141,55 +152,122 @@ class NrfConnectBuilder(Builder):
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False,
+                 enable_wifi: bool = False,
+                 enable_bledfu: bool = False,
+                 enable_release: bool = False,
                  ):
         super().__init__(root, runner, output_dir_lock)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.enable_wifi = enable_wifi
+        self.enable_bledfu = enable_bledfu
+        self.enable_release = enable_release
 
-    def _check_ncs_version(self):
+    def _run_in_nrfconnect_env(self, script: str, title: str = None):
+        cmd = self._prepare_environment() + script
+        self._Execute(['bash', '-c', cmd.strip()], title=title)
+
+    def _validate_ncs_environment(self):
         # validate the the ZEPHYR_BASE is up to date (generally the case in docker images)
         try:
-            self._Execute(
-                ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
+            self._run_in_nrfconnect_env(
+                'python3 scripts/setup/nrfconnect/update_ncs.py --check && '
+                'test -w "$(dirname "$ZEPHYR_BASE")"',
+                title='Validating NCS environment')
         except Exception:
             log.exception('Failed to validate ZEPHYR_BASE status')
             log.error(
                 'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
+            log.error(
+                'Ensure the nRF Connect environment is active: '
+                'source scripts/setup/nrfconnect/activate.sh')
 
             raise Exception('ZEPHYR_BASE validation failed')
 
     def _prepare_environment(self):
-        # Source the zephyrrc to set up the environment
-        # The zephyrrc changes the python environment, so we need to
-        # source the activate.sh script after zephyrrc to ensure that the
-        # all python packages and dependencies are available.
-        return 'source "$ZEPHYR_BASE/../.zephyrrc";\nsource scripts/activate.sh;\n'
+        # Activate the nRF Connect SDK and Matter build environments. Skip saving
+        # shell state because build commands run in a subshell.
+        return 'NRFCONNECT_SKIP_ENV_STATE=1 source scripts/setup/nrfconnect/activate.sh;\n'
 
     def _get_build_flags(self):
         flags = []
+
+        flags.append("-DSB_CONFIG_MERGED_HEX_FILES=y")
         if self.enable_rpcs:
             flags.append("-DOVERLAY_CONFIG=rpc.overlay")
+        if self.enable_wifi:
+            flags.append("-Dnrfconnect_SHIELD=nrf7002eb2")
+            flags.append("-DSB_CONFIG_WIFI_NRF70=y")
+            flags.append("-DCONFIG_CHIP_WIFI=y")
+        if self.enable_bledfu:
+            flags.append("-DCONFIG_CHIP_DFU_OVER_BT_SMP=y")
+        if self.enable_release:
+            flags.append("-DFILE_SUFFIX=release")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
         return " -- " + " ".join(flags) if len(flags) > 0 else ""
 
+    def _find_merged_hex_files(self):
+        merged_hex_files = sorted(glob.glob(os.path.join(self.output_dir, 'merged*.hex')))
+        if len(merged_hex_files) > 0:
+            return merged_hex_files
+
+        board_target = self.board.GnArgName().replace('/', '_')
+        expected = os.path.join(self.output_dir, f'merged_{board_target}.hex')
+        if os.path.isfile(expected):
+            return [expected]
+
+        return []
+
+    def _log_flash_instructions(self):
+        if self._runner.dry_run:
+            return
+
+        if self.app == NrfApp.UNIT_TESTS or self.board == NrfBoard.NATIVE_SIM:
+            return
+
+        merged_hex_files = self._find_merged_hex_files()
+        if len(merged_hex_files) == 0:
+            log.warning('Merged HEX file not found in %s', self.output_dir)
+            return
+
+        banner = '=' * 80
+        lines = [
+            '',
+            banner,
+            ' BUILD COMPLETE - FLASH THE DEVICE ',
+            banner,
+            '',
+            'Flash using nrfutil and the merged HEX file(s):',
+            '',
+        ]
+        for merged_hex in merged_hex_files:
+            lines.append(
+                '  nrfutil device program --firmware {firmware} --options chip_erase_mode=ERASE_ALL'.format(
+                    firmware=shlex.quote(merged_hex)))
+        lines.extend([
+            '',
+            'If more than one device is connected, list serial numbers with:',
+            '  nrfutil device list',
+            '',
+            'Then add --serial-number <serial_number> to the flash command(s) above, for example:',
+            '  nrfutil device program --firmware {firmware} --options chip_erase_mode=ERASE_ALL '
+            '--serial-number <serial_number>'.format(firmware=shlex.quote(merged_hex_files[0])),
+            '',
+            banner,
+            '',
+        ])
+        # Print to stderr so the flash instructions stay visible regardless of log level.
+        print('\n'.join(lines), file=sys.stderr, flush=True)
+
     @lock_output_dir
     def generate(self):
         if not os.path.exists(self.output_dir):
             if not self._runner.dry_run:
-                self._check_ncs_version()
-
-                zephyr_base = os.environ['ZEPHYR_BASE']
-                nrfconnect_sdk = os.path.dirname(zephyr_base)
-
-                # NRF builds will both try to change .west/config in nrfconnect and
-                # overall perform a git fetch on that location
-                if not os.access(nrfconnect_sdk, os.W_OK):
-                    raise Exception(
-                        f"Directory {nrfconnect_sdk} not writable. NRFConnect builds require updates to this directory.")
+                self._validate_ncs_environment()
 
             cmd = self._prepare_environment()
 
@@ -221,6 +299,8 @@ class NrfConnectBuilder(Builder):
             # pollute the source directory
             self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect'), '--no-tests=error'],
                           title='Run Tests ' + self.identifier)
+        else:
+            self._log_flash_instructions()
 
     @lock_output_dir
     def _bundle(self):
