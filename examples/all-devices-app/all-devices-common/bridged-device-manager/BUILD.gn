@@ -22,9 +22,9 @@ source_set("bridged-device-manager") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory:device-registration-entry",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device-factory:device-registration-entry",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/support",
   ]
