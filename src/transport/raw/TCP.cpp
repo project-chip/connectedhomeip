@@ -558,9 +558,6 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
 
     VerifyOrDie(!activeConnection.IsNull());
 
-    // Set to Connected state
-    activeConnection->mConnectionState = TCPState::kConnected;
-
     // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true.
     // This is to expedite transmission of payload data and not rely on the
     // network stack's configuration of collating enough data in the TCP
@@ -582,13 +579,15 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
 
             if ((conErr == CHIP_NO_ERROR) && (err == CHIP_NO_ERROR))
             {
-                // TODO(gmarcosb): These errors are just swallowed; caller unaware their message is just dropped?
-                // Likely just falls through to a timeout instead of fail-fast
                 err = endPoint->Send(std::move(buffer));
             }
         }
         return Loop::Continue;
     });
+
+    // A failed send above closes the connection, which reports the attempt as failed.
+    VerifyOrReturn(activeConnection->InUse());
+    activeConnection->mConnectionState = TCPState::kConnected;
 
     // Set the TCPKeepalive configurations on the established connection
     TEMPORARY_RETURN_IGNORED endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs,
