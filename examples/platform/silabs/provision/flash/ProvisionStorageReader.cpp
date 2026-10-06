@@ -96,7 +96,7 @@ CHIP_ERROR ProvisionStorageReader::GetProductName(char * value, size_t max)
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
-        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME);
         err = CHIP_NO_ERROR;
     }

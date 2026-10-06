@@ -153,8 +153,9 @@ CHIP_ERROR ProvisionStorageReader::GetSpake2pSalt(MutableByteSpan & value)
 #endif
     ReturnErrorOnFailure(err);
 
-    uint8_t decoded[chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length] = { 0 };
-    const size_t decodedSize                                      = chip::Base64Decode32(encoded, encodedSize, decoded);
+    uint8_t decoded[kSpake2pSaltDecodedBufferSize] = { 0 };
+    VerifyOrReturnError(BASE64_MAX_DECODED_LEN(encodedSize) <= kSpake2pSaltDecodedBufferSize, CHIP_ERROR_INVALID_ARGUMENT);
+    const size_t decodedSize = chip::Base64Decode32(encoded, static_cast<uint32_t>(encodedSize), decoded);
     VerifyOrReturnError(decodedSize >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length &&
                             decodedSize <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length,
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -180,8 +181,13 @@ CHIP_ERROR ProvisionStorageReader::GetSpake2pVerifier(MutableByteSpan & value, s
     }
 #endif
     ReturnErrorOnFailure(err);
-    size = chip::Base64Decode32(encoded, encodedSize, value.data());
+
+    uint8_t decoded[kSpake2pVerifierDecodedBufferSize] = { 0 };
+    VerifyOrReturnError(BASE64_MAX_DECODED_LEN(encodedSize) <= kSpake2pVerifierDecodedBufferSize, CHIP_ERROR_INVALID_ARGUMENT);
+    size = chip::Base64Decode32(encoded, static_cast<uint32_t>(encodedSize), decoded);
     VerifyOrReturnError(size == chip::Crypto::kSpake2p_VerifierSerialized_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(size <= value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(value.data(), decoded, size);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
 }

@@ -102,6 +102,8 @@ private:
     static constexpr size_t kSpake2pSaltB64BufferSize    = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
     static constexpr size_t kSpake2pVerifierB64BufferSize =
         BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
+    static constexpr size_t kSpake2pSaltDecodedBufferSize     = BASE64_MAX_DECODED_LEN(kSpake2pSaltB64BufferSize);
+    static constexpr size_t kSpake2pVerifierDecodedBufferSize = BASE64_MAX_DECODED_LEN(kSpake2pVerifierB64BufferSize);
 };
 
 } // namespace Provision
