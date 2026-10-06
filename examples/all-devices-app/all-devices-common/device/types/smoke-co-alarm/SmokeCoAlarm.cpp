@@ -25,39 +25,10 @@ using namespace chip::app::Clusters::SmokeCoAlarm;
 namespace chip {
 namespace app {
 
-namespace {
-
-// CO concentration: numeric + level indication, measured in air as ppm.
-SmokeCoAlarm::ConcentrationCluster::Config DefaultCoConfig()
-{
-    return SmokeCoAlarm::ConcentrationCluster::Config{
-        .clusterId = CarbonMonoxideConcentrationMeasurement::Id,
-        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                ConcentrationMeasurement::Feature::kLevelIndication),
-        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-    };
-}
-
-// Smoke concentration: numeric + level indication, measured in air as percent obscuration per foot.
-SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
-{
-    return SmokeCoAlarm::ConcentrationCluster::Config{
-        .clusterId = SmokeConcentrationMeasurement::Id,
-        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                ConcentrationMeasurement::Feature::kLevelIndication),
-        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
-    };
-}
-
-} // namespace
-
 SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
-                           const Clusters::SmokeCoAlarmCluster::Config & smokeConfig) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
-    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
-    mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(smokeConfig)
+                           const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
+    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -68,15 +39,21 @@ CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModel
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);
+    mSmokeCoAlarmCluster.Create(endpoint, mConfig.alarmConfig);
     mSmokeCoAlarmCluster.Cluster().SetDelegate(&mSmokeCoAlarmDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
-    mCoMeasurementCluster.Create(endpoint, mCoConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
+    if (mConfig.coConcentrationConfig.has_value())
+    {
+        mCoMeasurementCluster.Create(endpoint, *mConfig.coConcentrationConfig);
+        ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
+    }
 
-    mSmokeConcentrationCluster.Create(endpoint, mSmokeConcentrationConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
+    if (mConfig.smokeConcentrationConfig.has_value())
+    {
+        mSmokeConcentrationCluster.Create(endpoint, *mConfig.smokeConcentrationConfig);
+        ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
+    }
 
     return provider.AddEndpoint(mEndpointRegistration);
 }

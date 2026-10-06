@@ -762,14 +762,32 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
+                // Combined smoke + CO alarm exposing every optional attribute and both concentration measurement clusters,
+                // to showcase the device type's full surface.
                 // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
                 constexpr uint32_t kExampleExpiryDate = 3976214400;
-                Clusters::SmokeCoAlarmCluster::Config config;
-                config.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm).Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-                config.optionalAttribs =
+                SmokeCoAlarm::Config config;
+                config.alarmConfig.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm)
+                    .Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
+                config.alarmConfig.optionalAttribs =
                     Clusters::SmokeCoAlarmCluster::OptionalAttributeSet(Clusters::SmokeCoAlarmCluster::OptionalAttributeSet::All());
-                config.expiryDate = kExampleExpiryDate;
+                config.alarmConfig.WithExpiryDate(kExampleExpiryDate);
+                config.coConcentrationConfig = SmokeCoAlarm::ConcentrationCluster::Config{
+                    .clusterId = Clusters::CarbonMonoxideConcentrationMeasurement::Id,
+                    .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                        Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                        Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                    .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                    .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                };
+                config.smokeConcentrationConfig = SmokeCoAlarm::ConcentrationCluster::Config{
+                    .clusterId = Clusters::SmokeConcentrationMeasurement::Id,
+                    .features  = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                        Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                        Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                    .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                    .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+                };
                 return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }

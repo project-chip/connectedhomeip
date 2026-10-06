@@ -49,14 +49,19 @@ public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         SmokeCoAlarm::Attributes::DeviceMuted::Id, SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
         SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id, SmokeCoAlarm::Attributes::ContaminationState::Id,
-        SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::ExpiryDate::Id,
-        SmokeCoAlarm::Attributes::Unmounted::Id>;
+        SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::Unmounted::Id>;
     struct Config
     {
         chip::BitFlags<SmokeCoAlarm::Feature> featureMap;
         OptionalAttributeSet optionalAttribs;
         bool inoperativeWhenUnmounted = false;
         std::optional<uint32_t> expiryDate;
+
+        Config & WithExpiryDate(uint32_t value)
+        {
+            expiryDate = value;
+            return *this;
+        }
     };
 
     explicit SmokeCoAlarmCluster(EndpointId endpointId);

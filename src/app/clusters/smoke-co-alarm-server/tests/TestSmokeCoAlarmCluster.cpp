@@ -52,7 +52,7 @@ SmokeCoAlarmCluster::Config MakeFullConfig()
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    cfg.expiryDate      = kTestExpiryDate;
+    cfg.WithExpiryDate(kTestExpiryDate);
     return cfg;
 }
 
@@ -106,7 +106,7 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_ExpiryDateFromConfig)
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.expiryDate = kTestExpiryDate;
+    cfg.WithExpiryDate(kTestExpiryDate);
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);

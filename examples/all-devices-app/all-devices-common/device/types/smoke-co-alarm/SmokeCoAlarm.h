@@ -24,6 +24,8 @@
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 
@@ -35,8 +37,14 @@ class SmokeCoAlarm : public SingleEndpoint
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
-                 const Clusters::SmokeCoAlarmCluster::Config & smokeConfig);
+    struct Config
+    {
+        Clusters::SmokeCoAlarmCluster::Config alarmConfig;
+        std::optional<ConcentrationCluster::Config> coConcentrationConfig;
+        std::optional<ConcentrationCluster::Config> smokeConcentrationConfig;
+    };
+
+    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate, const Config & config);
     ~SmokeCoAlarm() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -51,9 +59,7 @@ public:
 protected:
     TimerDelegate & mTimerDelegate;
     Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
-    ConcentrationCluster::Config mCoConfig;
-    ConcentrationCluster::Config mSmokeConcentrationConfig;
-    Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;
+    Config mConfig;
 
     LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
     LazyRegisteredServerCluster<ConcentrationCluster> mSmokeConcentrationCluster;

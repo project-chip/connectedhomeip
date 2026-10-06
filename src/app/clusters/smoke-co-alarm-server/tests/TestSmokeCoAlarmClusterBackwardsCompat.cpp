@@ -40,11 +40,15 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
     ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
+// 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+constexpr uint32_t kTestExpiryDate = 3976214400;
+
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
     SmokeCoAlarmCluster::Config cfg;
     cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
     cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    cfg.WithExpiryDate(kTestExpiryDate);
     return cfg;
 }
 
