@@ -45,6 +45,13 @@
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <lib/support/FileDescriptor.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::System;
@@ -384,6 +391,195 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+namespace {
+
+int NewReusableIPv6UdpSocket()
+{
+    int fd = socket(AF_INET6, SOCK_DGRAM, 0);
+    if (fd >= 0)
+    {
+        constexpr int one = 1;
+        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+#ifdef SO_REUSEPORT
+        setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
+#endif // defined(SO_REUSEPORT)
+#ifdef IPV6_V6ONLY
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
+#endif // defined(IPV6_V6ONLY)
+    }
+    return fd;
+}
+
+int BindIPv6(int fd, uint16_t port)
+{
+    sockaddr_in6 sa = {};
+    sa.sin6_family  = AF_INET6;
+    sa.sin6_addr    = in6addr_any;
+    sa.sin6_port    = htons(port);
+    return bind(fd, reinterpret_cast<const sockaddr *>(&sa), sizeof(sa)) == 0 ? 0 : errno;
+}
+
+uint16_t BoundPort(int fd)
+{
+    sockaddr_in6 bound    = {};
+    socklen_t boundLength = sizeof(bound);
+    return getsockname(fd, reinterpret_cast<sockaddr *>(&bound), &boundLength) == 0 ? ntohs(bound.sin6_port) : 0;
+}
+
+#ifdef IP_LOCAL_PORT_RANGE
+bool RestrictEphemeralRangeTo(int fd, uint16_t port)
+{
+    // Low bound in bits 0-15, high bound in bits 16-31: the kernel may only pick `port`.
+    const uint32_t onlyThisPort = static_cast<uint32_t>(port) | (static_cast<uint32_t>(port) << 16);
+    return setsockopt(fd, IPPROTO_IP, IP_LOCAL_PORT_RANGE, &onlyThisPort, sizeof(onlyThisPort)) == 0;
+}
+#endif // defined(IP_LOCAL_PORT_RANGE)
+
+} // namespace
+
+#ifdef IP_LOCAL_PORT_RANGE
+TEST_F(TestInetEndPoint, TestUDPEphemeralPortIsNotShared)
+{
+    UDPEndPointHandle endPoint;
+    ASSERT_EQ(gUDP.NewEndPoint(endPoint), CHIP_NO_ERROR);
+    ASSERT_EQ(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, 0), CHIP_NO_ERROR);
+    const uint16_t port = endPoint->GetBoundPort();
+    ASSERT_NE(port, 0);
+
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    if (!RestrictEphemeralRangeTo(probe.Get(), port))
+    {
+        GTEST_SKIP() << "IP_LOCAL_PORT_RANGE unsupported by this kernel";
+    }
+    EXPECT_EQ(BindIPv6(probe.Get(), 0), EADDRINUSE);
+    endPoint.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUDPEphemeralRetryAfterFailedFixedBindIsNotShared)
+{
+    FileDescriptor holder(socket(AF_INET6, SOCK_DGRAM, 0));
+    ASSERT_GE(holder.Get(), 0);
+    ASSERT_EQ(BindIPv6(holder.Get(), 0), 0);
+    const uint16_t heldPort = BoundPort(holder.Get());
+    ASSERT_NE(heldPort, 0);
+
+    UDPEndPointHandle endPoint;
+    ASSERT_EQ(gUDP.NewEndPoint(endPoint), CHIP_NO_ERROR);
+    EXPECT_NE(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, heldPort), CHIP_NO_ERROR);
+    holder.Close();
+    ASSERT_EQ(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, 0), CHIP_NO_ERROR);
+    const uint16_t port = endPoint->GetBoundPort();
+    ASSERT_NE(port, 0);
+
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    if (!RestrictEphemeralRangeTo(probe.Get(), port))
+    {
+        GTEST_SKIP() << "IP_LOCAL_PORT_RANGE unsupported by this kernel";
+    }
+    EXPECT_EQ(BindIPv6(probe.Get(), 0), EADDRINUSE);
+    endPoint.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUDPSendAfterFailedFixedBindIsNotShared)
+{
+    FileDescriptor holder(socket(AF_INET6, SOCK_DGRAM, 0));
+    ASSERT_GE(holder.Get(), 0);
+    ASSERT_EQ(BindIPv6(holder.Get(), 0), 0);
+    const uint16_t heldPort = BoundPort(holder.Get());
+    ASSERT_NE(heldPort, 0);
+
+    FileDescriptor receiver(socket(AF_INET6, SOCK_DGRAM, 0));
+    ASSERT_GE(receiver.Get(), 0);
+    ASSERT_EQ(BindIPv6(receiver.Get(), 0), 0);
+    timeval timeout = {};
+    timeout.tv_sec  = 1;
+    ASSERT_EQ(setsockopt(receiver.Get(), SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)), 0);
+
+    UDPEndPointHandle endPoint;
+    ASSERT_EQ(gUDP.NewEndPoint(endPoint), CHIP_NO_ERROR);
+    EXPECT_NE(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, heldPort), CHIP_NO_ERROR);
+
+    IPAddress loopback;
+    ASSERT_TRUE(IPAddress::FromString("::1", loopback));
+    const uint8_t payload = 0;
+    ASSERT_EQ(endPoint->SendTo(loopback, BoundPort(receiver.Get()), PacketBufferHandle::NewWithData(&payload, sizeof(payload))),
+              CHIP_NO_ERROR);
+
+    uint8_t received;
+    sockaddr_in6 source    = {};
+    socklen_t sourceLength = sizeof(source);
+    ASSERT_EQ(recvfrom(receiver.Get(), &received, sizeof(received), 0, reinterpret_cast<sockaddr *>(&source), &sourceLength), 1);
+    const uint16_t port = ntohs(source.sin6_port);
+    ASSERT_NE(port, 0);
+
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    if (!RestrictEphemeralRangeTo(probe.Get(), port))
+    {
+        GTEST_SKIP() << "IP_LOCAL_PORT_RANGE unsupported by this kernel";
+    }
+    EXPECT_EQ(BindIPv6(probe.Get(), 0), EADDRINUSE);
+    endPoint.Release();
+}
+#endif // defined(IP_LOCAL_PORT_RANGE)
+
+TEST_F(TestInetEndPoint, TestUDPFixedPortIsShared)
+{
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    ASSERT_EQ(BindIPv6(probe.Get(), 0), 0);
+    const uint16_t port = BoundPort(probe.Get());
+    ASSERT_NE(port, 0);
+
+    UDPEndPointHandle first;
+    UDPEndPointHandle second;
+    ASSERT_EQ(gUDP.NewEndPoint(first), CHIP_NO_ERROR);
+    ASSERT_EQ(gUDP.NewEndPoint(second), CHIP_NO_ERROR);
+    EXPECT_EQ(first->Bind(IPAddressType::kIPv6, IPAddress::Any, port), CHIP_NO_ERROR);
+    EXPECT_EQ(second->Bind(IPAddressType::kIPv6, IPAddress::Any, port), CHIP_NO_ERROR);
+    first.Release();
+    second.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUDPFailedRebindKeepsEphemeralPortUnshared)
+{
+    UDPEndPointHandle endPoint;
+    ASSERT_EQ(gUDP.NewEndPoint(endPoint), CHIP_NO_ERROR);
+    ASSERT_EQ(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, 0), CHIP_NO_ERROR);
+    const uint16_t port = endPoint->GetBoundPort();
+    ASSERT_NE(port, 0);
+    EXPECT_NE(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, port), CHIP_NO_ERROR);
+
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    EXPECT_EQ(BindIPv6(probe.Get(), port), EADDRINUSE);
+    endPoint.Release();
+}
+
+TEST_F(TestInetEndPoint, TestUDPFailedRebindKeepsFixedPortShared)
+{
+    FileDescriptor holder(NewReusableIPv6UdpSocket());
+    ASSERT_GE(holder.Get(), 0);
+    ASSERT_EQ(BindIPv6(holder.Get(), 0), 0);
+    const uint16_t port = BoundPort(holder.Get());
+    ASSERT_NE(port, 0);
+
+    UDPEndPointHandle endPoint;
+    ASSERT_EQ(gUDP.NewEndPoint(endPoint), CHIP_NO_ERROR);
+    ASSERT_EQ(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, port), CHIP_NO_ERROR);
+    holder.Close();
+    EXPECT_NE(endPoint->Bind(IPAddressType::kIPv6, IPAddress::Any, port), CHIP_NO_ERROR);
+
+    FileDescriptor probe(NewReusableIPv6UdpSocket());
+    ASSERT_GE(probe.Get(), 0);
+    EXPECT_EQ(BindIPv6(probe.Get(), port), 0);
+    endPoint.Release();
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the Inet resource limitations.
