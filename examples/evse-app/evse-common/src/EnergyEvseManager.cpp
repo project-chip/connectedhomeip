@@ -65,24 +65,15 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     }
 
     // Restore ChargingEnabledUntil value - via Instance (which owns the data).
-    // A fresh installation defaults to charging enabled indefinitely, while a
-    // stored zero is an explicit Disable that must persist across a restart.
+    // A fresh installation stays Disabled until an EnableCharging command is received.
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),
                                      tempChargingEnabledUntil);
     bool chargingEnabledUntilStored = err == CHIP_NO_ERROR;
-    bool useDefaultChargingEnabled  = false;
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
         LogErrorOnFailure(SetChargingEnabledUntil(tempChargingEnabledUntil));
-    }
-    else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        tempChargingEnabledUntil = DataModel::NullNullable;
-        ReturnErrorOnFailure(SetChargingEnabledUntil(tempChargingEnabledUntil));
-        useDefaultChargingEnabled = true;
-        ChipLogProgress(AppServer, "EVSE: defaulting to charging enabled indefinitely");
     }
     else
     {
@@ -104,8 +95,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
         ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
     }
 
-    const bool chargingEnabled =
-        (chargingEnabledUntilStored || useDefaultChargingEnabled) && IsEnabledAtStartup(tempChargingEnabledUntil);
+    const bool chargingEnabled    = chargingEnabledUntilStored && IsEnabledAtStartup(tempChargingEnabledUntil);
     const bool dischargingEnabled = dischargingEnabledUntilStored && IsEnabledAtStartup(tempDischargingEnabledUntil);
     if (chargingEnabled && dischargingEnabled)
     {
