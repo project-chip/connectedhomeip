@@ -1093,11 +1093,14 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
 CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
-    // With no room left for the new path, folding it into a wider path is the fallback.
-    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath, mGlobalDirtySet.Exhausted()), CHIP_NO_ERROR);
+    // An equal entry, or one the new path widens, is preferred to renewing a wider entry.
+    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
     if (mGlobalDirtySet.Exhausted())
     {
+        // With no room left for the new path, folding it into a wider path is the fallback.
+        VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath, /* aRenewWiderPath = */ true), CHIP_NO_ERROR);
+
         if (!MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
         {
             ChipLogDetail(DataManagement, "Global dirty set pool exhausted, merge all paths.");

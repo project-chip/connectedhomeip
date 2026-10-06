@@ -519,6 +519,32 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestWiderDirtyPathIsNotRenewedByCovered
         return Loop::Continue;
     });
 
+    // With the pool full, an equal entry is still preferred to a wider one: renewing the wildcard would make the next
+    // report the whole node again.
+    engine.mGlobalDirtySet.ReleaseAll();
+    engine.BumpDirtySetGeneration();
+    EXPECT_TRUE(InsertToDirtySet(AttributePathParams()));
+    const uint32_t fullPoolWildcardGeneration = engine.GetDirtySetGeneration().Raw();
+    for (AttributeId i = 1; i < CHIP_IM_SERVER_MAX_NUM_DIRTY_SET; i++)
+    {
+        EXPECT_TRUE(InsertToDirtySet(AttributePathParams(kTestEndpointId, kTestClusterId, i)));
+    }
+    EXPECT_TRUE(engine.mGlobalDirtySet.Exhausted());
+
+    engine.BumpDirtySetGeneration();
+    EXPECT_EQ(CHIP_NO_ERROR, engine.InsertPathIntoDirtySet(AttributePathParams(kTestEndpointId, kTestClusterId, 1)));
+    engine.mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
+        if (path->HasWildcardEndpointId())
+        {
+            EXPECT_EQ(path->mGeneration.Raw(), fullPoolWildcardGeneration);
+        }
+        else if (path->mAttributeId == 1)
+        {
+            EXPECT_EQ(path->mGeneration.Raw(), engine.GetDirtySetGeneration().Raw());
+        }
+        return Loop::Continue;
+    });
+
     engine.Shutdown();
 }
 
