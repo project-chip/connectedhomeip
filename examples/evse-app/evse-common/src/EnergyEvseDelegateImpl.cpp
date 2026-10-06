@@ -986,6 +986,9 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
         mSession.StartSession(mInstance, 0, 0);
         SendEVConnectedEvent();
 
+        /* Any transfer state saved before a fault belongs to the previous session */
+        mStateBeforeFault = StateEnum::kUnknownEnumValue;
+
         /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
         return SetStateFromHardwareState(mHwState);
     }
@@ -1730,6 +1733,8 @@ void EnergyEvseDelegate::OnMaximumDischargeCurrentChanged(int64_t newValue)
 void EnergyEvseDelegate::OnUserMaximumChargeCurrentChanged(int64_t newValue)
 {
     ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(newValue));
+    /* An explicit value (client write, restored or defaulted) replaces any pending default from CircuitCapacity */
+    mUserMaximumChargeCurrentNeedsInitialization = false;
     ComputeMaxChargeCurrentLimit();
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
     LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));

@@ -214,17 +214,31 @@ CHIP_ERROR EnergyEvseManager::Init()
 {
     ReturnErrorOnFailure(Instance::Init());
 
+    // The cluster is now registered, so every failure below must call Shutdown() to unregister it,
+    // as the caller destroys this object on failure.
+
     // Set up the EnergyEvseTargetsStore and persistent storage delegate
     EnergyEvseDelegate * dg = GetDelegate();
-    VerifyOrReturnLogError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+    if (dg == nullptr)
+    {
+        ChipLogError(AppServer, "EVSE: no delegate");
+        Shutdown();
+        return CHIP_ERROR_UNINITIALIZED;
+    }
     dg->SetInstance(this);
 
     EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
-    VerifyOrReturnLogError(targetsStore != nullptr, CHIP_ERROR_UNINITIALIZED);
+    if (targetsStore == nullptr)
+    {
+        ChipLogError(AppServer, "EVSE: no targets delegate");
+        Shutdown();
+        return CHIP_ERROR_UNINITIALIZED;
+    }
 
-    ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage()), Shutdown());
+    ReturnErrorOnFailure(LoadPersistentValues(), Shutdown());
 
-    return LoadPersistentValues();
+    return CHIP_NO_ERROR;
 }
 
 void EnergyEvseManager::Shutdown()
