@@ -82,6 +82,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 {
     // we must be started up to accept writes (we make use of the context below)
     VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(emberAfFindEndpointType(request.path.mEndpointId) != nullptr, Status::UnsupportedEndpoint);
 
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
@@ -156,6 +157,10 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
                                                               DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
+    // A pending list write still needs its End notification for rollback and cleanup after its endpoint is disabled.
+    VerifyOrReturn(opType != DataModel::ListWriteOperation::kListWriteBegin ||
+                   emberAfFindEndpointType(aPath.mEndpointId) != nullptr);
+
     // NOTE: for backwards compatibility, we process AAI logic BEFORE Server Cluster Interface
     //       so that AttributeAccessInterface logic works if one was installed before Server Cluster Interface
     //       support was introduced in the SDK.

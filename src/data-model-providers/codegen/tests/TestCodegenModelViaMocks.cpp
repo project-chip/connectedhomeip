@@ -69,6 +69,7 @@
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -960,6 +961,16 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override
+    {
+        mListWriteNotificationCount++;
+        mLastListWriteOpType = opType;
+    }
+
+    uint32_t mListWriteNotificationCount = 0;
+    std::optional<ListWriteOperation> mLastListWriteOpType;
 
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
     {
@@ -2799,6 +2810,128 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
     }
 
     EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRequireVisibleEndpoint)
+{
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    // A registered cluster need not appear in Ember's cluster list, but its endpoint must be visible.
+    const ConcreteClusterPath clusterPath(kMockEndpoint1, MockClusterId(10));
+    FakeDefaultServerCluster cluster(clusterPath);
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+    auto unregister = ScopeExit([&] { EXPECT_SUCCESS(model.Registry().Unregister(&cluster)); });
+
+    // Model a disabled endpoint by hiding it from Ember metadata while retaining its cluster registration.
+    const MockNodeConfig noEndpoints({});
+    auto restoreConfig = ScopeExit([&] { SetMockNodeConfig(gTestNodeConfig); });
+    for (bool endpointVisible : { true, false, true })
+    {
+        SetMockNodeConfig(endpointVisible ? gTestNodeConfig : noEndpoints);
+        model.Reset();
+        ASSERT_EQ(model.Registry().Get(clusterPath), &cluster);
+
+        const CHIP_ERROR metadataStatus = endpointVisible ? CHIP_NO_ERROR : CHIP_ERROR_NOT_FOUND;
+        ReadOnlyBufferBuilder<ServerClusterEntry> clusters;
+        EXPECT_EQ(model.ServerClusters(clusterPath.mEndpointId, clusters), metadataStatus);
+        EXPECT_EQ(ServerClusterFinder(&model).Find(clusterPath).has_value(), endpointVisible);
+
+        ReadOnlyBufferBuilder<AttributeEntry> attributes;
+        EXPECT_EQ(model.Attributes(clusterPath, attributes), metadataStatus);
+        EXPECT_EQ(attributes.TakeBuffer().empty(), !endpointVisible);
+        for (const auto & attribute : FakeDefaultServerCluster::kExtraAttributes)
+        {
+            EXPECT_EQ(AttributeFinder(&model)
+                          .Find({ clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId })
+                          .has_value(),
+                      endpointVisible);
+        }
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> acceptedCommands;
+        EXPECT_EQ(model.AcceptedCommands(clusterPath, acceptedCommands), metadataStatus);
+        EXPECT_EQ(acceptedCommands.TakeBuffer().empty(), !endpointVisible);
+        ReadOnlyBufferBuilder<CommandId> generatedCommands;
+        EXPECT_EQ(model.GeneratedCommands(clusterPath, generatedCommands), metadataStatus);
+        EXPECT_EQ(generatedCommands.TakeBuffer().empty(), !endpointVisible);
+        EventEntry eventInfo;
+        EXPECT_EQ(model.EventInfo({ clusterPath.mEndpointId, clusterPath.mClusterId, kTestEventId }, eventInfo), metadataStatus);
+
+        ReadOperation read(clusterPath.mEndpointId, clusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+        read.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        auto encoder = read.StartEncoding();
+        EXPECT_EQ(model.ReadAttribute(read.GetRequest(), *encoder).GetStatusCode().GetStatus(),
+                  endpointVisible ? Status::Success : Status::UnsupportedEndpoint);
+        EXPECT_EQ(encoder->TriedEncode(), endpointVisible);
+
+        for (bool hasDataVersion : { false, true })
+        {
+            WriteOperation write(clusterPath.mEndpointId, clusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+            write.SetSubjectDescriptor(kAdminSubjectDescriptor);
+            if (hasDataVersion)
+            {
+                write.SetDataVersion(MakeOptional(cluster.GetDataVersion(clusterPath)));
+            }
+            auto decoder = write.DecoderFor<uint32_t>(1234);
+            EXPECT_EQ(model.WriteAttribute(write.GetRequest(), decoder).GetStatusCode().GetStatus(),
+                      endpointVisible ? Status::Success : Status::UnsupportedEndpoint);
+            EXPECT_EQ(decoder.TriedDecode(), endpointVisible);
+        }
+
+        InvokeRequest invoke(
+            { clusterPath.mEndpointId, clusterPath.mClusterId, FakeDefaultServerCluster::kAcceptedCommands[0].commandId },
+            kAdminSubjectDescriptor);
+        TLV::TLVReader reader;
+        auto result = model.InvokeCommand(invoke, reader, nullptr);
+        ASSERT_TRUE(result.has_value());
+        if (endpointVisible)
+        {
+            // This distinctive error confirms dispatch to the fake cluster.
+            EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_INCORRECT_STATE);
+        }
+        else
+        {
+            EXPECT_EQ(result->GetStatusCode().GetStatus(), Status::UnsupportedEndpoint);
+        }
+
+        const uint32_t notificationCount = cluster.mListWriteNotificationCount;
+        model.ListAttributeWriteNotification({ clusterPath.mEndpointId, clusterPath.mClusterId, kAttributeIdFakeAllowsWrite },
+                                             ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount + (endpointVisible ? 1u : 0u));
+    }
+}
+
+TEST_F(TestCodegenModelViaMocks, EndsListWriteAfterEndpointHidden)
+{
+    auto & model = CodegenDataModelProvider::Instance();
+    const ConcreteClusterPath clusterPath(kMockEndpoint1, MockClusterId(10));
+    const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+    FakeDefaultServerCluster cluster(clusterPath);
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+    auto unregister = ScopeExit([&] { EXPECT_SUCCESS(model.Registry().Unregister(&cluster)); });
+    const MockNodeConfig noEndpoints({});
+    auto restoreConfig = ScopeExit([&] { SetMockNodeConfig(gTestNodeConfig); });
+
+    for (auto endOperation : { ListWriteOperation::kListWriteFailure, ListWriteOperation::kListWriteSuccess })
+    {
+        SetMockNodeConfig(gTestNodeConfig);
+        model.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+        ASSERT_TRUE(cluster.mLastListWriteOpType.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpType, ListWriteOperation::kListWriteBegin);
+        const uint32_t notificationCount = cluster.mListWriteNotificationCount;
+
+        // Hide the parent endpoint while its cluster remains registered with a pending list write.
+        SetMockNodeConfig(noEndpoints);
+        ASSERT_EQ(model.Registry().Get(clusterPath), &cluster);
+        model.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
+
+        // End notifications must still reach the receiver of Begin for rollback and cleanup.
+        model.ListAttributeWriteNotification(attributePath, endOperation, kTestFabricIndex);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount + 1u);
+        EXPECT_EQ(*cluster.mLastListWriteOpType, endOperation);
+    }
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
