@@ -128,7 +128,7 @@ jobs:
               run: |
                   set -euxo pipefail
                   command -v ccache
-                  west build -p always -b "${{ matrix.board }}" "${{ matrix.sysbuild }}"--cmake-only \
+                  west build -p always -b "${{ matrix.board }}" ${{ matrix.sysbuild }} --cmake-only \
                   "${GITHUB_WORKSPACE}/examples/all-devices-app/zephyr" \
                   -d "build/${{ matrix.build_dir }}" \
                   -- \
