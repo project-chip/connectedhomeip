@@ -100,6 +100,7 @@ public:
     void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
+    void TestWiderDirtyPathIsNotRenewedByCoveredPath();
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -484,6 +485,41 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeAttributePathWhenDirtySetPoolE
                                       AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestWiderDirtyPathIsNotRenewedByCoveredPath)
+{
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                          app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+
+    auto & engine = InteractionModelEngine::GetInstance()->GetReportingEngine();
+    engine.mGlobalDirtySet.ReleaseAll();
+
+    // A whole-node wildcard, as left by a resumed wildcard subscription.
+    engine.BumpDirtySetGeneration();
+    EXPECT_EQ(CHIP_NO_ERROR, engine.InsertPathIntoDirtySet(AttributePathParams()));
+    const uint32_t wildcardGeneration = engine.GetDirtySetGeneration().Raw();
+
+    // A later change inside it is recorded on its own. The wildcard keeps its generation, so a handler that has
+    // reported past it is only sent the changed path, not the whole node again.
+    const AttributePathParams changed(kTestEndpointId, kTestClusterId, kTestFieldId1);
+    engine.BumpDirtySetGeneration();
+    EXPECT_EQ(CHIP_NO_ERROR, engine.InsertPathIntoDirtySet(changed));
+    EXPECT_TRUE(VerifyDirtySetContent(AttributePathParams(), changed));
+
+    // The same path again renews only its own entry.
+    engine.BumpDirtySetGeneration();
+    EXPECT_EQ(CHIP_NO_ERROR, engine.InsertPathIntoDirtySet(changed));
+    EXPECT_TRUE(VerifyDirtySetContent(AttributePathParams(), changed));
+
+    engine.mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
+        const uint32_t expected = path->HasWildcardEndpointId() ? wildcardGeneration : engine.GetDirtySetGeneration().Raw();
+        EXPECT_EQ(path->mGeneration.Raw(), expected);
+        return Loop::Continue;
+    });
+
+    engine.Shutdown();
 }
 
 } // namespace reporting
