@@ -41,6 +41,7 @@ jobs:
 
         strategy:
             matrix:
+                fail-fast: false
                 include:
                     - board: xg26_rb4118a
                       toolchain: zephyr
@@ -55,6 +56,9 @@ jobs:
             options: --user root
 
         steps:
+            - name: Checkout Matter
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
             - name: Checkout Zephyr
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
@@ -76,9 +80,6 @@ jobs:
                       matrix.toolchain }}
                   ccache-max-size: 2G
                   west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread"
-
-            - name: Checkout Matter
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
             - name: Configure Zephyr workspace and Matter submodules
               shell: bash
