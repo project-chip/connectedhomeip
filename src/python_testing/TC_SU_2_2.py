@@ -1121,15 +1121,14 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         kIdleEventData = None
         #There must be a state transition Event to kIdle
         for event in state_transition_events:
-            if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.previousState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
+            if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle and event.Data.previousState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading and event.Data.reason == Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kTimeOut:
                 kIdleEventData = event.Data
+                logger.info("%s StateTransition event to kIdle found for after DownloadError %s", step_number_s4, kIdleEventData)
 
-        # kIdle Event found check the values
-        logger.info("Found kIdle event for after DownloadErrorEvent%s",kIdleEventData)
-        asserts.assert_equal(kIdleEventData.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,)
-        asserts.assert_equal(kIdleEventData.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading,"Previous State for kIdle State transition was not kDownloading")
-        asserts.assert_equal(kIdleEventData.reason, Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure,"Reason is not kTimeout")
-
+        # If the event was not found fail the test as the event should have beed triggered at this point.
+        if kIdleEventData is None:
+            asserts.fail("%s : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.")
+    
         # [End of Step #6 TC_SU_2_7]
 
         self.step(5)
