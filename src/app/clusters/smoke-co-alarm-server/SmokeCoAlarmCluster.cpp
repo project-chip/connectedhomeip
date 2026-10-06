@@ -30,8 +30,9 @@ namespace Clusters {
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId) : SmokeCoAlarmCluster(endpointId, Config{}) {}
 
 SmokeCoAlarmCluster::SmokeCoAlarmCluster(EndpointId endpointId, const Config & config) :
-    DefaultServerCluster({ endpointId, Id }), mConfig(config), mInoperativeWhenUnmounted(config.mInoperativeWhenUnmounted),
-    mSmokeSensitivityLevel(config.mInitialSmokeSensitivityLevel), mExpiryDate(config.mExpiryDate.value_or(0))
+    DefaultServerCluster({ endpointId, Id }), mFeatureMap(config.mFeatureMap), mOptionalAttribs(config.mOptionalAttribs),
+    mInoperativeWhenUnmounted(config.mInoperativeWhenUnmounted), mSmokeSensitivityLevel(config.mInitialSmokeSensitivityLevel),
+    mExpiryDate(config.mExpiryDate)
 {}
 
 bool SmokeCoAlarmCluster::SetSmokeState(AlarmStateEnum newSmokeState)
@@ -99,7 +100,7 @@ void SmokeCoAlarmCluster::SetBatteryAlert(AlarmStateEnum newBatteryAlert)
 
 bool SmokeCoAlarmCluster::SetDeviceMuted(MuteStateEnum newDeviceMuted)
 {
-    VerifyOrReturnValue(mConfig.mOptionalAttribs.IsSet(DeviceMuted::Id), false);
+    VerifyOrReturnValue(mOptionalAttribs.IsSet(DeviceMuted::Id), false);
     if (mDeviceMuted == newDeviceMuted)
     {
         return true;
@@ -179,7 +180,7 @@ void SmokeCoAlarmCluster::SetEndOfServiceAlert(EndOfServiceEnum newEndOfServiceA
 
 bool SmokeCoAlarmCluster::SetInterconnectSmokeAlarm(AlarmStateEnum newInterconnectSmokeAlarm)
 {
-    VerifyOrReturnValue(mConfig.mOptionalAttribs.IsSet(InterconnectSmokeAlarm::Id), false);
+    VerifyOrReturnValue(mOptionalAttribs.IsSet(InterconnectSmokeAlarm::Id), false);
     if (!SetAttributeValue(mInterconnectSmokeAlarm, newInterconnectSmokeAlarm, InterconnectSmokeAlarm::Id))
     {
         return true;
@@ -202,7 +203,7 @@ bool SmokeCoAlarmCluster::SetInterconnectSmokeAlarm(AlarmStateEnum newInterconne
 
 bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectCOAlarm)
 {
-    VerifyOrReturnValue(mConfig.mOptionalAttribs.IsSet(InterconnectCOAlarm::Id), false);
+    VerifyOrReturnValue(mOptionalAttribs.IsSet(InterconnectCOAlarm::Id), false);
     if (!SetAttributeValue(mInterconnectCOAlarm, newInterconnectCOAlarm, InterconnectCOAlarm::Id))
     {
         return true;
@@ -225,13 +226,13 @@ bool SmokeCoAlarmCluster::SetInterconnectCOAlarm(AlarmStateEnum newInterconnectC
 
 void SmokeCoAlarmCluster::SetContaminationState(ContaminationStateEnum newContaminationState)
 {
-    VerifyOrReturn(mConfig.mOptionalAttribs.IsSet(ContaminationState::Id));
+    VerifyOrReturn(mOptionalAttribs.IsSet(ContaminationState::Id));
     SetAttributeValue(mContaminationState, newContaminationState, ContaminationState::Id);
 }
 
 void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensitivityLevel)
 {
-    VerifyOrReturn(mConfig.mOptionalAttribs.IsSet(SmokeSensitivityLevel::Id));
+    VerifyOrReturn(mOptionalAttribs.IsSet(SmokeSensitivityLevel::Id));
     SetAttributeValue(mSmokeSensitivityLevel, newSmokeSensitivityLevel, SmokeSensitivityLevel::Id);
     if (mDelegate != nullptr)
     {
@@ -241,13 +242,13 @@ void SmokeCoAlarmCluster::SetSmokeSensitivityLevel(SensitivityEnum newSmokeSensi
 
 void SmokeCoAlarmCluster::SetExpiryDate(uint32_t newExpiryDate)
 {
-    VerifyOrReturn(mConfig.mExpiryDate.has_value());
+    VerifyOrReturn(mOptionalAttribs.IsSet(ExpiryDate::Id));
     SetAttributeValue(mExpiryDate, newExpiryDate, ExpiryDate::Id);
 }
 
 bool SmokeCoAlarmCluster::SetUnmountedState(bool isUnmounted)
 {
-    VerifyOrReturnValue(mConfig.mOptionalAttribs.IsSet(Unmounted::Id), false);
+    VerifyOrReturnValue(mOptionalAttribs.IsSet(Unmounted::Id), false);
     if (!SetAttributeValue(mUnmounted, isUnmounted, Unmounted::Id))
     {
         return true;
@@ -346,7 +347,7 @@ DataModel::ActionReturnStatus SmokeCoAlarmCluster::ReadAttribute(const DataModel
     case ClusterRevision::Id:
         return encoder.Encode(SmokeCoAlarm::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(mConfig.mFeatureMap);
+        return encoder.Encode(mFeatureMap);
     case ExpressedState::Id:
         return encoder.Encode(mExpressedState);
     case SmokeState::Id:
@@ -403,15 +404,15 @@ CHIP_ERROR SmokeCoAlarmCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mConfig.mFeatureMap.Has(Feature::kSmokeAlarm), SmokeState::kMetadataEntry },
-        { mConfig.mFeatureMap.Has(Feature::kCoAlarm), COState::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(DeviceMuted::Id), DeviceMuted::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(InterconnectSmokeAlarm::Id), InterconnectSmokeAlarm::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(InterconnectCOAlarm::Id), InterconnectCOAlarm::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(ContaminationState::Id), ContaminationState::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(SmokeSensitivityLevel::Id), SmokeSensitivityLevel::kMetadataEntry },
-        { mConfig.mExpiryDate.has_value(), ExpiryDate::kMetadataEntry },
-        { mConfig.mOptionalAttribs.IsSet(Unmounted::Id), Unmounted::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kSmokeAlarm), SmokeState::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kCoAlarm), COState::kMetadataEntry },
+        { mOptionalAttribs.IsSet(DeviceMuted::Id), DeviceMuted::kMetadataEntry },
+        { mOptionalAttribs.IsSet(InterconnectSmokeAlarm::Id), InterconnectSmokeAlarm::kMetadataEntry },
+        { mOptionalAttribs.IsSet(InterconnectCOAlarm::Id), InterconnectCOAlarm::kMetadataEntry },
+        { mOptionalAttribs.IsSet(ContaminationState::Id), ContaminationState::kMetadataEntry },
+        { mOptionalAttribs.IsSet(SmokeSensitivityLevel::Id), SmokeSensitivityLevel::kMetadataEntry },
+        { mOptionalAttribs.IsSet(ExpiryDate::Id), ExpiryDate::kMetadataEntry },
+        { mOptionalAttribs.IsSet(Unmounted::Id), Unmounted::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));

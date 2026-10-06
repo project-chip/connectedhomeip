@@ -834,6 +834,7 @@ void SmokeCoAlarmInit()
             .WithDeviceMuted()
             .WithInterconnectSmokeAlarm()
             .WithInterconnectCOAlarm()
+            .WithExpiryDate(0)
             .WithUnmounted();
         VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");

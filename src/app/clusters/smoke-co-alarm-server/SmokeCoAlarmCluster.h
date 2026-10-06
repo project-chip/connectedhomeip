@@ -92,6 +92,7 @@ public:
 
         Config & WithExpiryDate(uint32_t value)
         {
+            mOptionalAttribs.Set<SmokeCoAlarm::Attributes::ExpiryDate::Id>();
             mExpiryDate = value;
             return *this;
         }
@@ -109,13 +110,14 @@ public:
         using OptionalAttributeSet = chip::app::OptionalAttributeSet<
             SmokeCoAlarm::Attributes::DeviceMuted::Id, SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
             SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id, SmokeCoAlarm::Attributes::ContaminationState::Id,
-            SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::Unmounted::Id>;
+            SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id, SmokeCoAlarm::Attributes::ExpiryDate::Id,
+            SmokeCoAlarm::Attributes::Unmounted::Id>;
 
         chip::BitFlags<SmokeCoAlarm::Feature> mFeatureMap;
         OptionalAttributeSet mOptionalAttribs;
         bool mInoperativeWhenUnmounted                              = false;
         SmokeCoAlarm::SensitivityEnum mInitialSmokeSensitivityLevel = SmokeCoAlarm::SensitivityEnum::kStandard;
-        std::optional<uint32_t> mExpiryDate;
+        uint32_t mExpiryDate                                        = 0;
     };
 
     explicit SmokeCoAlarmCluster(EndpointId endpointId);
@@ -178,9 +180,9 @@ public:
     uint32_t GetExpiryDate() const { return mExpiryDate; }
     bool GetUnmountedState() const { return mUnmounted; }
 
-    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const { return mConfig.mFeatureMap; }
-    bool SupportsSmokeAlarm() const { return mConfig.mFeatureMap.Has(SmokeCoAlarm::Feature::kSmokeAlarm); }
-    bool SupportsCOAlarm() const { return mConfig.mFeatureMap.Has(SmokeCoAlarm::Feature::kCoAlarm); }
+    chip::BitFlags<SmokeCoAlarm::Feature> GetFeatures() const { return mFeatureMap; }
+    bool SupportsSmokeAlarm() const { return mFeatureMap.Has(SmokeCoAlarm::Feature::kSmokeAlarm); }
+    bool SupportsCOAlarm() const { return mFeatureMap.Has(SmokeCoAlarm::Feature::kCoAlarm); }
 
     // DefaultServerCluster overrides
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -204,7 +206,8 @@ private:
      */
     void SetExpressedState(SmokeCoAlarm::ExpressedStateEnum newExpressedState);
 
-    const Config mConfig;
+    const chip::BitFlags<SmokeCoAlarm::Feature> mFeatureMap;
+    const Config::OptionalAttributeSet mOptionalAttribs;
     bool mInoperativeWhenUnmounted   = false;
     SmokeCoAlarmDelegate * mDelegate = nullptr;
 

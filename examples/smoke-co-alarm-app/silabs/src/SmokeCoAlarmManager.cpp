@@ -63,6 +63,7 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
         .WithDeviceMuted()
         .WithInterconnectSmokeAlarm()
         .WithInterconnectCOAlarm()
+        .WithExpiryDate(0)
         .WithUnmounted();
     ReturnErrorOnFailure(SmokeCoAlarmServer::Instance().Init(kSmokeCoAlarmEndpointId, config, this));
 
