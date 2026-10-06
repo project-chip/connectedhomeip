@@ -1,20 +1,19 @@
 # Matter nRF Connect Lighting Example Application
 
-> **Important:** This example is intended only to perform smoke tests of a Matter
-> solution integrated with nRF Connect SDK platform. The example quality is not
-> production ready and it may contain minor bugs or use not optimal
+> **Important:** This example is intended only to perform smoke tests of a
+> Matter solution integrated with nRF Connect SDK platform. The example quality
+> is not production ready and it may contain minor bugs or use not optimal
 > configuration. It is not recommended to use this example as a basis for
 > creating a market ready product.
 >
 > For the production ready and optimized Matter samples, see
 > [the Matter add-on for nRF Connect SDK samples](https://nrfconnectdocs.nordicsemi.com/addons/ncs-matter/latest/samples/index.html).
-> The Matter samples in nRF Connect SDK Matter add-on use various additional software
-> components and provide multiple optional features that improve the developer
-> and user experience. To read more about it, see
+> The Matter samples in nRF Connect SDK Matter add-on use various additional
+> software components and provide multiple optional features that improve the
+> developer and user experience. To read more about it, see
 > [Matter support in the Matter add-on for nRF Connect SDK](https://nrfconnectdocs.nordicsemi.com/addons/ncs-matter/latest/index.html)
-> page. Using Matter samples from the add-on allows you to get a full
-> Nordic technical support via [DevZone](https://devzone.nordicsemi.com/)
-> portal.
+> page. Using Matter samples from the add-on allows you to get a full Nordic
+> technical support via [DevZone](https://devzone.nordicsemi.com/) portal.
 
 The nRF Connect Lighting Example demonstrates how to remotely control a white
 dimmable light bulb. It uses buttons to test changing the lighting and device
@@ -50,9 +49,9 @@ Quick start from the connectedhomeip repository root:
 
     python3 scripts/setup/nrfconnect/setup.py
 
-> **Note**: The first run downloads several gigabytes of data (Matter submodules,
-> nRF Connect SDK, and toolchain). Later runs are much faster because already
-> installed components are detected and skipped.
+> **Note**: The first run downloads several gigabytes of data (Matter
+> submodules, nRF Connect SDK, and toolchain). Later runs are much faster
+> because already installed components are detected and skipped.
 
 To restore the previous shell environment:
 
@@ -422,10 +421,11 @@ Now you can proceed with the [Building](#building) instruction.
 
 Build from the connectedhomeip repository root with
 `scripts/build/build_examples.py`. Make sure the nRF Connect environment is
-active (see [Preparing nRF Connect environment](#preparing-nrf-connect-environment)).
+active (see
+[Preparing nRF Connect environment](#preparing-nrf-connect-environment)).
 
-Run the following command with _build-target_ replaced by the `build_examples.py`
-target for your kit:
+Run the following command with _build-target_ replaced by the
+`build_examples.py` target for your kit:
 
     ```
     $ ./scripts/build/build_examples.py --target nrf-<board>-light build
@@ -433,13 +433,13 @@ target for your kit:
 
 The table below maps supported kits to `build_examples.py` targets:
 
-| Kit build target | `build_examples.py` target |
-| ---------------- | -------------------------- |
-| `nrf52840dk/nrf52840` | `nrf-nrf52840dk-light` |
-| `nrf5340dk/nrf5340/cpuapp` | `nrf-nrf5340dk-light` |
-| `nrf54l15dk/nrf54l15/cpuapp` | `nrf-nrf54l15dk-light` |
-| `nrf54lm20dk/nrf54lm20b/cpuapp` | `nrf-nrf54lm20dk-light` |
-| `nrf52840dongle/nrf52840` | `nrf-nrf52840dongle-light` |
+| Kit build target                | `build_examples.py` target |
+| ------------------------------- | -------------------------- |
+| `nrf52840dk/nrf52840`           | `nrf-nrf52840dk-light`     |
+| `nrf5340dk/nrf5340/cpuapp`      | `nrf-nrf5340dk-light`      |
+| `nrf54l15dk/nrf54l15/cpuapp`    | `nrf-nrf54l15dk-light`     |
+| `nrf54lm20dk/nrf54lm20b/cpuapp` | `nrf-nrf54lm20dk-light`    |
+| `nrf52840dongle/nrf52840`       | `nrf-nrf52840dongle-light` |
 
 Example:
 
@@ -453,12 +453,12 @@ in the file name).
 
 Optional build modifiers can be appended to the target name:
 
-| Modifier | Description |
-| -------- | ----------- |
-| `-release` | Release configuration (`prj_release.conf`) |
-| `-bledfu` | Enable DFU over Bluetooth LE (SMP) |
-| `-wifi` | Enable Matter over Wi-Fi on nRF54LM20 DK with nRF7002 EB2 shield |
-| `-rpc` | Enable Pigweed RPC overlay |
+| Modifier   | Description                                                      |
+| ---------- | ---------------------------------------------------------------- |
+| `-release` | Release configuration (`prj_release.conf`)                       |
+| `-bledfu`  | Enable DFU over Bluetooth LE (SMP)                               |
+| `-wifi`    | Enable Matter over Wi-Fi on nRF54LM20 DK with nRF7002 EB2 shield |
+| `-rpc`     | Enable Pigweed RPC overlay                                       |
 
 Modifiers can be combined. For example:
 
@@ -532,7 +532,13 @@ has its own configuration file.
 
 #### Changing flash memory settings
 
-The example uses a static partition layout. Partitions are located in the `third_party/nrfconnect/ncs-matter/board` nRF Connect Matter add-on directory. Each `.dts` file in the `board` folder in the example directory includes the relevant `.dtsi` file from the Matter add-on. You can provide modification for your purposes by editing the specific `.dts` file or adding a new overlay file to the build system by adding the `EXTRA_DTC_OVERLAY_FILE` CMake flag to the build.
+The example uses a static partition layout. Partitions are located in the
+`third_party/nrfconnect/ncs-matter/board` nRF Connect Matter add-on directory.
+Each `.dts` file in the `board` folder in the example directory includes the
+relevant `.dtsi` file from the Matter add-on. You can provide modification for
+your purposes by editing the specific `.dts` file or adding a new overlay file
+to the build system by adding the `EXTRA_DTC_OVERLAY_FILE` CMake flag to the
+build.
 
 <hr>
 
@@ -548,11 +554,11 @@ build files with `build_examples.py`:
     $ west build -d out/nrf-<board>-light -t menuconfig
     ```
 
-Remember to replace `<board>` with the board part of your
-`build_examples.py` target (for example `nrf52840dk`).
+Remember to replace `<board>` with the board part of your `build_examples.py`
+target (for example `nrf52840dk`).
 
-Changes done with menuconfig will be lost if the output directory is deleted.
-To make them persistent, save the configuration options in the `prj.conf` file.
+Changes done with menuconfig will be lost if the output directory is deleted. To
+make them persistent, save the configuration options in the `prj.conf` file.
 
 ### Example build types
 

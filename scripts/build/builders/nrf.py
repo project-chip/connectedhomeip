@@ -246,16 +246,15 @@ class NrfConnectBuilder(Builder):
         ]
         for merged_hex in merged_hex_files:
             lines.append(
-                '  nrfutil device program --firmware {firmware} --options chip_erase_mode=ERASE_ALL'.format(
-                    firmware=shlex.quote(merged_hex)))
+                f'  nrfutil device program --firmware {shlex.quote(merged_hex)} --options chip_erase_mode=ERASE_ALL')
         lines.extend([
             '',
             'If more than one device is connected, list serial numbers with:',
             '  nrfutil device list',
             '',
             'Then add --serial-number <serial_number> to the flash command(s) above, for example:',
-            '  nrfutil device program --firmware {firmware} --options chip_erase_mode=ERASE_ALL '
-            '--serial-number <serial_number>'.format(firmware=shlex.quote(merged_hex_files[0])),
+            f'  nrfutil device program --firmware {shlex.quote(merged_hex_files[0])} --options chip_erase_mode=ERASE_ALL '
+            '--serial-number <serial_number>',
             '',
             banner,
             '',

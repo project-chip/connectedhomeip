@@ -136,11 +136,12 @@ class NrfButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        if (request.idx >= NUMBER_OF_BUTTONS) {
+        if (request.idx >= NUMBER_OF_BUTTONS)
+        {
             return pw::Status::InvalidArgument();
         }
 
-        const Nrf::ButtonMask hasChanged = BIT(request.idx);
+        const Nrf::ButtonMask hasChanged   = BIT(request.idx);
         const Nrf::ButtonState buttonState = request.pushed ? hasChanged : 0;
 
         Nrf::PostTask([buttonState, hasChanged]() { Nrf::GetBoard().DispatchButtonEvent(buttonState, hasChanged); });
