@@ -279,8 +279,9 @@ public:
     using OptMask = chip::BitMask<ColorControl::OptionsBitmap>;
 
     // Conventions shared by every handler below; only departures are noted per command.
-    //   * The On/Off + Options gate (§3.2.8.3 / ShouldExecuteIfOff) runs first: a command issued while the
-    //     device is off returns Success without acting unless ExecuteIfOff is effective. The mask/override
+    //   * The On/Off + Options gate (§3.2.8.3 / ShouldExecuteIfOff) runs after argument validation, so invalid
+    //     arguments are rejected even while the device is off. A valid command issued while the device is off
+    //     returns Success without acting unless ExecuteIfOff is effective. The mask/override
     //     default to empty for direct callers; InvokeCommand forwards the decoded command fields.
     //   * `isEnhanced` selects a command's Enhanced* twin: hue is the full 16-bit EnhancedCurrentHue rather
     //     than the 8-bit CurrentHue, and the active mode becomes enhanced hue/saturation.
@@ -463,6 +464,8 @@ private:
 
     static constexpr uint16_t kMaxTransitionTime         = 0xFFFE; // Max value as defined by the spec.
     static constexpr uint16_t kMaxColorTemperatureMireds = 0xFEFF; // Max value as defined by the spec.
+    static constexpr uint16_t kMinColorTemperatureMireds = 1;      // Min value as defined by the spec.
+
     // 10 distinct attribute IDs are scenable; CurrentHue and EnhancedCurrentHue are mutually exclusive,
     // so at most 9 are saved for any one device.
     static constexpr uint8_t kColorControlScenableAttributesCount = 10;
