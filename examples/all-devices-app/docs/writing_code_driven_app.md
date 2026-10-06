@@ -108,9 +108,9 @@ Single-endpoint devices (inheriting from
 `EndpointId(1)` directly, whereas multi-endpoint composed devices (inheriting
 from [`DeviceInterface`](../all-devices-common/device/api/Interface.h), such as
 `Oven`, `Refrigerator`, or `RoomAirConditioner`) take an
-[`EndpointIdAllocator`](../all-devices-common/device/api/EndpointIdAllocator.h)
+[`EndpointIdAllocator`](../all-devices-common/device/api/allocator/EndpointIdAllocator.h)
 (e.g.,
-[`SequentialEndpointIdAllocator`](../all-devices-common/device/api/SequentialEndpointIdAllocator.h)):
+[`ConsecutiveEndpointIdAllocator`](../all-devices-common/device/api/allocator/ConsecutiveEndpointIdAllocator.h)):
 
 ```cpp
 ReturnErrorOnFailure(mRootNode->Register(kRootEndpointId, *mDataModelProvider));
