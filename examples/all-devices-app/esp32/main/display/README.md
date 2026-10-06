@@ -87,6 +87,7 @@ display/
     │   ├── OccupancySensorScreen        # Occupancy sensor
     │   ├── TemperatureSensorScreen      # Temperature sensor
     │   ├── ChimeScreen                  # Chime
+    │   ├── SpeakerScreen                # Speaker (mute and volume)
     │   ├── WaterValveScreen             # Water valve
     │   ├── BridgedNodeScreen            # Bridged node
     │   └── AggregatorScreen             # Aggregator
