@@ -72,6 +72,8 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "provision/ProvisionCrypto.h"
 #include "provision/ProvisionStorageWriter.h"
 #include <headers/ProvisionManager.h>
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#include "provision/ProvisionStorageWriter.h"
 #endif
 #include <platform/DefaultTimerDelegate.h>
 
@@ -297,6 +299,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     provisionManager.SetChannel(Provision::ProvisionChannel::GetInstance());
     provisionManager.SetResetHandler([]() { GetPlatform().SoftwareReset(); });
     ReturnErrorOnFailure(provisionManager.Init(true));
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    ReturnErrorOnFailure(Provision::ProvisionStorageWriter::GetInstance().Initialize());
 #endif
 
     err = PlatformMgr().InitChipStack();
