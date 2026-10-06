@@ -58,12 +58,21 @@ public:
 void MatterSmokeCoAlarmPluginServerInitCallback()
 {
     static AllClustersSmokeCODelegate sSmokeCODelegate;
-    SmokeCoAlarmCluster::Config config;
-    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
     // utc_time_in_matter_epoch(datetime(2126, 1, 1, tzinfo=timezone.utc)) / 1_000_000
-    SmokeCoAlarmServer::Instance().SetExpiryDate(1, 3976214400);
+    constexpr uint32_t kExpiryDate = 3976214400;
+    SmokeCoAlarmCluster::Config config;
+    config
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kExpiryDate)
+        .WithUnmounted();
+    LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(1, config, &sSmokeCODelegate));
 }
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
