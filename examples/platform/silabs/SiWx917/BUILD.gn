@@ -90,6 +90,7 @@ config("siwx917-common-config") {
       # Group so lld resolves libc<-->nosys (_sbrk) regardless of -l order.
       "-Wl,--start-group",
       "-lc_nano",  # stdlib functions (e.g. snprintf)
+      "-lm",  # libm (e.g. floorf); GCC's g++ driver adds it implicitly
       "-lstdc++_nano",  # C++ stdlib functions (e.g. sprintf)
       "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
       "-lnosys",  # newlib syscall stubs (e.g. _sbrk); GCC gets this via
