@@ -670,11 +670,12 @@ template("efr32_sdk") {
         ]
       }
 
-      if (wifi_ncp_module) {
-        defines += [
-          "USE_BYPASS_CLOCK=1",
-          "SL_SI91X_ACX_MODULE=1",
-        ]
+      if (wifi_ncp_module_bypass_clk) {
+        defines += [ "USE_BYPASS_CLOCK=1" ]
+      }
+
+      if (wifi_ncp_module_acx) {
+        defines += [ "SL_SI91X_ACX_MODULE=1" ]
       }
 
       if (use_SiWx917) {

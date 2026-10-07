@@ -47,7 +47,8 @@ declare_args() {
 
   wifi_soc = false
 
-  wifi_ncp_module = false
+  wifi_ncp_module_acx = false
+  wifi_ncp_module_bypass_clk = false
 
   #Disable MQTT by default
   enable_matter_aws = false
@@ -103,6 +104,7 @@ si917_wifi_boards = [
   "BRD4338A",
   "BRD2605A",
   "BRD4343A",
+  "BRD4343C",
   "BRD4342A",
   "BRD2708A",
   "BRD2911A",
@@ -126,7 +128,10 @@ if (is_si917_board) {
   # Enabling BLE on 917 NCP by default
   sl_matter_enable_siwx_ble = true
 
-  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+  if (silabs_board == "BRD4343C") {
+    is_si917y_mcu = true
+    silabs_mcu = "SIWG917Y111MGAXA"
+  } else if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
     is_si917y_mcu = true
     silabs_mcu = "SIWG917Y111MGABA"
   } else {
