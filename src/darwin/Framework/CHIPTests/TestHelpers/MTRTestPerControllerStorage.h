@@ -41,6 +41,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 // For testing - direct access to the current count of keys in storage
 @property (nonatomic, readonly) NSUInteger count;
+
+// Keys passed to each delegate call, in call order, since the last resetRecordedCalls.
+@property (nonatomic, readonly) NSArray<NSString *> * singleStoreKeys;
+@property (nonatomic, readonly) NSArray<NSSet<NSString *> *> * bulkStoreKeys;
+@property (nonatomic, readonly) NSArray<NSString *> * removedKeys;
+- (void)resetRecordedCalls;
+
+// Returning YES fails the store or bulk store of those keys without storing anything.
+@property (atomic, copy, nullable) BOOL (^shouldFailStore)(NSSet<NSString *> * keys);
+
+// Simulates the process ending after writeCount more stores, bulk stores or removes: later ones change nothing.
+- (void)terminateAfterWrites:(NSUInteger)writeCount;
+- (void)resumeAfterTermination;
 @end
 
 @interface MTRTestPerControllerStorageWithBulkReadWrite : MTRTestPerControllerStorage
