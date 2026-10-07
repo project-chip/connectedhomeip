@@ -218,7 +218,7 @@ template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x, DecodeContext context);
 
 template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, DecodeContext context)
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, [[maybe_unused]] DecodeContext context)
 {
     if constexpr (detail::HasDecodeContext<X>::value)
     {
