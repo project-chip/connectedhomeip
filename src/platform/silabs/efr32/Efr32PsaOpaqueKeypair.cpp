@@ -189,13 +189,14 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
     }
     else
     {
-        psa_key_handle_t key_handle;
+        psa_key_attributes_t existing_attr = PSA_KEY_ATTRIBUTES_INIT;
 
         key_id = psa_key_id_from_opaque(opaque_id);
 
-        // Check if the key already exists
-        int ret = psa_open_key(key_id, &key_handle);
-        if (PSA_SUCCESS == ret)
+        // Check if the key already exists. psa_open_key() was removed in mbedTLS 4 / PSA Crypto 1.0.
+        status = psa_get_key_attributes(key_id, &existing_attr);
+        psa_reset_key_attributes(&existing_attr);
+        if (PSA_SUCCESS == status)
         {
             // WARNING: Existing key! This is caused by a problem in the key store.
             // The key must be destroyed, otherwhise the device won't recover.

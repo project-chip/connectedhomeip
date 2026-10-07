@@ -28,18 +28,9 @@ namespace Silabs {
 
 int destroyAESKey(uint32_t kid)
 {
-    psa_key_handle_t key_handle;
-
-    int err = psa_open_key(kid, &key_handle);
-    if (err)
-    {
-        psa_close_key(kid);
-    }
-    else
-    {
-        err = psa_destroy_key(kid);
-    }
-    return err;
+    // Persistent keys are addressed by ID; psa_open_key()/psa_close_key() were
+    // removed in mbedTLS 4 / PSA Crypto 1.0.
+    return psa_destroy_key(static_cast<psa_key_id_t>(kid));
 }
 
 CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
