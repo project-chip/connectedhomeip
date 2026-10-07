@@ -18,6 +18,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <app/data-model/WrappedStructEncoder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -40,6 +41,23 @@ using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType;
 
 constexpr ClusterEntry kTestCluster = kDishwasherMode;
+
+struct ModeCommandWithoutRequiredField
+{
+    using ResponseType = Commands::ChangeToModeResponse::DecodableType;
+
+    bool includeUnknownField = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    {
+        DataModel::WrappedStructEncoder encoder(writer, tag);
+        if (includeUnknownField)
+        {
+            encoder.Encode(1, uint8_t{ 1 });
+        }
+        return encoder.Finalize();
+    }
+};
 
 class TestDiagnosticDataProvider : public DeviceLayer::DiagnosticDataProvider
 {
@@ -340,6 +358,47 @@ TEST_F(TestModeBaseCluster, ChangeToModeSuccessUpdatesCurrentMode)
     EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
 }
 
+TEST_F(TestModeBaseCluster, ChangeToModeRequiresNewMode)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    for (const bool includeUnknownField : { false, true })
+    {
+        ASSERT_EQ(cluster.UpdateCurrentMode(1), Status::Success);
+        appDelegate.mLastHandledNewMode = 0xFF;
+        tester.GetDirtyList().clear();
+
+        // Neither an empty payload nor an unknown tag supplies the required NewMode argument.
+        auto result = tester.Invoke(Commands::ChangeToMode::Id, ModeCommandWithoutRequiredField{ includeUnknownField });
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+        EXPECT_FALSE(result.response.has_value());
+        EXPECT_EQ(cluster.GetCurrentMode(), 1u);
+        EXPECT_EQ(appDelegate.mLastHandledNewMode, 0xFFu);
+        EXPECT_FALSE(tester.IsAttributeDirty(CurrentMode::Id));
+    }
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeExplicitZeroIsAccepted)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.UpdateCurrentMode(1), Status::Success);
+    tester.GetDirtyList().clear();
+
+    Commands::ChangeToMode::Type request;
+    request.newMode = 0;
+    auto result     = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+    EXPECT_EQ(appDelegate.mLastHandledNewMode, 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
+}
+
 TEST_F(TestModeBaseCluster, ChangeToModeDelegateFailureLeavesCurrentModeUnchanged)
 {
     ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
@@ -585,6 +644,50 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagSuccessUpdatesCurrentMode)
     EXPECT_EQ(cluster.GetCurrentMode(), 1u);
     EXPECT_EQ(appDelegate.mLastHandledCoreModeTag, to_underlying(ModeTag::kLowEnergy));
     EXPECT_EQ(appDelegate.mLastHandledNewMode, 1u);
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagRequiresNewModeTag)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    for (const bool includeUnknownField : { false, true })
+    {
+        ASSERT_EQ(cluster.UpdateCurrentMode(1), Status::Success);
+        appDelegate.mLastHandledNewMode     = 0xFF;
+        appDelegate.mLastHandledCoreModeTag = 0xFFFF;
+        tester.GetDirtyList().clear();
+
+        // Core-tag commands must also contain their required argument, even though zero is a valid tag.
+        auto result = tester.Invoke(Commands::ChangeToModeByCoreTag::Id, ModeCommandWithoutRequiredField{ includeUnknownField });
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+        EXPECT_FALSE(result.response.has_value());
+        EXPECT_EQ(cluster.GetCurrentMode(), 1u);
+        EXPECT_EQ(appDelegate.mLastHandledNewMode, 0xFFu);
+        EXPECT_EQ(appDelegate.mLastHandledCoreModeTag, 0xFFFFu);
+        EXPECT_FALSE(tester.IsAttributeDirty(CurrentMode::Id));
+    }
+}
+
+TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagExplicitZeroIsAccepted)
+{
+    ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.UpdateCurrentMode(1), Status::Success);
+    tester.GetDirtyList().clear();
+
+    Commands::ChangeToModeByCoreTag::Type request;
+    request.newModeTag = to_underlying(ModeTag::kAuto);
+    auto result        = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    EXPECT_EQ(cluster.GetCurrentMode(), 0u);
+    EXPECT_EQ(appDelegate.mLastHandledNewMode, 0u);
+    EXPECT_EQ(appDelegate.mLastHandledCoreModeTag, to_underlying(ModeTag::kAuto));
     EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
 }
 
