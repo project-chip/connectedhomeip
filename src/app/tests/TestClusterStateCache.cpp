@@ -115,6 +115,107 @@ using AttributeInstructionListType = std::vector<AttributeInstruction>;
 
 using TestClusterStateCache = chip::Testing::AppContext;
 
+struct ContextRecordingValue
+{
+    static constexpr bool kIsFabricScoped = false;
+    uint8_t value                         = 0;
+    DataModel::DecodeContext context      = DataModel::DecodeContext::kUnspecified;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader) { return reader.Get(value); }
+
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext decodeContext)
+    {
+        context = decodeContext;
+        return reader.Get(value);
+    }
+};
+
+struct ContextRecordingListAttribute : Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo
+{
+    using DecodableType = DataModel::DecodableList<ContextRecordingValue>;
+};
+
+class CacheReadCallback : public ClusterStateCache::Callback
+{
+public:
+    void OnDone(ReadClient *) override {}
+};
+
+TEST_F(TestClusterStateCache, ReadContextReachesCachedListElements)
+{
+    CacheReadCallback callback;
+    ClusterStateCache cache(callback);
+    uint8_t buffer[64];
+    const uint8_t values[] = { 7, 8 };
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    ASSERT_SUCCESS(DataModel::Encode(writer, TLV::AnonymousTag(), DataModel::List<const uint8_t>(values)));
+    ASSERT_SUCCESS(writer.Finalize());
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_SUCCESS(reader.Next());
+
+    ConcreteDataAttributePath path(1, ContextRecordingListAttribute::GetClusterId(),
+                                   ContextRecordingListAttribute::GetAttributeId());
+    path.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+    path.mDataVersion.SetValue(1);
+    auto & readCallback = cache.GetBufferedCallback();
+    readCallback.OnReportBegin();
+    readCallback.OnAttributeData(path, &reader, StatusIB());
+    readCallback.OnReportEnd();
+
+    ContextRecordingListAttribute::DecodableType decoded;
+    ASSERT_SUCCESS(cache.Get<ContextRecordingListAttribute>(path, decoded));
+    auto iterator = decoded.begin();
+    for (const auto value : values)
+    {
+        ASSERT_TRUE(iterator.Next());
+        EXPECT_EQ(iterator.GetValue().value, value);
+        EXPECT_EQ(iterator.GetValue().context, DataModel::DecodeContext::kRead);
+    }
+    EXPECT_FALSE(iterator.Next());
+    EXPECT_SUCCESS(iterator.GetStatus());
+}
+
+TEST_F(TestClusterStateCache, CachedFabricScopedReadsRequireFabricIndex)
+{
+    using Attribute = Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo;
+    CacheReadCallback callback;
+    ClusterStateCache cache(callback);
+    Clusters::UnitTesting::Structs::TestFabricScoped::Type encoded;
+    encoded.SetFabricIndex(1);
+    uint8_t buffer[256];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    // A normal write encoding omits FabricIndex and cannot stand in for read data.
+    ASSERT_SUCCESS(DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), Attribute::Type(&encoded, 1)));
+    ASSERT_SUCCESS(writer.Finalize());
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_SUCCESS(reader.Next());
+    ConcreteDataAttributePath path(1, Attribute::GetClusterId(), Attribute::GetAttributeId());
+    path.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+    path.mDataVersion.SetValue(1);
+    auto & readCallback = cache.GetBufferedCallback();
+    readCallback.OnReportBegin();
+    readCallback.OnAttributeData(path, &reader, StatusIB());
+    readCallback.OnReportEnd();
+
+    Attribute::DecodableType attribute;
+    ASSERT_SUCCESS(cache.Get<Attribute>(path, attribute));
+    auto attributeIterator = attribute.begin();
+    EXPECT_FALSE(attributeIterator.Next());
+    EXPECT_EQ(attributeIterator.GetStatus(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+
+    Clusters::UnitTesting::Attributes::TypeInfo::DecodableType cluster;
+    std::list<ClusterStateCache::AttributeStatus> statuses;
+    ASSERT_SUCCESS(cache.Get(1, Attribute::GetClusterId(), cluster, statuses));
+    EXPECT_TRUE(statuses.empty());
+    auto clusterIterator = cluster.listFabricScoped.begin();
+    EXPECT_FALSE(clusterIterator.Next());
+    EXPECT_EQ(clusterIterator.GetStatus(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+}
+
 class ForwardedDataCallbackValidator final
 {
 public:

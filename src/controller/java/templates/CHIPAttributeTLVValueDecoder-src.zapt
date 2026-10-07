@@ -46,7 +46,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 case Attributes::{{asUpperCamelCase name}}::Id: {
                     using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
                     TypeInfo::DecodableType cppValue;
-                    *aError = app::DataModel::Decode(aReader, cppValue);
+                    *aError = app::DataModel::Decode(aReader, cppValue, app::DataModel::DecodeContext::kRead);
                     if (*aError != CHIP_NO_ERROR)
                     {
                         return nullptr;

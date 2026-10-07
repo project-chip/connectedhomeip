@@ -41,6 +41,16 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(chip::VendorId val)
 
 namespace DataModel {
 
+// Keep the existing Decode(reader) signatures, while checking required field presence.
+// kUnspecified accepts both existing fabric-scoped read and write encodings; incoming commands
+// and attribute writes use kWrite so read-side redaction cannot bypass their required fields.
+enum class DecodeContext : uint8_t
+{
+    kUnspecified,
+    kRead,
+    kWrite,
+};
+
 //
 // Decode
 //
@@ -181,6 +191,62 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
+    return CHIP_NO_ERROR;
+}
+
+namespace detail {
+
+template <typename X, typename = void>
+struct HasDecodeContext : std::false_type
+{
+};
+
+template <typename X>
+struct HasDecodeContext<
+    X, std::void_t<decltype(std::declval<X &>().DecodeWithContext(std::declval<TLV::TLVReader &>(), DecodeContext::kUnspecified))>>
+    : std::is_same<CHIP_ERROR,
+                   decltype(std::declval<X &>().DecodeWithContext(std::declval<TLV::TLVReader &>(), DecodeContext::kUnspecified))>
+{
+};
+
+} // namespace detail
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x, DecodeContext context);
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x, DecodeContext context);
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, DecodeContext context)
+{
+    if constexpr (detail::HasDecodeContext<X>::value)
+    {
+        return x.DecodeWithContext(reader, context);
+    }
+    else
+    {
+        return Decode(reader, x);
+    }
+}
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x, DecodeContext context)
+{
+    return Decode(reader, x.Emplace(), context);
+}
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x, DecodeContext context)
+{
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        x.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(Decode(reader, x.SetNonNull(), context));
+    VerifyOrReturnError(x.ExistingValueInEncodableRange(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     return CHIP_NO_ERROR;
 }
 
