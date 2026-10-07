@@ -74,6 +74,9 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-conditioner/impl/LoggingHumidityConditioner.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/HumiditySensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/humidity-sensor/impl/IncreasingHumiditySensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/irrigation-system/Irrigation.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/irrigation-system/impl/LoggingIrrigation.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/irrigation-system/impl/ValveConfigurations.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/LaundryDryer.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-dryer/impl/EmulatedLaundryDryer.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/laundry-washer/LaundryWasher.cpp"
@@ -196,6 +199,7 @@ foreach(_key
         generic-switch
         humidity-conditioner
         humidity-sensor
+        irrigation-system
         laundry-dryer
         laundry-washer
         light-sensor

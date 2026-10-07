@@ -26,6 +26,14 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate)
 {}
 
+WaterValve::WaterValve(TimerDelegate & timerDelegate,
+                       const DataModel::Nullable<ValveConfigurationAndControlCluster::StartupConfiguration> & config,
+                       const DataModel::Nullable<ValveConfigurationAndControlCluster::ValveContext> & context,
+                       WaterValveListener * listener) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
+    mStartupConfiguration(config), mValveContext(context), mListener(listener)
+{}
+
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
@@ -36,19 +44,7 @@ CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
-                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
-
-    ValveConfigurationAndControlCluster::ValveContext valveContext = {
-        .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
-        .optionalAttributeSet = {},
-        .config               = config,
-        .tsTracker            = nullptr,
-        .delegate             = this,
-    };
-
-    mValveCluster.Create(endpoint, valveContext);
+    mValveCluster.Create(endpoint, SetUpValveContext().Value());
     ReturnErrorOnFailure(provider.AddCluster(mValveCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -83,6 +79,11 @@ DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Per
 {
     Percent targetLevel = level.ValueOr(100);
     ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
+    mOpenLevel = targetLevel;
+    if (mListener != nullptr)
+    {
+        mListener->OnValveStateChanged();
+    }
     return DataModel::MakeNullable(targetLevel);
 }
 
@@ -93,12 +94,46 @@ CHIP_ERROR WaterValve::HandleCloseValve()
     {
         mValveCluster.Cluster().UpdateCurrentLevel(0);
     }
+    mOpenLevel.reset();
+    mRemainingDuration.reset();
+    if (mListener != nullptr)
+    {
+        mListener->OnValveStateChanged();
+    }
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WaterValve::CloseValve()
+{
+    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    return mValveCluster.Cluster().CloseValve();
+}
+
+CHIP_ERROR WaterValve::Pause()
+{
+    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mOpenLevel.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    mPausedLevel    = mOpenLevel;
+    mPausedDuration = mRemainingDuration;
+    return mValveCluster.Cluster().CloseValve();
+}
+
+CHIP_ERROR WaterValve::Resume()
+{
+    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPausedLevel.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    DataModel::Nullable<uint32_t> duration =
+        mPausedDuration.has_value() ? DataModel::MakeNullable(*mPausedDuration) : DataModel::NullNullable;
+    CHIP_ERROR err = mValveCluster.Cluster().OpenValve(DataModel::MakeNullable(*mPausedLevel), duration);
+    mPausedLevel.reset();
+    mPausedDuration.reset();
+    return err;
 }
 
 void WaterValve::HandleRemainingDurationTick(uint32_t duration)
 {
     ChipLogProgress(AppServer, "WaterValve: Remaining duration tick: %lu", static_cast<unsigned long>(duration));
+    mRemainingDuration = duration;
 }
 
 } // namespace chip::app
