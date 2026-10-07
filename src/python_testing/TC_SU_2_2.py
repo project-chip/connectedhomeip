@@ -1039,7 +1039,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             events=[(0, download_error_event, urgent)],
             fabricFiltered=True
         )
-        logger.info("DownloadError events after provider kill() %s", download_error_events_after_kill)
+        logger.info("%s DownloadError events after provider kill() %s", step_number_s4, download_error_events_after_kill)
 
         logger.info('%s: Step #4.3 - Wait for DUT to go back to kIdle after killing the provider, at termination time: %d',
                     step_number_s4, provider_termination_time)
@@ -1056,7 +1056,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
 
         total_time_to_kidle = int(kidle_report_time - provider_termination_time)
-        logger.info("Total time taken to reach UpdateState kIdle: %s seconds", total_time_to_kidle)
+        logger.info("%s Total time taken to reach UpdateState kIdle: %s seconds", step_number_s4 ,total_time_to_kidle)
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
         subscription_attr_state_busy_180s.cancel()
 
@@ -1069,7 +1069,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             events=[(0, download_error_event, urgent)],
             fabricFiltered=True
         )
-        logger.info("DownloadError events gathered after kIdle: %s", download_error_events)
+        logger.info("%s DownloadError events gathered after kIdle: %s", step_number_s4, download_error_events)
         event_download_error = None
         # No DownloadError event identified (no new events since the provider was killed), so
         # subscribe and wait for the DUT to emit it.
@@ -1103,7 +1103,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             asserts.assert_greater_equal(event_download_error.progressPercent, 0, "Download progress was 0")
 
         asserts.assert_is_not_none(event_download_error, f"{step_number_s4}: no DownloadError was found")
-        logger.info("DownloadError event: %s", event_download_error)
         asserts.assert_equal(event_download_error.softwareVersion, ota_image_version,
                              f"Expected Software version {ota_image_version}, found {event_download_error.softwareVersion}")
         asserts.assert_greater(event_download_error.bytesDownloaded, 0, "Download was 0 bytes")
@@ -1412,7 +1411,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_is_not_none(
             failure_report, f"{step_number_s6}: no StateTransition event with newState kIdle and reason kFailure was found")
         # Review the Event data
-        logger.info("State transition after killing the provider: %s", failure_report)
+        logger.info("%s State transition after killing the provider: %s",step_number_s6 ,failure_report)
         self.verify_state_transition_event(failure_report,
                                            expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
@@ -1428,10 +1427,11 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # LocalConfigDisabled is optional: if present, set it to False so the test can continue;
         # if absent, it is treated as False and the test continues.
         # OTA(SU) spec 3.4.1
+        step_number_s7 = "[STEP_7]"
         self.step(7)
         if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
             await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
-            logger.info("Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False")
+            logger.info("%s Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False",step_number_s7)
         # [End of Step #4 TC_SU_2_7]
 
         # [Start of Step #5 TC_SU_2_7]
@@ -1462,7 +1462,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             cluster=Clusters.OtaSoftwareUpdateRequestor,
             attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
-        logger.info("UpdateState value after the provider started: %s", update_state_attr_s8)
+        logger.info("%s UpdateState value after the provider started: %s", step_number_s8, update_state_attr_s8)
 
         subscription_state_transition = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -1510,7 +1510,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
         self.write_to_app_pipe(command, self.provider_app_pipe)
         response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info("Provider response info after AnnounceOTAProvider: %s", response_data)
+        logger.info("%s Provider response info after AnnounceOTAProvider: %s", step_number_s8, response_data)
         # Read the value of RequestorCanConsent as reported by the OTA-P
         requestor_can_consent = response_data['Payload']["RequestorCanConsent"]
         if requestor_can_consent:
@@ -1526,7 +1526,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             logger.info("%s: Found event for kDelayedOnUserConsent: %s", step_number_s8, event_report)
         else:
             # The requestor cannot consent, so this step can be skipped.
-            logger.info("Requestor cannot consent.")
+            logger.info("%s Requestor cannot consent.", step_number_s8)
             self.mark_current_step_skipped()
 
         subscription_state_transition.cancel()
@@ -1774,17 +1774,16 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
         logger.info("StateTransition events gathered: %s", events_response)
         if len(events_response) == 0:
-            asserts.fail("Failed to read StateTransition events")
+            asserts.fail("%s Failed to read StateTransition events",step_number_s9)
         delayed_on_apply_events = []
         # Collect the StateTransition events reporting kDelayedOnApply
         for event in events_response:
             if event.Header.EventId == state_transition_event_s9.event_id and event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply:
-                logger.info("StateTransition Event with kDelayedOnApply Found")
+                logger.info("%s StateTransition Event with kDelayedOnApply Found",step_number_s9)
                 delayed_on_apply_events.append(event.Data)
-                logger.info("Event reports found %s", delayed_on_apply_events)
 
         if len(delayed_on_apply_events) == 0:
-            asserts.fail("Unable to retrieve a StateTransitionEvent report with value kDelayedOnApply")
+            asserts.fail("%s Unable to retrieve a StateTransitionEvent report with value kDelayedOnApply",step_number_s9)
 
         # Retrieve the last report
         delayed_apply_event_report = delayed_on_apply_events[-1]
@@ -1872,16 +1871,15 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             events=[(0, version_applied_event, urgent)],
             fabricFiltered=True
         )
-        logger.info("Events gathered: %s", events_response)
+        logger.info("%s Events gathered after reboot: %s", step_number_s9, events_response)
         # Only VersionApplied events should be in the list
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
         version_applied_event_data = None
         # Look for the VersionApplied event
         for event in events_response:
-            logger.info(event)
             if event.Header.EventId == version_applied_event.event_id:
-                logger.info("VersionApplied event found")
+                logger.info("%s VersionApplied event found after reboot.", step_number_s9)
                 version_applied_event_data = event.Data
         asserts.assert_is_not_none(version_applied_event_data, "Failed to read the VersionApplied event")
         asserts.assert_equal(ota_image_version, version_applied_event_data.softwareVersion,
