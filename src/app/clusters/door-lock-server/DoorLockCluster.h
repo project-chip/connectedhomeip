@@ -47,7 +47,7 @@ inline constexpr size_t kMaxLanguageLength = 3;
 
 using CredentialStruct = Structs::CredentialStruct::Type;
 
-/// Plain (non-feature) optional attributes of the cluster.
+/// Optional attribute enablement of the cluster.
 ///
 /// A struct of flags is used instead of `OptionalAttributeSet` because Door Lock
 /// attribute ids exceed the 32-bit mask range supported by `OptionalAttributeSet`.
@@ -63,6 +63,14 @@ struct OptionalAttributes
     bool enableInsideStatusLED        = false;
     bool enablePrivacyModeButton      = false;
     bool localProgrammingFeatures     = false;
+    // Feature-gated optional attributes ([DPS], [!USR & PIN] and [USR]
+    // conformance): present only when the flag is set AND the feature condition
+    // is satisfied.
+    bool doorOpenEvents      = false;
+    bool doorClosedEvents    = false;
+    bool openPeriod          = false;
+    bool sendPINOverTheAir   = false;
+    bool expiringUserTimeout = false;
 };
 
 /// Values that configure a single DoorLock cluster instance.
@@ -80,8 +88,10 @@ struct Config
 
     // ---- Fixed attributes ----------------------------------------------------
     DlLockType lockType = DlLockType::kDeadBolt;
-    BitMask<DlSupportedOperatingModes> supportedOperatingModes =
-        BitMask<DlSupportedOperatingModes>(DlSupportedOperatingModes::kNormal, DlSupportedOperatingModes::kNoRemoteLockUnlock);
+    // The OperatingModesBitmap uses inverted polarity: a `0` bit marks a
+    // supported mode and undefined bits are `1`. The 0xFFF6 default supports
+    // Normal and NoRemoteLockUnlock only.
+    BitMask<DlSupportedOperatingModes> supportedOperatingModes = BitMask<DlSupportedOperatingModes>(0xFFF6);
 
     // Capacities, only used when the corresponding feature is enabled.
     uint16_t numberOfTotalUsersSupported        = 0;
@@ -116,11 +126,11 @@ struct Config
     bool enableInsideStatusLED   = false;
     bool enablePrivacyModeButton = false;
     BitMask<DlLocalProgrammingFeatures> localProgrammingFeatures;
-    uint8_t wrongCodeEntryLimit          = 0;
-    uint8_t userCodeTemporaryDisableTime = 0;
+    uint8_t wrongCodeEntryLimit          = 3;
+    uint8_t userCodeTemporaryDisableTime = 10;
     bool sendPINOverTheAir               = false;
     bool requirePINforRemoteOperation    = false;
-    uint16_t expiringUserTimeout         = 0;
+    uint16_t expiringUserTimeout         = 10;
 
     /// Timer delegate used for auto-relock scheduling and monotonic timestamps.
     TimerDelegate & timerDelegate;
@@ -145,7 +155,6 @@ public:
 
     // ---- ServerClusterInterface implementation --------------------------------
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -187,7 +196,7 @@ public:
     /// True while the UserCodeTemporaryDisableTime lockout window is active.
     bool IsLockoutEngaged() const;
 
-    // ---- Feature access (mirrors the legacy DoorLockServer API) ----------------
+    // ---- Feature access (application-facing API) ----------------
 
     BitFlags<Feature> Features() const { return mFeatures; }
 
@@ -261,9 +270,7 @@ private:
 
     // ---- Internal helpers -----------------------------------------------------------
 
-    using DelegateLockOpHandler = bool (Delegate::*)(chip::EndpointId, const DataModel::Nullable<FabricIndex> &,
-                                                     const DataModel::Nullable<NodeId> &, const Optional<chip::ByteSpan> &,
-                                                     OperationErrorEnum &);
+    using DelegateLockOpHandler = std::optional<OperationErrorEnum> (Delegate::*)(const LockOperationRequest &);
 
     /// Shared implementation of LockDoor/UnlockDoor/UnlockWithTimeout/UnboltDoor:
     /// operating-mode gate, lockout window, credential checks, hardware actuation,
