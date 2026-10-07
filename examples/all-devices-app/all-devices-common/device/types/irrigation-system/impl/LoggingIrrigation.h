@@ -25,7 +25,7 @@
 namespace chip {
 namespace app {
 
-class LoggingIrrigation : public Clusters::OperationalState::OperationalStateCluster::Delegate, 
+class LoggingIrrigation : public Clusters::OperationalState::OperationalStateCluster::Delegate,
                           public Irrigation,
                           public WaterValve::WaterValveListener
 {
@@ -53,7 +53,7 @@ public:
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     static std::vector<Irrigation::ValveList> ValveConfiguration();
-    
+
     void OnValveStateChanged() override;
 private:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
