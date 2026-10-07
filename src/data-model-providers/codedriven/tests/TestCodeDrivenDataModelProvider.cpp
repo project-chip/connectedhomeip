@@ -1138,7 +1138,7 @@ TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedOnAddAndRemove)
               (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, NoEndpointChangedNotificationBeforeStartup)
+TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedBeforeStartupAndOnShutdown)
 {
     CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
                                               mServerClusterTestContext.AttributePersistenceProvider());
@@ -1151,22 +1151,28 @@ TEST_F(TestCodeDrivenDataModelProvider, NoEndpointChangedNotificationBeforeStart
     mEndpointStorage.push_back(std::move(endpoint1));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+    ASSERT_EQ(localListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(localListener.mEndpointChanges[0],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
-    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+    ASSERT_EQ(localListener.mEndpointChanges.size(), 2u);
+    EXPECT_EQ(localListener.mEndpointChanges[1],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
 
     mEndpointStorage.push_back(std::move(endpoint2));
     mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+    ASSERT_EQ(localListener.mEndpointChanges.size(), 3u);
+    EXPECT_EQ(localListener.mEndpointChanges[2],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kAdded }));
 
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
-    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+    EXPECT_EQ(localListener.mEndpointChanges.size(), 3u);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
-    ASSERT_EQ(localListener.mEndpointChanges.size(), 1u);
-    EXPECT_EQ(localListener.mEndpointChanges[0],
+    ASSERT_EQ(localListener.mEndpointChanges.size(), 4u);
+    EXPECT_EQ(localListener.mEndpointChanges[3],
               (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kRemoved }));
 
     localProvider.UnregisterAttributeChangeListener(localListener);

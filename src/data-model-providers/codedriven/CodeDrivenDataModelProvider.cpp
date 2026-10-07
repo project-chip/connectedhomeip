@@ -284,9 +284,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
                 ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
             }
         }
-
-        NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
     }
+
+    NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
 
     return CHIP_NO_ERROR;
 }
@@ -327,10 +327,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
 
     ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
 
-    if (mServerClusterContext.has_value())
-    {
-        NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
-    }
+    NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
 
     return CHIP_NO_ERROR;
 }
