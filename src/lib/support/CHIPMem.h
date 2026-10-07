@@ -100,6 +100,9 @@ CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 
 /**
  * This is a helper mainly intended for implementing wrappers that forward to MemoryAlloc.
+ * Use it instead of MemoryAlloc(num * sizeof(T)) when allocating an array of T, so that the
+ * typed allocator sees T and the size cannot overflow. The memory is not zeroed; use
+ * MemoryCallocTyped when it has to be. Other code should prefer ScopedMemoryBuffer or New.
  *
  * @param[in]  num              Specifies number of elements (of size sizeof(T)) to allocate.
  *
@@ -137,6 +140,8 @@ CHIP_TYPED_MALLOC_WRAPPER_BEGIN
 
 /**
  * This is a helper mainly intended for implementing wrappers that forward to MemoryCalloc.
+ * Use it instead of MemoryCalloc(num, sizeof(T)) when allocating a zeroed array of T. When
+ * every element is written right away, MemoryAllocTyped avoids zeroing the memory.
  *
  * @param[in]  num              Specifies number of elements (of size sizeof(T)) to allocate.
  *

@@ -71,8 +71,13 @@
 #define CHIP_OVERRIDE_MALLOC_TYPED(override, type_param_pos)
 #endif
 
-// Macros to turn off warnings for typed malloc wrappers. These can be enabled
-// by defining CHIP_DISABLE_TYPED_MALLOC_WRAPPER_WARNINGS to 1. For example, to
+// Macros to turn off -Wallocator-wrappers, which flags functions that return
+// memory obtained from an allocator call, for typed malloc wrappers. A typed
+// wrapper passes the type on (to malloc_type_*, or through
+// CHIP_OVERRIDE_MALLOC_TYPED to the typed variant of the wrapper it calls), so
+// no type information is lost; wrappers around untyped allocators still warn.
+// These can be enabled by defining CHIP_DISABLE_TYPED_MALLOC_WRAPPER_WARNINGS
+// to 1. For example, to
 // turn off the warning for MemoryAllocTyped because it is a typed malloc
 // wrapper:
 //
