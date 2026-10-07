@@ -18,18 +18,15 @@
 
 #pragma once
 
-#include <app/clusters/level-control/LevelControlCluster.h>
+#include <device/types/speaker/Speaker.h>
 #include <lvgl.h>
 
 namespace chip::app {
 
 /**
- * Creates an interactive LevelControl cluster widget displaying level slider and percentage.
- * `levelName` prefixes the value text (e.g. "Volume: 40% (101)"). It is not copied, so it must
- * outlive the widget (use a string literal).
+ * Renders the device control screen for a Speaker device.
  * Must be called while holding the LVGL lock.
  */
-lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster,
-                                           const char * levelName = "Brightness");
+void ShowSpeakerScreen(lv_obj_t * parent, Speaker & device);
 
 } // namespace chip::app

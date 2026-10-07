@@ -24,9 +24,30 @@
 namespace chip::app {
 
 /**
+ * Text shown by the OnOff widget: the state label for each OnOff value, and the caption of the
+ * toggle button that leaves that state. The strings are not copied, so they must outlive the
+ * widget (use string literals).
+ */
+struct OnOffWidgetLabels
+{
+    const char * onState;
+    const char * offState;
+    const char * turnOff;
+    const char * turnOn;
+};
+
+inline constexpr OnOffWidgetLabels kOnOffPowerLabels = {
+    .onState  = "Power: ON",
+    .offState = "Power: OFF",
+    .turnOff  = "Turn OFF",
+    .turnOn   = "Turn ON",
+};
+
+/**
  * Creates an interactive OnOff cluster widget displaying state and a toggle button.
  * Must be called while holding the LVGL lock.
  */
-lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster);
+lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster,
+                                    const OnOffWidgetLabels & labels = kOnOffPowerLabels);
 
 } // namespace chip::app
