@@ -18,6 +18,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/media-file-management-server/MediaFileManagementCluster.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -66,10 +67,11 @@ public:
         return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString("video/mp4"), mimeType);
     }
 
-    Status HandleAddFile(const CharSpan & name, uint64_t size, const CharSpan & mimeType, const CharSpan & imageUri,
-                         Commands::AddFileResponse::Type & response) override
+    Status HandleAddFile(ScopedNodeId peer, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
+                         const CharSpan & imageUri, Commands::AddFileResponse::Type & response) override
     {
         mAddFileCalled  = true;
+        mAddFilePeer    = peer;
         response.status = FileStatusEnum::kSuccess;
         response.fileID.SetNonNull(static_cast<uint64_t>(42));
         return Status::Success;
@@ -82,21 +84,21 @@ public:
     }
 
     Status
-    HandleRequestSharedFiles(const CharSpan & clientName, uint16_t requestID,
+    HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
                              const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override
     {
         mRequestSharedFilesCalled = true;
         return Status::Success;
     }
 
-    Status HandleGetSharedFile(uint16_t responseID, Commands::GetSharedFileResponse::Type & response) override
+    Status HandleGetSharedFile(ScopedNodeId peer, uint16_t responseID, Commands::GetSharedFileResponse::Type & response) override
     {
         response.status = FileStatusEnum::kSuccess;
         return Status::Success;
     }
 
-    Status HandleOfferFile(const CharSpan & clientName, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
-                           const CharSpan & imageUri) override
+    Status HandleOfferFile(ScopedNodeId peer, const CharSpan & clientName, const CharSpan & name, uint64_t size,
+                           const CharSpan & mimeType, const CharSpan & imageUri) override
     {
         mOfferFileCalled = true;
         return Status::Success;
@@ -110,6 +112,7 @@ public:
     bool mRequestSharedFilesCalled = false;
     bool mOfferFileCalled          = false;
     uint64_t mDeletedFileID        = 0;
+    ScopedNodeId mAddFilePeer;
 };
 
 struct TestMediaFileManagementCluster : public ::testing::Test
@@ -196,6 +199,9 @@ TEST_F(TestMediaFileManagementCluster, InvokeAddFile)
     auto result = tester.Invoke<Commands::AddFile::Type, Commands::AddFileResponse::DecodableType>(request);
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(delegate.mAddFileCalled);
+    // The invoking peer must be plumbed through so the delegate can open the BDX
+    // pull back to it: it should match the mock handler's default subject.
+    EXPECT_EQ(delegate.mAddFilePeer, ScopedNodeId(kAdminSubjectDescriptor.subject, kAdminSubjectDescriptor.fabricIndex));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

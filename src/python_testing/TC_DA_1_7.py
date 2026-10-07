@@ -49,7 +49,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -105,7 +105,7 @@ def extract_akid(cert: Certificate) -> bytes | None:
         return None
 
 
-class TC_DA_1_7(MatterBaseTest):
+class TC_DA_1_7(MatterTestCommissionedDevice):
     ''' TC-DA-1.7
 
         This test requires two instances of the DUT with the same PID/VID to confirm that the individual
@@ -134,6 +134,11 @@ class TC_DA_1_7(MatterBaseTest):
             --script-args "--storage-path admin_storage.json --commissioning-method on-network \
                 --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
     '''
+
+    # Class-level defaults so steps_TC_DA_1_7 (which calls expected_number_of_DUTs)
+    # works on a bare instance at test-listing time, before setup_class runs.
+    allow_sdk_dac = False
+    post_cert_test = False
 
     def setup_class(self):
         super().setup_class()

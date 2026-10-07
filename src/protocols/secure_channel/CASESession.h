@@ -53,10 +53,7 @@ namespace chip {
 
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
-class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
-                               public Messaging::ExchangeDelegate,
-                               public FabricTable::Delegate,
-                               public PairingSession
+class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler, public FabricTable::Delegate, public PairingSession
 {
 public:
     ~CASESession() override;
@@ -214,8 +211,8 @@ protected:
 
     struct EncodeSigma1Inputs : Sigma1Param
     {
-        const Crypto::P256PublicKey * initiatorEphPubKey         = nullptr;
-        const ReliableMessageProtocolConfig * initiatorMrpConfig = nullptr;
+        const Crypto::P256PublicKey * initiatorEphPubKey = nullptr;
+        SessionParameters initiatorSessionParams;
         uint8_t initiatorResume1MICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
     };
 
@@ -238,7 +235,7 @@ protected:
         // size
         Platform::ScopedMemoryBuffer<uint8_t> msgR2Encrypted;
         size_t encrypted2Length = 0;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
     struct ParsedSigma2
     {
@@ -275,7 +272,7 @@ protected:
         uint8_t sigma2ResumeMICBuffer[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
         MutableByteSpan sigma2ResumeMIC{ sigma2ResumeMICBuffer };
         uint16_t responderSessionId;
-        const ReliableMessageProtocolConfig * responderMrpConfig;
+        SessionParameters responderSessionParams;
     };
 
     struct ParsedSigma2Resume

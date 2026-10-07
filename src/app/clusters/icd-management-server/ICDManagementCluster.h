@@ -46,11 +46,6 @@ namespace app {
 namespace Clusters {
 
 namespace IcdManagement {
-enum class OptionalCommands : uint8_t
-{
-    kStayActive = 0x01,
-};
-
 constexpr size_t kUserActiveModeTriggerInstructionMaxLength = 128;
 } // namespace IcdManagement
 
@@ -65,9 +60,12 @@ class ICDManagementCluster : public DefaultServerCluster, public chip::app::ICDS
 public:
     using OptionalAttributeSet = app::OptionalAttributeSet<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>;
 
+    /// Commands that this cluster supports only if the application opts into them.
+    using OptionalCommandSet = app::OptionalAttributeSet<IcdManagement::Commands::StayActiveRequest::Id>;
+
     // TODO: The interaction between enabledCommands and feature flags (particularly LITS) needs clarification.
     // According to spec, LITS implies StayActiveRequest support. Options:
-    // 1. Document that kStayActive bit in enabledCommands is ignored when LITS feature is set
+    // 1. Document that the StayActiveRequest bit in enabledCommands is ignored when LITS feature is set
     // 2. Add Startup() validation to fail if enabledCommands and feature flags are inconsistent,
     //    and simplify AcceptedCommands/GeneratedCommands to only check mEnabledCommands
 
@@ -81,7 +79,7 @@ public:
      */
     ICDManagementCluster(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                          ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
-                         BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                         OptionalCommandSet enabledCommands,
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
                          CharSpan userActiveModeTriggerInstruction);
 
@@ -116,7 +114,7 @@ protected:
     ICDConfigurationData & mICDConfigurationData;
     const OptionalAttributeSet mOptionalAttributeSet;
     const BitMask<IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerBitmap;
-    const BitMask<IcdManagement::OptionalCommands> mEnabledCommands;
+    const OptionalCommandSet mEnabledCommands;
     uint8_t mUserActiveModeTriggerInstructionLength;
     char mUserActiveModeTriggerInstruction[IcdManagement::kUserActiveModeTriggerInstructionMaxLength];
 };
@@ -156,7 +154,7 @@ class ICDManagementClusterWithCIP : public ICDManagementCluster
 public:
     ICDManagementClusterWithCIP(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
                                 ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
-                                BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                                OptionalCommandSet enabledCommands,
                                 BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
                                 CharSpan userActiveModeTriggerInstruction);
 

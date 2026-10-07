@@ -123,7 +123,7 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kS
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
 #endif
 
-chip::BitMask<Feature> GetFeatureMapFromCmdLine()
+chip::BitMask<Feature> GetFeatureMap()
 {
     return sFeatureMap;
 }

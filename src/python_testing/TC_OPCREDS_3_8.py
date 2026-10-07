@@ -51,6 +51,7 @@
 #     pre-existing-fabric: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import enum
 import hashlib
 import inspect
@@ -68,7 +69,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_command, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest, MatterTestCommissionedDevice
 from matter.testing.pics import accepted_cmd_pics_str
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
@@ -314,7 +315,7 @@ class test_step:
         self._test_instance.mark_current_step_skipped()
 
 
-class TC_OPCREDS_VidVerify(MatterBaseTest):
+class TC_OPCREDS_VidVerify(MatterTestCommissionedDevice):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_aggregating_steps: bool = False
@@ -364,7 +365,11 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
             self.current_step_id = 0
             self.is_aggregating_steps = True
             self.aggregated_steps = []
-            self.test_TC_OPCREDS_3_8()
+            # Run the bare test body, not the run_if_endpoint_matches wrapper: the
+            # wrapper needs a live DUT and self.event_loop, neither of which exists
+            # at test-listing time. In aggregation mode every test_step block skips
+            # its body, so the bare coroutine completes without device interaction.
+            asyncio.run(inspect.unwrap(type(self).test_TC_OPCREDS_3_8)(self))
         finally:
             self.is_aggregating_steps = False
 

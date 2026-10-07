@@ -25,7 +25,10 @@ if (wifi_soc) {
 # Seperate import since the matter_support_root is defined in the ef32_sdk.gni / SiWx917_sdk.gni
 import("${matter_support_root}/provision/args.gni")
 source_set("storage") {
-  sources = [ "ProvisionStorageCustom.cpp" ]
+  sources = [
+    "ProvisionStorageCommon.cpp",
+    "ProvisionStorageCustom.cpp",
+  ]
 
   if (use_provision_flash_storage) {
     sources += [ "ProvisionStorageFlash.cpp" ]

@@ -29,7 +29,8 @@ silabs:
   maintainers:
     - jmartinez-silabs
     - jepenven-silabs
-    - lpbeliveau-silabs
+    - rcasallas-silabs
+
     # Proposed maintainers (uncomment to activate):
     # - chirag-silabs
     # - arun-silabs
@@ -42,6 +43,10 @@ silabs:
     - "third_party/silabs/**"
     - "config/silabs/**"
     - "config/efr32/**"
+    - "src/test_driver/efr32/**"
+    - "scripts/examples/gn_silabs_example.sh"
+    - "scripts/tools/silabs/**"
+    - "scripts/setup/silabs/**"
 
 esp32:
   maintainers:
@@ -104,28 +109,40 @@ stm32:
     - "config/stm32/**"
     - "third_party/st/**"
 
-# --- Proposals / Opt-In Templates ---
+tizen:
+  maintainers:
+    - dr-venkman
+  paths:
+    - "src/platform/Tizen/**"
+    - "examples/platform/tizen/**"
+    - "examples/**/tizen/**"
+    - "config/tizen/**"
 
-# nrfconnect:
-#   maintainers:
-#     - ArekBalysNordic
-#     - adigie
-#     - kkasperczyk-no
-#   paths:
-#     - "src/platform/nrfconnect/**"
-#     - "examples/platform/nrfconnect/**"
-#     - "examples/**/nrfconnect/**"
-#     - "config/nrfconnect/**"
+bouffalolab:
+   maintainers:
+     - wy-hh
+     - shchen-Lab
+     - stoneM2017
+   paths:
+     - "src/platform/bouffalolab/**"
+     - "examples/platform/bouffalolab/**"
+     - "examples/**/bouffalolab/**"
+     - "config/bouffalolab/**"
+     - "third_party/bouffalolab/**"
+
+nrfconnect:
+  maintainers:
+    - ArekBalysNordic
+    - adigie
+    - kkasperczyk-no
+  paths:
+    - "src/platform/nrfconnect/**"
+    - "examples/platform/nrfconnect/**"
+    - "examples/**/nrfconnect/**"
+    - "config/nrfconnect/**"
+
+# --- Proposals / Opt-In Templates ---
 # 
-# tizen:
-#   maintainers:
-#     - enkiusz
-#     - arkq
-#   paths:
-#     - "src/platform/Tizen/**"
-#     - "examples/platform/tizen/**"
-#     - "examples/**/tizen/**"
-#     - "config/tizen/**"
 # 
 # asr:
 #   maintainers:
@@ -144,15 +161,6 @@ stm32:
 #     - "examples/platform/beken/**"
 #     - "examples/**/beken/**"
 #     - "config/beken/**"
-# 
-# bouffalolab:
-#   maintainers:
-#     - wy-hh
-#   paths:
-#     - "src/platform/bouffalolab/**"
-#     - "examples/platform/bouffalolab/**"
-#     - "examples/**/bouffalolab/**"
-#     - "config/bouffalolab/**"
 # 
 # qpg:
 #   maintainers:

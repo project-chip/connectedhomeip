@@ -52,7 +52,7 @@ template <typename... T>
 class GroupedCallbackList : protected Cancelable
 {
 public:
-    GroupedCallbackList() = default;
+    GroupedCallbackList() { mNext = mPrev = this; }
     ~GroupedCallbackList() { Clear(); }
 
     GroupedCallbackList(GroupedCallbackList const &)             = delete;
@@ -216,9 +216,9 @@ inline void LinkGroup(Cancelable * prev, Cancelable * cancelable)
 // Does NOT touch the state of adjacent nodes.
 inline Cancelable * ClearCancelable(Cancelable * cancelable)
 {
-    auto * next       = cancelable->mNext;
-    cancelable->mPrev = cancelable->mNext = cancelable;
-    cancelable->mCancel                   = nullptr;
+    auto * next         = cancelable->mNext;
+    cancelable->mCancel = nullptr;
+    cancelable->Invalidate();
     return next;
 }
 
@@ -237,7 +237,11 @@ inline void DequeueGroup(Cancelable * cancelable)
 template <size_t Index>
 void TaggedDequeueGroup(Cancelable * cancelable)
 {
-    (void) Index; // not used, we only care that instantiations have unique addresses
+    // Access a unique static volatile variable for each Index to ensure
+    // distinct relocations, preventing the linker from merging these functions
+    // under Identical Code Folding (--icf=all).
+    static volatile const size_t sTag = Index;
+    (void) sTag;
     DequeueGroup(cancelable);
 }
 

@@ -22,6 +22,13 @@
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_ENABLE_OPENTHREAD)
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+extern "C" {
+#include "addons_cli.h"
+}
+#endif
+
 #define MATTER_CLI_TASK_SIZE ((configSTACK_DEPTH_TYPE) 2048 / sizeof(portSTACK_TYPE))
 
 TaskHandle_t AppMatterCliTaskHandle;
@@ -67,6 +74,13 @@ CHIP_ERROR chip::NXP::App::AppCLIFreeRTOS::Init(void)
         }
 
         RegisterDefaultCommands();
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_ENABLE_OPENTHREAD)
+        /* verify that otInstance is not null before initializing addons */
+        otInstance * instance = otInstanceGetSingle();
+        VerifyOrDie(instance != nullptr);
+        otAppCliAddonsInit(instance);
+#endif
 
         if (xTaskCreate(&AppMatterCliTask, "AppMatterCli_task", MATTER_CLI_TASK_SIZE, NULL, 1, &AppMatterCliTaskHandle) != pdPASS)
         {

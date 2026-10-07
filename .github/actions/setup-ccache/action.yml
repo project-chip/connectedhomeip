@@ -28,7 +28,7 @@ runs:
       run: |
         brew install ccache
     - name: Configure ccache
-      uses: pyTooling/Actions/with-post-step@f6f6430469d2d58c911934bb41abf658b942d15b # v7.14.1
+      uses: pyTooling/Actions/with-post-step@a7d5e2058172ce93c3b9d657a314b328361a8b1f # v8.5.2
       with:
         main: |
           mkdir -p .ccache

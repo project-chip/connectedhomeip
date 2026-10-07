@@ -21,16 +21,16 @@
 
 #include <cstring>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 // Allows for a FullQName to be represented as a user-readable logging string
 class QNameString
 {
 public:
-    QNameString(const mdns::Minimal::FullQName & name);
+    QNameString(const chip::Dnssd::FullQName & name);
 
-    QNameString(mdns::Minimal::SerializedQNameIterator name);
+    QNameString(chip::Dnssd::SerializedQNameIterator name);
 
     inline const char * c_str() const { return mBuffer.c_str(); }
 
@@ -64,5 +64,5 @@ private:
     chip::StringBuilder<kMaxQNameLength> mBuffer;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

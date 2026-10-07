@@ -20,10 +20,7 @@
 
 namespace chip::app {
 
-Refrigerator::Refrigerator(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & cabinetIdentify, const Config & config) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRefrigerator, 1)),
-    mCabinet(timerDelegate, config.cabinetConfig, cabinetIdentify)
-{}
+Refrigerator::Refrigerator() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRefrigerator, 1)) {}
 
 CHIP_ERROR Refrigerator::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                   EndpointComposition composition)
@@ -33,12 +30,15 @@ CHIP_ERROR Refrigerator::Register(EndpointIdAllocator & allocator, CodeDrivenDat
 
     mEndpointId = allocator.Allocate();
 
+    // An explicit caller-provided tag list wins; otherwise the device falls back to
+    // its own default tags (used to disambiguate variants under wildcard allocation).
+    Span<const EndpointComposition::SemanticTag> tagList = composition.tagList.empty() ? mTagList : composition.tagList;
+
     ReturnErrorOnFailure(RegisterDescriptor(
-        mEndpointId, provider,
-        EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, composition.tagList)));
+        mEndpointId, provider, EndpointComposition(composition.parentId, DataModel::EndpointCompositionPattern::kTree, tagList)));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mCabinet.Register(allocator, provider, EndpointComposition::WithParent(mEndpointId)));
+    ReturnErrorOnFailure(RegisterParts(allocator, provider));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -46,7 +46,7 @@ CHIP_ERROR Refrigerator::Register(EndpointIdAllocator & allocator, CodeDrivenDat
 
 void Refrigerator::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mCabinet.Unregister(provider);
+    UnregisterParts(provider);
     UnregisterDescriptor(mEndpointId, provider);
     mEndpointId = kInvalidEndpointId;
 }

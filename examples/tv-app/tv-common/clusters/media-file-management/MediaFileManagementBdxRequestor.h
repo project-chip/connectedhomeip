@@ -1,0 +1,92 @@
+/*
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/OperationalSessionSetup.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/ScopedNodeId.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/bdx/BdxTransferSession.h>
+#include <protocols/bdx/TransferFacilitator.h>
+#include <transport/Session.h>
+
+#include <fstream>
+#include <string>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MediaFileManagement {
+
+/**
+ * BDX receiver for the tv-app's AddFile / OfferFile flows.
+ *
+ * When a client adds or offers a file, the tv-app pulls the bytes from the
+ * client: it opens a CASE session back to the client, initiates a
+ * receiver-drive BDX transfer for the given file designator, and writes each
+ * received block to a target path on disk.
+ *
+ * A single instance handles one transfer at a time.
+ */
+class MediaFileManagementBdxRequestor : public chip::bdx::Initiator
+{
+public:
+    MediaFileManagementBdxRequestor() : mOnConnected(OnDeviceConnected, this), mOnConnectionFailure(OnDeviceConnectionFailure, this)
+    {}
+
+    /**
+     * Download the file identified by `designator` from `peer` into `targetPath`.
+     * Establishes a CASE session if needed, then drives the BDX transfer. The
+     * transfer runs asynchronously; the file at `targetPath` is complete once
+     * the BDX AckEOF is exchanged.
+     */
+    CHIP_ERROR StartDownload(ScopedNodeId peer, std::string designator, std::string targetPath, uint64_t expectedSize);
+
+    bool IsBusy() const { return mInitialized; }
+
+    void AbortTransfer();
+
+private:
+    // Inherited from bdx::TransferFacilitator.
+    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
+
+    // CASE session establishment callbacks.
+    static void OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailure(void * context, const ScopedNodeId & peer, CHIP_ERROR error);
+
+    CHIP_ERROR BeginTransfer(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    void Reset();
+
+    Callback::Callback<chip::OnDeviceConnected> mOnConnected;
+    Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailure;
+
+    ScopedNodeId mPeer;
+    std::string mDesignator;
+    std::string mTargetPath;
+    uint64_t mExpectedSize = 0;
+    uint64_t mBytesWritten = 0;
+    std::ofstream mOutFile;
+    bool mInitialized = false;
+};
+
+} // namespace MediaFileManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

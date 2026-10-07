@@ -22,6 +22,7 @@
 #include <clusters/MediaFileManagement/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -70,29 +71,46 @@ public:
     /**
      * Handle the AddFile command. Populate `response` with the resulting status
      * and (on success) the newly assigned FileID.
+     *
+     * `peer` identifies the node that invoked the command; it is the node the
+     * file bytes are retrieved from out-of-band via BDX.
      */
-    virtual Protocols::InteractionModel::Status HandleAddFile(const CharSpan & name, uint64_t size, const CharSpan & mimeType,
-                                                              const CharSpan & imageUri,
+    virtual Protocols::InteractionModel::Status HandleAddFile(ScopedNodeId peer, const CharSpan & name, uint64_t size,
+                                                              const CharSpan & mimeType, const CharSpan & imageUri,
                                                               Commands::AddFileResponse::Type & response) = 0;
 
     /// Handle the DeleteFile command.
     virtual Protocols::InteractionModel::Status HandleDeleteFile(uint64_t fileID) = 0;
 
-    /// Handle the RequestSharedFiles command (MediaSharing feature).
+    /**
+     * Handle the RequestSharedFiles command (MediaSharing feature).
+     *
+     * `peer` identifies the requesting node; the files subsequently shared (and
+     * retrieved via BDX) are scoped to this node.
+     */
     virtual Protocols::InteractionModel::Status
-    HandleRequestSharedFiles(const CharSpan & clientName, uint16_t requestID,
+    HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
                              const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) = 0;
 
     /**
      * Handle the GetSharedFile command (MediaSharing feature). Populate
      * `response` with the resulting status and (on success) the file description.
+     *
+     * `peer` identifies the requesting node and is used to authorize that the
+     * requested file was shared with this node.
      */
-    virtual Protocols::InteractionModel::Status HandleGetSharedFile(uint16_t responseID,
+    virtual Protocols::InteractionModel::Status HandleGetSharedFile(ScopedNodeId peer, uint16_t responseID,
                                                                     Commands::GetSharedFileResponse::Type & response) = 0;
 
-    /// Handle the OfferFile command (MediaSharing feature).
-    virtual Protocols::InteractionModel::Status HandleOfferFile(const CharSpan & clientName, const CharSpan & name, uint64_t size,
-                                                                const CharSpan & mimeType, const CharSpan & imageUri) = 0;
+    /**
+     * Handle the OfferFile command (MediaSharing feature).
+     *
+     * `peer` identifies the offering node; the offered file bytes are retrieved
+     * from this node out-of-band via BDX.
+     */
+    virtual Protocols::InteractionModel::Status HandleOfferFile(ScopedNodeId peer, const CharSpan & clientName,
+                                                                const CharSpan & name, uint64_t size, const CharSpan & mimeType,
+                                                                const CharSpan & imageUri) = 0;
 };
 
 } // namespace MediaFileManagement

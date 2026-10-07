@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/dnssd/minimal_mdns/records/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/RecordResponder.h>
+#include <lib/dnssd/wire/records/Ptr.h>
 
 namespace mdns {
 namespace Minimal {
@@ -26,7 +26,9 @@ namespace Minimal {
 class PtrResponder : public RecordResponder
 {
 public:
-    PtrResponder(const FullQName & qname, const FullQName & target) : RecordResponder(QType::PTR, qname), mTarget(target) {}
+    PtrResponder(const chip::Dnssd::FullQName & qname, const chip::Dnssd::FullQName & target) :
+        RecordResponder(chip::Dnssd::QType::PTR, qname), mTarget(target)
+    {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                          const ResponseConfiguration & configuration) override
@@ -36,14 +38,14 @@ public:
             return;
         }
 
-        PtrResourceRecord record(GetQName(), mTarget);
+        chip::Dnssd::PtrResourceRecord record(GetQName(), mTarget);
         configuration.Adjust(record);
         delegate->AddResponse(record);
         delegate->ResponsesAdded(*this);
     }
 
 private:
-    const FullQName mTarget;
+    const chip::Dnssd::FullQName mTarget;
 };
 
 } // namespace Minimal

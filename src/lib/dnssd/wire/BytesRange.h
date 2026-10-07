@@ -22,8 +22,8 @@
 
 #include <lib/support/Span.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 /// Simple range of bytes with a start and an end
 class BytesRange
@@ -58,6 +58,6 @@ private:
     const uint8_t * mEnd   = nullptr;
 };
 
-} // namespace Minimal
+} // namespace Dnssd
 
-} // namespace mdns
+} // namespace chip

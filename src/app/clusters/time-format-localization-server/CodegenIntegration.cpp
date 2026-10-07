@@ -30,34 +30,21 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
 
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-#define CodegenInitError(...) ChipLogError(AppServer, __VA_ARGS__)
-#else // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-#define CodegenInitError(...) (void) 0;
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-
 namespace {
 
 void FetchDefaults(BitFlags<TimeFormatLocalization::Feature> featureMap, TimeFormatLocalization::HourFormatEnum & defaultHourFormat,
                    TimeFormatLocalization::CalendarTypeEnum & defaultCalendarType)
 {
     // hour format always supported
-    if (TimeFormatLocalization::Attributes::HourFormat::GetDefault(kRootEndpointId, &defaultHourFormat) != Status::Success)
-    {
-        CodegenInitError("Failed to get HourFormat for endpoint %u", kRootEndpointId);
-        defaultHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
-    }
+    TimeFormatLocalization::Attributes::HourFormat::GetDefaultOr(kRootEndpointId, defaultHourFormat,
+                                                                 TimeFormatLocalization::HourFormatEnum::k12hr);
 
     // Calendar format is feature-dependent. We set some default but still try to read it
     defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
     if (featureMap.Has(TimeFormatLocalization::Feature::kCalendarFormat))
     {
-        if (TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefault(kRootEndpointId, &defaultCalendarType) !=
-            Status::Success)
-        {
-            CodegenInitError("Failed to get ActiveCalendarType for endpoint %u", kRootEndpointId);
-            defaultCalendarType = TimeFormatLocalization::CalendarTypeEnum::kGregorian;
-        }
+        TimeFormatLocalization::Attributes::ActiveCalendarType::GetDefaultOr(kRootEndpointId, defaultCalendarType,
+                                                                             TimeFormatLocalization::CalendarTypeEnum::kGregorian);
     }
 }
 

@@ -44,12 +44,22 @@ constexpr std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLeng
     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kInoperative,
 };
 
+// 2126-01-01 00:00:00 UTC in Matter epoch seconds (seconds since 2000-01-01 00:00:00 UTC).
+constexpr uint32_t kTestExpiryDate = 3976214400;
+
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
-    SmokeCoAlarmCluster::Config cfg;
-    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    return cfg;
+    return SmokeCoAlarmCluster::Config()
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kTestExpiryDate)
+        .WithUnmounted();
 }
 
 struct TestSmokeCoAlarmBase : public ::testing::Test
@@ -85,7 +95,7 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_MandatoryOnly)
 TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
 {
     SmokeCoAlarmCluster::Config cfg;
-    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    cfg.WithSmokeAlarm({}).WithCOAlarm();
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -93,8 +103,48 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
         cluster,
         { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
           Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
+          Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAlarmOptionalAttributes)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.WithSmokeAlarm({
+        .withContaminationState = true,
+        .sensitivityLevel       = SensitivityEnum::kLow,
+    });
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(
+        cluster,
+        { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry,
+          Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
           Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry,
           Attributes::ContaminationState::kMetadataEntry, Attributes::SmokeSensitivityLevel::kMetadataEntry }));
+    uint8_t sensitivity{};
+    ASSERT_EQ(t.ReadAttribute(Attributes::SmokeSensitivityLevel::Id, sensitivity), CHIP_NO_ERROR);
+    EXPECT_EQ(sensitivity, to_underlying(SensitivityEnum::kLow));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_ExpiryDateFromConfig)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.WithSmokeAlarm({}).WithCOAlarm().WithExpiryDate(kTestExpiryDate);
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(
+        IsAttributesListEqualTo(cluster,
+                                { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry,
+                                  Attributes::COState::kMetadataEntry, Attributes::BatteryAlert::kMetadataEntry,
+                                  Attributes::TestInProgress::kMetadataEntry, Attributes::HardwareFaultAlert::kMetadataEntry,
+                                  Attributes::EndOfServiceAlert::kMetadataEntry, Attributes::ExpiryDate::kMetadataEntry }));
+    uint32_t expiry{};
+    ASSERT_EQ(t.ReadAttribute(Attributes::ExpiryDate::Id, expiry), CHIP_NO_ERROR);
+    EXPECT_EQ(expiry, kTestExpiryDate);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -283,8 +333,7 @@ TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_ReadonlyRejected)
 
 TEST_F(TestSmokeCoAlarmCluster, SetUnmountedState_InoperativeWhenUnmounted)
 {
-    SmokeCoAlarmCluster::Config cfg = MakeFullConfig();
-    cfg.inoperativeWhenUnmounted    = true;
+    SmokeCoAlarmCluster::Config cfg = MakeFullConfig().WithUnmounted(true);
     SmokeCoAlarmCluster local(kTestEndpointId, cfg);
     ClusterTester t(local);
     ASSERT_EQ(local.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -342,5 +391,33 @@ TEST_F(TestSmokeCoAlarmCluster, RemainingAlarmAttributes_ReadBack)
     cluster.SetContaminationState(ContaminationStateEnum::kCritical);
     EXPECT_EQ(cluster.GetContaminationState(), ContaminationStateEnum::kCritical);
 
-    EXPECT_EQ(cluster.GetExpiryDate(), 0u);
+    EXPECT_EQ(cluster.GetExpiryDate(), kTestExpiryDate);
+}
+
+TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_SmokeSensitivityLevel_OutOfRangeRejected)
+{
+    // Move off the kStandard default first, so the "unchanged" assertions below cannot be
+    // satisfied by a write that stores nothing at all.
+    ASSERT_EQ(tester.WriteAttribute(Attributes::SmokeSensitivityLevel::Id, to_underlying(SensitivityEnum::kLow)), CHIP_NO_ERROR);
+
+    // SensitivityEnum is 0..2; a value outside that range must be answered ConstraintError and must
+    // not be stored, rather than being folded onto kUnknownEnumValue and kept.
+    for (uint8_t outOfRange : { static_cast<uint8_t>(3), static_cast<uint8_t>(7), static_cast<uint8_t>(255) })
+    {
+        EXPECT_EQ(tester.WriteAttribute(Attributes::SmokeSensitivityLevel::Id, outOfRange), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        uint8_t level{};
+        ASSERT_EQ(tester.ReadAttribute(Attributes::SmokeSensitivityLevel::Id, level), CHIP_NO_ERROR);
+        EXPECT_EQ(level, to_underlying(SensitivityEnum::kLow));
+    }
+
+    // In-range values still have to be accepted, so a guard cannot pass by rejecting everything.
+    for (SensitivityEnum inRange : { SensitivityEnum::kHigh, SensitivityEnum::kStandard, SensitivityEnum::kLow })
+    {
+        ASSERT_EQ(tester.WriteAttribute(Attributes::SmokeSensitivityLevel::Id, to_underlying(inRange)), CHIP_NO_ERROR);
+
+        uint8_t level{};
+        ASSERT_EQ(tester.ReadAttribute(Attributes::SmokeSensitivityLevel::Id, level), CHIP_NO_ERROR);
+        EXPECT_EQ(level, to_underlying(inRange));
+    }
 }

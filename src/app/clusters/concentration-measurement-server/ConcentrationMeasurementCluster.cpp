@@ -27,6 +27,7 @@
 #include <clusters/Pm1ConcentrationMeasurement/Metadata.h>
 #include <clusters/Pm25ConcentrationMeasurement/Metadata.h>
 #include <clusters/RadonConcentrationMeasurement/Metadata.h>
+#include <clusters/SmokeConcentrationMeasurement/Metadata.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/Metadata.h>
 
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
@@ -45,6 +46,8 @@ static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevis
               chip::app::Clusters::Pm25ConcentrationMeasurement::kRevision);
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
               chip::app::Clusters::RadonConcentrationMeasurement::kRevision);
+static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
+              chip::app::Clusters::SmokeConcentrationMeasurement::kRevision);
 static_assert(chip::app::Clusters::CarbonDioxideConcentrationMeasurement::kRevision ==
               chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::kRevision);
 

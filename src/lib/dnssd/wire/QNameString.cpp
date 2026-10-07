@@ -16,10 +16,10 @@
  */
 #include <lib/dnssd/wire/QNameString.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
-QNameString::QNameString(const mdns::Minimal::FullQName & name)
+QNameString::QNameString(const chip::Dnssd::FullQName & name)
 {
     for (unsigned i = 0; i < name.nameCount; i++)
     {
@@ -31,7 +31,7 @@ QNameString::QNameString(const mdns::Minimal::FullQName & name)
     }
 }
 
-QNameString::QNameString(mdns::Minimal::SerializedQNameIterator name)
+QNameString::QNameString(chip::Dnssd::SerializedQNameIterator name)
 {
     bool first = true;
     while (name.Next())
@@ -52,5 +52,5 @@ QNameString::QNameString(mdns::Minimal::SerializedQNameIterator name)
     }
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

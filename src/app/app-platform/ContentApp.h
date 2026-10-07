@@ -115,7 +115,7 @@ public:
 
     virtual ~ContentApp() = default;
 
-    inline void SetEndpointId(EndpointId id) { mEndpointId = id; };
+    virtual void SetEndpointId(EndpointId id) { mEndpointId = id; };
     inline EndpointId GetEndpointId() { return mEndpointId; };
 
     const std::vector<SupportedCluster> & GetSupportedClusters() const { return mSupportedClusters; };

@@ -290,7 +290,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kMaxVoltageProtection), maxVoltageProtection);
     encoder.Encode(to_underlying(Fields::kMaxTemporaryVoltage), maxTemporaryVoltage);
     encoder.Encode(to_underlying(Fields::kNominalDischargeCurrent), nominalDischargeCurrent);
-    encoder.Encode(to_underlying(Fields::kMaximumDishargeCurrent), maximumDishargeCurrent);
+    encoder.Encode(to_underlying(Fields::kMaximumDischargeCurrent), maximumDischargeCurrent);
     encoder.Encode(to_underlying(Fields::kRatedShortCircuitCurrent), ratedShortCircuitCurrent);
     encoder.Encode(to_underlying(Fields::kRatedShortTimeWithstandCurrent), ratedShortTimeWithstandCurrent);
     encoder.Encode(to_underlying(Fields::kEnergyAbsorptionCapability), energyAbsorptionCapability);
@@ -336,9 +336,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nominalDischargeCurrent);
         }
-        else if (__context_tag == to_underlying(Fields::kMaximumDishargeCurrent))
+        else if (__context_tag == to_underlying(Fields::kMaximumDischargeCurrent))
         {
-            err = DataModel::Decode(reader, maximumDishargeCurrent);
+            err = DataModel::Decode(reader, maximumDischargeCurrent);
         }
         else if (__context_tag == to_underlying(Fields::kRatedShortCircuitCurrent))
         {
