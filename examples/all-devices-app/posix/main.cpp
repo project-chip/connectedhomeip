@@ -215,7 +215,7 @@ public:
             .testEventTriggerDelegate = *mContext.testEventTriggerDelegate,
             .identifyDelegate         = mContext.identifyDelegate,
         });
-        PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
+        PosixDeviceFactory::ExecuteRegistrationHooks(mRootNode.RootDevice());
 
         for (const auto & entry : AppOptions::GetDeviceTypeEntries())
         {
@@ -234,7 +234,7 @@ public:
             {
                 created.onDeviceRegistered();
             }
-            mConstructedDevices.push_back(std::move(created.device));
+            mConstructedDevices.push_back(std::move(created));
         }
 
         return CHIP_NO_ERROR;
@@ -242,11 +242,15 @@ public:
 
     void Shutdown()
     {
-        OOBAccessorRegistry::Instance().Clear();
         for (auto & device : mConstructedDevices)
         {
-            device->Unregister(mDataModelProvider);
+            if (device.beforeDeviceUnregistration)
+            {
+                device.beforeDeviceUnregistration();
+            }
+            device.device->Unregister(mDataModelProvider);
         }
+        PosixDeviceFactory::ExecuteUnregistrationHooks(mRootNode.RootDevice());
         mConstructedDevices.clear();
         mRootNode.RootDevice().Unregister(mDataModelProvider);
     }
@@ -255,7 +259,7 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
+    const std::vector<PosixDeviceFactory::DeviceRegistrationEntry> & GetConstructedDevices() const { return mConstructedDevices; }
 
 private:
     Context mContext;
@@ -263,7 +267,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+    std::vector<PosixDeviceFactory::DeviceRegistrationEntry> mConstructedDevices;
 };
 
 void SetupNamedPipe(const char * namedPipePath)

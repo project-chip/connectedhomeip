@@ -32,6 +32,7 @@ source_set("oob-accessors") {
     "InMemoryOOBAccessorRegistry.cpp",
     "InMemoryOOBAccessorRegistry.h",
     "NoopOOBAccessorRegistry.h",
+    "OOBAccessorRegisteredCallback.h",
     "OOBAccessor.h",
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",

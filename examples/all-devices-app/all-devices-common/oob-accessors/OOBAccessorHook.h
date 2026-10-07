@@ -19,6 +19,8 @@
 #include <oob-accessors/OOBAccessorRegistry.h>
 #include <type_traits>
 #include <utility>
+#include <vector>
+#include <algorithm>
 
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
@@ -60,8 +62,72 @@ public:
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
+            GetOOBAccessorRegistrationListener().SetCurrentDevice(&device);
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
+            GetOOBAccessorRegistrationListener().SetCurrentDevice(nullptr);
         }
+    }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {
+        // check if the device has OOB accessors that could be registered
+        if constexpr (detail::HasOOBAccessors<TDevice>::value)
+        {
+            auto & deviceToOOBAccessorMap = GetDeviceToOOBAccessorMap();
+
+            // Unregister all OOB accessors associated with the device being unregistered
+            for (auto [devicePtr, accessorPtr] : deviceToOOBAccessorMap)
+            {
+                if (devicePtr == &device)
+                {
+                    LogErrorOnFailure(OOBAccessorRegistry::Instance().Unregister(accessorPtr));
+                }
+            }
+
+            // Remove corresponding entries from the map
+            deviceToOOBAccessorMap.erase(
+                std::remove_if(deviceToOOBAccessorMap.begin(), deviceToOOBAccessorMap.end(),
+                               [&device](const auto & pair) { return pair.first == &device; }),
+                deviceToOOBAccessorMap.end());
+        }
+    }
+
+private:
+    class OOBAccessorRegistrationListener : public OOBAccessorRegisteredCallback
+    {
+    public:
+        OOBAccessorRegistrationListener(std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & deviceToOOBAccessorMap)
+            : mDeviceToOOBAccessorMap(deviceToOOBAccessorMap)
+        {
+            OOBAccessorRegistry::Instance().AddOOBAccessorRegisteredCallback(this);
+        }
+        ~OOBAccessorRegistrationListener()
+        {
+            OOBAccessorRegistry::Instance().RemoveOOBAccessorRegisteredCallback(this);
+        }
+        void OnRegistered(OOBAccessor * accessor) override
+        {
+            // If something other than this hook registered the accessor, we will not associate it with a device.
+            if (mCurrentDevice != nullptr)
+            {
+                mDeviceToOOBAccessorMap.push_back({ mCurrentDevice, accessor });
+            }
+        }
+        void SetCurrentDevice(DeviceInterface * device) { mCurrentDevice = device; }
+    private:
+        DeviceInterface * mCurrentDevice = nullptr;
+        std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & mDeviceToOOBAccessorMap;
+    };
+    static std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & GetDeviceToOOBAccessorMap()
+    {
+        static std::vector<std::pair<DeviceInterface *, OOBAccessor *>> sDeviceToOOBAccessorMap;
+        return sDeviceToOOBAccessorMap;
+    }
+    static OOBAccessorRegistrationListener & GetOOBAccessorRegistrationListener()
+    {
+        static OOBAccessorRegistrationListener sOOBAccessorRegistrationListener(GetDeviceToOOBAccessorMap());
+        return sOOBAccessorRegistrationListener;
     }
 };
 

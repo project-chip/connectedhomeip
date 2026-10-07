@@ -24,6 +24,20 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> ac
 {
     VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mAccessors.push_back(std::move(accessor));
+    for (auto * callback : mCallbacks)
+    {
+        callback->OnRegistered(mAccessors.back().get());
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InMemoryOOBAccessorRegistry::Unregister(OOBAccessor * accessor)
+{
+    VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    auto it = std::find_if(mAccessors.begin(), mAccessors.end(),
+                           [accessor](const std::unique_ptr<OOBAccessor> & ptr) { return ptr.get() == accessor; });
+    VerifyOrReturnError(it != mAccessors.end(), CHIP_ERROR_NOT_FOUND);
+    mAccessors.erase(it);
     return CHIP_NO_ERROR;
 }
 
@@ -38,6 +52,15 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan t
         }
     }
     return CHIP_ERROR_NOT_FOUND;
+}
+
+void InMemoryOOBAccessorRegistry::RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback * callback)
+{
+    auto it = std::find(mCallbacks.begin(), mCallbacks.end(), callback);
+    if (it != mCallbacks.end())
+    {
+        mCallbacks.erase(it);
+    }
 }
 
 } // namespace chip::app

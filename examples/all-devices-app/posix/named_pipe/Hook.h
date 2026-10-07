@@ -63,6 +63,9 @@ public:
             RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
     }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device) {}
 };
 
 } // namespace chip::app::NamedPipe
