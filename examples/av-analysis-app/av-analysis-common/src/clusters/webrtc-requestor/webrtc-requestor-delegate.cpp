@@ -141,9 +141,12 @@ void WebRTCRequestorDelegate::OnPeerConnectionFailed(const ScopedNodeId & aCamer
 
 void WebRTCRequestorDelegate::OnPeerConnectionReleased(const ScopedNodeId & aCameraNode, uint16_t aWebRTCSessionId)
 {
-    // The stream's media is over; analysis sessions sourced from it are ended
     ChipLogProgress(AppServer, "AvAnalysisNode: peer connection of WebRTC session %u of " ChipLogFormatScopedNodeId " released",
                     aWebRTCSessionId, ChipLogValueScopedNodeId(aCameraNode));
+
+    // The stream's media is over. Hence, the analysis sessions sourced from it needs to end
+    VerifyOrReturn(mAnalysisDelegate != nullptr);
+    mAnalysisDelegate->OnStreamReleased(aCameraNode);
 }
 
 } // namespace app
