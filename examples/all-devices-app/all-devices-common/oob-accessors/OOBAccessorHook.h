@@ -62,9 +62,9 @@ public:
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
-            GetOOBAccessorRegistrationListener().SetCurrentDevice(&device);
+            GetOOBAccessorRegistrationListener().SetCurrentDevice(device);
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
-            GetOOBAccessorRegistrationListener().SetCurrentDevice(nullptr);
+            GetOOBAccessorRegistrationListener().UnsetCurrentDevice();
         }
     }
 
@@ -114,7 +114,8 @@ private:
                 mDeviceToOOBAccessorMap.push_back({ mCurrentDevice, accessor });
             }
         }
-        void SetCurrentDevice(DeviceInterface * device) { mCurrentDevice = device; }
+        void SetCurrentDevice(DeviceInterface & device) { mCurrentDevice = &device; }
+        void UnsetCurrentDevice() { mCurrentDevice = nullptr; }
     private:
         DeviceInterface * mCurrentDevice = nullptr;
         std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & mDeviceToOOBAccessorMap;
