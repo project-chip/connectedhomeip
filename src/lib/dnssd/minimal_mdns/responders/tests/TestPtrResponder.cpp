@@ -30,6 +30,7 @@ using namespace chip;
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 constexpr uint16_t kMdnsPort = 5353;
 

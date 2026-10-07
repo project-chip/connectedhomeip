@@ -198,6 +198,12 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
 - (void)tearDown
 {
+#ifdef DEBUG
+    // continueAfterFailure is NO, so a failed assertion skips whatever a test does after it; leaving this
+    // set would silently pin every later test to that value.
+    [MTRBaseDevice unitTestSetMaxPathsPerInvokeOverride:0];
+#endif
+
     // Make sure our MTRDevice instances, which are stateful, do not keep that
     // state between different tests.
     if (sController != nil) {
@@ -2844,6 +2850,36 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
 
     [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * attestationRequestedViaInvokeCommands = [self expectationWithDescription:@"Invoked AttestationRequest via invokeCommands:"];
+    __auto_type * attestationPath = [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                                    clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                                                    commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)];
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * attestationGroup = @[
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:attestationPath commandFields:requestFields requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+    ];
+    [device invokeCommands:@[ attestationGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+                    XCTAssertEqual(values.count, attestationGroup.count);
+
+                    NSError * decodeError;
+                    __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&decodeError];
+                    XCTAssertNil(decodeError);
+                    XCTAssertNotNil(response);
+                    XCTAssertNotNil(response.attestationChallenge);
+
+                    [attestationRequestedViaInvokeCommands fulfill];
+                }];
+
+    [self waitForExpectations:@[ attestationRequestedViaInvokeCommands ] timeout:(2 * kTimeoutInSeconds)];
 }
 
 - (void)test028_TimeZoneAndDST
@@ -6001,6 +6037,414 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
 }
 
+#pragma mark - Helpers shared by the invokeCommands: grouping tests
+
+static MTRDeviceDataValueDictionary MTRTestUnsignedFieldStructure(NSArray<NSNumber *> * values)
+{
+    NSMutableArray<NSDictionary<NSString *, id> *> * fields = [NSMutableArray arrayWithCapacity:values.count];
+    for (NSUInteger i = 0; i < values.count; i++) {
+        [fields addObject:@{
+            MTRContextTagKey : @(i),
+            MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : values[i] },
+        }];
+    }
+    return @ { MTRTypeKey : MTRStructureValueType, MTRValueKey : fields };
+}
+
+static MTRCommandWithRequiredResponse * MTRTestCommand(NSNumber * endpointID, NSNumber * clusterID, NSNumber * commandID,
+    MTRDeviceDataValueDictionary _Nullable commandFields)
+{
+    __auto_type * path = [MTRCommandPath commandPathWithEndpointID:endpointID clusterID:clusterID commandID:commandID];
+    return [[MTRCommandWithRequiredResponse alloc] initWithPath:path commandFields:commandFields requiredResponse:nil];
+}
+
+// all-clusters-app advertises MaxPathsPerInvoke == 5, so these six split 5 + 1; the endpoint 2 command is
+// first so the first chunk spans two endpoints.
+static NSArray<MTRCommandWithRequiredResponse *> * MTRTestLightingCommandBurst(void)
+{
+    return @[
+        MTRTestCommand(@(2), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeLevelControlID), @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID),
+            MTRTestUnsignedFieldStructure(@[ @(128), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorID),
+            MTRTestUnsignedFieldStructure(@[ @(0x4000), @(0x4000), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID),
+            @(MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID),
+            MTRTestUnsignedFieldStructure(@[ @(250), @(0), @(0), @(0) ])),
+        MTRTestCommand(@(1), @(MTRClusterIDTypeLevelControlID),
+            @(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID),
+            MTRTestUnsignedFieldStructure(@[ @(200), @(0), @(0), @(0) ])),
+    ];
+}
+
+static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithRequiredResponse *> * commands)
+{
+    NSMutableArray<MTRCommandPath *> * paths = [NSMutableArray arrayWithCapacity:commands.count];
+    for (MTRCommandWithRequiredResponse * command in commands) {
+        [paths addObject:command.path];
+    }
+    return paths;
+}
+
+- (void)test045b_MTRDeviceInvokeGroupExceedingMaxPathsPerInvoke
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * commandGroup = MTRTestLightingCommandBurst();
+    __auto_type * expectedPaths = MTRTestCommandPaths(commandGroup);
+
+    XCTestExpectation * chunkedInvokeDone = [self expectationWithDescription:@"Invoke of a group exceeding max paths per invoke done"];
+    [device invokeCommands:@[ commandGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+
+                    [chunkedInvokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ chunkedInvokeDone ] timeout:(6 * kTimeoutInSeconds)];
+}
+
+- (void)test045c_MTRDeviceInvokeGroupWithRepeatedCommandPath
+{
+    // Packed into one message the server would reject all three; the repeat is non-adjacent on purpose.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * repeatedGroup = @[
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:togglePath commandFields:nil requiredResponse:nil],
+        [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil],
+    ];
+
+    XCTestExpectation * repeatedInvokeDone = [self expectationWithDescription:@"Invoke of a group with a repeated command path done"];
+    [device invokeCommands:@[ repeatedGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqualObjects(values, (@[
+                        @ { MTRCommandPathKey : onPath },
+                        @ { MTRCommandPathKey : togglePath },
+                        @ { MTRCommandPathKey : onPath },
+                    ]));
+
+                    [repeatedInvokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ repeatedInvokeDone ] timeout:(4 * kTimeoutInSeconds)];
+}
+
+- (void)test045d_MTRDeviceInvokeGroupFailureSpanningChunks
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSMutableArray<MTRCommandWithRequiredResponse *> * firstGroup = [MTRTestLightingCommandBurst() mutableCopy];
+    __auto_type * failing = firstGroup[2];
+    firstGroup[2] = [[MTRCommandWithRequiredResponse alloc] initWithPath:failing.path
+                                                           commandFields:failing.commandFields
+                                                        requiredResponse:@{
+                                                            @(0) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(0) }
+                                                        }];
+    __auto_type * secondGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOffID), nil) ];
+
+    __auto_type * expectedPaths = MTRTestCommandPaths(firstGroup);
+
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke of a chunked group containing a failure done"];
+    [device invokeCommands:@[ firstGroup, secondGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(7 * kTimeoutInSeconds)];
+}
+
+#ifdef DEBUG
+- (void)test045e_MTRDeviceInvokeGroupSendsOneMessagePerChunk
+{
+    // Counts messages actually sent; one-command-per-message would give three and six.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * burst = MTRTestLightingCommandBurst();
+    __auto_type * singleChunkGroup = [burst subarrayWithRange:NSMakeRange(1, 3)];
+
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * singleChunkDone = [self expectationWithDescription:@"Invoke of a group fitting in one message done"];
+    [device invokeCommands:@[ singleChunkGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqual(values.count, singleChunkGroup.count);
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], 1);
+                    [singleChunkDone fulfill];
+                }];
+    [self waitForExpectations:@[ singleChunkDone ] timeout:(4 * kTimeoutInSeconds)];
+
+    __auto_type * twoChunkGroup = burst;
+
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * twoChunkDone = [self expectationWithDescription:@"Invoke of a group needing two messages done"];
+    [device invokeCommands:@[ twoChunkGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqual(values.count, twoChunkGroup.count);
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], 2);
+                    [twoChunkDone fulfill];
+                }];
+    [self waitForExpectations:@[ twoChunkDone ] timeout:(7 * kTimeoutInSeconds)];
+}
+
+- (void)test045g_MTRDeviceInvokeGroupAgainstPeerWithoutBatching
+{
+    // all-clusters-app advertises 5, so the path a peer advertising 1 takes — a message per command, with no
+    // CommandRef, and responses resolved by request order rather than by ref — is otherwise never exercised.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * commandGroup = [MTRTestLightingCommandBurst() subarrayWithRange:NSMakeRange(1, 3)];
+    __auto_type * expectedPaths = MTRTestCommandPaths(commandGroup);
+
+    [MTRBaseDevice unitTestSetMaxPathsPerInvokeOverride:1];
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke against a peer without batching done"];
+    [device invokeCommands:@[ commandGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    // One message per command, and every response still landed on the right command.
+                    XCTAssertEqual([MTRBaseDevice unitTestInvokeRequestMessageCount], commandGroup.count);
+                    XCTAssertEqual(values.count, expectedPaths.count);
+                    for (NSUInteger i = 0; i < values.count; i++) {
+                        XCTAssertEqualObjects(values[i], @ { MTRCommandPathKey : expectedPaths[i] });
+                    }
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(6 * kTimeoutInSeconds)];
+    [MTRBaseDevice unitTestSetMaxPathsPerInvokeOverride:0];
+}
+#endif // DEBUG
+
+- (void)test045f_MTRDeviceInvokeGroupSnapshotsCommandFields
+{
+    // Made unencodable right after the call: if the mutation leaked through to encoding time, this errors.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSMutableDictionary<NSString *, id> * mutableFields =
+        [MTRTestUnsignedFieldStructure(@[ @(128), @(0), @(0), @(0) ]) mutableCopy];
+    __auto_type * movePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                             clusterID:@(MTRClusterIDTypeLevelControlID)
+                                                             commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID)];
+    __auto_type * moveCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:movePath
+                                                                       commandFields:mutableFields
+                                                                    requiredResponse:nil];
+
+    XCTestExpectation * moveDone = [self expectationWithDescription:@"Invoke of a command with mutated fields done"];
+    [device invokeCommands:@[ @[ moveCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+                    XCTAssertEqualObjects(values, (@[ @ { MTRCommandPathKey : movePath } ]));
+                    [moveDone fulfill];
+                }];
+
+    mutableFields[MTRValueKey] = @"not a list of fields";
+
+    [self waitForExpectations:@[ moveDone ] timeout:(4 * kTimeoutInSeconds)];
+}
+
+- (void)test045h_MTRDeviceInvokeGroupWithUnencodableCommand
+{
+    // A command whose fields are not a structure-typed data-value cannot be encoded.  It must fail in its own
+    // position — the commands around it in its group still run, earlier groups are unaffected, and only the
+    // groups after it are skipped — rather than the whole invoke being refused up front.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * offPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeOnOffID)
+                                                            commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)];
+    __auto_type * badPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeLevelControlID)
+                                                            commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID)];
+
+    // An unsigned-typed data-value where a structure is required.
+    __auto_type * unencodable = [[MTRCommandWithRequiredResponse alloc]
+            initWithPath:badPath
+           commandFields:@{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(1) }
+        requiredResponse:nil];
+
+    __auto_type * firstGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil) ];
+    __auto_type * secondGroup = @[
+        MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandToggleID), nil),
+        unencodable,
+        MTRTestCommand(@(1), @(MTRClusterIDTypeColorControlID), @(MTRCommandIDTypeClusterColorControlCommandMoveToColorID),
+            MTRTestUnsignedFieldStructure(@[ @(0x4000), @(0x4000), @(0), @(0), @(0) ])),
+    ];
+    __auto_type * thirdGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOffID), nil) ];
+
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke of a group with an unencodable command done"];
+    [device invokeCommands:@[ firstGroup, secondGroup, thirdGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 4);
+                    if (values.count == 4) {
+                        XCTAssertEqualObjects(values[0], @ { MTRCommandPathKey : onPath });
+                        XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : togglePath });
+                        XCTAssertEqualObjects(values[2][MTRCommandPathKey], badPath);
+                        NSError * badError = values[2][MTRErrorKey];
+                        XCTAssertNotNil(badError);
+                        XCTAssertEqualObjects(badError.domain, MTRErrorDomain);
+                        XCTAssertEqual(badError.code, MTRErrorCodeInvalidArgument);
+                        XCTAssertNil(values[3][MTRErrorKey]);
+                    }
+                    for (NSDictionary<NSString *, id> * value in values) {
+                        XCTAssertNotEqualObjects(value[MTRCommandPathKey], offPath);
+                    }
+                    [invokeDone fulfill];
+                }];
+
+    [self waitForExpectations:@[ invokeDone ] timeout:(6 * kTimeoutInSeconds)];
+}
+
+- (void)test045i_MTRDeviceInvokeEmptyCommandList
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * emptyDone = [self expectationWithDescription:@"Invoke of no commands done"];
+    [device invokeCommands:@[]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqualObjects(values, @[]);
+                    [emptyDone fulfill];
+                }];
+    [self waitForExpectations:@[ emptyDone ] timeout:kTimeoutInSeconds];
+
+    // Groups that are all empty have no command to invoke either.
+    XCTestExpectation * emptyGroupsDone = [self expectationWithDescription:@"Invoke of empty groups done"];
+    [device invokeCommands:@[ @[], @[] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqualObjects(values, @[]);
+                    [emptyGroupsDone fulfill];
+                }];
+    [self waitForExpectations:@[ emptyGroupsDone ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test045j_MTRDeviceInvokeGroupTimedInvokeWaitedTooLong
+{
+    // Sitting in the work queue past the timed invoke timeout must fail the commands that actually need a
+    // timed invoke, in their own position: a group that needs no timed invoke still runs even though the
+    // deadline has passed, and only the groups after the stale one are skipped.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    // RevokeCommissioning requires a timed invoke; it is never sent here, so its own status does not matter.
+    __auto_type * timedPath =
+        [MTRCommandPath commandPathWithEndpointID:@(0)
+                                        clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
+                                        commandID:@(MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID)];
+    __auto_type * offPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeOnOffID)
+                                                            commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)];
+
+    __auto_type * firstGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOnID), nil) ];
+    __auto_type * timedGroup = @[ [[MTRCommandWithRequiredResponse alloc] initWithPath:timedPath
+                                                                         commandFields:nil
+                                                                      requiredResponse:nil] ];
+    __auto_type * lastGroup = @[ MTRTestCommand(@(1), @(MTRClusterIDTypeOnOffID), @(MTRCommandIDTypeClusterOnOffCommandOffID), nil) ];
+
+    // Hold the work queue until the timed invoke deadline, which starts when invokeCommands: is called, has
+    // certainly passed.
+    MTRAsyncWorkItem * blockingItem =
+        [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [blockingItem setReadyHandler:^(id blockedDevice, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        [NSThread sleepForTimeInterval:((MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS / 1000.0) + 1)];
+        workCompletion(MTRAsyncWorkComplete);
+    }];
+    [device.asyncWorkQueue enqueueWorkItem:blockingItem description:@"Blocking work item"];
+
+    XCTestExpectation * invokeDone = [self expectationWithDescription:@"Invoke of a stale timed invoke done"];
+    [device invokeCommands:@[ firstGroup, timedGroup, lastGroup ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 2);
+                    if (values.count == 2) {
+                        // The group that needs no timed invoke still ran.
+                        XCTAssertEqualObjects(values[0], @ { MTRCommandPathKey : onPath });
+
+                        XCTAssertEqualObjects(values[1][MTRCommandPathKey], timedPath);
+                        NSError * timedError = values[1][MTRErrorKey];
+                        XCTAssertNotNil(timedError);
+                        XCTAssertEqualObjects(timedError.domain, MTRInteractionErrorDomain);
+                        XCTAssertEqual(timedError.code, MTRInteractionErrorCodeTimeout);
+                    }
+                    for (NSDictionary<NSString *, id> * value in values) {
+                        XCTAssertNotEqualObjects(value[MTRCommandPathKey], offPath);
+                    }
+                    [invokeDone fulfill];
+                }];
+
+    // The blocking work item alone holds the queue for longer than the timed invoke timeout.
+    [self waitForExpectations:@[ invokeDone ] timeout:(10 * kTimeoutInSeconds)];
+}
+
 - (void)test046_MTRCommandWithRequiredResponseEncoding
 {
     // Basic test with no command fields or required response.
@@ -6196,14 +6640,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         ;
     }];
 
-    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
+    // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test.
+    // This has to happen on the delegate queue: _clearSubscriptionPoolWork notifies
+    // delegates asynchronously, so the notification for the initial subscription is
+    // still queued there and would otherwise run the handler we are installing.
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
     __weak __auto_type weakDelegate = delegate;
-    delegate.onSubscriptionPoolWorkComplete = ^{
-        __strong __auto_type strongDelegate = weakDelegate;
-        strongDelegate.onSubscriptionPoolWorkComplete = nil;
-        [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
-    };
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolWorkComplete = nil;
+            [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
+        };
+    });
 
     // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
     [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
@@ -6240,22 +6689,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // We relaunch the app multiple times, to try to trigger time
     // synchronization loss detection. These are the different cases:
     //
-    //   1) Relaunch with a bad clock, this should just trigger an update,
-    //      because it's the first time that we detect a bad time.
-    //   2) Relaunch with a bad clock again, this should not trigger an update,
-    //      because we avoid doing it too soon after a previous update (see
-    //      MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE).
-    //   3) Set the cadence to zero and relaunch with a bad clock again. This
-    //      should trigger an update, because with cadence being zero we won't
-    //      block an update.
-    //   4) Relaunch with a slightly bad clock (and cadence still set to zero).
-    //      This should not trigger an update, because the time is not out of
-    //      sync enough.
+    //   1) Relaunch with a bad clock, this should trigger an update.
+    //   2) Relaunch with a bad clock again, this should trigger an update too:
+    //      a device with no battery-backed RTC loses its clock on every power
+    //      cycle, and the budget gives us room to repair several in a row.
+    //   3) Same again, still within the budget, so still an update.
+    //   4) Relaunch with a slightly bad clock. This should not trigger an
+    //      update, because the time is not out of sync enough.
+    //
+    // test049a covers exhausting the budget, without relaunching the app.
     for (int i = 0; i < 4; ++i) {
-        if (i == 2) {
-            delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
-        }
-
         __weak __auto_type weakDelegate = delegate;
 
         XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
@@ -6280,7 +6723,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertNil(error);
                 [correctedTime fulfill];
             };
-            if (i == 1 || i == 3) {
+            if (i == 3) {
                 correctedTime.inverted = YES;
             }
             [resubscriptionReachableExpectation fulfill];
@@ -6308,6 +6751,101 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+// Tests that we only repair a device's clock BUDGET times per window, so a device that
+// cannot keep its clock does not have us updating it forever.
+- (void)test049a_TimeSynchronizationRepairIsRateLimited
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    // The mock clock is required, not just convenient: without it the app has to set the
+    // real system clock, which it cannot do, so every SetUTCTime fails with
+    // TimeNotAccepted. Starting at the Matter epoch also means the app's own priming report
+    // shows a lost clock, which costs no budget because no update is scheduled yet.
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    // Repairs are scheduled rather than performed inline, so without this every iteration
+    // would wait out MTR_DEVICE_TIME_UPDATE_SHORT_WAIT_TIME_SEC.
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    // Let the update that subscription establishment schedules finish first. It costs no
+    // budget (nothing is spent unless a long-delay update was already pending), and it
+    // leaves exactly that long-delay update pending, which is what a repair needs.
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegateForBaseline = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegateForBaseline;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    // UTCTime = null means the device has no time, which is a time synchronization loss.
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    // Injecting the report is enough to hit the repair path; no need to restart the app
+    // with a bad clock the way test049 does.
+    __weak __auto_type weakDelegate = delegate;
+    __auto_type injectLoss = ^(BOOL expectRepair, NSString * label) {
+        XCTestExpectation * repaired = [self expectationWithDescription:[NSString stringWithFormat:@"SetUTCTime for %@", label]];
+        repaired.inverted = !expectRepair;
+        XCTestExpectation * reportEnded = [self expectationWithDescription:[NSString stringWithFormat:@"Report end for %@", label]];
+        // Clear the handlers as they fire, so a later report cannot reach an expectation
+        // an earlier iteration is done with.
+        delegate.onUTCTimeSet = ^(NSError * error) {
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onUTCTimeSet = nil;
+            XCTAssertNil(error);
+            [repaired fulfill];
+        };
+        delegate.onReportEnd = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+            [reportEnded fulfill];
+        };
+
+        [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnded ] timeout:kTimeoutInSeconds];
+        // Short timeout for the inverted ones, so a passing test does not sit there
+        // proving a negative.
+        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 1];
+    };
+
+    // The whole loop runs well inside the window, so losses past the budget must not be
+    // repaired.
+    const int budget = 5; // MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET
+    for (int i = 0; i < budget; ++i) {
+        injectLoss(YES, [NSString stringWithFormat:@"loss %d", i]);
+    }
+    injectLoss(NO, @"loss past budget");
+    injectLoss(NO, @"another loss past budget");
+
+    // Forcing the window to zero stands in for waiting it out; test049c covers it sliding
+    // entry by entry.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
+    injectLoss(YES, @"loss after window");
+}
+
 // Tests that time synchronization loss is detected even when the cached CurrentTime
 // value has not changed (i.e. when the device power-cycles repeatedly and always
 // reports null, matching what we already have in cache from the previous cycle).
@@ -6318,7 +6856,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
     __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
     delegate.skipSetupSubscription = YES;
-    delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
 
     [device setDelegate:delegate queue:queue];
 
@@ -6372,6 +6910,104 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:NO];
     [self waitForExpectations:@[ nonSubscriptionReportEnd ] timeout:kTimeoutInSeconds];
     [self waitForExpectations:@[ noLossFromRead ] timeout:2];
+}
+
+// Tests that the window slides: budget frees up as individual repairs age out, rather
+// than the whole window being discarded at once.
+- (void)test049c_TimeSynchronizationRepairBudgetWindowSlides
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We never subscribe, so the node does not have to exist, and tearDown removes this
+    // device so we start with the whole budget unspent.
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    // Spend the whole budget (5): 3 repairs 50 minutes ago and 2 repairs 10 minutes ago.
+    NSDate * fiftyMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-50 * 60];
+    NSDate * tenMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-10 * 60];
+    for (int i = 0; i < 3; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:fiftyMinutesAgo];
+    }
+    for (int i = 0; i < 2; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:tenMinutesAgo];
+    }
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
+
+    // With a 30 minute window only the older 3 age out, so exactly 3 slots come back.
+    // Expiring the window all at once would give us 5, and dropping one entry per check
+    // would give us fewer.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(30 * 60);
+    for (int i = 0; i < 3; ++i) {
+        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:[NSDate now]];
+    }
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
+}
+
+- (void)test049d_TimeSynchronizationLossSurvivesOverlappingReport
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    XCTestExpectation * repaired = [self expectationWithDescription:@"SetUTCTime for the loss"];
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [repaired fulfill];
+    };
+
+    [controller syncRunOnWorkQueue:^{
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleAttributeReport:nullTimeSyncReport fromSubscription:YES];
+        }];
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleReportEnd];
+            [device _handleReportEnd];
+        }];
+    } error:nil];
+
+    [self waitForExpectations:@[ repaired ] timeout:60];
 }
 
 - (void)test050_readAttributePaths_withWildCardPath

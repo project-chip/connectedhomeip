@@ -19,8 +19,8 @@
 
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class PtrResourceRecord : public ResourceRecord
 {
@@ -36,5 +36,5 @@ private:
     const FullQName mPtrName;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

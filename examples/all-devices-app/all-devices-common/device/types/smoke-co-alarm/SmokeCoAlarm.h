@@ -24,6 +24,8 @@
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 
@@ -35,7 +37,28 @@ class SmokeCoAlarm : public SingleEndpoint
 public:
     using ConcentrationCluster = Clusters::ConcentrationMeasurement::ConcentrationMeasurementCluster;
 
-    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate);
+    struct Config
+    {
+        Clusters::SmokeCoAlarmCluster::Config alarmConfig;
+        std::optional<ConcentrationCluster::Config> coConcentrationConfig;
+        std::optional<ConcentrationCluster::Config> smokeConcentrationConfig;
+
+        Config & WithCoConcentration(ConcentrationCluster::Config config)
+        {
+            config.clusterId      = Clusters::CarbonMonoxideConcentrationMeasurement::Id;
+            coConcentrationConfig = config;
+            return *this;
+        }
+
+        Config & WithSmokeConcentration(ConcentrationCluster::Config config)
+        {
+            config.clusterId         = Clusters::SmokeConcentrationMeasurement::Id;
+            smokeConcentrationConfig = config;
+            return *this;
+        }
+    };
+
+    SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate, const Config & config);
     ~SmokeCoAlarm() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -43,16 +66,17 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     ConcentrationCluster & GetCoConcentrationCluster();
+    ConcentrationCluster & GetSmokeConcentrationCluster();
     Clusters::SmokeCoAlarmCluster & GetSmokeCoAlarmCluster();
     Clusters::IdentifyCluster & GetIdentifyCluster();
 
 protected:
     TimerDelegate & mTimerDelegate;
     Clusters::SmokeCoAlarmDelegate & mSmokeCoAlarmDelegate;
-    ConcentrationCluster::Config mCoConfig;
-    Clusters::SmokeCoAlarmCluster::Config mSmokeConfig;
+    Config mConfig;
 
     LazyRegisteredServerCluster<ConcentrationCluster> mCoMeasurementCluster;
+    LazyRegisteredServerCluster<ConcentrationCluster> mSmokeConcentrationCluster;
     LazyRegisteredServerCluster<Clusters::SmokeCoAlarmCluster> mSmokeCoAlarmCluster;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
 };

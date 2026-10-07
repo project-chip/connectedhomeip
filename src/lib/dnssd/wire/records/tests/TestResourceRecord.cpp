@@ -25,7 +25,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::Encoding::BigEndian;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 const QNamePart kNames[] = { "foo", "bar" };
 

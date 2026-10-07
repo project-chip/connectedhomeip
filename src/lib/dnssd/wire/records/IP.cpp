@@ -17,8 +17,8 @@
 
 #include "IP.h"
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 bool IPResourceRecord::WriteData(RecordWriter & out) const
 {
@@ -35,5 +35,5 @@ bool IPResourceRecord::WriteData(RecordWriter & out) const
     return out.Fit();
 }
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

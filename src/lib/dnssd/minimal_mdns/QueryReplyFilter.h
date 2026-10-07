@@ -29,9 +29,9 @@ namespace Minimal {
 class QueryReplyFilter : public ReplyFilter
 {
 public:
-    QueryReplyFilter(const QueryData & queryData) : mQueryData(queryData) {}
+    QueryReplyFilter(const chip::Dnssd::QueryData & queryData) : mQueryData(queryData) {}
 
-    bool Accept(QType qType, QClass qClass, FullQName qname) override
+    bool Accept(chip::Dnssd::QType qType, chip::Dnssd::QClass qClass, chip::Dnssd::FullQName qname) override
     {
         if (!AcceptableQueryType(qType))
         {
@@ -64,22 +64,22 @@ public:
     }
 
 private:
-    bool AcceptableQueryType(QType qType)
+    bool AcceptableQueryType(chip::Dnssd::QType qType)
     {
         if (mSendingAdditionalItems)
         {
             return true;
         }
 
-        return ((mQueryData.GetType() == QType::ANY) || (mQueryData.GetType() == qType));
+        return ((mQueryData.GetType() == chip::Dnssd::QType::ANY) || (mQueryData.GetType() == qType));
     }
 
-    bool AcceptableQueryClass(QClass qClass)
+    bool AcceptableQueryClass(chip::Dnssd::QClass qClass)
     {
-        return ((mQueryData.GetClass() == QClass::ANY) || (mQueryData.GetClass() == qClass));
+        return ((mQueryData.GetClass() == chip::Dnssd::QClass::ANY) || (mQueryData.GetClass() == qClass));
     }
 
-    bool AcceptablePath(FullQName qname)
+    bool AcceptablePath(chip::Dnssd::FullQName qname)
     {
         if (mIgnoreNameMatch || mQueryData.IsAnnounceBroadcast())
         {
@@ -89,7 +89,7 @@ private:
         return (mQueryData.GetName() == qname);
     }
 
-    const QueryData & mQueryData;
+    const chip::Dnssd::QueryData & mQueryData;
     bool mIgnoreNameMatch        = false;
     bool mSendingAdditionalItems = false;
 };

@@ -168,16 +168,17 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         mDefaultOpenDuration = value;
 
         // Persist using AttributePersistence nullable storage representation.
-        NumericAttributeTraits<uint32_t>::StorageType storageValue;
-        NullableToStorage(mDefaultOpenDuration, storageValue);
-        return mContext->attributeStorage.WriteValue(request.path,
-                                                     { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenDuration);
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
     {
         Percent defaultOpenLevel;
         ReturnErrorOnFailure(decoder.Decode(defaultOpenLevel));
+        // DefaultOpenLevel is constrained to 1 to 100; Percent decodes as a plain uint8 and enforces neither bound.
+        VerifyOrReturnError(defaultOpenLevel >= kMinLevelValuePercent && defaultOpenLevel <= kMaxLevelValuePercent,
+                            Status::ConstraintError);
         VerifyOrReturnValue(defaultOpenLevel != mDefaultOpenLevel, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         // TODO(#40708): Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow performing specific checks
         // on provided values; update this logic once a fix for
@@ -187,8 +188,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
-        return mContext->attributeStorage.WriteValue(
-            request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenLevel), sizeof(mDefaultOpenLevel) });
+        AttributePersistence attrPersistence{ mContext->attributeStorage };
+        return attrPersistence.StoreNativeEndianValue(request.path, mDefaultOpenLevel);
     }
 
     return Status::UnsupportedWrite;

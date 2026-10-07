@@ -24,6 +24,7 @@
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
 
 const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
 

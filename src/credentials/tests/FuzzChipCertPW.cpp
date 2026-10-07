@@ -10,8 +10,8 @@
 #include <tuple>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include "credentials/CHIPCert.h"
 #include "credentials/CHIPCertificateSet.h"
@@ -25,8 +25,7 @@ using namespace chip;
 using namespace chip::Credentials;
 using namespace fuzztest;
 
-// Small C++17 helpers — abseil is not propagated through pw_fuzzer's public include path,
-// so we rely on standard library primitives instead of absl::EndsWith / absl::StrContains.
+// Small C++17 helpers so the harness does not depend on absl::EndsWith / absl::StrContains.
 constexpr bool EndsWithSv(std::string_view text, std::string_view suffix)
 {
     return text.size() >= suffix.size() && text.compare(text.size() - suffix.size(), suffix.size(), suffix) == 0;
@@ -244,7 +243,7 @@ FUZZ_TEST(FuzzChipCert, VerifyCertSignatureFuzz)
 /******************************************************************************************************************* */
 //
 // The harnesses below port API surfaces that existed as standalone libFuzzer harnesses
-// (FuzzChipCertValidation.cpp, FuzzCertificateSet.cpp, FuzzOpCertExtractors.cpp) into pw_fuzzer
+// (FuzzChipCertValidation.cpp, FuzzCertificateSet.cpp, FuzzOpCertExtractors.cpp) into
 // FUZZ_TESTs so they are visible to the FuzzTest coverage workflow
 // (scripts/tests/run_fuzztest_coverage.py) and benefit from seeded mutation.
 

@@ -34,7 +34,6 @@
 
 using namespace chip;
 using namespace chip::Dnssd;
-using namespace mdns::Minimal;
 
 namespace {
 

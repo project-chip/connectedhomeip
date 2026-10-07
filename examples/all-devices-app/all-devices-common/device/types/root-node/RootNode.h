@@ -22,7 +22,6 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
@@ -39,6 +38,18 @@
 namespace chip {
 namespace app {
 
+/// Base implementation of the Root Node endpoint.
+///
+/// Owns the always-present root-node clusters (Basic Information, General
+/// Commissioning, Administrator Commissioning, General/Software Diagnostics,
+/// Group Key Management, Access Control, Operational Credentials, and
+/// optionally Groupcast when the SDK enables it).
+///
+/// Optional features that also live on the root endpoint (network
+/// commissioning for WiFi/Thread, OTA Requestor, ICD, ...) are added by
+/// composing this class through `RootNodeWith<Features...>`. The device type
+/// list and client-cluster list are passed in at construction so that the
+/// composing subclass can extend them (e.g., adding `kOtaRequestor`).
 class RootNode : public SingleEndpoint
 {
 public:
@@ -62,22 +73,38 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
+        uint16_t minGuaranteedSubscriptionsPerFabric;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
-    RootNode(const Context & context) :
-        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+    /// Only the `RootNode` device type by default. `RootNodeWith` passes a
+    /// composed span that also includes device types contributed by features
+    /// (e.g., `kOtaRequestor`).
+    static constexpr DataModel::DeviceTypeEntry kDefaultDeviceTypes[] = { Device::Type::kRootNode };
+
+    RootNode(const Context & context,
+             Span<const DataModel::DeviceTypeEntry> deviceTypes = Span<const DataModel::DeviceTypeEntry>(kDefaultDeviceTypes)) :
+        SingleEndpoint(deviceTypes),
+        mContext(context)
     {}
     ~RootNode() override = default;
 
+    using SingleEndpoint::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
+    Clusters::GeneralCommissioningCluster & GeneralCommissioning() { return mGeneralCommissioningCluster.Cluster(); }
 
 protected:
+    /// Registers the base root-node clusters on the provider without adding the endpoint itself.
+    /// `RootNodeWith` uses this so feature clusters can be added before AddEndpoint runs, which
+    /// CodeDrivenDataModelProvider requires once it has been started.
+    CHIP_ERROR RegisterRootClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                    EndpointComposition composition = {});
+
     Context mContext;
 
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;

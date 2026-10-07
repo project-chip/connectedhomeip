@@ -143,7 +143,7 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
                 ApplicationEPType currentApp;
                 CatalogVendorApp * vendorApp           = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
                 currentApp.application.catalogVendorID = vendorApp->catalogVendorId;
-                currentApp.application.applicationID   = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+                currentApp.application.applicationID   = CharSpan::fromCharString(vendorApp->applicationId);
                 currentApp.endpoint                    = Optional<EndpointId>(app->GetEndpointId());
                 return aEncoder.Encode(currentApp);
             }

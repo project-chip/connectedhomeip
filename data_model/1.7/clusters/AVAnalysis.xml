@@ -1,0 +1,377 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0557" name="AV Analysis Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0557" name="AV Analysis">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="AVANALY" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="LCLCONDETECT" name="LocalContextDetection" summary="Local Context Detection supported">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="1" code="REMCONDETECT" name="RemoteContextDetection" summary="Remote Context Detection supported">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="2" code="PERZONEDETECT" name="PerZoneContextDetection" summary="Detection on a per Zone basis supported">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <number name="AnalysisStreamID" type="uint16"/>
+    <enum name="AnalysisStreamStateEnum">
+      <item value="0" name="PendingInitiation" summary="A stream has been allocated, but no WebRTC or PushAV use exists">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Failure" summary="A failure occurred in activating the stream">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="WebRTCInitiated" summary="A WebRTC session has been initiated either via the normal or standby flow">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="PushAVAllocated" summary="A PushAV stream has been allocated">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="WebRTCActive" summary="The WebRTC session is streaming">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="PushAVActive" summary="The PushAV session is active, either continuous or motion triggers">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="PushAVPendingDeactivation" summary="The PushAV session is pending acknowledgement of deactivation">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="WebRTCPendingDeactivation" summary="The WebRTC session is pending acknowledgement of deactivation">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="AnalysisStreamStruct">
+      <field id="0" name="AnalysisStreamID" type="AnalysisStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="WebRTCEndpointID" type="endpoint-no">
+        <quality nullable="true"/>
+        <optionalConform choice="b"/>
+      </field>
+      <field id="2" name="PushAVEndpointID" type="endpoint-no">
+        <quality nullable="true"/>
+        <optionalConform choice="b"/>
+      </field>
+      <field id="3" name="AnalysisStreamState" type="AnalysisStreamStateEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="ContextTriggerStruct">
+      <field id="0" name="Context" type="SemanticTagStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ZoneIDs" type="list">
+        <entry type="ZoneID"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PERZONEDETECT"/>
+        </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="TrackedContextStruct">
+      <field id="0" name="IdentifiedContextID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="IdentifiedContext" type="SemanticTagStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="PreviousZone" type="ZoneID">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PERZONEDETECT"/>
+        </mandatoryConform>
+      </field>
+      <field id="3" name="CurrentZone" type="ZoneID">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PERZONEDETECT"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="StartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="EndTime" type="epoch-s">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <min>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <field name="StartTime"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </min>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SupportedAmbientContexts" type="list">
+      <entry type="SemanticTagStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="50"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="ActiveAmbientContextTriggers" type="list">
+      <entry type="ContextTriggerStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="50"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MaxAnalysisStreamCount" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0003" name="CurrentAnalysisStreamCount" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <attribute name="MaxAnalysisStreamCount"/>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="AnalysisStreams" type="list">
+      <entry type="AnalysisStreamStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount>
+          <attribute name="MaxAnalysisStreamCount"/>
+        </maxCount>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="TrackingEnabled" type="bool">
+      <access read="true" write="true" readPrivilege="manage" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="EnableContextTriggers" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="ContextTriggers" type="list">
+        <entry type="ContextTriggerStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="50"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="DisableContextTriggers" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="ContextTriggers" type="list">
+        <entry type="ContextTriggerStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="50"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="EstablishAnalysisStream" direction="commandToServer" response="EstablishAnalysisStreamResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="EstablishAnalysisStreamResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <field id="0" name="AnalysisStreamID" type="AnalysisStreamID">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="ActivateAnalysisStream" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <field id="0" name="AnalysisStreamID" type="AnalysisStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="WebRTCEndpointID" type="endpoint-no">
+        <optionalConform choice="c"/>
+      </field>
+      <field id="2" name="PushAVEndpointID" type="endpoint-no">
+        <optionalConform choice="c"/>
+      </field>
+    </command>
+    <command id="0x05" name="DeactivateAnalysisStream" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <field id="0" name="AnalysisStreamID" type="AnalysisStreamID">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="RemoveAnalysisStream" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="REMCONDETECT"/>
+      </mandatoryConform>
+      <field id="0" name="AnalysisStreamID" type="AnalysisStreamID">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="AnalysisSessionStart" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="SessionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SourceNodeID" type="node-id">
+        <mandatoryConform>
+          <feature name="REMCONDETECT"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="TriggeredZones" type="list">
+        <entry type="ZoneID"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="AnalysisSessionEnd" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="SessionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SourceNodeID" type="node-id">
+        <mandatoryConform>
+          <feature name="REMCONDETECT"/>
+        </mandatoryConform>
+      </field>
+    </event>
+    <event id="0x02" name="PerceivedContext" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+      <field id="0" name="SessionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SourceNodeID" type="node-id">
+        <mandatoryConform>
+          <feature name="REMCONDETECT"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="SourceStartTimestamp" type="epoch-us">
+        <mandatoryConform>
+          <feature name="REMCONDETECT"/>
+        </mandatoryConform>
+      </field>
+      <field id="3" name="NewIdentifiedContexts" type="list">
+        <entry type="TrackedContextStruct"/>
+        <optionalConform/>
+      </field>
+      <field id="4" name="CurrentIdentifiedContexts" type="list">
+        <entry type="TrackedContextStruct"/>
+        <optionalConform/>
+      </field>
+      <field id="5" name="ExpiredContexts" type="list">
+        <entry type="TrackedContextStruct"/>
+        <optionalConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

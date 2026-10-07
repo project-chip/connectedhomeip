@@ -58,11 +58,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @end
 
+MTR_TESTABLE_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory (Test)
++ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
+                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval;
+@end
+
 @interface MTRDevice (Test)
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
+- (void)_handleReportBegin;
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)_handleReportEnd;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
@@ -79,11 +88,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+
++ (void)unitTestResetInvokeRequestMessageCount;
++ (NSUInteger)unitTestInvokeRequestMessageCount;
+
+// Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
++ (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
 @end
 
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date;
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;

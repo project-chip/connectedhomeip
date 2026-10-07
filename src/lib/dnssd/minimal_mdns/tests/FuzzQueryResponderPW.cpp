@@ -49,8 +49,8 @@
 #include <cstdint>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
@@ -77,6 +77,7 @@ namespace {
 using namespace chip;
 using namespace fuzztest;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 void EnsureInitialized()
 {
@@ -136,7 +137,7 @@ private:
         // rejects would mean the builder emitted something it cannot itself read.
         NullParserDelegate delegate;
         const BytesRange reply(data->Start(), data->Start() + data->DataLength());
-        EXPECT_TRUE(ParsePacket(reply, &delegate));
+        EXPECT_TRUE(ParseMdnsPacket(reply, &delegate));
         return CHIP_NO_ERROR;
     }
 
@@ -328,7 +329,7 @@ void RespondToQueryNoCorruption(const std::vector<uint8_t> & queryPacket)
 
     const BytesRange packet(queryPacket.data(), queryPacket.data() + queryPacket.size());
     RespondingDelegate delegate(sender, source);
-    (void) ParsePacket(packet, &delegate);
+    (void) ParseMdnsPacket(packet, &delegate);
 }
 
 FUZZ_TEST(QueryResponderPW, RespondToQueryNoCorruption)

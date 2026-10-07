@@ -20,6 +20,7 @@ from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.esp32_zephyr import Esp32ZephyrApp, Esp32ZephyrBoard, Esp32ZephyrBuilder
 from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
@@ -49,21 +50,26 @@ _ALL_DEVICES_APP_DEVICES = [
     'ambient-context-sensor',
     'bridged-node',
     'chime',
+    'color-temperature-light',
     'contact-sensor',
     'cooktop',
     'device-energy-management',
     'dimmable-light',
     'dimmable-plug-in-unit',
     'dishwasher',
+    'electrical-sensor',
+    'extended-color-light',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
+    'humidity-conditioner',
     'humidity-sensor',
     'laundry-dryer',
     'laundry-washer',
     'light-sensor',
     'microwave-oven',
+    'mode-select',
     'mounted-dimmable-load-control',
     'mounted-on-off-control',
     'occupancy-sensor',
@@ -77,12 +83,15 @@ _ALL_DEVICES_APP_DEVICES = [
     'rain-sensor',
     'refrigerator',
     'robotic-vacuum-cleaner',
+    'room-air-conditioner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'thread-border-router',
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',
+    'window-covering',
     # keep-sorted: end
 ]
 
@@ -190,6 +199,7 @@ def BuildHostTarget():
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
         TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
+        TargetPart('electrical-protection', app=HostApp.ELECTRICAL_PROTECTION),
         TargetPart('microwave-oven', app=HostApp.MICROWAVE_OVEN),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
@@ -298,6 +308,7 @@ def BuildEsp32Target():
     # boards
     target.AppendFixedTargets([
         TargetPart('m5stack', board=Esp32Board.M5Stack),
+        TargetPart('m5stack-cores3', board=Esp32Board.M5StackCoreS3),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),
@@ -333,6 +344,27 @@ def BuildEsp32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
     target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
+
+    return target
+
+
+def BuildEsp32ZephyrTarget() -> BuildTarget:
+    """Create the ESP32 Zephyr build target."""
+    target = BuildTarget('esp32', Esp32ZephyrBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('zephyr'),
+    ])
+
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+    ])
+
+    # applications
+    target.AppendFixedTargets([
+        TargetPart('light', app=Esp32ZephyrApp.LIGHT),
+    ])
 
     return target
 
@@ -845,9 +877,12 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tl3218x', board=TelinkBoard.TL3218X),
-        TargetPart('tl3218x_ml3m', board=TelinkBoard.TL3218X_ML3M),
-        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
+        TargetPart('tl3228x', board=TelinkBoard.TL3228X),
+        TargetPart('tl3228x_retention', board=TelinkBoard.TL3228X_RETENTION),
+        TargetPart('tl3238x', board=TelinkBoard.TL3238X),
+        TargetPart('tl3238x_retention', board=TelinkBoard.TL3238X_RETENTION),
+        TargetPart('tl5218x', board=TelinkBoard.TL5218X),
+        TargetPart('tl5218x_retention', board=TelinkBoard.TL5218X_RETENTION),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
         TargetPart('tl7218x_ml7g', board=TelinkBoard.TL7218X_ML7G),
         TargetPart('tl7218x_ml7m', board=TelinkBoard.TL7218X_ML7M),
@@ -894,6 +929,7 @@ def BuildTelinkTarget():
     target.AppendModifier('mars', mars_board_config=True)
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
+    target.AppendModifier('concurrent-connection', enable_concurrent_connection=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
@@ -939,6 +975,7 @@ BUILD_TARGETS = [
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
+    BuildEsp32ZephyrTarget(),
     BuildGenioTarget(),
     BuildHostFakeTarget(),
     BuildHostTarget(),

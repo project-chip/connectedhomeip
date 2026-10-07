@@ -44,14 +44,10 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/hci.h>
+#include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-#include <version.h>
-#else
-#include <zephyr/random/random.h>
 #include <zephyr/version.h>
-#endif
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
@@ -149,6 +145,21 @@ constexpr uint8_t kMatterBleIdentity = 1;
 constexpr uint8_t kMatterBleIdentity = 0;
 #endif // CONFIG_BT_BONDABLE
 
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
+bool IsMatterIdentity(const bt_conn * conn)
+{
+    VerifyOrReturnValue(conn, false);
+
+    bt_conn_info info{};
+    const int err = bt_conn_get_info(conn, &info);
+    VerifyOrReturnValue(err == 0, false);
+
+    return info.id == kMatterBleIdentity;
+}
+
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
 int InitRandomStaticAddress(bool idPresent, int & id)
 {
     // Generate a random static address for the default identity.
@@ -206,6 +217,19 @@ int InitRandomStaticAddress(bool idPresent, int & id)
 
 } // unnamed namespace
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
+// Telink TLX: keep a scheduler task active for BLE/802.15.4 coexistence.
+int StartMinimalBLEAdvertisement()
+{
+    static const struct bt_data minimal_ad[] = {
+        BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
+    };
+    const struct bt_le_adv_param params =
+        BT_LE_ADV_PARAM_INIT(0 /* non-connectable, non-scannable */, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
+    return bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
+}
+#endif // CONFIG_BT_TLX
+
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -245,6 +269,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 #endif
 #endif // CONFIG_BT_BONDABLE
+
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
+    // Telink TLX: start a minimal BLE advertisement before dual-mode so Thread's tlx_start_radio() does not block.
+    int adv_err = StartMinimalBLEAdvertisement();
+    VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
+#endif
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
 
@@ -332,6 +362,15 @@ void BLEManagerImpl::DriveBLEState()
                 mFlags.Clear(Flags::kChipoBleGattServiceRegister);
             }
         }
+
+#if defined(CONFIG_BT_TLX) && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                 \
+    !CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+        // Telink TLX: stop the minimal advertisement once Thread is attached.
+        if (ConnectivityMgr().IsThreadAttached())
+        {
+            bt_le_adv_stop();
+        }
+#endif
     }
 }
 
@@ -662,6 +701,15 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
+#if defined(CONFIG_BT_TLX) && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                 \
+    !CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    // Telink TLX: keep BLE idle after disconnect (bt_conn_unref() may resume advertising).
+    if (!mFlags.Has(Flags::kAdvertisingEnabled))
+    {
+        bt_le_adv_stop();
+    }
+#endif
+
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
@@ -941,6 +989,10 @@ bool BLEManagerImpl::UnsetSubscribed(bt_conn * conn)
 ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, const void * buf, uint16_t len,
                                       uint16_t offset, uint8_t flags)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
@@ -965,6 +1017,10 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
 
 ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint16_t value)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     if (value != BT_GATT_CCC_INDICATE && value != 0)
@@ -983,6 +1039,10 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 
 void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturn(IsMatterIdentity(conId));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipDeviceEvent event;
 
     event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
@@ -1003,6 +1063,10 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
@@ -1033,6 +1097,10 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    // Drop all callbacks incoming for the identity other than the one used for advertising
+    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
@@ -1052,6 +1120,10 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
+#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
+#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())

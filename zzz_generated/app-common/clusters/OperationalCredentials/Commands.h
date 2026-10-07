@@ -199,6 +199,9 @@ namespace CertificateChainRequest {
 enum class Fields : uint8_t
 {
     kCertificateType = 0,
+    kCryptoProfile   = 1,
+    kSegmentID       = 2,
+    kMaxSegmentSize  = 3,
 };
 
 struct Type
@@ -209,6 +212,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
+    Optional<AttestationCryptoProfileEnum> cryptoProfile;
+    Optional<uint16_t> segmentID;
+    Optional<uint16_t> maxSegmentSize;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -225,6 +231,9 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
+    Optional<AttestationCryptoProfileEnum> cryptoProfile;
+    Optional<uint16_t> segmentID;
+    Optional<uint16_t> maxSegmentSize;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -232,7 +241,9 @@ public:
 namespace CertificateChainResponse {
 enum class Fields : uint8_t
 {
-    kCertificate = 0,
+    kCertificate       = 0,
+    kTotalDocumentSize = 1,
+    kNextSegmentID     = 2,
 };
 
 struct Type
@@ -243,6 +254,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan certificate;
+    Optional<uint16_t> totalDocumentSize;
+    Optional<uint16_t> nextSegmentID;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -258,6 +271,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan certificate;
+    Optional<uint16_t> totalDocumentSize;
+    Optional<uint16_t> nextSegmentID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

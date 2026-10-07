@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,159 +17,75 @@
 
 #pragma once
 
+#include "app/clusters/thermostat-server/Temperature.h"
+#include "lib/core/CHIPError.h"
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/clusters/thermostat-server/ThermostatDelegate.h>
+#include <credentials/FabricTable.h>
 
 namespace chip {
+
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-/**
- * The ThermostatDelegate class serves as the instance delegate for storing Presets related information and providing it to the
- * Thermostat server code. It also manages the presets attribute and provides methods to write to presets, edit presets, maintain a
- * pending presets list and either commit the presets when requested or discard the changes. It also provides APIs to get and set
- * the attribute values.
- *
+/*
+ * A simple implementation of ThermostatDelegate.
+ * It reports and persists the basic state of the thermostat.
  */
-
-static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
-
-static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
-
-static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
-
-// TODO: #34556 Support multiple presets/schedules of each type.
-// We will support only one preset of each preset/schedule type.
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
-static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
-
-// For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
-// kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
-static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
-
-static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
-
 class ThermostatDelegate : public Delegate
 {
 public:
-    static inline ThermostatDelegate & GetInstance() { return sInstance; }
+    ThermostatDelegate(EndpointId endpoint, AttributePersistenceProvider * provider = nullptr,
+                       FabricTable * fabricTable = nullptr) :
+        mEndpointId(endpoint),
+        mProvider(provider), mFabricTable(fabricTable)
+    {}
 
-    std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(chip::AttributeId attributeId) override;
+    FabricTable & GetFabricTable() const override;
 
-    CHIP_ERROR GetPresetTypeAtIndex(size_t index, Structs::PresetTypeStruct::Type & presetType) override;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    uint8_t GetNumberOfPresets() override;
+    SystemModeEnum GetSystemMode() const override;
+    Protocols::InteractionModel::Status SetSystemMode(SystemModeEnum systemMode, bool & changed) override;
 
-    CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+    Protocols::InteractionModel::Status GetRunningMode(ThermostatRunningModeEnum & runningMode) const override;
+    Protocols::InteractionModel::Status SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed) override;
 
-    CHIP_ERROR GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle) override;
+    Protocols::InteractionModel::Status GetRunningState(BitMask<RelayStateBitmap> & runningState) const override;
+    Protocols::InteractionModel::Status SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed) override;
 
-    CHIP_ERROR SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle) override;
+    ControlSequenceOfOperationEnum GetControlSequenceOfOperation() const override;
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq, bool & changed) override;
 
-    void InitializePendingPresets() override;
+    DataModel::Nullable<temperature> GetLocalTemperature() const override;
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed) override;
 
-    CHIP_ERROR AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset) override;
+    Protocols::InteractionModel::Status GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const override;
 
-    CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override;
+    int8_t GetLocalTemperatureCalibration() const override;
+    Protocols::InteractionModel::Status SetLocalTemperatureCalibration(int8_t temp, bool & changed) override;
 
-    CHIP_ERROR CommitPendingPresets() override;
-
-    void ClearPendingPresetList() override;
-
-    uint8_t GetMaxThermostatSuggestions() override;
-
-    uint8_t GetNumberOfThermostatSuggestions() override;
-
-    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
-                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
-
-    void GetCurrentThermostatSuggestion(
-        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
-
-    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() override;
-
-    CHIP_ERROR AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) override;
-
-    CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t indexToRemove) override;
-
-    CHIP_ERROR GetUniqueID(uint8_t & uniqueID) override;
-
-    CHIP_ERROR ReEvaluateCurrentSuggestion() override;
-
-    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
+    Protocols::InteractionModel::Status GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const override;
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed) override;
 
 private:
-    static ThermostatDelegate sInstance;
+    EndpointId mEndpointId;
+    AttributePersistenceProvider * mProvider = nullptr;
+    FabricTable * mFabricTable               = nullptr;
 
-    ThermostatDelegate();
-    ~ThermostatDelegate();
+    ControlSequenceOfOperationEnum mControlSequenceOfOperation = ControlSequenceOfOperationEnum::kCoolingAndHeating;
 
-    ThermostatDelegate(const ThermostatDelegate &)             = delete;
-    ThermostatDelegate & operator=(const ThermostatDelegate &) = delete;
+    SystemModeEnum mSystemMode                         = SystemModeEnum::kOff;
+    ThermostatRunningModeEnum mRunningMode             = ThermostatRunningModeEnum::kOff;
+    BitMask<RelayStateBitmap> mRunningState            = BitMask<RelayStateBitmap>(0);
+    DataModel::Nullable<temperature> mLocalTemperature = DataModel::Nullable<int16_t>();
+    int8_t mLocalTemperatureCalibration                = 0;
 
-    /**
-     * @brief Initializes the preset types array with all preset types corresponding to PresetScenarioEnum.
-     */
-    void InitializePresetTypes();
-
-    /**
-     * @brief Initializes the presets array with some sample presets for testing.
-     */
-    void InitializePresets();
-
-    /**
-     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
-     * field. If there are no entries or an error occurs, returns the value in the MaxThermostatSuggestions attribute as an
-     * invalid index.
-     *
-     */
-    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
-
-    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
-
-    static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
-
-    void CancelExpirationTimer();
-
-    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
-        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
-
-    void SetCurrentThermostatSuggestion(size_t index);
-
-    bool HaveSuggestionWithID(uint8_t uniqueIDToFind);
-
-    uint8_t mNumberOfPresets;
-
-    Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
-    PresetStructWithOwnedMembers mPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
-    PresetStructWithOwnedMembers mPendingPresets[kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType];
-
-    uint8_t mNextFreeIndexInPendingPresetsList;
-    uint8_t mNextFreeIndexInPresetsList;
-
-    uint8_t mActivePresetHandleData[kPresetHandleSize];
-    size_t mActivePresetHandleDataSize;
-    bool mActivePresetHandleIsNull = true;
-
-    uint8_t mMaxThermostatSuggestions;
-    ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
-    uint8_t mNextFreeIndexInThermostatSuggestionsList;
-    uint8_t mUniqueID;
-
-    // TODO: #39949 - This information should be stored in the cluster instance.
-    size_t mIndexOfCurrentSuggestion;
-    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
-
-    bool mIsExpirationTimerRunning = false;
-
-    uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
-
-    Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
-
-    /**
-     * @brief Initializes the schedules types array with example schedule types.
-     */
-    void InitializeScheduleTypes();
+    BitMask<RemoteSensingBitmap> mRemoteSensing = BitMask<RemoteSensingBitmap>(0);
 };
 
 } // namespace Thermostat

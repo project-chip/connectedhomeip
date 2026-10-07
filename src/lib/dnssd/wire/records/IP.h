@@ -21,8 +21,8 @@
 
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class IPResourceRecord : public ResourceRecord
 {
@@ -38,6 +38,6 @@ private:
     const chip::Inet::IPAddress mIPAddress;
 };
 
-} // namespace Minimal
+} // namespace Dnssd
 
-} // namespace mdns
+} // namespace chip

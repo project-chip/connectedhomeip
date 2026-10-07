@@ -26,7 +26,7 @@
 namespace {
 
 using namespace chip;
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 class TestQNameString : public ::testing::Test
 {
@@ -45,7 +45,7 @@ TEST_F(TestQNameString, Construction)
         EXPECT_TRUE(heapQName.EndsWith(".test"));
         EXPECT_FALSE(heapQName.EndsWith("some"));
 
-        mdns::Minimal::SerializedQNameIterator SInvalid;
+        chip::Dnssd::SerializedQNameIterator SInvalid;
         QNameString heapQNameI(SInvalid);
         EXPECT_STREQ(heapQNameI.c_str(), "(!INVALID!)");
     }

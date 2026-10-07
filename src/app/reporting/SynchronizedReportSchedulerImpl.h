@@ -85,6 +85,7 @@ public:
     void OnTransitionToIdle() override;
 
     bool IsReportScheduled(ReadHandler * ReadHandler) override;
+    void RescheduleAllReports() override;
 
     /** @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers,
      *

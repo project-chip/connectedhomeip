@@ -25,6 +25,19 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::AttestationCryptoProfileEnum val)
+{
+    using EnumType = OperationalCredentials::AttestationCryptoProfileEnum;
+    switch (val)
+    {
+    case EnumType::kEcdsaMatterLegacy:
+    case EnumType::kMlDsa44:
+    case EnumType::kMlDsa65:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials::CertificateChainTypeEnum val)
 {
     using EnumType = OperationalCredentials::CertificateChainTypeEnum;

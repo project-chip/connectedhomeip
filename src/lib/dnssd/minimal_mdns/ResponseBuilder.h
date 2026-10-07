@@ -40,11 +40,11 @@ public:
     ResponseBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
         mPacket = std::move(packet);
-        mHeader = HeaderRef(mPacket->Start());
+        mHeader = chip::Dnssd::HeaderRef(mPacket->Start());
 
-        if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
+        if (mPacket->AvailableDataLength() >= chip::Dnssd::HeaderRef::kSizeBytes)
         {
-            mPacket->SetDataLength(HeaderRef::kSizeBytes);
+            mPacket->SetDataLength(chip::Dnssd::HeaderRef::kSizeBytes);
             mHeader.Clear();
             mBuildOk = true;
         }
@@ -67,7 +67,7 @@ public:
     CHECK_RETURN_VALUE
     chip::System::PacketBufferHandle ReleasePacket()
     {
-        mHeader  = HeaderRef(nullptr);
+        mHeader  = chip::Dnssd::HeaderRef(nullptr);
         mBuildOk = false;
         return std::move(mPacket);
     }
@@ -77,12 +77,12 @@ public:
         return (mHeader.GetAnswerCount() != 0) || (mHeader.GetAuthorityCount() != 0) || (mHeader.GetAdditionalCount() != 0);
     }
 
-    HeaderRef & Header() { return mHeader; }
+    chip::Dnssd::HeaderRef & Header() { return mHeader; }
 
     /// Attempts to add a record to the currentsystem packet buffer.
     /// On success, the packet buffer data length is updated.
     /// On failure, the packet buffer data length is NOT updated and header is unchanged.
-    ResponseBuilder & AddRecord(ResourceType type, const ResourceRecord & record)
+    ResponseBuilder & AddRecord(chip::Dnssd::ResourceType type, const chip::Dnssd::ResourceRecord & record)
     {
         if (!mBuildOk)
         {
@@ -102,7 +102,7 @@ public:
         return *this;
     }
 
-    ResponseBuilder & AddQuery(const QueryData & query)
+    ResponseBuilder & AddQuery(const chip::Dnssd::QueryData & query)
     {
         if (!mBuildOk)
         {
@@ -125,9 +125,9 @@ public:
 
 private:
     chip::System::PacketBufferHandle mPacket;
-    HeaderRef mHeader;
+    chip::Dnssd::HeaderRef mHeader;
     chip::Encoding::BigEndian::BufferWriter mEndianOutput;
-    RecordWriter mWriter;
+    chip::Dnssd::RecordWriter mWriter;
     bool mBuildOk = false;
 };
 

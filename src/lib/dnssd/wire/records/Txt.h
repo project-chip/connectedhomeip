@@ -21,8 +21,8 @@
 
 #include <lib/dnssd/wire/records/ResourceRecord.h>
 
-namespace mdns {
-namespace Minimal {
+namespace chip {
+namespace Dnssd {
 
 class TxtResourceRecord : public ResourceRecord
 {
@@ -74,5 +74,5 @@ private:
     const size_t mEntryCount;
 };
 
-} // namespace Minimal
-} // namespace mdns
+} // namespace Dnssd
+} // namespace chip

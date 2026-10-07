@@ -49,8 +49,8 @@
 #include <string>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/TxtFields.h>

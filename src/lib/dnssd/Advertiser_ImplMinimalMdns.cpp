@@ -47,6 +47,7 @@ namespace {
 
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 
 #if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)
@@ -331,7 +332,7 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
 #endif
 
     mCurrentSource = info;
-    if (!ParsePacket(data, this))
+    if (!ParseMdnsPacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
 #if CHIP_MINMDNS_HIGH_VERBOSITY

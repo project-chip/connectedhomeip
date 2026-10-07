@@ -256,6 +256,14 @@ class AccessChecker(BasicCompositionTests):
 
         log.info('Testing commands on %s at privilege %s', xml_cluster.name, privilege)
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
+            # TODO(spec): ChangeToModeByCoreTag in ModeBase.adoc / data_model/1.7/clusters/ModeBase.xml
+            # is missing `<access invokePrivilege="operate"/>`. As a result, spec_parsing defaults
+            # its privilege to UNKNOWN, causing TC_AccessChecker to expect UNSUPPORTED_ACCESS at Operate
+            # privilege even though the device implementation correctly allows Operate access.
+            if xml_cluster.accepted_commands[command_id].name == "ChangeToModeByCoreTag":
+                log.warning("Skipping ChangeToModeByCoreTag access check due to missing invokePrivilege in spec XML")
+                continue
+
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS.get(cluster_id, {}).get(command_id)
             if command is None:
