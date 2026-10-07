@@ -74,7 +74,11 @@ public:
     /**
      * @brief Clears all registered accessors and callbacks during device teardown.
      */
-    void Clear() { mAccessors.clear(); mCallbacks.clear(); }
+    void Clear()
+    {
+        mAccessors.clear();
+        mCallbacks.clear();
+    }
 
     /**
      * @brief Returns the number of registered accessors.

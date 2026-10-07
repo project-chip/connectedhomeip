@@ -65,7 +65,8 @@ public:
     }
 
     template <typename TDevice>
-    static void BeforeDeviceUnregistration(TDevice & device) {}
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {}
 };
 
 } // namespace chip::app::NamedPipe
