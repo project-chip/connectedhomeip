@@ -69,6 +69,9 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
+- (void)_handleReportBegin;
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)_handleReportEnd;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
@@ -96,6 +99,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date;
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;

@@ -111,6 +111,7 @@ examples/all-devices-app/
 │       ├── InMemoryOOBAccessorRegistry.h/.cpp          # Container of registered OOBAccessors
 │       ├── NoopOOBAccessorRegistry.h                   # Zero-cost inline stub for disabled targets
 │       └── clusters/
+│           ├── BUILD.gn                                # Per-cluster GN targets (e.g. :on-off, :occupancy)
 │           └── <Cluster>OOBAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOOBAccessor, OccupancyOOBAccessor)
 └── posix/
     └── named_pipe/
@@ -495,7 +496,7 @@ source_set("<device-name>") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
   ]
 }
 
