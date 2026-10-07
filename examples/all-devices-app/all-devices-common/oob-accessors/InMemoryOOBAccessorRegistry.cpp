@@ -16,6 +16,7 @@
 
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 
+#include <algorithm>
 #include <lib/support/CodeUtils.h>
 
 namespace chip::app {
