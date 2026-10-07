@@ -35,14 +35,23 @@ namespace DoorLock {
 
 namespace {
 
-/// Mirrors the legacy `getFabricIndex`: the fabric of the invoking session (if any).
+/// Fabric index of the invoking session, if any.
+///
+/// The delegate interface reports the operation initiator through nullable
+/// fabric/node-id pairs, because local operations have neither; a remote
+/// operation therefore presents its always-known fabric through the same
+/// nullable types.
 DataModel::Nullable<FabricIndex> GetOperationFabric(const DataModel::InvokeRequest & request)
 {
+    if (request.subjectDescriptor.fabricIndex == kUndefinedFabricIndex)
+    {
+        return DataModel::Nullable<FabricIndex>();
+    }
     return DataModel::Nullable<FabricIndex>(request.subjectDescriptor.fabricIndex);
 }
 
-/// Mirrors the legacy `getNodeId`: the node id of the invoking session, only
-/// meaningful for CASE sessions.
+/// Node id of the invoking session: only CASE sessions have one, every other
+/// session type (and any local operation) reports a null node id.
 DataModel::Nullable<NodeId> GetOperationNode(const DataModel::InvokeRequest & request)
 {
     if (request.subjectDescriptor.fabricIndex == kUndefinedFabricIndex ||
@@ -53,8 +62,7 @@ DataModel::Nullable<NodeId> GetOperationNode(const DataModel::InvokeRequest & re
     return DataModel::Nullable<NodeId>(request.subjectDescriptor.subject);
 }
 
-/// Cap so the auto-relock timeout always fits the timer representation
-/// (legacy caps for the same reason before converting to milliseconds).
+/// Cap so the auto-relock timeout always fits the timer representation.
 constexpr uint32_t kMaxAutoRelockTimeoutSec = 7 * 24 * 60 * 60;
 
 /// Encodes a nullable Aliro key: an empty span from the delegate means
@@ -102,16 +110,6 @@ DoorLockCluster::DoorLockCluster(EndpointId endpointId, Delegate & delegate, con
     mAutoRelockTimerContext.cluster = this;
 }
 
-CHIP_ERROR DoorLockCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    // A restarted cluster must not fire a stale auto-relock timer.
-    mTimerDelegate.CancelTimer(&mAutoRelockTimerContext);
-
-    return CHIP_NO_ERROR;
-}
-
 void DoorLockCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTimerDelegate.CancelTimer(&mAutoRelockTimerContext);
@@ -121,11 +119,11 @@ void DoorLockCluster::Shutdown(ClusterShutdownType shutdownType)
 CHIP_ERROR DoorLockCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        // Door position sensor [DPS]
+        // Door position sensor [DPS]; the counters keep their own optional flags.
         { mFeatures.Has(Feature::kDoorPositionSensor), DoorState::kMetadataEntry },
-        { mFeatures.Has(Feature::kDoorPositionSensor), DoorOpenEvents::kMetadataEntry },
-        { mFeatures.Has(Feature::kDoorPositionSensor), DoorClosedEvents::kMetadataEntry },
-        { mFeatures.Has(Feature::kDoorPositionSensor), OpenPeriod::kMetadataEntry },
+        { mFeatures.Has(Feature::kDoorPositionSensor) && mOptionalAttributes.doorOpenEvents, DoorOpenEvents::kMetadataEntry },
+        { mFeatures.Has(Feature::kDoorPositionSensor) && mOptionalAttributes.doorClosedEvents, DoorClosedEvents::kMetadataEntry },
+        { mFeatures.Has(Feature::kDoorPositionSensor) && mOptionalAttributes.openPeriod, OpenPeriod::kMetadataEntry },
         // User management [USR]
         { mFeatures.Has(Feature::kUser), NumberOfTotalUsersSupported::kMetadataEntry },
         { mFeatures.Has(Feature::kUser), CredentialRulesSupport::kMetadataEntry },
@@ -146,12 +144,13 @@ CHIP_ERROR DoorLockCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
         { mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential), WrongCodeEntryLimit::kMetadataEntry },
         { mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential),
           UserCodeTemporaryDisableTime::kMetadataEntry },
-        // SendPINOverTheAir is only available when the User feature is NOT
-        // supported (with USR the credentials belong to user records).
-        { !mFeatures.Has(Feature::kUser) && mFeatures.Has(Feature::kPinCredential), SendPINOverTheAir::kMetadataEntry },
+        // SendPINOverTheAir [!USR & PIN]: with USR the credentials belong to
+        // user records, so the attribute only exists when USR is NOT supported.
+        { mOptionalAttributes.sendPINOverTheAir && !mFeatures.Has(Feature::kUser) && mFeatures.Has(Feature::kPinCredential),
+          SendPINOverTheAir::kMetadataEntry },
         { mFeatures.Has(Feature::kCredentialsOverTheAirAccess) && mFeatures.Has(Feature::kPinCredential),
           RequirePINforRemoteOperation::kMetadataEntry },
-        { mFeatures.Has(Feature::kUser), ExpiringUserTimeout::kMetadataEntry },
+        { mOptionalAttributes.expiringUserTimeout && mFeatures.Has(Feature::kUser), ExpiringUserTimeout::kMetadataEntry },
         // Aliro reader provisioning [ALIRO]
         { mFeatures.Has(Feature::kAliroProvisioning), AliroReaderVerificationKey::kMetadataEntry },
         { mFeatures.Has(Feature::kAliroProvisioning), AliroReaderGroupIdentifier::kMetadataEntry },
@@ -183,23 +182,15 @@ CHIP_ERROR DoorLockCluster::Attributes(const ConcreteClusterPath & path, ReadOnl
 CHIP_ERROR DoorLockCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    static constexpr DataModel::AcceptedCommandEntry kBaseCommands[] = {
+    // UnboltDoor is last so the [UBOLT]-gated command list is a prefix-truncation
+    // of the same in-place array: no copy or heap allocation.
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::LockDoor::kMetadataEntry,
         Commands::UnlockDoor::kMetadataEntry,
         Commands::UnlockWithTimeout::kMetadataEntry,
+        Commands::UnboltDoor::kMetadataEntry,
     };
-
-    if (mFeatures.Has(Feature::kUnbolt))
-    {
-        // UnboltDoor is only accepted when the UBOLT feature is enabled.
-        ReturnErrorOnFailure(builder.AppendElements(Span(kBaseCommands)));
-        static constexpr DataModel::AcceptedCommandEntry kUnboltCommands[] = {
-            Commands::UnboltDoor::kMetadataEntry,
-        };
-        return builder.AppendElements(Span(kUnboltCommands));
-    }
-
-    return builder.ReferenceExisting(kBaseCommands);
+    return builder.ReferenceExisting(Span(kAcceptedCommands, mFeatures.Has(Feature::kUnbolt) ? 4u : 3u));
 }
 
 DataModel::ActionReturnStatus DoorLockCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -380,14 +371,21 @@ DataModel::ActionReturnStatus DoorLockCluster::WriteAttribute(const DataModel::W
         CharSpan value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnError(value.size() <= Internal::kMaxLanguageLength, Protocols::InteractionModel::Status::ConstraintError);
-        memcpy(mLanguage.data(), value.data(), value.size());
-        mLanguageLength = value.size();
-        NotifyAttributeChanged(Language::Id);
+        if (!value.data_equal(CharSpan(mLanguage.data(), mLanguageLength)))
+        {
+            if (!value.empty())
+            {
+                memcpy(mLanguage.data(), value.data(), value.size());
+            }
+            mLanguageLength = value.size();
+            NotifyAttributeChanged(Language::Id);
+        }
         return CHIP_NO_ERROR;
     }
     case LEDSettings::Id: {
         uint8_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnError(value <= 2, Protocols::InteractionModel::Status::ConstraintError);
         SetAttributeValue(mLEDSettings, value, LEDSettings::Id);
         return CHIP_NO_ERROR;
     }
@@ -400,15 +398,17 @@ DataModel::ActionReturnStatus DoorLockCluster::WriteAttribute(const DataModel::W
     case SoundVolume::Id: {
         uint8_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnError(value <= 3, Protocols::InteractionModel::Status::ConstraintError);
         SetAttributeValue(mSoundVolume, value, SoundVolume::Id);
         return CHIP_NO_ERROR;
     }
     case OperatingMode::Id: {
         OperatingModeEnum value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        // Spec: OperatingMode SHALL be a mode listed in SupportedOperatingModes.
-        // Each mode N is represented by bit (1 << N) in the bitmap.
-        VerifyOrReturnError(mSupportedOperatingModes.Has(static_cast<DlSupportedOperatingModes>(1u << to_underlying(value))),
+        VerifyOrReturnError(value != OperatingModeEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
+        // The OperatingModesBitmap uses inverted polarity: a `0` bit marks a
+        // supported mode, so the mode is rejected when its bit is set.
+        VerifyOrReturnError(!mSupportedOperatingModes.Has(static_cast<DlSupportedOperatingModes>(1u << to_underlying(value))),
                             Protocols::InteractionModel::Status::ConstraintError);
         SetAttributeValue(mOperatingMode, value, OperatingMode::Id);
         return CHIP_NO_ERROR;
@@ -478,7 +478,9 @@ DataModel::ActionReturnStatus DoorLockCluster::WriteAttribute(const DataModel::W
     }
     }
 
-    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    // Only writable attributes have a case above: this default is reached for
+    // listed-but-read-only attributes, so reject those as non-writable.
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 std::optional<DataModel::ActionReturnStatus> DoorLockCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -496,9 +498,16 @@ std::optional<DataModel::ActionReturnStatus> DoorLockCluster::InvokeCommand(cons
     case Commands::UnlockDoor::Id: {
         Commands::UnlockDoor::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
-        return HandleRemoteLockOperation(
+        auto status = HandleRemoteLockOperation(
             request, mFeatures.Has(Feature::kUnbolt) ? LockOperationTypeEnum::kUnlatch : LockOperationTypeEnum::kUnlock,
             &Delegate::HandleDoorUnlockCommand, commandData.PINCode);
+        // Spec 5.3.3.25: a successful remote unlock (re)starts the auto-relock
+        // countdown using AutoRelockTime (0 disables it).
+        if (status.has_value() && status->IsSuccess() && mAutoRelockTime != 0)
+        {
+            ScheduleAutoRelock(mAutoRelockTime);
+        }
+        return status;
     }
     case Commands::UnlockWithTimeout::Id: {
         Commands::UnlockWithTimeout::DecodableType commandData;
@@ -560,8 +569,8 @@ CHIP_ERROR DoorLockCluster::SendLockAlarmEvent(AlarmCodeEnum alarmCode)
 
 CHIP_ERROR DoorLockCluster::HandleWrongCodeEntry()
 {
-    // Wrong-code tracking only exists with PIN or RFID credentials
-    // (legacy: the WrongCodeEntryLimit attribute is not present).
+    // Wrong-code tracking only applies when PIN or RFID credentials are
+    // supported: without credentials there is nothing to count.
     VerifyOrReturnError(mFeatures.Has(Feature::kPinCredential) || mFeatures.Has(Feature::kRfidCredential), CHIP_NO_ERROR);
 
     mWrongCodeEntryAttempts++;
@@ -582,9 +591,9 @@ void DoorLockCluster::ResetWrongCodeEntryAttempts()
 
 bool DoorLockCluster::IsLockoutEngaged() const
 {
-    // A zero lockout end timestamp means no lockout was ever engaged (legacy
-    // relies on the real monotonic clock being past epoch 0; the mock clock in
-    // tests starts at 0, so the comparison must be strict).
+    // A zero lockout end timestamp means no lockout was ever engaged. The
+    // comparison is strict so that a (mock) clock that has not advanced past
+    // its zero point yet does not report an engaged lockout.
     return mLockoutEndTimestamp > mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
@@ -597,7 +606,7 @@ CHIP_ERROR DoorLockCluster::EngageLockout()
 
     SendEvent(Events::DoorLockAlarm::Type{ AlarmCodeEnum::kWrongCodeEntryLimit });
 
-    mDelegate.OnLockoutStarted(mPath.mEndpointId, mLockoutEndTimestamp);
+    mDelegate.OnLockoutStarted(mLockoutEndTimestamp);
     return CHIP_NO_ERROR;
 }
 
@@ -630,7 +639,7 @@ void DoorLockCluster::OnAutoRelockTimerExpired()
         return;
     }
 
-    mDelegate.OnAutoRelock(mPath.mEndpointId);
+    mDelegate.OnAutoRelock();
 }
 
 void DoorLockCluster::AutoRelockTimerContext::TimerFired()
@@ -693,8 +702,11 @@ std::optional<DataModel::ActionReturnStatus> DoorLockCluster::HandleRemoteLockOp
     {
         // Credential verification (PIN lookup, RequirePINForRemoteOperation) is
         // layered on the delegate in a later phase; the delegate performs the
-        // hardware actuation and reports the failure reason.
-        success = (mDelegate.*handler)(mPath.mEndpointId, GetOperationFabric(request), GetOperationNode(request), pinCode, reason);
+        // hardware actuation and reports the failure reason (nullopt = success).
+        std::optional<OperationErrorEnum> operationResult =
+            (mDelegate.*handler)(LockOperationRequest{ GetOperationFabric(request), GetOperationNode(request), pinCode });
+        success = !operationResult.has_value();
+        reason  = operationResult.value_or(OperationErrorEnum::kUnspecified);
     }
 
     // Spec 5.3.4.1: an invalid PIN counts towards WrongCodeEntryLimit and may
@@ -735,7 +747,7 @@ CHIP_ERROR DoorLockCluster::ApplyLockStateChange(DlLockState newState, Operation
     SetAttributeValue(mLockState, newState, LockState::Id);
 
     // DlLockState::kNotFullyLocked has no appropriate event and unclear
-    // auto-relocking semantics, so skip it (mirrors the legacy server).
+    // auto-relocking semantics, so skip it.
     VerifyOrReturnError(newState == DlLockState::kLocked || newState == DlLockState::kUnlocked ||
                             newState == DlLockState::kUnlatched,
                         CHIP_NO_ERROR);
@@ -748,6 +760,14 @@ CHIP_ERROR DoorLockCluster::ApplyLockStateChange(DlLockState newState, Operation
     else if (newState == DlLockState::kUnlatched)
     {
         opType = LockOperationTypeEnum::kUnlatch;
+    }
+
+    // Any pending auto-relock is obsolete once a lock operation takes effect: a
+    // stale timer would otherwise relock a door that was unlocked (with
+    // AutoRelockTime = 0) in the meantime.
+    if (opType == LockOperationTypeEnum::kLock)
+    {
+        mTimerDelegate.CancelTimer(&mAutoRelockTimerContext);
     }
 
     if (opSource == OperationSourceEnum::kRemote && (fabricIdx.IsNull() || nodeId.IsNull()))
@@ -767,9 +787,9 @@ CHIP_ERROR DoorLockCluster::ApplyLockStateChange(DlLockState newState, Operation
         ResetWrongCodeEntryAttempts();
     }
 
-    // Spec 5.3.3.25: 0 = disabled; when set, unlock operations from any source
-    // are timed (legacy: auto-relock only applies to plain unlocks, the
-    // UnlockWithTimeout command schedules its own timer).
+    // Spec 5.3.3.25: 0 = disabled; unlock operations from any source are timed.
+    // Lock and unlatch operations are not relocked here, and UnlockWithTimeout
+    // schedules its own one-shot timer instead of using AutoRelockTime.
     if (opType == LockOperationTypeEnum::kUnlock && mAutoRelockTime != 0)
     {
         ScheduleAutoRelock(mAutoRelockTime);

@@ -18,7 +18,11 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/Span.h>
 #include <system/SystemClock.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -41,6 +45,18 @@ static constexpr size_t kAliroSigningKeySize = 32;
  *  Defines methods for implementing application-specific logic for the door lock cluster.
  *  It defines the interfaces that a door lock should implement to support Aliro provisioning attributes.
  */
+
+/// Payload of a lock / unlock / unbolt actuation request.
+///
+/// Bundles the operation initiator (fabric index and node id, both null for
+/// local actuations) with the optional PIN credential carried by the command,
+/// so the actuation hooks below take a single request argument.
+struct LockOperationRequest
+{
+    DataModel::Nullable<FabricIndex> fabricIdx;
+    DataModel::Nullable<NodeId> nodeId;
+    Optional<ByteSpan> pinCode;
+};
 
 class Delegate
 {
@@ -154,52 +170,37 @@ public:
     /**
      * @brief Hardware actuation hook for the LockDoor command.
      *
-     * @param[in] endpointId endpoint for which remote lock command is called
-     * @param[in] fabricIdx fabric index responsible for operating the lock
-     * @param[in] nodeId node id responsible for operating the lock
-     * @param[in] pinCode PIN code (optional)
-     * @param[out] err error code if door locking failed (set only if retval == false)
-     * @retval true on success
+     * @param[in] request the actuation request: initiator identity and PIN credential
+     * @return nullopt on success, otherwise the operation error to report in
+     *         the LockOperationError event
      */
-    virtual bool HandleDoorLockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
-                                       const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                       OperationErrorEnum & err)
+    virtual std::optional<OperationErrorEnum> HandleDoorLockCommand(const LockOperationRequest & request)
     {
-        return false;
+        return OperationErrorEnum::kUnspecified;
     }
 
     /**
      * @brief Hardware actuation hook for the UnlockDoor / UnlockWithTimeout commands.
      *
-     * @param[in] endpointId endpoint for which remote unlock command is called
-     * @param[in] fabricIdx fabric index responsible for operating the lock
-     * @param[in] nodeId node id responsible for operating the lock
-     * @param[in] pinCode PIN code (optional)
-     * @param[out] err error code if door unlocking failed (set only if retval == false)
-     * @retval true on success
+     * @param[in] request the actuation request: initiator identity and PIN credential
+     * @return nullopt on success, otherwise the operation error to report in
+     *         the LockOperationError event
      */
-    virtual bool HandleDoorUnlockCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
-                                         const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                         OperationErrorEnum & err)
+    virtual std::optional<OperationErrorEnum> HandleDoorUnlockCommand(const LockOperationRequest & request)
     {
-        return false;
+        return OperationErrorEnum::kUnspecified;
     }
 
     /**
      * @brief Hardware actuation hook for the UnboltDoor command.
      *
-     * @param[in] endpointId endpoint for which remote unbolt command is called
-     * @param[in] fabricIdx fabric index responsible for operating the lock
-     * @param[in] nodeId node id responsible for operating the lock
-     * @param[in] pinCode PIN code (optional)
-     * @param[out] err error code if door unbolting failed (set only if retval == false)
-     * @retval true on success
+     * @param[in] request the actuation request: initiator identity and PIN credential
+     * @return nullopt on success, otherwise the operation error to report in
+     *         the LockOperationError event
      */
-    virtual bool HandleDoorUnboltCommand(EndpointId endpointId, const chip::app::DataModel::Nullable<FabricIndex> & fabricIdx,
-                                         const chip::app::DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                         OperationErrorEnum & err)
+    virtual std::optional<OperationErrorEnum> HandleDoorUnboltCommand(const LockOperationRequest & request)
     {
-        return false;
+        return OperationErrorEnum::kUnspecified;
     }
 
     /**
@@ -210,18 +211,15 @@ public:
      * The cluster has already updated the LockState attribute (and emitted the
      * lock operation event) when this is called. Matching the legacy contract,
      * the delegate performs the physical relock actuation here.
-     *
-     * @param[in] endpointId endpoint on which the auto relock fired
      */
-    virtual void OnAutoRelock(EndpointId endpointId) {}
+    virtual void OnAutoRelock() {}
 
     /**
      * @brief Called when the UserCodeTemporaryDisableTime lockout window starts.
      *
-     * @param[in] endpointId endpoint on which the lockout started
      * @param[in] lockoutEndTimestamp timestamp at which the lockout window ends
      */
-    virtual void OnLockoutStarted(EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTimestamp) {}
+    virtual void OnLockoutStarted(chip::System::Clock::Timestamp lockoutEndTimestamp) {}
 };
 
 } // namespace DoorLock

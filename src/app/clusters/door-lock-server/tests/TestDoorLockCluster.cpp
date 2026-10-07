@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMem.h>
 
 #include <cstring>
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -73,23 +74,14 @@ public:
 class AcceptingDelegate : public TestDelegateBase
 {
 public:
-    bool HandleDoorLockCommand(EndpointId endpointId, const DataModel::Nullable<FabricIndex> & fabricIdx,
-                               const DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                               OperationErrorEnum & err) override
+    std::optional<OperationErrorEnum> HandleDoorLockCommand(const LockOperationRequest & request) override { return std::nullopt; }
+    std::optional<OperationErrorEnum> HandleDoorUnlockCommand(const LockOperationRequest & request) override
     {
-        return true;
+        return std::nullopt;
     }
-    bool HandleDoorUnlockCommand(EndpointId endpointId, const DataModel::Nullable<FabricIndex> & fabricIdx,
-                                 const DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                 OperationErrorEnum & err) override
+    std::optional<OperationErrorEnum> HandleDoorUnboltCommand(const LockOperationRequest & request) override
     {
-        return true;
-    }
-    bool HandleDoorUnboltCommand(EndpointId endpointId, const DataModel::Nullable<FabricIndex> & fabricIdx,
-                                 const DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                 OperationErrorEnum & err) override
-    {
-        return true;
+        return std::nullopt;
     }
 };
 
@@ -134,12 +126,10 @@ class RejectingDelegate : public TestDelegateBase
 {
 public:
     int mLockAttempts = 0;
-    bool HandleDoorLockCommand(EndpointId endpointId, const DataModel::Nullable<FabricIndex> & fabricIdx,
-                               const DataModel::Nullable<NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                               OperationErrorEnum & err) override
+    std::optional<OperationErrorEnum> HandleDoorLockCommand(const LockOperationRequest & request) override
     {
         mLockAttempts++;
-        return false;
+        return OperationErrorEnum::kUnspecified;
     }
 };
 
@@ -173,28 +163,36 @@ Config FeaturedConfig(TimerDelegate & timerDelegate)
 {
     Config config(timerDelegate);
     config.features.Set(Feature::kPinCredential).Set(Feature::kUser).Set(Feature::kDoorPositionSensor).Set(Feature::kUnbolt);
-    config.optionalAttributes.language       = true;
-    config.optionalAttributes.ledSettings    = true;
-    config.optionalAttributes.autoRelockTime = true;
-    config.numberOfPINUsersSupported         = 10;
-    config.maxPINCodeLength                  = 8;
-    config.minPINCodeLength                  = 4;
-    config.wrongCodeEntryLimit               = 5;
-    config.userCodeTemporaryDisableTime      = 10;
+    config.optionalAttributes.language                     = true;
+    config.optionalAttributes.ledSettings                  = true;
+    config.optionalAttributes.autoRelockTime               = true;
+    config.optionalAttributes.soundVolume                  = true;
+    config.optionalAttributes.defaultConfigurationRegister = true;
+    config.optionalAttributes.doorOpenEvents               = true;
+    config.optionalAttributes.doorClosedEvents             = true;
+    config.optionalAttributes.openPeriod                   = true;
+    config.optionalAttributes.expiringUserTimeout          = true;
+    config.numberOfPINUsersSupported                       = 10;
+    config.maxPINCodeLength                                = 8;
+    config.minPINCodeLength                                = 4;
+    config.wrongCodeEntryLimit                             = 5;
+    config.userCodeTemporaryDisableTime                    = 10;
     return config;
 }
 
 /// PIN-only config without the USR feature, so SendPINOverTheAir exists
-/// (it is only present when the User feature is NOT supported and PIN is).
+/// (it is only present when the User feature is NOT supported and PIN is,
+/// and its optional attribute flag is set).
 Config PinWithoutUserConfig(TimerDelegate & timerDelegate)
 {
     Config config(timerDelegate);
     config.features.Set(Feature::kPinCredential);
-    config.numberOfPINUsersSupported    = 10;
-    config.maxPINCodeLength             = 8;
-    config.minPINCodeLength             = 4;
-    config.wrongCodeEntryLimit          = 5;
-    config.userCodeTemporaryDisableTime = 10;
+    config.optionalAttributes.sendPINOverTheAir = true;
+    config.numberOfPINUsersSupported            = 10;
+    config.maxPINCodeLength                     = 8;
+    config.minPINCodeLength                     = 4;
+    config.wrongCodeEntryLimit                  = 5;
+    config.userCodeTemporaryDisableTime         = 10;
     return config;
 }
 
@@ -360,19 +358,51 @@ TEST_F(TestDoorLockClusterFeatured, ExpiringUserTimeoutConstraints)
 
 TEST_F(TestDoorLockClusterFeatured, OperatingModeMustBeSupported)
 {
-    // Spec: OperatingMode SHALL be a value listed in the SupportedOperatingModes bitmap.
-    // FeaturedConfig keeps the default supported modes: Normal | NoRemoteLockUnlock.
+    // Spec: OperatingModesBitmap uses inverted polarity (a `0` bit marks a
+    // supported mode); the 0xFFF6 default supports Normal and NoRemoteLockUnlock.
+    uint16_t supportedModes = 0;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::SupportedOperatingModes::Id, supportedModes), CHIP_NO_ERROR);
+    EXPECT_EQ(supportedModes, 0xFFF6u);
 
-    // Privacy mode is not in the supported bitmap -> rejected.
+    // Privacy mode is not supported -> rejected.
     EXPECT_EQ(tester.WriteAttribute(Attributes::OperatingMode::Id, OperatingModeEnum::kPrivacy),
               Protocols::InteractionModel::Status::ConstraintError);
 
-    // kNoRemoteLockUnlock is in the supported bitmap -> accepted.
+    // Unknown enum values are rejected.
+    EXPECT_EQ(tester.WriteAttribute(Attributes::OperatingMode::Id, OperatingModeEnum::kUnknownEnumValue),
+              Protocols::InteractionModel::Status::ConstraintError);
+
+    // kNoRemoteLockUnlock is supported -> accepted.
     EXPECT_EQ(tester.WriteAttribute(Attributes::OperatingMode::Id, OperatingModeEnum::kNoRemoteLockUnlock), CHIP_NO_ERROR);
 
     OperatingModeEnum mode = OperatingModeEnum::kNormal;
     ASSERT_EQ(tester.ReadAttribute(Attributes::OperatingMode::Id, mode), CHIP_NO_ERROR);
     EXPECT_EQ(mode, OperatingModeEnum::kNoRemoteLockUnlock);
+}
+
+TEST_F(TestDoorLockClusterFeatured, LanguageWriteIsSuppressedWhenUnchanged)
+{
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Language::Id, CharSpan::fromCharString("en")), CHIP_NO_ERROR);
+    const size_t dirtyAfterSet = tester.GetDirtyList().size();
+
+    // Writing the current value again does not mark the attribute dirty.
+    EXPECT_EQ(tester.WriteAttribute(Attributes::Language::Id, CharSpan::fromCharString("en")), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.GetDirtyList().size(), dirtyAfterSet);
+
+    // A different value marks it dirty again.
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Language::Id, CharSpan::fromCharString("fr")), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.GetDirtyList().size(), dirtyAfterSet + 1);
+}
+
+TEST_F(TestDoorLockClusterFeatured, LEDSettingsAndSoundVolumeBounds)
+{
+    // Spec: LEDSettings is 0-2 and SoundVolume is 0-3.
+    EXPECT_EQ(tester.WriteAttribute(Attributes::LEDSettings::Id, static_cast<uint8_t>(3)),
+              Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::LEDSettings::Id, static_cast<uint8_t>(2)), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::SoundVolume::Id, static_cast<uint8_t>(4)),
+              Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::SoundVolume::Id, static_cast<uint8_t>(3)), CHIP_NO_ERROR);
 }
 
 TEST_F(TestDoorLockClusterFeatured, LanguageLengthConstraint)
@@ -472,7 +502,6 @@ TEST_F(TestDoorLockClusterFeatured, RescheduledAutoRelockCancelsPendingTimer)
     DoorLockCluster cluster(kTestEndpointId, mDelegate, FeaturedConfig(timerDelegate));
     ClusterTester relockTester(cluster);
     ASSERT_EQ(cluster.Startup(relockTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    // Startup cancels any stale timer.
 
     ASSERT_EQ(relockTester.WriteAttribute(Attributes::AutoRelockTime::Id, static_cast<uint32_t>(10)), CHIP_NO_ERROR);
 
@@ -480,8 +509,8 @@ TEST_F(TestDoorLockClusterFeatured, RescheduledAutoRelockCancelsPendingTimer)
     ASSERT_EQ(cluster.SetLockState(DlLockState::kUnlocked, OperationSourceEnum::kManual, noUser, Span<const CredentialStruct>(),
                                    DataModel::Nullable<FabricIndex>(), DataModel::Nullable<NodeId>()),
               CHIP_NO_ERROR);
-    // Snapshot after the first schedule (which itself cancelled the pending
-    // Startup-reset timer under the cancel-before-start contract).
+    // Snapshot after the first schedule (which itself cancelled the previous
+    // relock timer, if any, under the cancel-before-start contract).
     const int cancelAfterFirstSchedule = timerDelegate.mCancelCount;
 
     // A second unlock re-schedules: the pending timer is cancelled first.
@@ -496,6 +525,56 @@ TEST_F(TestDoorLockClusterFeatured, RescheduledAutoRelockCancelsPendingTimer)
     ASSERT_EQ(relockTester.ReadAttribute(Attributes::LockState::Id, lockState), CHIP_NO_ERROR);
     ASSERT_FALSE(lockState.IsNull());
     EXPECT_EQ(lockState.Value(), DlLockState::kLocked);
+}
+
+TEST_F(TestDoorLockClusterFeatured, AutoRelockAfterUnlockCommand)
+{
+    // A successful UnlockDoor command starts the auto-relock countdown using
+    // AutoRelockTime, even when the lock operation reports Unlatch (UBOLT).
+    ASSERT_EQ(tester.WriteAttribute(Attributes::AutoRelockTime::Id, static_cast<uint32_t>(10)), CHIP_NO_ERROR);
+
+    Commands::UnlockDoor::Type request;
+    auto result = tester.Invoke(Commands::UnlockDoor::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+    if (result.status.has_value())
+    {
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::Success);
+    }
+
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(11));
+    DataModel::Nullable<DlLockState> lockState;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::LockState::Id, lockState), CHIP_NO_ERROR);
+    ASSERT_FALSE(lockState.IsNull());
+    EXPECT_EQ(lockState.Value(), DlLockState::kLocked);
+}
+
+TEST_F(TestDoorLockClusterFeatured, LockCancelsPendingAutoRelockTimer)
+{
+    // A lock operation while an auto-relock timer is pending makes the timer
+    // obsolete: the stale timer must not relock a door that is later unlocked
+    // again with AutoRelockTime == 0.
+    ASSERT_EQ(tester.WriteAttribute(Attributes::AutoRelockTime::Id, static_cast<uint32_t>(10)), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> noUser;
+    ASSERT_EQ(mCluster.SetLockState(DlLockState::kUnlocked, OperationSourceEnum::kManual, noUser, Span<const CredentialStruct>(),
+                                    DataModel::Nullable<FabricIndex>(), DataModel::Nullable<NodeId>()),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(mCluster.SetLockState(DlLockState::kLocked, OperationSourceEnum::kManual, noUser, Span<const CredentialStruct>(),
+                                    DataModel::Nullable<FabricIndex>(), DataModel::Nullable<NodeId>()),
+              CHIP_NO_ERROR);
+
+    // Unlock again with AutoRelockTime == 0: nothing re-schedules the relock.
+    ASSERT_EQ(tester.WriteAttribute(Attributes::AutoRelockTime::Id, static_cast<uint32_t>(0)), CHIP_NO_ERROR);
+    ASSERT_EQ(mCluster.SetLockState(DlLockState::kUnlocked, OperationSourceEnum::kManual, noUser, Span<const CredentialStruct>(),
+                                    DataModel::Nullable<FabricIndex>(), DataModel::Nullable<NodeId>()),
+              CHIP_NO_ERROR);
+
+    // The stale timer from the first unlock must not fire.
+    mTimerDelegate.AdvanceClock(System::Clock::Seconds32(11));
+    DataModel::Nullable<DlLockState> lockState;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::LockState::Id, lockState), CHIP_NO_ERROR);
+    ASSERT_FALSE(lockState.IsNull());
+    EXPECT_EQ(lockState.Value(), DlLockState::kUnlocked);
 }
 
 /// Fixture with the Aliro provisioning + BLE UWB features.
@@ -562,10 +641,11 @@ TEST_F(TestDoorLockClusterFeatured, DoorPositionCountersAreWritable)
 
 TEST_F(TestDoorLockClusterFeatured, DefaultConfigurationRegisterIsReadOnly)
 {
-    // Spec 9.2.9.28: DefaultConfigurationRegister is read-only (R V).
+    // Spec 9.2.9.28: DefaultConfigurationRegister is read-only (R V): the
+    // attribute is readable, but any write to it fails.
     BitMask<DlDefaultConfigurationRegister> value;
-    EXPECT_EQ(tester.WriteAttribute(Attributes::DefaultConfigurationRegister::Id, value),
-              Protocols::InteractionModel::Status::UnsupportedAttribute);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DefaultConfigurationRegister::Id, value), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::DefaultConfigurationRegister::Id, value), CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
 }
 
 TEST_F(TestDoorLockClusterAliro, UnconfiguredAliroKeysReadAsNull)
