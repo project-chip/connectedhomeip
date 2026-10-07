@@ -98,9 +98,23 @@ void ConfigureKeyAttributes(psa_key_attributes_t & attributes, uint32_t keyId)
 #endif
 }
 
+// Destroy an existing key at keyId so generate/import can reuse the id.
+// Missing keys are expected; only unexpected PSA errors are returned.
+psa_status_t DestroyKeyIfPresent(uint32_t keyId)
+{
+    const psa_status_t status = psa_destroy_key(static_cast<psa_key_id_t>(keyId));
+    if (status == PSA_SUCCESS || status == PSA_ERROR_INVALID_HANDLE || status == PSA_ERROR_DOES_NOT_EXIST)
+    {
+        return PSA_SUCCESS;
+    }
+    return status;
+}
+
 psa_status_t GenerateKey(uint32_t keyId)
 {
-    (void) psa_destroy_key(static_cast<psa_key_id_t>(keyId));
+    const psa_status_t destroyStatus = DestroyKeyIfPresent(keyId);
+    VerifyOrReturnError(destroyStatus == PSA_SUCCESS, destroyStatus);
+
     psa_key_attributes_t attributes = psa_key_attributes_init();
     ConfigureKeyAttributes(attributes, keyId);
     psa_key_id_t generatedId = 0;
@@ -111,7 +125,9 @@ psa_status_t GenerateKey(uint32_t keyId)
 
 psa_status_t ImportKey(uint32_t keyId, const uint8_t * value, size_t size)
 {
-    (void) psa_destroy_key(static_cast<psa_key_id_t>(keyId));
+    const psa_status_t destroyStatus = DestroyKeyIfPresent(keyId);
+    VerifyOrReturnError(destroyStatus == PSA_SUCCESS, destroyStatus);
+
     psa_key_attributes_t attributes = psa_key_attributes_init();
     ConfigureKeyAttributes(attributes, keyId);
     psa_key_id_t importedId  = 0;

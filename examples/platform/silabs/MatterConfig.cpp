@@ -298,7 +298,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     provisionManager.SetCryptoProvider(Provision::ProvisionCrypto::GetInstance());
     provisionManager.SetChannel(Provision::ProvisionChannel::GetInstance());
     provisionManager.SetResetHandler([]() { GetPlatform().SoftwareReset(); });
-    ReturnErrorOnFailure(provisionManager.Init(true));
+    ReturnErrorOnFailure(provisionManager.Init(false /*provisionByDefault*/));
 #elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
     ReturnErrorOnFailure(Provision::ProvisionStorageWriter::GetInstance().Initialize());
 #endif

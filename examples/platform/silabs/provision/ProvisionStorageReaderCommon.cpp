@@ -202,7 +202,7 @@ CHIP_ERROR ProvisionStorageReader::GetSetupPayload(MutableCharSpan & value)
     VerifyOrReturnError(value.size() > prefix_len, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     CHIP_ERROR err = GetSetupPayload(payload, sizeof(payload), size);
-
+#if SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
@@ -225,7 +225,8 @@ CHIP_ERROR ProvisionStorageReader::GetSetupPayload(MutableCharSpan & value)
 
         return CHIP_NO_ERROR;
     }
-#endif
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#endif // SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
 
     ReturnErrorOnFailure(err);
     VerifyOrReturnError(size > 0, CHIP_ERROR_NOT_FOUND);

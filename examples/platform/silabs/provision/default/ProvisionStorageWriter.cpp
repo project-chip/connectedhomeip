@@ -28,9 +28,9 @@
 
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 
-#ifdef SL_PROVISION_GENERATOR
+#if defined(SL_PROVISION_GENERATOR) && SL_PROVISION_GENERATOR
 extern void setNvm3End(uint32_t addr);
-#endif
+#endif // SL_PROVISION_GENERATOR
 extern uint8_t linker_nvm_end[];
 #ifdef _SILICON_LABS_32B_SERIES_3
 extern uint8_t linker_static_secure_tokens_begin;
@@ -221,7 +221,7 @@ CHIP_ERROR ProvisionStorageWriter::SetProvisionVersion(const char * value, size_
 
 CHIP_ERROR ProvisionStorageWriter::SetTestEventTriggerKey(const ByteSpan & value)
 {
-#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     constexpr size_t kEnableKeyLength = 16;
     VerifyOrReturnError(value.size() == kEnableKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, value.data(), value.size());
@@ -267,10 +267,10 @@ CHIP_ERROR ProvisionStorageWriter::Initialize(uint32_t flash_addr, uint32_t flas
         base_addr               = tokenStartAddr + FLASH_PAGE_SIZE;
 #endif
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
-#ifdef SL_PROVISION_GENERATOR
+#if defined(SL_PROVISION_GENERATOR) && SL_PROVISION_GENERATOR
         // TODO: Might be ok to move this to gfw only using Reader.GetCredentialsBaseAddress().
         setNvm3End(base_addr);
-#endif
+#endif // SL_PROVISION_GENERATOR
     }
     return SetCredentialsBaseAddress(base_addr);
 }

@@ -1126,7 +1126,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 void BaseApplication::OutputQrCode(bool refreshLCD)
 {
     (void) refreshLCD; // could be unused
-
+#if SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
     // Create buffer for the Qr code setup payload that can fit max size and null terminator.
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
@@ -1149,6 +1149,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     {
         ChipLogError(AppServer, "Getting QR code failed!");
     }
+#endif // SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
 }
 
 bool BaseApplication::GetProvisionStatus()
