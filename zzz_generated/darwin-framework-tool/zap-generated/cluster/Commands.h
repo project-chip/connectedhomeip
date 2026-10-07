@@ -161328,7 +161328,7 @@ public:
         AddArgument("ProgramIdentifier", &mRequest.programIdentifier);
         AddArgument("ShouldRecordSeries", 0, 1, &mRequest.shouldRecordSeries);
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ExternalIDList", &mComplex_ExternalIDList);
+        AddArgument("ExternalIDList", &mComplex_ExternalIDList, "", Argument::kOptional);
 #endif // MTR_ENABLE_PROVISIONAL
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
@@ -161348,19 +161348,27 @@ public:
         params.programIdentifier = [[NSString alloc] initWithBytes:mRequest.programIdentifier.data() length:mRequest.programIdentifier.size() encoding:NSUTF8StringEncoding];
         params.shouldRecordSeries = [NSNumber numberWithBool:mRequest.shouldRecordSeries];
 #if MTR_ENABLE_PROVISIONAL
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            for (auto & entry_0 : mRequest.externalIDList) {
-                MTRChannelClusterAdditionalInfoStruct * newElement_0;
-                newElement_0 = [MTRChannelClusterAdditionalInfoStruct new];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data() length:entry_0.name.size() encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data() length:entry_0.value.size() encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
+        if (mRequest.externalIDList.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.externalIDList.Value()) {
+                    MTRChannelClusterAdditionalInfoStruct * newElement_1;
+                    newElement_1 = [MTRChannelClusterAdditionalInfoStruct new];
+                    newElement_1.name = [[NSString alloc] initWithBytes:entry_1.name.data() length:entry_1.name.size() encoding:NSUTF8StringEncoding];
+                    newElement_1.value = [[NSString alloc] initWithBytes:entry_1.value.data() length:entry_1.value.size() encoding:NSUTF8StringEncoding];
+                    [array_1 addObject:newElement_1];
+                }
+                params.externalIDList = array_1;
             }
-            params.externalIDList = array_0;
+        } else {
+            params.externalIDList = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
-        params.data = [NSData dataWithBytes:mRequest.data.data() length:mRequest.data.size()];
+        if (mRequest.data.HasValue()) {
+            params.data = [NSData dataWithBytes:mRequest.data.Value().data() length:mRequest.data.Value().size()];
+        } else {
+            params.data = nil;
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -161382,7 +161390,7 @@ public:
 
 private:
     chip::app::Clusters::Channel::Commands::RecordProgram::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>> mComplex_ExternalIDList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>> mComplex_ExternalIDList;
 };
 
 /*
@@ -161397,7 +161405,7 @@ public:
         AddArgument("ProgramIdentifier", &mRequest.programIdentifier);
         AddArgument("ShouldRecordSeries", 0, 1, &mRequest.shouldRecordSeries);
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ExternalIDList", &mComplex_ExternalIDList);
+        AddArgument("ExternalIDList", &mComplex_ExternalIDList, "", Argument::kOptional);
 #endif // MTR_ENABLE_PROVISIONAL
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
@@ -161417,19 +161425,27 @@ public:
         params.programIdentifier = [[NSString alloc] initWithBytes:mRequest.programIdentifier.data() length:mRequest.programIdentifier.size() encoding:NSUTF8StringEncoding];
         params.shouldRecordSeries = [NSNumber numberWithBool:mRequest.shouldRecordSeries];
 #if MTR_ENABLE_PROVISIONAL
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            for (auto & entry_0 : mRequest.externalIDList) {
-                MTRChannelClusterAdditionalInfoStruct * newElement_0;
-                newElement_0 = [MTRChannelClusterAdditionalInfoStruct new];
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data() length:entry_0.name.size() encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data() length:entry_0.value.size() encoding:NSUTF8StringEncoding];
-                [array_0 addObject:newElement_0];
+        if (mRequest.externalIDList.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.externalIDList.Value()) {
+                    MTRChannelClusterAdditionalInfoStruct * newElement_1;
+                    newElement_1 = [MTRChannelClusterAdditionalInfoStruct new];
+                    newElement_1.name = [[NSString alloc] initWithBytes:entry_1.name.data() length:entry_1.name.size() encoding:NSUTF8StringEncoding];
+                    newElement_1.value = [[NSString alloc] initWithBytes:entry_1.value.data() length:entry_1.value.size() encoding:NSUTF8StringEncoding];
+                    [array_1 addObject:newElement_1];
+                }
+                params.externalIDList = array_1;
             }
-            params.externalIDList = array_0;
+        } else {
+            params.externalIDList = nil;
         }
 #endif // MTR_ENABLE_PROVISIONAL
-        params.data = [NSData dataWithBytes:mRequest.data.data() length:mRequest.data.size()];
+        if (mRequest.data.HasValue()) {
+            params.data = [NSData dataWithBytes:mRequest.data.Value().data() length:mRequest.data.Value().size()];
+        } else {
+            params.data = nil;
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -161451,7 +161467,7 @@ public:
 
 private:
     chip::app::Clusters::Channel::Commands::CancelRecordProgram::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>> mComplex_ExternalIDList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>> mComplex_ExternalIDList;
 };
 
 /*

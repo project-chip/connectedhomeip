@@ -606,8 +606,8 @@ exit:
 }
 
 bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                         const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                         const chip::ByteSpan & data)
+                                         const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                         const chip::Optional<chip::ByteSpan> & data)
 {
     DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
@@ -644,8 +644,8 @@ exit:
 }
 
 bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                               const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                               const chip::ByteSpan & data)
+                                               const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                               const chip::Optional<chip::ByteSpan> & data)
 {
     DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
