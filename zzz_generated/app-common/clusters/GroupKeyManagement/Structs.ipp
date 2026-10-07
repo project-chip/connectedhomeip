@@ -20,6 +20,7 @@
 
 #include <clusters/GroupKeyManagement/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -58,29 +59,53 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldGroupId,
+        kFieldEndpoints,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            // FabricIndex is supplied by the interaction for writes and is encoded for reads.
+            if (aContext != DataModel::DecodeContext::kRead)
+            {
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            }
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupId, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldGroupId));
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
-            err = DataModel::Decode(reader, endpoints);
+            err = DataModel::Decode(reader, endpoints, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEndpoints));
         }
         else if (__context_tag == to_underlying(Fields::kGroupName))
         {
-            err = DataModel::Decode(reader, groupName);
+            err = DataModel::Decode(reader, groupName, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
 
         ReturnErrorOnFailure(err);
@@ -117,25 +142,49 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldGroupId,
+        kFieldGroupKeySetID,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            // FabricIndex is supplied by the interaction for writes and is encoded for reads.
+            if (aContext != DataModel::DecodeContext::kRead)
+            {
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            }
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
-            err = DataModel::Decode(reader, groupId);
+            err = DataModel::Decode(reader, groupId, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldGroupId));
         }
         else if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            err = DataModel::Decode(reader, groupKeySetID);
+            err = DataModel::Decode(reader, groupKeySetID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldGroupKeySetID));
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
 
         ReturnErrorOnFailure(err);
@@ -161,45 +210,74 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldGroupKeySetID,
+        kFieldGroupKeySecurityPolicy,
+        kFieldEpochKey0,
+        kFieldEpochStartTime0,
+        kFieldEpochKey1,
+        kFieldEpochStartTime1,
+        kFieldEpochKey2,
+        kFieldEpochStartTime2,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            err = DataModel::Decode(reader, groupKeySetID);
+            err = DataModel::Decode(reader, groupKeySetID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldGroupKeySetID));
         }
         else if (__context_tag == to_underlying(Fields::kGroupKeySecurityPolicy))
         {
-            err = DataModel::Decode(reader, groupKeySecurityPolicy);
+            err = DataModel::Decode(reader, groupKeySecurityPolicy, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldGroupKeySecurityPolicy));
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey0))
         {
-            err = DataModel::Decode(reader, epochKey0);
+            err = DataModel::Decode(reader, epochKey0, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochKey0));
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime0))
         {
-            err = DataModel::Decode(reader, epochStartTime0);
+            err = DataModel::Decode(reader, epochStartTime0, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochStartTime0));
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey1))
         {
-            err = DataModel::Decode(reader, epochKey1);
+            err = DataModel::Decode(reader, epochKey1, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochKey1));
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime1))
         {
-            err = DataModel::Decode(reader, epochStartTime1);
+            err = DataModel::Decode(reader, epochStartTime1, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochStartTime1));
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey2))
         {
-            err = DataModel::Decode(reader, epochKey2);
+            err = DataModel::Decode(reader, epochKey2, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochKey2));
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime2))
         {
-            err = DataModel::Decode(reader, epochStartTime2);
+            err = DataModel::Decode(reader, epochStartTime2, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEpochStartTime2));
         }
 
         ReturnErrorOnFailure(err);

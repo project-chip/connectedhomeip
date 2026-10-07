@@ -21,6 +21,7 @@
 #include <clusters/WebRTCTransportRequestor/Commands.h>
 
 #include <app/data-model/Decode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -43,29 +44,41 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldWebRTCSessionID,
+        kFieldSdp,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
         {
-            err = DataModel::Decode(reader, webRTCSessionID);
+            err = DataModel::Decode(reader, webRTCSessionID, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldWebRTCSessionID));
         }
         else if (__context_tag == to_underlying(Fields::kSdp))
         {
-            err = DataModel::Decode(reader, sdp);
+            err = DataModel::Decode(reader, sdp, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSdp));
         }
         else if (__context_tag == to_underlying(Fields::kICEServers))
         {
-            err = DataModel::Decode(reader, ICEServers);
+            err = DataModel::Decode(reader, ICEServers, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kICETransportPolicy))
         {
-            err = DataModel::Decode(reader, ICETransportPolicy);
+            err = DataModel::Decode(reader, ICETransportPolicy, DataModel::DecodeContext::kWrite);
         }
 
         ReturnErrorOnFailure(err);
@@ -84,21 +97,33 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldWebRTCSessionID,
+        kFieldSdp,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
         {
-            err = DataModel::Decode(reader, webRTCSessionID);
+            err = DataModel::Decode(reader, webRTCSessionID, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldWebRTCSessionID));
         }
         else if (__context_tag == to_underlying(Fields::kSdp))
         {
-            err = DataModel::Decode(reader, sdp);
+            err = DataModel::Decode(reader, sdp, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSdp));
         }
 
         ReturnErrorOnFailure(err);
@@ -117,21 +142,33 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldWebRTCSessionID,
+        kFieldICECandidates,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
         {
-            err = DataModel::Decode(reader, webRTCSessionID);
+            err = DataModel::Decode(reader, webRTCSessionID, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldWebRTCSessionID));
         }
         else if (__context_tag == to_underlying(Fields::kICECandidates))
         {
-            err = DataModel::Decode(reader, ICECandidates);
+            err = DataModel::Decode(reader, ICECandidates, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldICECandidates));
         }
 
         ReturnErrorOnFailure(err);
@@ -150,21 +187,33 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldWebRTCSessionID,
+        kFieldReason,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kWebRTCSessionID))
         {
-            err = DataModel::Decode(reader, webRTCSessionID);
+            err = DataModel::Decode(reader, webRTCSessionID, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldWebRTCSessionID));
         }
         else if (__context_tag == to_underlying(Fields::kReason))
         {
-            err = DataModel::Decode(reader, reason);
+            err = DataModel::Decode(reader, reason, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldReason));
         }
 
         ReturnErrorOnFailure(err);

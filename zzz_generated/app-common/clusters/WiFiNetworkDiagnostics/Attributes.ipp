@@ -33,41 +33,41 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Bssid::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bssid);
+        return DataModel::Decode(reader, bssid, DataModel::DecodeContext::kRead);
     case Attributes::SecurityType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, securityType);
+        return DataModel::Decode(reader, securityType, DataModel::DecodeContext::kRead);
     case Attributes::WiFiVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiFiVersion);
+        return DataModel::Decode(reader, wiFiVersion, DataModel::DecodeContext::kRead);
     case Attributes::ChannelNumber::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, channelNumber);
+        return DataModel::Decode(reader, channelNumber, DataModel::DecodeContext::kRead);
     case Attributes::Rssi::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rssi);
+        return DataModel::Decode(reader, rssi, DataModel::DecodeContext::kRead);
     case Attributes::BeaconLostCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, beaconLostCount);
+        return DataModel::Decode(reader, beaconLostCount, DataModel::DecodeContext::kRead);
     case Attributes::BeaconRxCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, beaconRxCount);
+        return DataModel::Decode(reader, beaconRxCount, DataModel::DecodeContext::kRead);
     case Attributes::PacketMulticastRxCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, packetMulticastRxCount);
+        return DataModel::Decode(reader, packetMulticastRxCount, DataModel::DecodeContext::kRead);
     case Attributes::PacketMulticastTxCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, packetMulticastTxCount);
+        return DataModel::Decode(reader, packetMulticastTxCount, DataModel::DecodeContext::kRead);
     case Attributes::PacketUnicastRxCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, packetUnicastRxCount);
+        return DataModel::Decode(reader, packetUnicastRxCount, DataModel::DecodeContext::kRead);
     case Attributes::PacketUnicastTxCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, packetUnicastTxCount);
+        return DataModel::Decode(reader, packetUnicastTxCount, DataModel::DecodeContext::kRead);
     case Attributes::CurrentMaxRate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentMaxRate);
+        return DataModel::Decode(reader, currentMaxRate, DataModel::DecodeContext::kRead);
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overrunCount);
+        return DataModel::Decode(reader, overrunCount, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

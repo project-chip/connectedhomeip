@@ -20,6 +20,7 @@
 
 #include <clusters/OccupancySensing/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -41,25 +42,44 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldHoldTimeMin,
+        kFieldHoldTimeMax,
+        kFieldHoldTimeDefault,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kHoldTimeMin))
         {
-            err = DataModel::Decode(reader, holdTimeMin);
+            err = DataModel::Decode(reader, holdTimeMin, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHoldTimeMin));
         }
         else if (__context_tag == to_underlying(Fields::kHoldTimeMax))
         {
-            err = DataModel::Decode(reader, holdTimeMax);
+            err = DataModel::Decode(reader, holdTimeMax, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHoldTimeMax));
         }
         else if (__context_tag == to_underlying(Fields::kHoldTimeDefault))
         {
-            err = DataModel::Decode(reader, holdTimeDefault);
+            err = DataModel::Decode(reader, holdTimeDefault, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHoldTimeDefault));
         }
 
         ReturnErrorOnFailure(err);
@@ -81,29 +101,50 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldStartTimestamp,
+        kFieldEndTimestamp,
+        kFieldOccupancy,
+        kFieldConfidence,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kStartTimestamp))
         {
-            err = DataModel::Decode(reader, startTimestamp);
+            err = DataModel::Decode(reader, startTimestamp, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldStartTimestamp));
         }
         else if (__context_tag == to_underlying(Fields::kEndTimestamp))
         {
-            err = DataModel::Decode(reader, endTimestamp);
+            err = DataModel::Decode(reader, endTimestamp, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEndTimestamp));
         }
         else if (__context_tag == to_underlying(Fields::kOccupancy))
         {
-            err = DataModel::Decode(reader, occupancy);
+            err = DataModel::Decode(reader, occupancy, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldOccupancy));
         }
         else if (__context_tag == to_underlying(Fields::kConfidence))
         {
-            err = DataModel::Decode(reader, confidence);
+            err = DataModel::Decode(reader, confidence, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldConfidence));
         }
 
         ReturnErrorOnFailure(err);

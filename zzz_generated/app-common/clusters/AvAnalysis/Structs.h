@@ -55,6 +55,7 @@ public:
     AnalysisStreamStateEnum analysisStreamState = static_cast<AnalysisStreamStateEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -89,6 +90,7 @@ public:
     Optional<DataModel::Nullable<DataModel::DecodableList<uint16_t>>> zoneIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -116,6 +118,7 @@ public:
     DataModel::Nullable<uint32_t> endTime;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 

@@ -21,6 +21,7 @@
 #include <clusters/FanControl/Commands.h>
 
 #include <app/data-model/Decode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -42,25 +43,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldDirection,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kDirection))
         {
-            err = DataModel::Decode(reader, direction);
+            err = DataModel::Decode(reader, direction, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDirection));
         }
         else if (__context_tag == to_underlying(Fields::kWrap))
         {
-            err = DataModel::Decode(reader, wrap);
+            err = DataModel::Decode(reader, wrap, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kLowestOff))
         {
-            err = DataModel::Decode(reader, lowestOff);
+            err = DataModel::Decode(reader, lowestOff, DataModel::DecodeContext::kWrite);
         }
 
         ReturnErrorOnFailure(err);

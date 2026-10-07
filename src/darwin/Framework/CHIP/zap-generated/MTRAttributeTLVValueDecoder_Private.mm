@@ -40,7 +40,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -66,7 +66,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::AcceptedCommandList::Id: {
         using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -92,7 +92,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::AttributeList::Id: {
         using TypeInfo = Attributes::AttributeList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -118,7 +118,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::FeatureMap::Id: {
         using TypeInfo = Attributes::FeatureMap::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -129,7 +129,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::ClusterRevision::Id: {
         using TypeInfo = Attributes::ClusterRevision::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }

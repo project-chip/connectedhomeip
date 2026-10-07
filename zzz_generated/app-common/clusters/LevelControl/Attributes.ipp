@@ -33,43 +33,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentLevel);
+        return DataModel::Decode(reader, currentLevel, DataModel::DecodeContext::kRead);
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, remainingTime);
+        return DataModel::Decode(reader, remainingTime, DataModel::DecodeContext::kRead);
     case Attributes::MinLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minLevel);
+        return DataModel::Decode(reader, minLevel, DataModel::DecodeContext::kRead);
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxLevel);
+        return DataModel::Decode(reader, maxLevel, DataModel::DecodeContext::kRead);
     case Attributes::CurrentFrequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentFrequency);
+        return DataModel::Decode(reader, currentFrequency, DataModel::DecodeContext::kRead);
     case Attributes::MinFrequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minFrequency);
+        return DataModel::Decode(reader, minFrequency, DataModel::DecodeContext::kRead);
     case Attributes::MaxFrequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxFrequency);
+        return DataModel::Decode(reader, maxFrequency, DataModel::DecodeContext::kRead);
     case Attributes::Options::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, options);
+        return DataModel::Decode(reader, options, DataModel::DecodeContext::kRead);
     case Attributes::OnOffTransitionTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onOffTransitionTime);
+        return DataModel::Decode(reader, onOffTransitionTime, DataModel::DecodeContext::kRead);
     case Attributes::OnLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onLevel);
+        return DataModel::Decode(reader, onLevel, DataModel::DecodeContext::kRead);
     case Attributes::OnTransitionTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onTransitionTime);
+        return DataModel::Decode(reader, onTransitionTime, DataModel::DecodeContext::kRead);
     case Attributes::OffTransitionTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, offTransitionTime);
+        return DataModel::Decode(reader, offTransitionTime, DataModel::DecodeContext::kRead);
     case Attributes::DefaultMoveRate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultMoveRate);
+        return DataModel::Decode(reader, defaultMoveRate, DataModel::DecodeContext::kRead);
     case Attributes::StartUpCurrentLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpCurrentLevel);
+        return DataModel::Decode(reader, startUpCurrentLevel, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

@@ -33,23 +33,23 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ThreadMetrics::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, threadMetrics);
+        return DataModel::Decode(reader, threadMetrics, DataModel::DecodeContext::kRead);
     case Attributes::CurrentHeapFree::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentHeapFree);
+        return DataModel::Decode(reader, currentHeapFree, DataModel::DecodeContext::kRead);
     case Attributes::CurrentHeapUsed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentHeapUsed);
+        return DataModel::Decode(reader, currentHeapUsed, DataModel::DecodeContext::kRead);
     case Attributes::CurrentHeapHighWatermark::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentHeapHighWatermark);
+        return DataModel::Decode(reader, currentHeapHighWatermark, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

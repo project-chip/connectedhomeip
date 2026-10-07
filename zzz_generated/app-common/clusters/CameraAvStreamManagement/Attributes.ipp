@@ -33,99 +33,99 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxConcurrentEncoders::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConcurrentEncoders);
+        return DataModel::Decode(reader, maxConcurrentEncoders, DataModel::DecodeContext::kRead);
     case Attributes::MaxEncodedPixelRate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxEncodedPixelRate);
+        return DataModel::Decode(reader, maxEncodedPixelRate, DataModel::DecodeContext::kRead);
     case Attributes::VideoSensorParams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, videoSensorParams);
+        return DataModel::Decode(reader, videoSensorParams, DataModel::DecodeContext::kRead);
     case Attributes::NightVisionUsesInfrared::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nightVisionUsesInfrared);
+        return DataModel::Decode(reader, nightVisionUsesInfrared, DataModel::DecodeContext::kRead);
     case Attributes::MinViewportResolution::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minViewportResolution);
+        return DataModel::Decode(reader, minViewportResolution, DataModel::DecodeContext::kRead);
     case Attributes::RateDistortionTradeOffPoints::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rateDistortionTradeOffPoints);
+        return DataModel::Decode(reader, rateDistortionTradeOffPoints, DataModel::DecodeContext::kRead);
     case Attributes::MaxContentBufferSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxContentBufferSize);
+        return DataModel::Decode(reader, maxContentBufferSize, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneCapabilities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneCapabilities);
+        return DataModel::Decode(reader, microphoneCapabilities, DataModel::DecodeContext::kRead);
     case Attributes::SpeakerCapabilities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speakerCapabilities);
+        return DataModel::Decode(reader, speakerCapabilities, DataModel::DecodeContext::kRead);
     case Attributes::TwoWayTalkSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, twoWayTalkSupport);
+        return DataModel::Decode(reader, twoWayTalkSupport, DataModel::DecodeContext::kRead);
     case Attributes::SnapshotCapabilities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, snapshotCapabilities);
+        return DataModel::Decode(reader, snapshotCapabilities, DataModel::DecodeContext::kRead);
     case Attributes::MaxNetworkBandwidth::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxNetworkBandwidth);
+        return DataModel::Decode(reader, maxNetworkBandwidth, DataModel::DecodeContext::kRead);
     case Attributes::CurrentFrameRate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentFrameRate);
+        return DataModel::Decode(reader, currentFrameRate, DataModel::DecodeContext::kRead);
     case Attributes::HDRModeEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, HDRModeEnabled);
+        return DataModel::Decode(reader, HDRModeEnabled, DataModel::DecodeContext::kRead);
     case Attributes::SupportedStreamUsages::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedStreamUsages);
+        return DataModel::Decode(reader, supportedStreamUsages, DataModel::DecodeContext::kRead);
     case Attributes::AllocatedVideoStreams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, allocatedVideoStreams);
+        return DataModel::Decode(reader, allocatedVideoStreams, DataModel::DecodeContext::kRead);
     case Attributes::AllocatedAudioStreams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, allocatedAudioStreams);
+        return DataModel::Decode(reader, allocatedAudioStreams, DataModel::DecodeContext::kRead);
     case Attributes::AllocatedSnapshotStreams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, allocatedSnapshotStreams);
+        return DataModel::Decode(reader, allocatedSnapshotStreams, DataModel::DecodeContext::kRead);
     case Attributes::StreamUsagePriorities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, streamUsagePriorities);
+        return DataModel::Decode(reader, streamUsagePriorities, DataModel::DecodeContext::kRead);
     case Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, softRecordingPrivacyModeEnabled);
+        return DataModel::Decode(reader, softRecordingPrivacyModeEnabled, DataModel::DecodeContext::kRead);
     case Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, softLivestreamPrivacyModeEnabled);
+        return DataModel::Decode(reader, softLivestreamPrivacyModeEnabled, DataModel::DecodeContext::kRead);
     case Attributes::HardPrivacyModeOn::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, hardPrivacyModeOn);
+        return DataModel::Decode(reader, hardPrivacyModeOn, DataModel::DecodeContext::kRead);
     case Attributes::NightVision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nightVision);
+        return DataModel::Decode(reader, nightVision, DataModel::DecodeContext::kRead);
     case Attributes::NightVisionIllum::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nightVisionIllum);
+        return DataModel::Decode(reader, nightVisionIllum, DataModel::DecodeContext::kRead);
     case Attributes::Viewport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, viewport);
+        return DataModel::Decode(reader, viewport, DataModel::DecodeContext::kRead);
     case Attributes::SpeakerMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speakerMuted);
+        return DataModel::Decode(reader, speakerMuted, DataModel::DecodeContext::kRead);
     case Attributes::SpeakerVolumeLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speakerVolumeLevel);
+        return DataModel::Decode(reader, speakerVolumeLevel, DataModel::DecodeContext::kRead);
     case Attributes::SpeakerMaxLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speakerMaxLevel);
+        return DataModel::Decode(reader, speakerMaxLevel, DataModel::DecodeContext::kRead);
     case Attributes::SpeakerMinLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speakerMinLevel);
+        return DataModel::Decode(reader, speakerMinLevel, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneMuted);
+        return DataModel::Decode(reader, microphoneMuted, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneVolumeLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneVolumeLevel);
+        return DataModel::Decode(reader, microphoneVolumeLevel, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneMaxLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneMaxLevel);
+        return DataModel::Decode(reader, microphoneMaxLevel, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneMinLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneMinLevel);
+        return DataModel::Decode(reader, microphoneMinLevel, DataModel::DecodeContext::kRead);
     case Attributes::MicrophoneAGCEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, microphoneAGCEnabled);
+        return DataModel::Decode(reader, microphoneAGCEnabled, DataModel::DecodeContext::kRead);
     case Attributes::ImageRotation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, imageRotation);
+        return DataModel::Decode(reader, imageRotation, DataModel::DecodeContext::kRead);
     case Attributes::ImageFlipHorizontal::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, imageFlipHorizontal);
+        return DataModel::Decode(reader, imageFlipHorizontal, DataModel::DecodeContext::kRead);
     case Attributes::ImageFlipVertical::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, imageFlipVertical);
+        return DataModel::Decode(reader, imageFlipVertical, DataModel::DecodeContext::kRead);
     case Attributes::LocalVideoRecordingEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localVideoRecordingEnabled);
+        return DataModel::Decode(reader, localVideoRecordingEnabled, DataModel::DecodeContext::kRead);
     case Attributes::LocalSnapshotRecordingEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localSnapshotRecordingEnabled);
+        return DataModel::Decode(reader, localSnapshotRecordingEnabled, DataModel::DecodeContext::kRead);
     case Attributes::StatusLightEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, statusLightEnabled);
+        return DataModel::Decode(reader, statusLightEnabled, DataModel::DecodeContext::kRead);
     case Attributes::StatusLightBrightness::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, statusLightBrightness);
+        return DataModel::Decode(reader, statusLightBrightness, DataModel::DecodeContext::kRead);
     case Attributes::ImageRotationDiscreteAngles::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, imageRotationDiscreteAngles);
+        return DataModel::Decode(reader, imageRotationDiscreteAngles, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

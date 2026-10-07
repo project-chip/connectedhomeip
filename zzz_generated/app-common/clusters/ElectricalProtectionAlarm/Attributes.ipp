@@ -33,35 +33,35 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Mask::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mask);
+        return DataModel::Decode(reader, mask, DataModel::DecodeContext::kRead);
     case Attributes::State::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, state);
+        return DataModel::Decode(reader, state, DataModel::DecodeContext::kRead);
     case Attributes::Supported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supported);
+        return DataModel::Decode(reader, supported, DataModel::DecodeContext::kRead);
     case Attributes::ArcCause::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, arcCause);
+        return DataModel::Decode(reader, arcCause, DataModel::DecodeContext::kRead);
     case Attributes::OverLoadRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overLoadRating);
+        return DataModel::Decode(reader, overLoadRating, DataModel::DecodeContext::kRead);
     case Attributes::OverVoltageRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overVoltageRating);
+        return DataModel::Decode(reader, overVoltageRating, DataModel::DecodeContext::kRead);
     case Attributes::SurgeProtectionRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, surgeProtectionRating);
+        return DataModel::Decode(reader, surgeProtectionRating, DataModel::DecodeContext::kRead);
     case Attributes::ShortCircuitRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, shortCircuitRating);
+        return DataModel::Decode(reader, shortCircuitRating, DataModel::DecodeContext::kRead);
     case Attributes::ResidualCurrentRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, residualCurrentRating);
+        return DataModel::Decode(reader, residualCurrentRating, DataModel::DecodeContext::kRead);
     case Attributes::ArcFaultRating::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, arcFaultRating);
+        return DataModel::Decode(reader, arcFaultRating, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

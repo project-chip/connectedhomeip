@@ -20,6 +20,7 @@
 
 #include <clusters/GeneralDiagnostics/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -43,33 +44,56 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldCurrentSubscriptions,
+        kFieldCurrentSubscriptionsForFabric,
+        kFieldTotalSubscriptionsEstablished,
+        kFieldTotalInteractionModelMessagesSent,
+        kFieldTotalInteractionModelMessagesReceived,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kCurrentSubscriptions))
         {
-            err = DataModel::Decode(reader, currentSubscriptions);
+            err = DataModel::Decode(reader, currentSubscriptions, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCurrentSubscriptions));
         }
         else if (__context_tag == to_underlying(Fields::kCurrentSubscriptionsForFabric))
         {
-            err = DataModel::Decode(reader, currentSubscriptionsForFabric);
+            err = DataModel::Decode(reader, currentSubscriptionsForFabric, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCurrentSubscriptionsForFabric));
         }
         else if (__context_tag == to_underlying(Fields::kTotalSubscriptionsEstablished))
         {
-            err = DataModel::Decode(reader, totalSubscriptionsEstablished);
+            err = DataModel::Decode(reader, totalSubscriptionsEstablished, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTotalSubscriptionsEstablished));
         }
         else if (__context_tag == to_underlying(Fields::kTotalInteractionModelMessagesSent))
         {
-            err = DataModel::Decode(reader, totalInteractionModelMessagesSent);
+            err = DataModel::Decode(reader, totalInteractionModelMessagesSent, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTotalInteractionModelMessagesSent));
         }
         else if (__context_tag == to_underlying(Fields::kTotalInteractionModelMessagesReceived))
         {
-            err = DataModel::Decode(reader, totalInteractionModelMessagesReceived);
+            err = DataModel::Decode(reader, totalInteractionModelMessagesReceived, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTotalInteractionModelMessagesReceived));
         }
 
         ReturnErrorOnFailure(err);
@@ -95,45 +119,74 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldName,
+        kFieldIsOperational,
+        kFieldOffPremiseServicesReachableIPv4,
+        kFieldOffPremiseServicesReachableIPv6,
+        kFieldHardwareAddress,
+        kFieldIPv4Addresses,
+        kFieldIPv6Addresses,
+        kFieldType,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kName))
         {
-            err = DataModel::Decode(reader, name);
+            err = DataModel::Decode(reader, name, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldName));
         }
         else if (__context_tag == to_underlying(Fields::kIsOperational))
         {
-            err = DataModel::Decode(reader, isOperational);
+            err = DataModel::Decode(reader, isOperational, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldIsOperational));
         }
         else if (__context_tag == to_underlying(Fields::kOffPremiseServicesReachableIPv4))
         {
-            err = DataModel::Decode(reader, offPremiseServicesReachableIPv4);
+            err = DataModel::Decode(reader, offPremiseServicesReachableIPv4, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldOffPremiseServicesReachableIPv4));
         }
         else if (__context_tag == to_underlying(Fields::kOffPremiseServicesReachableIPv6))
         {
-            err = DataModel::Decode(reader, offPremiseServicesReachableIPv6);
+            err = DataModel::Decode(reader, offPremiseServicesReachableIPv6, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldOffPremiseServicesReachableIPv6));
         }
         else if (__context_tag == to_underlying(Fields::kHardwareAddress))
         {
-            err = DataModel::Decode(reader, hardwareAddress);
+            err = DataModel::Decode(reader, hardwareAddress, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHardwareAddress));
         }
         else if (__context_tag == to_underlying(Fields::kIPv4Addresses))
         {
-            err = DataModel::Decode(reader, IPv4Addresses);
+            err = DataModel::Decode(reader, IPv4Addresses, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldIPv4Addresses));
         }
         else if (__context_tag == to_underlying(Fields::kIPv6Addresses))
         {
-            err = DataModel::Decode(reader, IPv6Addresses);
+            err = DataModel::Decode(reader, IPv6Addresses, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldIPv6Addresses));
         }
         else if (__context_tag == to_underlying(Fields::kType))
         {
-            err = DataModel::Decode(reader, type);
+            err = DataModel::Decode(reader, type, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldType));
         }
 
         ReturnErrorOnFailure(err);

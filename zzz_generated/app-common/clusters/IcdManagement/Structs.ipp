@@ -20,6 +20,7 @@
 
 #include <clusters/IcdManagement/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -68,29 +69,67 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldCheckInNodeID,
+        kFieldMonitoredSubject,
+        kFieldClientType,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
+    bool __saw_sensitive_field = false;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            const bool hasFabricIndex = __required_fields.IsPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            // A read may redact the entire set of fabric-sensitive fields. Writes must include them.
+            if (aContext != DataModel::DecodeContext::kWrite && hasFabricIndex && !__saw_sensitive_field)
+            {
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCheckInNodeID));
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMonitoredSubject));
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldClientType));
+            }
+            // FabricIndex is supplied by the interaction for writes and is encoded for reads.
+            if (aContext != DataModel::DecodeContext::kRead)
+            {
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            }
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
-            err = DataModel::Decode(reader, checkInNodeID);
+            err = DataModel::Decode(reader, checkInNodeID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCheckInNodeID));
+            __saw_sensitive_field = true;
         }
         else if (__context_tag == to_underlying(Fields::kMonitoredSubject))
         {
-            err = DataModel::Decode(reader, monitoredSubject);
+            err = DataModel::Decode(reader, monitoredSubject, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMonitoredSubject));
+            __saw_sensitive_field = true;
         }
         else if (__context_tag == to_underlying(Fields::kClientType))
         {
-            err = DataModel::Decode(reader, clientType);
+            err = DataModel::Decode(reader, clientType, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldClientType));
+            __saw_sensitive_field = true;
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
 
         ReturnErrorOnFailure(err);
