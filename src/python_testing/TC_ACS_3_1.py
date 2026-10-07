@@ -511,7 +511,7 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=cluster.Attributes.AmbientContextType, value=[])], timeout_sec=10)
         ambientContextType = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
         asserts.assert_greater_equal(len(ambientContextType), 0, "AmbientContextType should be empty.")
         log.info("Received AmbientContextType empty.")
 
