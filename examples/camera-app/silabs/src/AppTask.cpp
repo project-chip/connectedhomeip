@@ -32,13 +32,21 @@
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DefaultTimerDelegate.h>
-#include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
 #include <device/types/root-node/RootNode.h>
 #include <device/types/root-node/RootNodeWith.h>
-#include <device/types/root-node/features/WifiFeature.h>
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <device/types/root-node/features/ThreadFeature.h>                // nogncheck
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h> // nogncheck
+#elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <device/types/root-node/features/WifiFeature.h>    // nogncheck
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h> // nogncheck
+#else
+#error "The Silabs camera-app requires either Thread or Wi-Fi"
+#endif
 
 #if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include <app/clusters/ota-requestor/CodegenIntegration.h>  // nogncheck
@@ -48,10 +56,6 @@
 // gRequestorCore is defined in examples/platform/silabs/OTAConfig.cpp and drives the
 // OTA state machine that the OTARequestorCluster (composed by OtaFeature) forwards to.
 extern chip::DefaultOTARequestor gRequestorCore;
-#endif
-
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI)
-#error "The Silabs camera-app only supports Wi-Fi (SiWx917 SoC)"
 #endif
 
 #define APP_FUNCTION_BUTTON 0
@@ -66,6 +70,13 @@ DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<RootNode> sRootNode;
 LoggingCamera sCamera;
+
+#if CHIP_ENABLE_OPENTHREAD
+DeviceLayer::NetworkCommissioning::GenericThreadDriver sThreadDriver;
+using NetworkFeature = ThreadFeature;
+#else
+using NetworkFeature = WifiFeature;
+#endif
 
 constexpr EndpointId kCameraEndpointId = 1;
 } // namespace
@@ -168,16 +179,20 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .minGuaranteedSubscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 
-    WifiFeature::Context wifiContext{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() };
+#if CHIP_ENABLE_OPENTHREAD
+    NetworkFeature::Context networkContext{ .threadDriver = sThreadDriver };
+#else
+    NetworkFeature::Context networkContext{ .wifiDriver = *DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() };
+#endif
 
 #if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
     OtaFeature::Context otaContext{
         .otaCommands = gRequestorCore,
         .attributes  = chip::GetOTARequestorAttributes(),
     };
-    sRootNode = std::make_unique<RootNodeWith<WifiFeature, OtaFeature>>(rootNodeContext, wifiContext, otaContext);
+    sRootNode = std::make_unique<RootNodeWith<NetworkFeature, OtaFeature>>(rootNodeContext, networkContext, otaContext);
 #else
-    sRootNode = std::make_unique<RootNodeWith<WifiFeature>>(rootNodeContext, wifiContext);
+    sRootNode = std::make_unique<RootNodeWith<NetworkFeature>>(rootNodeContext, networkContext);
 #endif // SILABS_OTA_ENABLED
     VerifyOrReturnError(sRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 

@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Project configuration for the Silabs camera-app (SiWx917 SoC).
+ *          Project configuration for the Silabs camera-app (EFR32 Thread and SiWx917 SoC).
  */
 
 #pragma once

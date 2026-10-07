@@ -20,11 +20,9 @@ buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 # CHIP uses angle bracket includes.
 check_system_includes = true
 
-# SiWx917 SoC is the only supported target, so the default dotfile matches build_for_wifi_gnfile.gn.
+# Default build targets EFR32 Thread boards; SiWx917 uses build_for_wifi_gnfile.gn.
 default_args = {
   target_cpu = "arm"
   target_os = "freertos"
-  chip_enable_wifi = true
-  chip_device_platform = "SiWx917"
-  import("//build_for_wifi_args.gni")
+  import("//args.gni")
 }

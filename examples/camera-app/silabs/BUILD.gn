@@ -24,16 +24,21 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 assert(current_os == "freertos")
-assert(wifi_soc,
-       "examples/camera-app/silabs only supports the SiWx917 Wi-Fi SoC.")
+assert(wifi_soc || !chip_enable_wifi,
+       "examples/camera-app/silabs supports EFR32 Thread boards and the SiWx917 Wi-Fi SoC, not Wi-Fi NCP.")
 assert(!chip_enable_icd_server,
        "ICD is not supported by examples/camera-app/silabs.")
 
 silabs_project_dir = "${chip_root}/examples/camera-app/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
-examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+}
 
 import("${examples_common_plat_dir}/args.gni")
 
@@ -58,22 +63,33 @@ if (slc_generate) {
                     "list lines"))
 }
 
-siwx917_sdk("sdk") {
-  sources = [
-    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
-    "${silabs_project_dir}/include/CHIPProjectConfig.h",
-  ]
+_sdk_sources = [
+  "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
+  "${silabs_project_dir}/include/CHIPProjectConfig.h",
+]
 
-  include_dirs = [
-    "${chip_root}/src/platform/silabs/SiWx",
-    "${silabs_project_dir}/include",
-    "${examples_plat_dir}",
-    "${chip_root}/src/lib",
-    "${examples_common_plat_dir}",
-    "${examples_common_plat_dir}/freertos_config",
-  ]
+_sdk_include_dirs = [
+  "${silabs_project_dir}/include",
+  "${examples_plat_dir}",
+  "${chip_root}/src/lib",
+  "${examples_common_plat_dir}",
+  "${examples_common_plat_dir}/freertos_config",
+]
 
-  defines = []
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = _sdk_sources
+    include_dirs =
+        [ "${chip_root}/src/platform/silabs/SiWx" ] + _sdk_include_dirs
+    defines = []
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = _sdk_sources
+    include_dirs =
+        [ "${chip_root}/src/platform/silabs/efr32" ] + _sdk_include_dirs
+    defines = []
+  }
 }
 
 source_set("logging-camera") {
@@ -115,12 +131,22 @@ silabs_executable("camera_app") {
   deps = [
     ":logging-camera",
     ":sdk",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/zzz_generated/app-common/devices",
-    "${examples_plat_dir}:siwx917-common",
   ]
+
+  if (wifi_soc) {
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
+      "${examples_plat_dir}:siwx917-common",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread",
+      "${examples_plat_dir}:efr32-common",
+    ]
+  }
 
   # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
   # Its code-driven singletons replace src/app/clusters/ota-requestor/CodegenIntegration.cpp.
@@ -146,11 +172,14 @@ silabs_executable("camera_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [
-    "-T" + rebase_path(ldscript, root_build_dir),
-    "-Wl,--defsym",
-    "-Wl,SILABS_WIFI=1",
-  ]
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
 
   if (chip_print_memory_usage) {
     ldflags += [

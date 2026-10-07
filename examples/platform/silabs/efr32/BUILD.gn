@@ -113,6 +113,7 @@ config("efr32-common-config") {
       "-Wl,--allow-multiple-definition",  # to allow our overrides from memory
                                           # manager
       "-lc_nano",  # for C stdlib functions (e.g.snprintf)
+      "-lm",  # libm (e.g. floorf); GCC's g++ driver adds it implicitly
       "-lstdc++_nano",  # for C++ stdlib functions (e.g. sprintf)
       "-lgcc",  # ARM EABI runtime functions (soft-float, 64-bit ops, etc.)
     ]
