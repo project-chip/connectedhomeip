@@ -23,6 +23,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <app/server/Dnssd.h>
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif
@@ -66,18 +67,15 @@ public:
         SessionManager & sessionManager;
         Messaging::ExchangeManager & exchangeManager;
         app::FailSafeContext & failSafeContext;
+        app::DnssdServer & dnssdServer = app::DnssdServer::Instance();
 #if CONFIG_NETWORK_LAYER_BLE
-        Ble::BleLayer * bleLayer = nullptr;
+        Ble::BleLayer & bleLayer;
 #endif
     };
 
     CommissioningWindowManager() : mPASESession(*this) {}
 
-    CHIP_ERROR Init(const Context & context)
-    {
-        mContext.emplace(context);
-        return CHIP_NO_ERROR;
-    }
+    void Init(const Context & context) { mContext.emplace(context); }
 
     System::Clock::Seconds32 MaxCommissioningTimeout() const;
 

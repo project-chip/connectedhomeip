@@ -25,8 +25,10 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
+#include <transport/SessionManager.h>
 #include <vector>
 
 namespace {
@@ -49,6 +51,13 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 
     GeneralCommissioningCluster::Context CreateStandardContext()
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return
         {
             .commissioningWindowManager = mCommissioningWindowManager,                          //
@@ -66,6 +75,11 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     CommissioningWindowManager mCommissioningWindowManager;
     FabricTable mFabricTable;
     app::FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)

@@ -81,10 +81,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         // If in NonConcurrentConnection, this will already have been completed
-        if (context.bleLayer != nullptr)
-        {
-            context.bleLayer->CloseAllBleConnections();
-        }
+        context.bleLayer.CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
@@ -102,7 +99,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        CHIP_ERROR err = context.dnssdServer.AdvertiseOperational();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -116,10 +113,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
     {
         ChipLogProgress(AppServer, "Received kCloseAllBleConnections:%d", static_cast<int>(event->Type));
-        if (context.bleLayer != nullptr)
-        {
-            context.bleLayer->Shutdown();
-        }
+        context.bleLayer.Shutdown();
     }
 #endif
 }
@@ -175,9 +169,9 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %" CHIP_ERROR_FORMAT, mFailedCommissioningAttempts, err.Format());
 #if CONFIG_NETWORK_LAYER_BLE
-    if (mContext.has_value() && mContext->bleLayer != nullptr)
+    if (mContext.has_value())
     {
-        mContext->bleLayer->CloseAllBleConnections();
+        mContext->bleLayer.CloseAllBleConnections();
     }
 #endif
 
@@ -452,12 +446,12 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     if (IsCommissioningWindowOpen())
     {
 #if CONFIG_NETWORK_LAYER_BLE
-        if (mListeningForPASE && mContext.has_value() && mContext->bleLayer != nullptr)
+        if (mListeningForPASE && mContext.has_value())
         {
             // We never established PASE, so never armed a fail-safe and hence
             // can't rely on it expiring to close our BLE connection.  Do that
             // manually here.
-            mContext->bleLayer->CloseAllBleConnections();
+            mContext->bleLayer.CloseAllBleConnections();
         }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
@@ -571,7 +565,10 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 
     // reset all advertising, switching to our new commissioning mode.
-    app::DnssdServer::Instance().StartServer();
+    if (mContext.has_value())
+    {
+        mContext->dnssdServer.StartServer();
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -583,8 +580,9 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
 
     TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
-    LogErrorOnFailure(
-        context.exchangeManager.UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest));
+    // Handler may already be unregistered (e.g. after OnUnsolicitedMessageReceived or when called from Cleanup/Shutdown).
+    RETURN_SAFELY_IGNORED context.exchangeManager.UnregisterUnsolicitedMessageHandlerForType(
+        Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
     mPairingSession.Clear();
 
@@ -594,7 +592,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // AdvertiseAndListenForPASE) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer();
+        context.dnssdServer.StartServer();
     }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -631,12 +629,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
 
 CHIP_ERROR CommissioningWindowManager::SetTemporaryDiscriminator(uint16_t discriminator)
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(MakeOptional(discriminator));
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(MakeOptional(discriminator));
 }
 
 CHIP_ERROR CommissioningWindowManager::RestoreDiscriminator()
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(NullOptional);
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(NullOptional);
 }
 
 void CommissioningWindowManager::HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)

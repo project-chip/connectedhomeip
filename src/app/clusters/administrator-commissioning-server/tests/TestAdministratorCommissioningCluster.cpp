@@ -46,6 +46,13 @@ struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
     AdministratorCommissioningLogic::Context CreateContext()
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = GetSecureSessionManager(), .exchangeManager = GetExchangeManager(),
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return AdministratorCommissioningLogic::Context{
             .commissioningWindowManager = mCommissioningWindowManager,
             .fabricTable                = mFabricTable,
@@ -56,6 +63,9 @@ struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
     CommissioningWindowManager mCommissioningWindowManager;
     FabricTable mFabricTable;
     FailSafeContext mFailSafeContext;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)

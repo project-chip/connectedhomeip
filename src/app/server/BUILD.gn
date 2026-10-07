@@ -70,20 +70,73 @@ static_library("thread_rendezvous_announcement") {
   ]
 }
 
+source_set("dnssd") {
+  sources = [
+    "CommissioningModeProvider.h",
+    "Dnssd.cpp",
+    "Dnssd.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/dnssd:naming",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/system",
+    "${chip_root}/src/transport",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
+
+  if (chip_device_config_enable_thread_meshcop) {
+    deps = [ ":thread_rendezvous_announcement" ]
+  }
+}
+
+source_set("commissioning_window_manager") {
+  sources = [
+    "AppDelegate.h",
+    "CommissioningWindowManager.cpp",
+    "CommissioningWindowManager.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":dnssd",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/system",
+    "${chip_root}/src/transport",
+    "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning:ids",
+  ]
+}
+
 static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
     "AclStorage.cpp",
     "AclStorage.h",
-    "AppDelegate.h",
-    "CommissioningModeProvider.h",
-    "CommissioningWindowManager.cpp",
-    "CommissioningWindowManager.h",
     "DefaultAclStorage.cpp",
     "DefaultAclStorage.h",
-    "Dnssd.cpp",
-    "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Server.cpp",
@@ -95,6 +148,8 @@ static_library("server") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":commissioning_window_manager",
+    ":dnssd",
     "${chip_root}/src/access",
     "${chip_root}/src/access:provider-impl",
     "${chip_root}/src/app",
@@ -111,10 +166,6 @@ static_library("server") {
     "${chip_root}/src/transport",
     "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning:ids",
   ]
-
-  if (chip_device_config_enable_thread_meshcop) {
-    deps = [ ":thread_rendezvous_announcement" ]
-  }
 
   if (chip_terms_and_conditions_required) {
     public_deps += [ ":terms_and_conditions" ]

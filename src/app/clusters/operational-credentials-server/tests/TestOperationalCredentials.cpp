@@ -27,6 +27,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <messaging/ExchangeMgr.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -219,6 +220,13 @@ struct TestOperationalCredentials : public ::testing::Test
 
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return {
             .fabricTable                = mFabricTable,
             .failSafeContext            = mFailSafeContext,
@@ -237,9 +245,13 @@ struct TestOperationalCredentials : public ::testing::Test
     FabricTable mFabricTable;
     FailSafeContext mFailSafeContext;
     SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
     CommissioningWindowManager mCommissioningWindowManager;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
     TestDACProvider mDacProvider;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
