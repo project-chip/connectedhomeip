@@ -163,6 +163,42 @@ if(CONFIG_CHIP)
     
     set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
+<<<<<<< HEAD
+=======
+    target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+    # libCHIP.a calls mbedtls_md_info_from_type(), which lives in libtfpsacrypto.a.
+    # Zephyr scans that archive before the Matter link group, so the reference is
+    # still undefined when the archive has already been passed. Rescan it afterwards.
+    # mbedtls is a Zephyr module that may be configured after this file, so defer
+    # until the application CMakeLists has finished and the target exists.
+    function(chip_link_tfpsacrypto)
+        if(TARGET chip AND TARGET tfpsacrypto)
+            target_link_libraries(chip INTERFACE
+                -Wl,--start-group $<TARGET_FILE:tfpsacrypto> -Wl,--end-group)
+        endif()
+    endfunction()
+    cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL chip_link_tfpsacrypto)
+
+    include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
+    chip_enable_gnu_std(chip)
+
+    # //src/data-model-providers/codedriven is a GN source_set and is not part of
+    # libCHIP.a, so the module compiles the code-driven provider itself.
+    if(CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+        zephyr_library_named(chip_codedriven_data_model)
+        target_sources(chip_codedriven_data_model PRIVATE
+            ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
+            ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
+        )
+        target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+    endif()
+
+>>>>>>> e369825 ([Zephyr] All device app wifi (#74530))
     if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         target_link_options(chip INTERFACE
             -Wl,--wrap=malloc

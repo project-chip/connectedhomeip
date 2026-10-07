@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+<<<<<<< HEAD:src/controller/python/matter/yaml/__init__.py
 #
 #    @file
 #      Provides Python APIs for Matter.
@@ -24,3 +25,25 @@
 from . import runner
 
 __all__ = ['runner']
+=======
+CONFIG_NVS_LOOKUP_CACHE=y
+CONFIG_NVS_LOOKUP_CACHE_SIZE=1024
+
+# Si917 Wi-Fi / Matter-over-Wi-Fi integration.  Keep these explicit instead of
+# relying solely on the generic defaults in Kconfig.defaults: CONFIG_WIFI makes
+# CHIP_WIFI available, and the latter two select the Matter Wi-Fi root feature
+# (Network Commissioning + Wi-Fi Network Diagnostics) and station driver.
+CONFIG_WIFI=y
+CONFIG_CHIP_WIFI=y
+CONFIG_CHIP_ENABLE_WIFI_STATION=y
+CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=-1
+
+CONFIG_GPIO=y
+
+CONFIG_NET_IF_UNICAST_IPV6_ADDR_COUNT=6
+CONFIG_NET_IF_MCAST_IPV6_ADDR_COUNT=14
+
+CONFIG_LOG_BUFFER_SIZE=8192
+
+CONFIG_MBEDTLS_ECP_NIST_OPTIM=y
+>>>>>>> e369825 ([Zephyr] All device app wifi (#74530)):examples/all-devices-app/zephyr/socs/siwg917m111mgtba.conf
