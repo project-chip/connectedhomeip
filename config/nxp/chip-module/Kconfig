@@ -50,7 +50,6 @@ config CHIP_APP_OPERATIONAL_KEYSTORE
 	help
 		Use custom implementation of operational keystore.
 
-
 if CHIP_APP_OPERATIONAL_KEYSTORE
 	choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
 		prompt "Select Operation Keystore Implementation"
