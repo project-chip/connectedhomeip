@@ -130,10 +130,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         ChipLogProgress(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
     }
 
-    /* If it looks ok, store the min & max charging current */
+    /* If it looks ok, persist the max charging current before the enable deadline, so that a power loss
+     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    ReturnValueAndLogOnFailure(
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), maximumChargeCurrent),
+        Status::Failure, AppServer, "Failed to persist charging command current limit");
     mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
     /* The setter only calls the persisting callback if the value changes, but a null value
      * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot */
@@ -182,17 +185,19 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
                         static_cast<long unsigned int>(dischargingEnabledUntil.Value()));
     }
 
+    /* Persist the max discharging current before the enable deadline, so that a power loss
+     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    ReturnValueAndLogOnFailure(
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), maximumDischargeCurrent),
+        Status::Failure, AppServer, "Failed to persist discharging command current limit");
+    mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
+
     /* The setter only calls the persisting callback if the value changes, but a null value
      * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot */
     LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil));
     LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(dischargingEnabledUntil));
-
-    /* If it looks ok, store the max discharging current */
-    mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
-        mMaximumDischargingCurrentLimitFromCommand));
     ComputeMaxDischargeCurrentLimit();
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DischargingEnabledEvent);
