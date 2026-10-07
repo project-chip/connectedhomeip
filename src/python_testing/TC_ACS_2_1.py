@@ -243,7 +243,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
             # write test attributes
             await self.write_single_attribute(attr.ObjectCountConfig.CountingObject.NamespaceID(OBJECT_IDENTIFICATION_NAMESPACE_ID))
-            OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3 # person
+            OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
             await self.write_single_attribute(attr.ObjectCountConfig.CountingObject.Tag(OBJECT_IDENTIFICATION_NAMESPACE_TAG))
             OBJECT_COUNT_THRESHOLD = 2
             await self.write_single_attribute(attr.ObjectCountConfig.ObjectCountThreshold(OBJECT_COUNT_THRESHOLD))
@@ -269,13 +269,13 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             attribute_list = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
             if attr.ObjectCount.attribute_id in attribute_list:
-                
+
                 self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
                 objectCount = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
                 asserts.assert_true(isinstance(objectCount, int), "ObjectCount value should be uint16 data.")
                 asserts.assert_greater_equal(objectCount, 1,
-                                          "ObjectCount value should be greater than equal to 1.")
+                                             "ObjectCount value should be greater than equal to 1.")
             else:
                 self.skip_step("9")
 
