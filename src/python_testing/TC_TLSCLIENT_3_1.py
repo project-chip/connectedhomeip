@@ -35,9 +35,9 @@
 
 import random
 
-import test_plan_support
 from mobly import asserts
-from TC_TLSCLIENT_Base import TC_TLSCLIENT_Base
+from support_modules import test_plan_support
+from support_modules.tlsclient_testbase import TC_TLSCLIENT_Base
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

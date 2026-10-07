@@ -40,8 +40,8 @@
 import logging
 
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
+from support_modules.avsm_testbase import AVSMTestBase
+from support_modules.pavsti_utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 
 import matter.clusters as Clusters
 from matter.clusters import Globals

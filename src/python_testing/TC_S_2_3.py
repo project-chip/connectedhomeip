@@ -97,8 +97,9 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import is_groupcast_on_root_node
-from TC_S_common import build_extension_fields, is_writable, read_scenable_value, select_scenable_attribute, value_other_than
+from support_modules.gc_common import is_groupcast_on_root_node
+from support_modules.s_common import (build_extension_fields, is_writable, read_scenable_value, select_scenable_attribute,
+                                      value_other_than)
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

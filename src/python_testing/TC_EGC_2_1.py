@@ -40,7 +40,7 @@
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
-from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+from support_modules.egc_testbase import ElectricalGridConditionsTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue

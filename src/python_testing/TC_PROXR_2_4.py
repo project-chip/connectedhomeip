@@ -43,8 +43,9 @@ import logging
 import time
 
 from mobly import asserts
-from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES, BLTCSModeEnum,
-                              BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
+from support_modules.proxr_testbase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES,
+                                            BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase,
+                                            RangingRoleEnum, RangingTechEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
