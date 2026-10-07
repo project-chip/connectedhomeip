@@ -187,6 +187,19 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryResumesCharging)
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
 }
 
+TEST_F(TestEnergyEvseDelegate, FaultRecoveryDoesNotResumeChargingAfterDeadlineExpiredDuringFault)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+
+    // The deadline passes while the fault is active (no check is scheduled during a fault)
+    ASSERT_EQ(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+}
+
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryDoesNotStartDischargeThatWasNeverRequested)
 {
     ASSERT_EQ(mDelegate.HwSetState(StateEnum::kPluggedInDemand), Status::Success);

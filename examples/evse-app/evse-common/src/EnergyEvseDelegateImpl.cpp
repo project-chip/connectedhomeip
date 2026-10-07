@@ -385,6 +385,19 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     return Status::Success;
 }
 
+/* An enable with a deadline must not outlive its deadline, so if the check cannot be scheduled fail safe by disabling */
+Status EnergyEvseDelegate::ScheduleDeadlineCheckOrDisable()
+{
+    if (ScheduleCheckOnEnabledTimeout() == Status::Success)
+    {
+        return Status::Success;
+    }
+
+    ChipLogError(AppServer, "EVSE: unable to schedule enable deadline check, disabling");
+    Disable();
+    return Status::Failure;
+}
+
 void EnergyEvseDelegate::CancelActiveTimers()
 {
     // Cancel the EVSE check timer if it is active
@@ -395,7 +408,11 @@ void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void 
 {
     EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
 
-    dg->ScheduleCheckOnEnabledTimeout();
+    if (dg->ScheduleCheckOnEnabledTimeout() != Status::Success)
+    {
+        ChipLogError(AppServer, "EVSE: unable to reschedule enable deadline check, disabling");
+        dg->Disable();
+    }
 }
 
 /**
@@ -1197,9 +1214,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         break;
     }
 
-    ScheduleCheckOnEnabledTimeout();
-
-    return Status::Success;
+    return ScheduleDeadlineCheckOrDisable();
 }
 Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
 {
@@ -1254,9 +1269,7 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
         break;
     }
 
-    ScheduleCheckOnEnabledTimeout();
-
-    return Status::Success;
+    return ScheduleDeadlineCheckOrDisable();
 }
 Status EnergyEvseDelegate::HandleDisabledEvent()
 {
@@ -1370,17 +1383,22 @@ Status EnergyEvseDelegate::HandleFaultCleared()
         return Status::Failure;
     }
 
-    if (mHwState == StateEnum::kPluggedInDemand && stateToRestore == StateEnum::kPluggedInCharging &&
-        stateBeforeFault != StateEnum::kPluggedInCharging && stateBeforeFault != StateEnum::kPluggedInDischarging)
-    {
-        SendEnergyTransferStartedEvent();
-    }
-
     /* Put back the sentinel to catch new faults if more are raised. */
     mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
     mStateBeforeFault       = StateEnum::kUnknownEnumValue;
 
-    return Status::Success;
+    /* A deadline may have passed while the fault was active (the check is not scheduled during a fault).
+     * Process any expiry before reporting a transfer start, and schedule the check for any remaining deadline. */
+    const Status scheduleStatus = ScheduleDeadlineCheckOrDisable();
+
+    if (mHwState == StateEnum::kPluggedInDemand && stateToRestore == StateEnum::kPluggedInCharging &&
+        GetState() == StateEnum::kPluggedInCharging && stateBeforeFault != StateEnum::kPluggedInCharging &&
+        stateBeforeFault != StateEnum::kPluggedInDischarging)
+    {
+        SendEnergyTransferStartedEvent();
+    }
+
+    return scheduleStatus;
 }
 
 /**

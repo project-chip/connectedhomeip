@@ -199,6 +199,7 @@ public:
      * on ChargingEnabledUntil / DischargingEnabledUntil expiring.
      */
     Status ScheduleCheckOnEnabledTimeout();
+    Status ScheduleDeadlineCheckOrDisable();
     void CancelActiveTimers();
 
     /**

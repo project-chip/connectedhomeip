@@ -254,6 +254,8 @@ void EnergyEvseManager::Shutdown()
     EnergyEvseDelegate * dg = GetDelegate();
     if (dg)
     {
+        // A pending enable deadline timer would otherwise fire with no instance linked
+        dg->CancelActiveTimers();
         dg->SetInstance(nullptr);
         EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
         if (targetsStore)
