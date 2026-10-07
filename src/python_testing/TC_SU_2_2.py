@@ -1056,7 +1056,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
 
         total_time_to_kidle = int(kidle_report_time - provider_termination_time)
-        logger.info("%s Total time taken to reach UpdateState kIdle: %s seconds", step_number_s4 ,total_time_to_kidle)
+        logger.info("%s Total time taken to reach UpdateState kIdle: %s seconds", step_number_s4, total_time_to_kidle)
         asserts.assert_greater_equal(total_time_to_kidle, 300, "Time to UpdateState kIdle was less than 5 minutes.")
         subscription_attr_state_busy_180s.cancel()
 
@@ -1411,7 +1411,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_is_not_none(
             failure_report, f"{step_number_s6}: no StateTransition event with newState kIdle and reason kFailure was found")
         # Review the Event data
-        logger.info("%s State transition after killing the provider: %s",step_number_s6 ,failure_report)
+        logger.info("%s State transition after killing the provider: %s", step_number_s6, failure_report)
         self.verify_state_transition_event(failure_report,
                                            expected_previous_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
@@ -1431,7 +1431,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.step(7)
         if await self.attribute_guard(self.get_endpoint(), Clusters.BasicInformation.Attributes.LocalConfigDisabled()):
             await self.write_single_attribute(Clusters.BasicInformation.Attributes.LocalConfigDisabled(False), self.get_endpoint(), expect_success=True)
-            logger.info("%s Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False",step_number_s7)
+            logger.info("%s Basic Information Cluster -> LocalConfigDisabled attribute found and updated to False", step_number_s7)
         # [End of Step #4 TC_SU_2_7]
 
         # [Start of Step #5 TC_SU_2_7]
@@ -1774,16 +1774,16 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
         logger.info("StateTransition events gathered: %s", events_response)
         if len(events_response) == 0:
-            asserts.fail("%s Failed to read StateTransition events",step_number_s9)
+            asserts.fail("%s Failed to read StateTransition events", step_number_s9)
         delayed_on_apply_events = []
         # Collect the StateTransition events reporting kDelayedOnApply
         for event in events_response:
             if event.Header.EventId == state_transition_event_s9.event_id and event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply:
-                logger.info("%s StateTransition Event with kDelayedOnApply Found",step_number_s9)
+                logger.info("%s StateTransition Event with kDelayedOnApply Found", step_number_s9)
                 delayed_on_apply_events.append(event.Data)
 
         if len(delayed_on_apply_events) == 0:
-            asserts.fail("%s Unable to retrieve a StateTransitionEvent report with value kDelayedOnApply",step_number_s9)
+            asserts.fail("%s Unable to retrieve a StateTransitionEvent report with value kDelayedOnApply", step_number_s9)
 
         # Retrieve the last report
         delayed_apply_event_report = delayed_on_apply_events[-1]
