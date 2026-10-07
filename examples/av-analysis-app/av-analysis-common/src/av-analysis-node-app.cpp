@@ -68,7 +68,7 @@ CHIP_ERROR AvAnalysisNodeApp::Init(WebRTCPeerController * aPeerController)
         Shutdown();
         return err;
     }
-    mRequestorDelegate.Init(mPeerController, &mWebRTCClient);
+    mRequestorDelegate.Init(mPeerController, &mWebRTCClient, &mAvAnalysisDelegate);
 
     // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
     mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),

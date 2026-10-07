@@ -142,5 +142,35 @@ CHIP_ERROR AvAnalysisNodeDelegate::TriggerSessionEnd(Optional<uint16_t> aSession
     return CHIP_NO_ERROR;
 }
 
+void AvAnalysisNodeDelegate::OnStreamReleased(const ScopedNodeId & aCameraNode)
+{
+    VerifyOrReturn(mPeerController != nullptr);
+
+    // Another stream from the same camera keeps its sessions alive
+    for (const auto & stream : mPeerController->ConnectedStreams())
+    {
+        VerifyOrReturn(stream.cameraNode != aCameraNode);
+    }
+
+    std::vector<uint16_t> sessionsWithoutSource;
+    for (const auto & entry : mSessions)
+    {
+        if (entry.second.sourceNodeId == aCameraNode.GetNodeId())
+        {
+            sessionsWithoutSource.push_back(entry.first);
+        }
+    }
+    for (uint16_t sessionId : sessionsWithoutSource)
+    {
+        ChipLogProgress(AppServer, "AvAnalysisNode: stream from node " ChipLogFormatX64 " is gone, ending analysis session %u",
+                        ChipLogValueX64(aCameraNode.GetNodeId()), sessionId);
+        CHIP_ERROR err = TriggerSessionEnd(MakeOptional(sessionId));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "AvAnalysisNode: analysis session %u not ended: %" CHIP_ERROR_FORMAT, sessionId, err.Format());
+        }
+    }
+}
+
 } // namespace app
 } // namespace chip

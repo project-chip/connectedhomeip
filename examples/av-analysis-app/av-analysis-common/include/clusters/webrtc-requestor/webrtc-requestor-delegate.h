@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "clusters/av-analysis/av-analysis-delegate.h"
 #include "webrtc-peer-controller.h"
 
 #include <app/clusters/av-analysis-server/DefaultAvAnalysisWebRTCClient.h>
@@ -35,10 +36,12 @@ class WebRTCRequestorDelegate : public Clusters::WebRTCTransportRequestor::Deleg
                                 public WebRTCPeerController::PeerConnectionObserver
 {
 public:
-    void Init(WebRTCPeerController * aPeerController, Clusters::DefaultAvAnalysisWebRTCClient * aWebRTCClient)
+    void Init(WebRTCPeerController * aPeerController, Clusters::DefaultAvAnalysisWebRTCClient * aWebRTCClient,
+              AvAnalysisNodeDelegate * aAnalysisDelegate)
     {
-        mPeerController = aPeerController;
-        mWebRTCClient   = aWebRTCClient;
+        mPeerController   = aPeerController;
+        mWebRTCClient     = aWebRTCClient;
+        mAnalysisDelegate = aAnalysisDelegate;
         if (mPeerController != nullptr)
         {
             mPeerController->SetPeerConnectionObserver(this);
@@ -73,6 +76,7 @@ private:
 
     WebRTCPeerController * mPeerController                  = nullptr;
     Clusters::DefaultAvAnalysisWebRTCClient * mWebRTCClient = nullptr;
+    AvAnalysisNodeDelegate * mAnalysisDelegate              = nullptr;
 };
 
 } // namespace app

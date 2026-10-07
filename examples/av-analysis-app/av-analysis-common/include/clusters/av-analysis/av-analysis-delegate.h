@@ -72,13 +72,19 @@ public:
      */
     CHIP_ERROR TriggerSessionEnd(Optional<uint16_t> aSessionId);
 
+    /**
+     * A stream from the camera was released: once none of its streams is connected, the sessions
+     * sourced from it are ended, each with its AnalysisSessionEnd event.
+     */
+    void OnStreamReleased(const ScopedNodeId & aCameraNode);
+
     bool HasActiveSession() const { return !mSessions.empty(); }
     uint16_t GetLatestSessionId() const { return mLatestSessionId; }
 
 private:
     struct Session
     {
-        NodeId sourceNodeId = kUndefinedNodeId;
+        NodeId sourceNodeId     = kUndefinedNodeId;
         bool hasTrackedContexts = false;
     };
 
