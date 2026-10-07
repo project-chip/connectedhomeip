@@ -284,6 +284,8 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
                 ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
             }
         }
+
+        NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
     }
 
     return CHIP_NO_ERROR;
@@ -291,6 +293,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, ClusterShutdownType shutdownType)
 {
+    VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mEndpointInterfaceRegistry.Get(endpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (mServerClusterContext.has_value())
     {
         // If the provider has been started, we need to check if any clusters on this endpoint
@@ -320,7 +325,14 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
-    return mEndpointInterfaceRegistry.Unregister(endpointId);
+    ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
+
+    if (mServerClusterContext.has_value())
+    {
+        NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & entry)

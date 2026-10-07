@@ -46,8 +46,22 @@ using namespace chip::Testing;
 class TestProviderChangeListener : public DataModel::AttributeChangeListener
 {
 public:
+    struct EndpointChange
+    {
+        EndpointId endpointId;
+        EndpointChangeType type;
+
+        bool operator==(const EndpointChange & other) const { return endpointId == other.endpointId && type == other.type; }
+    };
+
     void OnAttributeChanged(const ConcreteAttributePath & path, AttributeChangeType type) override { mDirtyList.push_back(path); }
+    void OnEndpointChanged(EndpointId endpointId, EndpointChangeType type) override
+    {
+        mEndpointChanges.push_back({ endpointId, type });
+    }
+
     std::vector<ConcreteAttributePath> mDirtyList;
+    std::vector<EndpointChange> mEndpointChanges;
 };
 
 class TestActionContext : public DataModel::ActionContext
@@ -1094,4 +1108,103 @@ TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredE
     EXPECT_EQ(clusterWithoutRegisteredEndpoint.startupCallCount, 0);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedOnAddAndRemove)
+{
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+
+    mEndpointStorage.push_back(std::move(endpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(mChangeListener.mEndpointChanges[0],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
+
+    mEndpointStorage.push_back(std::move(endpoint2));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 2u);
+    EXPECT_EQ(mChangeListener.mEndpointChanges[1],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kAdded }));
+
+    ASSERT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 3u);
+    EXPECT_EQ(mChangeListener.mEndpointChanges[2],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, NoEndpointChangedNotificationBeforeStartup)
+{
+    CodeDrivenDataModelProvider localProvider(mServerClusterTestContext.StorageDelegate(),
+                                              mServerClusterTestContext.AttributePersistenceProvider());
+    TestProviderChangeListener localListener;
+    localProvider.RegisterAttributeChangeListener(localListener);
+
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+
+    mEndpointStorage.push_back(std::move(endpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+
+    ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
+    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+
+    mEndpointStorage.push_back(std::move(endpoint2));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry2));
+    ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+
+    ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
+    EXPECT_TRUE(localListener.mEndpointChanges.empty());
+
+    EXPECT_SUCCESS(localProvider.Shutdown());
+    ASSERT_EQ(localListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(localListener.mEndpointChanges[0],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry2.id, EndpointChangeType::kRemoved }));
+
+    localProvider.UnregisterAttributeChangeListener(localListener);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, NoEndpointChangedNotificationOnFailedAddOrRemove)
+{
+    static MockServerCluster multiEndpointCluster({ { endpointEntry1.id, 100 }, { endpointEntry2.id, 100 } }, 1, {});
+    static ServerClusterRegistration clusterRegistration(multiEndpointCluster);
+    ASSERT_EQ(mProvider.AddCluster(clusterRegistration), CHIP_NO_ERROR);
+
+    auto invalidEndpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *invalidEndpoint,
+        DataModel::EndpointEntry{ .id = kInvalidEndpointId, .compositionPattern = EndpointCompositionPattern(0) }));
+    EXPECT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_TRUE(mChangeListener.mEndpointChanges.empty());
+
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(multiEndpointCluster.startupCallCount, 1);
+
+    // Duplicate endpoint ID should fail without notifying
+    auto duplicateEndpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(duplicateEndpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    EXPECT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_ERROR_DUPLICATE_KEY_ID);
+    EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+
+    // Removing an unregistered endpoint (even one referenced by a multi-endpoint cluster)
+    // should fail without notifying or shutting down the cluster.
+    EXPECT_EQ(mProvider.RemoveEndpoint(endpointEntry2.id), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(multiEndpointCluster.shutdownCallCount, 0);
+
+    EXPECT_EQ(mProvider.RemoveEndpoint(kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
 }
