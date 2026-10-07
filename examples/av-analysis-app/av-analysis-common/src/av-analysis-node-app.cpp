@@ -73,6 +73,8 @@ CHIP_ERROR AvAnalysisNodeApp::Init(WebRTCPeerController * aPeerController)
     // No Zone Management cluster on this endpoint: PerZoneContextDetection is off and MaxZones is Null
     mAvAnalysisServer.Create(mEndpointId, BitFlags<AvAnalysis::Feature>(AvAnalysis::Feature::kRemoteContextDetection),
                              kSupportedAmbientContexts, DataModel::Nullable<uint8_t>(), kMaxAnalysisStreams);
+    // Sessions are sourced from the streams the peer controller has connected
+    mAvAnalysisDelegate.Init(mPeerController);
     mAvAnalysisServer.Cluster().SetDelegate(&mAvAnalysisDelegate);
     mAvAnalysisServer.Cluster().SetCameraClient(&mCameraClient);
     mAvAnalysisServer.Cluster().SetWebRTCClient(&mWebRTCClient);
