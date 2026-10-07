@@ -450,7 +450,7 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=(post_prompt_settle_delay_seconds+holdTime_input))
             # time precision tolerance
-            Prec_tor = 1000 # 1 second
+            Prec_tor = 1000  # 1 second
             if event.eventStartTimePos is not None:
                 asserts.assert_true(abs(event.eventStartTimePos - event_start_time) < Prec_tor, "Not matching EventStartTimePos")
                 # log.info(f"event time from AmbientContextDetectEnded field data: {event.eventStartTimePos}")
