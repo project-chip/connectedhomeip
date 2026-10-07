@@ -34,6 +34,16 @@ config CHIP_APP_IDENTIFY_ENDPOINT
 	help
       Set the endpoint ID for the Identify cluster implementation.
 
+config CHIP_APP_HEAP_STATS_LOGS
+	bool "Print periodic heap usage statistics to the console"
+	default n
+	help
+	  When enabled, the application periodically prints heap usage
+	  statistics (system heap, CHIP malloc heap, mbedTLS heap, depending
+	  on which stats-gathering options are enabled) to the console via
+	  printk(). Keep disabled in production builds to avoid flooding the
+	  logs
+
 config CHIP_APP_OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
 	default y if CHIP_SE05X
