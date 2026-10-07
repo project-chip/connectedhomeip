@@ -62,6 +62,8 @@ public:
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
+            // Set the current device in the registration listener, so that when accessors are registered,
+            // they will be added to the map by the callback with the device as the key.
             GetOOBAccessorRegistrationListener().SetCurrentDevice(device);
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
             GetOOBAccessorRegistrationListener().UnsetCurrentDevice();
@@ -102,9 +104,11 @@ private:
             OOBAccessorRegistry::Instance().AddOOBAccessorRegisteredCallback(this);
         }
         ~OOBAccessorRegistrationListener() { OOBAccessorRegistry::Instance().RemoveOOBAccessorRegisteredCallback(this); }
+
+        // Add the registered accessor to the map with the current device as the key, if a device is currently being registered.
         void OnRegistered(OOBAccessor * accessor) override
         {
-            // If something other than this hook registered the accessor, we will not associate it with a device.
+            // If something other than this hook registered the accessor, we will not associate it with the device.
             if (mCurrentDevice != nullptr)
             {
                 mDeviceToOOBAccessorMap.push_back({ mCurrentDevice, accessor });
