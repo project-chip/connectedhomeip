@@ -72,13 +72,9 @@ public:
     void RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback * callback);
 
     /**
-     * @brief Clears all registered accessors and callbacks during device teardown.
+     * @brief Clears all registered accessors during device teardown.
      */
-    void Clear()
-    {
-        mAccessors.clear();
-        mCallbacks.clear();
-    }
+    void Clear() { mAccessors.clear(); }
 
     /**
      * @brief Returns the number of registered accessors.
