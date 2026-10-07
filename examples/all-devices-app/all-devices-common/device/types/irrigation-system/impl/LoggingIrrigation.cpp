@@ -122,7 +122,7 @@ void LoggingIrrigation::HandleStopStateCallback(GenericOperationalError & err)
 }
 
 CHIP_ERROR LoggingIrrigation::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                              EndpointComposition composition)
+                                            EndpointComposition composition)
 {
     VerifyOrReturnError(!mValveContext.empty(), CHIP_ERROR_INCORRECT_STATE);
 

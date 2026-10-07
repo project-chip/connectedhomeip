@@ -24,29 +24,29 @@ namespace {
 
 using namespace Clusters;
 
-const ValveConfigurationAndControlCluster::StartupConfiguration defaultConfig{ DataModel::NullNullable,
-                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+const ValveConfigurationAndControlCluster::StartupConfiguration defaultConfig{
+    DataModel::NullNullable, ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+    ValveConfigurationAndControlCluster::kDefaultLevelStep
+};
 
 const ValveConfigurationAndControlCluster::ValveContext defaultValveContext = {
-        .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
-        .optionalAttributeSet = {},
-        .config                = defaultConfig,
-        .tsTracker            = nullptr,
-        .delegate              = nullptr,
-    };
-
+    .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
+    .optionalAttributeSet = {},
+    .config               = defaultConfig,
+    .tsTracker            = nullptr,
+    .delegate             = nullptr,
+};
 
 const EndpointComposition::SemanticTag kValve1[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 1},
+    { .namespaceID = CommonNamespace::kLocationId, .tag = 1 },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
 };
 const EndpointComposition::SemanticTag kValve2[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 2},
+    { .namespaceID = CommonNamespace::kLocationId, .tag = 2 },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
 };
 const EndpointComposition::SemanticTag kValve3[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 2},
+    { .namespaceID = CommonNamespace::kLocationId, .tag = 2 },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 3 },
 };
 
@@ -54,23 +54,24 @@ const EndpointComposition::SemanticTag kValve3[] = {
 
 std::vector<Irrigation::ValveList> LoggingIrrigation::ValveConfiguration()
 {
-    return  std::vector<Irrigation::ValveList>{
-                    Irrigation::ValveList {
-                                                .startupConfiguration = defaultConfig,
-                                                .valveContext = defaultValveContext,
-                                                .tags = Span<const EndpointComposition::SemanticTag>(kValve1),
-                    },
-                     Irrigation::ValveList {  .startupConfiguration = defaultConfig,
-                                                    .valveContext = defaultValveContext,
-                                                .tags = Span<const EndpointComposition::SemanticTag>(kValve2),
-                    },
-                    Irrigation::ValveList{
-                                                .startupConfiguration = defaultConfig,
-                                                .valveContext = defaultValveContext,
-                                                .tags = Span<const EndpointComposition::SemanticTag>(kValve3),
-                    },
+    return std::vector<Irrigation::ValveList>{
+        Irrigation::ValveList{
+            .startupConfiguration = defaultConfig,
+            .valveContext         = defaultValveContext,
+            .tags                 = Span<const EndpointComposition::SemanticTag>(kValve1),
+        },
+        Irrigation::ValveList{
+            .startupConfiguration = defaultConfig,
+            .valveContext         = defaultValveContext,
+            .tags                 = Span<const EndpointComposition::SemanticTag>(kValve2),
+        },
+        Irrigation::ValveList{
+            .startupConfiguration = defaultConfig,
+            .valveContext         = defaultValveContext,
+            .tags                 = Span<const EndpointComposition::SemanticTag>(kValve3),
+        },
 
-        };
+    };
 }
 
 } // namespace chip::app

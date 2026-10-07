@@ -18,40 +18,40 @@
 #pragma once
 #include "app/clusters/flow-measurement-server/FlowMeasurementCluster.h"
 #include "app/clusters/identify-server/IdentifyCluster.h"
-#include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include "app/server-cluster/ServerClusterInterfaceRegistry.h"
-#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include "lib/core/CHIPError.h"
 #include "lib/support/TimerDelegate.h"
-#include <lib/core/DataModelTypes.h>
-#include <device/api/Interface.h>
+#include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <clusters/shared/Enums.h>
+#include <device/api/Interface.h>
 #include <devices/Types.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 
-class Irrigation :  public DeviceInterface
+class Irrigation : public DeviceInterface
 {
 public:
     struct ValveList
     {
-        DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration>  startupConfiguration;
+        DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> startupConfiguration;
         DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
-    Irrigation(TimerDelegate & TDelegate,Clusters::IdentifyDelegate & IDelegate,
-                Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :  DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
+    Irrigation(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
+               Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :
+        DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
 
-                mTimerDelegate(TDelegate),mIdentifyDelegate(&IDelegate),
-                                                                                    mOperationalStateDelegate(ODelegate)
+        mTimerDelegate(TDelegate), mIdentifyDelegate(&IDelegate), mOperationalStateDelegate(ODelegate)
 
-                                                                                    {}
+    {}
     ~Irrigation() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition composition) override;
+                        EndpointComposition composition) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::IdentifyCluster & IdentifyCluster()
@@ -70,17 +70,16 @@ public:
         return mFlowMeasurementCluster.Cluster();
     }
 
-    EndpointId GetEndpointId() const
-    {
-        return mEndpointId;
-    }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
 protected:
     TimerDelegate & mTimerDelegate;
+
 private:
     virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                      EndpointComposition composition)    = 0;
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
-    EndpointId mEndpointId = kInvalidEndpointId;
+    EndpointId mEndpointId                                               = kInvalidEndpointId;
     Clusters::IdentifyDelegate * mIdentifyDelegate;
     Clusters::OperationalState::OperationalStateCluster::Delegate * mOperationalStateDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;

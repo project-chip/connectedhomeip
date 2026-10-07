@@ -55,6 +55,7 @@ public:
     static std::vector<Irrigation::ValveList> ValveConfiguration();
 
     void OnValveStateChanged() override;
+
 private:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                              EndpointComposition composition) override;
