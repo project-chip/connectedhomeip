@@ -28,8 +28,8 @@ class ContentAppObserverManager : public ContentAppObserverDelegate
 public:
     ContentAppObserverManager();
 
-    void HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper,
-                                 const chip::Optional<chip::CharSpan> & data, const chip::CharSpan & encodingHint) override;
+    void HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper, chip::CharSpan data,
+                                 const chip::Optional<chip::CharSpan> & encodingHint) override;
 
 protected:
 };

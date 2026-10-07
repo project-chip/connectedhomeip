@@ -34,8 +34,8 @@ Alchemy: v1.6.2
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <command source="client" code="0x00" name="ContentAppMessage" response="ContentAppMessageResponse">
       <description>Upon receipt, the data field MAY be parsed and interpreted.</description>
-      <arg id="0" name="Data" type="long_char_string" optional="true" length="500"/>
-      <arg id="1" name="EncodingHint" type="char_string" length="100"/>
+      <arg id="0" name="Data" type="long_char_string" length="500"/>
+      <arg id="1" name="EncodingHint" type="char_string" optional="true" length="100"/>
     </command>
 
     <command source="server" code="0x01" name="ContentAppMessageResponse" disableDefaultResponse="true">
