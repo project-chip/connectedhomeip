@@ -1,11 +1,11 @@
 from mobly import asserts
 
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import VERSION_TO_DM, PrebuiltDataModelDirectory, build_xml_data_model, latest_prebuilt_directory
 
 
-class TestLatestPrebuiltDirectory(MatterBaseTest):
+class TestLatestPrebuiltDirectory(CertificationUnitTestNoDevice):
     def test_latest_prebuilt_directory_returns_newest_version(self):
         """latest_prebuilt_directory() must point at the newest entry in VERSION_TO_DM."""
         asserts.assert_equal(
