@@ -23,6 +23,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <gtest/gtest.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 using namespace chip;
@@ -71,6 +72,11 @@ public:
 
 protected:
     ConcreteAttributePath Path(AttributeId id) { return ConcreteAttributePath(kEndpointId, EnergyEvse::Id, id); }
+
+    std::string PoisonKey(AttributeId id)
+    {
+        return DefaultStorageKeyAllocator::SafeAttributeValue(kEndpointId, EnergyEvse::Id, id).KeyName();
+    }
 
     template <typename T>
     CHIP_ERROR ReadPersisted(AttributeId id, T & value)
@@ -225,6 +231,46 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryForNewSessionStartsNewTransfer)
 
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+}
+
+TEST_F(TestEnergyEvseDelegate, EnableChargingFailsWhenDeadlineCannotBePersisted)
+{
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA), Status::Success);
+
+    mStorage.AddPoisonKey(PoisonKey(Attributes::ChargingEnabledUntil::Id));
+    EXPECT_EQ(mDelegate.EnableCharging(DataModel::Nullable<uint32_t>(1000u), kMinimumCurrent_mA, kCircuitCapacity_mA),
+              Status::Failure);
+    mStorage.ClearPoisonKeys();
+
+    // The new limit must not be left paired with the previous (indefinite) deadline
+    int64_t limit = 0;
+    ASSERT_EQ(ReadPersisted(Attributes::MaximumChargeCurrent::Id, limit), CHIP_NO_ERROR);
+    EXPECT_EQ(limit, kMaximumChargeCurrent_mA);
+    EXPECT_TRUE(mInstance.GetChargingEnabledUntil().IsNull());
+}
+
+TEST_F(TestEnergyEvseDelegate, EnableDischargingFailsWhenDeadlineCannotBePersisted)
+{
+    mStorage.AddPoisonKey(PoisonKey(Attributes::DischargingEnabledUntil::Id));
+    EXPECT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Failure);
+    mStorage.ClearPoisonKeys();
+
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+}
+
+TEST_F(TestEnergyEvseDelegate, ExpiryOfOneDeadlineKeepsTheOtherModeEnabled)
+{
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kEnabled);
+
+    // The charging deadline is in the past
+    ASSERT_EQ(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mDelegate.ScheduleCheckOnEnabledTimeout(), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    ASSERT_FALSE(mInstance.GetChargingEnabledUntil().IsNull());
+    EXPECT_EQ(mInstance.GetChargingEnabledUntil().Value(), 0u);
 }
 
 TEST_F(TestEnergyEvseDelegate, UserMaximumChargeCurrentDefaultsImmediatelyWhenCircuitCapacityKnown)

@@ -136,12 +136,21 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), maximumChargeCurrent),
         Status::Failure, AppServer, "Failed to persist charging command current limit");
-    mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
 
     /* The setter only calls the persisting callback if the value changes, but a null value
-     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot */
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil));
+     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to persist charging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
+        return Status::Failure;
+    }
+    mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
+
     LogErrorOnFailure(mInstance->SetChargingEnabledUntil(chargingEnabledUntil));
     LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(minimumChargeCurrent));
 
@@ -191,12 +200,22 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
         GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), maximumDischargeCurrent),
         Status::Failure, AppServer, "Failed to persist discharging command current limit");
-    mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
 
     /* The setter only calls the persisting callback if the value changes, but a null value
-     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot */
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil));
+     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to persist discharging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+            mMaximumDischargingCurrentLimitFromCommand));
+        return Status::Failure;
+    }
+    mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
+
     LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(dischargingEnabledUntil));
     ComputeMaxDischargeCurrentLimit();
 
@@ -240,19 +259,21 @@ static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint3
  * If both charging and discharging have expired or are Zero, it disables the EVSE.
  * If only one has expired, it updates the state to the other enabled state.
  * If both are still valid, it does nothing.
+ *
+ * @return Status::Failure if the supply state could not be updated, so the caller can fail safe by disabling
  */
-void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
+Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
 {
-    if (mInstance == nullptr)
+    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+
+    bool chargingExpired    = IsTimeExpired(GetChargingEnabledUntil(), matterEpochSeconds);
+    bool dischargingExpired = IsTimeExpired(GetDischargingEnabledUntil(), matterEpochSeconds);
+
+    if (chargingExpired && dischargingExpired)
     {
-        return;
+        // If both charging and discharging have expired, disable the EVSE
+        return Disable();
     }
-
-    DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
-    DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
-
-    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpochSeconds);
-    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpochSeconds);
 
     if (chargingExpired)
     {
@@ -267,16 +288,9 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSecond
         LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
-        // Change to discharging-only if discharging is still enabled
-        if (!dischargingExpired)
-        {
-            LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled));
-        }
-        else
-        {
-            // If both charging and discharging have expired, disable the EVSE
-            Disable();
-        }
+        // Change to discharging-only as discharging is still enabled
+        ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled), Status::Failure, AppServer,
+                                   "Failed to update SupplyState after charging expired");
     }
 
     if (dischargingExpired)
@@ -291,17 +305,12 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSecond
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
             mMaximumDischargingCurrentLimitFromCommand));
 
-        // Change to charging-only if charging is still enabled
-        if (!chargingExpired)
-        {
-            LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled));
-        }
-        else
-        {
-            // If both charging and discharging have expired, disable the EVSE
-            Disable();
-        }
+        // Change to charging-only as charging is still enabled
+        ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled), Status::Failure, AppServer,
+                                   "Failed to update SupplyState after discharging expired");
     }
+
+    return Status::Success;
 }
 
 /**
@@ -377,14 +386,18 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     SupplyStateEnum currentState = GetSupplyState();
     if (currentState == SupplyStateEnum::kChargingEnabled || currentState == SupplyStateEnum::kDischargingEnabled)
     {
-        Disable();
+        return Disable();
     }
-    else if (currentState == SupplyStateEnum::kEnabled)
+
+    if (currentState == SupplyStateEnum::kEnabled)
     {
-        HandleEnabledStateExpiration(matterEpochSeconds);
+        // On failure the SupplyState is still kEnabled, so return rather than recursing on the same expired deadline
+        const Status status = HandleEnabledStateExpiration(matterEpochSeconds);
+        VerifyOrReturnValue(status == Status::Success, status);
+
         // Call ourselves again now that one of our 2 timers has expired
         // The other timer expiry may need to be scheduled now
-        ScheduleCheckOnEnabledTimeout();
+        return ScheduleCheckOnEnabledTimeout();
     }
 
     return Status::Success;

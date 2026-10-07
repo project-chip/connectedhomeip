@@ -205,8 +205,9 @@ public:
     /**
      * @brief   Helper function to handle timer expiration when in enabled state
      * @param matterEpoch Current time in Matter epoch seconds
+     * @return Status::Failure if the SupplyState could not be updated
      */
-    void HandleEnabledStateExpiration(uint32_t matterEpochSeconds);
+    Status HandleEnabledStateExpiration(uint32_t matterEpochSeconds);
 
     /**
      * @brief   Helper function to get know if the EV is plugged in based on state
