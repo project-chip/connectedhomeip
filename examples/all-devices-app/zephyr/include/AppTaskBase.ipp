@@ -35,7 +35,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
