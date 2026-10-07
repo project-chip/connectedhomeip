@@ -17,7 +17,6 @@
 #pragma once
 
 #include <algorithm>
-#include <oob-accessors/OOBAccessorRegistry.h>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -35,6 +34,7 @@
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
