@@ -54,17 +54,17 @@ const EndpointComposition::SemanticTag kValve3[] = {
 
 std::vector<Irrigation::ValveList> LoggingIrrigation::ValveConfiguration()
 {
-    return  std::vector<Irrigation::ValveList>{ 
-                    Irrigation::ValveList { 
+    return  std::vector<Irrigation::ValveList>{
+                    Irrigation::ValveList {
                                                 .startupConfiguration = defaultConfig,
                                                 .valveContext = defaultValveContext,
                                                 .tags = Span<const EndpointComposition::SemanticTag>(kValve1),
                     },
                      Irrigation::ValveList {  .startupConfiguration = defaultConfig,
-                                                    .valveContext = defaultValveContext, 
+                                                    .valveContext = defaultValveContext,
                                                 .tags = Span<const EndpointComposition::SemanticTag>(kValve2),
                     },
-                    Irrigation::ValveList{ 
+                    Irrigation::ValveList{
                                                 .startupConfiguration = defaultConfig,
                                                 .valveContext = defaultValveContext,
                                                 .tags = Span<const EndpointComposition::SemanticTag>(kValve3),

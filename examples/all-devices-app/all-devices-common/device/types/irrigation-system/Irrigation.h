@@ -35,7 +35,7 @@ class Irrigation :  public DeviceInterface
 {
 public:
     struct ValveList
-    { 
+    {
         DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration>  startupConfiguration;
         DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
         Span<const EndpointComposition::SemanticTag> tags;
@@ -43,10 +43,10 @@ public:
 
     Irrigation(TimerDelegate & TDelegate,Clusters::IdentifyDelegate & IDelegate,
                 Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :  DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
-                                                                                    
+
                 mTimerDelegate(TDelegate),mIdentifyDelegate(&IDelegate),
                                                                                     mOperationalStateDelegate(ODelegate)
-                                                                                    
+
                                                                                     {}
     ~Irrigation() override = default;
 
