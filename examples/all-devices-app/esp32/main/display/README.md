@@ -66,8 +66,8 @@ display/
     ├── DeviceScreenHook.h          # DeviceFactory post-registration hook
     ├── DeviceScreenRegistration.h/.cpp # Per-device-type registration overloads
     ├── clusters/                   # Reusable cluster widgets, one card each
-    │   ├── OnOffClusterWidget                 # State label and toggle button
-    │   ├── LevelControlClusterWidget          # Level slider with percentage
+    │   ├── OnOffClusterWidget                 # State label and toggle button with caller-supplied labels
+    │   ├── LevelControlClusterWidget          # Level slider with percentage and caller-supplied level name
     │   ├── ColorControlClusterWidget          # Mode selector plus hue/sat, xy and temperature groups
     │   ├── FanControlClusterWidget            # Speed slider and mode buttons
     │   ├── TemperatureMeasurementClusterWidget # Measured value and setter
@@ -87,6 +87,7 @@ display/
     │   ├── OccupancySensorScreen        # Occupancy sensor
     │   ├── TemperatureSensorScreen      # Temperature sensor
     │   ├── ChimeScreen                  # Chime
+    │   ├── SpeakerScreen                # Speaker (mute and volume)
     │   ├── WaterValveScreen             # Water valve
     │   ├── BridgedNodeScreen            # Bridged node
     │   └── AggregatorScreen             # Aggregator
