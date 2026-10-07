@@ -24,7 +24,10 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestPumpConfigurationAndControlCluster.cpp" ]
 
-  sources = [ "../../level-control/codegen/level-control.cpp" ]
+  sources = [
+    "../../level-control/codegen/level-control.cpp",
+    "../../level-control/codegen/level-control.h",
+  ]
   foreach(file, app_config_dependent_sources) {
     sources += [ "../" + file ]
   }
@@ -41,6 +44,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/cluster-building-blocks",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:app-test-stubs",
