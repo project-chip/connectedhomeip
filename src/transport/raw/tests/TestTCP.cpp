@@ -31,6 +31,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <crypto/RandUtils.h>
+#include <inet/InetFaultInjection.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -174,6 +175,7 @@ public:
         ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
                         PeerAddrString(conn->mPeerAddr), conErr.Format());
         mHandleConnectionCompleteCalled = &*conn;
+        mHandleConnectionCompleteError  = conErr;
     }
 
     void HandleConnectionReceived(ActiveTCPConnectionState & conn) override
@@ -212,6 +214,7 @@ public:
 
         mReceiveHandlerCallCount        = 0;
         mHandleConnectionCompleteCalled = nullptr;
+        mHandleConnectionCompleteError  = CHIP_NO_ERROR;
         mHandleConnectionCloseCalled    = nullptr;
         mHandleConnectionReceivedCalled = nullptr;
 
@@ -419,6 +422,30 @@ public:
         TCPBase::sForceFailureInDoHandleIncomingConnection = false;
     }
 
+#if CHIP_WITH_NLFAULTINJECTION
+    void PendingSendFailureFailsConnectAttemptTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    {
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_TRUE(activeTCPConnState);
+        ASSERT_TRUE(activeTCPConnState->IsConnecting());
+
+        System::PacketBufferHandle buffer;
+        EXPECT_SUCCESS(BufferWithHeader(1, buffer, PAYLOAD));
+        auto & faultManager = Inet::FaultInjection::GetManager();
+        faultManager.FailAtFault(Inet::FaultInjection::kFault_Send, 0, 1);
+        EXPECT_SUCCESS(tcp.SendMessage(activeTCPConnState, std::move(buffer)));
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        EXPECT_EQ(faultManager.GetFaultRecords()[Inet::FaultInjection::kFault_Send].mNumCallsToFail, 0u);
+        faultManager.ResetFaultConfigurations();
+
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+        EXPECT_NE(mHandleConnectionCompleteError, CHIP_NO_ERROR);
+        EXPECT_EQ(mHandleConnectionCloseCalled, nullptr);
+    }
+#endif // CHIP_WITH_NLFAULTINJECTION
+
     void DisconnectTest(TCPImpl & tcp)
     {
         // Disconnect and wait for seeing peer close
@@ -446,10 +473,11 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount           = 0;
-    void * mHandleConnectionCompleteCalled = nullptr;
-    void * mHandleConnectionCloseCalled    = nullptr;
-    void * mHandleConnectionReceivedCalled = nullptr;
+    int mReceiveHandlerCallCount              = 0;
+    void * mHandleConnectionCompleteCalled    = nullptr;
+    CHIP_ERROR mHandleConnectionCompleteError = CHIP_NO_ERROR;
+    void * mHandleConnectionCloseCalled       = nullptr;
+    void * mHandleConnectionReceivedCalled    = nullptr;
 
 private:
     IOContext * mIOContext;
@@ -713,6 +741,18 @@ protected:
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
 
+#if CHIP_WITH_NLFAULTINJECTION
+    void PendingSendFailureFailsConnectAttemptTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+        uint16_t port;
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        ASSERT_SUCCESS(gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port));
+        gMockTransportMgrDelegate.PendingSendFailureFailsConnectAttemptTest(tcp, addr, port);
+        gMockTransportMgrDelegate.DisconnectTest(tcp);
+    }
+#endif // CHIP_WITH_NLFAULTINJECTION
+
     // Callback used by CheckProcessReceivedBuffer.
     static CHIP_ERROR TestDataCallbackCheck(const uint8_t * message, size_t length, int count,
                                             ActiveTCPConnectionHandle & connection, void * data)
@@ -850,6 +890,15 @@ TEST_F(TestTCP, HandleConnLateFailureTest4)
     IPAddress::FromString("127.0.0.1", addr);
     HandleConnLateFailureTest(addr);
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+TEST_F(TestTCP, PendingSendFailureFailsConnectAttemptTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    PendingSendFailureFailsConnectAttemptTest(addr);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 #endif // INET_CONFIG_ENABLE_IPV4
 
 TEST_F(TestTCP, ConnectSendMessageThenCloseTest6)
@@ -886,6 +935,15 @@ TEST_F(TestTCP, HandleConnLateFailureTest6)
     IPAddress::FromString("::1", addr);
     HandleConnLateFailureTest(addr);
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+TEST_F(TestTCP, PendingSendFailureFailsConnectAttemptTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    PendingSendFailureFailsConnectAttemptTest(addr);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
 {

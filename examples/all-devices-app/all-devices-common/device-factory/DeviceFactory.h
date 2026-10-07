@@ -777,7 +777,38 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate);
+                // Combined smoke + CO alarm exposing every optional attribute and both concentration measurement clusters,
+                // to showcase the device type's full surface.
+                // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
+                constexpr uint32_t kExampleExpiryDate = 3976214400;
+                SmokeCoAlarm::Config config;
+                config.alarmConfig
+                    .WithSmokeAlarm({
+                        .withContaminationState = true,
+                        .sensitivityLevel       = Clusters::SmokeCoAlarm::SensitivityEnum::kStandard,
+                    })
+                    .WithCOAlarm()
+                    .WithDeviceMuted()
+                    .WithInterconnectSmokeAlarm()
+                    .WithInterconnectCOAlarm()
+                    .WithExpiryDate(kExampleExpiryDate)
+                    .WithUnmounted();
+                config
+                    .WithCoConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    })
+                    .WithSmokeConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+                    });
+                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }
 
