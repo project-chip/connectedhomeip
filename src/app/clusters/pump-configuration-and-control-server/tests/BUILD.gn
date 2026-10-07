@@ -24,12 +24,21 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestPumpConfigurationAndControlCluster.cpp" ]
 
-  sources = []
+  sources = [ "../../level-control/codegen/level-control.cpp" ]
   foreach(file, app_config_dependent_sources) {
     sources += [ "../" + file ]
   }
 
   cflags = [ "-Wconversion" ]
+
+  defines = [
+    "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+    "IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL",
+    "MATTER_DM_PLUGIN_LEVEL_CONTROL",
+    "MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL=1",
+    "MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL=254",
+    "MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE=0",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -39,5 +48,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
   ]
 }
