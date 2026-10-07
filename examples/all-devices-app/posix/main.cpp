@@ -17,10 +17,11 @@
  */
 
 #include <AppMainLoop.h>
-#include <CodeDrivenDataModelDevices.h>
 #include <DeviceFactoryPlatformOverride.h>
+#include <DeviceInstances.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <PosixAudioManager.h>
+#include <PosixDeviceFactory.h>
 #include <TracingCommandLineArgument.h>
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include <TraceDecoder.h>
@@ -41,7 +42,6 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
-#include <device-factory/DeviceFactory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -159,7 +159,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(sDacProvider.Init(AppOptions::GetConfig().dacProvider));
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
 
-    static CodeDrivenDataModelDevices devices({
+    static DeviceInstances devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
@@ -174,7 +174,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dnssdServer                = DnssdServer::Instance(),                                 //
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
+            .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
             .bindingTable               = Binding::Table::GetInstance(),                           //
             .bindingManager             = Binding::Manager::GetInstance(),                         //
             .identifyDelegate           = gIdentifyDelegate,                                       //

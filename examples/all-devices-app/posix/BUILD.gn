@@ -26,17 +26,19 @@ if (chip_enable_pw_rpc) {
 
 config("posix-includes") {
   include_dirs = [
+    ".",
     "include",
     "${chip_root}/examples/common",
   ]
 }
 
-source_set("code-driven-data-model-devices") {
+source_set("device-instances") {
   sources = [
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/OOBAccessorHook.h",
     "${chip_root}/examples/all-devices-app/posix/named_pipe/Hook.h",
-    "CodeDrivenDataModelDevices.cpp",
-    "include/CodeDrivenDataModelDevices.h",
+    "DeviceInstances.cpp",
+    "DeviceInstances.h",
+    "PosixDeviceFactory.h",
   ]
 
   public_deps = [
@@ -138,7 +140,7 @@ executable("all-devices-app") {
   ]
 
   deps = [
-    ":code-driven-data-model-devices",
+    ":device-instances",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/identify:LoggingIdentifyDelegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-dac-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",

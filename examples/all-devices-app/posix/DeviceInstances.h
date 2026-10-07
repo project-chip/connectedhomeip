@@ -25,6 +25,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
@@ -33,17 +34,14 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device-factory/DeviceFactory.h>
 #include <device/api/Interface.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
-#include <oob-accessors/OOBAccessorHook.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
-#include <posix/named_pipe/Hook.h>
 #include <transport/SessionManager.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -52,14 +50,30 @@
 
 #include <cstdint>
 #include <memory>
-#include <set>
 #include <vector>
 
 namespace chip::app {
 
-using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
-
-class CodeDrivenDataModelDevices
+/**
+ * Manages the lifecycle of the code-driven data model provider and all device
+ * endpoint instances for the application.
+ *
+ * This class owns:
+ * - The backing `CodeDrivenDataModelProvider` and its attribute persistence provider.
+ * - The root node device (`AppRootNode`) registered on endpoint 0 (`kRootEndpointId`).
+ * - The collection of application device instances (`DeviceInterface`) constructed
+ *   dynamically via `PosixDeviceFactory` from command-line `DeviceTypeParser::Entry`
+ *   specifications.
+ *
+ * Usage:
+ * 1. Instantiate with a `Context` containing the required server/platform dependencies.
+ * 2. Call `Startup(deviceEntries)` before `Server::Init()` to initialize persistence,
+ *    register the root node, and construct/register all requested device endpoints.
+ * 3. Pass `&DataModelProvider()` to `ServerInitParams::dataModelProvider`.
+ * 4. Call `Shutdown()` during application teardown to unregister and destroy all
+ *    constructed devices and the root node.
+ */
+class DeviceInstances
 {
 public:
     struct Context
@@ -78,7 +92,7 @@ public:
         DnssdServer & dnssdServer;
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
-        TestEventTriggerDelegate * testEventTriggerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         Clusters::IdentifyDelegate & identifyDelegate;
@@ -92,9 +106,7 @@ public:
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
-    explicit CodeDrivenDataModelDevices(const Context & context);
-
-    std::set<EndpointId> GetReservedEndpointIds(const std::vector<DeviceTypeParser::Entry> & deviceEntries) const;
+    explicit DeviceInstances(const Context & context);
 
     CHIP_ERROR Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries);
 

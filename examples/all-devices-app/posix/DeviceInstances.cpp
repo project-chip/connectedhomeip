@@ -16,19 +16,40 @@
  *    limitations under the License.
  */
 
-#include <CodeDrivenDataModelDevices.h>
+#include <DeviceInstances.h>
 
+#include <PosixDeviceFactory.h>
 #include <device/api/SingleEndpoint.h>
 #include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
+#include <set>
 #include <utility>
 
 namespace chip::app {
 
-CodeDrivenDataModelDevices::CodeDrivenDataModelDevices(const Context & context) :
+namespace {
+
+std::set<EndpointId> GetReservedEndpointIds(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
+{
+    std::set<EndpointId> usedIds;
+    usedIds.insert(kRootEndpointId);
+
+    for (const auto & entry : deviceEntries)
+    {
+        if (entry.endpoint != kInvalidEndpointId)
+        {
+            usedIds.insert(entry.endpoint);
+        }
+    }
+    return usedIds;
+}
+
+} // namespace
+
+DeviceInstances::DeviceInstances(const Context & context) :
     mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
     mRootNode(
         {
@@ -46,7 +67,7 @@ CodeDrivenDataModelDevices::CodeDrivenDataModelDevices(const Context & context) 
                 .dnssdServer                         = mContext.dnssdServer,                //
                 .deviceLoadStatusProvider            = mContext.deviceLoadStatusProvider,   //
                 .diagnosticDataProvider              = mContext.diagnosticDataProvider,     //
-                .testEventTriggerDelegate            = mContext.testEventTriggerDelegate,   //
+                .testEventTriggerDelegate            = &mContext.testEventTriggerDelegate,  //
                 .dacProvider                         = mContext.dacProvider,                //
                 .eventManagement                     = mContext.eventManagement,            //
                 .timerDelegate                       = mContext.timerDelegate,              //
@@ -55,7 +76,7 @@ CodeDrivenDataModelDevices::CodeDrivenDataModelDevices(const Context & context) 
             .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        [](bool enableWiFi) {
+        []([[maybe_unused]] bool enableWiFi) {
             BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
             features.Set(AppRootNode::EnabledFeatures::kWiFi, enableWiFi);
@@ -64,25 +85,8 @@ CodeDrivenDataModelDevices::CodeDrivenDataModelDevices(const Context & context) 
         }(mContext.enableWiFi))
 {}
 
-std::set<EndpointId>
-CodeDrivenDataModelDevices::GetReservedEndpointIds(const std::vector<DeviceTypeParser::Entry> & deviceEntries) const
+CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
 {
-    std::set<EndpointId> usedIds;
-    usedIds.insert(kRootEndpointId);
-
-    for (const auto & entry : deviceEntries)
-    {
-        if (entry.endpoint != kInvalidEndpointId)
-        {
-            usedIds.insert(entry.endpoint);
-        }
-    }
-    return usedIds;
-}
-
-CHIP_ERROR CodeDrivenDataModelDevices::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
-{
-    VerifyOrReturnError(mContext.testEventTriggerDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
     DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds(deviceEntries));
@@ -100,7 +104,7 @@ CHIP_ERROR CodeDrivenDataModelDevices::Startup(const std::vector<DeviceTypeParse
         .breadcrumbTracker        = mRootNode.RootDevice().GeneralCommissioning(),
         .bindingTable             = mContext.bindingTable,
         .bindingManager           = mContext.bindingManager,
-        .testEventTriggerDelegate = *mContext.testEventTriggerDelegate,
+        .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
     });
     PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
@@ -128,7 +132,7 @@ CHIP_ERROR CodeDrivenDataModelDevices::Startup(const std::vector<DeviceTypeParse
     return CHIP_NO_ERROR;
 }
 
-void CodeDrivenDataModelDevices::Shutdown()
+void DeviceInstances::Shutdown()
 {
     OOBAccessorRegistry::Instance().Clear();
     for (auto & device : mConstructedDevices)
