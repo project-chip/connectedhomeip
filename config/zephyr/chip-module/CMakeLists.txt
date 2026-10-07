@@ -174,6 +174,19 @@ if(CONFIG_CHIP)
 
     target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
 
+    # libCHIP.a calls mbedtls_md_info_from_type(), which lives in libtfpsacrypto.a.
+    # Zephyr scans that archive before the Matter link group, so the reference is
+    # still undefined when the archive has already been passed. Rescan it afterwards.
+    # mbedtls is a Zephyr module that may be configured after this file, so defer
+    # until the application CMakeLists has finished and the target exists.
+    function(chip_link_tfpsacrypto)
+        if(TARGET chip AND TARGET tfpsacrypto)
+            target_link_libraries(chip INTERFACE
+                -Wl,--start-group $<TARGET_FILE:tfpsacrypto> -Wl,--end-group)
+        endif()
+    endfunction()
+    cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL chip_link_tfpsacrypto)
+
     include(${CHIP_ROOT}/config/zephyr/app/enable-gnu-std.cmake)
     chip_enable_gnu_std(chip)
 

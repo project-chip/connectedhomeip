@@ -26,7 +26,9 @@
 #include <device/api/Interface.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #include "delegates/ZephyrIdentifyDelegate.h"
 
@@ -80,7 +82,9 @@ public:
 
     CHIP_ERROR InitThreadNetworking();
 
-    // TODO: no Wi-Fi implementation yet
+    // Binds the Zephyr Wi-Fi station driver to the optional Matter shell. The
+    // driver itself is consumed by WifiFeature when it creates the root
+    // Network Commissioning and Wi-Fi Network Diagnostics clusters.
     CHIP_ERROR InitWifiNetworking();
 
     /// Storage/group data provider setup.
@@ -130,7 +134,9 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver mWifiDriver;
+    // Must be the singleton: WiFiManager completion callbacks call ZephyrWifiDriver::Instance().
+    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver & mWifiDriver =
+        DeviceLayer::NetworkCommissioning::ZephyrWifiDriver::Instance();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
