@@ -362,6 +362,21 @@ TEST_F(TestPumpLevelTransition, LimitReadFailureLeavesTransitionRunning)
     EXPECT_EQ(gCurrentLevel, level);
 }
 
+TEST_F(TestPumpLevelTransition, MinimumLimitReadFailureLeavesTransitionRunning)
+{
+    StartTransition(50);
+    ASSERT_FALSE(HasFailure());
+    auto level       = gCurrentLevel;
+    auto remaining   = gRemainingTime;
+    gLimitReadStatus = Status::Failure;
+    gLevelDirty      = MarkAttributeDirty::kNo;
+    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
+    EXPECT_TRUE(mTimer.HasTimer());
+    EXPECT_EQ(gCurrentLevel, level);
+    EXPECT_EQ(gRemainingTime, remaining);
+    EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kNo);
+}
+
 TEST_F(TestPumpLevelTransition, TakeoverSynchronizesQuietReportingForStop)
 {
     ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
@@ -397,6 +412,20 @@ TEST_F(TestPumpLevelTransition, LevelWriteFailureEndsTransition)
     EXPECT_FALSE(mTimer.HasTimer());
     EXPECT_EQ(gRemainingTime, 0u);
     EXPECT_EQ(gCurrentLevel, level);
+}
+
+TEST_F(TestPumpLevelTransition, MinimumLevelWriteFailureEndsTransition)
+{
+    StartTransition(50);
+    ASSERT_FALSE(HasFailure());
+    auto level        = gCurrentLevel;
+    gLevelWriteStatus = Status::Failure;
+    gLevelDirty       = MarkAttributeDirty::kNo;
+    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
+    EXPECT_FALSE(mTimer.HasTimer());
+    EXPECT_EQ(gRemainingTime, 0u);
+    EXPECT_EQ(gCurrentLevel, level);
+    EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kNo);
 }
 
 } // namespace
