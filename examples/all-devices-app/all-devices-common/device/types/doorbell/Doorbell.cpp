@@ -35,8 +35,7 @@ constexpr uint8_t kNumberOfSwitchPositions = 2;
 
 Doorbell::Doorbell(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mConfig(config)
-{
-}
+{}
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
