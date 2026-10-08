@@ -71,6 +71,10 @@ void AndroidWebRTCTransportRequestorManager::Init(JNIEnv * env, jobject javaCall
     jclass localIceCandidateClass = env->FindClass("chip/devicecontroller/IceCandidate");
     if (localIceCandidateClass != nullptr)
     {
+        if (mIceCandidateClass != nullptr)
+        {
+            env->DeleteGlobalRef(mIceCandidateClass);
+        }
         mIceCandidateClass = static_cast<jclass>(env->NewGlobalRef(localIceCandidateClass));
         env->DeleteLocalRef(localIceCandidateClass);
         ChipLogProgress(Controller, "Successfully cached IceCandidate class");

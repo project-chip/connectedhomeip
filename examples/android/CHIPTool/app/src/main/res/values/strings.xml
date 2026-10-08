@@ -311,7 +311,7 @@
     <string name="camera_radio_snapshot">Snapshot</string>
 
     <string name="camera_liveview_local_video_stream_id">Video Stream ID : </string>
-    <string name="camera_liveview_local_webRTC_session_id">webRTC Session ID : </string>
+    <string name="camera_liveview_local_webrtc_session_id">webRTC Session ID : </string>
     <string name="camera_liveview_local_width_hint">Video Stream Width (Default : 1920)</string>
     <string name="camera_liveview_local_width">1920</string>
     <string name="camera_liveview_local_height_hint">Video Stream Height (Default : 1080)</string>
