@@ -14,6 +14,30 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_23_kvs --ble-controller 0 --wifi --interface-id -1
+#     script-args: >
+#       --storage-path /tmp/cnet_4_23_admin_storage.json
+#       --in-test-commissioning-method ble-wifi
+#       --discriminator 3840
+#       --passcode 20202021
+#       --dut-node-id 0x12344321
+#       --endpoint 0
+#       --ble-controller 1
+#       --wifi-ssid MatterAP
+#       --wifi-passphrase MatterAPPassword
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+# === END CI TEST ARGUMENTS ===
+
 
 import asyncio
 import contextlib
@@ -152,6 +176,8 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
 
 
 class TC_CNET_4_23(MatterTestCommissioner):
+
+    disable_wildcard_subscription = True
 
     async def _validate_network_config_response(
         self,

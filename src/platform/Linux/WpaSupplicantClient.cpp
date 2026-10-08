@@ -556,8 +556,27 @@ void WpaSupplicantClient::OnWpaPropertiesChanged(WpaSupplicant1Interface * iface
                 break;
             }
 
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
-                mConnectivityManagerImpl->OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
+            NetworkCommissioning::Status commissioningError = NetworkCommissioning::Status::kOtherConnectionFailure;
+            switch (abs(reason))
+            {
+            case WLAN_REASON_PREV_AUTH_NOT_VALID:
+            case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
+            case WLAN_REASON_4WAY_HANDSHAKE_TIMEOUT:
+            case WLAN_REASON_GROUP_KEY_UPDATE_TIMEOUT:
+            case WLAN_REASON_MICHAEL_MIC_FAILURE:
+                commissioningError = NetworkCommissioning::Status::kAuthFailure;
+                break;
+            case WLAN_REASON_UNSPECIFIED:
+            case WLAN_REASON_TIMEOUT:
+                commissioningError = NetworkCommissioning::Status::kNetworkNotFound;
+                break;
+            default:
+                commissioningError = NetworkCommissioning::Status::kOtherConnectionFailure;
+                break;
+            }
+
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, commissioningError, reason]() {
+                mConnectivityManagerImpl->OnConnectResult(commissioningError, CharSpan(), reason);
             });
             if (delegate != nullptr)
             {

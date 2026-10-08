@@ -43,6 +43,39 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(await interface.network.Enabled.get_async())
                 self.assertEqual(await interface.CurrentNetwork.get_async(), "/")
 
+    async def test_select_network_failure_on_ssid_or_password_mismatch(self):
+        mock = SimpleNamespace(ssid="MatterAP", password="MatterAPPassword")
+
+        # Case 1: Wrong SSID
+        interface = WpaSupplicantMock.WpaInterface(mock, 0)
+        await interface.AddNetwork({"ssid": ("s", "WrongSSID"), "psk": ("s", "MatterAPPassword")})
+        await interface.SelectNetwork(interface.network.path)
+        if interface._associate_task:
+            await interface._associate_task
+        self.assertEqual(await interface.DisconnectReason.get_async(), -1)
+        self.assertEqual(await interface.State.get_async(), "disconnected")
+        self.assertFalse(await interface.network.Enabled.get_async())
+
+        # Case 2: Wrong Password
+        interface = WpaSupplicantMock.WpaInterface(mock, 0)
+        await interface.AddNetwork({"ssid": ("s", "MatterAP"), "psk": ("s", "WrongPassword")})
+        await interface.SelectNetwork(interface.network.path)
+        if interface._associate_task:
+            await interface._associate_task
+        self.assertEqual(await interface.DisconnectReason.get_async(), -23)
+        self.assertEqual(await interface.State.get_async(), "disconnected")
+        self.assertFalse(await interface.network.Enabled.get_async())
+
+        # Case 3: Correct credentials
+        interface = WpaSupplicantMock.WpaInterface(mock, 0)
+        await interface.AddNetwork({"ssid": ("s", "MatterAP"), "psk": ("s", "MatterAPPassword")})
+        await interface.SelectNetwork(interface.network.path)
+        if interface._associate_task:
+            await interface._associate_task
+        self.assertEqual(await interface.DisconnectReason.get_async(), 0)
+        self.assertEqual(await interface.State.get_async(), "completed")
+        self.assertTrue(await interface.network.Enabled.get_async())
+
 
 if __name__ == "__main__":
     unittest.main()

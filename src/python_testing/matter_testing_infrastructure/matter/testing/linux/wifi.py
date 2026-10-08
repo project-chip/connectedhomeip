@@ -346,8 +346,11 @@ class WpaSupplicantMock(TerminableThread):
             self.bss = WpaSupplicantMock.WpaBSS(self, mock.ssid)
             self.mock_mac = f"00:11:22:33:44:{index:02x}"  # Unique MAC per interface
             self.state = "disconnected"
+            self.disconnect_reason = 0
             self.scanning = False
             self.current_network = "/"
+            self.configured_ssid: str | None = None
+            self.configured_psk: str | None = None
             self.nan_sessions: dict[int, dict] = {}
             self.interface_name_in_sim: str = ""
             # The link this interface represents. Association brings it up and
@@ -432,6 +435,18 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
+            extracted = self._extract_variant_dict(args)
+            if "ssid" in extracted:
+                ssid = extracted["ssid"]
+                if isinstance(ssid, (bytes, bytearray)):
+                    ssid = ssid.decode("utf-8", errors="replace")
+                self.configured_ssid = str(ssid).strip('"')
+                self.network.ssid = self.configured_ssid
+            if "psk" in extracted:
+                psk = extracted["psk"]
+                if isinstance(psk, (bytes, bytearray)):
+                    psk = psk.decode("utf-8", errors="replace")
+                self.configured_psk = str(psk).strip('"')
             return self.network.path
 
         @sdbus.dbus_method_async("o")
@@ -444,7 +459,43 @@ class WpaSupplicantMock(TerminableThread):
                         return
                     # Mock AP association process.
                     await self.State.set_async("associating")
+                    await asyncio.sleep(0.05)
+
+                    mock_ssid = getattr(self.mock, "ssid", "")
+                    mock_psk = getattr(self.mock, "password", None)
+                    target_ssid = self.configured_ssid if self.configured_ssid is not None else mock_ssid
+                    target_psk = self.configured_psk if self.configured_psk is not None else mock_psk
+
+                    if mock_ssid and target_ssid != mock_ssid:
+                        log.debug(
+                            "Interface[%d] SSID mismatch ('%s' != '%s'); simulating network not found",
+                            self.index,
+                            target_ssid,
+                            mock_ssid,
+                        )
+                        await self.DisconnectReason.set_async(-1)
+                        await self.State.set_async("disconnected")
+                        await self.network.Enabled.set_async(False)
+                        await self.CurrentNetwork.set_async("/")
+                        return
+
+                    if mock_psk is not None and target_psk != mock_psk:
+                        log.debug(
+                            "Interface[%d] PSK mismatch ('%s' != '%s'); simulating auth failure",
+                            self.index,
+                            target_psk,
+                            mock_psk,
+                        )
+                        await self.State.set_async("associated")
+                        await asyncio.sleep(0.05)
+                        await self.DisconnectReason.set_async(-23)
+                        await self.State.set_async("disconnected")
+                        await self.network.Enabled.set_async(False)
+                        await self.CurrentNetwork.set_async("/")
+                        return
+
                     await self.State.set_async("associated")
+                    await self.DisconnectReason.set_async(0)
                     if self.link is not None:
                         # Bringing the link up waits on duplicate address detection,
                         # which would block this loop and stall NAN discovery.
@@ -465,6 +516,8 @@ class WpaSupplicantMock(TerminableThread):
             log.debug("Interface[%d] RemoveNetwork: path=%s", self.index, path)
             await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
+            self.configured_ssid = None
+            self.configured_psk = None
             await self._leave_network()
 
         @sdbus.dbus_method_async()
@@ -472,6 +525,8 @@ class WpaSupplicantMock(TerminableThread):
             log.debug("Interface[%d] RemoveAllNetworks", self.index)
             await self.network.Enabled.set_async(False)
             await self.CurrentNetwork.set_async("/")
+            self.configured_ssid = None
+            self.configured_psk = None
             await self._leave_network()
 
         @sdbus.dbus_method_async()
@@ -695,6 +750,14 @@ class WpaSupplicantMock(TerminableThread):
         @State.setter_private
         def State_setter(self, value: str) -> None:
             self.state = value
+
+        @sdbus.dbus_property_async("i")
+        def DisconnectReason(self) -> int:
+            return self.disconnect_reason
+
+        @DisconnectReason.setter_private
+        def DisconnectReason_setter(self, value: int) -> None:
+            self.disconnect_reason = value
 
         @sdbus.dbus_property_async("b")
         def Scanning(self) -> bool:

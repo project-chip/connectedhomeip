@@ -220,7 +220,7 @@ def run_commissioning_method(run: Metadata) -> str | None:
 
     parser = matter_test_args_parser()
     args, _ = parser.parse_known_args(shlex.split(run.script_args))
-    return args.commissioning_method
+    return args.commissioning_method or args.in_test_commissioning_method
 
 
 @contextlib.contextmanager
