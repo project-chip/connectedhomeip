@@ -57,10 +57,54 @@
     return nil;
 }
 
+static NSArray * _Nullable DecodeInterestedPaths(id encodedPaths, NSString * leafKey)
+{
+    if (![encodedPaths isKindOfClass:[NSArray class]]) {
+        return nil;
+    }
+
+    NSMutableArray * paths = [NSMutableArray array];
+    for (id encodedPath in encodedPaths) {
+        if ([encodedPath isKindOfClass:[NSNumber class]]) {
+            [paths addObject:encodedPath];
+            continue;
+        }
+        if (![encodedPath isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        NSNumber * endpointID = encodedPath[MTRDeviceControllerRegistrationInterestedPathEndpointIDKey];
+        NSNumber * clusterID = encodedPath[MTRDeviceControllerRegistrationInterestedPathClusterIDKey];
+        NSNumber * leafID = encodedPath[leafKey];
+        if (![endpointID isKindOfClass:[NSNumber class]] || ![clusterID isKindOfClass:[NSNumber class]]) {
+            continue;
+        }
+        if (![leafID isKindOfClass:[NSNumber class]]) {
+            [paths addObject:[MTRClusterPath clusterPathWithEndpointID:endpointID clusterID:clusterID]];
+        } else if ([leafKey isEqualToString:MTRDeviceControllerRegistrationInterestedPathAttributeIDKey]) {
+            [paths addObject:[MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:leafID]];
+        } else {
+            [paths addObject:[MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:leafID]];
+        }
+    }
+    return paths;
+}
+
 // TODO this is declared optional but the framework does not do any check on it, so it just crashes.
 - (oneway void)deviceController:(NSUUID *)controllerUUID updateControllerConfiguration:(NSDictionary *)controllerState
 {
     ChipLogProgress(chipTool, "XPC: %s", __func__);
+
+    for (NSDictionary * node in controllerState[MTRDeviceControllerRegistrationNodeIDsKey]) {
+        if (![node isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        NSArray * attributePaths = DecodeInterestedPaths(node[MTRDeviceControllerRegistrationInterestedPathsForAttributesKey], MTRDeviceControllerRegistrationInterestedPathAttributeIDKey);
+        NSArray * eventPaths = DecodeInterestedPaths(node[MTRDeviceControllerRegistrationInterestedPathsForEventsKey], MTRDeviceControllerRegistrationInterestedPathEventIDKey);
+        ChipLogProgress(chipTool, "XPC: node %s interested attribute paths %s event paths %s",
+            [[node[MTRDeviceControllerRegistrationNodeIDKey] description] UTF8String],
+            attributePaths ? [[attributePaths description] UTF8String] : "all",
+            eventPaths ? [[eventPaths description] UTF8String] : "all");
+    }
 }
 
 - (oneway void)deviceController:(NSUUID *)controllerUUID nodeID:(NSNumber *)nodeID getStateWithReply:(void (^)(MTRDeviceState state))reply
