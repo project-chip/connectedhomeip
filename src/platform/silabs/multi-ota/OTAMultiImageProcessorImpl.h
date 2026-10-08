@@ -20,6 +20,8 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <headers/ProvisionCryptoInterface.h>
+#include <headers/ProvisionStorageInterfaces.h>
 #include <include/platform/CHIPDeviceLayer.h>
 #include <include/platform/OTAImageProcessor.h>
 #include <lib/core/OTAImageHeader.h>
@@ -41,8 +43,16 @@ class OTAMultiImageProcessorImpl : public chip::OTAImageProcessorInterface
 public:
     using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
 
-    CHIP_ERROR Init(OTADownloader * downloader);
-    CHIP_ERROR OtaHookInit();
+    /**
+     * @param downloader    OTA downloader feeding image blocks to this processor.
+     * @param storageWriter Backend used by the factory data processor to persist attestation credentials.
+     * @param crypto        Backend used by the factory data processor to import the attestation key.
+     *
+     * The backends must outlive the processor; applications typically pass their singletons.
+     */
+    CHIP_ERROR Init(OTADownloader * downloader, Provision::IProvisionStorageWriter & storageWriter,
+                    Provision::IProvisionCrypto & crypto);
+    CHIP_ERROR OtaHookInit(Provision::IProvisionStorageWriter & storageWriter, Provision::IProvisionCrypto & crypto);
     static CHIP_ERROR ProcessDescriptor(void * descriptor);
     void Clear();
 

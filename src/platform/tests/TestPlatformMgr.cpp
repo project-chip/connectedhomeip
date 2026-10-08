@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include <atomic>
+#include <memory>
 
 #include <pw_unit_test/framework.h>
 
@@ -40,6 +41,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <signal.h>
+#include <unistd.h>
+#endif
 
 using namespace chip;
 using namespace chip::Logging;
@@ -262,3 +268,75 @@ TEST_F(TestPlatformMgr, MockSystemLayerTest)
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+namespace {
+void RegisterHandlerCapturing(int sig, std::weak_ptr<int> & captured)
+{
+    auto value = std::make_shared<int>(sig);
+    captured   = value;
+    EXPECT_TRUE(PlatformMgrImpl().RegisterSignalHandler(sig, ^{
+        (void) *value;
+    }));
+}
+} // namespace
+
+TEST_F(TestPlatformMgr, UnregisterSignalHandlerReleasesHandler)
+{
+    std::weak_ptr<int> usr1;
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR1, usr1);
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    EXPECT_TRUE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_TRUE(usr1.expired());
+    EXPECT_FALSE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+
+    EXPECT_TRUE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+    EXPECT_TRUE(usr2.expired());
+}
+
+TEST_F(TestPlatformMgr, UnregisterAllSignalHandlersReleasesHandlers)
+{
+    std::weak_ptr<int> usr1;
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR1, usr1);
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    PlatformMgrImpl().UnregisterAllSignalHandlers();
+    EXPECT_TRUE(usr1.expired());
+    EXPECT_TRUE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+}
+
+TEST_F(TestPlatformMgr, UnregisterAllSignalHandlersFromDeliveredSignal)
+{
+    ASSERT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    ASSERT_EQ(PlatformMgr().StartEventLoopTask(), CHIP_NO_ERROR);
+
+    std::atomic<bool> unregistered{ false };
+    auto * unregisteredPtr = &unregistered;
+    EXPECT_TRUE(PlatformMgrImpl().RegisterSignalHandler(SIGUSR1, ^{
+        PlatformMgrImpl().UnregisterAllSignalHandlers();
+        unregisteredPtr->store(true);
+    }));
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    EXPECT_EQ(kill(getpid(), SIGUSR1), 0);
+    for (size_t t = 0; !unregistered && t < 5000; t++)
+    {
+        chip::test_utils::SleepMillis(1);
+    }
+
+    ASSERT_TRUE(unregistered);
+    EXPECT_TRUE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+
+    EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
+}
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
