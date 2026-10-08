@@ -76,7 +76,7 @@ Git: 0.7-summer-2025-177-gd33ec772f
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
     <features>
       <feature bit="0" code="SPD" name="MultiSpeed" summary="0-SpeedMax Fan Speeds">
         <optionalConform/>
