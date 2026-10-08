@@ -204,7 +204,6 @@ private:
     std::optional<bool> IsListAttributePath(const ConcreteAttributePath & path);
 
     Messaging::ExchangeHolder mExchangeCtx;
-    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     Optional<ConcreteAttributePath> mProcessingAttributePath;
 
@@ -248,6 +247,7 @@ private:
 
     BitFlags<StateBits> mStateFlags;
     State mState = State::Uninitialized;
+    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace app
