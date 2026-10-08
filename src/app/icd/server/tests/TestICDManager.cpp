@@ -117,7 +117,7 @@ class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
     TestSubscriptionsInfoProvider() = default;
-    ~TestSubscriptionsInfoProvider(){};
+    ~TestSubscriptionsInfoProvider() {};
 
     void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
     void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
@@ -1853,7 +1853,32 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     // Step 1: Simulate cold boot / reboot initialization (Shutdown -> Init resets the settle delay to its default)
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&mICDStateObserver);
+    SetThreadConnectivityState(true /* enabled */, false /* attached */);
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    mICDManager.SetPersistentStorageDelegate(&testStorage)
+        .SetFabricTable(&GetFabricTable())
+        .SetSymmetricKeyStore(&mKeystore)
+        .SetExchangeManager(&GetExchangeManager())
+        .SetSubscriptionsInfoProvider(&mSubInfoProvider)
+        .SetICDCheckInBackOffStrategy(&mStrategy);
+    mICDManager.Init();
+    // With an empty ICDMonitoringTable, Init() must not latch mPendingActiveModeOnNetworkAttach.
+    EXPECT_FALSE(IsPendingActiveModeOnNetworkAttach());
+
+    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+    ICDMonitoringEntry entry(&(mKeystore));
+    entry.checkInNodeID    = kClientNodeId11;
+    entry.monitoredSubject = kClientNodeId11;
+    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
+
+    mICDManager.Shutdown();
+    mICDManager.RegisterObserver(&mICDStateObserver);
     mICDManager.SetPersistentStorageDelegate(&testStorage)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(&mKeystore)
@@ -1869,33 +1894,16 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     mICDManager.SetNetworkAttachSettleDelay(Seconds32(45));
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 2: Thread is unattached on cold boot
-    SetThreadConnectivityState(true /* enabled */, false /* attached */);
-
-    // Step 3: At bootup (kServerReady), TriggerCheckInMessages is invoked while Thread is unattached
+    // Step 2: Thread is unattached on cold boot, and Init() latched mPendingActiveModeOnNetworkAttach
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
-    BitFlags<Clusters::IcdManagement::Feature> featureMap;
-    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
-    privateIcdConfigData.SetFeatureMap(featureMap);
-
-    ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
-    ICDMonitoringEntry entry(&(mKeystore));
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId11;
-    EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
-
-    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
-    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
-    EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 #else
     ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-    // Step 4: Verify the pending attach action remains latched while the device is active for its initial threshold
+    // Step 4: Verify the pending attach action remains latched while Thread is detached
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
     mICDStateObserver.ResetAll();
 
@@ -1908,9 +1916,7 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
                                         .ThreadConnectivityChange = { .Result = DeviceLayer::kConnectivity_Established } };
     HandlePlatformEvent(&event);
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
-#if !CHIP_CONFIG_ENABLE_ICD_CIP
     EXPECT_TRUE(mICDStateObserver.mOnEnterActiveModeCalled);
-#endif // !CHIP_CONFIG_ENABLE_ICD_CIP
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
     mICDStateObserver.ResetAll();
 
@@ -1921,8 +1927,16 @@ TEST_F(TestICDManager, TestScenario15_DeviceReboot_ColdBoot_DeferredIfDetached)
     EXPECT_FALSE(mICDStateObserver.mOnEnterActiveModeCalled);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
-    // Step 7: The Matter server finishes initializing DNS-SD -> immediately enters ActiveMode (so SRP can fast-poll)
-    // and schedules the 45s settle timer while keeping mPendingActiveModeOnNetworkAttach latched.
+    // Step 7: The Matter server finishes initializing DNS-SD -> Server::OnPlatformEvent calls TriggerCheckInMessages()
+    // (which enters ActiveMode because Thread is attached), then ICDManager::HandlePlatformEvent(kServerReady) extends
+    // ActiveMode and schedules the 45s settle timer while keeping mPendingActiveModeOnNetworkAttach latched.
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; });
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_TRUE(mICDStateObserver.mOnEnterActiveModeCalled);
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
+    EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     SignalServerReady();
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
     EXPECT_TRUE(mICDStateObserver.mOnEnterActiveModeCalled);
@@ -1979,33 +1993,37 @@ TEST_F(TestICDManager, TestNetworkAttachSettleTimer_LatchesActiveModeIntentAcros
     // already attached, followed by HandlePlatformEvent(kServerReady).
     mICDManager.Shutdown();
     mICDManager.RegisterObserver(&mICDStateObserver);
+    SetThreadConnectivityState(true /* enabled */, true /* attached */);
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    BitFlags<Clusters::IcdManagement::Feature> featureMap;
+    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
     mICDManager.SetPersistentStorageDelegate(&testStorage)
         .SetFabricTable(&GetFabricTable())
         .SetSymmetricKeyStore(&mKeystore)
         .SetExchangeManager(&GetExchangeManager())
         .SetSubscriptionsInfoProvider(&mSubInfoProvider)
         .SetICDCheckInBackOffStrategy(&mStrategy);
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-    mICDManager.Init();
-    mICDStateObserver.ResetAll();
-    mICDManager.SetNetworkAttachSettleDelay(Seconds32(45));
-    SetThreadConnectivityState(true /* enabled */, true /* attached */);
 
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
-    BitFlags<Clusters::IcdManagement::Feature> featureMap;
-    featureMap.Set(Clusters::IcdManagement::Feature::kCheckInProtocolSupport);
-    privateIcdConfigData.SetFeatureMap(featureMap);
     ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
     ICDMonitoringEntry entry(&(mKeystore));
     entry.checkInNodeID    = kClientNodeId11;
     entry.monitoredSubject = kClientNodeId11;
     EXPECT_EQ(CHIP_NO_ERROR, entry.SetKey(ByteSpan(kKeyBuffer1a)));
     EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    mICDManager.Init();
+    mICDStateObserver.ResetAll();
+    mICDManager.SetNetworkAttachSettleDelay(Seconds32(45));
 
-    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; }, ICDManager::CheckInTriggerReason::kColdBoot);
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+
+    mICDManager.TriggerCheckInMessages([](FabricIndex, NodeId) { return true; });
+    EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_TRUE(mICDStateObserver.mOnEnterActiveModeCalled);
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
     EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
 #else
@@ -2017,6 +2035,7 @@ TEST_F(TestICDManager, TestNetworkAttachSettleTimer_LatchesActiveModeIntentAcros
 
     SignalServerReady();
     EXPECT_TRUE(IsPendingActiveModeOnNetworkAttach());
+    EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::ActiveMode);
 
     // Initial ActiveMode expires long before the 45s settle delay elapses.
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() +
