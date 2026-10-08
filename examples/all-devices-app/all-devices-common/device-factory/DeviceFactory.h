@@ -72,6 +72,7 @@
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
+#include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/WaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
@@ -826,6 +827,14 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_HEATER)
+        {
+            RegisterCreator("water-heater", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWaterHeater>(mContext->timerDelegate, mContext->fabricTable,
+                                                        mContext->diagnosticDataProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
