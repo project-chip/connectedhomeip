@@ -27,8 +27,6 @@
 #include "AndroidDeviceControllerWrapper.h"
 #include "AndroidInteractionClient.h"
 #include "AndroidLogDownloadFromNode.h"
-#include "AndroidWebRTCTransportProviderClient.h"
-#include "AndroidWebRTCTransportRequestorManager.h"
 #include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -62,6 +60,8 @@
 #include <vector>
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#include "AndroidWebRTCTransportProviderClient.h"
+#include "AndroidWebRTCTransportRequestorManager.h"
 #include <app/dynamic_server/AccessControl.h>
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
@@ -2408,6 +2408,7 @@ JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
 JNI_METHOD(void, webRTCTransportSolicitOffer)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject callback)
 {
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -2429,12 +2430,14 @@ JNI_METHOD(void, webRTCTransportSolicitOffer)
         ChipLogError(Controller, "Failed to solicit offer.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+#endif
 }
 
 JNI_METHOD(void, webRTCTransportProvideOffer)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject jVideoStreamId, jobject jAudioStreamId,
  jstring offerSdp, jobject callback)
 {
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -2486,6 +2489,7 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
         ChipLogError(Controller, "Failed to provide offer.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+#endif
 }
 
 void * IOThreadMain(void * arg)

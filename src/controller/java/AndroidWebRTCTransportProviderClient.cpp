@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 
 #include <controller/webrtc/WebRTCTransportRequestorManager.h>
 
@@ -126,15 +127,14 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
 
     size_t requiredBufferSize = offerSdp.size() + 256;
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> payloadBuffer;
-    if (!payloadBuffer.Alloc(requiredBufferSize))
+    if (!client->mPayloadBuffer.Alloc(requiredBufferSize))
     {
         client->Cleanup();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     chip::TLV::TLVWriter writer;
-    writer.Init(payloadBuffer.Get(), requiredBufferSize);
+    writer.Init(client->mPayloadBuffer.Get(), requiredBufferSize);
 
     err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
     if (err == CHIP_NO_ERROR)
@@ -149,7 +149,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
     }
 
     err = client->SendCommand(client, endpointId, Clusters::WebRTCTransportProvider::Id,
-                              Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id, payloadBuffer.Get(),
+                              Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id, client->mPayloadBuffer.Get(),
                               writer.GetLengthWritten());
 
     if (err != CHIP_NO_ERROR)
@@ -190,15 +190,14 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
     value.audioStreams          = NullOptional;
 
     constexpr size_t kPayloadSize = 256;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> payloadBuffer;
-    if (!payloadBuffer.Alloc(kPayloadSize))
+    if (!client->mPayloadBuffer.Alloc(kPayloadSize))
     {
         client->Cleanup();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     chip::TLV::TLVWriter writer;
-    writer.Init(payloadBuffer.Get(), kPayloadSize);
+    writer.Init(client->mPayloadBuffer.Get(), kPayloadSize);
 
     err = chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
     if (err == CHIP_NO_ERROR)
@@ -213,7 +212,7 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
     }
 
     err = client->SendCommand(client, endpointId, Clusters::WebRTCTransportProvider::Id,
-                              Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id, payloadBuffer.Get(),
+                              Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id, client->mPayloadBuffer.Get(),
                               writer.GetLengthWritten());
 
     if (err != CHIP_NO_ERROR)
@@ -375,8 +374,18 @@ void AndroidWebRTCTransportProviderClient::NotifyError(CHIP_ERROR error)
 
 void AndroidWebRTCTransportProviderClient::Cleanup()
 {
-    // Deletes the current instance to prevent memory leaks after the async operation finishes.
-    delete this;
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            auto * self = reinterpret_cast<AndroidWebRTCTransportProviderClient *>(arg);
+            delete self;
+        },
+        reinterpret_cast<intptr_t>(this));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to schedule cleanup: %" CHIP_ERROR_FORMAT, err.Format());
+        delete this;
+    }
 }
 
 } // namespace Controller

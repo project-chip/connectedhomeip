@@ -74,6 +74,8 @@ private:
 
     jmethodID mOnResponseMethod = nullptr;
     jmethodID mOnErrorMethod    = nullptr;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> mPayloadBuffer;
 };
 
 } // Namespace Controller

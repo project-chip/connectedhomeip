@@ -142,10 +142,6 @@ shared_library("jni") {
     "AndroidLogDownloadFromNode.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
-    "AndroidWebRTCTransportProviderClient.cpp",
-    "AndroidWebRTCTransportProviderClient.h",
-    "AndroidWebRTCTransportRequestorManager.cpp",
-    "AndroidWebRTCTransportRequestorManager.h",
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
     "BdxDiagnosticLogsReceiver.cpp",
@@ -177,6 +173,10 @@ shared_library("jni") {
 
   if (chip_build_controller_dynamic_server) {
     sources += [
+      "AndroidWebRTCTransportProviderClient.cpp",
+      "AndroidWebRTCTransportProviderClient.h",
+      "AndroidWebRTCTransportRequestorManager.cpp",
+      "AndroidWebRTCTransportRequestorManager.h",
       "BdxOTASender.cpp",
       "BdxOTASender.h",
       "OTAProviderDelegateBridge.cpp",

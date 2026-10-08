@@ -48,7 +48,7 @@ struct CommandContext
     WebRTCClientHandle handle;
 };
 
-static std::map<WebRTCClientHandle, std::unique_ptr<ProviderClientWrapper>> g_provider_clients;
+static std::map<WebRTCClientHandle, std::shared_ptr<ProviderClientWrapper>> g_provider_clients;
 
 WebRTCClientHandle webrtc_client_create()
 {
@@ -186,12 +186,12 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
 
 WebRTCClientHandle webrtc_provider_client_create()
 {
-    auto wrapper              = std::make_unique<ProviderClientWrapper>();
+    auto wrapper              = std::make_shared<ProviderClientWrapper>();
     wrapper->client           = std::make_unique<WebRTCTransportProviderClient>();
     WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(wrapper->client.get());
 
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_provider_clients[handle] = std::move(wrapper);
+    g_provider_clients[handle] = wrapper;
     return handle;
 }
 
@@ -311,12 +311,21 @@ void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle hand
 PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void * appContext, uint16_t endpointId,
                                                 uint32_t clusterId, uint32_t commandId, const uint8_t * payload, size_t length)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-    auto it = g_provider_clients.find(handle);
-    if (it != g_provider_clients.end())
+    std::shared_ptr<ProviderClientWrapper> wrapper;
+
+    {
+        std::lock_guard<std::mutex> lock(g_mutex);
+        auto it = g_provider_clients.find(handle);
+        if (it != g_provider_clients.end())
+        {
+            wrapper = it->second;
+        }
+    }
+
+    if (wrapper)
     {
         CommandContext * ctx = new CommandContext{ appContext, handle };
-        CHIP_ERROR err       = it->second->client->SendCommand(ctx, endpointId, clusterId, commandId, payload, length);
+        CHIP_ERROR err       = wrapper->client->SendCommand(ctx, endpointId, clusterId, commandId, payload, length);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -324,6 +333,7 @@ PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void 
         }
         return ToPyChipError(err);
     }
+
     return ToPyChipError(CHIP_ERROR_INTERNAL);
 }
 

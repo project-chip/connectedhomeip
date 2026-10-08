@@ -68,12 +68,18 @@ class CameraFragment : Fragment() {
 
   private val pendingIceCandidates = mutableListOf<IceCandidate>()
 
-  override fun onCreateView(
+override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     _binding = CameraFragmentBinding.inflate(inflater, container, false)
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
     scope = viewLifecycleOwner.lifecycleScope
 
     addressUpdateFragment =
@@ -89,8 +95,6 @@ class CameraFragment : Fragment() {
     setupSnapshotViewListeners()
 
     setupRadioGroupListener()
-
-    return binding.root
   }
 
   private fun setupWebRTCTransportRequestor() {
@@ -168,6 +172,20 @@ class CameraFragment : Fragment() {
     }
   }
 
+  private suspend fun readCameraFeatureMap(cluster: ChipClusters.CameraAvStreamManagementCluster): Long =
+    suspendCancellableCoroutine { continuation ->
+      cluster.readFeatureMapAttribute(object : ChipClusters.LongAttributeCallback {
+        override fun onSuccess(value: Long) {
+          continuation.resume(value)
+        }
+
+        override fun onError(error: Exception) {
+          Log.e(TAG, "Failed to read FeatureMap", error)
+          continuation.resumeWithException(error)
+        }
+      })
+    }
+
   private suspend fun sendAllocateVideoStream() {
     val devicePtr =
       try {
@@ -182,6 +200,19 @@ class CameraFragment : Fragment() {
 
     val cluster =
       ChipClusters.CameraAvStreamManagementCluster(devicePtr, addressUpdateFragment.endpointId)
+
+    val featureMap = try {
+      readCameraFeatureMap(cluster)
+    } catch (e: Exception) {
+      Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
+      scope.launch(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "Failed to read FeatureMap: ${e.message}", Toast.LENGTH_LONG).show()
+      }
+      return
+    }
+
+    val isWatermarkSupported = (featureMap and FEATURE_WATERMARK_MASK) != 0L
+    val isOsdSupported = (featureMap and FEATURE_OSD_MASK) != 0L
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/9c894019866348d324bf07a8664f56603e4b8537/src/app_clusters/cameras.adoc?plain=1#L139
     val streamUsage = 3U // LiveView
@@ -198,8 +229,8 @@ class CameraFragment : Fragment() {
     val minBitRate = 10000L
     val maxBitRate = 10000L
     val keyFrameInterval = 4000
-    val watermarkEnabled = Optional.of<Boolean>(false)
-    val osdEnabled = Optional.of<Boolean>(false)
+    val watermarkEnabled = if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
+    val osdEnabled = if (isOsdSupported) Optional.of(false) else Optional.empty<Boolean>()
 
     cluster.videoStreamAllocate(
       object : ChipClusters.CameraAvStreamManagementCluster.VideoStreamAllocateResponseCallback {
@@ -697,6 +728,19 @@ class CameraFragment : Fragment() {
       }
     val cluster = ChipClusters.CameraAvStreamManagementCluster(devicePtr, endpointId)
 
+    val featureMap = try {
+      readCameraFeatureMap(cluster)
+    } catch (e: Exception) {
+      Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
+      scope.launch(Dispatchers.Main) {
+        Toast.makeText(requireContext(), "Failed to read FeatureMap: ${e.message}", Toast.LENGTH_LONG).show()
+      }
+      return
+    }
+
+    val isWatermarkSupported = (featureMap and FEATURE_WATERMARK_MASK) != 0L
+    val isOsdSupported = (featureMap and FEATURE_OSD_MASK) != 0L
+
     // Set min resolution to 640x480
     val minResolution = ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct(640, 480)
     // Set max resolution to 1920x1080
@@ -708,6 +752,9 @@ class CameraFragment : Fragment() {
     val maxFrameRate = 30
     // Set quality to 1
     val quality = 1
+
+    val watermarkEnabled = if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
+    val osdEnabled = if (isOsdSupported) Optional.of(false) else Optional.empty<Boolean>()
 
     scope.launch(Dispatchers.Main) {
       Toast.makeText(requireContext(), "Allocating Snapshot Stream...", Toast.LENGTH_SHORT).show()
@@ -746,8 +793,8 @@ class CameraFragment : Fragment() {
       minResolution,
       maxResolution,
       quality,
-      Optional.of(false), // Set watermarkEnabled to false
-      Optional.of(false) // Set OSDEnabled to false
+      watermarkEnabled,
+      osdEnabled
     )
   }
 
@@ -915,6 +962,10 @@ class CameraFragment : Fragment() {
 
   companion object {
     private const val TAG = "CameraFragment"
+
+    // Camera Feature Map Bitmasks
+    private const val FEATURE_WATERMARK_MASK = 1L shl 6
+    private const val FEATURE_OSD_MASK = 1L shl 7
 
     fun newInstance(): CameraFragment = CameraFragment()
   }

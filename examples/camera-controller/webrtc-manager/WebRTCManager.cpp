@@ -694,7 +694,7 @@ std::vector<ICECandidateInfo> WebRTCManager::ParseClientICECandidates(const std:
         else if (line.find(candidatePrefix) == 0)
         {
             ICECandidateInfo info;
-            info.candidate  = line;
+            info.candidate  = line.substr(2);
             info.mid        = currentMid;
             info.mlineIndex = -1;
 
@@ -748,7 +748,7 @@ std::string WebRTCManager::MergeICECandidatesIntoSDP(const std::string & origina
             {
                 for (const auto & candStr : candidatesByMid[currentMid])
                 {
-                    mergedSdp += candStr + "\n";
+                    mergedSdp += "a=" + candStr + "\n";
                 }
                 candidatesByMid.erase(currentMid);
             }
