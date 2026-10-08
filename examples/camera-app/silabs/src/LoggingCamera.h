@@ -52,8 +52,7 @@ public:
     LoggingCamera();
     ~LoggingCamera() override = default;
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
@@ -79,9 +78,9 @@ public:
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
     void OnStreamUsagePrioritiesChanged() override;
     void OnAttributeChanged(AttributeId attributeId) override;
-    Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
-                                                        const VideoResolutionStruct & resolution,
-                                                        Clusters::CameraAvStreamManagement::ImageSnapshot & outImageSnapshot) override;
+    Protocols::InteractionModel::Status
+    CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
+                    Clusters::CameraAvStreamManagement::ImageSnapshot & outImageSnapshot) override;
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
     const std::vector<VideoStreamStruct> & GetAllocatedVideoStreams() const override;
     const std::vector<AudioStreamStruct> & GetAllocatedAudioStreams() const override;

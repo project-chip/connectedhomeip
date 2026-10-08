@@ -50,10 +50,10 @@ constexpr uint32_t kMaxNetworkBandwidth  = 10 * 1000 * 1000; // bps
 constexpr uint32_t kMinH264BitRate       = 10000;
 constexpr uint8_t kMicrophoneChannels    = 1;
 
-const AudioCodecEnum kAudioCodecs[]  = { AudioCodecEnum::kOpus };
-const uint32_t kAudioSampleRates[]   = { 48000 };
-const uint8_t kAudioBitDepths[]      = { 16 };
-const ClusterId kClientClusters[]    = { WebRTCTransportRequestor::Id };
+const AudioCodecEnum kAudioCodecs[]            = { AudioCodecEnum::kOpus };
+const uint32_t kAudioSampleRates[]             = { 48000 };
+const uint8_t kAudioBitDepths[]                = { 16 };
+const ClusterId kClientClusters[]              = { WebRTCTransportRequestor::Id };
 const Globals::StreamUsageEnum kStreamUsages[] = { Globals::StreamUsageEnum::kLiveView, Globals::StreamUsageEnum::kRecording };
 
 template <typename StreamList, typename IdGetter>
@@ -512,7 +512,7 @@ CHIP_ERROR LoggingCamera::IsStreamUsageSupported(StreamUsageEnum streamUsage)
     VerifyOrReturnError(mAvStreamManagementCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     const auto & priorities = mAvStreamManagementCluster.Cluster().GetStreamUsagePriorities();
     return (std::find(priorities.begin(), priorities.end(), streamUsage) != priorities.end()) ? CHIP_NO_ERROR
-                                                                                               : CHIP_ERROR_NOT_FOUND;
+                                                                                              : CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR LoggingCamera::IsHardPrivacyModeActive(bool & isActive)

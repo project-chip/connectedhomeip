@@ -39,7 +39,7 @@
 #include <device/types/root-node/RootNodeWith.h>
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <device/types/root-node/features/ThreadFeature.h>                // nogncheck
+#include <device/types/root-node/features/ThreadFeature.h>               // nogncheck
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h> // nogncheck
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/features/WifiFeature.h>    // nogncheck
@@ -51,7 +51,7 @@
 #if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 #include <app/clusters/ota-requestor/CodegenIntegration.h>  // nogncheck
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h> // nogncheck
-#include <device/types/root-node/features/OtaFeature.h>    // nogncheck
+#include <device/types/root-node/features/OtaFeature.h>     // nogncheck
 
 // gRequestorCore is defined in examples/platform/silabs/OTAConfig.cpp and drives the
 // OTA state machine that the OTARequestorCluster (composed by OtaFeature) forwards to.
