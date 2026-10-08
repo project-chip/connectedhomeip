@@ -31,9 +31,11 @@ executable("chip-av-analysis-app") {
   configs += [ ":config" ]
 
   sources = [
+    "include/AvAnalysisAppCommandDelegate.h",
     "include/CHIPProjectAppConfig.h",
     "include/webrtc-peer-manager.h",
     "main.cpp",
+    "src/AvAnalysisAppCommandDelegate.cpp",
     "src/webrtc-peer-manager.cpp",
   ]
 
