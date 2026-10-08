@@ -63,15 +63,16 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
 
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
-        if (!mWaterValves[i]->IsOpen())
+        // Save before closing: closing clears the valve's open level and remaining duration.
+        auto openLevel = mWaterValves[i]->OpenLevel();
+        if (!openLevel.has_value())
         {
             continue;
         }
-        // Save before closing: closing clears the valve's open level and remaining duration.
         // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
-        auto remaining  = mWaterValves[i]->RemainingDuration();
-        mPausedZones[i] = PausedZone{ *mWaterValves[i]->OpenLevel(),
-                                      remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
+        auto remaining = mWaterValves[i]->RemainingDuration();
+        mPausedZones[i] =
+            PausedZone{ *openLevel, remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
         if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
         {
             mPausedZones[i].reset();
@@ -86,18 +87,18 @@ void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError 
     ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandleResumeStateCallback()");
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
-        if (!mPausedZones[i])
+        auto & zone = mPausedZones[i];
+        if (!zone.has_value())
         {
             continue;
         }
-        CHIP_ERROR error =
-            mWaterValves[i]->OpenValve(DataModel::MakeNullable(mPausedZones[i]->level), mPausedZones[i]->remainingDuration);
+        CHIP_ERROR error = mWaterValves[i]->OpenValve(DataModel::MakeNullable(zone->level), zone->remainingDuration);
         if (error != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
         }
-        mPausedZones[i].reset();
+        zone.reset();
     }
     CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning);
     if (error != CHIP_NO_ERROR)
