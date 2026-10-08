@@ -28,18 +28,6 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurati
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
     mTimerDelegate(timerDelegate), mValveDelegate(delegate), mConfig(config)
 {}
-<<<<<<< HEAD
-=======
-
-WaterValve::WaterValve(TimerDelegate & timerDelegate,
-                       const DataModel::Nullable<ValveConfigurationAndControlCluster::StartupConfiguration> & config,
-                       const DataModel::Nullable<ValveConfigurationAndControlCluster::ValveContext> & context,
-                       WaterValveListener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
-    mTimerDelegate(timerDelegate), mStartupConfiguration(config), mValveContext(context), mListener(listener)
-{}
-
->>>>>>> e6f0fb22d26 ([pre-commit.ci] auto fixes from pre-commit.com hooks)
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);

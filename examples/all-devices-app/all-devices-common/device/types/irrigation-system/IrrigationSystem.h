@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-class Irrigation : public DeviceInterface
+class IrrigationSystem : public DeviceInterface
 {
 public:
     struct ValveList
@@ -41,14 +41,14 @@ public:
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
-    Irrigation(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
-               Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :
+    IrrigationSystem(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
+                     Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :
         DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
 
         mTimerDelegate(TDelegate), mIdentifyDelegate(&IDelegate), mOperationalStateDelegate(ODelegate)
 
     {}
-    ~Irrigation() override = default;
+    ~IrrigationSystem() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition) override;

@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#include "Irrigation.h" // IWYU pragma: keep.
+#include "IrrigationSystem.h" // IWYU pragma: keep.
 #include "lib/support/CodeUtils.h"
 namespace chip {
 namespace app {
 
-CHIP_ERROR Irrigation::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                EndpointComposition composition)
+CHIP_ERROR IrrigationSystem::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                      EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -48,7 +48,7 @@ CHIP_ERROR Irrigation::Register(EndpointIdAllocator & allocator, CodeDrivenDataM
     return CHIP_NO_ERROR;
 }
 
-void Irrigation::Unregister(CodeDrivenDataModelProvider & provider)
+void IrrigationSystem::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterParts(provider);
     UnregisterDescriptor(mEndpointId, provider);

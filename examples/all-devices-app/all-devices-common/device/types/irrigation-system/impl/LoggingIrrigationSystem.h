@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <device/types/irrigation-system/Irrigation.h>
+#include <device/types/irrigation-system/IrrigationSystem.h>
 #include <device/types/water-valve/WaterValve.h>
 
 #include <memory>
@@ -25,17 +25,22 @@
 namespace chip {
 namespace app {
 
-class LoggingIrrigation : public Clusters::OperationalState::OperationalStateCluster::Delegate,
-                          public Irrigation,
-                          public WaterValve::WaterValveListener
+class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
+                                public IrrigationSystem,
+                                public WaterValve::WaterValveListener
 {
 public:
-    LoggingIrrigation(Clusters::IdentifyDelegate & identifyDelegate, TimerDelegate & timerDelegate,
-                      std::vector<Irrigation::ValveList> valves) :
-        Irrigation(timerDelegate, identifyDelegate, this),
-        mValveContext(std::move(valves))
+    struct PausedZone
+    {
+        Percent level;
+        DataModel::Nullable<uint32_t> remainingDuration;
+    };
+
+    LoggingIrrigationSystem(Clusters::IdentifyDelegate & identifyDelegate, TimerDelegate & timerDelegate,
+                            std::vector<IrrigationSystem::ValveList> valves) :
+        IrrigationSystem(timerDelegate, identifyDelegate, this), mValveContext(std::move(valves))
     {}
-    ~LoggingIrrigation() override = default;
+    ~LoggingIrrigationSystem() override = default;
 
     DataModel::Nullable<uint32_t> GetCountdownTime() override;
 
@@ -52,7 +57,7 @@ public:
 
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
-    static std::vector<Irrigation::ValveList> ValveConfiguration();
+    static std::vector<IrrigationSystem::ValveList> ValveConfiguration();
 
     void OnValveStateChanged() override;
 
@@ -60,8 +65,8 @@ private:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                              EndpointComposition composition) override;
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
-
-    std::vector<Irrigation::ValveList> mValveContext;
+    std::vector<std::optional<PausedZone>> mPausedZones;
+    std::vector<IrrigationSystem::ValveList> mValveContext;
     std::vector<std::unique_ptr<WaterValve>> mWaterValves;
 };
 

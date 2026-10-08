@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "LoggingIrrigation.h"
+#include "LoggingIrrigationSystem.h"
 #include "device/api/Interface.h"
 
 #include <clusters/shared/Enums.h>
@@ -52,20 +52,20 @@ const EndpointComposition::SemanticTag kValve3[] = {
 
 } // namespace
 
-std::vector<Irrigation::ValveList> LoggingIrrigation::ValveConfiguration()
+std::vector<IrrigationSystem::ValveList> LoggingIrrigationSystem::ValveConfiguration()
 {
-    return std::vector<Irrigation::ValveList>{
-        Irrigation::ValveList{
+    return std::vector<IrrigationSystem::ValveList>{
+        IrrigationSystem::ValveList{
             .startupConfiguration = defaultConfig,
             .valveContext         = defaultValveContext,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve1),
         },
-        Irrigation::ValveList{
+        IrrigationSystem::ValveList{
             .startupConfiguration = defaultConfig,
             .valveContext         = defaultValveContext,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve2),
         },
-        Irrigation::ValveList{
+        IrrigationSystem::ValveList{
             .startupConfiguration = defaultConfig,
             .valveContext         = defaultValveContext,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve3),
