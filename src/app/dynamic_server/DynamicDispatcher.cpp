@@ -28,7 +28,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/dynamic_server/DynamicDispatcher.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -36,6 +35,7 @@
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/dynamic_server/DynamicDispatcher.h>
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -196,8 +196,7 @@ Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool 
         return MakeOptional(OtaSoftwareUpdateProvider::Id);
     }
 
-    if (gWebRTCRequestorEndpointEnabled && endpoint == app::dynamic_server::kWebRTCRequestorDynamicEndpointId && n == 0 &&
-        server)
+    if (gWebRTCRequestorEndpointEnabled && endpoint == app::dynamic_server::kWebRTCRequestorDynamicEndpointId && n == 0 && server)
     {
         return MakeOptional(WebRTCTransportRequestor::Id);
     }
@@ -217,8 +216,9 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
-    if (server && (endpoint == kOtaProviderDynamicEndpointId ||
-                   (gWebRTCRequestorEndpointEnabled && endpoint == app::dynamic_server::kWebRTCRequestorDynamicEndpointId)))
+    if (server &&
+        (endpoint == kOtaProviderDynamicEndpointId ||
+         (gWebRTCRequestorEndpointEnabled && endpoint == app::dynamic_server::kWebRTCRequestorDynamicEndpointId)))
     {
         return 1;
     }
