@@ -64,7 +64,7 @@ public:
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
-            // RAII listener that will register itself as litsener to the OOBAccessorRegistry and will add any registered accessors
+            // RAII listener that will register itself as listener to the OOBAccessorRegistry and will add any registered accessors
             // to the deviceToOOBAccessorMap. At the end of the scope, it will unregister itself from the OOBAccessorRegistry.
             OOBAccessorRegistrationListener listener(device, GetDeviceToOOBAccessorMap());
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());

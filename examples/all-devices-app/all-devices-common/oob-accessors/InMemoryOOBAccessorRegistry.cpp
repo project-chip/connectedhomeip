@@ -24,10 +24,14 @@ namespace chip::app {
 CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> accessor)
 {
     VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    auto & accessorRef = *accessor;
     mAccessors.push_back(std::move(accessor));
-    for (auto * callback : mAccessorRegisteredCallbacks)
+
+    // iterate over a copy in case the callback modifies the list of callbacks (e.g. unregisters itself)
+    auto accessorRegisteredCallbacksCopy = mAccessorRegisteredCallbacks;
+    for (auto * callback : accessorRegisteredCallbacksCopy)
     {
-        callback->OnRegistered(*mAccessors.back());
+        callback->OnRegistered(accessorRef);
     }
     return CHIP_NO_ERROR;
 }
