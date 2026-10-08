@@ -2406,7 +2406,8 @@ JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
 }
 
 JNI_METHOD(void, webRTCTransportSolicitOffer)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject callback)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint endpointId, jobject jVideoStreamId, jobject jAudioStreamId,
+ jobject callback)
 {
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
@@ -2422,8 +2423,35 @@ JNI_METHOD(void, webRTCTransportSolicitOffer)
         return;
     }
 
+    Optional<app::DataModel::Nullable<uint16_t>> optionalVideoStreamId;
+    if (jVideoStreamId != nullptr)
+    {
+        jint videoStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jVideoStreamId);
+        if (!chip::CanCastTo<uint16_t>(videoStreamId))
+        {
+            ChipLogError(Controller, "Invalid video stream ID: out of uint16_t range.");
+            chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        optionalVideoStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(videoStreamId)));
+    }
+
+    Optional<app::DataModel::Nullable<uint16_t>> optionalAudioStreamId;
+    if (jAudioStreamId != nullptr)
+    {
+        jint audioStreamId = chip::JniReferences::GetInstance().IntegerToPrimitive(jAudioStreamId);
+        if (!chip::CanCastTo<uint16_t>(audioStreamId))
+        {
+            ChipLogError(Controller, "Invalid audio stream ID: out of uint16_t range.");
+            chip::JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+        optionalAudioStreamId.SetValue(app::DataModel::Nullable<uint16_t>(static_cast<uint16_t>(audioStreamId)));
+    }
+
     err = AndroidWebRTCTransportProviderClient::SolicitOffer(wrapper->Controller(), static_cast<chip::NodeId>(deviceId),
-                                                             static_cast<chip::EndpointId>(endpointId), callback);
+                                                             static_cast<chip::EndpointId>(endpointId), optionalVideoStreamId,
+                                                             optionalAudioStreamId, callback);
 
     if (err != CHIP_NO_ERROR)
     {

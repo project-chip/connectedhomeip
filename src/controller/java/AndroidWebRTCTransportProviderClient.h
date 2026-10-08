@@ -41,7 +41,9 @@ public:
                                    Optional<app::DataModel::Nullable<uint16_t>> videoStreamID,
                                    Optional<app::DataModel::Nullable<uint16_t>> audioStreamID, const CharSpan & offerSdp,
                                    jobject jcallback);
-    static CHIP_ERROR SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId, jobject jcallback);
+    static CHIP_ERROR SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
+                                   Optional<app::DataModel::Nullable<uint16_t>> videoStreamID,
+                                   Optional<app::DataModel::Nullable<uint16_t>> audioStreamID, jobject jcallback);
 
 private:
     // Constructors and destructors are set to private because the object lifecycle

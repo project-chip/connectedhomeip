@@ -162,6 +162,8 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::ProvideOffer(DeviceController *
 }
 
 CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController * controller, NodeId deviceId, EndpointId endpointId,
+                                                              Optional<DataModel::Nullable<uint16_t>> videoStreamID,
+                                                              Optional<DataModel::Nullable<uint16_t>> audioStreamID,
                                                               jobject jcallback)
 {
     auto * client = new AndroidWebRTCTransportProviderClient(Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Id);
@@ -181,8 +183,8 @@ CHIP_ERROR AndroidWebRTCTransportProviderClient::SolicitOffer(DeviceController *
 
     value.streamUsage           = StreamUsageEnum::kLiveView;
     value.originatingEndpointID = WebRTCTransportRequestorManager::Instance().GetEndpointId();
-    value.videoStreamID         = NullOptional;
-    value.audioStreamID         = NullOptional;
+    value.videoStreamID         = videoStreamID;
+    value.audioStreamID         = audioStreamID;
     value.ICEServers            = NullOptional;
     value.metadataEnabled       = NullOptional;
     value.SFrameConfig          = NullOptional;

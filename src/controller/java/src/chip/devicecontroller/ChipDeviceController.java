@@ -1034,11 +1034,18 @@ public class ChipDeviceController {
    *
    * @param deviceId The Node ID of the device to communicate with.
    * @param endpointId The target Endpoint ID.
+   * @param videoStreamId The ID of the video stream to request (optional, can be null).
+   * @param audioStreamId The ID of the audio stream to request (optional, can be null).
    * @param callback The callback to receive the success or failure of the command.
    */
   public void webRTCTransportSolicitOffer(
-      long deviceId, int endpointId, @Nonnull WebRTCTransportSolicitOfferCallback callback) {
-    webRTCTransportSolicitOffer(deviceControllerPtr, deviceId, endpointId, callback);
+      long deviceId,
+      int endpointId,
+      @Nullable Integer videoStreamId,
+      @Nullable Integer audioStreamId,
+      @Nonnull WebRTCTransportSolicitOfferCallback callback) {
+    webRTCTransportSolicitOffer(
+        deviceControllerPtr, deviceId, endpointId, videoStreamId, audioStreamId, callback);
   }
 
   /**
@@ -1046,6 +1053,8 @@ public class ChipDeviceController {
    *
    * @param deviceId The Node ID of the device to communicate with.
    * @param endpointId The target Endpoint ID.
+   * @param videoStreamId The ID of the video stream to provide (optional, can be null).
+   * @param audioStreamId The ID of the audio stream to provide (optional, can be null).
    * @param offerSdp The SDP Offer string to be delivered.
    * @param callback The callback to receive the success or failure of the command.
    */
@@ -1908,6 +1917,8 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       int endpointId,
+      @Nullable Integer videoStreamId,
+      @Nullable Integer audioStreamId,
       WebRTCTransportSolicitOfferCallback callback);
 
   private native void webRTCTransportProvideOffer(
