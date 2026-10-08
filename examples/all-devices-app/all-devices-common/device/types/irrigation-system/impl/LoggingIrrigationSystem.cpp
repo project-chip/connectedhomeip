@@ -16,7 +16,9 @@
  */
 
 #include "LoggingIrrigationSystem.h"
+#include "device/types/irrigation-system/IrrigationSystem.h"
 
+#include <cstddef>
 #include <lib/support/TypeTraits.h>
 
 #include <algorithm>
@@ -65,15 +67,16 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
         {
             continue;
         }
-        // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
-        auto remaining  = mWaterValves[i]->RemainingDuration();
-        mPausedZones[i] = PausedZone{ *mWaterValves[i]->OpenLevel(),
-                                      remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
         if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
         }
+
+        // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
+        auto remaining  = mWaterValves[i]->RemainingDuration();
+        mPausedZones[i] = PausedZone{ *mWaterValves[i]->OpenLevel(),
+                                      remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
     }
 }
 
@@ -88,12 +91,12 @@ void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError 
         }
         CHIP_ERROR error =
             mWaterValves[i]->OpenValve(DataModel::MakeNullable(mPausedZones[i]->level), mPausedZones[i]->remainingDuration);
-        mPausedZones[i].reset();
         if (error != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
         }
+        mPausedZones[i].reset();
     }
     CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning);
     if (error != CHIP_NO_ERROR)
@@ -171,6 +174,13 @@ void LoggingIrrigationSystem::UnregisterParts(CodeDrivenDataModelProvider & prov
 void LoggingIrrigationSystem::OnValveStateChanged()
 {
     bool anyOpen = std::any_of(mWaterValves.begin(), mWaterValves.end(), [](const auto & v) { return v->IsOpen(); });
+
+    // The master valve follows the zones regardless of the operational state, so it also closes while Paused.
+    if (mMasterValve.has_value() && anyOpen != mMasterValve->IsOpen())
+    {
+        LogErrorOnFailure(anyOpen ? mMasterValve->Open() : mMasterValve->Close());
+    }
+
     if (anyOpen)
     {
         LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));

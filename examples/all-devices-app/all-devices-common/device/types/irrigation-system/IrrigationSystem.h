@@ -30,6 +30,20 @@
 
 namespace chip {
 namespace app {
+/// Physical master valve on the main supply line. Optional in irrigation systems and not a Matter endpoint:
+/// the irrigation system opens it before the first zone opens and closes it after the last zone closes.
+/// Implementations must update mOpen when Open() / Close() succeed.
+class MasterValve
+{
+public:
+    virtual ~MasterValve()     = default;
+    virtual CHIP_ERROR Open()  = 0;
+    virtual CHIP_ERROR Close() = 0;
+    bool IsOpen() const { return mOpen; }
+
+protected:
+    bool mOpen = false;
+};
 
 class IrrigationSystem : public DeviceInterface
 {
@@ -69,7 +83,6 @@ public:
         VerifyOrDie(mFlowMeasurementCluster.IsConstructed());
         return mFlowMeasurementCluster.Cluster();
     }
-
     EndpointId GetEndpointId() const { return mEndpointId; }
 
 protected:
