@@ -29,6 +29,7 @@ if (chip_build_tests) {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/bridged-device-manager/oob-accessors",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:ambient-context",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:basic-information",

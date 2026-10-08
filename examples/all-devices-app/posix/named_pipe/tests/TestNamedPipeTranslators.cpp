@@ -23,6 +23,7 @@
 #include <posix/named_pipe/translators/AmbientContextTranslator.h>
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
+#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
@@ -371,6 +372,38 @@ TEST_F(TestNamedPipeTranslators, RvcTranslator)
     Json::Value remAreaJson = ParseJson(R"({"Name": "RemoveArea", "AreaId": 10})");
     EXPECT_EQ(translator.TranslateAndExecute(1, remAreaJson, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "RemoveArea");
+
+    // Unknown action
+    Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestNamedPipeTranslators, BridgedDeviceTranslator)
+{
+    BridgedDeviceTranslator translator;
+
+    // Valid AddBridgedDevice action
+    Json::Value validAddJson = ParseJson(R"({"Name": "AddBridgedDevice", "Device": "electrical-sensor"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, validAddJson, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "AddBridgedDevice");
+
+    // With AggregatorEndpointId
+    Json::Value parentJson = ParseJson(R"({"Name": "AddBridgedDevice", "Device": "electrical-sensor", "AggregatorEndpointId": 5})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, parentJson, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "AddBridgedDevice");
+
+    // Missing Device field
+    Json::Value missingDevice = ParseJson(R"({"Name": "AddBridgedDevice"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, missingDevice, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Valid RemoveBridgedDevice action
+    Json::Value validRemoveJson = ParseJson(R"({"Name": "RemoveBridgedDevice", "DeviceInterfaceId": 10})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, validRemoveJson, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "RemoveBridgedDevice");
+
+    // Missing DeviceInterfaceId field
+    Json::Value missingDeviceInterfaceId = ParseJson(R"({"Name": "RemoveBridgedDevice"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, missingDeviceInterfaceId, mRegistry), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Unknown action
     Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");

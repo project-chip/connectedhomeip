@@ -33,6 +33,7 @@
 #include <device/types/on-off-plug-in-unit/NamedPipeTranslators.h>
 #include <device/types/robotic-vacuum-cleaner/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
+#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 
 namespace chip::app::NamedPipe {
 
@@ -62,6 +63,7 @@ public:
         {
             RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
+        LogErrorOnFailure(Dispatcher::Instance().EnsureTranslatorRegistered<BridgedDeviceTranslator>());
     }
 };
 
