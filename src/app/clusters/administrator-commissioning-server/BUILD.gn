@@ -23,9 +23,11 @@ source_set("administrator-commissioning-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server:commissioning_window_manager",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
     "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning",
   ]
 }

@@ -96,6 +96,10 @@ source_set("dnssd") {
     "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
   ]
 
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
+  }
+
   if (chip_device_config_enable_thread_meshcop) {
     deps = [ ":thread_rendezvous_announcement" ]
   }
@@ -164,7 +168,6 @@ static_library("server") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
-    "${chip_root}/zzz_generated/app-common/clusters/AdministratorCommissioning:ids",
   ]
 
   if (chip_terms_and_conditions_required) {
