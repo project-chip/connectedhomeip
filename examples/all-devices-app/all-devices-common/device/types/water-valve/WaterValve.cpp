@@ -83,7 +83,7 @@ DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Per
     mOpenLevel = targetLevel;
     if (mListener != nullptr)
     {
-        mListener->OnValveStateChanged();
+        mListener->OnValveOpened();
     }
     return DataModel::MakeNullable(targetLevel);
 }
@@ -99,7 +99,7 @@ CHIP_ERROR WaterValve::HandleCloseValve()
     mRemainingDuration.reset();
     if (mListener != nullptr)
     {
-        mListener->OnValveStateChanged();
+        mListener->OnValveClosed();
     }
     return CHIP_NO_ERROR;
 }

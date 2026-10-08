@@ -67,16 +67,17 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
         {
             continue;
         }
-        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
-        {
-            err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
-            return;
-        }
-
+        // Save before closing: closing clears the valve's open level and remaining duration.
         // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
         auto remaining  = mWaterValves[i]->RemainingDuration();
         mPausedZones[i] = PausedZone{ *mWaterValves[i]->OpenLevel(),
                                       remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
+        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
+        {
+            mPausedZones[i].reset();
+            err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+            return;
+        }
     }
 }
 
@@ -171,21 +172,33 @@ void LoggingIrrigationSystem::UnregisterParts(CodeDrivenDataModelProvider & prov
     mPausedZones.clear();
 }
 
-void LoggingIrrigationSystem::OnValveStateChanged()
+void LoggingIrrigationSystem::OnValveOpened()
+{
+    // The master valve must be open before any zone can water.
+    if (mMasterValve.has_value() && !mMasterValve->IsOpen())
+    {
+        LogErrorOnFailure(mMasterValve->Open());
+    }
+    // Any open zone means water is flowing, even if it was opened directly while Paused.
+    LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));
+}
+
+void LoggingIrrigationSystem::OnValveClosed()
 {
     bool anyOpen = std::any_of(mWaterValves.begin(), mWaterValves.end(), [](const auto & v) { return v->IsOpen(); });
-
-    // The master valve follows the zones regardless of the operational state, so it also closes while Paused.
-    if (mMasterValve.has_value() && anyOpen != mMasterValve->IsOpen())
-    {
-        LogErrorOnFailure(anyOpen ? mMasterValve->Open() : mMasterValve->Close());
-    }
-
     if (anyOpen)
     {
-        LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));
+        // Other zones are still watering.
+        return;
     }
-    else if (OperationalStateCluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
+
+    // Last zone closed: close the master valve, also while Paused.
+    if (mMasterValve.has_value() && mMasterValve->IsOpen())
+    {
+        LogErrorOnFailure(mMasterValve->Close());
+    }
+    // A close never means Running; keep Paused so pausing several zones does not end in Stopped.
+    if (OperationalStateCluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
     {
         LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped));
     }

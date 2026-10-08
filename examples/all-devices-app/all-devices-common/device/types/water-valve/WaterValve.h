@@ -31,8 +31,9 @@ public:
     class WaterValveListener
     {
     public:
-        virtual ~WaterValveListener()      = default;
-        virtual void OnValveStateChanged() = 0;
+        virtual ~WaterValveListener() = default;
+        virtual void OnValveOpened()  = 0;
+        virtual void OnValveClosed()  = 0;
     };
 
     WaterValve(TimerDelegate & timerDelegate);
