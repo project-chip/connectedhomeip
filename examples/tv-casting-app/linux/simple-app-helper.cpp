@@ -277,7 +277,7 @@ void InvokeMediaFileManagementAddFile(matter::casting::memory::Strong<matter::ca
     request.name     = chip::CharSpan::fromCharString(kMediaFileName);
     request.size     = kMediaFileSize;
     request.mimeType = chip::CharSpan::fromCharString(kMediaFileMimeType);
-    request.imageUri = chip::CharSpan::fromCharString(kMediaFileImageUri);
+    request.imageURI = chip::CharSpan::fromCharString(kMediaFileImageUri);
 
     // call Invoke on addFileCommand while passing in success/failure callbacks
     addFileCommand->Invoke(
@@ -331,7 +331,7 @@ void InvokeMediaFileManagementOfferFile(matter::casting::memory::Strong<matter::
     request.name       = chip::CharSpan::fromCharString(kMediaFileName);
     request.size       = kMediaFileSize;
     request.mimeType   = chip::CharSpan::fromCharString(kMediaFileMimeType);
-    request.imageUri   = chip::CharSpan::fromCharString(kMediaFileImageUri);
+    request.imageURI   = chip::CharSpan::fromCharString(kMediaFileImageUri);
 
     offerFileCommand->Invoke(
         request, nullptr,
@@ -371,18 +371,18 @@ void InvokeMediaFileManagementGetSharedFile(matter::casting::memory::Strong<matt
         request, new chip::ScopedNodeId(peer),
         [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type::ResponseType & response) {
             std::unique_ptr<chip::ScopedNodeId> peerId(static_cast<chip::ScopedNodeId *>(context));
-            if (!response.fileDescription.HasValue() || response.fileDescription.Value().IsNull())
+            if (response.fileDescription.IsNull())
             {
                 ChipLogError(AppServer, "GetSharedFile Success but response carried no FileDescription");
                 return;
             }
-            const auto & file = response.fileDescription.Value().Value();
+            const auto & file = response.fileDescription.Value();
 
             // The tv-app rewrote ImageUri to bdx://<tv-app-node-id>/<designator>.
             // Parse it and pull the bytes over BDX into a local file.
             chip::NodeId uriNodeId = chip::kUndefinedNodeId;
             chip::CharSpan designatorSpan;
-            CHIP_ERROR err = chip::bdx::ParseURI(file.imageUri, uriNodeId, designatorSpan);
+            CHIP_ERROR err = chip::bdx::ParseURI(file.imageURI, uriNodeId, designatorSpan);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "GetSharedFile: ImageUri is not a bdx:// URI: %" CHIP_ERROR_FORMAT, err.Format());
@@ -845,7 +845,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance() -> StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)

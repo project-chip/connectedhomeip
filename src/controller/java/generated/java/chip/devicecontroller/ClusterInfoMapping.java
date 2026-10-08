@@ -20680,7 +20680,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription) {
+    public void onSuccess(Integer status, @Nullable ChipStructs.MediaFileManagementClusterFileDescriptionStruct fileDescription) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
@@ -33991,8 +33991,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo mediaFileManagementaddFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
     mediaFileManagementaddFileCommandParams.put("mimeType",mediaFileManagementaddFilemimeTypeCommandParameterInfo);
 
-    CommandParameterInfo mediaFileManagementaddFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
-    mediaFileManagementaddFileCommandParams.put("imageUri",mediaFileManagementaddFileimageUriCommandParameterInfo);
+    CommandParameterInfo mediaFileManagementaddFileimageURICommandParameterInfo = new CommandParameterInfo("imageURI", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("imageURI",mediaFileManagementaddFileimageURICommandParameterInfo);
     InteractionInfo mediaFileManagementaddFileInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MediaFileManagementCluster) cluster)
@@ -34007,7 +34007,7 @@ public class ClusterInfoMapping {
              commandArguments.get("mimeType")
 
            , (String)
-             commandArguments.get("imageUri")
+             commandArguments.get("imageURI")
 
             );
         },
@@ -34092,8 +34092,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo mediaFileManagementofferFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
     mediaFileManagementofferFileCommandParams.put("mimeType",mediaFileManagementofferFilemimeTypeCommandParameterInfo);
 
-    CommandParameterInfo mediaFileManagementofferFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
-    mediaFileManagementofferFileCommandParams.put("imageUri",mediaFileManagementofferFileimageUriCommandParameterInfo);
+    CommandParameterInfo mediaFileManagementofferFileimageURICommandParameterInfo = new CommandParameterInfo("imageURI", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("imageURI",mediaFileManagementofferFileimageURICommandParameterInfo);
     InteractionInfo mediaFileManagementofferFileInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MediaFileManagementCluster) cluster)
@@ -34107,7 +34107,7 @@ public class ClusterInfoMapping {
         , (String)
         commandArguments.get("mimeType")
         , (String)
-        commandArguments.get("imageUri")
+        commandArguments.get("imageURI")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

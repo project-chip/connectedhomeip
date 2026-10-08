@@ -16351,7 +16351,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddFile
  *
- * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage.
+ * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX).
  */
 - (void)addFileWithParams:(MTRMediaFileManagementClusterAddFileParams *)params completion:(void (^)(MTRMediaFileManagementClusterAddFileResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**

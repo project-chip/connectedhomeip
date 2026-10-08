@@ -16148,7 +16148,7 @@ public:
         AddArgument("Name", &mRequest.name);
         AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
         AddArgument("MimeType", &mRequest.mimeType);
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
         ClusterCommand::AddArguments();
     }
 
@@ -16252,8 +16252,7 @@ public:
 
 private:
     chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>>
-        mComplex_SupportedMimeTypes;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::CharSpan>>> mComplex_SupportedMimeTypes;
 };
 
 /*
@@ -16306,7 +16305,7 @@ public:
         AddArgument("Name", &mRequest.name);
         AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
         AddArgument("MimeType", &mRequest.mimeType);
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
         ClusterCommand::AddArguments();
     }
 
