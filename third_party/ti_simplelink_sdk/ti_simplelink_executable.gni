@@ -89,19 +89,20 @@ template("ti_simplelink_executable") {
       }
     } else if (ti_simplelink_device_family == "cc32xx") {
       ldscript = "${ti_simplelink_sdk_root}/source/ti/boards/cc32xxsf/cc32xxsf_freertos.lds"
+    } else if (ti_simplelink_device_family == "cc35xx") {
+      ldscript = "${chip_root}/src/platform/ti/cc35xx/cc35xx_freertos.lds"
     }
-
     inputs = [ ldscript ]
 
     ldflags = [
       "-L" + rebase_path(ti_simplelink_sdk_root + "/source", root_build_dir),
-      rebase_path(
-          "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-          root_build_dir),
+      "-L" + rebase_path("${target_gen_dir}/sysconfig/", root_build_dir),
+      "-T" + rebase_path(
+              "${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
+              root_build_dir),
       "-T" + rebase_path(ldscript, root_build_dir),
     ]
   }
-
   if (chip_enable_ota_requestor) {
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (custom_factory_data) {
@@ -125,6 +126,8 @@ template("ti_simplelink_executable") {
           ]
         }
         pw_python_action("${simplelink_target_name}-factory-data.hex") {
+          public_deps = [ ":${simplelink_target_name}.out.image" ]
+
           script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
           sources = [
             "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema",
@@ -141,6 +144,9 @@ template("ti_simplelink_executable") {
                 "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema"),
             "-o",
             rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
+                        root_out_dir),
+            "--matter_app_map_file",
+            rebase_path("${root_out_dir}/${output_base_name}.out.map",
                         root_out_dir),
             "-device",
             "cc13x4_26x4",
@@ -333,7 +339,6 @@ template("ti_simplelink_executable") {
           "-T" + rebase_path(ldscript, root_build_dir),
         ]
 
-        # We do not want to modify third party code, so we are adding this flag to suppress the warnings coming from it
         cflags_c = [ "-Wno-incompatible-pointer-types" ]
       }
 
@@ -431,7 +436,6 @@ template("ti_simplelink_executable") {
              custom_factory_data) {
     pw_python_action("${simplelink_target_name}-without-factory-data.hex") {
       public_deps = [ ":${simplelink_target_name}.out.image" ]
-
       script = "${ti_simplelink_sdk_build_root}/factory_data_trim.py"
       sources = [ "${root_out_dir}/${objcopy_image_name}" ]
       outputs =
@@ -444,10 +448,12 @@ template("ti_simplelink_executable") {
         rebase_path(
             "${root_out_dir}/${output_base_name}-without-factory-data.hex",
             root_out_dir),
-        "cc13x4_26x4",
+        ti_simplelink_device_family,
       ]
     }
     pw_python_action("${simplelink_target_name}-factory-data.hex") {
+      public_deps = [ ":${simplelink_target_name}.out.image" ]
+
       script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
       sources = [
         "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema",
@@ -465,8 +471,11 @@ template("ti_simplelink_executable") {
         "-o",
         rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
                     root_out_dir),
+        "--matter_app_map_file",
+        rebase_path("${root_out_dir}/${output_base_name}.out.map",
+                    root_out_dir),
         "-device",
-        "cc13x4_26x4",
+        ti_simplelink_device_family,
       ]
     }
     pw_python_action("${simplelink_target_name}-and-factory-data.hex") {
@@ -494,6 +503,24 @@ template("ti_simplelink_executable") {
     }
   }
 
+  if (ti_simplelink_device_family == "cc35xx") {
+    pw_python_action("vendor_image.sign.bin") {
+      public_deps = [ ":${simplelink_target_name}.out.image" ]
+
+      script = "${ti_simplelink_sdk_build_root}/cc35xx/sign_cc35xx_img.py"
+      sources = [ "${root_out_dir}/${objcopy_image_name}" ]
+      outputs = [ "${root_out_dir}/vendor_image.sign.bin" ]
+      args = [
+        rebase_path("${ti_simplelink_sdk_build_root}/cc35xx/", root_build_dir),
+        rebase_path("${root_out_dir}", root_out_dir),
+        ti_simplelink_wifi_toolbox_root,
+        rebase_path("${target_gen_dir}/sysconfig", root_out_dir),
+        rebase_path("${root_out_dir}/${output_base_name}.out", root_out_dir),
+        ti_simplelink_wifi_sdk_root,
+      ]
+    }
+  }
+
   group(simplelink_target_name) {
     if (chip_enable_ota_requestor) {
       # Generating the ota binary image
@@ -509,6 +536,9 @@ template("ti_simplelink_executable") {
       data_deps = [ ":${simplelink_target_name}.out" ]
       if (ti_simplelink_device_family == "cc13x4_26x4" && custom_factory_data) {
         data_deps += [ ":${simplelink_target_name}-and-factory-data.hex" ]
+      }
+      if (ti_simplelink_device_family == "cc35xx") {
+        data_deps += [ ":vendor_image.sign.bin" ]
       }
     }
 
