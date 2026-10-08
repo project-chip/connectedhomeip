@@ -32,8 +32,10 @@
 #include <device/types/occupancy-sensor/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
+#include <device/types/power-source/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
+#include <device/types/soil-sensor/OOBAccessors.h>
 
 namespace chip::app {
 

@@ -16,10 +16,14 @@
  */
 #pragma once
 
+#include <optional>
+
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <device/api/SingleEndpoint.h>
+#include <device/types/power-source/BatteryPowerSource.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip {
@@ -28,9 +32,15 @@ namespace app {
 class SoilSensor : public SingleEndpoint
 {
 public:
+    using SimpleBatteryPowerSourceCluster = BatteryPowerSource::SimpleBatteryPowerSourceCluster;
+
+    static Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type DefaultSoilMoistureMeasurementLimits();
+    static Clusters::TemperatureMeasurementCluster::StartupConfiguration DefaultTemperatureConfiguration();
+
+    SoilSensor(TimerDelegate & timerDelegate, bool includeTemperature = true);
     SoilSensor(TimerDelegate & timerDelegate,
                Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
-               Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
+               std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> tempConfig = std::nullopt);
     ~SoilSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -39,17 +49,27 @@ public:
 
     // Public getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
-
     Clusters::SoilMeasurementCluster & SoilMeasurementCluster() { return mSoilMeasurementCluster.Cluster(); }
-    Clusters::TemperatureMeasurementCluster & TemperatureMeasurementCluster() { return mTemperatureMeasurementCluster.Cluster(); }
+
+    bool HasTemperature() const { return mTemperatureMeasurementCluster.IsConstructed(); }
+    Clusters::TemperatureMeasurementCluster & TemperatureMeasurementCluster()
+    {
+        VerifyOrDie(mTemperatureMeasurementCluster.IsConstructed());
+        return mTemperatureMeasurementCluster.Cluster();
+    }
+
+    SimpleBatteryPowerSourceCluster & PowerSourceCluster() { return mBatteryPowerSourceCluster.Cluster(); }
 
 protected:
     TimerDelegate & mTimerDelegate;
     Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mMoistureLimits;
-    Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
+    std::optional<Clusters::TemperatureMeasurementCluster::StartupConfiguration> mTempConfig;
+    EndpointId mEndpointList[1] = { kInvalidEndpointId };
+
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::SoilMeasurementCluster> mSoilMeasurementCluster;
     LazyRegisteredServerCluster<Clusters::TemperatureMeasurementCluster> mTemperatureMeasurementCluster;
+    LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
 };
 
 } // namespace app

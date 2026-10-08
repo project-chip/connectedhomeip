@@ -17,7 +17,6 @@
 #include "IncreasingMoistureSoilSensor.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
@@ -28,30 +27,10 @@ namespace app {
 
 namespace {
 constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
-
-const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-};
-
-const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
-    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-    .measured         = true,
-    .minMeasuredValue = 0,
-    .maxMeasuredValue = 100,
-    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
-};
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-10)),
-    .maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(50)),
-    .tolerance        = 0,
-};
-
 } // namespace
 
 IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
+    SoilSensor(mTimerDelegate, /* includeTemperature = */ true)
 {}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
@@ -77,36 +56,38 @@ void IncreasingMoistureSoilSensor::TimerFired()
 {
     if (mSoilMoistureMeasuredValue.IsNull())
     {
-        mSoilMoistureMeasuredValue.SetNonNull(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+        mSoilMoistureMeasuredValue.SetNonNull(mMoistureLimits.minMeasuredValue);
     }
-    else if (mSoilMoistureMeasuredValue.Value() >= kDefaultSoilMoistureMeasurementLimits.maxMeasuredValue)
+    else if (mSoilMoistureMeasuredValue.Value() >= mMoistureLimits.maxMeasuredValue)
     {
-        mSoilMoistureMeasuredValue.SetNonNull(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+        mSoilMoistureMeasuredValue.SetNonNull(mMoistureLimits.minMeasuredValue);
     }
     else
     {
-        mSoilMoistureMeasuredValue.SetNonNull(mSoilMoistureMeasuredValue.Value() + 1U);
+        mSoilMoistureMeasuredValue.SetNonNull(static_cast<chip::Percent>(mSoilMoistureMeasuredValue.Value() + 1U));
     }
 
     ChipLogProgress(AppServer, "IncreasingMoistureValue: Increasing to %d", mSoilMoistureMeasuredValue.Value());
     LogErrorOnFailure(mSoilMeasurementCluster.Cluster().SetSoilMoistureMeasuredValue(mSoilMoistureMeasuredValue));
 
-    // Simulate increasing temperature
-    if (mTemperatureMeasuredValue.IsNull())
+    // Simulate increasing temperature if enabled
+    if (HasTemperature() && mTempConfig.has_value())
     {
-        mTemperatureMeasuredValue.SetNonNull(kDefaultTemperatureConfig.minMeasuredValue.Value());
-    }
-    else if (mTemperatureMeasuredValue.Value() >= kDefaultTemperatureConfig.maxMeasuredValue.Value())
-    {
-        mTemperatureMeasuredValue.SetNonNull(kDefaultTemperatureConfig.minMeasuredValue.Value());
-    }
-    else
-    {
-        mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 1));
-    }
+        int16_t minTemp = mTempConfig->minMeasuredValue.ValueOr(-1000);
+        int16_t maxTemp = mTempConfig->maxMeasuredValue.ValueOr(5000);
 
-    ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
-    LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
+        if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)
+        {
+            mTemperatureMeasuredValue.SetNonNull(minTemp);
+        }
+        else
+        {
+            mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 100));
+        }
+
+        ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
+        LogErrorOnFailure(TemperatureMeasurementCluster().SetMeasuredValue(mTemperatureMeasuredValue));
+    }
 
     VerifyOrDie(mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec) == CHIP_NO_ERROR);
 }

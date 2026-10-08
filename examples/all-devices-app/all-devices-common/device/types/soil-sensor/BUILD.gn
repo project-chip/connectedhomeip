@@ -17,13 +17,20 @@ import("//build_overrides/chip.gni")
 
 source_set("soil-sensor") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "SoilSensor.cpp",
     "SoilSensor.h",
+    "SoilSensorAccessor.cpp",
+    "SoilSensorAccessor.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/power-source-server",
     "${chip_root}/src/app/clusters/soil-measurement-server",
     "${chip_root}/src/app/clusters/temperature-measurement-server",
     "${chip_root}/src/data-model-providers/codedriven",
