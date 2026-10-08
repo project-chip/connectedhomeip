@@ -78,7 +78,12 @@ MTR_DIRECT_MEMBERS
 
 - (void)dealloc
 {
-    [self cancel];
+    // The device clears _completion before it can drop its last reference to us, and calls delegates
+    // asynchronously, so a set _completion means we are still registered and the device lock is not held here.
+    if (_completion != nil) {
+        [_device _pendingAttributeWaiterDeallocated];
+    }
+    [self _notifyCancellation];
 }
 
 - (void)cancel

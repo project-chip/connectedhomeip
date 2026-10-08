@@ -27,13 +27,23 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
 /**
- * A node entry carries the union of its delegates' interested paths, sorted, under
- * MTRDeviceControllerRegistrationInterestedPathsForAttributesKey and MTRDeviceControllerRegistrationInterestedPathsForEventsKey.
- * The attribute paths include those of pending attribute-value waiters, so a node with only waiters is listed too.
- * A missing key means every path. Each element is an NSNumber endpoint ID, or a dictionary of NSNumbers holding
- * MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and MTRDeviceControllerRegistrationInterestedPathClusterIDKey,
- * plus MTRDeviceControllerRegistrationInterestedPathAttributeIDKey for an attribute path or
- * MTRDeviceControllerRegistrationInterestedPathEventIDKey for an event path.
+ * Each dictionary in the MTRDeviceControllerRegistrationNodeIDsKey array describes one node that has a delegate
+ * or a pending attribute-value waiter. Besides MTRDeviceControllerRegistrationNodeIDKey, it can hold:
+ *
+ * - MTRDeviceControllerRegistrationInterestedPathsForAttributesKey: an array of the attribute paths the client's
+ *   delegates and pending attribute-value waiters for that node are interested in.
+ * - MTRDeviceControllerRegistrationInterestedPathsForEventsKey: an array of the event paths its delegates are
+ *   interested in.
+ *
+ * A missing key means the client is interested in every path of that kind, and an empty array means none. Neither
+ * array has duplicates, and their order does not depend on the order delegates were added. An element of either
+ * array is one of:
+ *
+ * - An NSNumber endpoint ID: every path on that endpoint.
+ * - A dictionary with NSNumber values for MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and
+ *   MTRDeviceControllerRegistrationInterestedPathClusterIDKey: every path in that cluster on that endpoint.
+ * - The same dictionary with an NSNumber value for MTRDeviceControllerRegistrationInterestedPathAttributeIDKey
+ *   (attributes array) or MTRDeviceControllerRegistrationInterestedPathEventIDKey (events array): that one path.
  */
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_NEWLY_AVAILABLE;
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_NEWLY_AVAILABLE;
