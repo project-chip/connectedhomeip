@@ -23,10 +23,10 @@ using namespace ::chip::DeviceLayer;
 
 namespace chip {
 
-CHIP_ERROR SilabsTestEventTriggerDelegate::Init(DeviceLayer::Silabs::Provision::ProvisionedDataProvider * provider)
+CHIP_ERROR SilabsTestEventTriggerDelegate::Init(DeviceLayer::Silabs::Provision::IProvisionStorageReader * reader)
 {
-    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mProvider = provider;
+    VerifyOrReturnError(reader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mReader = reader;
 
     return CHIP_NO_ERROR;
 }
@@ -38,11 +38,11 @@ bool SilabsTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableK
     uint8_t storedEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
     MutableByteSpan storedEnableKeySpan(storedEnableKey);
 
-    // If mProvider is equal to nullptr, we still continue in the function to check if the requested enableKey matches the zero
+    // If mReader is equal to nullptr, we still continue in the function to check if the requested enableKey matches the zero
     // key.
-    if (mProvider != nullptr)
+    if (mReader != nullptr)
     {
-        error = mProvider->GetTestEventTriggerKey(storedEnableKeySpan);
+        error = mReader->GetTestEventTriggerKey(storedEnableKeySpan);
     }
 
     if (error != CHIP_NO_ERROR)

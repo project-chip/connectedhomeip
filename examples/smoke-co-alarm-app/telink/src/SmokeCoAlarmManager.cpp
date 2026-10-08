@@ -36,9 +36,20 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
+    // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+    constexpr uint32_t kExpiryDate = 3976214400;
     SmokeCoAlarmCluster::Config config;
-    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    config
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kExpiryDate)
+        .WithUnmounted();
     return SmokeCoAlarmServer::Instance().Init(1, config, this);
 }
 

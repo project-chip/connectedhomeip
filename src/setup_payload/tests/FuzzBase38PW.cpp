@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <iostream>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include "setup_payload/QRCodeSetupPayloadParser.h"
 #include <setup_payload/Base38Decode.h>
