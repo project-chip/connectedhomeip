@@ -119,6 +119,12 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+void SimulatedWaterHeater::Shutdown(ClusterShutdownType type)
+{
+    mTimerDelegate.CancelTimer(this);
+    mAttributeStorage = nullptr;
+}
+
 void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mConfig.timerDelegate.CancelTimer(this);

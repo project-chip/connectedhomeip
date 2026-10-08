@@ -92,6 +92,7 @@ public:
     GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType type) override;
 
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;
