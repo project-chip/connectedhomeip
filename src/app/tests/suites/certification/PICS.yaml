@@ -700,11 +700,6 @@ PICS:
       id: MCORE.OTA.VendorSpecific
 
     - label:
-          "Does the DUT have Administer privilege over the Access Control of
-          another node?"
-      id: MCORE.ACL.Administrator
-
-    - label:
           "Does the Requestor DUT support querying a different Provider in its
           OTA Provider List when it hits error conditions in invoking the
           QueryImage command?"
@@ -5256,9 +5251,6 @@ PICS:
     #
     # client / manually
     #
-    - label: "Does the DUT support sending the AnnounceOTAProvider Command?"
-      id: OTAR.C.M.AnnounceOTAProvider
-
     - label: "Does the DUT support sending the NotifyUpdateApplied Command?"
       id: OTAR.C.M.NotifyUpdateApplied
 
