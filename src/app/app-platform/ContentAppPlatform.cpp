@@ -35,6 +35,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <string>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -105,9 +107,9 @@ Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId
     return (Status::Failure);
 }
 
-Status __attribute__((weak))
-AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Status __attribute__((weak)) AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer)
 {
     return (Status::Failure);
 }
@@ -821,11 +823,14 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 if (isNodeAdded && rotatingId.size() != 0)
                 {
                     // handle login
-                    auto setupPIN             = std::to_string(passcode);
+                    // The Setup PIN is the 8-digit passcode as a decimal string; keep leading zeros
+                    // (e.g. passcode 1234 is "00001234").
+                    char setupPIN[9];
+                    snprintf(setupPIN, sizeof(setupPIN), "%08" PRIu32, passcode);
                     auto accountLoginDelegate = app->GetAccountLoginDelegate();
                     if (accountLoginDelegate != nullptr)
                     {
-                        bool condition = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
+                        bool condition = accountLoginDelegate->HandleLogin(rotatingId, CharSpan::fromCharString(setupPIN),
                                                                            MakeOptional(subjectNodeId));
                         ChipLogProgress(Controller, "AccountLogin::Login command sent and returned: %s",
                                         condition ? "success" : "failure");
