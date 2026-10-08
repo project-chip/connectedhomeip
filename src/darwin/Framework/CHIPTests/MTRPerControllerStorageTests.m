@@ -4066,6 +4066,98 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
+
+// A session request for a Thread node that is waiting on a resolve that never answers must fail
+// when the controller shuts down, rather than when the wait would have timed out.
+- (void)testThreadDeviceSessionRequestFailsOnShutdownWhileResolveNeverAnswers
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(559);
+    NSNumber * fabricID = @(560);
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(25);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // Restart the controller so no CASE session to the node survives.
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:kUnresolvableOperationalInstanceName];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    // Not registered with the test case and held weakly by the completion, so a completion that only
+    // arrives after the test has ended does nothing.
+    __auto_type * toggleHeldExpectation = [[XCTestExpectation alloc] initWithDescription:@"toggle still held"];
+    toggleHeldExpectation.inverted = YES;
+    __auto_type * toggleExpectation = [[XCTestExpectation alloc] initWithDescription:@"toggle failed"];
+    __weak XCTestExpectation * weakToggleHeldExpectation = toggleHeldExpectation;
+    __weak XCTestExpectation * weakToggleExpectation = toggleExpectation;
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [cluster toggleWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [weakToggleHeldExpectation fulfill];
+        [weakToggleExpectation fulfill];
+    }];
+
+    // The request is held by the connectivity check, not failed.
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ toggleHeldExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    XCTWaiterResult shutdownResult = [XCTWaiter waitForExpectations:@[ toggleExpectation ] timeout:kTimeoutInSeconds];
+
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:nil];
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    ResetCommissionee([MTRBaseDevice deviceWithNodeID:deviceID controller:controller], queue, self, kTimeoutInSeconds);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    XCTAssertEqual(shutdownResult, XCTWaiterResultCompleted);
+}
 #endif // DEBUG
 
 @end

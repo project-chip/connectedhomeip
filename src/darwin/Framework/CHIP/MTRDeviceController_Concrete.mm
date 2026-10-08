@@ -146,6 +146,8 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+    // Fail the session requests still waiting on a connectivity monitor; run on the Matter queue at shutdown.
+    NSMutableSet<dispatch_block_t> * _connectivityCheckShutdownHandlers;
 #ifdef DEBUG
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
     os_unfair_lock _unitTestHookLock;
@@ -524,6 +526,23 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         // _cppCommissioner, so we're not in a state where we claim to be
         // running but are actually partially shut down.
         _cppCommissioner = nullptr;
+
+        // Fail the session requests still waiting on a connectivity monitor: shutdown has stopped
+        // their monitors, and their timeouts hold them only weakly, so nothing else will. This has
+        // to happen in the same Matter-queue step that stops the controller running: a request
+        // registers here on the Matter queue only while the controller is running, so every request
+        // is either registered before this point and failed here, or never registered at all. The
+        // handlers take _deviceConnectivityMonitorLock themselves, so run them outside it.
+        NSSet<dispatch_block_t> * shutdownHandlers;
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            shutdownHandlers = [_connectivityCheckShutdownHandlers copy];
+            [_connectivityCheckShutdownHandlers removeAllObjects];
+        }
+        for (dispatch_block_t shutdownHandler in shutdownHandlers) {
+            shutdownHandler();
+        }
+
         commissionerToShutDown->Shutdown();
         // Don't clear out our fabric index association until controller
         // shutdown completes, in case it wants to write to storage as it
@@ -793,6 +812,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         }
 
         _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
+        _connectivityCheckShutdownHandlers = [NSMutableSet set];
 
         commissionerInitialized = YES;
 
@@ -1817,6 +1837,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         monitorWaitSeconds = _unitTestConnectivityMonitorWaitSeconds;
     }
 #endif
+    __block dispatch_block_t shutdownHandler;
     void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
         // Ensure the work item is queued only once, since this handler could be called multiple times in a row
         if (workItem) {
@@ -1830,6 +1851,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             }
             workItem = nil;
             [deviceConnectivityMonitor stopMonitoring];
+            {
+                std::lock_guard lock(self->_deviceConnectivityMonitorLock);
+                [self->_connectivityCheckShutdownHandlers removeObject:shutdownHandler];
+            }
+            shutdownHandler = nil;
         }
     };
     BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
@@ -1842,6 +1868,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         {
             std::lock_guard lock(_deviceConnectivityMonitorLock);
             [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+        }
+        shutdownHandler = ^{
+            if (workItem) {
+                MTR_LOG("%@ shutting down, failing session request for node 0x%016llX waiting on its connectivity monitor", self, nodeID);
+                workItem = nil;
+                [deviceConnectivityMonitor stopMonitoring];
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+            }
+        };
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_connectivityCheckShutdownHandlers addObject:shutdownHandler];
         }
         __weak void (^weakEnqueueWorkItemOnce)(BOOL) = enqueueWorkItemOnce;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (monitorWaitSeconds * NSEC_PER_SEC)), _chipWorkQueue, ^{
