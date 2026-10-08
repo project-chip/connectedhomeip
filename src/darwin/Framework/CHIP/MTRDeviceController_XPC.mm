@@ -51,6 +51,12 @@ NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDevic
 NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
 NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
 NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey = @"MTRDeviceControllerRegistrationControllerCompressedFabricID";
+NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey = @"MTRDeviceControllerRegistrationInterestedPathsForAttributes";
+NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey = @"MTRDeviceControllerRegistrationInterestedPathsForEvents";
+NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey = @"MTRDeviceControllerRegistrationInterestedPathEndpointID";
+NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey = @"MTRDeviceControllerRegistrationInterestedPathClusterID";
+NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey = @"MTRDeviceControllerRegistrationInterestedPathAttributeID";
+NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTRDeviceControllerRegistrationInterestedPathEventID";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
@@ -60,6 +66,29 @@ NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey 
 }
 
 #pragma mark - Node ID Management
+
+static NSArray<id> * MTRRegistrationInterestedPaths(NSArray<id> * interestedPaths)
+{
+    NSMutableArray<id> * registrationPaths = [NSMutableArray arrayWithCapacity:interestedPaths.count];
+    for (id interestedPath in interestedPaths) {
+        if ([interestedPath isKindOfClass:[NSNumber class]]) {
+            [registrationPaths addObject:interestedPath];
+            continue;
+        }
+
+        MTRClusterPath * clusterPath = interestedPath;
+        NSMutableDictionary<NSString *, NSNumber *> * registrationPath = [NSMutableDictionary dictionary];
+        registrationPath[MTRDeviceControllerRegistrationInterestedPathEndpointIDKey] = clusterPath.endpoint;
+        registrationPath[MTRDeviceControllerRegistrationInterestedPathClusterIDKey] = clusterPath.cluster;
+        if ([interestedPath isKindOfClass:[MTRAttributePath class]]) {
+            registrationPath[MTRDeviceControllerRegistrationInterestedPathAttributeIDKey] = ((MTRAttributePath *) interestedPath).attribute;
+        } else if ([interestedPath isKindOfClass:[MTREventPath class]]) {
+            registrationPath[MTRDeviceControllerRegistrationInterestedPathEventIDKey] = ((MTREventPath *) interestedPath).event;
+        }
+        [registrationPaths addObject:registrationPath];
+    }
+    return registrationPaths;
+}
 
 MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_COMMAND(updateControllerConfiguration
                                                : (NSDictionary *) controllerState, updateControllerConfiguration
@@ -85,9 +114,18 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
         MTRDevice * device = [self.nodeIDToDeviceMap objectForKey:nodeID];
-        if ([device delegateExists]) {
+        NSArray<id> * interestedPathsForAttributes = [device unionOfInterestedPathsForAttributes];
+        NSArray<id> * interestedPathsForEvents = [device unionOfInterestedPathsForEvents];
+        if ([device delegateExists] || interestedPathsForAttributes.count > 0) {
             NSMutableDictionary * nodeDictionary = [NSMutableDictionary dictionary];
             MTR_REQUIRED_ATTRIBUTE(MTRDeviceControllerRegistrationNodeIDKey, nodeID, nodeDictionary)
+
+            if (interestedPathsForAttributes != nil) {
+                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForAttributesKey] = MTRRegistrationInterestedPaths(interestedPathsForAttributes);
+            }
+            if (interestedPathsForEvents != nil) {
+                nodeDictionary[MTRDeviceControllerRegistrationInterestedPathsForEventsKey] = MTRRegistrationInterestedPaths(interestedPathsForEvents);
+            }
 
             [nodeIDs addObject:nodeDictionary];
         }

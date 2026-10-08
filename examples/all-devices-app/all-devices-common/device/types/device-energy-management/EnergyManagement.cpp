@@ -173,7 +173,7 @@ CHIP_ERROR EnergyManagement::SetESAState(ESAStateEnum state)
     mESAState = state;
 
     VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), Id, Attributes::ESAState::Id },
+    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::ESAState::Id },
                                       DataModel::AttributeChangeType::kReportable);
 
     return CHIP_NO_ERROR;

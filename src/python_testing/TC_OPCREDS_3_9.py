@@ -37,7 +37,7 @@ from support_modules.pqc_support import (AttestationCryptoProfile, CertificateAl
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -49,14 +49,14 @@ kOversizedMaxSegmentSize = 0xFFFF
 kInvalidCertificateType = 0x03
 
 
-class TC_OPCREDS_3_9(MatterBaseTest):
+class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
     """PQC Device Attestation CertificateChainRequest behavior [DUT-Server]."""
 
     def desc_TC_OPCREDS_3_9(self) -> str:
         return "[TC-OPCREDS-3.9] PQC Device Attestation CertificateChainRequest behavior [DUT-Server]"
 
     def pics_TC_OPCREDS_3_9(self) -> list[str]:
-        return ["OPCREDS.S", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
+        return ["OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_OPCREDS_3_9(self) -> list[TestStep]:
         return [

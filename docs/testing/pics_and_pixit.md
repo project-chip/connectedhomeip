@@ -318,6 +318,13 @@ contents.
 Tests that do not use these decorators are unaffected; validation and failure
 output apply only when the decorators are present.
 
+Separately, every test run ends with an execution summary that logs all
+command-line flags and named arguments, whether or not the test uses these
+decorators. The Wi-Fi credentials are currently redacted (`--wifi-ssid`,
+`--wifi-passphrase`, and the `wifi_ssid` and `wifi_password` PIXITs, as well as
+the `PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID` and
+`PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS` used in CNET 4.11).
+
 ### Command-line example
 
 A test declaring both PIXITs and harness parameters:

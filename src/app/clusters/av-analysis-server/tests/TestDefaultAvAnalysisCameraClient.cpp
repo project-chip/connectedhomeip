@@ -120,6 +120,7 @@ public:
     using DefaultAvAnalysisCameraClient::HandleServerListReport;
     using DefaultAvAnalysisCameraClient::NormalizeProfile;
     using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
+    using DefaultAvAnalysisCameraClient::Request;
 
 protected:
     // Discovery does not run on its own; the test drives OnProfileDiscoveryComplete explicitly
@@ -705,6 +706,83 @@ TEST_F(TestDefaultAvAnalysisCameraClient, AttributeReportWithoutARequestIsIgnore
     client.OnAttributeData(path, &reader, StatusIB());
 
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, kInvalidEndpointId);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryWithoutAvsmEndpointReturnsNotFound)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Endpoint 0 serves Descriptor but not CameraAVStreamManagement
+    uint8_t buffer[64];
+    TLV::TLVReader reader;
+    const ClusterId kRootClusters[] = { Descriptor::Id };
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kRootClusters), MutableByteSpan(buffer), reader));
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+
+    // Read finishes cleanly with no matching endpoint -> Status::NotFound
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryErrorReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Read fails with a transport/IM error -> Status::Failure
+    client.OnError(CHIP_ERROR_TIMEOUT);
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryAttributeStatusFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, nullptr, StatusIB(Status::Failure));
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryDecodeFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Encode a scalar integer instead of a TLV array for ServerList
+    uint8_t buffer[32];
+    TLV::TLVReader reader;
+    ASSERT_TRUE(EncodeTlv(buffer, sizeof(buffer), reader,
+                          [](TLV::TLVWriter & w) { return w.Put(TLV::AnonymousTag(), static_cast<uint32_t>(42)); }));
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
 }
 
 } // namespace
