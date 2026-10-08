@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
-#include "LoggingIrrigation.h"
+#include "LoggingIrrigationSystem.h"
+
+#include <lib/support/TypeTraits.h>
 
 #include <algorithm>
 #include <iterator>
@@ -25,13 +27,13 @@ using namespace chip::app::Clusters::OperationalState;
 namespace chip {
 namespace app {
 
-DataModel::Nullable<uint32_t> LoggingIrrigation::GetCountdownTime()
+DataModel::Nullable<uint32_t> LoggingIrrigationSystem::GetCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigation::GetCountdownTime()");
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::GetCountdownTime()");
     return DataModel::NullNullable;
 }
 
-CHIP_ERROR LoggingIrrigation::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+CHIP_ERROR LoggingIrrigationSystem::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     static constexpr OperationalStateEnum kStates[] = { OperationalStateEnum::kStopped, OperationalStateEnum::kRunning,
                                                         OperationalStateEnum::kPaused };
@@ -40,15 +42,15 @@ CHIP_ERROR LoggingIrrigation::GetOperationalStateAtIndex(size_t index, GenericOp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LoggingIrrigation::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+CHIP_ERROR LoggingIrrigationSystem::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     // No phases are supported.
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void LoggingIrrigation::HandlePauseStateCallback(GenericOperationalError & err)
+void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigation::HandlePauseStateCallback()");
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandlePauseStateCallback()");
     // Set Paused first so the valve close notifications do not move the system to Stopped.
     CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kPaused);
     if (error != CHIP_NO_ERROR)
@@ -57,13 +59,17 @@ void LoggingIrrigation::HandlePauseStateCallback(GenericOperationalError & err)
         return;
     }
 
-    for (const auto & valve : mWaterValves)
+    for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
-        if (!valve->IsOpen())
+        if (!mWaterValves[i]->IsOpen())
         {
             continue;
         }
-        if (valve->Pause() != CHIP_NO_ERROR)
+        // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
+        auto remaining  = mWaterValves[i]->RemainingDuration();
+        mPausedZones[i] = PausedZone{ *mWaterValves[i]->OpenLevel(),
+                                      remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
+        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
@@ -71,16 +77,19 @@ void LoggingIrrigation::HandlePauseStateCallback(GenericOperationalError & err)
     }
 }
 
-void LoggingIrrigation::HandleResumeStateCallback(GenericOperationalError & err)
+void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigation::HandleResumeStateCallback()");
-    for (const auto & valve : mWaterValves)
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandleResumeStateCallback()");
+    for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
-        if (!valve->IsPaused())
+        if (!mPausedZones[i])
         {
             continue;
         }
-        if (valve->Resume() != CHIP_NO_ERROR)
+        CHIP_ERROR error =
+            mWaterValves[i]->OpenValve(DataModel::MakeNullable(mPausedZones[i]->level), mPausedZones[i]->remainingDuration);
+        mPausedZones[i].reset();
+        if (error != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
@@ -93,36 +102,45 @@ void LoggingIrrigation::HandleResumeStateCallback(GenericOperationalError & err)
     }
 }
 
-void LoggingIrrigation::HandleStartStateCallback(GenericOperationalError & err)
+void LoggingIrrigationSystem::HandleStartStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigation::HandleStartStateCallback()");
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandleStartStateCallback()");
     // Watering is started per zone via the Water Valve endpoints; the system state follows the valves.
     err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
 }
 
-void LoggingIrrigation::HandleStopStateCallback(GenericOperationalError & err)
+void LoggingIrrigationSystem::HandleStopStateCallback(GenericOperationalError & err)
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigation::HandleStopStateCallback()");
-
-    for (const auto & valve : mWaterValves)
-    {
-        valve->ClearPause();
-        if (valve->IsOpen() && valve->CloseValve() != CHIP_NO_ERROR)
-        {
-            err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
-            return;
-        }
-    }
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandleStopStateCallback()");
 
     // Needed when stopping from Paused: the valves are already closed, so no close notification sets Stopped.
     if (OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped) != CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
     }
+
+    for (size_t i = 0; i < mWaterValves.size(); ++i)
+    {
+        if (!mWaterValves[i]->IsOpen())
+        {
+            continue;
+        }
+
+        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
+        {
+            err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+            return;
+        }
+    }
+    // Forget paused zones so a Resume after Stop does not reopen them.
+    for (auto & zone : mPausedZones)
+    {
+        zone.reset();
+    }
 }
 
-CHIP_ERROR LoggingIrrigation::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                                            EndpointComposition composition)
+CHIP_ERROR LoggingIrrigationSystem::RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                                                  EndpointComposition composition)
 {
     VerifyOrReturnError(!mValveContext.empty(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -134,9 +152,10 @@ CHIP_ERROR LoggingIrrigation::RegisterParts(EndpointIdAllocator & allocator, Cod
         mWaterValves.push_back(std::move(valve));
     }
 
+    mPausedZones.resize(mWaterValves.size());
     return CHIP_NO_ERROR;
 }
-void LoggingIrrigation::UnregisterParts(CodeDrivenDataModelProvider & provider)
+void LoggingIrrigationSystem::UnregisterParts(CodeDrivenDataModelProvider & provider)
 {
     for (const auto & valve : mWaterValves)
     {
@@ -146,9 +165,10 @@ void LoggingIrrigation::UnregisterParts(CodeDrivenDataModelProvider & provider)
         }
     }
     mWaterValves.clear();
+    mPausedZones.clear();
 }
 
-void LoggingIrrigation::OnValveStateChanged()
+void LoggingIrrigationSystem::OnValveStateChanged()
 {
     bool anyOpen = std::any_of(mWaterValves.begin(), mWaterValves.end(), [](const auto & v) { return v->IsOpen(); });
     if (anyOpen)

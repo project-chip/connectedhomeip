@@ -19,8 +19,8 @@ import("//build_overrides/chip.gni")
 
 source_set("irrigation-system") {
   sources = [
-    "Irrigation.cpp",
-    "Irrigation.h",
+    "IrrigationSystem.cpp",
+    "IrrigationSystem.h",
   ]
 
   public_deps = [
@@ -35,8 +35,8 @@ source_set("irrigation-system") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingIrrigation.cpp",
-    "impl/LoggingIrrigation.h",
+    "impl/LoggingIrrigationSystem.cpp",
+    "impl/LoggingIrrigationSystem.h",
     "impl/ValveConfigurations.cpp",
   ]
 

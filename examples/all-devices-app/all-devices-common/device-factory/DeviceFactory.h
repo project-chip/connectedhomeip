@@ -46,7 +46,7 @@
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
-#include <device/types/irrigation-system/impl/LoggingIrrigation.h>
+#include <device/types/irrigation-system/impl/LoggingIrrigationSystem.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
@@ -724,8 +724,8 @@ private:
         {
             RegisterCreator("irrigation-system", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingIrrigation>(mContext->identifyDelegate, mContext->timerDelegate,
-                                                     LoggingIrrigation::ValveConfiguration());
+                return MakeDevice<LoggingIrrigationSystem>(mContext->identifyDelegate, mContext->timerDelegate,
+                                                     LoggingIrrigationSystem::ValveConfiguration());
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FAN)

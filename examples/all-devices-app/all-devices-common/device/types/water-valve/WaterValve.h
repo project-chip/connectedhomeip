@@ -42,31 +42,16 @@ public:
                WaterValveListener * listener = nullptr);
     ~WaterValve() override = default;
 
-    /// Closes the valve through the cluster, so the valve attributes are updated as well.
-    CHIP_ERROR CloseValve();
-    /// Remembers the current open level and remaining duration, then closes the valve.
-    CHIP_ERROR Pause();
-    /// Reopens a paused valve with the remembered level and remaining duration.
-    CHIP_ERROR Resume();
-    /// Forgets the remembered pause data without reopening the valve.
-    void ClearPause()
-    {
-        mPausedLevel.reset();
-        mPausedDuration.reset();
-    }
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    CHIP_ERROR CloseValve();
+    CHIP_ERROR OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration);
     // Public getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
-
-    // Clusters::ValveConfigurationAndControl::Delegate implementation
-    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
-    CHIP_ERROR HandleCloseValve() override;
-    void HandleRemainingDurationTick(uint32_t duration) override;
 
     DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> SetUpValveContext()
     {
@@ -108,13 +93,17 @@ public:
         };
     }
     bool IsOpen() const { return mOpenLevel.has_value(); }
-    bool IsPaused() const { return mPausedLevel.has_value(); }
+    std::optional<Percent> OpenLevel() const { return mOpenLevel; }
+    std::optional<uint32_t> RemainingDuration() const { return mRemainingDuration; }
 
 protected:
+    // Clusters::ValveConfigurationAndControl::Delegate implementation
+    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
+    CHIP_ERROR HandleCloseValve() override;
+    void HandleRemainingDurationTick(uint32_t duration) override;
+
     std::optional<Percent> mOpenLevel;
     std::optional<uint32_t> mRemainingDuration;
-    std::optional<Percent> mPausedLevel;
-    std::optional<uint32_t> mPausedDuration;
     TimerDelegate & mTimerDelegate;
     DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> mStartupConfiguration;
     DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;

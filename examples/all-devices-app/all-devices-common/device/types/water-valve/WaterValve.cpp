@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model/Nullable.h"
 #include <device/types/water-valve/WaterValve.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -108,28 +109,11 @@ CHIP_ERROR WaterValve::CloseValve()
     VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     return mValveCluster.Cluster().CloseValve();
 }
-
-CHIP_ERROR WaterValve::Pause()
+CHIP_ERROR WaterValve::OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration)
 {
     VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mOpenLevel.has_value(), CHIP_ERROR_INCORRECT_STATE);
-    mPausedLevel    = mOpenLevel;
-    mPausedDuration = mRemainingDuration;
-    return mValveCluster.Cluster().CloseValve();
+    return mValveCluster.Cluster().OpenValve(level, duration);
 }
-
-CHIP_ERROR WaterValve::Resume()
-{
-    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mPausedLevel.has_value(), CHIP_ERROR_INCORRECT_STATE);
-    DataModel::Nullable<uint32_t> duration =
-        mPausedDuration.has_value() ? DataModel::MakeNullable(*mPausedDuration) : DataModel::NullNullable;
-    CHIP_ERROR err = mValveCluster.Cluster().OpenValve(DataModel::MakeNullable(*mPausedLevel), duration);
-    mPausedLevel.reset();
-    mPausedDuration.reset();
-    return err;
-}
-
 void WaterValve::HandleRemainingDurationTick(uint32_t duration)
 {
     ChipLogProgress(AppServer, "WaterValve: Remaining duration tick: %lu", static_cast<unsigned long>(duration));
