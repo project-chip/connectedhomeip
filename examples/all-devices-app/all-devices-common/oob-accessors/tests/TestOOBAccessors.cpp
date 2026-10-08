@@ -76,8 +76,8 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     EXPECT_EQ(registry.Size(), 0U);
 
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    auto testAccessor1 = std::make_unique<TestOOBAccessor>();
-    auto testAccessor2 = std::make_unique<TestOOBAccessor>();
+    auto testAccessor1      = std::make_unique<TestOOBAccessor>();
+    auto testAccessor2      = std::make_unique<TestOOBAccessor>();
     auto & testAccessor1Ref = *testAccessor1;
     auto & testAccessor2Ref = *testAccessor2;
 
@@ -93,7 +93,8 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
         EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
-        EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+        EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())),
+                  CHIP_ERROR_NOT_FOUND);
     }
 
     {
@@ -129,8 +130,8 @@ TEST_F(TestOOBAccessors, OnAccessorRegisteredCallbacks)
     TestOOBAccessorRegisteredCallback callback;
     registry.AddOOBAccessorRegisteredCallback(callback);
 
-    auto testAccessor1 = std::make_unique<TestOOBAccessor>();
-    auto testAccessor2 = std::make_unique<TestOOBAccessor>();
+    auto testAccessor1      = std::make_unique<TestOOBAccessor>();
+    auto testAccessor2      = std::make_unique<TestOOBAccessor>();
     auto & testAccessor1Ref = *testAccessor1;
 
     EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);

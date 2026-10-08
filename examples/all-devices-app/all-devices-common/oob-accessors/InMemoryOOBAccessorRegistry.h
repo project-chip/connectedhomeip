@@ -63,7 +63,10 @@ public:
      * @brief Add a callback to be invoked when an accessor is registered.
      * @param callback The callback instance to register.
      */
-    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback) { mAccessorRegisteredCallbacks.push_back(&callback); }
+    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback)
+    {
+        mAccessorRegisteredCallbacks.push_back(&callback);
+    }
 
     /**
      * @brief Remove a callback from being invoked when an accessor is registered.

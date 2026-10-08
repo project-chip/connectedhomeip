@@ -64,8 +64,8 @@ public:
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
-            // RAII listener that will register itself as litsener to the OOBAccessorRegistry and will add any registered accessors to the deviceToOOBAccessorMap.
-            // At the end of the scope, it will unregister itself from the OOBAccessorRegistry.
+            // RAII listener that will register itself as litsener to the OOBAccessorRegistry and will add any registered accessors
+            // to the deviceToOOBAccessorMap. At the end of the scope, it will unregister itself from the OOBAccessorRegistry.
             OOBAccessorRegistrationListener listener(device, GetDeviceToOOBAccessorMap());
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
         }
@@ -99,7 +99,8 @@ private:
     class OOBAccessorRegistrationListener : public OOBAccessorRegisteredCallback
     {
     public:
-        OOBAccessorRegistrationListener(DeviceInterface & device, std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & deviceToOOBAccessorMap) :
+        OOBAccessorRegistrationListener(DeviceInterface & device,
+                                        std::vector<std::pair<DeviceInterface *, OOBAccessor *>> & deviceToOOBAccessorMap) :
             mDevice(device),
             mDeviceToOOBAccessorMap(deviceToOOBAccessorMap)
         {
@@ -108,10 +109,7 @@ private:
         ~OOBAccessorRegistrationListener() { OOBAccessorRegistry::Instance().RemoveOOBAccessorRegisteredCallback(*this); }
 
         // Add the registered accessor to the map with the current device as the key, if a device is currently being registered.
-        void OnRegistered(OOBAccessor & accessor) override
-        {
-            mDeviceToOOBAccessorMap.push_back({ &mDevice, &accessor });
-        }
+        void OnRegistered(OOBAccessor & accessor) override { mDeviceToOOBAccessorMap.push_back({ &mDevice, &accessor }); }
 
     private:
         DeviceInterface & mDevice;
