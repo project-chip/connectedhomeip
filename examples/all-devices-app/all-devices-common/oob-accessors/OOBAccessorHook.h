@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include <device/api/DeviceInterface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
@@ -34,6 +35,7 @@
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
+#include <lib/support/CodeUtils.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {

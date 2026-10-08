@@ -182,7 +182,7 @@ void RegisterDeviceFactoryOverrides(Factory & factory, TimerDelegate & timerDele
 #endif
             auto * rawDevice = device.get();
             return typename Factory::DeviceRegistrationEntry{
-                std::move(device), Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice)
+                std::move(device), Factory::template MakeOnDeviceRegisteredCallback<CommissioningProxyDevice>(rawDevice), Factory::template MakeBeforeDeviceUnregistrationCallback<CommissioningProxyDevice>(rawDevice)
             };
         });
     }
