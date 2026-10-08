@@ -262,7 +262,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         // should be started up.
         for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
         {
-            bool clusterIsOnNewEndpoint = false;
+            std::optional<ClusterId> clusterIdOnNewEndpoint;
             int registeredEndpointCount = 0;
 
             for (const auto & path : cluster->GetPaths())
@@ -273,17 +273,21 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
                 }
                 if (path.mEndpointId == registration.endpointEntry.id)
                 {
-                    clusterIsOnNewEndpoint = true;
+                    clusterIdOnNewEndpoint = path.mClusterId;
                 }
             }
 
             // If the cluster is on the endpoint we just added, and this is the *only*
             // registered endpoint for this cluster, it's time to start it.
-            if (clusterIsOnNewEndpoint && registeredEndpointCount == 1)
+            if (clusterIdOnNewEndpoint.has_value() && registeredEndpointCount == 1)
             {
                 // Do not fail endpoint registration if a cluster Startup fails: all clusters on the
                 // endpoint should still be attempted and Shutdown will be called on removal.
-                LogErrorOnFailure(cluster->Startup(*mServerClusterContext));
+                if (CHIP_ERROR err = cluster->Startup(*mServerClusterContext); err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DataManagement, "Cluster %u/" ChipLogFormatMEI " startup failed: %" CHIP_ERROR_FORMAT,
+                                 registration.endpointEntry.id, ChipLogValueMEI(*clusterIdOnNewEndpoint), err.Format());
+                }
             }
         }
     }

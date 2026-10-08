@@ -1246,4 +1246,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointSucceedsAndNotifiesWhenCluste
     ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 2u);
     EXPECT_EQ(mChangeListener.mEndpointChanges[1],
               (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
+
+    EXPECT_EQ(mProvider.RemoveCluster(&failingCluster), CHIP_NO_ERROR);
+    EXPECT_EQ(mProvider.RemoveCluster(&succeedingCluster), CHIP_NO_ERROR);
 }
