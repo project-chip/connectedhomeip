@@ -16,6 +16,7 @@
 
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 
+#include <algorithm>
 #include <lib/support/CodeUtils.h>
 
 namespace chip::app {
@@ -23,7 +24,24 @@ namespace chip::app {
 CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> accessor)
 {
     VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    auto & accessorRef = *accessor;
     mAccessors.push_back(std::move(accessor));
+
+    // iterate over a copy in case the callback modifies the list of callbacks (e.g. unregisters itself)
+    auto accessorRegisteredCallbacksCopy = mAccessorRegisteredCallbacks;
+    for (auto * callback : accessorRegisteredCallbacksCopy)
+    {
+        callback->OnRegistered(accessorRef);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InMemoryOOBAccessorRegistry::Unregister(OOBAccessor & accessor)
+{
+    auto it = std::find_if(mAccessors.begin(), mAccessors.end(),
+                           [&accessor](const std::unique_ptr<OOBAccessor> & ptr) { return ptr.get() == &accessor; });
+    VerifyOrReturnError(it != mAccessors.end(), CHIP_ERROR_NOT_FOUND);
+    mAccessors.erase(it);
     return CHIP_NO_ERROR;
 }
 
@@ -38,6 +56,15 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan t
         }
     }
     return CHIP_ERROR_NOT_FOUND;
+}
+
+void InMemoryOOBAccessorRegistry::RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback)
+{
+    auto it = std::find(mAccessorRegisteredCallbacks.begin(), mAccessorRegisteredCallbacks.end(), &callback);
+    if (it != mAccessorRegisteredCallbacks.end())
+    {
+        mAccessorRegisteredCallbacks.erase(it);
+    }
 }
 
 } // namespace chip::app
