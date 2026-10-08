@@ -165,6 +165,8 @@ config ALL_DEVICES_DEVICE_SPEAKER
 config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
 	bool "Temperature sensor"
 
+config ALL_DEVICES_DEVICE_THERMOSTAT
+	bool "Thermostat"
 config ALL_DEVICES_DEVICE_THREAD_BORDER_ROUTER
 	bool "Thread border router"
 

@@ -239,6 +239,10 @@ _available_devices = [
     "TEMPERATURE_SENSOR",
   ],
   [
+    "thermostat",
+    "THERMOSTAT",
+  ],
+  [
     "thread-border-router",
     "THREAD_BORDER_ROUTER",
   ],

@@ -99,6 +99,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
