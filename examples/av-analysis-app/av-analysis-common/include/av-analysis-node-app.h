@@ -44,6 +44,8 @@ public:
 
     void Shutdown();
 
+    AvAnalysisNodeDelegate & GetAnalysisDelegate() { return mAvAnalysisDelegate; }
+
 private:
     // Maximum number of concurrently established analysis streams
     static constexpr uint8_t kMaxAnalysisStreams = 2;

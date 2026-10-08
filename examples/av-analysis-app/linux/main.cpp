@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
+#include "AvAnalysisAppCommandDelegate.h"
 #include "av-analysis-node-app.h"
 #include "webrtc-peer-manager.h"
 
 #include <AppMain.h>
+#include <NamedPipeCommands.h>
 #include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
@@ -31,6 +33,9 @@ constexpr EndpointId kAvAnalysisNodeEndpointId = 1;
 WebRTCPeerManager gWebRTCPeerManager;
 AvAnalysisNodeApp gAvAnalysisNodeApp(kAvAnalysisNodeEndpointId);
 
+NamedPipeCommands gNamedPipeCommands;
+AvAnalysisAppCommandDelegate gAppCommandDelegate;
+
 } // namespace
 
 void ApplicationInit()
@@ -38,10 +43,19 @@ void ApplicationInit()
     ChipLogProgress(AppServer, "Matter AV Analysis Node Linux App: ApplicationInit()");
 
     VerifyOrDie(gAvAnalysisNodeApp.Init(&gWebRTCPeerManager) == CHIP_NO_ERROR);
+
+    gAppCommandDelegate.SetAnalysisDelegate(&gAvAnalysisNodeApp.GetAnalysisDelegate());
+    const std::string appPipePath(LinuxDeviceOptions::GetInstance().app_pipe);
+    if (!appPipePath.empty() && gNamedPipeCommands.Start(appPipePath, &gAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to start the app command pipe at %s", appPipePath.c_str());
+        TEMPORARY_RETURN_IGNORED gNamedPipeCommands.Stop();
+    }
 }
 
 void ApplicationShutdown()
 {
+    TEMPORARY_RETURN_IGNORED gNamedPipeCommands.Stop();
     gAvAnalysisNodeApp.Shutdown();
 }
 
