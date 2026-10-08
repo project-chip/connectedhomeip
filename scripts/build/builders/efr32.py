@@ -40,6 +40,7 @@ class Efr32App(Enum):
     CLOSURE = auto()
     SMOKE_CO_ALARM = auto()
     ALL_DEVICES = auto()
+    CAMERA = auto()
 
     def ExampleName(self):
         if self == Efr32App.EVSE:
@@ -66,6 +67,8 @@ class Efr32App(Enum):
             return 'smoke-co-alarm-app'
         if self == Efr32App.ALL_DEVICES:
             return 'all-devices-app'
+        if self == Efr32App.CAMERA:
+            return 'camera-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
@@ -95,6 +98,8 @@ class Efr32App(Enum):
             return 'matter-silabs-smoke-co-alarm-example'
         if self == Efr32App.ALL_DEVICES:
             return 'matter-silabs-all-devices-example'
+        if self == Efr32App.CAMERA:
+            return 'matter-silabs-camera-example'
         raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self):
@@ -124,6 +129,8 @@ class Efr32App(Enum):
             return 'smoke_co_alarm_app.flashbundle.txt'
         if self == Efr32App.ALL_DEVICES:
             return 'all_devices_app.flashbundle.txt'
+        if self == Efr32App.CAMERA:
+            return 'camera_app.flashbundle.txt'
         raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):

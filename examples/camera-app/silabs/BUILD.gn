@@ -1,0 +1,200 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+assert(current_os == "freertos")
+assert(wifi_soc || !chip_enable_wifi,
+       "examples/camera-app/silabs supports EFR32 Thread boards and the SiWx917 Wi-Fi SoC, not Wi-Fi NCP.")
+assert(!chip_enable_icd_server,
+       "ICD is not supported by examples/camera-app/silabs.")
+
+silabs_project_dir = "${chip_root}/examples/camera-app/silabs"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+}
+
+import("${examples_common_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                      "${silabs_mcu}",
+                      rebase_path(slc_gen_path),
+                    ],
+                    "list lines"))
+}
+
+_sdk_sources = [
+  "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
+  "${silabs_project_dir}/include/CHIPProjectConfig.h",
+]
+
+_sdk_include_dirs = [
+  "${silabs_project_dir}/include",
+  "${examples_plat_dir}",
+  "${chip_root}/src/lib",
+  "${examples_common_plat_dir}",
+  "${examples_common_plat_dir}/freertos_config",
+]
+
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = _sdk_sources
+    include_dirs =
+        [ "${chip_root}/src/platform/silabs/SiWx" ] + _sdk_include_dirs
+    defines = []
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = _sdk_sources
+    include_dirs =
+        [ "${chip_root}/src/platform/silabs/efr32" ] + _sdk_include_dirs
+    defines = []
+  }
+}
+
+source_set("logging-camera") {
+  sources = [
+    "src/LoggingCamera.cpp",
+    "src/LoggingCamera.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/src/app/clusters/camera-av-stream-management-server",
+    "${chip_root}/src/app/clusters/webrtc-transport-provider-server",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/WebRTCTransportRequestor:ids",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
+
+silabs_executable("camera_app") {
+  output_name = "matter-silabs-camera-example.out"
+  defines = []
+  include_dirs = [
+    "include",
+    "src",
+    "${chip_root}/examples/all-devices-app/all-devices-common",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/data-model-providers",
+  ]
+
+  sources = [
+    "include/AppConfig.h",
+    "include/AppEvent.h",
+    "include/AppTask.h",
+    "src/AppTask.cpp",
+  ]
+
+  deps = [
+    ":logging-camera",
+    ":sdk",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/platform/logging:default",
+    "${chip_root}/zzz_generated/app-common/devices",
+  ]
+
+  if (wifi_soc) {
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
+      "${examples_plat_dir}:siwx917-common",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread",
+      "${examples_plat_dir}:efr32-common",
+    ]
+  }
+
+  # examples/platform/silabs/OTAConfig.cpp brings in the OTA requestor runtime.
+  # Its code-driven singletons replace src/app/clusters/ota-requestor/CodegenIntegration.cpp.
+  if (chip_enable_ota_requestor) {
+    _ota_requestor_dir = "${chip_root}/src/app/clusters/ota-requestor"
+    sources += [
+      "${_ota_requestor_dir}/BDXDownloader.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestor.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestorDriver.cpp",
+      "${_ota_requestor_dir}/DefaultOTARequestorStorage.cpp",
+    ]
+    deps += [
+      "${_ota_requestor_dir}:ota-requestor",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:ota",
+    ]
+  }
+
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("silabs") {
+  deps = [ ":camera_app" ]
+}
+
+group("default") {
+  deps = [ ":silabs" ]
+}
