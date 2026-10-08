@@ -58,17 +58,15 @@ protected:
     Testing::TestServerClusterContext mClusterContext;
 };
 
-} // namespace
-
 struct TestOOBAccessor : public OOBAccessor
 {
-    CHIP_ERROR HandleAction(CharSpan action, ByteSpan /* tlvData */) override
+    std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan /* tlvData */) override
     {
-        if (action.data_equal("TestAction"_span))
+        if (!action.data_equal("TestAction"_span))
         {
-            return CHIP_NO_ERROR;
+            return std::nullopt;
         }
-        return CHIP_ERROR_NOT_FOUND;
+        return CHIP_NO_ERROR;
     }
 };
 
@@ -129,7 +127,7 @@ TEST_F(TestOOBAccessors, OnAccessorRegisteredCallbacks)
 {
     InMemoryOOBAccessorRegistry registry;
     TestOOBAccessorRegisteredCallback callback;
-    registry.AddRegisteredCallback(callback);
+    registry.AddOOBAccessorRegisteredCallback(callback);
 
     auto testAccessor1 = std::make_unique<TestOOBAccessor>();
     auto testAccessor2 = std::make_unique<TestOOBAccessor>();
@@ -138,7 +136,7 @@ TEST_F(TestOOBAccessors, OnAccessorRegisteredCallbacks)
     EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);
     EXPECT_EQ(callback.lastRegisteredAccessor, &testAccessor1Ref);
 
-    registry.RemoveRegisteredCallback(callback);
+    registry.RemoveOOBAccessorRegisteredCallback(callback);
     EXPECT_EQ(registry.Register(std::move(testAccessor2)), CHIP_NO_ERROR);
 
     // The callback should not be invoked for the second accessor since it was removed from the registry

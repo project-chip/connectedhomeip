@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include <device/api/DeviceInterface.h>
+#include <device/api/Interface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
@@ -103,9 +103,9 @@ private:
             mDevice(device),
             mDeviceToOOBAccessorMap(deviceToOOBAccessorMap)
         {
-            OOBAccessorRegistry::Instance().AddOOBAccessorRegisteredCallback(this);
+            OOBAccessorRegistry::Instance().AddOOBAccessorRegisteredCallback(*this);
         }
-        ~OOBAccessorRegistrationListener() { OOBAccessorRegistry::Instance().RemoveOOBAccessorRegisteredCallback(this); }
+        ~OOBAccessorRegistrationListener() { OOBAccessorRegistry::Instance().RemoveOOBAccessorRegisteredCallback(*this); }
 
         // Add the registered accessor to the map with the current device as the key, if a device is currently being registered.
         void OnRegistered(OOBAccessor & accessor) override

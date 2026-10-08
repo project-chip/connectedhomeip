@@ -27,7 +27,7 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> ac
     mAccessors.push_back(std::move(accessor));
     for (auto * callback : mAccessorRegisteredCallbacks)
     {
-        callback->OnRegistered(mAccessors.back().get());
+        callback->OnRegistered(*mAccessors.back());
     }
     return CHIP_NO_ERROR;
 }
@@ -56,7 +56,7 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan t
 
 void InMemoryOOBAccessorRegistry::RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback)
 {
-    auto it = std::find(mAccessorRegisteredCallbacks.begin(), mAccessorRegisteredCallbacks.end(), callback);
+    auto it = std::find(mAccessorRegisteredCallbacks.begin(), mAccessorRegisteredCallbacks.end(), &callback);
     if (it != mAccessorRegisteredCallbacks.end())
     {
         mAccessorRegisteredCallbacks.erase(it);
