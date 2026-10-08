@@ -68,7 +68,7 @@ class CameraFragment : Fragment() {
 
   private val pendingIceCandidates = mutableListOf<IceCandidate>()
 
-override fun onCreateView(
+  override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
@@ -172,9 +172,11 @@ override fun onCreateView(
     }
   }
 
-  private suspend fun readCameraFeatureMap(cluster: ChipClusters.CameraAvStreamManagementCluster): Long =
-    suspendCancellableCoroutine { continuation ->
-      cluster.readFeatureMapAttribute(object : ChipClusters.LongAttributeCallback {
+  private suspend fun readCameraFeatureMap(
+    cluster: ChipClusters.CameraAvStreamManagementCluster
+  ): Long = suspendCancellableCoroutine { continuation ->
+    cluster.readFeatureMapAttribute(
+      object : ChipClusters.LongAttributeCallback {
         override fun onSuccess(value: Long) {
           continuation.resume(value)
         }
@@ -183,8 +185,9 @@ override fun onCreateView(
           Log.e(TAG, "Failed to read FeatureMap", error)
           continuation.resumeWithException(error)
         }
-      })
-    }
+      }
+    )
+  }
 
   private suspend fun sendAllocateVideoStream() {
     val devicePtr =
@@ -201,15 +204,21 @@ override fun onCreateView(
     val cluster =
       ChipClusters.CameraAvStreamManagementCluster(devicePtr, addressUpdateFragment.endpointId)
 
-    val featureMap = try {
-      readCameraFeatureMap(cluster)
-    } catch (e: Exception) {
-      Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
-      scope.launch(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "Failed to read FeatureMap: ${e.message}", Toast.LENGTH_LONG).show()
+    val featureMap =
+      try {
+        readCameraFeatureMap(cluster)
+      } catch (e: Exception) {
+        Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
+        scope.launch(Dispatchers.Main) {
+          Toast.makeText(
+              requireContext(),
+              "Failed to read FeatureMap: ${e.message}",
+              Toast.LENGTH_LONG
+            )
+            .show()
+        }
+        return
       }
-      return
-    }
 
     val isWatermarkSupported = (featureMap and FEATURE_WATERMARK_MASK) != 0L
     val isOsdSupported = (featureMap and FEATURE_OSD_MASK) != 0L
@@ -229,7 +238,8 @@ override fun onCreateView(
     val minBitRate = 10000L
     val maxBitRate = 10000L
     val keyFrameInterval = 4000
-    val watermarkEnabled = if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
+    val watermarkEnabled =
+      if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
     val osdEnabled = if (isOsdSupported) Optional.of(false) else Optional.empty<Boolean>()
 
     cluster.videoStreamAllocate(
@@ -728,15 +738,21 @@ override fun onCreateView(
       }
     val cluster = ChipClusters.CameraAvStreamManagementCluster(devicePtr, endpointId)
 
-    val featureMap = try {
-      readCameraFeatureMap(cluster)
-    } catch (e: Exception) {
-      Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
-      scope.launch(Dispatchers.Main) {
-        Toast.makeText(requireContext(), "Failed to read FeatureMap: ${e.message}", Toast.LENGTH_LONG).show()
+    val featureMap =
+      try {
+        readCameraFeatureMap(cluster)
+      } catch (e: Exception) {
+        Log.e(TAG, "FeatureMap read failed. Aborting videoStreamAllocate.", e)
+        scope.launch(Dispatchers.Main) {
+          Toast.makeText(
+              requireContext(),
+              "Failed to read FeatureMap: ${e.message}",
+              Toast.LENGTH_LONG
+            )
+            .show()
+        }
+        return
       }
-      return
-    }
 
     val isWatermarkSupported = (featureMap and FEATURE_WATERMARK_MASK) != 0L
     val isOsdSupported = (featureMap and FEATURE_OSD_MASK) != 0L
@@ -753,7 +769,8 @@ override fun onCreateView(
     // Set quality to 1
     val quality = 1
 
-    val watermarkEnabled = if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
+    val watermarkEnabled =
+      if (isWatermarkSupported) Optional.of(false) else Optional.empty<Boolean>()
     val osdEnabled = if (isOsdSupported) Optional.of(false) else Optional.empty<Boolean>()
 
     scope.launch(Dispatchers.Main) {
