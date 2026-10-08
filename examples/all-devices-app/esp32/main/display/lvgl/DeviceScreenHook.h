@@ -56,6 +56,12 @@ public:
             RegisterMissingDeviceScreen(device, device.GetEndpointId(), DeviceScreenRegistry::Instance());
         }
     }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {
+        DeviceScreenRegistry::Instance().Unregister(device.GetEndpointId());
+    }
 };
 
 } // namespace chip::app
