@@ -20,10 +20,29 @@
 #include <device/types/water-valve/WaterValve.h>
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace chip {
 namespace app {
+
+class LoggingMasterValve : public MasterValve
+{
+public:
+    CHIP_ERROR Open() override
+    {
+        ChipLogProgress(AppServer, "IrrigationSystem: Opening master valve");
+        mOpen = true;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Close() override
+    {
+        ChipLogProgress(AppServer, "IrrigationSystem: Closing master valve");
+        mOpen = false;
+        return CHIP_NO_ERROR;
+    }
+};
 
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                 public IrrigationSystem,
@@ -37,10 +56,14 @@ public:
     };
 
     LoggingIrrigationSystem(Clusters::IdentifyDelegate & identifyDelegate, TimerDelegate & timerDelegate,
-                            std::vector<IrrigationSystem::ValveList> valves) :
-        IrrigationSystem(timerDelegate, identifyDelegate, this),
-        mValveContext(std::move(valves))
-    {}
+                            std::vector<IrrigationSystem::ValveList> valves, bool hasMasterValve) :
+        IrrigationSystem(timerDelegate, identifyDelegate, this), mValveContext(std::move(valves))
+    {
+        if (hasMasterValve)
+        {
+            mMasterValve.emplace();
+        }
+    }
     ~LoggingIrrigationSystem() override = default;
 
     DataModel::Nullable<uint32_t> GetCountdownTime() override;
@@ -59,6 +82,7 @@ public:
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     static std::vector<IrrigationSystem::ValveList> ValveConfiguration();
+    static constexpr bool kHasMasterValve = true;
 
     void OnValveStateChanged() override;
 
@@ -69,6 +93,7 @@ private:
     std::vector<std::optional<PausedZone>> mPausedZones;
     std::vector<IrrigationSystem::ValveList> mValveContext;
     std::vector<std::unique_ptr<WaterValve>> mWaterValves;
+    std::optional<LoggingMasterValve> mMasterValve; // empty when the system has no master valve
 };
 
 } // namespace app

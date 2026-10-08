@@ -23,7 +23,7 @@ namespace chip::app {
 namespace {
 
 using namespace Clusters;
-
+// TODO: dont move with defaults.
 const ValveConfigurationAndControlCluster::StartupConfiguration defaultConfig{
     DataModel::NullNullable, ValveConfigurationAndControlCluster::kDefaultOpenLevel,
     ValveConfigurationAndControlCluster::kDefaultLevelStep
