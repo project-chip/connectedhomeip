@@ -54,11 +54,14 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 constexpr BitMask<Clusters::WaterHeaterManagement::Feature> kWhmFeatures = {};
 // Only the Heating feature is supported for the Thermostat cluster.
 constexpr BitMask<Clusters::Thermostat::Feature> kThermostatFeatures(Clusters::Thermostat::Feature::kHeating);
-// Only the AbsMinHeatSetpointLimit and AbsMaxHeatSetpointLimit OptionalAttributes are supported for the Thermostat cluster.
-constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes = {
-    .AbsMinHeatSetpointLimit = true,
-    .AbsMaxHeatSetpointLimit = true,
-};
+constexpr Clusters::Thermostat::OptionalAttributes GetThermostatOptionalAttributes()
+{
+    Clusters::Thermostat::OptionalAttributes attrs;
+    attrs.AbsMinHeatSetpointLimit = true;
+    attrs.AbsMaxHeatSetpointLimit = true;
+    return attrs;
+}
+constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes = GetThermostatOptionalAttributes();
 } // namespace
 
 SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
@@ -110,13 +113,7 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
 
     EvaluateHeatingDemand();
 
-    CHIP_ERROR err = mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
-    if (err != CHIP_NO_ERROR)
-    {
-        Unregister(*mProvider);
-        return err;
-    }
-    return CHIP_NO_ERROR;
+    return mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
 }
 
 void SimulatedWaterHeater::Shutdown(ClusterShutdownType type)
@@ -515,16 +512,21 @@ void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBas
         return;
     }
 
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
-
     if (!mIsSyncingMode)
     {
         mIsSyncingMode              = true;
         const auto targetSystemMode = (newMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
-        ThermostatCluster().SetSystemMode(targetSystemMode);
-        mIsSyncingMode = false;
+        const auto status           = ThermostatCluster().SetSystemMode(targetSystemMode);
+        mIsSyncingMode              = false;
+
+        if (status != Protocols::InteractionModel::Status::Success)
+        {
+            response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+            return;
+        }
     }
 
+    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
     EvaluateHeatingDemand(newMode);
 }
 } // namespace chip::app
