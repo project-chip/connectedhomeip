@@ -116,7 +116,7 @@ Alchemy: v1.7.16
   </struct>
 
   <cluster>
-    <domain>Closures</domain>
+    <domain>General</domain>
     <name>Closure Dimension</name>
     <code>0x0105</code>
     <define>CLOSURE_DIMENSION_CLUSTER</define>
@@ -161,7 +161,7 @@ Alchemy: v1.7.16
           <feature name="PS"/>
         </optionalConform>
       </feature>
-      <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area" apiMaturity="provisional">
+      <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
         <otherwiseConform>
           <provisionalConform/>
           <optionalConform/>
