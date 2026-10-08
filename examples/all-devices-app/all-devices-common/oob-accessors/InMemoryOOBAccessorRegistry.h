@@ -50,7 +50,7 @@ public:
      * @brief Unregisters an OOB accessor instance.
      * @param accessor The accessor instance to unregister.
      */
-    CHIP_ERROR Unregister(OOBAccessor * accessor);
+    CHIP_ERROR Unregister(OOBAccessor & accessor);
 
     /**
      * @brief Dispatches an action to registered accessors in order.
@@ -63,13 +63,13 @@ public:
      * @brief Add a callback to be invoked when an accessor is registered.
      * @param callback The callback instance to register.
      */
-    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback * callback) { mCallbacks.push_back(callback); }
+    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback) { mAccessorRegisteredCallbacks.push_back(&callback); }
 
     /**
      * @brief Remove a callback from being invoked when an accessor is registered.
      * @param callback The callback instance to unregister.
      */
-    void RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback * callback);
+    void RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback);
 
     /**
      * @brief Clears all registered accessors during device teardown.
@@ -83,7 +83,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
-    std::vector<OOBAccessorRegisteredCallback *> mCallbacks;
+    std::vector<OOBAccessorRegisteredCallback *> mAccessorRegisteredCallbacks;
 };
 
 } // namespace chip::app

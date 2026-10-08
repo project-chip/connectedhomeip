@@ -27,7 +27,7 @@ struct OOBAccessorRegisteredCallback
      * @brief Callback invoked when an accessor is registered.
      * @param accessor The accessor that was registered.
      */
-    virtual void OnRegistered(OOBAccessor * accessor) = 0;
+    virtual void OnRegistered(OOBAccessor & accessor) = 0;
 };
 
 } // namespace chip::app
