@@ -202,6 +202,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override
     {
         startupCallCount++;
+        ReturnErrorOnFailure(mStartupError);
         return DefaultServerCluster::Startup(context);
     }
 
@@ -211,8 +212,9 @@ public:
         DefaultServerCluster::Shutdown(shutdownType);
     }
 
-    int startupCallCount  = 0;
-    int shutdownCallCount = 0;
+    int startupCallCount     = 0;
+    int shutdownCallCount    = 0;
+    CHIP_ERROR mStartupError = CHIP_NO_ERROR;
 
     std::optional<DataModel::ReadAttributeRequest> mLastReadRequest;
     std::optional<DataModel::WriteAttributeRequest> mLastWriteRequest;
@@ -1213,4 +1215,35 @@ TEST_F(TestCodeDrivenDataModelProvider, NoEndpointChangedNotificationOnFailedAdd
 
     EXPECT_EQ(mProvider.RemoveEndpoint(kInvalidEndpointId), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, AddEndpointSucceedsAndNotifiesWhenClusterStartupFails)
+{
+    MockServerCluster failingCluster({ endpointEntry1.id, 100 }, 1, {});
+    failingCluster.mStartupError = CHIP_ERROR_INTERNAL;
+    ServerClusterRegistration failingRegistration(failingCluster);
+
+    MockServerCluster succeedingCluster({ endpointEntry1.id, 101 }, 1, {});
+    ServerClusterRegistration succeedingRegistration(succeedingCluster);
+
+    ASSERT_EQ(mProvider.AddCluster(failingRegistration), CHIP_NO_ERROR);
+    ASSERT_EQ(mProvider.AddCluster(succeedingRegistration), CHIP_NO_ERROR);
+
+    auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
+    mEndpointStorage.push_back(std::move(endpoint1));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+
+    EXPECT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    EXPECT_EQ(failingCluster.startupCallCount, 1);
+    EXPECT_EQ(succeedingCluster.startupCallCount, 1);
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 1u);
+    EXPECT_EQ(mChangeListener.mEndpointChanges[0],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kAdded }));
+
+    ASSERT_EQ(mProvider.RemoveEndpoint(endpointEntry1.id), CHIP_NO_ERROR);
+    EXPECT_EQ(failingCluster.shutdownCallCount, 1);
+    EXPECT_EQ(succeedingCluster.shutdownCallCount, 1);
+    ASSERT_EQ(mChangeListener.mEndpointChanges.size(), 2u);
+    EXPECT_EQ(mChangeListener.mEndpointChanges[1],
+              (TestProviderChangeListener::EndpointChange{ endpointEntry1.id, EndpointChangeType::kRemoved }));
 }

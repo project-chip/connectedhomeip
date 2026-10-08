@@ -281,7 +281,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
             // registered endpoint for this cluster, it's time to start it.
             if (clusterIsOnNewEndpoint && registeredEndpointCount == 1)
             {
-                ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
+                // Do not fail endpoint registration if a cluster Startup fails: all clusters on the
+                // endpoint should still be attempted and Shutdown will be called on removal.
+                LogErrorOnFailure(cluster->Startup(*mServerClusterContext));
             }
         }
     }
