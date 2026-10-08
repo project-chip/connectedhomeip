@@ -101,25 +101,18 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     {
         mOccupiedHeatingSetpoint = kFinalTemperature;
     }
-    // Setup initial values
-    const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
-    ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
-
     // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster
-    // code) so we need to find a way to reconcile the two, in this implementation we set the SystemMode to the initial mode based
-    // on the CurrentMode.
-    const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
-    ThermostatCluster().SetSystemMode(initialSystemMode);
-
-    EvaluateHeatingDemand();
-
-    return mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds));
+    // code) so we need to find a way to reconcile the two. Defer mode reconciliation until all clusters on the endpoint
+    // are constructed and started.
+    mStartupReconciliationPending = true;
+    return mConfig.timerDelegate.StartTimer(this, System::Clock::Milliseconds32(0));
 }
 
 void SimulatedWaterHeater::Shutdown(ClusterShutdownType type)
 {
     mTimerDelegate.CancelTimer(this);
-    mAttributeStorage = nullptr;
+    mStartupReconciliationPending = false;
+    mAttributeStorage             = nullptr;
 }
 
 void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
@@ -130,6 +123,22 @@ void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
 
 void SimulatedWaterHeater::TimerFired()
 {
+    if (mStartupReconciliationPending)
+    {
+        mStartupReconciliationPending = false;
+
+        const uint8_t currentMode = WaterHeaterModeCluster().GetCurrentMode();
+        ChipLogProgress(AppServer, "WaterHeater: Startup in mode %u", currentMode);
+
+        const auto initialSystemMode = (currentMode == kWaterHeaterModeManual) ? SystemModeEnum::kHeat : SystemModeEnum::kOff;
+        ThermostatCluster().SetSystemMode(initialSystemMode);
+
+        EvaluateHeatingDemand();
+
+        LogErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+        return;
+    }
+
     if (mBoostState == BoostStateEnum::kInactive && !IsNormalHeatingPermitted())
     {
         SetHeatingEnabled(false);

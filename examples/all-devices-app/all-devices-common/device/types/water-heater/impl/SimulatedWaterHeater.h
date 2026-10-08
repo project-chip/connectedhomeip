@@ -121,9 +121,10 @@ private:
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
     uint32_t mBoostRemainingTime                                = 0;
     std::optional<Clusters::Thermostat::temperature> mBoostTemporarySetpoint;
-    bool mBoostOneShot   = false;
-    bool mHeatingEnabled = false;
-    bool mIsSyncingMode  = false;
+    bool mBoostOneShot                 = false;
+    bool mHeatingEnabled               = false;
+    bool mIsSyncingMode                = false;
+    bool mStartupReconciliationPending = false;
 
     // Thermostat attributes
     Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;

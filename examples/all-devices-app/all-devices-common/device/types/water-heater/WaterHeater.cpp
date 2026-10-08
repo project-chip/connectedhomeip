@@ -36,14 +36,9 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mEndpointId = endpoint;
 
     mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
-    ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
-
     mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
                               HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mTimerDelegate), mThermostatDelegate,
                               mHeatingDelegate);
-
-    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
-
     mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
                                    Clusters::ModeBaseCluster::Config{
                                        .feature                = BitMask<Clusters::ModeBase::Feature>(),
@@ -52,6 +47,9 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
                                        .onOffValueForStartUp   = false,
                                        .diagnosticDataProvider = mConfig.diagnosticDataProvider,
                                    });
+
+    ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
+    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
     ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterModeCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
