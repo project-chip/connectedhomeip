@@ -58,25 +58,91 @@ protected:
     Testing::TestServerClusterContext mClusterContext;
 };
 
+} // namespace
+
+struct TestOOBAccessor : public OOBAccessor
+{
+    CHIP_ERROR HandleAction(CharSpan action, ByteSpan /* tlvData */) override
+    {
+        if (action.data_equal("TestAction"_span))
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+};
+
 TEST_F(TestOOBAccessors, RegistryLifecycle)
 {
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    auto testAccessor1 = std::make_unique<TestOOBAccessor>();
+    auto testAccessor2 = std::make_unique<TestOOBAccessor>();
+    auto & testAccessor1Ref = *testAccessor1;
+    auto & testAccessor2Ref = *testAccessor2;
 
-    uint8_t buffer[64];
-    TLV::TLVWriter writer;
-    writer.Init(buffer);
-    TLV::TLVType outer;
-    EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
-    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 1U);
 
-    EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("NonExistentAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_ERROR_NOT_FOUND);
+    }
+
+    {
+        uint8_t buffer[64];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType outer;
+        EXPECT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(outer), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        EXPECT_EQ(registry.HandleAction("TestAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+    }
+
+    EXPECT_EQ(registry.Unregister(testAccessor2Ref), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.Unregister(testAccessor1Ref), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 0U);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);
+}
+
+struct TestOOBAccessorRegisteredCallback : public OOBAccessorRegisteredCallback
+{
+    void OnRegistered(OOBAccessor & accessor) override { lastRegisteredAccessor = &accessor; }
+
+    OOBAccessor * lastRegisteredAccessor = nullptr;
+};
+
+TEST_F(TestOOBAccessors, OnAccessorRegisteredCallbacks)
+{
+    InMemoryOOBAccessorRegistry registry;
+    TestOOBAccessorRegisteredCallback callback;
+    registry.AddRegisteredCallback(callback);
+
+    auto testAccessor1 = std::make_unique<TestOOBAccessor>();
+    auto testAccessor2 = std::make_unique<TestOOBAccessor>();
+    auto & testAccessor1Ref = *testAccessor1;
+
+    EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);
+    EXPECT_EQ(callback.lastRegisteredAccessor, &testAccessor1Ref);
+
+    registry.RemoveRegisteredCallback(callback);
+    EXPECT_EQ(registry.Register(std::move(testAccessor2)), CHIP_NO_ERROR);
+
+    // The callback should not be invoked for the second accessor since it was removed from the registry
+    EXPECT_EQ(callback.lastRegisteredAccessor, &testAccessor1Ref);
 }
 
 TEST_F(TestOOBAccessors, OnOffOOBAccessor)
