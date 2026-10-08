@@ -38,7 +38,7 @@ namespace SupportedMimeTypes {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedMimeTypes::Id,
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
-                   Access::Privilege::kView, std::nullopt);
+                   Access::Privilege::kManage, std::nullopt);
 } // namespace SupportedMimeTypes
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     TotalStorage::kMetadataEntry,
