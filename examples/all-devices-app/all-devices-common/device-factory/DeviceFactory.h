@@ -802,9 +802,6 @@ private:
         {
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
-                Clusters::Thermostat::OptionalAttributes optionalAttributes;
-                optionalAttributes.AbsMinHeatSetpointLimit = true;
-                optionalAttributes.AbsMaxHeatSetpointLimit = true;
                 return MakeDevice<SimulatedWaterHeater>(
                     mContext->timerDelegate,
                     mContext->fabricTable,

@@ -40,10 +40,8 @@
         mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
         ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
 
-        mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kCooling),
-        HeatingThermostat::Config({}, mTimerDelegate), mThermostatDelegate, mHeatingDelegate);
-        ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
-
+        mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
+        HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mTimerDelegate), mThermostatDelegate, mHeatingDelegate);
 
         ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
