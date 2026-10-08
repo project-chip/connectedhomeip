@@ -29,7 +29,7 @@ namespace {
 class DoorbellOOBAccessor : public OOBAccessor
 {
 public:
-    DoorbellOOBAccessor(Doorbell & device, EndpointId endpointId) : mDevice(device), mEndpointId(endpointId) {}
+    DoorbellOOBAccessor(Doorbell & device) : mDevice(device) {}
 
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override
     {
@@ -67,7 +67,7 @@ private:
         ReturnErrorOnFailure(reader.ExitContainer(outerType));
 
         VerifyOrReturnError(hasEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-        if (endpointId != mEndpointId)
+        if (endpointId != mDevice.GetEndpointId())
         {
             return std::nullopt;
         }
@@ -76,14 +76,13 @@ private:
     }
 
     Doorbell & mDevice;
-    EndpointId mEndpointId;
 };
 
 } // namespace
 
 void RegisterOOBAccessors(Doorbell & device, OOBAccessorRegistry & registry)
 {
-    LogErrorOnFailure(registry.Register(std::make_unique<DoorbellOOBAccessor>(device, device.GetEndpointId())));
+    LogErrorOnFailure(registry.Register(std::make_unique<DoorbellOOBAccessor>(device)));
 }
 
 } // namespace chip::app

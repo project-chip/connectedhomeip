@@ -394,8 +394,8 @@ TEST_F(TestNamedPipeTranslators, DoorbellTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
     EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
 
-    // Unknown action (SetCurrentPosition is no longer supported)
-    Json::Value unknown = ParseJson(R"({"Name": "SetCurrentPosition", "CurrentPosition": 1})");
+    // Unknown action
+    Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 

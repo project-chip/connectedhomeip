@@ -17,7 +17,6 @@
 #include <clusters/Chime/Ids.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <devices/Types.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -28,13 +27,15 @@ namespace app {
 
 namespace {
 const ClusterId kClientClusters[] = { Chime::Id };
+
+// This device should support MomentarySwitch and has 2 positions.
+constexpr BitMask<Clusters::Switch::Feature> kSwitchFeatures(Clusters::Switch::Feature::kMomentarySwitch);
+constexpr uint8_t kNumberOfSwitchPositions = 2;
 } // namespace
 
 Doorbell::Doorbell(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDoorbell, 1)), mConfig(config)
 {
-    // The Feature MomentarySwitch is required for a doorbell.
-    VerifyOrDie(mConfig.features.Has(Clusters::Switch::Feature::kMomentarySwitch));
 }
 
 CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -47,9 +48,9 @@ CHIP_ERROR Doorbell::Register(chip::EndpointId endpoint, CodeDrivenDataModelProv
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mConfig.timerDelegate).WithDelegate(&mConfig.identifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSwitchCluster.Create(endpoint, mConfig.features,
+    mSwitchCluster.Create(endpoint, kSwitchFeatures,
                           SwitchCluster::StartupConfiguration{
-                              .numberOfPositions = mConfig.numberOfSwitchPositions,
+                              .numberOfPositions = kNumberOfSwitchPositions,
                           });
     ReturnErrorOnFailure(provider.AddCluster(mSwitchCluster.Registration()));
 
@@ -111,24 +112,19 @@ Clusters::BindingCluster & Doorbell::BindingCluster()
     return mBindingCluster.Cluster();
 }
 
-CHIP_ERROR Doorbell::SetSwitchPosition(uint8_t newPosition)
-{
-    VerifyOrReturnError(mSwitchCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(AppServer, "Doorbell: Switch position changed on endpoint %u to %u", mEndpointId, newPosition);
-    return mSwitchCluster.Cluster().SetCurrentPosition(newPosition);
-}
-
 CHIP_ERROR Doorbell::HandleShortPress()
 {
+    VerifyOrReturnError(mSwitchCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     // A basic doorbell short press simulates pressing the momentary switch (position 1),
     // triggering the chime, and then returning it to its idle released state (position 0).
-    ReturnErrorOnFailure(SetSwitchPosition(1));
+    ChipLogProgress(AppServer, "Doorbell: Short press on endpoint %u", mEndpointId);
+    ReturnErrorOnFailure(mSwitchCluster.Cluster().SetCurrentPosition(1));
     if (mSwitchCluster.Cluster().OnInitialPress(1) == std::nullopt)
     {
         ChipLogError(AppServer, "Doorbell: Unable to send OnInitialPress event");
     }
     // Chime should be triggered here.
-    return SetSwitchPosition(0);
+    return mSwitchCluster.Cluster().SetCurrentPosition(0);
 }
 
 } // namespace app

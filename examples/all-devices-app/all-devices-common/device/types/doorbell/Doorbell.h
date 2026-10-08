@@ -39,13 +39,9 @@ public:
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
         Clusters::IdentifyDelegate & identifyDelegate;
-        // Switch cluster configuration
-        uint8_t numberOfSwitchPositions = 2;
-        BitFlags<Clusters::Switch::Feature> features =
-            BitFlags<Clusters::Switch::Feature>(Clusters::Switch::Feature::kMomentarySwitch);
     };
 
-    Doorbell(const Config & config);
+    explicit Doorbell(const Config & config);
     ~Doorbell() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -53,8 +49,6 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
-
-    CHIP_ERROR SetSwitchPosition(uint8_t newPosition);
 
     // Doorbell actions (can be invoked via OOB accessors, named pipes, or physical button drivers)
     CHIP_ERROR HandleShortPress();
