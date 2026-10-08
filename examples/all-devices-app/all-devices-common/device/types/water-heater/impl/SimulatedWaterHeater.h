@@ -26,13 +26,12 @@
 
 namespace chip::app {
 
-class SimulatedWaterHeater
-    : public Clusters::WaterHeaterManagement::Delegate,
-      public Clusters::Thermostat::Delegate,
-      public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
-      public Clusters::ModeBase::AppDelegate,
-      public TimerContext,
-      public WaterHeater
+class SimulatedWaterHeater : public Clusters::WaterHeaterManagement::Delegate,
+                             public Clusters::Thermostat::Delegate,
+                             public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
+                             public Clusters::ModeBase::AppDelegate,
+                             public TimerContext,
+                             public WaterHeater
 {
 public:
     static constexpr Clusters::Thermostat::temperature kMinTemperature     = 0;
@@ -40,7 +39,8 @@ public:
     static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
     static constexpr Clusters::Thermostat::temperature kMaxTemperature     = 10000;
 
-    explicit SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable, DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
+    explicit SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                  DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
     ~SimulatedWaterHeater() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;

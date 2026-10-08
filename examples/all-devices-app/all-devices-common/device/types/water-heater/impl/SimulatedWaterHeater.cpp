@@ -51,18 +51,28 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 };
 
 // This cluster implementation does not support any Optional features for the WaterHeaterManagement cluster.
-constexpr BitMask<Clusters::WaterHeaterManagement::Feature> kWhmFeatures = { };
+constexpr BitMask<Clusters::WaterHeaterManagement::Feature> kWhmFeatures = {};
 // Only the Heating feature is supported for the Thermostat cluster.
 constexpr BitMask<Clusters::Thermostat::Feature> kThermostatFeatures(Clusters::Thermostat::Feature::kHeating);
 // Only the AbsMinHeatSetpointLimit and AbsMaxHeatSetpointLimit OptionalAttributes are supported for the Thermostat cluster.
-constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes = { 
+constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes = {
     .AbsMinHeatSetpointLimit = true,
     .AbsMaxHeatSetpointLimit = true,
 };
 } // namespace
 
-SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable, DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
-    WaterHeater( WaterHeater::Config{ .timerDelegate = timerDelegate, .fabricTable = fabricTable, .diagnosticDataProvider = diagnosticDataProvider, .whmFeatures = kWhmFeatures, .waterHeaterManagementDelegate = *this, .thermostatFeatures = kThermostatFeatures, .thermostatOptionalAttributes = kThermostatOptionalAttributes, .thermostatDelegate = *this, .heatingDelegate = *this, .waterHeaterModeDelegate = *this })
+SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                                           DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+    WaterHeater(WaterHeater::Config{ .timerDelegate                 = timerDelegate,
+                                     .fabricTable                   = fabricTable,
+                                     .diagnosticDataProvider        = diagnosticDataProvider,
+                                     .whmFeatures                   = kWhmFeatures,
+                                     .waterHeaterManagementDelegate = *this,
+                                     .thermostatFeatures            = kThermostatFeatures,
+                                     .thermostatOptionalAttributes  = kThermostatOptionalAttributes,
+                                     .thermostatDelegate            = *this,
+                                     .heatingDelegate               = *this,
+                                     .waterHeaterModeDelegate       = *this })
 {}
 
 SimulatedWaterHeater::~SimulatedWaterHeater()

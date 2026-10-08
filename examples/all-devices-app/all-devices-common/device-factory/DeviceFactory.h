@@ -802,11 +802,8 @@ private:
         {
             RegisterCreator("water-heater", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedWaterHeater>(
-                    mContext->timerDelegate,
-                    mContext->fabricTable,
-                    mContext->diagnosticDataProvider
-                );
+                return MakeDevice<SimulatedWaterHeater>(mContext->timerDelegate, mContext->fabricTable,
+                                                        mContext->diagnosticDataProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)

@@ -15,90 +15,89 @@
  *    limitations under the License.
  */
 
- #include <device/types/water-heater/WaterHeater.h>
+#include <device/types/water-heater/WaterHeater.h>
 
- namespace chip::app {
-    WaterHeater::WaterHeater(const Config & config) :
-        SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)),
-        mConfig(config), mTimerDelegate(config.timerDelegate), mWhmDelegate(config.waterHeaterManagementDelegate),
-        mWaterHeaterModeDelegate(config.waterHeaterModeDelegate),
-        mThermostatDelegate(config.thermostatDelegate),
-        mHeatingDelegate(config.heatingDelegate)
-    {}
-    WaterHeater::~WaterHeater() = default;
+namespace chip::app {
+WaterHeater::WaterHeater(const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mConfig(config),
+    mTimerDelegate(config.timerDelegate), mWhmDelegate(config.waterHeaterManagementDelegate),
+    mWaterHeaterModeDelegate(config.waterHeaterModeDelegate), mThermostatDelegate(config.thermostatDelegate),
+    mHeatingDelegate(config.heatingDelegate)
+{}
+WaterHeater::~WaterHeater() = default;
 
-    CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-        EndpointComposition composition)
+CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+{
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+    mProvider   = &provider;
+    mEndpointId = endpoint;
+
+    mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
+    ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
+
+    mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
+                              HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mTimerDelegate), mThermostatDelegate,
+                              mHeatingDelegate);
+
+    ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
+
+    mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
+                                   Clusters::ModeBaseCluster::Config{
+                                       .feature                = BitMask<Clusters::ModeBase::Feature>(),
+                                       .optionalAttributeSet   = {},
+                                       .appDelegate            = mWaterHeaterModeDelegate,
+                                       .onOffValueForStartUp   = false,
+                                       .diagnosticDataProvider = mConfig.diagnosticDataProvider,
+                                   });
+    ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterModeCluster.Registration()));
+
+    ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
+
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
+}
+
+void WaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    mProvider = nullptr;
+    UnregisterDescriptor(provider);
+    UnregisterOptionalClusters(provider);
+    if (mWaterHeaterManagementCluster.IsConstructed())
     {
-        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-        DeviceRegistrationTransaction transaction(*this, provider);
-
-        ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-        mProvider = &provider;
-        mEndpointId = endpoint;
-
-        mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
-        ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterManagementCluster.Registration()));
-
-        mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
-        HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mTimerDelegate), mThermostatDelegate, mHeatingDelegate);
-
-        ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
-
-        mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
-                            Clusters::ModeBaseCluster::Config{
-                                .feature                = BitMask<Clusters::ModeBase::Feature>(),
-                                .optionalAttributeSet   = {},
-                                .appDelegate            = mWaterHeaterModeDelegate,
-                                .onOffValueForStartUp   = false,
-                                .diagnosticDataProvider = mConfig.diagnosticDataProvider,
-                            });
-        ReturnErrorOnFailure(provider.AddCluster(mWaterHeaterModeCluster.Registration()));
-
-        ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));
-
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-        transaction.Commit();
-        return CHIP_NO_ERROR;
-    }
-
-    void WaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
-    {
-        mProvider = nullptr;
-        UnregisterDescriptor(provider);
-        UnregisterOptionalClusters(provider);
-        if (mWaterHeaterManagementCluster.IsConstructed())
-        {
         LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterManagementCluster.Cluster()));
         mWaterHeaterManagementCluster.Destroy();
-        }
-        if (mThermostatCluster.IsConstructed())
-        {
+    }
+    if (mThermostatCluster.IsConstructed())
+    {
         LogErrorOnFailure(provider.RemoveCluster(&mThermostatCluster.Cluster()));
         mThermostatCluster.Destroy();
-        }
-        if (mWaterHeaterModeCluster.IsConstructed())
-        {
+    }
+    if (mWaterHeaterModeCluster.IsConstructed())
+    {
         LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterModeCluster.Cluster()));
         mWaterHeaterModeCluster.Destroy();
-        }
     }
+}
 
-    Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster()
-    {
-        VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
-        return mWaterHeaterManagementCluster.Cluster();
-    }
+Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster()
+{
+    VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
+    return mWaterHeaterManagementCluster.Cluster();
+}
 
-    WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster()
-    {
-        VerifyOrDie(mThermostatCluster.IsConstructed());
-        return mThermostatCluster.Cluster();
-    }
+WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster()
+{
+    VerifyOrDie(mThermostatCluster.IsConstructed());
+    return mThermostatCluster.Cluster();
+}
 
-    Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster()
-    {
-        VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
-        return mWaterHeaterModeCluster.Cluster();
-    }
+Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster()
+{
+    VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
+    return mWaterHeaterModeCluster.Cluster();
+}
 } // namespace chip::app
