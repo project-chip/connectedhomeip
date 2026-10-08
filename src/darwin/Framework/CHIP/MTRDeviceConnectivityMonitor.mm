@@ -72,6 +72,11 @@ static dispatch_queue_t sSharedResolverQueue;
 static NSMapTable<NSNumber *, MTRDeviceConnectivityMonitor *> * sMonitorMap;
 static uintptr_t sNextMonitorID = 1;
 
+#ifdef DEBUG
+// Lets tests stand in for a node whose operational resolve never answers.
+static NSString * sUnitTestInstanceNameOverride;
+#endif
+
 - (instancetype)initWithInstanceName:(NSString *)instanceName
 {
     if (self = [super init]) {
@@ -121,6 +126,17 @@ static uintptr_t sNextMonitorID = 1;
         MTR_LOG_ERROR("%@ could not make instance name", self);
         return nil;
     }
+
+#ifdef DEBUG
+    NSString * instanceNameOverride;
+    {
+        std::lock_guard lock(sConnectivityMonitorLock);
+        instanceNameOverride = sUnitTestInstanceNameOverride;
+    }
+    if (instanceNameOverride) {
+        return [self initWithInstanceName:instanceNameOverride];
+    }
+#endif
 
     return [self initWithInstanceName:[NSString stringWithUTF8String:instanceName]];
 }
@@ -483,6 +499,12 @@ static void ResolveCallback(
 }
 
 #ifdef DEBUG
++ (void)unitTestSetInstanceNameOverride:(nullable NSString *)instanceName
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    sUnitTestInstanceNameOverride = [instanceName copy];
+}
+
 + (BOOL)unitTestHasActiveSharedConnection
 {
     std::lock_guard lock(sConnectivityMonitorLock);
