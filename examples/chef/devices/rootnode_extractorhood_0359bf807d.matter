@@ -1755,7 +1755,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 5;
+  revision 6;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
