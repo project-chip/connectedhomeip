@@ -83,7 +83,7 @@ class CameraFragment : Fragment() {
     scope = viewLifecycleOwner.lifecycleScope
 
     addressUpdateFragment =
-      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+      childFragmentManager.findFragmentById(R.id.address_update_fragment) as AddressUpdateFragment
 
     initWebRTC()
     createPeerConnection()
@@ -154,20 +154,20 @@ class CameraFragment : Fragment() {
   }
 
   private fun setupLocalLiveViewListeners() {
-    binding.liveviewLocalAllocateVideoStreamBtn.setOnClickListener {
+    binding.liveViewLocalAllocateVideoStreamBtn.setOnClickListener {
       scope.launch { sendAllocateVideoStream() }
     }
 
-    binding.startLiveviewBtn.setOnClickListener { scope.launch { startLiveView() } }
+    binding.startLiveViewBtn.setOnClickListener { scope.launch { startLiveView() } }
 
-    binding.stopLiveviewBtn.setOnClickListener {
+    binding.stopLiveViewBtn.setOnClickListener {
       val streamID =
-        binding.liveviewLocalWebRTCSessionIdTextView.text.toString().toUIntOrNull() ?: 0U
+        binding.liveViewLocalWebrtcSessionIdTextView.text.toString().toUIntOrNull() ?: 0U
       scope.launch { stopLiveView(streamID) }
     }
 
-    binding.liveviewLocalDeallocateVideoStreamBtn.setOnClickListener {
-      val streamID = binding.liveviewLocalVideoStreamIdTextView.text.toString().toUIntOrNull() ?: 0U
+    binding.liveViewLocalDeallocateVideoStreamBtn.setOnClickListener {
+      val streamID = binding.liveViewLocalVideoStreamIdTextView.text.toString().toUIntOrNull() ?: 0U
       scope.launch { sendDeallocateVideoStream(streamID) }
     }
   }
@@ -253,7 +253,7 @@ class CameraFragment : Fragment() {
                 Toast.LENGTH_LONG
               )
               .show()
-            binding.liveviewLocalVideoStreamIdTextView.text = videoStreamID?.toString() ?: "0"
+            binding.liveViewLocalVideoStreamIdTextView.text = videoStreamID?.toString() ?: "0"
             currentLiveViewVideoStreamId = videoStreamID
           }
         }
@@ -313,7 +313,7 @@ class CameraFragment : Fragment() {
           )
           currentWebRTCSessionId = webRTCSessionID
           scope.launch(Dispatchers.Main) {
-            binding.liveviewLocalWebRTCSessionIdTextView.text = webRTCSessionID.toString()
+            binding.liveViewLocalWebrtcSessionIdTextView.text = webRTCSessionID.toString()
           }
         }
 
@@ -452,19 +452,19 @@ class CameraFragment : Fragment() {
   private fun setupRadioGroupListener() {
     binding.radioGroupMode.setOnCheckedChangeListener { _, checkedId ->
       when (checkedId) {
-        R.id.LiveViewLocalRadioButton -> {
+        R.id.live_view_local_radio_button -> {
           binding.liveViewLocalScrollView.visibility = View.VISIBLE
           binding.liveViewRemoteScrollView.visibility = View.GONE
           binding.snapshotScrollView.visibility = View.GONE
           binding.videoView.visibility = View.VISIBLE
         }
-        R.id.LiveViewRemoteRadioButton -> {
+        R.id.live_view_remote_radio_button -> {
           binding.liveViewLocalScrollView.visibility = View.GONE
           binding.liveViewRemoteScrollView.visibility = View.VISIBLE
           binding.snapshotScrollView.visibility = View.GONE
           binding.videoView.visibility = View.VISIBLE
         }
-        R.id.SnapshotRadioButton -> {
+        R.id.snapshot_radio_button -> {
           binding.liveViewLocalScrollView.visibility = View.GONE
           binding.liveViewRemoteScrollView.visibility = View.GONE
           binding.snapshotScrollView.visibility = View.VISIBLE
@@ -555,7 +555,7 @@ class CameraFragment : Fragment() {
             Toast.makeText(requireContext(), "ICE Gathering Complete.", Toast.LENGTH_SHORT).show()
 
             val isLocalMode =
-              binding.radioGroupMode.checkedRadioButtonId == R.id.LiveViewLocalRadioButton
+              binding.radioGroupMode.checkedRadioButtonId == R.id.live_view_local_radio_button
             if (isLocalMode) {
               val sessionId = currentWebRTCSessionId
 

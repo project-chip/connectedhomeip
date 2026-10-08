@@ -290,7 +290,7 @@ void AndroidWebRTCTransportProviderClient::HandleCommandError(void * appContext,
     auto * self = static_cast<AndroidWebRTCTransportProviderClient *>(appContext);
     if (self != nullptr)
     {
-        self->NotifyError(error);
+        self->NotifyError(error != CHIP_NO_ERROR ? error : chip::app::StatusIB(status, clusterStatus).ToChipError());
     }
 }
 
