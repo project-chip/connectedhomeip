@@ -143,9 +143,9 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // involve sync dispatch to the Matter queue.
     dispatch_queue_t _commissioningQueue;
 
-    // Keep track of dns-sd resolution objects for shutdown-time cleanup.
+    // Session requests waiting on dns-sd resolution; each is failed if the controller shuts down first.
     os_unfair_lock _deviceConnectivityMonitorLock;
-    NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+    NSMapTable<MTRDeviceConnectivityMonitor *, dispatch_block_t> * _shutdownHandlersForDeviceConnectivityMonitors;
 #ifdef DEBUG
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
 #endif
@@ -488,12 +488,15 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
     // Calling stopMonitoring breaks the retain cycle of the monitor handler holding
     // the monitor object, allowing the monitor object to dealloc and clean up.
+    NSMapTable<MTRDeviceConnectivityMonitor *, dispatch_block_t> * shutdownHandlers;
     {
         std::lock_guard lock(_deviceConnectivityMonitorLock);
-        for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
-            [deviceConnectivityMonitor stopMonitoring];
-        }
-        [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
+        shutdownHandlers = [_shutdownHandlersForDeviceConnectivityMonitors copy];
+        [_shutdownHandlersForDeviceConnectivityMonitors removeAllObjects];
+    }
+    for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in shutdownHandlers) {
+        [deviceConnectivityMonitor stopMonitoring];
+        dispatch_async(_chipWorkQueue, [shutdownHandlers objectForKey:deviceConnectivityMonitor]);
     }
 
     [_factory controllerShuttingDown:self];
@@ -785,7 +788,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             self.fabricID = @(_cppCommissioner->GetFabricId());
         }
 
-        _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
+        _shutdownHandlersForDeviceConnectivityMonitors = [NSMapTable strongToStrongObjectsMapTable];
 
         commissionerInitialized = YES;
 
@@ -1793,20 +1796,25 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                     [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
                 }
                 workItem = nil;
-                [deviceConnectivityMonitor stopMonitoring];
+                [self _stopWaitingOnDeviceConnectivityMonitor:deviceConnectivityMonitor];
             }
         };
+        dispatch_block_t failWorkItemOnceForShutdown = ^{
+            if (workItem) {
+                MTR_LOG("%@ shut down while a session request for node 0x%016llX waited on its connectivity monitor", self, nodeID);
+                workItem = nil;
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+            }
+        };
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_shutdownHandlersForDeviceConnectivityMonitors setObject:failWorkItemOnceForShutdown forKey:deviceConnectivityMonitor];
+        }
         BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
             enqueueWorkItemOnce(NO);
         } queue:_chipWorkQueue];
 
         if (monitorStarted) {
-            // Add the monitor object to the weak set, so that the above retain cycle can be broken
-            // when the controller shuts down.
-            {
-                std::lock_guard lock(_deviceConnectivityMonitorLock);
-                [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
-            }
             __weak void (^weakEnqueueWorkItemOnce)(BOOL) = enqueueWorkItemOnce;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (monitorWaitSeconds * NSEC_PER_SEC)), _chipWorkQueue, ^{
                 void (^strongEnqueueWorkItemOnce)(BOOL) = weakEnqueueWorkItemOnce;
@@ -1818,11 +1826,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             // DNS-SD monitoring failed to start - proceed with immediate connection attempt
             // (This is unlikely, but needed so that the workItem block always executes.)
             MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
-            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+            BOOL failedByShutdown;
+            {
+                std::lock_guard lock(_deviceConnectivityMonitorLock);
+                failedByShutdown = [_shutdownHandlersForDeviceConnectivityMonitors objectForKey:deviceConnectivityMonitor] == nil;
+                [_shutdownHandlersForDeviceConnectivityMonitors removeObjectForKey:deviceConnectivityMonitor];
+            }
+            if (!failedByShutdown) {
+                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
+            }
         }
     } else {
         [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
     }
+}
+
+- (void)_stopWaitingOnDeviceConnectivityMonitor:(MTRDeviceConnectivityMonitor *)deviceConnectivityMonitor
+{
+    {
+        std::lock_guard lock(_deviceConnectivityMonitorLock);
+        [_shutdownHandlersForDeviceConnectivityMonitors removeObjectForKey:deviceConnectivityMonitor];
+    }
+    [deviceConnectivityMonitor stopMonitoring];
 }
 
 - (BOOL)_completeWithExistingSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion

@@ -1006,4 +1006,100 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
 #endif
 }
 
+#ifdef DEBUG
+- (void)requestSessionForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller errors:(NSMutableArray *)errors
+{
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        [errors addObject:error ?: NSNull.null];
+    }];
+}
+#endif
+
+- (void)test045_ControllerShutdownCompletesARequestWaitingOnTheMonitorWithAnError
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x1045);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block NSError * sessionError;
+    __block BOOL completed = NO;
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        sessionError = error;
+        completed = YES;
+    }];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"session request waits on its connectivity monitor");
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return completed; } timeout:kPromptSeconds description:@"pending session request completed by controller shutdown"]);
+    XCTAssertNotNil(sessionError);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test046_ControllerShutdownCompletesEveryRequestWaitingOnAMonitor
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSArray<NSNumber *> * nodeIDs = @[ @(0x1046), @(0x1047), @(0x1048) ];
+    NSMutableArray * errors = [NSMutableArray array];
+    for (NSNumber * nodeID in nodeIDs) {
+        [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+        [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    }
+    [self requestSessionForNodeID:nodeIDs[0] controller:controller errors:errors];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + nodeIDs.count + 1, @"every session request waits on its own connectivity monitor");
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count == nodeIDs.count + 1); } timeout:kPromptSeconds description:@"every waiting session request completed by controller shutdown"]);
+    XCTAssertFalse([errors containsObject:NSNull.null], @"%@", errors);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test047_RequestCompletedByShutdownIsNotCompletedAgainByTheMonitorTimeout
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x1049);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0); } timeout:kPromptSeconds description:@"waiting session request completed by controller shutdown"]);
+    XCTAssertTrue([self stays:^{ return (BOOL) (errors.count == 1); } duration:kMonitorWaitSeconds + 1], @"completed once, not again when the monitor wait times out: %@", errors);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test048_ControllerShutdownWithNoWaitingRequest
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x104A);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+
+    [controller shutdown];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0); } timeout:kPromptSeconds description:@"session request after shutdown completed"]);
+    XCTAssertTrue([self stays:^{ return (BOOL) (errors.count == 1); } duration:1]);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
 @end
