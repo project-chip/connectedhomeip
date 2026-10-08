@@ -84,7 +84,6 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
-- (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 @end
 
 @interface MTRBaseDevice (TestDebug)
