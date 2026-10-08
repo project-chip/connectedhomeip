@@ -19,6 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
@@ -279,6 +280,11 @@ if (chip_build_tests) {
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/support/tests",
       ]
+    }
+
+    if (chip_build_controller_dynamic_server &&
+        (chip_device_platform == "darwin" || chip_device_platform == "linux")) {
+      tests += [ "${chip_root}/src/app/dynamic_server/tests" ]
     }
 
     if (matter_enable_tracing_support &&
