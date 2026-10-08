@@ -40,7 +40,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # UnknownProblemLocation is used to attach a location-less warning to record_warning().
@@ -174,7 +174,7 @@ def modify_thread_tlv(dataset: bytes, tlv_type: int, modifier_fn: Callable[[byte
     raise ValueError(f"TLV type 0x{tlv_type:02x} not found in dataset")
 
 
-class TC_CNET_4_24(MatterBaseTest):
+class TC_CNET_4_24(MatterTestCommissioner):
     """
     [TC-CNET-4.24] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
     PASE session variant — for uncommissioned devices.
