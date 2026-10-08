@@ -258,6 +258,20 @@ TEST_F(TestEnergyEvseDelegate, EnableDischargingFailsWhenDeadlineCannotBePersist
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
 }
 
+TEST_F(TestEnergyEvseDelegate, DisableReportsFailureWhenDeadlineCannotBePersisted)
+{
+    StartCharging();
+
+    mStorage.AddPoisonKey(PoisonKey(Attributes::ChargingEnabledUntil::Id));
+    EXPECT_EQ(mDelegate.Disable(), Status::Failure);
+    mStorage.ClearPoisonKeys();
+
+    // The disable still takes effect in memory so the EVSE stops charging
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+    EXPECT_EQ(mInstance.GetMaximumChargeCurrent(), 0);
+}
+
 TEST_F(TestEnergyEvseDelegate, ExpiryOfOneDeadlineKeepsTheOtherModeEnabled)
 {
     ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA), Status::Success);

@@ -52,14 +52,30 @@ Status EnergyEvseDelegate::Disable()
     }
 
     DataModel::Nullable<uint32_t> disableTime(0);
-    /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 (persisted by the attribute change callbacks) */
+    /* Persist the zero deadlines explicitly: the setters' persisting callbacks cannot report a storage failure
+     * (and are skipped if the value is unchanged), and a deadline left in storage would re-enable the EVSE on reboot */
+    const CHIP_ERROR chargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), disableTime);
+    const CHIP_ERROR dischargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), disableTime);
+    const bool deadlinesPersisted = (chargingDeadlineErr == CHIP_NO_ERROR) && (dischargingDeadlineErr == CHIP_NO_ERROR);
+    if (!deadlinesPersisted)
+    {
+        ChipLogError(AppServer,
+                     "EVSE: failed to persist disabled deadlines (charging: %" CHIP_ERROR_FORMAT
+                     ", discharging: %" CHIP_ERROR_FORMAT ")",
+                     chargingDeadlineErr.Format(), dischargingDeadlineErr.Format());
+    }
+
+    /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 */
     LogErrorOnFailure(mInstance->SetChargingEnabledUntil(disableTime));
     LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(disableTime));
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
     LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
 
-    /* Complete the in-memory shutdown regardless of storage errors (these are logged) */
+    /* Complete the in-memory shutdown regardless of storage errors, but report a deadline storage failure
+     * to the caller because the disable would not survive a reboot */
     mMaximumChargingCurrentLimitFromCommand = 0;
     ComputeMaxChargeCurrentLimit();
     LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
@@ -76,10 +92,11 @@ Status EnergyEvseDelegate::Disable()
     {
         // Preserve the requested disabled state until the fault clears.
         mSupplyStateBeforeFault = SupplyStateEnum::kDisabled;
-        return Status::Success;
+        return deadlinesPersisted ? Status::Success : Status::Failure;
     }
 
-    return HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
+    const Status status = HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
+    return deadlinesPersisted ? status : Status::Failure;
 }
 
 /**
