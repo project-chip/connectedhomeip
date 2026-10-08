@@ -18,8 +18,7 @@ import("//build_overrides/chip.gni")
 source_set("water-heater") {
   sources = [
     "WaterHeater.h",
-    "impl/SimulatedWaterHeater.cpp",
-    "impl/SimulatedWaterHeater.h",
+    "WaterHeater.cpp",
   ]
 
   public_deps = [
@@ -31,5 +30,20 @@ source_set("water-heater") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices",
+  ]
+}
+
+source_set("simulated") {
+  sources = [
+    "impl/SimulatedWaterHeater.cpp",
+    "impl/SimulatedWaterHeater.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/persistence",
+  ]
+
+  public_deps = [
+    ":water-heater",
   ]
 }
