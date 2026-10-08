@@ -297,11 +297,11 @@ template("siwx917_sdk") {
     ]
 
     # Defines for Si917Y MCU
-    if (is_si917y_mcu) {
+    if (is_si917y_acx) {
       defines += [ "SL_SI91X_ACX_MODULE=1" ]
     }
 
-    if (is_si91x_32khz_external_oscillator) {
+    if (is_si91x_32khz_xo) {
       defines += [ "SI91X_32kHz_EXTERNAL_OSCILLATOR=1" ]
     }
 
