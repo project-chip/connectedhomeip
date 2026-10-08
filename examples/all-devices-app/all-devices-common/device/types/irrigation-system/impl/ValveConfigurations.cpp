@@ -18,35 +18,58 @@
 #include "device/api/Interface.h"
 
 #include <clusters/shared/Enums.h>
+#include <cstdint>
 
 namespace chip::app {
 namespace {
 
 using namespace Clusters;
-// TODO: dont move with defaults.
-const ValveConfigurationAndControlCluster::StartupConfiguration defaultConfig{
-    DataModel::NullNullable, ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-    ValveConfigurationAndControlCluster::kDefaultLevelStep
-};
+constexpr uint8_t kLocationZoneTag = 0x04;
 
-const ValveConfigurationAndControlCluster::ValveContext defaultValveContext = {
+// Zone 1: level-controlled valve, no default duration (runs until closed).
+const ValveConfigurationAndControlCluster::StartupConfiguration kConfig1{ DataModel::NullNullable, 100, 1 };
+
+// Zone 2: level-controlled valve opening to 50% in steps of 10, auto-closes after 10 minutes by default.
+const ValveConfigurationAndControlCluster::StartupConfiguration kConfig2{ DataModel::MakeNullable<uint32_t>(600), 50, 10 };
+
+// Zone 3: simple on/off valve (no Level feature), auto-closes after 5 minutes by default.
+const ValveConfigurationAndControlCluster::StartupConfiguration kConfig3{ DataModel::MakeNullable<uint32_t>(300),
+                                                                          ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                          ValveConfigurationAndControlCluster::kDefaultLevelStep };
+const ValveConfigurationAndControlCluster::ValveContext kValveContext1 = {
     .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
     .optionalAttributeSet = {},
-    .config               = defaultConfig,
+    .config               = kConfig1,
     .tsTracker            = nullptr,
     .delegate             = nullptr,
 };
 
+const ValveConfigurationAndControlCluster::ValveContext kValveContext2 = {
+    .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
+    .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet()
+                                .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
+                                .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
+    .config    = kConfig2,
+    .tsTracker = nullptr,
+    .delegate  = nullptr,
+};
+const ValveConfigurationAndControlCluster::ValveContext kValveContext3 = {
+    .features             = {},
+    .optionalAttributeSet = {},
+    .config               = kConfig3,
+    .tsTracker            = nullptr,
+    .delegate             = nullptr,
+};
 const EndpointComposition::SemanticTag kValve1[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 1 },
+    { .namespaceID = CommonNamespace::kLocationId, .tag = kLocationZoneTag },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
 };
 const EndpointComposition::SemanticTag kValve2[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 2 },
+    { .namespaceID = CommonNamespace::kLocationId, .tag = kLocationZoneTag },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
 };
 const EndpointComposition::SemanticTag kValve3[] = {
-    { .namespaceID = CommonNamespace::kLocationId, .tag = 2 },
+    { .namespaceID = CommonNamespace::kLocationId, .tag = kLocationZoneTag },
     { .namespaceID = CommonNamespace::kNumberId, .tag = 3 },
 };
 
@@ -56,18 +79,18 @@ std::vector<IrrigationSystem::ValveList> LoggingIrrigationSystem::ValveConfigura
 {
     return std::vector<IrrigationSystem::ValveList>{
         IrrigationSystem::ValveList{
-            .startupConfiguration = defaultConfig,
-            .valveContext         = defaultValveContext,
+            .startupConfiguration = kConfig1,
+            .valveContext         = kValveContext1,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve1),
         },
         IrrigationSystem::ValveList{
-            .startupConfiguration = defaultConfig,
-            .valveContext         = defaultValveContext,
+            .startupConfiguration = kConfig2,
+            .valveContext         = kValveContext2,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve2),
         },
         IrrigationSystem::ValveList{
-            .startupConfiguration = defaultConfig,
-            .valveContext         = defaultValveContext,
+            .startupConfiguration = kConfig3,
+            .valveContext         = kValveContext3,
             .tags                 = Span<const EndpointComposition::SemanticTag>(kValve3),
         },
 

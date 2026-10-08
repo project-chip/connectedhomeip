@@ -85,7 +85,9 @@ public:
     static std::vector<IrrigationSystem::ValveList> ValveConfiguration();
     static constexpr bool kHasMasterValve = true;
 
-    void OnValveStateChanged() override;
+    void OnValveOpened() override;
+
+    void OnValveClosed() override;
 
 private:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
