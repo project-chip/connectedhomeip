@@ -39,12 +39,14 @@
 // Framesize for audio pipeline
 #define AUDIO_FRAMESIZE 20
 
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::ZoneManagement;
+using namespace chip::app::Clusters::AvAnalysis;
 
 using namespace Camera;
 
@@ -66,6 +68,7 @@ struct AudioAppSinkContext
 
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
+constexpr int kBallAnimationPattern = 18;
 
 // Callback function for GStreamer app sink
 GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
@@ -90,40 +93,38 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Check if SFrame encryption is enabled for this stream
-        auto & mediaController = self->GetMediaController();
-        Transport * transport  = mediaController.GetTransportForVideoStream(videoStreamID);
-
-        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
         {
-            auto & sframeConfig = transport->sFrameConfig.Value();
-            ChipLogProgress(Camera, "SFrame encryption enabled for video stream %u: cipherSuite=0x%04X, keyLen=%u", videoStreamID,
-                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
-
-            // TODO: Implement SFrame encryption (occurs AFTER H.264 encoding, BEFORE RTP packetization)
-            // Current state: map.data contains H.264 encoded frames from GStreamer
-            //
-            // SFrame encryption steps:
-            // 1. Take the H.264 compressed payload (map.data, map.size)
-            // 2. Select encryption algorithm based on cipherSuite:
-            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
-            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
-            // 3. Encrypt the H.264 payload using sframeConfig.baseKey
-            // 4. Build SFrame header containing:
-            //    - Key ID (kid) from sframeConfig.kid
-            //    - Frame counter (incremented per frame)
-            // 5. Prepend SFrame header to encrypted payload:
-            //    Result: [SFrame Header | Encrypted(H.264 Payload)]
-            // 6. This will later be packed into RTP as:
-            //    [RTP Header | SFrame Header | Encrypted(H.264 Payload)]
-            //    SFUs can inspect RTP headers but payload remains encrypted
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
         }
+        auto firstPtsIt = self->mVideoStreamPtsOffsetMs.find(videoStreamID);
+        if (firstPtsIt == self->mVideoStreamPtsOffsetMs.end())
+        {
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mVideoStreamPtsOffsetMs[videoStreamID] = nowMs - rawMs;
+        }
+        int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
+        if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
+        {
 
-        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(H.264)]
-        // If SFrame is disabled, this is raw H.264 encoded frames
-
-        // Forward H.264 RTP data to media controller with the correct videoStreamID
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
+            // Forward raw H.264 encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mVideoStreamPtsOffsetMs[videoStreamID], videoStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -164,40 +165,37 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Check if SFrame encryption is enabled for this stream
-        auto & mediaController = self->GetMediaController();
-        Transport * transport  = mediaController.GetTransportForAudioStream(audioStreamID);
-
-        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
         {
-            auto & sframeConfig = transport->sFrameConfig.Value();
-            ChipLogProgress(Camera, "SFrame encryption enabled for audio stream %u: cipherSuite=0x%04X, keyLen=%u", audioStreamID,
-                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
-
-            // TODO: Implement SFrame encryption (occurs AFTER Opus encoding, BEFORE RTP packetization)
-            // Current state: map.data contains Opus encoded frames from GStreamer
-            //
-            // SFrame encryption steps:
-            // 1. Take the Opus compressed payload (map.data, map.size)
-            // 2. Select encryption algorithm based on cipherSuite:
-            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
-            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
-            // 3. Encrypt the Opus payload using sframeConfig.baseKey
-            // 4. Build SFrame header containing:
-            //    - Key ID (kid) from sframeConfig.kid
-            //    - Frame counter (incremented per frame)
-            // 5. Prepend SFrame header to encrypted payload:
-            //    Result: [SFrame Header | Encrypted(Opus Payload)]
-            // 6. This will later be packed into RTP as:
-            //    [RTP Header | SFrame Header | Encrypted(Opus Payload)]
-            //    SFUs can inspect RTP headers but payload remains encrypted
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
         }
-
-        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(Opus)]
-        // If SFrame is disabled, this is raw Opus encoded frames
-
-        // Send raw Opus frames to the media controller
-        self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
+        auto firstPtsIt = self->mAudioStreamPtsOffsetMs.find(audioStreamID);
+        if (firstPtsIt == self->mAudioStreamPtsOffsetMs.end())
+        {
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mAudioStreamPtsOffsetMs[audioStreamID] = nowMs - rawMs;
+        }
+        int64_t ts = self->mAudioStreamPtsOffsetMs[audioStreamID] + (rawPts / 1000000);
+        if (ts >= self->mAudioStreamPtsOffsetMs[audioStreamID])
+        {
+            // Forward raw Opus encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mAudioStreamPtsOffsetMs[audioStreamID], audioStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -293,7 +291,6 @@ struct SnapshotPipelineConfig
     int height;
     int quality;
     int framerate;
-    std::string filename;
 };
 
 GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, CameraError & error)
@@ -306,7 +303,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     GstElement * videorate      = gst_element_factory_make("videorate", "videorate");
     GstElement * videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
     GstElement * queue          = gst_element_factory_make("queue", "queue");
-    GstElement * filesink       = gst_element_factory_make("multifilesink", "sink");
+    GstElement * appsink        = gst_element_factory_make("appsink", "sink");
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -316,7 +313,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
         { videorate, "videorate" },           //
         { videorate_caps, "videorate_caps" }, //
         { queue, "queue" },                   //
-        { filesink, "filesink" }              //
+        { appsink, "appsink" }                //
     };
     bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -324,7 +321,7 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     if (isElementFactoryMakeFailed)
     {
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, filesink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, appsink);
 
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -344,14 +341,14 @@ GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, C
     g_object_set(jpeg_caps, "caps", caps, nullptr);
     gst_caps_unref(caps);
 
-    // Set the output file location
-    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
 
     // Add elements to the pipeline
-    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr);
+    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr);
 
     // Link the elements
-    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, nullptr) != TRUE)
+    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr) != TRUE)
     {
         ChipLogError(Camera, "Elements could not be linked.");
 
@@ -372,7 +369,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
     GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
     GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * filesink   = gst_element_factory_make("multifilesink", "sink");
+    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
 
     // Check for any nullptr among the created elements
     const std::vector<std::pair<GstElement *, const char *>> elements = {
@@ -381,7 +378,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
         { capsfilter, "capsfilter" }, //
         { jpegenc, "jpegenc" },       //
         { queue, "queue" },           //
-        { filesink, "filesink" }      //
+        { appsink, "appsink" }        //
     };
     const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
 
@@ -389,7 +386,7 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     if (isElementFactoryMakeFailed)
     {
         // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, filesink);
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
     }
@@ -408,12 +405,71 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
     // Set JPEG quality
     g_object_set(jpegenc, "quality", config.quality, nullptr);
 
-    // Set multifilesink to write only one file
-    g_object_set(filesink, "location", config.filename.c_str(), nullptr);
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
 
     // Add and link elements
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, filesink, nullptr);
-    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, filesink, nullptr))
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
+    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
+    {
+        ChipLogError(Camera, "Elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+
+GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & config, CameraError & error)
+{
+    GstElement * pipeline   = gst_pipeline_new("snapshot-pipeline-test");
+    GstElement * source     = gst_element_factory_make("videotestsrc", "source");
+    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
+    GstElement * queue      = gst_element_factory_make("queue", "queue");
+    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },     //
+        { source, "source" },         //
+        { capsfilter, "capsfilter" }, //
+        { jpegenc, "jpegenc" },       //
+        { queue, "queue" },           //
+        { appsink, "appsink" }        //
+    };
+    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
+
+    if (isElementFactoryMakeFailed)
+    {
+        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Configure videotestsrc: pattern=kBallAnimationPattern (ball animation), live=true
+    g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
+
+    // Set resolution and framerate caps
+    GstCaps * caps = gst_caps_new_simple(                    //
+        "video/x-raw",                                       //
+        "width", G_TYPE_INT, config.width,                   //
+        "height", G_TYPE_INT, config.height,                 //
+        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
+        nullptr                                              //
+    );
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    // Set JPEG quality
+    g_object_set(jpegenc, "quality", config.quality, nullptr);
+
+    // Configure appsink
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
+
+    // Add and link elements
+    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
+    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
     {
         ChipLogError(Camera, "Elements could not be linked.");
         gst_object_unref(pipeline);
@@ -445,6 +501,7 @@ CameraDevice::CameraDevice()
     mZoneManager.SetCameraDevice(this);
     mPushAVTransportManager.SetCameraDevice(this);
     mMediaController.SetCameraDevice(this);
+    mAVAnalysisManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -463,6 +520,23 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -471,6 +545,12 @@ CameraError CameraDevice::InitializeCameraDevice()
     {
         gst_init(nullptr, nullptr);
         gstreamerInitialized = true;
+    }
+
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        ChipLogProgress(Camera, "Using test video source, skipping physical camera initialization");
+        return CameraError::SUCCESS;
     }
 
     ChipLogDetail(Camera, "InitializeCameraDevice: %s", mVideoDevicePath.c_str());
@@ -496,18 +576,23 @@ CameraError CameraDevice::InitializeStreams()
 
 // Function to create the GStreamer pipeline
 GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
-                                                  const std::string & filename, CameraError & error)
+                                                  CameraError & error)
 {
-    const auto cameraType = GstreamerPipepline::detectCameraType(device);
-
     const GstreamerPipepline::Snapshot::SnapshotPipelineConfig config = {
         .device    = device,
         .width     = width,
         .height    = height,
         .quality   = quality,
         .framerate = framerate,
-        .filename  = filename,
     };
+
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        ChipLogProgress(Camera, "Using test video source for snapshot pipeline");
+        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineTestVideosrc(config, error);
+    }
+
+    const auto cameraType = GstreamerPipepline::detectCameraType(device);
 
     switch (cameraType)
     {
@@ -547,8 +632,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 
     if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
     {
-        const int kBallAnimationPattern = 18;
-        source                          = gst_element_factory_make("videotestsrc", "source");
+        source = gst_element_factory_make("videotestsrc", "source");
         g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
         ChipLogProgress(Camera, "Video piepline: using test video source");
     }
@@ -556,6 +640,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         source = gst_element_factory_make("v4l2src", "source");
         g_object_set(source, "device", device.c_str(), nullptr);
+        ChipLogProgress(Camera, "Video pipeline: using V4L2 source");
     }
 
     // Check for any nullptr among the created elements
@@ -819,6 +904,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 {
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
+    uint16_t streamId               = 0;
+    SnapshotStream * snapshotStream = nullptr;
 
     if (streamID.IsNull())
     {
@@ -828,11 +915,23 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
                          resolution.height);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
+        // Find the stream that matched
+        for (auto & s : mSnapshotStreams)
+        {
+            if (s.snapshotStreamParams.minResolution.width == matchedRes.width &&
+                s.snapshotStreamParams.minResolution.height == matchedRes.height &&
+                s.snapshotStreamParams.imageCodec == matchedCodec)
+            {
+                snapshotStream = &s;
+                streamId       = s.snapshotStreamParams.snapshotStreamID;
+                break;
+            }
+        }
     }
     else
     {
-        uint16_t streamId = streamID.Value();
-        auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+        streamId = streamID.Value();
+        auto it  = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == streamId;
         });
         if (it == mSnapshotStreams.end())
@@ -840,32 +939,99 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
             ChipLogError(Camera, "Snapshot stream not found for stream ID %u", streamId);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
-        matchedRes   = it->snapshotStreamParams.minResolution;
-        matchedCodec = it->snapshotStreamParams.imageCodec;
+        snapshotStream = &(*it);
+        matchedRes     = it->snapshotStreamParams.minResolution;
+        matchedCodec   = it->snapshotStreamParams.imageCodec;
     }
 
-    // Read from image file stored from snapshot stream.
-    std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
+    if (snapshotStream == nullptr)
     {
-        ChipLogError(Camera, "Error opening snapshot image file: ");
+        ChipLogError(Camera, "Failed to determine snapshot stream");
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    GstElement * snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
+    bool startedOnDemand          = false;
 
-    // Ensure space for image snapshot data in outImageSnapshot
-    outImageSnapshot.data.resize(static_cast<size_t>(size));
-
-    if (!file.read(reinterpret_cast<char *>(outImageSnapshot.data.data()), size))
+    if (snapshotPipeline == nullptr)
     {
-        ChipLogError(Camera, "Error reading image file: ");
-        file.close();
+        // Stream is not running, start it temporarily
+        ChipLogProgress(Camera, "Snapshot stream not running, starting on demand");
+        if (StartSnapshotStream(streamId) != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to start snapshot stream on demand");
+            return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+        }
+        snapshotPipeline = reinterpret_cast<GstElement *>(snapshotStream->snapshotContext);
+        startedOnDemand  = true;
+    }
+
+    if (snapshotPipeline == nullptr)
+    {
+        ChipLogError(Camera, "Snapshot pipeline is still null after trying to start");
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    file.close();
+    auto stopOnDemandStream = [this, streamId, startedOnDemand]() {
+        if (startedOnDemand)
+        {
+            ChipLogProgress(Camera, "Stopping snapshot stream that was started on demand");
+            if (StopSnapshotStream(streamId) != CameraError::SUCCESS)
+            {
+                ChipLogError(Camera, "Failed to stop snapshot stream %u that was started on demand", streamId);
+            }
+        }
+    };
+
+    // Get the appsink
+    GstElement * appsink = gst_bin_get_by_name(GST_BIN(snapshotPipeline), "sink");
+    if (!appsink)
+    {
+        ChipLogError(Camera, "Failed to get appsink from snapshot pipeline");
+        stopOnDemandStream();
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    // Pull sample from appsink
+    ChipLogProgress(Camera, "Pulling sample from appsink...");
+    GstSample * sample = gst_app_sink_try_pull_sample(GST_APP_SINK(appsink), 2 * GST_SECOND);
+    gst_object_unref(appsink);
+
+    if (!sample)
+    {
+        ChipLogError(Camera, "Failed to pull sample from appsink (timeout or error)");
+        stopOnDemandStream();
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    GstBuffer * buffer = gst_sample_get_buffer(sample);
+    if (!buffer)
+    {
+        ChipLogError(Camera, "Failed to get buffer from sample");
+        gst_sample_unref(sample);
+        stopOnDemandStream();
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    GstMapInfo map;
+
+    if (gst_buffer_map(buffer, &map, GST_MAP_READ))
+    {
+        outImageSnapshot.data.resize(map.size);
+        memcpy(outImageSnapshot.data.data(), map.data, map.size);
+        gst_buffer_unmap(buffer, &map);
+    }
+    else
+    {
+        ChipLogError(Camera, "Failed to map buffer");
+        gst_sample_unref(sample);
+        stopOnDemandStream();
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    gst_sample_unref(sample);
+
+    stopOnDemandStream();
 
     outImageSnapshot.imageRes   = matchedRes;
     outImageSnapshot.imageCodec = matchedCodec;
@@ -884,10 +1050,15 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
+                                          allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
+
+    mCurrentVideoFrameRate = framerate;
+
     // Create Gstreamer video pipeline using the final allocated stream parameters
     CameraError error          = CameraError::SUCCESS;
     GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, allocatedStream.minFrameRate, error);
+                                                     allocatedStream.minResolution.height, framerate, error);
     if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
@@ -906,7 +1077,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
-                    allocatedStream.minResolution.height, allocatedStream.minFrameRate);
+                    allocatedStream.minResolution.height, framerate);
 
     // Start the pipeline
     ChipLogProgress(Camera, "Requesting PLAYING …");
@@ -1000,6 +1171,7 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
             return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
         }
     }
+    mVideoStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1056,7 +1228,7 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(audioPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+    gst_element_get_state(audioPipeline, &state, nullptr, 5 * GST_SECOND);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Camera, "Audio pipeline did not reach PLAYING state.");
@@ -1098,12 +1270,15 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
     if (audioPipeline != nullptr)
     {
         GstStateChangeReturn result = gst_element_set_state(audioPipeline, GST_STATE_NULL);
-        if (result == GST_STATE_CHANGE_FAILURE)
-        {
-            return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
-        }
+
+        // Always clean up, regardless of state change result
         gst_object_unref(audioPipeline);
         it->audioContext = nullptr;
+
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
+        }
     }
 
     // Stop the audio playback pipeline
@@ -1116,6 +1291,8 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
                          static_cast<int>(playbackError));
         }
     }
+
+    mAudioStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1174,7 +1351,7 @@ CameraError CameraDevice::StopAudioPlaybackStream()
 }
 
 // Allocate snapshot stream
-CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & args,
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
                                                  uint16_t & outStreamID)
 {
 
@@ -1210,7 +1387,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     CameraError error             = CameraError::SUCCESS;
     GstElement * snapshotPipeline = CreateSnapshotPipeline(
         mVideoDevicePath, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
-        it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, "capture_snapshot.jpg", error);
+        it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, error);
     if (snapshotPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create snapshot pipeline.");
@@ -1230,10 +1407,46 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(snapshotPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
-    if (state != GST_STATE_PLAYING)
+    GstStateChangeReturn state_result = gst_element_get_state(snapshotPipeline, &state, nullptr, 5 * GST_SECOND);
+    if (state_result == GST_STATE_CHANGE_FAILURE || state != GST_STATE_PLAYING)
     {
-        ChipLogError(Camera, "Snapshot pipeline did not reach PLAYING state.");
+        ChipLogError(Camera, "Snapshot pipeline did not reach PLAYING state. Result: %d, State: %d", state_result, state);
+
+        // Try to get error message from GStreamer bus
+        GstBus * bus = gst_element_get_bus(snapshotPipeline);
+        if (bus)
+        {
+            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            if (msg)
+            {
+                GError * err       = nullptr;
+                gchar * debug_info = nullptr;
+
+                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+                {
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
+                {
+                    gst_message_parse_warning(msg, &err, &debug_info);
+                    ChipLogProgress(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogProgress(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                g_clear_error(&err);
+                g_free(debug_info);
+                gst_message_unref(msg);
+            }
+            gst_object_unref(bus);
+        }
+
         gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
         gst_object_unref(snapshotPipeline);
         it->snapshotContext = nullptr;
@@ -1261,22 +1474,15 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
     {
         // Stop the pipeline
         GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
+
+        // Always clean up, regardless of state change result
+        gst_object_unref(snapshotPipeline);
+        it->snapshotContext = nullptr;
+
         if (result == GST_STATE_CHANGE_FAILURE)
         {
             return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
         }
-
-        // Unreference the pipeline
-        gst_object_unref(snapshotPipeline);
-        it->snapshotContext = nullptr;
-    }
-
-    // Remove the snapshot file
-    std::string fileName = SNAPSHOT_FILE_PATH;
-    if (unlink(fileName.c_str()) == -1)
-    {
-        ChipLogError(Camera, "Failed to remove snapshot file after stopping stream (err = %s).", strerror(errno));
-        return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
     }
 
     return CameraError::SUCCESS;
@@ -1613,6 +1819,11 @@ CameraError CameraDevice::SetPhysicalPTZ(chip::Optional<int16_t> aPan, chip::Opt
     return CameraError::SUCCESS;
 }
 
+std::vector<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> CameraDevice::GetSupportedAmbientContexts()
+{
+    return kSupportedAmbientContexts;
+}
+
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
 {
     mDetectionSensitivity = aSensitivity;
@@ -1631,20 +1842,63 @@ CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zon
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 {
 
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+    return mZoneManager.IsValidAnalysisZone(zoneId);
 }
 
-void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+    // Zone events are per-zone - each zone needs its own event notification
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
+}
+
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
+{
+    mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
+    // Note: PushAVTransportManager doesn't need zone stopped event currently
+}
+
+void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                               uint16_t identifiedContextId)
+{
+    bool triggeredContextEnabled;
+
+    // The manager only expects ZoneIDs if the feature flag is set, if the flag is set, and the provided set is empty, then
+    // set this to Null. We will always be given a vector, it may be empty.
+    Optional<app::DataModel::Nullable<std::vector<uint16_t>>> mZoneIds;
+    if (GetCameraSupportsPerZoneDetect())
+    {
+        if (!zoneIds.empty())
+        {
+            mZoneIds = MakeOptional(app::DataModel::MakeNullable(zoneIds));
+        }
+        else
+        {
+            mZoneIds = MakeOptional(app::DataModel::NullNullable);
+        }
+    }
+
+    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, mZoneIds, identifiedContextId, triggeredContextEnabled);
+
+    // We only want to trigger PushAV if the triggering context has been enabled
+    if (triggeredContextEnabled)
+    {
+        mPushAVTransportManager.HandleAmbientContextTrigger(namespaceId, tagId, zoneIds);
+    }
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -1748,8 +2002,8 @@ void CameraDevice::InitializeSnapshotStreams()
                       streamId);
 }
 
-bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs,
-                                     uint16_t & outStreamID)
+bool CameraDevice::AddSnapshotStream(
+    const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs, uint16_t & outStreamID)
 {
     constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
 
@@ -1834,9 +2088,9 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
+void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderCluster * provider)
 {
-    return mWebRTCProviderManager;
+    mWebRTCProviderManager.SetWebRTCTransportProvider(provider);
 }
 
 PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
@@ -1844,7 +2098,7 @@ PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()
     return mPushAVTransportManager;
 }
 
-CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamManagementDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
@@ -1854,7 +2108,7 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
     return mCameraAVStreamManager;
 }
 
-CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }
@@ -1864,14 +2118,14 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
     return mZoneManager;
 }
 
+AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
+{
+    return mAVAnalysisManager;
+}
+
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
-}
-
-void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
-{
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
 size_t CameraDevice::GetPreRollBufferSize()

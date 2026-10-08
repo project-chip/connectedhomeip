@@ -53,8 +53,8 @@ template("bouffalolab_executable") {
     objcopy_image_name = output_base_name + ".raw"
     flashing_config_inputs = [
       "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml",
-      "${chip_root}/third_party/bouffalolab/bouffalo_sdk/bsp/board/bl616dk/config/bl_factory_params_IoTKitA_auto.dts",
-      "${chip_root}/third_party/bouffalolab/bouffalo_sdk/bsp/board/bl616dk/config/boot2_bl616_isp_release_v8.1.6.bin",
+      "${chip_root}/third_party/bouffalolab/repo_bouffalo_sdk/bsp/board/bl616dk/config/bl_factory_params_IoTKitA_auto.dts",
+      "${chip_root}/third_party/bouffalolab/repo_bouffalo_sdk/bsp/board/bl616dk/config/boot2_bl616_isp_release_v8.1.8.bin",
     ]
 
     copy(flashing_config_target) {

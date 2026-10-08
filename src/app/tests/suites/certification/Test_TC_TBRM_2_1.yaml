@@ -81,3 +81,12 @@ tests:
       response:
           constraints:
               type: int64u
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: network-manager
+      app: network-manager
+    - name: network-infrastructure-manager
+      app: all-devices
+      args: ["--device", "network-infrastructure-manager"]

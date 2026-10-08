@@ -35,19 +35,22 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
 
-class TC_TIMESYNC_2_13(MatterBaseTest):
+class TC_TIMESYNC_2_13(MatterTestCommissionedDevice):
     def wait_for_trusted_time_souce_event(self, timeout, cb):
         """
         Waits for the MissingTrustedTimeSource event and validates its type.
@@ -119,7 +122,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts))
 
         self.print_step(9, "TH1 waits 5 seconds")
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.print_step(10, "TH1 sends the SetTrustedTimeSource command with TrustedTimeSource set to NULL")
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))

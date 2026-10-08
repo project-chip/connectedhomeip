@@ -21,6 +21,7 @@
 
 #include "AppTvShellCommands.h"
 #include "AppTv.h"
+#include "messages/MessagesManager.h"
 
 #include <access/AccessControl.h>
 #include <inttypes.h>
@@ -86,10 +87,10 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(),
+                                                                     rotatingIdString, sizeof(rotatingIdString));
 
-        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+        CharSpan rotatingIdSpan = CharSpan::fromCharString(rotatingIdString);
 
         static const size_t kSetupPinSize = 12;
         char setupPin[kSetupPinSize];
@@ -431,14 +432,13 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         Access::AccessControl::Entry entry;
         while (iterator.Next(entry) == CHIP_NO_ERROR)
         {
-            DumpAccessControlEntry(entry);
+            TEMPORARY_RETURN_IGNORED DumpAccessControlEntry(entry);
         }
         return CHIP_NO_ERROR;
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
-        Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
-        return CHIP_NO_ERROR;
+        return Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
     }
     else if (strcmp(argv[0], "print-installed-apps") == 0)
     {
@@ -465,13 +465,55 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     return error;
 }
 
+static CHIP_ERROR MessagesHandler(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    if (argc == 0 || strcmp(argv[0], "help") == 0)
+    {
+        streamer_printf(sout, "  help                       Usage: messages <subcommand>\r\n");
+        streamer_printf(sout, "  list                       List cached messages and their state. Usage: messages list\r\n");
+        streamer_printf(sout, "  do-not-disturb [on|off]    Get or set do-not-disturb. Usage: messages do-not-disturb on\r\n");
+        streamer_printf(sout, "\r\n");
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "list") == 0)
+    {
+        GetMessagesManager()->LogCachedMessages();
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "do-not-disturb") == 0)
+    {
+        if (argc < 2)
+        {
+            streamer_printf(sout, "do-not-disturb is %s\r\n", GetMessagesManager()->GetDoNotDisturb() ? "on" : "off");
+            return CHIP_NO_ERROR;
+        }
+        if (strcmp(argv[1], "on") == 0)
+        {
+            GetMessagesManager()->SetDoNotDisturb(true);
+            return CHIP_NO_ERROR;
+        }
+        if (strcmp(argv[1], "off") == 0)
+        {
+            GetMessagesManager()->SetDoNotDisturb(false);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 void RegisterAppTvCommands()
 {
 
-    static const shell_command_t sDeviceComand = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
+    static const shell_command_t sDeviceComand   = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
+    static const shell_command_t sMessagesComand = { &MessagesHandler, "messages",
+                                                     "Messages cluster commands. Usage: messages [command_name]" };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
+    Engine::Root().RegisterCommands(&sMessagesComand, 1);
     return;
 }
 

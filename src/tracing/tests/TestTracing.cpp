@@ -37,6 +37,9 @@ public:
     LoggingTraceBackend() {}
     const std::vector<std::string> & traces() const { return mTraces; }
 
+    void Open() override { mTraces.push_back("OPEN"); }
+    void Close() override { mTraces.push_back("CLOSE"); }
+
     // Implementation
     void TraceBegin(const char * label, const char * group) override
     {
@@ -77,10 +80,9 @@ TEST(TestTracing, TestBasicTracing)
         }
     }
 
-    std::vector<std::string> expected = {
-        "BEGIN:Group:A", "BEGIN:Group:B", "BEGIN:Group:C", "BEGIN:Group:D", "END:Group:D", "INSTANT:Group:FOO",
-        "END:Group:C",   "END:Group:B",   "BEGIN:Group:E", "END:Group:E",   "END:Group:A",
-    };
+    std::vector<std::string> expected = { "OPEN",        "BEGIN:Group:A",     "BEGIN:Group:B", "BEGIN:Group:C", "BEGIN:Group:D",
+                                          "END:Group:D", "INSTANT:Group:FOO", "END:Group:C",   "END:Group:B",   "BEGIN:Group:E",
+                                          "END:Group:E", "END:Group:A",       "CLOSE" };
 
     EXPECT_EQ(backend.traces().size(), expected.size());
     EXPECT_TRUE(std::equal(backend.traces().begin(), backend.traces().end(), expected.begin(), expected.end()));
@@ -110,24 +112,20 @@ TEST(TestTracing, TestMultipleBackends)
         }
     }
 
-    std::vector<std::string> expected1 = {
-        "BEGIN:G:1", "BEGIN:G:2", "BEGIN:G:3", "END:G:3", "BEGIN:G:4", "END:G:4", "END:G:2", "END:G:1",
-    };
+    std::vector<std::string> expected1 = { "OPEN",      "BEGIN:G:1", "BEGIN:G:2", "BEGIN:G:3", "END:G:3",
+                                           "BEGIN:G:4", "END:G:4",   "END:G:2",   "END:G:1",   "CLOSE" };
 
     EXPECT_EQ(b1.traces().size(), expected1.size());
     EXPECT_TRUE(std::equal(b1.traces().begin(), b1.traces().end(), expected1.begin(), expected1.end()));
 
     std::vector<std::string> expected2 = {
-        "BEGIN:G:2", "BEGIN:G:3", "END:G:3", "BEGIN:G:4", "END:G:4", "END:G:2",
+        "OPEN", "BEGIN:G:2", "BEGIN:G:3", "END:G:3", "BEGIN:G:4", "END:G:4", "END:G:2", "CLOSE"
     };
 
     EXPECT_EQ(b2.traces().size(), expected2.size());
     EXPECT_TRUE(std::equal(b2.traces().begin(), b2.traces().end(), expected2.begin(), expected2.end()));
 
-    std::vector<std::string> expected3 = {
-        "BEGIN:G:3",
-        "END:G:3",
-    };
+    std::vector<std::string> expected3 = { "OPEN", "BEGIN:G:3", "END:G:3", "CLOSE" };
 
     EXPECT_EQ(b3.traces().size(), expected3.size());
     EXPECT_TRUE(std::equal(b3.traces().begin(), b3.traces().end(), expected3.begin(), expected3.end()));

@@ -88,7 +88,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
         return true;
     }
 
-    user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
+    user.userName       = chip::CharSpan::fromCharString(userInDb.userName);
     user.credentials    = chip::Span<const CredentialStruct>(userInDb.credentials.data(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
@@ -591,7 +591,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
             gCurrentAction.nodeId     = nodeId;
 
             // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                                 OnLockActionCompleteCallback, nullptr);
 
             return true;
         }
@@ -675,7 +676,8 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
     gCurrentAction.nodeId          = nodeId;
 
     // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                         OnLockActionCompleteCallback, nullptr);
 
     return true;
 }
@@ -703,7 +705,8 @@ void LockEndpoint::OnLockActionCompleteCallback(chip::System::Layer *, void * ca
         gCurrentAction.lockState = DlLockState::kUnlocked;
 
         // Do this async as a real lock would do too but use 0s delay to speed up CI tests
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0), OnLockActionCompleteCallback, nullptr);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(0),
+                                                                             OnLockActionCompleteCallback, nullptr);
     }
     else
     {

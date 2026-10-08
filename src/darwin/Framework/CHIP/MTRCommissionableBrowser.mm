@@ -123,7 +123,7 @@ public:
 
 #if CONFIG_NETWORK_LAYER_BLE
         mBleScannerDelegateOwner = owner; // retain the owner until OnBleScanStopped is called
-        PlatformMgrImpl().StopBleScan(); // doesn't actually fail, and if it did we'd want to carry on regardless
+        TEMPORARY_RETURN_IGNORED PlatformMgrImpl().StopBleScan(); // doesn't actually fail, and if it did we'd want to carry on regardless
 #else
         (void) owner;
 #endif // CONFIG_NETWORK_LAYER_BLE

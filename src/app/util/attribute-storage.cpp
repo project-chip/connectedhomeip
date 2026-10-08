@@ -14,13 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/Span.h"
 #include <app/util/attribute-storage.h>
 
+#include <algorithm>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
@@ -32,9 +31,11 @@
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -82,6 +83,8 @@ static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.
 static bool emberAfEndpointIsEnabled(EndpointId endpoint);
+
+static void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
 
 namespace {
 
@@ -195,12 +198,12 @@ void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
-    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
-                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
-
     emberEndpointCount = FIXED_ENDPOINT_COUNT;
 
 #if FIXED_ENDPOINT_COUNT > 0
+
+    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
+                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
     constexpr uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
     constexpr uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
@@ -396,7 +399,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     return CHIP_NO_ERROR;
 }
 
-EndpointId emberAfClearDynamicEndpoint(uint16_t index)
+EndpointId emberAfClearDynamicEndpoint(uint16_t index, MatterClusterShutdownType shutdownType)
 {
     EndpointId ep = 0;
 
@@ -406,7 +409,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        emberAfEndpointEnableDisable(ep, false);
+        emberAfEndpointEnableDisable(ep, false, shutdownType);
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
@@ -477,11 +480,13 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
-        emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         if (cluster->IsServer())
         {
+            // Call the code-driven init callback before the emberAf... one,
+            // so the latter can be used to configure code-driven clusters
             MatterClusterServerInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         }
+        emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_INIT_FUNCTION);
         if (f != nullptr)
         {
@@ -490,7 +495,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     }
 }
 
-static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint, MatterClusterShutdownType shutdownType)
 {
     // Call shutdown callbacks from clusters, mainly for canceling pending timers
     uint8_t clusterIndex;
@@ -500,7 +505,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         if (cluster->IsServer())
         {
-            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, shutdownType);
         }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
@@ -522,6 +527,19 @@ void emAfCallInits()
         if (emberAfEndpointIndexIsEnabled(index))
         {
             initializeEndpoint(&(emAfEndpoints[index]));
+        }
+    }
+}
+
+// Symmetric to emAfCallInits() — calls shutdown callbacks for all enabled endpoints.
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    uint16_t index;
+    for (index = 0; index < emberAfEndpointCount(); index++)
+    {
+        if (emberAfEndpointIndexIsEnabled(index))
+        {
+            shutdownEndpoint(&(emAfEndpoints[index]), shutdownType);
         }
     }
 }
@@ -677,70 +695,66 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                                 *metadata = am;
                             }
 
+                            uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
+                            uint8_t *src, *dst;
+                            if (write)
                             {
-                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
-                                uint8_t *src, *dst;
+                                src = buffer;
+                                dst = attributeLocation;
+                                if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                         am->attributeId))
+                                {
+                                    return Status::UnsupportedAccess;
+                                }
+                            }
+                            else
+                            {
+                                if (buffer == nullptr)
+                                {
+                                    return Status::Success;
+                                }
+
+                                src = attributeLocation;
+                                dst = buffer;
+                                if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId, am->attributeId))
+                                {
+                                    return Status::UnsupportedAccess;
+                                }
+                            }
+
+                            // Is the attribute externally stored?
+                            if (am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE)
+                            {
                                 if (write)
                                 {
-                                    src = buffer;
-                                    dst = attributeLocation;
-                                    if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             am->attributeId))
-                                    {
-                                        return Status::UnsupportedAccess;
-                                    }
+                                    return emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId, am,
+                                                                                 buffer);
                                 }
-                                else
+
+                                if (readLength < emberAfAttributeSize(am))
                                 {
-                                    if (buffer == nullptr)
-                                    {
-                                        return Status::Success;
-                                    }
-
-                                    src = attributeLocation;
-                                    dst = buffer;
-                                    if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            am->attributeId))
-                                    {
-                                        return Status::UnsupportedAccess;
-                                    }
+                                    // Prevent a potential buffer overflow
+                                    return Status::ResourceExhausted;
                                 }
 
-                                // Is the attribute externally stored?
-                                if (am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE)
-                                {
-                                    if (write)
-                                    {
-                                        return emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId, am,
-                                                                                     buffer);
-                                    }
-
-                                    if (readLength < emberAfAttributeSize(am))
-                                    {
-                                        // Prevent a potential buffer overflow
-                                        return Status::ResourceExhausted;
-                                    }
-
-                                    return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am,
-                                                                                buffer, emberAfAttributeSize(am));
-                                }
-
-                                // Internal storage is only supported for fixed endpoints
-                                if (!isDynamicEndpoint)
-                                {
-                                    return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
-                                }
-
-                                return Status::Failure;
+                                return emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am, buffer,
+                                                                            emberAfAttributeSize(am));
                             }
-                        }
-                        else
-                        { // Not the attribute we are looking for
-                            // Increase the index if attribute is not externally stored
-                            if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE))
+
+                            // Internal storage is only supported for fixed endpoints
+                            if (!isDynamicEndpoint)
                             {
-                                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
+                                return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                             }
+
+                            return Status::Failure;
+                        }
+
+                        // Not the attribute we are looking for
+                        // Increase the index if attribute is not externally stored
+                        if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE))
+                        {
+                            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
                         }
                     }
 
@@ -934,6 +948,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         return kEmberInvalidEndpointIndex;
     }
 
+#if FIXED_ENDPOINT_COUNT > 0
     if (epIndex < FIXED_ENDPOINT_COUNT)
     {
         // This endpoint is a fixed one.
@@ -955,6 +970,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         epIndex = adjustedEndpointIndex;
     }
     else
+#endif // FIXED_ENDPOINT_COUNT > 0
     {
         // This is a dynamic endpoint.
         // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
@@ -976,7 +992,7 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
     return emberAfEndpointIndexIsEnabled(index);
 }
 
-bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
+bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterClusterShutdownType shutdownType)
 {
     uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
     bool currentlyEnabled;
@@ -998,19 +1014,20 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         if (enable)
         {
             initializeEndpoint(&(emAfEndpoints[index]));
-            emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
         }
         else
         {
-            shutdownEndpoint(&(emAfEndpoints[index]));
+            shutdownEndpoint(&(emAfEndpoints[index]), shutdownType);
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
+        // The Descriptor cluster on Endpoint 0 subscribing to OnEndpointChanged events.
+        //
+        // NOTE: this should eventually be refactored for descriptor cluster to detect these changes
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
         while (parentEndpointId != kInvalidEndpointId)
         {
-            emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                    emberAfGlobalInteractionModelAttributesChangedListener());
+            emberAfAttributeChanged(parentEndpointId, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
             uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
             if (parentIndex == kEmberInvalidEndpointIndex)
             {
@@ -1020,8 +1037,9 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
         }
 
-        emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id,
-                                emberAfGlobalInteractionModelAttributesChangedListener());
+        CodegenDataModelProvider::Instance().NotifyEndpointChanged(
+            endpoint, enable ? DataModel::EndpointChangeType::kAdded : DataModel::EndpointChangeType::kRemoved);
+        emberAfAttributeChanged(/* endpoint = */ 0, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::PartsList::Id);
     }
 
     emberMetadataStructureGeneration++;
@@ -1326,53 +1344,15 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
 
                     if (ptr == nullptr)
                     {
-                        size_t defaultValueSizeForBigEndianNudger = 0;
-                        // Bypasses compiler warning about unused variable for little endian platforms.
-                        (void) defaultValueSizeForBigEndianNudger;
-                        if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+                        // A missing default (or one that cannot be resolved) leaves ptr null, which
+                        // emAfReadOrWriteAttribute treats as an array of all zeroes.
+                        AttributeDefaultValue defaultValue;
+                        if (emberAfGetAttributeDefaultValue(*am, defaultValue) == Protocols::InteractionModel::Status::Success)
                         {
-                            // This is intentionally 2 and not 4 bytes since defaultValue in min/max
-                            // attributes is still uint16_t.
-                            if (emberAfAttributeSize(am) <= 2)
-                            {
-                                static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
-                                              "if statement relies on size of max/min defaultValue being 2");
-                                ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger =
-                                    sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
-                            }
+                            // Defaults live in flash and are only read from here; emAfReadOrWriteAttribute
+                            // takes a non-const pointer because the same parameter is an output on reads.
+                            ptr = const_cast<uint8_t *>(defaultValue.rawData.data());
                         }
-                        else
-                        {
-                            if ((emberAfAttributeSize(am) <= 4) && !emberAfIsStringAttributeType(am->attributeType))
-                            {
-                                ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToDefaultValue;
-                            }
-                        }
-                        // At this point, ptr either points to a default value, or is NULL, in which case
-                        // it should be treated as if it is pointing to an array of all zeroes.
-
-#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
-                        // The default values for attributes that are less than or equal to
-                        // defaultValueSizeForBigEndianNudger in bytes are stored in an
-                        // uint32_t.  On big-endian platforms, a pointer to the default value
-                        // of size less than defaultValueSizeForBigEndianNudger will point to the wrong
-                        // byte.  So, for those cases, nudge the pointer forward so it points
-                        // to the correct byte.
-                        if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
-                        {
-                            ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
-                        }
-#endif // BIGENDIAN
                     }
 
                     emAfReadOrWriteAttribute(&record,
@@ -1591,32 +1571,86 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
     return ep.dataVersions + clusterIndex;
 }
 
-DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
+void emberAfIncreaseDataVersion(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
 {
-    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
-}
 
-void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             DataModel::ProviderChangeListener * listener)
-{
-    // Increase cluster data path
-    DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
+    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
     if (version == nullptr)
     {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!", endpoint,
-                     ChipLogValueMEI(clusterId));
+        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in emberAfIncreaseDataVersion!",
+                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
     }
     else
     {
         (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32, endpoint,
-                      ChipLogValueMEI(clusterId), *(version));
+        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
+                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *version);
+    }
+}
+
+void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
+    const ConcreteAttributePath path(endpoint, clusterId, attributeId);
+
+    emberAfIncreaseDataVersion(path);
+    CodegenDataModelProvider::Instance().NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
+}
+
+namespace chip {
+namespace app {
+
+namespace {
+
+/// Dynamic endpoints are registered at runtime and carry no ZAP configuration.
+bool IsDynamicEndpoint(EndpointId endpoint)
+{
+    uint16_t index = findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
+    return (index != kEmberInvalidEndpointIndex) && (index >= emberAfFixedEndpointCount());
+}
+
+} // namespace
+
+Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                       AttributeDefaultValue & outDefault)
+{
+    const EmberAfCluster * cluster = emberAfFindServerCluster(endpoint, clusterId);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedCluster);
+
+    for (uint16_t i = 0; i < cluster->attributeCount; ++i)
+    {
+        const EmberAfAttributeMetadata & am = cluster->attributes[i];
+        if (am.attributeId != attributeId)
+        {
+            continue;
+        }
+
+        // Without a ZAP configuration, the only thing a dynamic endpoint can offer is what the
+        // application reports through the external read callback, so ask for that first. Strings are
+        // excluded because rawData is a view and the callback can only fill a buffer; they resolve
+        // from metadata, which for DECLARE_DYNAMIC_ATTRIBUTE means NotFound.
+        if (am.IsExternal() && !emberAfIsStringAttributeType(am.attributeType) &&
+            !emberAfIsLongStringAttributeType(am.attributeType) && am.size <= AttributeDefaultValue::kMaxOwnedValueSize &&
+            IsDynamicEndpoint(endpoint))
+        {
+            // The callback writes exactly am.size bytes in storage order, so unlike an inline flash
+            // default this needs no endianness adjustment.
+            // Zero-initialized: an application that returns Success without filling the buffer must
+            // not leak stack contents into the reported default.
+            uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize] = {};
+            if (emberAfExternalAttributeReadCallback(endpoint, clusterId, &am, value, am.size) == Status::Success)
+            {
+                // Guaranteed by the am.size check above, which is the only way SetOwnedValue fails.
+                VerifyOrDie(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType));
+                return Status::Success;
+            }
+            // The application does not serve this attribute; fall back to the declaration.
+        }
+
+        return emberAfGetAttributeDefaultValue(am, outDefault);
     }
 
-    listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
+    return Status::UnsupportedAttribute;
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
-{
-    listener->MarkDirty(AttributePathParams(endpoint));
-}
+} // namespace app
+} // namespace chip

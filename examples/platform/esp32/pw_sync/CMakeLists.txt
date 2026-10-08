@@ -34,7 +34,6 @@ pw_add_library(pw_sync.esp32_interrupt_spin_lock STATIC
     PUBLIC_DEPS
       pw_assert
       pw_sync.interrupt_spin_lock.facade
-      pw_sync.yield_core
       pw_third_party.freertos
     PUBLIC_COMPILE_OPTIONS
       -Wno-undef

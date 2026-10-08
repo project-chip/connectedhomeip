@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
@@ -114,11 +115,9 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
                                                           DataModelCallbacks::OperationOrder::Pre, path);
 
-    DataModel::ReadAttributeRequest readRequest;
+    DataModel::ReadAttributeRequest readRequest(path, subjectDescriptor);
 
-    readRequest.readFlags         = flags;
-    readRequest.subjectDescriptor = &subjectDescriptor;
-    readRequest.path              = path;
+    readRequest.readFlags = flags;
 
     DataModel::ServerClusterFinder serverClusterFinder(dataModel);
 
@@ -135,10 +134,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
-    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
-    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
-    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
-
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case).
     //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
@@ -151,6 +146,15 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::AttributeFinder finder(dataModel);
     std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    // Fabric-sensitive attributes are always reported fabric-filtered, regardless of the
+    // FabricFiltered flag on the request.
+    const bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered) ||
+        (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive));
+    readRequest.readFlags.Set(ReadFlags::kFabricFiltered, isFabricFiltered);
+
+    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
     {
@@ -381,10 +385,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         ConcreteAttributePath readPath;
 
         ChipLogDetail(DataManagement,
-                      "Building Reports for ReadHandler with LastReportGeneration = 0x" ChipLogFormatX64
-                      " DirtyGeneration = 0x" ChipLogFormatX64,
-                      ChipLogValueX64(apReadHandler->mPreviousReportsBeginGeneration),
-                      ChipLogValueX64(apReadHandler->mDirtyGeneration));
+                      "Building Reports for ReadHandler with LastReportGeneration = 0x%08lX DirtyGeneration = 0x%08lX",
+                      static_cast<long>(apReadHandler->mPreviousReportsBeginGeneration.Raw()),
+                      static_cast<long>(apReadHandler->mDirtyGeneration.Raw()));
 
         // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
         if (!apReadHandler->IsReporting())
@@ -410,7 +413,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         // We don't need to worry about paths that were already marked dirty before the last time this read handler
                         // started a report that it completed: those paths already got reported.
-                        if (dirtyPath->mGeneration > apReadHandler->mPreviousReportsBeginGeneration)
+                        if (dirtyPath->mGeneration.After(apReadHandler->mPreviousReportsBeginGeneration))
                         {
                             concretePathDirty = true;
                             return Loop::Break;
@@ -994,7 +997,7 @@ bool Engine::ClearTombPaths()
 {
     bool pathReleased = false;
     mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-        if (path->mGeneration == 0)
+        if (path->mGeneration.IsZero())
         {
             mGlobalDirtySet.ReleaseObject(path);
             pathReleased = true;
@@ -1007,7 +1010,7 @@ bool Engine::ClearTombPaths()
 bool Engine::MergeDirtyPathsUnderSameCluster()
 {
     mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
-        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
+        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration.IsZero())
         {
             return Loop::Continue;
         }
@@ -1022,7 +1025,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
             {
                 return Loop::Continue;
             }
-            if (innerPath->mGeneration > outerPath->mGeneration)
+            if (innerPath->mGeneration.After(outerPath->mGeneration))
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
@@ -1030,7 +1033,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
-            innerPath->mGeneration = 0;
+            innerPath->mGeneration.Clear();
             return Loop::Continue;
         });
         return Loop::Continue;
@@ -1042,7 +1045,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
 bool Engine::MergeDirtyPathsUnderSameEndpoint()
 {
     mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
-        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration == 0)
+        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration.IsZero())
         {
             return Loop::Continue;
         }
@@ -1055,7 +1058,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
             {
                 return Loop::Continue;
             }
-            if (innerPath->mGeneration > outerPath->mGeneration)
+            if (innerPath->mGeneration.After(outerPath->mGeneration))
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
@@ -1064,7 +1067,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
-            innerPath->mGeneration = 0;
+            innerPath->mGeneration.Clear();
             return Loop::Continue;
         });
         return Loop::Continue;
@@ -1256,12 +1259,23 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
     Run();
 }
 
-void Engine::MarkDirty(const AttributePathParams & path)
+void Engine::OnAttributeChanged(const ConcreteAttributePath & path, DataModel::AttributeChangeType type)
 {
-    CHIP_ERROR err = SetDirty(path);
+    VerifyOrReturn(type == DataModel::AttributeChangeType::kReportable);
+
+    CHIP_ERROR err = SetDirty({ path.mEndpointId, path.mClusterId, path.mAttributeId });
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Failed to set path dirty: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void Engine::OnEndpointChanged(EndpointId endpointId, DataModel::EndpointChangeType type)
+{
+    CHIP_ERROR err = SetDirty(AttributePathParams(endpointId));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to set endpoint %u dirty: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
 }
 

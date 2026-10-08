@@ -46,6 +46,14 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #define CHIP_CONFIG_SLOW_CRYPTO 0
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
+// Size the SHA-256 opaque stream context for the PSA backend, whose
+//  psa_hash_operation_t is larger than the raw mbedTLS/OpenSSL context the generic default is sized for.
+//  A constant was used instead to avoid pulling in crypto/PSA headers; The crypto PAL implements a static_assert
+// to ensure the real context fits.
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 256
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
@@ -63,6 +71,15 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
+
+// Increase C++ lambda event size to accommodate larger local captures
+// for connman-based Connectivity Manager network management
+// implementation, particularly on [I]LP64 architectures in which
+// pointers are double the size of those on [I]LP32 architectures.
+
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (48)
+#endif // CHIP_CONFIG_LAMBDA_EVENT_SIZE
 
 // ==================== Security Configuration Overrides ====================
 

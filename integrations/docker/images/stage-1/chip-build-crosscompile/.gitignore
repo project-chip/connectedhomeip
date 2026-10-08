@@ -1,10 +1,12 @@
 .cipd
-cidata.iso
+cidata*.iso
 cipd.yaml
 ensure_file.txt
 meta-data
-sysrootsrv.img
-ubuntu-21.04-aarch64-sysroot.tar.xz
-ubuntu-24.04-aarch64-sysroot
-ubuntu-24.04-server-cloudimg-arm64.img
+sysrootsrv*.img
+ubuntu-21.04-*-sysroot.tar.xz
+ubuntu-24.04-*-sysroot
+ubuntu-24.04-*-full
+ubuntu-noble-*
+ubuntu-24.04-server-cloudimg*.img
 user-data

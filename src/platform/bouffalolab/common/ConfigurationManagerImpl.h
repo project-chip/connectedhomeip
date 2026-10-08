@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/BflbConfig.h>
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -27,7 +27,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Bouffalo Lab platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::BLConfig>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::BflbConfig>
 {
 public:
     static ConfigurationManagerImpl & GetDefaultInstance();

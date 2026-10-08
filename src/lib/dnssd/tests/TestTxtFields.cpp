@@ -140,6 +140,10 @@ TEST(TestTxtFields, TestGetProduct)
     // overflow a uint16
     sprintf(vp, "123+%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     EXPECT_EQ(GetProduct(GetSpan(vp)), 0);
+
+    // Empty value (e.g. an on-wire "VP=" TXT entry, which ParseTxtRecord delivers as an
+    // empty ByteSpan). The length check must not underflow on a zero-length span.
+    EXPECT_EQ(GetProduct(ByteSpan()), 0);
 }
 TEST(TestTxtFields, TestGetVendor)
 {
@@ -223,6 +227,33 @@ TEST(TestTxtFields, TestGetDeviceType)
     // overflow a uint32
     sprintf(dt, "%" PRIu64, static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1);
     EXPECT_EQ(GetDeviceType(GetSpan(dt)), 0u);
+}
+
+// TXT numeric values are strict decimal ASCII per the spec. A leading sign or
+// whitespace is not a digit and must be rejected rather than silently accepted
+// by strtoul() (e.g. "+5"/" 5" must not parse as 5).
+TEST(TestTxtFields, TestNumericDecimalStrictness)
+{
+    char buf[64];
+
+    strcpy(buf, "+5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+    strcpy(buf, " 5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+    strcpy(buf, "-5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 0);
+
+    strcpy(buf, "+5");
+    EXPECT_EQ(GetDeviceType(GetSpan(buf)), 0u);
+    strcpy(buf, " 5");
+    EXPECT_EQ(GetDeviceType(GetSpan(buf)), 0u);
+
+    strcpy(buf, "+1");
+    EXPECT_EQ(GetCommissioningMode(GetSpan(buf)), 0);
+
+    // A well-formed decimal value is still accepted.
+    strcpy(buf, "5");
+    EXPECT_EQ(GetLongDiscriminator(GetSpan(buf)), 5);
 }
 
 TEST(TestTxtFields, TestGetDeviceName)
@@ -801,6 +832,17 @@ void DiscoveredTxtFieldICDoperatesAsLIT()
     strcpy(key, "ICD");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
+
+    // Invalid value, empty
+    strcpy(key, "ICD");
+    strcpy(val, "");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
+
+    // Invalid value: missing
+    strcpy(key, "ICD");
+    FillNodeDataFromTxt(GetSpan(key), {}, resolutionData);
     EXPECT_FALSE(nodeData.Get<NodeData>().isICDOperatingAsLIT.has_value());
 }
 

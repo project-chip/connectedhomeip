@@ -156,9 +156,16 @@
     return self.forceTimeUpdateShortDelayToZero;
 }
 
-- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
+- (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device
 {
-    return self.forceTimeSynchronizationLossDetectionCadenceToZero;
+    return self.timeSynchronizationLossDetectionCadenceOverride;
+}
+
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
+{
+    if (self.onTimeSynchronizationLossDetected != nil) {
+        self.onTimeSynchronizationLossDetected();
+    }
 }
 
 @end

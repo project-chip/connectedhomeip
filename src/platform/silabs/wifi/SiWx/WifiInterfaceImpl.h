@@ -34,11 +34,11 @@ public:
         kStationDisconnect  = 1,
         kAPStart            = 2,
         kAPStop             = 3,
-        kScan               = 4, /* This combines the scan start and scan result events  */
-        kStationStartJoin   = 5,
-        kConnectionComplete = 6, /* This combines the DHCP and Notify */
-        kStationDhcpDone    = 7,
-        kStationDhcpPoll    = 8,
+        kStationStartScan   = 5,
+        kStationStartJoin   = 6,
+        kConnectionComplete = 7, /* This combines the DHCP and Notify */
+        kStationDhcpDone    = 8,
+        kStationDhcpPoll    = 9,
     };
 
     static WifiInterfaceImpl & GetInstance() { return mInstance; }
@@ -57,17 +57,17 @@ public:
     bool IsStationConnected() override;
     bool IsStationModeEnabled() override;
     bool IsStationReady() override;
-    CHIP_ERROR TriggerDisconnection() override;
+    void TriggerDisconnection() override;
     void ClearWifiCredentials() override;
-    void SetWifiCredentials(const WifiCredentials & credentials) override;
-    CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) override;
+    CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) override;
+    CHIP_ERROR GetWifiCredentials(WiFiCredentials & credentials) override;
     CHIP_ERROR ConnectToAccessPoint(void) override;
     bool HasAnIPv4Address() override;
     bool HasAnIPv6Address() override;
     void CancelScanNetworks() override;
     bool IsWifiProvisioned() override;
     CHIP_ERROR InitWiFiStack(void) override;
-    CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) override;
+    CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) override;
     CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info) override;
     CHIP_ERROR ResetCounters() override;
 
@@ -154,7 +154,6 @@ private:
     void NotifySuccessfulConnection();
 
     bool mHasNotifiedWifiConnectivity = false;
-
     static WifiInterfaceImpl mInstance;
 };
 

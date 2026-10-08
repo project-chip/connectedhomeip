@@ -55,11 +55,11 @@
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
-#ifdef CONFIG_APP_TASK_STACK_SIZE
-#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) CONFIG_APP_TASK_STACK_SIZE / sizeof(portSTACK_TYPE))
+#ifdef CONFIG_CHIP_APP_TASK_STACK_SIZE
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) CONFIG_CHIP_APP_TASK_STACK_SIZE / sizeof(portSTACK_TYPE))
 #else
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
-#endif // CONFIG_APP_TASK_STACK_SIZE
+#endif // CONFIG_CHIP_APP_TASK_STACK_SIZE
 #endif // APP_TASK_STACK_SIZE
 
 #ifndef APP_TASK_PRIORITY
@@ -84,6 +84,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+// Defined in the ot-nxp submodule (border_agent.c), which is a C source file.
+extern "C" const char sBaseServiceInstanceName[];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TBR
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -130,7 +135,6 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TaskHandle_t taskHandle;
 
 #if CONFIG_ENABLE_PW_RPC
     chip::NXP::App::Rpc::Init();
@@ -156,6 +160,7 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
      */
     AppTaskFreeRTOS::AppTaskMain(this);
 #else
+    TaskHandle_t taskHandle;
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
         pdPASS)
@@ -231,3 +236,10 @@ void chip::NXP::App::AppTaskFreeRTOS::DispatchEvent(const AppEvent & event)
         ChipLogProgress(DeviceLayer, "Event received with no handler. Dropping event.");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskFreeRTOS::GetBorderRouterName()
+{
+    return BuildBorderRouterName(sBaseServiceInstanceName);
+}
+#endif

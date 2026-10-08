@@ -25,7 +25,7 @@
 #     for more details.
 #
 
-cmake_minimum_required(VERSION 3.13.1)
+cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
@@ -46,12 +46,19 @@ set(CHIP_CFLAGS
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-set(CONFIG_ZEPHYR_PIGWEED_MODULE 1)
-set(CONFIG_PIGWEED_ASSERT 1)
-set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
-add_subdirectory(${PIGWEED_ROOT} "${CMAKE_BINARY_DIR}/pigweed")
+# ==================================================
+# Setup Pigweed
+# ==================================================
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+# native_sim runs as a host process; stdio avoids pw_sys_io_zephyr's dependency on
+# Zephyr kernel headers (heap_constants.h build-order issue on Zephyr 4.4).
+pw_set_backend(pw_sys_io pw_sys_io_stdio)
 
 # ==================================================
 # Build 'all tests' runner
@@ -65,6 +72,7 @@ target_link_libraries(app PUBLIC
   chip
   $<TARGET_FILE:kernel>
   pw_unit_test
+  pw_sys_io_stdio
 )
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 

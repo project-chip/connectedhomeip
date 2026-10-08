@@ -209,7 +209,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
         }
         else
         {
-            mPendingKeypair->DestroyKey();
+            TEMPORARY_RETURN_IGNORED mPendingKeypair->DestroyKey();
             if (id == kEFR32OpaqueKeyIdVolatile)
             {
                 id = kEFR32OpaqueKeyIdUnknown;
@@ -311,7 +311,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     }
 
     // There's a good chance we'll need the key again soon
-    mCachedKey->Load(id);
+    TEMPORARY_RETURN_IGNORED mCachedKey->Load(id);
 
     ResetPendingKey(true /* keepKeyPairInStorage */);
 
@@ -359,7 +359,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
     if (id == cachedId)
     {
         // Delete from persistent storage and unload
-        mCachedKey->DestroyKey();
+        TEMPORARY_RETURN_IGNORED mCachedKey->DestroyKey();
         return CHIP_NO_ERROR;
     }
 
@@ -370,7 +370,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
         return CHIP_ERROR_INTERNAL;
     }
 
-    mCachedKey->DestroyKey();
+    TEMPORARY_RETURN_IGNORED mCachedKey->DestroyKey();
 
     return CHIP_NO_ERROR;
 }
@@ -437,7 +437,7 @@ Crypto::P256Keypair * Efr32PsaOperationalKeystore::AllocateEphemeralKeypairForCA
 
     if (new_key != nullptr)
     {
-        new_key->Create(kEFR32OpaqueKeyIdVolatile, EFR32OpaqueKeyUsages::ECDH_P256);
+        TEMPORARY_RETURN_IGNORED new_key->Create(kEFR32OpaqueKeyIdVolatile, EFR32OpaqueKeyUsages::ECDH_P256);
     }
 
     return new_key;

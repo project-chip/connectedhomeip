@@ -22,4 +22,4 @@ import("${chip_root}/examples/platform/mt793x/args.gni")
 mt793x_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_pw_rpc = true
-chip_enable_openthread = true
+chip_enable_thread = true

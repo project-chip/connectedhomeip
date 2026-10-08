@@ -193,6 +193,70 @@ TEST_F(TestPSAOpKeyStore, TestEphemeralKeys)
     opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
 }
 
+TEST_F(TestPSAOpKeyStore, TestPendingKeypairRevertPreservesActiveKeyWithCustomAllocator)
+{
+    constexpr FabricIndex kFabricIndex = 111;
+    constexpr psa_key_id_t kBaseKeyId  = 4096;
+
+    class CustomAllocator : public PSAKeyAllocator
+    {
+    public:
+        psa_key_id_t GetDacKeyId() override { return kBaseKeyId; }
+        psa_key_id_t GetOpKeyId(FabricIndex fabricIndex) override { return kBaseKeyId + fabricIndex; }
+        psa_key_id_t AllocateICDKeyId() override { return PSA_KEY_ID_NULL; }
+        void UpdateKeyAttributes(psa_key_attributes_t & attrs) override
+        {
+            // Keep default behavior for algorithm/usage, only enforce deterministic key ID mapping for persistent keys.
+            if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT && psa_get_key_id(&attrs) == 0)
+            {
+                psa_set_key_id(&attrs, GetOpKeyId(kFabricIndex));
+            }
+        }
+    };
+
+    static CustomAllocator customAllocator;
+    SetPSAKeyAllocator(&customAllocator);
+
+    PSAOperationalKeystore opKeystore;
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
+    MutableByteSpan csrSpan{ csrBuf };
+    P256PublicKey activePublicKey;
+    P256PublicKey pendingPublicKey;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Commit the first keypair as active.
+    err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), activePublicKey), CHIP_NO_ERROR);
+    EXPECT_EQ(opKeystore.ActivateOpKeypairForFabric(kFabricIndex, activePublicKey), CHIP_NO_ERROR);
+    EXPECT_EQ(opKeystore.CommitOpKeypairForFabric(kFabricIndex), CHIP_NO_ERROR);
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+
+    // Start a second keypair generation for the same fabric; this one stays pending.
+    csrSpan = MutableByteSpan{ csrBuf };
+    err     = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pendingPublicKey), CHIP_NO_ERROR);
+    EXPECT_FALSE(activePublicKey.Matches(pendingPublicKey));
+    EXPECT_EQ(opKeystore.ActivateOpKeypairForFabric(kFabricIndex, pendingPublicKey), CHIP_NO_ERROR);
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+
+    // Reverting a pending keypair must not remove the already committed key.
+    EXPECT_EQ(opKeystore.RemoveOpKeypairForFabric(kFabricIndex), CHIP_NO_ERROR);
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+
+    uint8_t msg[] = { 0x01, 0x02, 0x03 };
+    P256ECDSASignature signature;
+    EXPECT_EQ(opKeystore.SignWithOpKeypair(kFabricIndex, ByteSpan{ msg }, signature), CHIP_NO_ERROR);
+    EXPECT_EQ(activePublicKey.ECDSA_validate_msg_signature(msg, sizeof(msg), signature), CHIP_NO_ERROR);
+    EXPECT_EQ(pendingPublicKey.ECDSA_validate_msg_signature(msg, sizeof(msg), signature), CHIP_ERROR_INVALID_SIGNATURE);
+
+    EXPECT_EQ(opKeystore.RemoveOpKeypairForFabric(kFabricIndex), CHIP_NO_ERROR);
+    SetPSAKeyAllocator(nullptr);
+}
+
 TEST_F(TestPSAOpKeyStore, TestMigrationKeys)
 {
     chip::TestPersistentStorageDelegate storage;

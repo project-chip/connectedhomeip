@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
+#include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/static-cluster-config/FixedLabel.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -41,7 +41,10 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+        VerifyOrDie(deviceInfoProvider != nullptr);
+
+        gServers[clusterInstanceIndex].Create(endpointId, *DeviceLayer::GetDeviceInfoProvider());
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -72,7 +75,7 @@ void MatterFixedLabelClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
+void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -83,7 +86,7 @@ void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kFixedLabelFixedClusterCount,
             .maxClusterInstanceCount   = kFixedLabelMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterFixedLabelPluginServerInitCallback() {}

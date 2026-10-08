@@ -45,7 +45,7 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     GAutoPtr<GVariant> dataValue(g_variant_lookup_value(serviceData, Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, nullptr));
     VerifyOrReturnError(dataValue != nullptr, false);
 
-    size_t dataLen         = 0;
+    gsize dataLen          = 0;
     const void * dataBytes = g_variant_get_fixed_array(dataValue.get(), &dataLen, sizeof(uint8_t));
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 

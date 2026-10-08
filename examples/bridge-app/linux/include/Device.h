@@ -18,18 +18,18 @@
 
 #pragma once
 
+#include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 
 #include <cstdint>
-#include <stdbool.h>
-#include <stdint.h>
 
 #include <functional>
 #include <string>
 #include <sys/types.h>
 #include <vector>
 
-class Device
+class Device : public chip::app::Clusters::BridgedDeviceBasicInformationDelegate
 {
 public:
     static const int kDeviceNameSize     = 32;
@@ -37,15 +37,14 @@ public:
 
     enum Changed_t
     {
-        kChanged_Reachable            = 1u << 0,
-        kChanged_Location             = 1u << 1,
-        kChanged_Name                 = 1u << 2,
-        kChanged_ConfigurationVersion = 1u << 3,
-        kChanged_Last                 = kChanged_ConfigurationVersion,
+        // NOTE: device changes are handled automatically by the cluster, there
+        //       is no separate notification needed
+        // Only remaining notifications are non-cluster changes
+        kChanged_Location = 1,
+        kChanged_Last     = kChanged_Location,
     } Changed;
 
     Device(const char * szDeviceName, std::string szLocation);
-    virtual ~Device() {}
 
     bool IsReachable();
     void SetReachable(bool aReachable);
@@ -54,7 +53,7 @@ public:
     void SetLocation(std::string szLocation);
     void GenerateUniqueId();
     uint32_t GetConfigurationVersion();
-    void SetConfigurationVersion(uint32_t configurationVersion);
+    void IncreaseConfigurationVersion();
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
@@ -65,18 +64,32 @@ public:
     inline std::string GetZone() { return mZone; };
     inline void SetZone(std::string zone) { mZone = zone; };
 
+    chip::app::ServerClusterRegistration &
+    CreateBridgedDeviceInfo(chip::EndpointId endpointId,
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::MutableData && mutableData,
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixedData
+
+    );
+
+    /// Clears internal status: unregisters dynamic endpoints and resets internal
+    /// state.
+    void Unregister();
+
+    // BridgedDeviceBasicInformationDelegate
+    chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override;
+
 private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
 
 protected:
-    bool mReachable                         = false;
     char mName[kDeviceNameSize + 1]         = { 0 };
     char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
-    uint32_t mConfigurationVersion;
     std::string mLocation;
-    chip::EndpointId mEndpointId;
-    chip::EndpointId mParentEndpointId;
+    chip::EndpointId mEndpointId       = chip::kInvalidEndpointId;
+    chip::EndpointId mParentEndpointId = chip::kInvalidEndpointId;
     std::string mZone;
+
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::BridgedDeviceBasicInformationCluster> mBridgedDevice;
 };
 
 class DeviceOnOff : public Device

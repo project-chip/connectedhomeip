@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+assert(current_toolchain != "",
+       "Build settings cannot be evaluated without a toolchain." +
+           " Do not import this file from default_args / args.gni.")
+
 declare_args() {
-  # Crypto implementation: mbedtls, openssl, boringssl, platform.
+  # Crypto implementation: mbedtls, psa, openssl, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
 
   # Compile mbedtls externally. Only used if chip_crypto == "mbedtls"
   chip_external_mbedtls = false
 
-  # Use PSA Spake2+ implementation. Only used if chip_crypto == "psa"
-  chip_crypto_psa_spake2p = false
+  # spake2p implementation: mbedtls, psa, custom
+  chip_crypto_spake2p = "mbedtls"
 
   # Use PSA AEAD single-part implementation. Only used if chip_crypto == "psa"
   chip_crypto_psa_aead_single_part = false
@@ -35,11 +39,45 @@ declare_args() {
   # Trusty TEE, please refer the website listed below:
   # https://source.android.com/docs/security/features/trusty
   chip_with_trusty_os = false
+
+  # Controls enabling of ELE(EdgeLock Enclave) for i.MX 9 platforms, this
+  # feature enables hardware acceleration for cryptographic algorithms.
+  # And provides a full suite of drivers for secure hardware on i.MX 9.
+  # see https://www.nxp.com/products/nxp-product-information/nxp-product-programs/edgelock-secure-enclave:EDGELOCK-SECURE-ENCLAVE
+  # to get more information.
+  chip_with_imx_ele = false
 }
+
+if (chip_crypto == "") {
+  if (current_os == "android" || current_os == "freertos" ||
+      current_os == "zephyr" || current_os == "webos" ||
+      current_os == "cmsis-rtos") {
+    chip_crypto = "mbedtls"
+  } else if (current_os == "mac" || current_os == "ios") {
+    chip_crypto = "boringssl"
+  } else {
+    chip_crypto = "openssl"
+  }
+}
+
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "psa" ||
+        chip_crypto == "openssl" || chip_crypto == "boringssl" ||
+        chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
+
+if (chip_crypto_keystore == "") {
+  if (chip_crypto == "psa") {
+    chip_crypto_keystore = "psa"
+  } else {
+    chip_crypto_keystore = "raw"
+  }
+}
+
+assert(chip_crypto_keystore == "psa" || chip_crypto_keystore == "raw" ||
+           chip_crypto_keystore == "app",
+       "Please select a valid crypto keystore: psa, raw, app")
 
 assert(
     !chip_external_mbedtls || chip_crypto == "mbedtls" || chip_crypto == "psa",
     "Use of external mbedtls requires the mbedtls or psa crypto impl")
-
-assert(!chip_crypto_psa_spake2p || chip_crypto == "psa",
-       "Use of psa spake2+ requires the psa crypto impl")

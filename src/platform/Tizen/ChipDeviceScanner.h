@@ -80,7 +80,7 @@ class ChipDeviceScanner
 {
 public:
     ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate){};
-    ~ChipDeviceScanner() { StopScan(); }
+    ~ChipDeviceScanner() { TEMPORARY_RETURN_IGNORED StopScan(); }
 
     /// Initiate a scan for devices, with the given scan filter data
     CHIP_ERROR StartScan(ScanFilterType filterType, const ScanFilterData & filterData);
@@ -92,9 +92,8 @@ private:
     void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo);
     CHIP_ERROR StartScanImpl();
 
-    int CreateLEScanFilter(ScanFilterType filterType);
-    int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
-    int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    CHIP_ERROR RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    CHIP_ERROR SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
     void UnRegisterScanFilter();
 
     ChipDeviceScannerDelegate * mDelegate;

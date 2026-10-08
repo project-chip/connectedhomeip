@@ -458,3 +458,9 @@ tests:
       verification: |
           Compare 5a and 6a, Verify SetupURL appended by "?/a=" and the decimal numeric value of one of the exposed ActionIDs
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: bridge
+      app: bridge

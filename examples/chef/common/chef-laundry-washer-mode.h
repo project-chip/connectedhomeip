@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,18 +48,15 @@ private:
     ModeTagStructType modeTagsWhites[1]   = { { .value = to_underlying(ModeTag::kWhites) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Delicate"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Delicate"_span,
                                                  .mode     = ModeDelicate,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDelicate) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Heavy"),
-                                                 .mode     = ModeHeavy,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Whites"),
-                                                 .mode     = ModeWhites,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsWhites) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Heavy"_span, .mode = ModeHeavy, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Whites"_span, .mode = ModeWhites, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsWhites) },
     };
 
     CHIP_ERROR Init() override;
@@ -82,12 +79,3 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-#ifdef MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                             const EmberAfAttributeMetadata * attributeMetadata,
-                                                                             uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                            const EmberAfAttributeMetadata * attributeMetadata,
-                                                                            uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

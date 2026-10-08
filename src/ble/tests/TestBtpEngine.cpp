@@ -559,7 +559,27 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
     // Create a packet buffer with a large payload that will result in 257 fragments (to test sequence number wraparound).
     size_t packetLength = mBtpEngine.sDefaultFragmentSize - kTransferProtocolMaxHeaderSize + kTransferProtocolAckSize +
         256 * (mBtpEngine.sDefaultFragmentSize - kTransferProtocolMidFragmentMaxHeaderSize + kTransferProtocolAckSize);
+
+    if (packetLength + System::PacketBuffer::kDefaultHeaderReserve > System::PacketBuffer::kMaxAllocSize)
+    {
+        ChipLogProgress(Test, "Skipping IsValidAckOnSequenceWraparound: packetLength (%u) exceeds PacketBuffer::kMaxAllocSize (%u)",
+                        static_cast<unsigned>(packetLength), static_cast<unsigned>(System::PacketBuffer::kMaxAllocSize));
+        return;
+    }
+
     auto packet0 = System::PacketBufferHandle::New(packetLength);
+    ASSERT_FALSE(packet0.IsNull());
+
+    // Fixed-size buffer pools (e.g. CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL) allocate a
+    // fixed kMaxSizeWithoutReserve block regardless of the requested size, so MaxDataLength()
+    // may still be smaller than packetLength even when kMaxAllocSize is large.
+    if (packet0->MaxDataLength() < packetLength)
+    {
+        ChipLogProgress(Test,
+                        "Skipping IsValidAckOnSequenceWraparound: PacketBuffer MaxDataLength (%u) < required packetLength (%u)",
+                        static_cast<unsigned>(packet0->MaxDataLength()), static_cast<unsigned>(packetLength));
+        return;
+    }
     packet0->SetDataLength(packetLength);
 
     // Send the first packet to start transmission.
@@ -662,6 +682,41 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
     EXPECT_FALSE(mBtpEngine.ExpectingAck());
     // After acknowledgment, the newest unacked sent sequence number should still be 0 (no new sends).
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+}
+
+TEST_F(TestBtpEngine, EnforcesMinFragmentSize)
+{
+
+    const uint16_t belowMinFragmentSize = static_cast<uint16_t>(BtpEngine::sMinFragmentSize - 1);
+    const uint16_t aboveMinFragmentSize = static_cast<uint16_t>(BtpEngine::sMinFragmentSize + 4);
+    const uint16_t aboveMaxFragmentSize = static_cast<uint16_t>(BtpEngine::sMaxFragmentSize + 3);
+    // Default should match the engine constant.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sDefaultFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sDefaultFragmentSize);
+
+    // Set to a value smaller than sMinFragmentSize.
+    mBtpEngine.SetTxFragmentSize(belowMinFragmentSize);
+    mBtpEngine.SetRxFragmentSize(belowMinFragmentSize);
+
+    // Verify that it is clamped to sMinFragmentSize.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sMinFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sMinFragmentSize);
+
+    // Set to a value larger than sMinFragmentSize.
+    mBtpEngine.SetTxFragmentSize(aboveMinFragmentSize);
+    mBtpEngine.SetRxFragmentSize(aboveMinFragmentSize);
+
+    // Verify that it is set correctly.
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), aboveMinFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), aboveMinFragmentSize);
+
+    // Set to a value larger than sMaxFragmentSize.
+    mBtpEngine.SetTxFragmentSize(aboveMaxFragmentSize);
+    mBtpEngine.SetRxFragmentSize(aboveMaxFragmentSize);
+
+    // Verify that it is clamped to sMaxFragmentSize
+    EXPECT_EQ(mBtpEngine.GetTxFragmentSize(), BtpEngine::sMaxFragmentSize);
+    EXPECT_EQ(mBtpEngine.GetRxFragmentSize(), BtpEngine::sMaxFragmentSize);
 }
 
 } // namespace

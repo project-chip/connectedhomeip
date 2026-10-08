@@ -58,6 +58,7 @@ namespace Commands {
 namespace PlayChimeSound {
 enum class Fields : uint8_t
 {
+    kChimeID = 0,
 };
 
 struct Type
@@ -66,6 +67,8 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PlayChimeSound::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Chime::Id; }
+
+    Optional<uint8_t> chimeID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -80,6 +83,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlayChimeSound::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Chime::Id; }
     static constexpr bool kIsFabricScoped = false;
+
+    Optional<uint8_t> chimeID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

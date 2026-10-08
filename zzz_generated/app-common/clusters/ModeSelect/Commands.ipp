@@ -56,7 +56,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ChangeToMode.
+} // namespace ChangeToMode
 } // namespace Commands
 } // namespace ModeSelect
 } // namespace Clusters

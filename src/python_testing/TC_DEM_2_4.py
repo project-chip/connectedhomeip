@@ -20,14 +20,13 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0x12
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -41,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -50,13 +49,15 @@ from TC_DEMTestBase import DEMTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_4(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_4."""
 
     def desc_TC_DEM_2_4(self) -> str:
@@ -65,13 +66,12 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_4(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F04",  # Depends on F04(Pausable)
         ]
-        return pics
 
     def steps_TC_DEM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -108,7 +108,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("10", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("10a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E03(Resumed) sent with Cause=3 (UserOptOut)"),
             TestStep("11a", "TH reads from the DUT the ESAState",
@@ -126,7 +126,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("13", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("13a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("13b", "TH reads from the DUT the Forecast",
                      "Value has to include ForecastUpdateReason=Local Optimization"),
             TestStep("14", "TH sends command ResumeRequest",
@@ -138,7 +138,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("15", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("15a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("15b", "TH reads from the DUT the Forecast",
                      "Value has to include ForecastUpdateReason=Local Optimization"),
             TestStep("16", "TH sends command ResumeRequest",
@@ -148,7 +148,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
             TestStep("17", "TH sends command PauseRequest with Duration=Forecast.slots[0].MinPauseDuration, Cause=LocalOptimization",
                      "Verify DUT responds w/ status SUCCESS(0x00) and Event DEM.S.E02(Paused) sent"),
             TestStep("17a", "TH reads from the DUT the ESAState",
-                     "Value has to be 0x05 (Paused)"),
+                     "Value has to be 0x04 (Paused)"),
             TestStep("18", "Wait for minPauseDuration.",
                      "Event DEM.S.E03(Resumed) sent with Cause=0 (NormalCompletion)"),
             TestStep("18a", "TH reads from the DUT the ESAState",
@@ -169,12 +169,10 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_4(self):
 
-        logging.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
+        log.info(Clusters.Objects.DeviceEnergyManagement.Attributes.FeatureMap)
 
         self.step("1")
         # Commission DUT - already done
@@ -352,8 +350,8 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kPaused)
 
         self.step("18")
-        logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
-        time.sleep(forecast.slots[0].minPauseDuration)
+        log.info("Sleeping for forecast.slots[0].minPauseDuration %ss", forecast.slots[0].minPauseDuration)
+        await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 

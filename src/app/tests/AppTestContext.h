@@ -18,7 +18,7 @@
 #include <messaging/tests/MessagingContext.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /**
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
@@ -37,5 +37,5 @@ public:
     virtual void TearDown();
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

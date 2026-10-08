@@ -19,6 +19,7 @@
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <lib/dnssd/Resolver.h>
+#include <messaging/ExchangeHolder.h>
 #include <protocols/secure_channel/CheckinMessage.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -87,7 +88,10 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
 
     VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return exchangeContext->SendMessage(MsgType::ICD_CheckIn, std::move(buffer), Messaging::SendMessageFlags::kNoAutoRequestAck);
+    Messaging::ExchangeHolder exchangeHolder(*this);
+    exchangeHolder.Grab(exchangeContext);
+
+    return exchangeHolder->SendMessage(MsgType::ICD_CheckIn, std::move(buffer), Messaging::SendMessageFlags::kNoAutoRequestAck);
 }
 
 CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter)
@@ -101,11 +105,8 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
 
     AddressResolve::NodeLookupRequest request(peerId);
 
-    memcpy(mAes128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
-           entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
-
-    memcpy(mHmac128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
-           entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(mAes128KeyHandle.OpaqueBytes().data(), entry.aesKeyHandle.OpaqueBytes().data(), Crypto::Aes128KeyHandle::Size());
+    memcpy(mHmac128KeyHandle.OpaqueBytes().data(), entry.hmacKeyHandle.OpaqueBytes().data(), Crypto::Hmac128KeyHandle::Size());
 
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 

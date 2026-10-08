@@ -30,6 +30,70 @@ int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type,
                               const std::string & codec);
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state);
 
+/**
+ * @brief Validates that an SDP contains the minimum required fields for WebRTC.
+ *
+ * This function checks that the SDP has the mandatory session-level fields per RFC 8866
+ * plus the necessary ICE and DTLS parameters required by the underlying WebRTC library.
+ * Without these fields, the library would throw an exception when trying to set the
+ * remote description.
+ *
+ * Required fields (per RFC 8866):
+ * - Version (v=)
+ * - Origin (o=)
+ * - Session name (s=)
+ * - Connection (c=)
+ * - Timing (t=)
+ * - At least one media line (m=)
+ *
+ * Required fields (WebRTC-specific):
+ * - ICE user fragment (a=ice-ufrag:)
+ * - ICE password (a=ice-pwd:)
+ * - DTLS fingerprint (a=fingerprint:)
+ *
+ * @param sdp The SDP string to validate
+ * @return true if the SDP contains all required fields, false otherwise
+ */
+bool ValidateSdpFields(const std::string & sdp)
+{
+    if (sdp.empty())
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP is empty");
+        return false;
+    }
+
+    struct SdpRequirement
+    {
+        const char * substring;
+        const char * description;
+    };
+
+    // Define the list of required substrings and their corresponding descriptions for error logging.
+    // These include mandatory SDP session-level fields per RFC 8866 plus WebRTC-specific requirements.
+    static const SdpRequirement kRequirements[] = {
+        { "v=", "version" },
+        { "o=", "origin" },
+        { "s=", "session name" },
+        { "c=", "connection" },
+        { "t=", "timing" },
+        { "m=", "media line" },
+        { "a=ice-ufrag:", "ICE user fragment" },
+        { "a=ice-pwd:", "ICE password" },
+        { "a=fingerprint:", "DTLS fingerprint" },
+    };
+
+    for (const auto & req : kRequirements)
+    {
+        if (sdp.find(req.substring) == std::string::npos)
+        {
+            ChipLogError(NotSpecified, "ValidateSdpFields: SDP has no %s (%s): %s", req.description, req.substring, sdp.c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 WebRTCClient::WebRTCClient()
 {
     mPeerConnection = nullptr;
@@ -143,6 +207,8 @@ void WebRTCClient::addVideoTrack(std::string mid, int payloadType)
     addr.sin_port        = htons(kVideoStreamDestPort);
 
     mVideoTrack->onFrame([this, addr](rtc::binary message, rtc::FrameInfo frameInfo) {
+        this->mVideoFramesReceived++;
+        this->mVideoBytesReceived += message.size();
         // send H264 frames to sock so that a client can pick it up to dispaly it.
         sendto(this->mVideoRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
@@ -174,6 +240,8 @@ void WebRTCClient::addAudioTrack(std::string mid, int payloadType)
 
     mAudioTrack->onMessage(
         [this, audioAddr](rtc::binary message) {
+            this->mAudioPacketsReceived++;
+            this->mAudioBytesReceived += message.size();
             // send audio RTP packets to sock so that a client can pick it up to play it.
             sendto(this->mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
@@ -212,6 +280,11 @@ void WebRTCClient::SetRemoteDescription(const std::string & sdp, const std::stri
     if (mPeerConnection == nullptr)
     {
         ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    if (!ValidateSdpFields(sdp))
+    {
         return;
     }
 

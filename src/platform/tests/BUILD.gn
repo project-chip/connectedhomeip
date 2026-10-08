@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
@@ -23,13 +24,14 @@ declare_args() {
   chip_enable_dnssd_tests = chip_device_platform == "darwin"
 }
 
-if (chip_device_platform != "none" && chip_device_platform != "fake") {
+if (chip_device_platform != "none") {
   import("${chip_root}/build/chip/chip_test_suite.gni")
 
   chip_test_suite("tests") {
     output_name = "libPlatformTests"
 
-    test_sources = []
+    test_sources = [ "TestGeneralFaults.cpp" ]
+    defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
 
     if (current_os != "zephyr") {
       # TODO: unclear as to why this fails on zephyr
@@ -61,14 +63,13 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
         "TestPlatformTime.cpp",
       ]
 
-      defines = []
       if (chip_device_platform == "esp32") {
         # SleepMillis can undersleep by as much as 10ms on esp32-qemu.
         defines += [ "CONFIG_WIDER_SLEEP_MARGIN" ]
       }
     }
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       # FIXME: TestThreadStackMgr requires ot-br-posix daemon to be running
       # test_sources += [ "TestThreadStackMgr.cpp" ]
       # configs = [ "//${chip_root}/third_party/ot-br-posix:dbus_config" ]
@@ -103,5 +104,59 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
   import("${chip_root}/build/chip/chip_test_group.gni")
   chip_test_group("tests") {
     tests = []
+  }
+}
+
+if (enable_fuzz_test_targets) {
+  source_set("tizen_fuzzer_stubs") {
+    public = [
+      "tizen_stubs/ble/Ble.h",
+      "tizen_stubs/ble/BleUUID.h",
+      "tizen_stubs/bluetooth.h",
+      "tizen_stubs/bluetooth_internal.h",
+      "tizen_stubs/chip_support_stubs.h",
+      "tizen_stubs/glib.h",
+      "tizen_stubs/lib/core/CHIPError.h",
+      "tizen_stubs/lib/support/CHIPMemString.h",
+      "tizen_stubs/lib/support/CodeUtils.h",
+      "tizen_stubs/lib/support/Span.h",
+      "tizen_stubs/lib/support/logging/CHIPLogging.h",
+      "tizen_stubs/platform/CHIPDeviceConfig.h",
+      "tizen_stubs/platform/GLibTypeDeleter.h",
+      "tizen_stubs/platform/NetworkCommissioning.h",
+      "tizen_stubs/platform/PlatformError.h",
+      "tizen_stubs/platform/PlatformManager.h",
+      "tizen_stubs/platform/internal/DeviceNetworkInfo.h",
+      "tizen_stubs/system/SystemClock.h",
+      "tizen_stubs/tizen.h",
+      "tizen_stubs/tizen_api_stubs.h",
+      "tizen_stubs/wifi-manager.h",
+    ]
+  }
+
+  chip_fuzz_target("fuzz-tizen-ble-scan-parser") {
+    sources = [
+      "FuzzTizenBLEScanParser.cpp",
+      "tizen_stubs/tizenrt_ble_service_data.c",
+    ]
+    public_deps = [ ":tizen_fuzzer_stubs" ]
+    cflags = [ "-funsigned-char" ]
+    include_dirs = [
+      "tizen_stubs",
+      "${chip_root}/src",
+    ]
+  }
+
+  chip_fuzz_target("fuzz-tizen-wifi-manager") {
+    sources = [ "FuzzTizenWiFiManager.cpp" ]
+    defines = [
+      "CHIP_DEVICE_CONFIG_ENABLE_WIFI=1",
+      "CHIP_ENABLE_OPENTHREAD=0",
+    ]
+    public_deps = [ ":tizen_fuzzer_stubs" ]
+    include_dirs = [
+      "tizen_stubs",
+      "${chip_root}/src",
+    ]
   }
 }

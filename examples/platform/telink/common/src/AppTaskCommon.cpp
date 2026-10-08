@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,11 +21,16 @@
 
 #include "BLEManagerImpl.h"
 #include "ButtonManager.h"
+#include "FabricTableDelegate.h"
 #include "LEDManager.h"
 #include "PWMManager.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "ThreadUtil.h"
+#if CONFIG_OPENTHREAD_SNTP_CLIENT
+#include "ThreadTimeSync.h"
+#endif
+#include <lib/support/ThreadOperationalDataset.h>
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
@@ -35,10 +40,14 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
+#ifdef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+#include "AllDevicesServer.h"
+#else
+#include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/Instance.h>
+#endif
 
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
@@ -52,9 +61,20 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
 
-#include <zephyr/fs/nvs.h>
-#include <zephyr/settings/settings.h>
-#include <zephyr/sys/reboot.h>
+bool AppTaskCommon::sIsCommissioningFailed = false;
+
+#include "Reboot.h"
+#include <zephyr_pm_observer.h>
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+#include <zephyr/pm/policy.h>
+#endif
+
+#if defined(CONFIG_IEEE802154_TLX_OPTIMIZATION)
+extern "C" {
+bool isThreadCommissioned = false;
+}
+#endif // CONFIG_IEEE802154_TLX_OPTIMIZATION
 
 using namespace chip::app;
 
@@ -82,28 +102,45 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
 
-bool sIsCommissioningFailed = false;
-bool sIsNetworkProvisioned  = false;
-bool sIsNetworkEnabled      = false;
-bool sIsNetworkAttached     = false;
-bool sHaveBLEConnections    = false;
+bool sIsNetworkProvisioned = false;
+bool sIsNetworkEnabled     = false;
+bool sIsNetworkAttached    = false;
+bool sHaveBLEConnections   = false;
 
-#if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+void EnablePostCommissioningBle(intptr_t)
+{
+    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
 #endif
 
 #ifndef IDENTIFY_CLUSTER_DISABLED
 
 void OnIdentifyTriggerEffect(Identify * identify)
 {
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
+    ChipLogProgress(Zcl, "OnIdentifyTriggerEffect for endpoint %u, effect: %u", endpoint,
+                    static_cast<unsigned>(identify->mCurrentEffectIdentifier));
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
 }
 
-Identify sIdentify = {
-    kExampleEndpointId,           AppTask::IdentifyStartHandler,
-    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
+#ifndef TELINK_APP_IDENTIFY_ENDPOINTS
+#define TELINK_APP_IDENTIFY_ENDPOINTS(X) X(kExampleEndpointId)
+#endif
+
+#define TELINK_IDENTIFY_INSTANCE(endpoint)                                                                                         \
+    { endpoint, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,                                                       \
+      Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, OnIdentifyTriggerEffect },
+
+Identify sIdentifyInstances[] = { TELINK_APP_IDENTIFY_ENDPOINTS(TELINK_IDENTIFY_INSTANCE) };
+
+#undef TELINK_IDENTIFY_INSTANCE
 
 #endif
 
@@ -116,10 +153,14 @@ class AppCallbacks : public AppDelegate
     bool isComissioningStarted;
 
 public:
-    void OnCommissioningSessionEstablishmentStarted() override { sIsCommissioningFailed = false; }
+    void OnCommissioningSessionEstablishmentStarted() override { AppTaskCommon::sIsCommissioningFailed = false; }
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
-    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override
+    {
+        AppTaskCommon::sIsCommissioningFailed = true;
+        isComissioningStarted                 = false;
+    }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
     {
@@ -132,45 +173,6 @@ public:
 AppCallbacks sCallbacks;
 } // namespace
 
-class AppFabricTableDelegate : public FabricTable::Delegate
-{
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-    {
-        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
-        {
-            ChipLogProgress(DeviceLayer, "Erasing settings partition");
-
-            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
-            void * storage = nullptr;
-            int status     = settings_storage_get(&storage);
-
-            if (!status)
-            {
-                status = nvs_clear(static_cast<nvs_fs *>(storage));
-            }
-
-            if (!status)
-            {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
-            }
-
-            if (status)
-            {
-                ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
-            }
-#ifdef CONFIG_TFLM_FEATURE
-            AppTask::MicroSpeechProcessStop();
-#endif
-            // Reboot in case of failed commissioning to allow new pairing via BLE
-            if (sIsCommissioningFailed)
-            {
-                ChipLogProgress(DeviceLayer, "Rebooting board");
-                sys_reboot(SYS_REBOOT_WARM);
-            }
-        }
-    }
-};
-
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     // Disable openthread before reset to prevent writing to NVS
@@ -179,7 +181,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
         {
-            ThreadStackManagerImpl().Finalize();
+            otInstanceFinalize(openthread_get_default_instance());
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -212,6 +214,34 @@ void AppTaskCommon::PowerOnFactoryReset(void)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 #endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+static void PowerOnNetworkCheck(void)
+{
+    Thread::OperationalDataset curDataset;
+    CHIP_ERROR err  = DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(curDataset);
+    bool hasDataset = (err == CHIP_NO_ERROR); // Check if stored OpenThread dataset
+
+    uint8_t fabricNum = chip::Server::GetInstance().GetFabricTable().FabricCount();
+
+    if (!hasDataset && fabricNum == 0)
+    { // New device
+        return;
+    }
+    else if (hasDataset && fabricNum > 0)
+    { // Device successfully commissioned
+        return;
+    }
+    else if (hasDataset && fabricNum == 0)
+    {
+        ChipLogProgress(DeviceLayer, "Thread dataset exists, but matter uncommissioned\n");
+    }
+    else
+    {
+        return;
+    }
+}
+#endif
 
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {
@@ -247,6 +277,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
         DispatchEvent(&event);
     }
 }
+
 #ifdef CONFIG_MCUMGR_TRANSPORT_BT
 /* Demonstration of the fail handling */
 void HandleDFUFail(VerificationFailReason reason)
@@ -254,6 +285,7 @@ void HandleDFUFail(VerificationFailReason reason)
     LOG_INF("DFU image verification failed with reason: %d", reason);
 }
 #endif
+
 void AppTaskCommon::PrintFirmwareInfo(void)
 {
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -269,13 +301,23 @@ void AppTaskCommon::PrintFirmwareInfo(void)
     LOG_DBG("\t branch: %s %.8s%s %s", ZEPHYR_BRANCH, ZEPHYR_COMMIT_HASH, ZEPHYR_LOCAL_STATUS, ZEPHYR_COMMIT_DATE);
     LOG_DBG("\t remote: %s", ZEPHYR_REMOTE_URL);
     LOG_DBG("\t HAL commit: %.8s%s %s", TELINK_HAL_COMMIT_HASH, TELINK_HAL_LOCAL_STATUS, TELINK_HAL_COMMIT_DATE);
+
+    LOG_DBG("OpenThread revision: ");
+    LOG_DBG("\t path: %s", OPENTHREAD_PATH);
+    LOG_DBG("\t remote: %s", OT_REMOTE_URL);
+    if (strlen(OT_TAG) > 0)
+    {
+        LOG_DBG("\t tag: %s", OT_TAG);
+    }
+    LOG_DBG("\t branch: %s %.8s%s %s", OT_BRANCH, OT_COMMIT_HASH, OT_LOCAL_STATUS, OT_COMMIT_DATE);
 #endif
 }
+
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {
-    CHIP_ERROR err;
-
     PrintFirmwareInfo();
+
+    pm_observer_init();
 
     InitLeds();
     UpdateStatusLED();
@@ -300,8 +342,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     SetCommissionableDataProvider(&mFactoryDataProvider);
     // Read EnableKey from the factory data.
     MutableByteSpan enableKey(sTestEventTriggerEnableKey);
-    err = mFactoryDataProvider.GetEnableKey(enableKey);
-    if (err != CHIP_NO_ERROR)
+    if (mFactoryDataProvider.GetEnableKey(enableKey) != CHIP_NO_ERROR)
     {
         LOG_ERR("GetEnableKey failed. Could not delegate test event trigger");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
@@ -310,7 +351,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-    // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
@@ -318,19 +358,35 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+#ifdef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
+    // all-devices owns data model provider setup because the concrete device
+    // type is selected at runtime.
+    ReturnErrorOnFailure(chip::app::all_devices::InitAllDevicesServer(initParams));
+#else
+    // ZAP/codegen applications use the generated data model.
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
-#if APP_SET_DEVICE_INFO_PROVIDER
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+    }
 #endif
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    AppFabricTableDelegate::Init();
+#endif // CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
     // We only have network commissioning on endpoint 0.
@@ -338,6 +394,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
+
 #ifdef CONFIG_MCUMGR_TRANSPORT_BT
     GetDFUOverSMP().Init();
     GetDFUOverSMP().SetFailCallback(HandleDFUFail);
@@ -355,37 +412,43 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    LogErrorOnFailure(PlatformMgr().AddEventHandler(ChipEventHandler, 0));
 
-    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("AppFabricTableDelegate fail");
-        return err;
-    }
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    // TODO: Defer this validation until chip::Server is fully initialized to avoid crashes
+    PowerOnNetworkCheck();
+#endif
 
     return CHIP_NO_ERROR;
 }
 
-void AppTaskCommon::IdentifyStartHandler(Identify *)
+void AppTaskCommon::IdentifyStartHandler(Identify * identify)
 {
-    AppEvent event;
+    AppEvent event            = {};
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
 
-    event.Type    = AppEvent::kEventType_IdentifyStart;
-    event.Handler = [](AppEvent * event) {
-        ChipLogProgress(Zcl, "OnIdentifyStart");
+    event.Type               = AppEvent::kEventType_IdentifyStart;
+    event.TimerEvent.Context = reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint));
+    event.Handler            = [](AppEvent * event) {
+        chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
+        ChipLogProgress(Zcl, "OnIdentifyStart for endpoint %u", ep);
+
         PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
     };
     GetAppTask().PostEvent(&event);
 }
 
-void AppTaskCommon::IdentifyStopHandler(Identify *)
+void AppTaskCommon::IdentifyStopHandler(Identify * identify)
 {
-    AppEvent event;
+    AppEvent event            = {};
+    chip::EndpointId endpoint = identify->mCluster.Cluster().GetPaths()[0].mEndpointId;
 
-    event.Type    = AppEvent::kEventType_IdentifyStop;
-    event.Handler = [](AppEvent * event) {
-        ChipLogProgress(Zcl, "OnIdentifyStop");
+    event.Type               = AppEvent::kEventType_IdentifyStop;
+    event.TimerEvent.Context = reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint));
+    event.Handler            = [](AppEvent * event) {
+        chip::EndpointId ep = static_cast<chip::EndpointId>(reinterpret_cast<uintptr_t>(event->TimerEvent.Context));
+        ChipLogProgress(Zcl, "OnIdentifyStop for endpoint %u", ep);
+
         PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
     };
     GetAppTask().PostEvent(&event);
@@ -417,7 +480,7 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
         break;
 #endif
     case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
+        ToggleBleAdvButtonEventHandler();
         break;
     }
 }
@@ -490,7 +553,7 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
 #if CONFIG_TELINK_OTA_BUTTON_TEST
     buttonManager.addCallback(TestOTAButtonEventHandler, 2, true);
 #else
-    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
+    buttonManager.addCallback(ToggleBleAdvButtonEventHandler, 2, true);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
@@ -553,24 +616,39 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
     }
 }
 
-void AppTaskCommon::StartBleAdvButtonEventHandler(void)
+void AppTaskCommon::ToggleBleAdvButtonEventHandler(void)
 {
     AppEvent event;
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartBleAdvHandler;
+    event.Handler            = ToggleBleAdvHandler;
     GetAppTask().PostEvent(&event);
 }
 
-void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
+void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
 {
-    LOG_INF("StartBleAdvHandler");
+    LOG_INF("ToggleBleAdvHandler");
 
     // Disable manual Matter service BLE advertising after device provisioning.
     if (sIsNetworkProvisioned)
     {
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // Concurrent idle mode: toggle BLE advertising on demand so that
+        // BLE (e.g. Channel Sounding) becomes accessible on button press.
+        if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+        {
+            LOG_INF("Disabling BLE adv");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        else
+        {
+            LOG_INF("Enabling BLE adv");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        }
+#else
         LOG_INF("Device already commissioned");
+#endif
         return;
     }
 
@@ -675,14 +753,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     LOG_INF("StartThreadHandler");
     if (!sIsNetworkProvisioned)
     {
-        // Switch context from BLE to Thread
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-#else
-        ThreadStackMgrImpl().SetRadioBlocked(false);
-        ThreadStackMgrImpl().SetThreadEnabled(true);
-#endif
+        LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
         StartDefaultThreadNetwork();
     }
     else
@@ -759,6 +830,36 @@ void AppTaskCommon::TriggerMicroSpeechEventHandler(AppEvent * aEvent)
 }
 #endif
 
+void AppTaskCommon::OtaEventsHandler(const ChipDeviceEvent * event)
+{
+    switch (event->OtaStateChanged.newState)
+    {
+    case DeviceLayer::kOtaDownloadInProgress:
+        ChipLogProgress(DeviceLayer, "OTA image download in progress\n");
+        break;
+    case DeviceLayer::kOtaDownloadComplete:
+        ChipLogProgress(DeviceLayer, "OTA image download complete\n");
+        break;
+    case DeviceLayer::kOtaDownloadFailed:
+        ChipLogProgress(DeviceLayer, "OTA image download failed\n");
+        break;
+    case DeviceLayer::kOtaDownloadAborted:
+        ChipLogProgress(DeviceLayer, "OTA image download aborted\n");
+        break;
+    case DeviceLayer::kOtaApplyInProgress:
+        ChipLogProgress(DeviceLayer, "OTA image apply in progress\n");
+        break;
+    case DeviceLayer::kOtaApplyComplete:
+        ChipLogProgress(DeviceLayer, "OTA image apply complete\n");
+        break;
+    case DeviceLayer::kOtaApplyFailed:
+        ChipLogProgress(DeviceLayer, "OTA image apply failed\n");
+        break;
+    default:
+        break;
+    }
+}
+
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
@@ -766,32 +867,85 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
+            if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
             {
-                LOG_INF("NFC Tag emulation is already started");
+                if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+                {
+                    LOG_INF("NFC Tag emulation is already started");
+                }
+                else
+                {
+                    ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+                }
             }
-            else
-            {
-                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-            }
+#endif
         }
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            (void) NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
-        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // NOTE: Telink builds configure CONFIG_BT_MAX_CONN=1, so during
+        // commissioning the single BLE connection slot is always the
+        // commissioning connection. Any BLE disconnect while the fail-safe
+        // is armed therefore corresponds to the commissioning connection.
+        // If CONFIG_BT_MAX_CONN is ever raised, the disconnected connection
+        // identifier must be plumbed through kCHIPoBLEConnectionClosed and
+        // matched here before expiring the fail-safe.
+        if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
         {
-            LOG_INF("BLE disconnected during commissioning");
-            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
-            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+            // Unexpected BLE disconnect during commissioning
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
         }
+        // Concurrent mode: do NOT call bt_disable() — BLE scheduler must stay
+        // active for Telink TLX BLE+802.15.4 hardware coexistence.
+#else
+        if (ConnectivityMgr().GetBleLayer()->IsInitialized())
+        {
+            // Unexpected BLE disconnect during commissioning
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        else
+        {
+            // Expected BLE disconnect, e.g. after commissioning is complete
+            bt_disable();
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+            ChipLogProgress(DeviceLayer, "Switch to Thread");
+            LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+
+            ChipDeviceEvent opEvent;
+            opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
+            CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
+            }
+#endif
+        }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         break;
+#if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+    case DeviceEventType::kCommissioningComplete:
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+        break;
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -807,6 +961,12 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         break;
     case DeviceEventType::kThreadStateChange:
+#if CONFIG_OPENTHREAD_SNTP_CLIENT
+        if (ConnectivityMgr().IsThreadAttached())
+        {
+            ThreadTimeSync::getInstance().sync_dns("pool.ntp.org");
+        }
+#endif
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
@@ -825,12 +985,31 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
         }
 #endif
+#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
+        otDeviceRole curRole;
+        ThreadStackMgr().LockThreadStack();
+        curRole = otThreadGetDeviceRole(openthread_get_default_instance());
+        ThreadStackMgr().UnlockThreadStack();
+        if (sIsNetworkAttached && curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED)
+        {
+            if (isThreadCommissioned == false)
+                isThreadCommissioned = true;
+        }
+#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsWiFiStationConnected();
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (sIsNetworkProvisioned && (ConnectivityMgr().NumBLEConnections() == 0))
+        {
+            /* Disable BLE to ability to enter deep sleep mode once Wi-Fi is provisioned
+            and there are no active BLE connections (BLE is only needed for commissioning) */
+            bt_disable();
+        }
+#endif
 #if CONFIG_CHIP_OTA_REQUESTOR
         if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
         {
@@ -841,6 +1020,9 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif
+        break;
+    case DeviceEventType::kOtaStateChanged:
+        AppTaskCommon::OtaEventsHandler(event);
         break;
     default:
         break;
@@ -875,3 +1057,20 @@ void AppTaskCommon::GetEvent(AppEvent * aEvent)
 {
     k_msgq_get(&sAppEventQueue, aEvent, K_FOREVER);
 }
+
+// deep-sleep platform workaround
+#if (CONFIG_PM && (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+extern "C" bool __real_bt_is_ready(void);
+
+extern "C" bool __wrap_bt_is_ready(void)
+{
+    if (pm_observer_deep_sleep_occurred())
+    {
+        ChipLogDetail(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        Reboot(SoftwareRebootReason::kOther);
+        return false;
+    }
+    return __real_bt_is_ready();
+}
+
+#endif

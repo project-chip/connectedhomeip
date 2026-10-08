@@ -509,22 +509,25 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
 {
     if (
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        error == System::MapErrorLwIP(ERR_MEM)
+        error == System::MapErrorLwIP(ERR_MEM) || error == System::MapErrorLwIP(ERR_CONN)
 #else
-        error == CHIP_ERROR_POSIX(ENOBUFS)
+        error == CHIP_ERROR_POSIX(ENOBUFS) || error == CHIP_ERROR_POSIX(ENETDOWN)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     )
     {
-        // sendmsg on BSD-based systems never blocks, no matter how the
-        // socket is configured, and will return ENOBUFS in situation in
-        // which Linux, for example, blocks.
+        // Treat specific send errors as transient and non-fatal:
         //
-        // This is typically a transient situation, so we pretend like this
-        // packet drop happened somewhere on the network instead of inside
-        // sendmsg and will just resend it in the normal MRP way later.
+        // - Errors caused by lack of transmit (TX) buffers (e.g. ERR_MEM, ENOBUFS):
+        //   These indicate that the system temporarily cannot allocate memory for sending data,
+        //   often due to momentary buffer exhaustion under high load.
         //
-        // Similarly, on LwIP an ERR_MEM on send indicates a likely
-        // temporary lack of TX buffers.
+        // - Errors caused by network connection issues (e.g. ERR_CONN, ENETDOWN):
+        //   These can occur when the connection is temporarily lost or the interface goes down.
+        //   Such conditions may resolve shortly without requiring a full teardown.
+        //
+        // These errors are treated as recoverable to avoid prematurely closing exchanges
+        // or tearing down subscriptions during transient conditions.
+
         ChipLogError(ExchangeManager, "Ignoring transient send error: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
                      error.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
         error = CHIP_NO_ERROR;
@@ -540,21 +543,30 @@ void ReliableMessageMgr::SetAdditionalMRPBackoffTime(const Optional<System::Cloc
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
-    const auto sessionHandle           = entry.ec->GetSessionHandle();
+    const auto sessionHandle = entry.ec->GetSessionHandle();
 
-    // Check if we have received at least one application-level message
-    if (entry.ec->HasReceivedAtLeastOneMessage())
-    {
-        // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
-        baseTimeout = sessionHandle->GetRemoteMRPConfig().mActiveRetransTimeout;
-    }
-    else
-    {
-        // If we haven't received at least one message
-        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        baseTimeout = sessionHandle->GetMRPBaseTimeout();
-    }
+    // Per Matter Core spec §4.11.2.1 Retransmissions: choose the Active or Idle
+    // base timeout based on the peer's CURRENT activity mode at the moment we
+    // schedule the retransmit. The peer may have been Active when it last sent
+    // us a message in this exchange, but transitioned back to Idle once its
+    // Session Active Threshold (SAT) elapsed.
+    //
+    // For Intermittently Connected Devices (ICDs) where SAI ≪ SII, an earlier
+    // shortcut here pinned to ActiveRetransTimeout (SAI) for the remainder of
+    // the exchange as soon as one message had been received. That caused every
+    // subsequent retransmit to be scheduled well inside the peer's sleep
+    // window, defeating reliable delivery. A common failure mode is CASE Sigma3
+    // to a sleepy device: the just-received Sigma2 marks the exchange "has
+    // received a message", so Sigma3 retransmits were spaced on SAI-derived
+    // backoff (sub-second to a few seconds) instead of the SII-derived spacing
+    // the ICD actually polls on (multiple seconds), and the device never
+    // observed any of them.
+    //
+    // GetMRPBaseTimeout() re-evaluates IsPeerActive() against SAT on every
+    // call, returning ActiveRetransTimeout (SAI) while the peer is in its
+    // Active window and IdleRetransTimeout (SII) afterward, which is the
+    // behavior the spec actually prescribes.
+    System::Clock::Timeout baseTimeout = sessionHandle->GetMRPBaseTimeout();
 
     System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
     entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;

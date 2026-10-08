@@ -26,13 +26,6 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
-def checkPythonVersion():
-    if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' +
-              str(sys.version_info[0]))
-        exit(1)
-
-
 zapFilesToSkip = {
     # examples/chef/sample_app_util/test_files/sample_zap_file.zap is
     # not a real .zap file; it's input to generating .zap files.  So
@@ -63,14 +56,10 @@ def getTargets():
 def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Convert all .zap files to the current zap version')
-    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+    parser.add_argument('--run-bootstrap', action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--dry-run', action='store_true', dest='dry_run')
-    parser.set_defaults(parallel=True)
-    parser.set_defaults(dry_run=False)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--dry-run', action=argparse.BooleanOptionalAction, default=False)
     return parser.parse_args()
 
 
@@ -83,7 +72,6 @@ def convertOne(target):
 
 def main():
     args = runArgumentsParser()
-    checkPythonVersion()
 
     if args.run_bootstrap:
         subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)

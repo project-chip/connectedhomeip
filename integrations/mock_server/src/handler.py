@@ -15,13 +15,12 @@
 import http.server
 import json
 import urllib.parse
-from typing import List, Optional, Type
 
 from route_configuration import Configuration, Route
 from router import match_route
 
 
-def createMockServerHandler(config: Configuration) -> Type[http.server.BaseHTTPRequestHandler]:
+def createMockServerHandler(config: Configuration) -> type[http.server.BaseHTTPRequestHandler]:
     """
     Creates a custom HTTP request handler class configured with predefined routes and responses.
 
@@ -93,8 +92,8 @@ def createMockServerHandler(config: Configuration) -> Type[http.server.BaseHTTPR
             query_params: dict[str, list[str]] = urllib.parse.parse_qs(parsed_path.query)
 
             # Find the matching route from the configuration
-            routes: List[Route] = config.routing
-            route: Optional[Route] = match_route(routes, self.command, path, query_params)
+            routes: list[Route] = config.routing
+            route: Route | None = match_route(routes, self.command, path, query_params)
 
             if not route:
                 # No matching route found; return a 404 error response
@@ -105,7 +104,11 @@ def createMockServerHandler(config: Configuration) -> Type[http.server.BaseHTTPR
             # Use the static response defined in the configuration
             self._set_headers(route.response.status, route.response.headers)
             if route.response.headers.get("Content-Type") == "application/json":
-                self.wfile.write(json.dumps(route.response.body).encode("utf-8"))
+                # If body is bytes (from $ref), write directly; otherwise serialize dict
+                if isinstance(route.response.body, bytes):
+                    self.wfile.write(route.response.body)
+                else:
+                    self.wfile.write(json.dumps(route.response.body).encode("utf-8"))
             else:
                 self.wfile.write(str(route.response.body).encode("utf-8"))
 

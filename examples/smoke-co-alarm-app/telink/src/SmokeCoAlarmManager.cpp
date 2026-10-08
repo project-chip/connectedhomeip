@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::SmokeCoAlarm;
 using namespace ::chip::DeviceLayer;
 
@@ -28,14 +29,33 @@ LOG_MODULE_DECLARE(COsensor, CONFIG_CHIP_APP_LOG_LEVEL);
 SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> sPriorityOrder = {
-    ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kCOAlarm,
-    ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,     ExpressedStateEnum::kTesting,
-    ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
+    ExpressedStateEnum::kInoperative, ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kInterconnectSmoke,
+    ExpressedStateEnum::kCOAlarm,     ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
+    ExpressedStateEnum::kTesting,     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    return CHIP_NO_ERROR;
+    // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+    constexpr uint32_t kExpiryDate = 3976214400;
+    SmokeCoAlarmCluster::Config config;
+    config
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kExpiryDate)
+        .WithUnmounted();
+    return SmokeCoAlarmServer::Instance().Init(1, config, this);
+}
+
+void SmokeCoAlarmManager::OnSelfTestRequested()
+{
+    StartSelfTesting();
 }
 
 void SmokeCoAlarmManager::StartSelfTesting()

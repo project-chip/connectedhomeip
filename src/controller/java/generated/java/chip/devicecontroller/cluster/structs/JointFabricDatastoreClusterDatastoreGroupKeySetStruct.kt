@@ -31,7 +31,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
   val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
   val epochStartTime2: ULong?,
-  val groupKeyMulticastPolicy: UInt,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreGroupKeySetStruct {\n")
@@ -43,7 +42,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
     append("\tepochStartTime1 : $epochStartTime1\n")
     append("\tepochKey2 : $epochKey2\n")
     append("\tepochStartTime2 : $epochStartTime2\n")
-    append("\tgroupKeyMulticastPolicy : $groupKeyMulticastPolicy\n")
     append("}\n")
   }
 
@@ -82,7 +80,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
       } else {
         putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
       }
-      put(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY), groupKeyMulticastPolicy)
       endStructure()
     }
   }
@@ -96,7 +93,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
     private const val TAG_EPOCH_START_TIME1 = 5
     private const val TAG_EPOCH_KEY2 = 6
     private const val TAG_EPOCH_START_TIME2 = 7
-    private const val TAG_GROUP_KEY_MULTICAST_POLICY = 8
 
     fun fromTlv(
       tlvTag: Tag,
@@ -148,8 +144,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
           null
         }
-      val groupKeyMulticastPolicy =
-        tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY))
 
       tlvReader.exitContainer()
 
@@ -162,7 +156,6 @@ class JointFabricDatastoreClusterDatastoreGroupKeySetStruct(
         epochStartTime1,
         epochKey2,
         epochStartTime2,
-        groupKeyMulticastPolicy,
       )
     }
   }

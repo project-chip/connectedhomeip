@@ -136,7 +136,12 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    error = chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "PlatformMgr().ScheduleWork() failed: %" CHIP_ERROR_FORMAT, error.Format());
+        return;
+    }
 
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)

@@ -1,0 +1,10 @@
+## IDF component manager dependencies.
+##
+## The CoreS3 board support package drives the panel, its power rails and the
+## touch controller.  It is only meaningful on the ESP32-S3, so the rule below
+## keeps it out of every other board's dependency graph.
+dependencies:
+    espressif/m5stack_core_s3:
+        version: "^4.1"
+        rules:
+            - if: "target == esp32s3"

@@ -90,6 +90,8 @@ public:
                       OperationErrorEnum & err);
     bool ReadConfigValues();
 
+    void ActuatorMovementTimerEventHandler();
+
 private:
     friend BoltLockManager & BoltLockMgr(void);
     State_t mState;
@@ -101,7 +103,6 @@ private:
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     static BoltLockManager sLock;
 

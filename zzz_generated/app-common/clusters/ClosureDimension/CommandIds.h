@@ -13,7 +13,7 @@ namespace ClosureDimension {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 2;
+inline constexpr uint32_t kAcceptedCommandsCount = 4;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 0;
@@ -25,6 +25,14 @@ inline constexpr CommandId Id = 0x00000000;
 namespace Step {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Step
+
+namespace GroupedSetTarget {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace GroupedSetTarget
+
+namespace GroupedStep {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace GroupedStep
 
 } // namespace Commands
 } // namespace ClosureDimension

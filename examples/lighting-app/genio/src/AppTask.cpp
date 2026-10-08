@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -36,6 +37,7 @@
 
 #include <assert.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -111,6 +113,8 @@ chip::app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningIns
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
 
@@ -319,17 +323,23 @@ CHIP_ERROR AppTask::Init()
     MT793X_LOG("APP: Done WiFi Init");
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sWiFiNetworkCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif
+
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    error = chip::Server::GetInstance().Init(initParams);
+    SuccessOrExit(error);
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -365,6 +375,7 @@ CHIP_ERROR AppTask::Init()
     RegisterLightCommands();
 #endif
 
+exit:
     return error;
 }
 
@@ -538,11 +549,9 @@ void AppTask::OccupancyEventHandler(AppEvent * aEvent)
         return;
     }
 
-    uint8_t attributeValue = aEvent->OccupancytEvent.Present ? 1 : 0;
-
-    MT793X_LOG("Lighting occupancy: %u", attributeValue);
-
-    OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+    // OccupancySensing cluster is not present in the lighting-app data
+    // model; keep the shell command observable via the log only.
+    MT793X_LOG("Lighting occupancy: %u", aEvent->OccupancytEvent.Present);
 }
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)

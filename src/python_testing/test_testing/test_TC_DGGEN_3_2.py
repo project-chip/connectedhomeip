@@ -26,7 +26,7 @@ from matter.testing.runner import MockTestRunner
 
 
 @dataclass
-class TestSpec():
+class TestSpec:
     max_paths: int
     dmtest_feature_map: int
     expect_pass: bool

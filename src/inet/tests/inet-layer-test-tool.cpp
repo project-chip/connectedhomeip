@@ -178,7 +178,9 @@ static OptionSet *       sToolOptionSets[] =
 {
     &sToolOptions,
     &gNetworkOptions,
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
     &gFaultInjectionOptions,
+#endif  // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
     &sHelpOptions,
     nullptr
 };

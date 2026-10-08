@@ -18,7 +18,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import Dict, Optional
 
 import constants
 
@@ -48,7 +47,7 @@ class StatefulShell:
             print('Windows is currently not supported. Use Linux or MacOS platforms')
             exit(1)
 
-        self.env: Dict[str, str] = os.environ.copy()
+        self.env: dict[str, str] = os.environ.copy()
         self.cwd: str = self.env["PWD"]
 
     def print_env(self) -> None:
@@ -67,7 +66,7 @@ class StatefulShell:
         self, cmd: str, *,
         raise_on_returncode=True,
         return_cmd_output=False,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Runs a command and updates environment.
 
         Args:
@@ -159,3 +158,4 @@ class StatefulShell:
                     )
 
                 return output
+        return None

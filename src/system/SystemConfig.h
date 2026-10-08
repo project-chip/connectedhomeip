@@ -176,6 +176,19 @@
 #undef SUCCESS
 #endif
 #include <lwip/opt.h>
+
+// TODO: this is an awkward workaround for some platforms (AmebaD - platform_stdlib_rtl8721d)
+// defining false as 0, resulting in casting `inconsistent types/ bool and int` errors for
+// lambda argument deduction.
+//
+// Currently this happens as an inclusion of `lwip/opt.h`, so the undefine is added in this header
+#ifdef false
+#undef false
+#endif
+#ifdef true
+#undef true
+#endif
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /* Configuration option variables defined below */
@@ -837,7 +850,10 @@ struct LwIPEvent;
  * Individual systems may override this size based on their requirements.
  * Data transfers over MRP should not be using this size for allocating
  * buffers as they are restricted by the IPv6 MTU.
+ *
+ * This is set to 64000 bytes (spec-defined MAX_TCP_MESSAGE_SIZE) plus 4 bytes
+ * for the TCP framing message length prefix (kTCPFramingHeaderSize).
  */
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
-#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000)
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000 + 4)
 #endif

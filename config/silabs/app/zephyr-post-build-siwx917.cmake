@@ -1,0 +1,73 @@
+#
+#   Copyright (c) 2026 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# ==============================================================================
+# SiWx917: wrap the SoC-generated RPS (NWP / Security Bootloader) as Matter OTA.
+#
+# Depend on zephyr.bin (known CMake output); SoC post-build creates the RPS in
+# the same step, so it is present when ota_image_tool runs.
+# Do not use add_custom_command(TARGET zephyr_final) — that target is not
+# created in this CMakeLists directory.
+#
+# chip_ota_image() is not used here because its DEPENDS must be the RPS input,
+# which is not a primary CMake artifact; we depend on zephyr.bin instead.
+# ==============================================================================
+find_package(Python3 REQUIRED)
+
+set(ZEPHYR_OUTPUT_DIR ${PROJECT_BINARY_DIR}/zephyr)
+
+if(CONFIG_SIWX91X_SIGN_KEY OR CONFIG_SIWX91X_MIC_KEY)
+    set(SIWX_RPS_INPUT ${ZEPHYR_OUTPUT_DIR}/zephyr.signed.rps)
+else()
+    set(SIWX_RPS_INPUT ${ZEPHYR_OUTPUT_DIR}/zephyr.rps)
+endif()
+
+if(CONFIG_CHIP_OTA_IMAGE_BUILD)
+    set(SIWX_OTA_OUTPUT ${ZEPHYR_OUTPUT_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME})
+
+    if(DEFINED APPVERSION)
+        set(SIWX_OTA_ARGS
+            "--vendor-id" ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id" ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version" ${APPVERSION}
+            "--version-str" ${APP_VERSION_EXTENDED_STRING}
+            "--digest-algorithm" "sha256"
+        )
+    else()
+        set(SIWX_OTA_ARGS
+            "--vendor-id" ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id" ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION}
+            "--version-str" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}
+            "--digest-algorithm" "sha256"
+        )
+    endif()
+
+    separate_arguments(SIWX_OTA_EXTRA_ARGS NATIVE_COMMAND "${CONFIG_CHIP_OTA_IMAGE_EXTRA_ARGS}")
+    list(APPEND SIWX_OTA_ARGS ${SIWX_OTA_EXTRA_ARGS})
+    list(APPEND SIWX_OTA_ARGS ${SIWX_RPS_INPUT} ${SIWX_OTA_OUTPUT})
+    string(REPLACE ";" "\n" SIWX_OTA_ARGS_FILE "${SIWX_OTA_ARGS}")
+    file(GENERATE OUTPUT ${SIWX_OTA_OUTPUT}.args CONTENT ${SIWX_OTA_ARGS_FILE})
+
+    add_custom_command(
+        OUTPUT ${SIWX_OTA_OUTPUT}
+        COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${SIWX_OTA_OUTPUT}.args
+        DEPENDS ${ZEPHYR_OUTPUT_DIR}/zephyr.bin ${CHIP_ROOT}/src/app/ota_image_tool.py
+        COMMENT "Generating Matter OTA image from ${SIWX_RPS_INPUT}"
+        VERBATIM
+    )
+    add_custom_target(chip-ota-image ALL DEPENDS ${SIWX_OTA_OUTPUT})
+endif()

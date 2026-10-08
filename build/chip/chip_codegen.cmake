@@ -1,4 +1,4 @@
-# Run chip code generation. 
+# Run chip code generation.
 #
 # Example usage:
 #   chip_codegen("app"
@@ -138,7 +138,7 @@ endfunction()
 #                  suitable to be added within a build target
 #   ZCL_PATH     - [OPTIONAL] Path to a custom ZCL JSON file.
 #                  This maps to the '--zcl' argument in the "scripts/tools/zap/generate.py" script.
-#                  By default, generate.py attempts to autodetect the ZCL path from the .zap 
+#                  By default, generate.py attempts to autodetect the ZCL path from the .zap
 #                  file which is often a relative path. When the .zap file is relocated or symlinked,
 #                  these relative paths become invalid, causing the build to fail.
 #                  Passing ZCL_PATH explicitly via CMake ensures the build remains robust and portable.
@@ -167,33 +167,35 @@ function(chip_zapgen TARGET_NAME)
             CONTENT "${OUTPUT_AS_NEWLINES}"
         )
 
-
         set(OUT_NAMES)
         foreach(NAME IN LISTS ARG_OUTPUTS)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
-        if ("${ARG_GENERATOR}" STREQUAL "app-templates")
-            SET(TEMPLATE_PATH "${CHIP_ROOT}/src/app/zap-templates/app-templates.json")
-
-            # TODO: unclear how to maintain these: there is no parser that can figure
-            #       out links of template files and zap files and such
-            SET(EXTRA_DEPENDENCIES
-                "${CHIP_ROOT}/src/app/zap-templates/partials/header.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/access.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/endpoint_config.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/gen_config.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/im-cluster-command-handler.zapt"
-           )
-           SET(OUTPUT_SUBDIR "zap-generated")
-        else()
-            message(SEND_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
+        set(TEMPLATE_PATH "${CHIP_ROOT}/src/app/zap-templates/${ARG_GENERATOR}.json")
+        if (NOT EXISTS "${TEMPLATE_PATH}")
+            message(FATAL_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
         endif()
+
+        set(EXTRA_DEPENDENCIES "")
+
+        # Extract extra dependencies from the generator template.
+        file(READ "${TEMPLATE_PATH}" TEMPLATE_STRING)
+        foreach(key IN ITEMS "partials" "templates")
+            string(JSON ARRAY_LEN ERROR_VARIABLE JSON_ERR LENGTH "${TEMPLATE_STRING}" "${key}")
+            if (NOT JSON_ERR)
+                math(EXPR STOP_INDEX "${ARRAY_LEN} - 1")
+                foreach(i RANGE ${STOP_INDEX})
+                    string(JSON ITEM_PATH GET "${TEMPLATE_STRING}" "${key}" "${i}" "path")
+                    list(APPEND EXTRA_DEPENDENCIES "${CHIP_ROOT}/src/app/zap-templates/${ITEM_PATH}")
+                endforeach()
+            endif()
+        endforeach()
 
         set(ZAPGEN_ARGS
             "--no-prettify-output"
             "--templates" "${TEMPLATE_PATH}"
-            "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
+            "--output-dir" "${GEN_FOLDER}/zap-generated"
             "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
             "--parallel"
             "${ARG_INPUT}"

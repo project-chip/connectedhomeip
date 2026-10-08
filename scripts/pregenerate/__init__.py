@@ -16,13 +16,15 @@
 import fnmatch
 import logging
 import os
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Iterator, List, Optional
 
 from .type_definitions import IdlFileType, InputIdlFile
 from .using_codegen import (CodegenCppAppPregenerator, CodegenCppClustersTLVMetaPregenerator,
                             CodegenCppProtocolsTLVMetaPregenerator, CodegenJavaClassPregenerator, CodegenJavaJNIPregenerator)
 from .using_zap import ZapApplicationPregenerator
+
+log = logging.getLogger(__name__)
 
 
 def _IdlsInDirectory(top_directory_name: str, truncate_length: int):
@@ -38,7 +40,7 @@ def _IdlsInDirectory(top_directory_name: str, truncate_length: int):
                                    relative_path=os.path.join(root[truncate_length:], file))
 
 
-def _FindAllIdls(sdk_root: str, external_roots: Optional[List[str]]) -> Iterator[InputIdlFile]:
+def _FindAllIdls(sdk_root: str, external_roots: list[str] | None) -> Iterator[InputIdlFile]:
     relevant_subdirs = [
         'examples',  # all example apps
         'src',      # realistically only controller/data_model
@@ -51,7 +53,7 @@ def _FindAllIdls(sdk_root: str, external_roots: Optional[List[str]]) -> Iterator
     # first go over SDK items
     for subdir_name in relevant_subdirs:
         top_directory_name = os.path.join(sdk_root, subdir_name)
-        logging.debug(f"Searching {top_directory_name}")
+        log.debug("Searching '%s'", top_directory_name)
         for idl in _IdlsInDirectory(top_directory_name, sdk_root_length+1):
             yield idl
 
@@ -66,10 +68,10 @@ def _FindAllIdls(sdk_root: str, external_roots: Optional[List[str]]) -> Iterator
 @dataclass
 class TargetFilter:
     # If set, only the specified files are accepted for codegen
-    file_type: Optional[IdlFileType] = None
+    file_type: IdlFileType | None = None
 
     # If non-empty only the given paths will be code-generated
-    path_glob: List[str] = field(default_factory=list)
+    path_glob: list[str] = field(default_factory=list)
 
 
 # TODO: the build GlobMatcher is more complete by supporting `{}` grouping
@@ -82,7 +84,7 @@ class GlobMatcher:
         return fnmatch.fnmatch(s, self.pattern)
 
 
-def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]], filter: TargetFilter, runner):
+def FindPregenerationTargets(sdk_root: str, external_roots: list[str] | None, tgt_filter: TargetFilter, runner):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
@@ -102,17 +104,17 @@ def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]],
         ZapApplicationPregenerator(sdk_root),
     ]
 
-    path_matchers = [GlobMatcher(pattern) for pattern in filter.path_glob]
+    path_matchers = [GlobMatcher(pattern) for pattern in tgt_filter.path_glob]
 
     for idl in _FindAllIdls(sdk_root, external_roots):
-        if filter.file_type is not None:
-            if idl.file_type != filter.file_type:
-                logging.debug(f"Will not process file of type {idl.file_type}: {idl.relative_path}")
+        if tgt_filter.file_type is not None:
+            if idl.file_type != tgt_filter.file_type:
+                log.debug("Will not process file of type '%s': '%s'", idl.file_type, idl.relative_path)
                 continue
 
         if path_matchers:
             if all(not matcher.matches(idl.relative_path) for matcher in path_matchers):
-                logging.debug(f"Glob not matched for {idl.relative_path}")
+                log.debug("Glob not matched for '%s'", idl.relative_path)
                 continue
 
         for generator in generators:

@@ -82,10 +82,10 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         }
 
         char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(state->GetRotatingId(), state->GetRotatingIdLength(),
+                                                                     rotatingIdString, sizeof(rotatingIdString));
 
-        CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+        CharSpan rotatingIdSpan = CharSpan::fromCharString(rotatingIdString);
 
         static const size_t kSetupPinSize = 12;
         char setupPin[kSetupPinSize];
@@ -282,7 +282,7 @@ char * AppPlatformHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "remove-app-access") == 0)
     {
-        Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
+        TEMPORARY_RETURN_IGNORED Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
         strcpy(response, "removed app access");
 
         return response;
@@ -395,5 +395,12 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray string
         env->ReleaseStringUTFChars(string, argv[i]);
     }
 
-    return env->NewStringUTF(buf);
+    jstring result = nullptr;
+    CHIP_ERROR err =
+        JniReferences::GetInstance().CharToStringUTF(chip::CharSpan::fromCharString(buf), reinterpret_cast<jobject &>(result));
+    if (err != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+    return result;
 }

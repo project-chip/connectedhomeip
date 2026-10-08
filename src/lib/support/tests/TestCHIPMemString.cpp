@@ -27,7 +27,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
@@ -146,7 +146,7 @@ TEST_F(TestCHIPMemString, TestMemoryAllocString)
     MemoryFree(allocatedStr);
 }
 
-TEST_F(TestCHIPMemString, TestScopedBuffer)
+TEST_F(TestCHIPMemString, TestScopedMemoryBuffer)
 {
     // Scoped buffer has its own tests that check the memory properly. Here we are just testing that the string is copied in
     // properly.

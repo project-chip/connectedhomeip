@@ -26,10 +26,8 @@ class TestConfigParser:
     """
 
     def get_config(test_file: str):
-        config_options = {}
 
         yaml_loader = YamlLoader()
         _, _, _, config, _ = yaml_loader.load(test_file)
-        config_options = {key: value if not isinstance(
+        return {key: value if not isinstance(
             value, dict) else value['defaultValue'] for key, value in config.items()}
-        return config_options

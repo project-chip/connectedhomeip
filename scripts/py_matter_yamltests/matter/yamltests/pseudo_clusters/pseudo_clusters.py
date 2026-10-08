@@ -13,7 +13,6 @@
 #    limitations under the License.
 
 import inspect
-from typing import List
 
 from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
@@ -26,11 +25,11 @@ from .pseudo_cluster import PseudoCluster
 
 
 class PseudoClusters:
-    def __init__(self, clusters: List[PseudoCluster]):
+    def __init__(self, clusters: list[PseudoCluster]):
         self.clusters = clusters
 
     def supports(self, request) -> bool:
-        return False if self.__get_command(request) is None else True
+        return self.__get_command(request) is not None
 
     def is_manual_step(self, request):
         return ((request.cluster == LogCommands().name and
@@ -43,16 +42,22 @@ class PseudoClusters:
         for cluster in self.clusters:
             if request.cluster == cluster.name:
                 return cluster
+        return None
 
-    async def execute(self, request, definitions=None):
+    async def execute(self, request, definitions=None, **kwargs):
         status = {'error': 'FAILURE'}
 
         command = self.__get_command(request)
         if command:
-            if 'definitions' in inspect.signature(command).parameters:
-                status = await command(request, definitions)
-            else:
-                status = await command(request)
+            sig = inspect.signature(command)
+            call_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
+            # 'definitions' is a formal parameter of the execute method to maintain API
+            # compatibility, meaning it is not collected in **kwargs. We must check and
+            # inject it separately if the command signature expects it.
+            if 'definitions' in sig.parameters:
+                call_kwargs['definitions'] = definitions
+
+            status = await command(request, **call_kwargs)
 
             # If the command does not returns an error, it is considered a success.
             if status is None:

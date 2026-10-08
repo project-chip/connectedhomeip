@@ -35,6 +35,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kZone), zone);
+    encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
+    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     return encoder.Finalize();
 }
 
@@ -52,11 +54,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zone);
         }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
+        }
 
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CreateTwoDCartesianZone.
+} // namespace CreateTwoDCartesianZone
 namespace CreateTwoDCartesianZoneResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -84,7 +94,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CreateTwoDCartesianZoneResponse.
+} // namespace CreateTwoDCartesianZoneResponse
 namespace UpdateTwoDCartesianZone {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -92,6 +102,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kZoneID), zoneID);
     encoder.Encode(to_underlying(Fields::kZone), zone);
+    encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
+    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
     return encoder.Finalize();
 }
 
@@ -113,11 +125,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zone);
         }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
+        }
 
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace UpdateTwoDCartesianZone.
+} // namespace UpdateTwoDCartesianZone
 namespace RemoveZone {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -145,7 +165,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace RemoveZone.
+} // namespace RemoveZone
 namespace CreateOrUpdateTrigger {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -173,7 +193,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CreateOrUpdateTrigger.
+} // namespace CreateOrUpdateTrigger
 namespace RemoveTrigger {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -201,7 +221,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace RemoveTrigger.
+} // namespace RemoveTrigger
 } // namespace Commands
 } // namespace ZoneManagement
 } // namespace Clusters

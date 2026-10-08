@@ -18,7 +18,9 @@
 #pragma once
 
 #include <cctype>
-#include <nlassert.h>
+#include <cstdarg>
+#include <cstdio>
+#include <lib/support/Assertions.h>
 
 #include "BufferWriter.h"
 
@@ -30,7 +32,7 @@ class StringBuilderBase
 public:
     StringBuilderBase(char * buffer, size_t size) : mWriter(reinterpret_cast<uint8_t *>(buffer), size - 1)
     {
-        nlASSERT(size > 0);
+        VerifyOrDieWithoutLogging(size > 0);
         buffer[0] = 0; // make c-str work by default
     }
 
@@ -76,6 +78,9 @@ public:
 
     /// Write a formatted string to the stringbuilder
     StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3);
+
+    /// Write a formatted string to the stringbuilder using va_list
+    StringBuilderBase & AddFormatV(const char * format, va_list args) ENFORCE_FORMAT(2, 0);
 
     /// For strings we often want to know when they were truncated. If the underlying writer did
     /// not fit, this replaces the last 3 characters with "."

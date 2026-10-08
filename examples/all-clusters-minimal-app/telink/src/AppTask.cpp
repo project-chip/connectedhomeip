@@ -27,7 +27,7 @@ chip::app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedMod
 
 CHIP_ERROR AppTask::Init()
 {
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     // Configure Bindings
     CHIP_ERROR err = InitBindingHandlers();

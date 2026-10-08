@@ -81,15 +81,17 @@ using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChip
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
 using OnReportEndCallback               = void (*)(PyObject * appContext);
+using OnNotifySubscriptionStillActiveCallback = void (*)(PyObject * appContext);
 
-OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
-OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
-OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback = nullptr;
-OnResubscriptionAttemptedCallback gOnResubscriptionAttemptedCallback = nullptr;
-OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
-OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
-OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
-OnReportBeginCallback gOnReportEndCallback                           = nullptr;
+OnReadAttributeDataCallback gOnReadAttributeDataCallback                         = nullptr;
+OnReadEventDataCallback gOnReadEventDataCallback                                 = nullptr;
+OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback             = nullptr;
+OnResubscriptionAttemptedCallback gOnResubscriptionAttemptedCallback             = nullptr;
+OnReadErrorCallback gOnReadErrorCallback                                         = nullptr;
+OnReadDoneCallback gOnReadDoneCallback                                           = nullptr;
+OnReportBeginCallback gOnReportBeginCallback                                     = nullptr;
+OnReportBeginCallback gOnReportEndCallback                                       = nullptr;
+OnNotifySubscriptionStillActiveCallback gOnNotifySubscriptionStillActiveCallback = nullptr;
 
 void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
 {
@@ -230,6 +232,11 @@ public:
 
     void OnReportEnd() override { gOnReportEndCallback(mAppContext); }
 
+    void NotifySubscriptionStillActive(const ReadClient & apReadClient) override
+    {
+        gOnNotifySubscriptionStillActiveCallback(mAppContext);
+    }
+
     void OnDone(ReadClient *) override
     {
         gOnReadDoneCallback(mAppContext);
@@ -266,7 +273,11 @@ struct __attribute__((packed)) PyReadAttributeParams
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding);
+                                               bool forceLegacyListEncoding, bool suppressResponse);
+PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
+    void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, bool timedRequestFieldValue,
+    size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData,
+    size_t attributeDataLength);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -318,51 +329,12 @@ private:
 
 using namespace chip::python;
 
-extern "C" {
-void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCallback, OnWriteErrorCallback onWriteErrorCallback,
-                                      OnWriteDoneCallback onWriteDoneCallback)
-{
-    gOnWriteResponseCallback = onWriteResponseCallback;
-    gOnWriteErrorCallback    = onWriteErrorCallback;
-    gOnWriteDoneCallback     = onWriteDoneCallback;
-}
-
-void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
-                                     OnReadEventDataCallback onReadEventDataCallback,
-                                     OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
-                                     OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
-                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
-                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
-{
-    gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
-    gOnReadEventDataCallback           = onReadEventDataCallback;
-    gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
-    gOnResubscriptionAttemptedCallback = onResubscriptionAttemptedCallback;
-    gOnReadErrorCallback               = onReadErrorCallback;
-    gOnReadDoneCallback                = onReadDoneCallback;
-    gOnReportBeginCallback             = onReportBeginCallback;
-    gOnReportEndCallback               = onReportEndCallback;
-}
-
-PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
-                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
-                                               bool forceLegacyListEncoding)
+namespace {
+// Helper function to process write attributes data - reduces code duplication
+CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttributeData * writeAttributesData,
+                                      size_t attributeDataLength, bool forceLegacyListEncoding = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // The FFI from Python to C when calling a variadic function has issues when the regular, non-variadic, function
-    // arguments are unit16_t. As a result we pass these arguments as size_t and cast them to the expected uint16_t.
-    uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
-    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
-    uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
-
-    std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
-    std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
-        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
-        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
-
-    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {
@@ -381,13 +353,76 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
             dataVersion.SetValue(path.dataVersion);
         }
 
-        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
-                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
-
-        SuccessOrExit(err = client->PutPreencodedAttribute(
-                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                          reader, listEncodingOverride));
+        if (forceLegacyListEncoding)
+        {
+            auto listEncodingOverride = WriteClient::TestListEncodingOverride::kForceLegacyEncoding;
+            SuccessOrExit(err = client->PutPreencodedAttribute(
+                              chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                              reader, listEncodingOverride));
+        }
+        else
+        {
+            SuccessOrExit(
+                err = client->PutPreencodedAttribute(
+                    chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+        }
     }
+
+exit:
+    return err;
+}
+} // namespace
+
+extern "C" {
+void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCallback, OnWriteErrorCallback onWriteErrorCallback,
+                                      OnWriteDoneCallback onWriteDoneCallback)
+{
+    gOnWriteResponseCallback = onWriteResponseCallback;
+    gOnWriteErrorCallback    = onWriteErrorCallback;
+    gOnWriteDoneCallback     = onWriteDoneCallback;
+}
+
+void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
+                                     OnReadEventDataCallback onReadEventDataCallback,
+                                     OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
+                                     OnResubscriptionAttemptedCallback onResubscriptionAttemptedCallback,
+                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
+                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback,
+                                     OnNotifySubscriptionStillActiveCallback onNotifySubscriptionStillActiveCallback)
+{
+    gOnReadAttributeDataCallback             = onReadAttributeDataCallback;
+    gOnReadEventDataCallback                 = onReadEventDataCallback;
+    gOnSubscriptionEstablishedCallback       = onSubscriptionEstablishedCallback;
+    gOnResubscriptionAttemptedCallback       = onResubscriptionAttemptedCallback;
+    gOnReadErrorCallback                     = onReadErrorCallback;
+    gOnReadDoneCallback                      = onReadDoneCallback;
+    gOnReportBeginCallback                   = onReportBeginCallback;
+    gOnReportEndCallback                     = onReportEndCallback;
+    gOnNotifySubscriptionStillActiveCallback = onNotifySubscriptionStillActiveCallback;
+}
+
+PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
+                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
+                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding, bool suppressResponse)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // The FFI from Python to C when calling a variadic function has issues when the regular, non-variadic, function
+    // arguments are unit16_t. As a result we pass these arguments as size_t and cast them to the expected uint16_t.
+    uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
+    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
+
+    std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
+    std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), suppressResponse);
+
+    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    SuccessOrExit(err =
+                      ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
                                                  interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
@@ -403,6 +438,53 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
 exit:
     return ToPyChipError(err);
+}
+
+PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequestField(
+    void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT, bool timedRequestFieldValue,
+    size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData,
+    size_t attributeDataLength)
+{
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
+    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
+
+    std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
+
+    // Use the TestOnly constructor that allows decoupling the Timed Request action from the TimedRequest field value.
+    // This allows testing mismatched scenarios:
+    // - timedWriteTimeoutMs = 0, timedRequestFieldValue = true:  No action, but field=true (TIMED_REQUEST_MISMATCH)
+    // - timedWriteTimeoutMs > 0, timedRequestFieldValue = false: Action sent, but field=false (TIMED_REQUEST_MISMATCH)
+    std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
+        timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing(), timedRequestFieldValue,
+        WriteClient::TestOnlyOverrideTimedRequestFieldTag{});
+
+    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
+
+    // Send WriteRequest - will trigger TIMED_REQUEST_MISMATCH if action and field don't match
+    SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
+                                                 interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
+                                                                           : System::Clock::kZero));
+
+    client.release();
+    callback.release();
+
+    if (busyWaitMs)
+    {
+        usleep(busyWaitMs * 1000);
+    }
+
+exit:
+    return ToPyChipError(err);
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
 }
 
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,

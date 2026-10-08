@@ -58,9 +58,12 @@ public:
     void Add(T * pResponse)
     {
         size_t tempCount = itemCount + 1;
-        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
-        if (mpScanResponse)
+        // Keep the results gathered so far if the reallocation fails: assigning the result straight to
+        // mpScanResponse would drop them while itemCount still counts them.
+        T * newScanResponse = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
+        if (newScanResponse)
         {
+            mpScanResponse = newScanResponse;
             // first item at index. update after the copy.
             memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
             itemCount = tempCount;
@@ -91,14 +94,6 @@ public:
         bool mExhausted = false;
     };
 
-    struct WiFiNetwork
-    {
-        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen = 0;
-        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
-        uint8_t credentialsLen = 0;
-    };
-
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
@@ -122,7 +117,6 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
     uint32_t GetSupportedWiFiBandsMask() const override;
 
     void OnConnectWiFiNetwork();
@@ -130,13 +124,13 @@ public:
     static SlWiFiDriver * GetInstance() { return mDriver; }
 
 private:
-    bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
+    bool NetworkMatch(const Silabs::WifiInterface::WiFiCredentials & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
-    static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
+    static void OnScanWiFiNetworkDone(NetworkCommissioning::WiFiScanResponse * aScanResult);
 
     static SlWiFiDriver * mDriver;
-    WiFiNetwork mSavedNetwork   = {};
-    WiFiNetwork mStagingNetwork = {};
+    Silabs::WifiInterface::WiFiCredentials mSavedNetwork   = {};
+    Silabs::WifiInterface::WiFiCredentials mStagingNetwork = {};
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;

@@ -22,7 +22,6 @@
 #      This file is utility for Chip BLE
 #
 
-from __future__ import absolute_import, print_function
 
 from ctypes import Structure, c_bool, c_int32, c_uint16, c_void_p
 
@@ -46,9 +45,9 @@ FAKE_CONN_OBJ_VALUE = 12121212
 SERVICE_DATA_LEN = 8
 
 
-def VoidPtrToUUIDString(ptr, len):
+def VoidPtrToUUIDString(ptr, length):
     try:
-        ptr = ChipUtility.VoidPtrToByteArray(ptr, len)
+        ptr = ChipUtility.VoidPtrToByteArray(ptr, length)
         ptr = ChipUtility.Hexlify(ptr)
         ptr = (
             ptr[:8]
@@ -88,18 +87,15 @@ class BleTxEvent:
         self.Status = status
 
     def Print(self, prefix=""):
-        print(
-            "%sBleEvent Type: %s"
-            % (prefix, ("TX" if self.EventType == BLE_EVENT_TYPE_TX else "ERROR"))
-        )
-        print("%sStatus: %s" % (prefix, str(self.Status)))
+        print("{}BleEvent Type: {}".format(prefix, ("TX" if self.EventType == BLE_EVENT_TYPE_TX else "ERROR")))
+        print(f"{prefix}Status: {str(self.Status)}")
 
         if self.SvcId:
-            print("%sSvcId:" % (prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("%sCharId:" % (prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):
@@ -123,11 +119,8 @@ class BleDisconnectEvent:
         self.Error = error
 
     def Print(self, prefix=""):
-        print(
-            "%sBleEvent Type: %s"
-            % (prefix, ("DC" if self.EventType == BLE_EVENT_TYPE_DISCONNECT else "ERROR"))
-        )
-        print("%sError: %s" % (prefix, str(self.Error)))
+        print("{}BleEvent Type: {}".format(prefix, ("DC" if self.EventType == BLE_EVENT_TYPE_DISCONNECT else "ERROR")))
+        print(f"{prefix}Error: {str(self.Error)}")
 
     def SetField(self, name, val):
         name = name.lower()
@@ -148,20 +141,17 @@ class BleRxEvent:
         self.Buffer = buffer
 
     def Print(self, prefix=""):
-        print(
-            "%sBleEvent Type: %s"
-            % (prefix, ("RX" if self.EventType == BLE_EVENT_TYPE_RX else "ERROR"))
-        )
+        print("{}BleEvent Type: {}".format(prefix, ("RX" if self.EventType == BLE_EVENT_TYPE_RX else "ERROR")))
         if self.Buffer:
-            print("%sBuffer:" % (prefix))
+            print(f"{prefix}Buffer:")
             print(ChipUtility.Hexlify(self.Buffer))
 
         if self.SvcId:
-            print("%sSvcId:" % (prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("%sCharId:" % (prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):
@@ -195,17 +185,15 @@ class BleSubscribeEvent:
 
     def Print(self, prefix=""):
         print(
-            "%sBleEvent Type: %s"
-            % (
+            "{}BleEvent Type: {}".format(
                 prefix,
                 ("SUBSCRIBE" if self.EventType ==
                  BLE_EVENT_TYPE_SUBSCRIBE else "ERROR"),
             )
         )
-        print("%sStatus: %s" % (prefix, str(self.Status)))
+        print(f"{prefix}Status: {str(self.Status)}")
         print(
-            "%sOperation: %s"
-            % (
+            "{}Operation: {}".format(
                 prefix,
                 (
                     "UNSUBSCRIBE"
@@ -216,11 +204,11 @@ class BleSubscribeEvent:
         )
 
         if self.SvcId:
-            print("%sSvcId:" % (prefix))
+            print(f"{prefix}SvcId:")
             print(ChipUtility.Hexlify(self.SvcId))
 
         if self.CharId:
-            print("%sCharId:" % (prefix))
+            print(f"{prefix}CharId:")
             print(ChipUtility.Hexlify(self.CharId))
 
     def SetField(self, name, val):

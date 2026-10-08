@@ -37,16 +37,14 @@ class ExampleMicrowaveOvenModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(ModeTag::kNormal) } };
-    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(ModeTag::kDefrost) } };
+    ModeTagStructType modeTagsNormal[1]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kDefrost) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
-                                                 .mode     = ModeDefrost,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Defrost"_span, .mode = ModeDefrost, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
     };
 
     CHIP_ERROR Init() override;

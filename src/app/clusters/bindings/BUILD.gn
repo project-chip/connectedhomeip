@@ -30,8 +30,8 @@ source_set("binding-manager") {
 
 source_set("bindings") {
   sources = [
-    "binding-cluster.cpp",
-    "binding-cluster.h",
+    "BindingCluster.cpp",
+    "BindingCluster.h",
   ]
 
   public_deps = [

@@ -81,7 +81,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AudioStreamAllocate.
+} // namespace AudioStreamAllocate
 namespace AudioStreamAllocateResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -109,7 +109,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AudioStreamAllocateResponse.
+} // namespace AudioStreamAllocateResponse
 namespace AudioStreamDeallocate {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -137,7 +137,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace AudioStreamDeallocate.
+} // namespace AudioStreamDeallocate
 namespace VideoStreamAllocate {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -215,7 +215,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace VideoStreamAllocate.
+} // namespace VideoStreamAllocate
 namespace VideoStreamAllocateResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -243,7 +243,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace VideoStreamAllocateResponse.
+} // namespace VideoStreamAllocateResponse
 namespace VideoStreamModify {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -281,7 +281,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace VideoStreamModify.
+} // namespace VideoStreamModify
 namespace VideoStreamDeallocate {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -309,7 +309,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace VideoStreamDeallocate.
+} // namespace VideoStreamDeallocate
 namespace SnapshotStreamAllocate {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -367,7 +367,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SnapshotStreamAllocate.
+} // namespace SnapshotStreamAllocate
 namespace SnapshotStreamAllocateResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -395,7 +395,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SnapshotStreamAllocateResponse.
+} // namespace SnapshotStreamAllocateResponse
 namespace SnapshotStreamModify {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -433,7 +433,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SnapshotStreamModify.
+} // namespace SnapshotStreamModify
 namespace SnapshotStreamDeallocate {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -461,7 +461,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SnapshotStreamDeallocate.
+} // namespace SnapshotStreamDeallocate
 namespace SetStreamPriorities {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -489,7 +489,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetStreamPriorities.
+} // namespace SetStreamPriorities
 namespace CaptureSnapshot {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -522,7 +522,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CaptureSnapshot.
+} // namespace CaptureSnapshot
 namespace CaptureSnapshotResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -560,7 +560,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace CaptureSnapshotResponse.
+} // namespace CaptureSnapshotResponse
 } // namespace Commands
 } // namespace CameraAvStreamManagement
 } // namespace Clusters

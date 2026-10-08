@@ -388,17 +388,11 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_WEEK_DAY_INDEX)) {
         weekDayIndex_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
         userIndex_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_STATUS)) {
+      } else if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DAYS_MASK)) {
+      } else if (tag == ContextSpecificTag(TAG_DAYS_MASK)) {
         daysMask_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -410,9 +404,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_START_HOUR)) {
+      } else if (tag == ContextSpecificTag(TAG_START_HOUR)) {
         startHour_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -424,9 +416,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_START_MINUTE)) {
+      } else if (tag == ContextSpecificTag(TAG_START_MINUTE)) {
         startMinute_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -438,9 +428,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_END_HOUR)) {
+      } else if (tag == ContextSpecificTag(TAG_END_HOUR)) {
         endHour_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -452,9 +440,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_END_MINUTE)) {
+      } else if (tag == ContextSpecificTag(TAG_END_MINUTE)) {
         endMinute_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -610,17 +596,11 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_YEAR_DAY_INDEX)) {
         yearDayIndex_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
         userIndex_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_STATUS)) {
+      } else if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
         localStartTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -632,9 +612,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
         localEndTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -783,13 +761,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_HOLIDAY_INDEX)) {
         holidayIndex_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_STATUS)) {
+      } else if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
         localStartTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -801,9 +775,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
+      } else if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
         localEndTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -815,9 +787,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPERATING_MODE)) {
+      } else if (tag == ContextSpecificTag(TAG_OPERATING_MODE)) {
         operatingMode_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -981,9 +951,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
         userIndex_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_NAME)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_NAME)) {
         userName_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -996,9 +964,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_UNIQUE_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_UNIQUE_ID)) {
         userUniqueID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1011,9 +977,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
         userStatus_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1026,9 +990,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
         userType_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1041,9 +1003,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CREDENTIAL_RULE)) {
+      } else if (tag == ContextSpecificTag(TAG_CREDENTIAL_RULE)) {
         credentialRule_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1056,9 +1016,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CREDENTIALS)) {
+      } else if (tag == ContextSpecificTag(TAG_CREDENTIALS)) {
         credentials_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1077,9 +1035,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
         creatorFabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1092,9 +1048,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
         lastModifiedFabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1107,9 +1061,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NEXT_USER_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NEXT_USER_INDEX)) {
         nextUserIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1227,9 +1179,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
         userIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1242,9 +1192,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
         nextCredentialIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1319,9 +1267,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
       if (tag == ContextSpecificTag(TAG_CREDENTIAL_EXISTS)) {
         credentialExists_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
         userIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1334,9 +1280,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
         creatorFabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1349,9 +1293,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
         lastModifiedFabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1364,9 +1306,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
         nextCredentialIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1379,9 +1319,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_CREDENTIAL_DATA)) {
+      } else if (tag == ContextSpecificTag(TAG_CREDENTIAL_DATA)) {
         credentialData_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

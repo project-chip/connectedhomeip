@@ -24,7 +24,7 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
-#if !CHIP_DEVICE_LAYER_TARGET_BL616
+#if !CHIP_DEVICE_LAYER_TARGET_BFLB
 #include <stdio.h>
 #include <string.h>
 #include <uart.h>
@@ -33,7 +33,7 @@
 namespace chip {
 namespace Shell {
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 namespace {
 int streamer_bouffalo_sdk_init(streamer_t * streamer)
 {

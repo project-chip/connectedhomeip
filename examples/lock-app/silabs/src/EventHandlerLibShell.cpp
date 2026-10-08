@@ -16,6 +16,7 @@
  */
 
 #include "EventHandlerLibShell.h"
+#include "AppConfig.h"
 #include "AppTask.h"
 #include "lib/shell/Engine.h"
 #include "lib/shell/commands/Help.h"
@@ -23,8 +24,6 @@
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CodeUtils.h>
-
-constexpr uint8_t lockEndpoint = 1;
 
 using namespace chip;
 using namespace chip::app;
@@ -106,9 +105,7 @@ CHIP_ERROR AlarmEventHandler(int argc, char ** argv)
     data->eventId         = Events::DoorLockAlarm::Id;
     data->alarmCode       = static_cast<AlarmCodeEnum>(atoi(argv[0]));
 
-    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /********************************************************
@@ -138,9 +135,7 @@ CHIP_ERROR DoorStateEventHandler(int argc, char ** argv)
     data->eventId             = Events::DoorStateChange::Id;
     data->doorState           = static_cast<DoorStateEnum>(atoi(argv[0]));
 
-    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /**
@@ -194,13 +189,13 @@ void EventWorkerFunction(intptr_t context)
     {
     case Events::DoorLockAlarm::Id: {
         AlarmEventData * alarmData = reinterpret_cast<AlarmEventData *>(context);
-        DoorLockServer::Instance().SendLockAlarmEvent(lockEndpoint, alarmData->alarmCode);
+        DoorLockServer::Instance().SendLockAlarmEvent(LOCK_ENDPOINT, alarmData->alarmCode);
         break;
     }
 
     case Events::DoorStateChange::Id: {
         DoorStateEventData * doorStateData = reinterpret_cast<DoorStateEventData *>(context);
-        DoorLockServer::Instance().SetDoorState(lockEndpoint, doorStateData->doorState);
+        DoorLockServer::Instance().SetDoorState(LOCK_ENDPOINT, doorStateData->doorState);
         break;
     }
 

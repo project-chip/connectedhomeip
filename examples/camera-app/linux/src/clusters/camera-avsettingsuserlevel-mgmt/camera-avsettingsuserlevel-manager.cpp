@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -288,18 +287,6 @@ Status CameraAVSettingsUserLevelManager::DPTZRelativeMove(uint16_t aVideoStreamI
 
     ChipLogError(Camera, "CameraApp: DPTZRelativeMove with no matching video stream ID.");
     return Status::NotFound;
-}
-
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers)
-{
-    mptzPresetHelpers.clear();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
-{
-    dptzStreams.clear();
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback()

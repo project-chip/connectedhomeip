@@ -84,8 +84,8 @@ uint8_t sSecondsSinceUpdate    = 0;
 CHIP_ERROR ElectricalEnergyMeasurementInstance::Init()
 {
     // Initialize attributes
-    SetMeasurementAccuracy(mEndpointId, kAccuracy);
-    SetCumulativeReset(mEndpointId, MakeOptional(kResetStruct));
+    TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(mEndpointId, kAccuracy);
+    TEMPORARY_RETURN_IGNORED SetCumulativeReset(mEndpointId, MakeOptional(kResetStruct));
 
     // Assign class attributes to instantiated global variables
     // for the access to TimerEventHandler

@@ -106,7 +106,7 @@ class SetupPayload:
     def generate_qrcode(self):
         data = qrcode_format.build(self.qrcode_dict())
         b38_encoded = Base38.encode(data[::-1])  # reversing
-        return 'MT:{}'.format(b38_encoded)
+        return f'MT:{b38_encoded}'
 
     def generate_manualcode(self):
         CHUNK1_START = 0
@@ -116,17 +116,17 @@ class SetupPayload:
         CHUNK3_START = CHUNK2_START + CHUNK2_LEN
         CHUNK3_LEN = 13
 
-        bytes = manualcode_format.build(self.manualcode_dict())
+        data = manualcode_format.build(self.manualcode_dict())
         bits = bitarray()
-        bits.frombytes(bytes)
+        bits.frombytes(data)
 
         chunk1 = str(int(bits[CHUNK1_START:CHUNK1_START + CHUNK1_LEN].to01(), 2)).zfill(1)
         chunk2 = str(int(bits[CHUNK2_START:CHUNK2_START + CHUNK2_LEN].to01(), 2)).zfill(5)
         chunk3 = str(int(bits[CHUNK3_START:CHUNK3_START + CHUNK3_LEN].to01(), 2)).zfill(4)
         chunk4 = str(self.vid).zfill(5) if self.flow != CommissioningFlow.Standard else ''
         chunk5 = str(self.pid).zfill(5) if self.flow != CommissioningFlow.Standard else ''
-        payload = '{}{}{}{}{}'.format(chunk1, chunk2, chunk3, chunk4, chunk5)
-        return '{}{}'.format(payload, calc_check_digit(payload))
+        payload = f'{chunk1}{chunk2}{chunk3}{chunk4}{chunk5}'
+        return f'{payload}{calc_check_digit(payload)}'
 
     @staticmethod
     def from_container(container, is_qrcode):
@@ -187,8 +187,7 @@ class SetupPayload:
     def parse(payload):
         if payload.startswith('MT:'):
             return SetupPayload.parse_qrcode(payload)
-        else:
-            return SetupPayload.parse_manualcode(payload)
+        return SetupPayload.parse_manualcode(payload)
 
 
 @click.group()
@@ -212,8 +211,8 @@ def parse(payload):
 @click.option('--commissioning-flow', '-cf', type=click.IntRange(0, 2), default=0, help='Commissioning flow, 0:Standard, 1:User-Intent, 2:Custom')
 def generate(passcode, discriminator, vendor_id, product_id, discovery_cap_bitmask, commissioning_flow):
     payload = SetupPayload(discriminator, passcode, discovery_cap_bitmask, commissioning_flow, vendor_id, product_id)
-    print("Manualcode : {}".format(payload.generate_manualcode()))
-    print("QRCode     : {}".format(payload.generate_qrcode()))
+    print(f"Manualcode : {payload.generate_manualcode()}")
+    print(f"QRCode     : {payload.generate_qrcode()}")
 
 
 if __name__ == '__main__':

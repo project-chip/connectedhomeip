@@ -330,7 +330,7 @@ class JointFabricDatastoreCluster(
     groupKeySetID: UShort?,
     groupCAT: UShort?,
     groupCATVersion: UShort?,
-    groupPermission: UByte,
+    groupPermission: UByte?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 4u
@@ -358,7 +358,9 @@ class JointFabricDatastoreCluster(
     }
 
     val TAG_GROUP_PERMISSION_REQ: Int = 5
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_PERMISSION_REQ), groupPermission)
+    groupPermission?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_GROUP_PERMISSION_REQ), groupPermission)
+    }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -430,7 +432,7 @@ class JointFabricDatastoreCluster(
   }
 
   suspend fun updateAdmin(
-    nodeID: ULong?,
+    nodeID: ULong,
     friendlyName: String?,
     icac: ByteArray?,
     timedInvokeTimeout: Duration? = null,
@@ -441,7 +443,7 @@ class JointFabricDatastoreCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_NODE_ID_REQ: Int = 0
-    nodeID?.let { tlvWriter.put(ContextSpecificTag(TAG_NODE_ID_REQ), nodeID) }
+    tlvWriter.put(ContextSpecificTag(TAG_NODE_ID_REQ), nodeID)
 
     val TAG_FRIENDLY_NAME_REQ: Int = 1
     friendlyName?.let { tlvWriter.put(ContextSpecificTag(TAG_FRIENDLY_NAME_REQ), friendlyName) }

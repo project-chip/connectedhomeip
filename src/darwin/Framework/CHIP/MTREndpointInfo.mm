@@ -212,7 +212,7 @@ static NSString * const sChildrenCodingKey = @"ch";
     using namespace Descriptor::Attributes;
 
     NSMutableDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [[NSMutableDictionary alloc] init];
-    cache->ForEachAttribute(Descriptor::Id, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+    TEMPORARY_RETURN_IGNORED cache->ForEachAttribute(Descriptor::Id, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
         VerifyOrReturnError(path.mAttributeId == DeviceTypeList::Id, CHIP_NO_ERROR);
 
         CHIP_ERROR err = CHIP_NO_ERROR;

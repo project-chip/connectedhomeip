@@ -67,7 +67,7 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
 }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-CharSpan SpanEndpoint::EndpointUniqueId() const
+CharSpan SpanEndpoint::EndpointUniqueID() const
 {
     return mEndpointUniqueId;
 }

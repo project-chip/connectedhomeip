@@ -112,7 +112,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(Controller, "JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/devicecontroller/ChipDeviceController");
@@ -165,7 +165,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     // If the IO thread has not been stopped yet, shut it down now.
     // TODO(arkq): Maybe we should just assert here, as the IO thread
     //             should be stopped before the library is unloaded.
-    StopIOThread();
+    TEMPORARY_RETURN_IGNORED StopIOThread();
 
     sJVM = nullptr;
 
@@ -513,8 +513,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
         chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
         bool shouldWaitAfterDeviceAttestation = false;
         jclass deviceAttestationDelegateCls   = nullptr;
-        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                      deviceAttestationDelegateCls);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetLocalClassRef(
+            env, "chip/devicecontroller/DeviceAttestationDelegate", deviceAttestationDelegateCls);
         VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
         if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
@@ -635,8 +635,16 @@ JNI_METHOD(void, commissionDevice)
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -689,7 +697,7 @@ static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, c
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
-    wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    TEMPORARY_RETURN_IGNORED wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
 
     if (csrNonce != nullptr)
     {
@@ -697,8 +705,21 @@ static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, c
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed. %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -767,8 +788,21 @@ JNI_METHOD(void, pairDeviceWithAddress)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed: %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -816,11 +850,24 @@ JNI_METHOD(void, pairDeviceWithCode)
 
     if (networkCredentials != nullptr)
     {
-        wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+        TEMPORARY_RETURN_IGNORED wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed: %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -999,6 +1046,48 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     }
 }
 
+JNI_METHOD(void, setThreadCredentialsNeededListener)
+(JNIEnv * env, jobject self, jlong handle, jobject listener)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = wrapper->SetThreadCredentialsNeededListener(listener);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set ThreadCredentialsNeeded listener: %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+}
+
+JNI_METHOD(void, setWiFiCredentialsNeededListener)
+(JNIEnv * env, jobject self, jlong handle, jobject listener)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = wrapper->SetWiFiCredentialsNeededListener(listener);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set WiFiCredentialsNeeded Listener. : %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+}
+
 JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
 (JNIEnv * env, jobject self, jlong handle, jobject icdRegistrationInfo)
 {
@@ -1092,7 +1181,7 @@ JNI_METHOD(jbyteArray, createRootCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(jKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(jKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
 
@@ -1155,7 +1244,7 @@ JNI_METHOD(jbyteArray, createIntermediateCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(rootKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(rootKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
 
@@ -1221,13 +1310,13 @@ JNI_METHOD(jbyteArray, createOperationalCertificate)
     if (caseAuthenticatedTags != nullptr)
     {
         jint size;
-        JniReferences::GetInstance().GetListSize(caseAuthenticatedTags, size);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetListSize(caseAuthenticatedTags, size);
         VerifyOrExit(static_cast<size_t>(size) <= chip::kMaxSubjectCATAttributeCount, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         for (jint i = 0; i < size; i++)
         {
             jobject cat = nullptr;
-            JniReferences::GetInstance().GetListItem(caseAuthenticatedTags, i, cat);
+            TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetListItem(caseAuthenticatedTags, i, cat);
             VerifyOrExit(cat != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
             cats.values[i] = static_cast<uint32_t>(JniReferences::GetInstance().IntegerToPrimitive(cat));
         }
@@ -1235,7 +1324,7 @@ JNI_METHOD(jbyteArray, createOperationalCertificate)
 
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
 
-    keypair.SetDelegate(signingKeypair);
+    TEMPORARY_RETURN_IGNORED keypair.SetDelegate(signingKeypair);
     err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
     SuccessOrExit(err);
     {
@@ -1509,22 +1598,20 @@ JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong hand
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupInfoIterator::AutoReleasing it(
+        groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex()));
 
     jobject groupIds;
     err = chip::JniReferences::GetInstance().CreateArrayList(groupIds);
 
     chip::Credentials::GroupDataProvider::GroupInfo group;
 
-    if (it)
+    while (it.Next(group))
     {
-        while (it->Next(group))
-        {
-            jobject jGroupId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                       static_cast<jint>(group.group_id), jGroupId);
-            chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
-        }
+        jobject jGroupId;
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(group.group_id), jGroupId);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
     }
 
     return groupIds;
@@ -1538,19 +1625,17 @@ JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupInfoIterator::AutoReleasing it(
+        groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex()));
 
     GroupId groupId = static_cast<GroupId>(jGroupId);
     chip::Credentials::GroupDataProvider::GroupInfo group;
 
-    if (it)
+    while (it.Next(group))
     {
-        while (it->Next(group))
+        if (group.group_id == groupId)
         {
-            if (group.group_id == groupId)
-            {
-                return env->NewStringUTF(group.name);
-            }
+            return env->NewStringUTF(group.name);
         }
     }
 
@@ -1565,28 +1650,24 @@ JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
+        groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
-    GroupId groupId = static_cast<GroupId>(jGroupId);
-    jobject wrapperKeyId;
+    GroupId groupId      = static_cast<GroupId>(jGroupId);
+    jobject wrapperKeyId = nullptr;
 
-    if (iter)
+    while (iter.Next(groupKey))
     {
-        while (iter->Next(groupKey))
+        if (groupKey.group_id == groupId)
         {
-            if (groupKey.group_id == groupId)
-            {
-                jobject jKeyId;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                           static_cast<jint>(groupKey.keyset_id), jKeyId);
-                chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
-                iter->Release();
-                return wrapperKeyId;
-            }
+            jobject jKeyId;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(groupKey.keyset_id), jKeyId);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
+            return wrapperKeyId;
         }
-        iter->Release();
     }
-    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
     return wrapperKeyId;
 }
 
@@ -1631,23 +1712,19 @@ JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
 
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::KeySetIterator::AutoReleasing it(groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex()));
 
     jobject keySetIds;
     err = chip::JniReferences::GetInstance().CreateArrayList(keySetIds);
 
     chip::Credentials::GroupDataProvider::KeySet keySet;
 
-    if (it)
+    while (it.Next(keySet))
     {
-        while (it->Next(keySet))
-        {
-            jobject jKeySetId;
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                       static_cast<jint>(keySet.keyset_id), jKeySetId);
-            chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
-        }
-        it->Release();
+        jobject jKeySetId;
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(keySet.keyset_id), jKeySetId);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
     }
 
     return keySetIds;
@@ -1661,30 +1738,25 @@ JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong hand
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+    GroupDataProvider::KeySetIterator::AutoReleasing it(groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex()));
 
     chip::Credentials::GroupDataProvider::KeySet keySet;
 
-    uint16_t keySetId = static_cast<uint16_t>(jKeySetId);
-    jobject wrapperKeyPolicy;
-
-    if (it)
+    uint16_t keySetId        = static_cast<uint16_t>(jKeySetId);
+    jobject wrapperKeyPolicy = nullptr;
+    while (it.Next(keySet))
     {
-        while (it->Next(keySet))
+        if (keySet.keyset_id == keySetId)
         {
-            if (keySet.keyset_id == keySetId)
-            {
-                jobject jKeyPolicy;
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
-                                                                           static_cast<jint>(keySet.policy), jKeyPolicy);
-                chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
-                it->Release();
-                return wrapperKeyPolicy;
-            }
+            jobject jKeyPolicy;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(keySet.policy), jKeyPolicy);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
+            return wrapperKeyPolicy;
         }
-        it->Release();
     }
-    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
+
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
     return wrapperKeyPolicy;
 }
 
@@ -1696,10 +1768,16 @@ JNI_METHOD(jboolean, bindKeySet)(JNIEnv * env, jobject self, jlong handle, jint 
     VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
 
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter            = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t current_count = iter->Count();
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
+        groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
 
-    iter->Release();
+    if (!iter.IsValid())
+    {
+        return JNI_FALSE;
+    }
+
+    size_t current_count = iter.Count();
+
     CHIP_ERROR err = groupDataProvider->SetGroupKeyAt(
         wrapper->Controller()->GetFabricIndex(), current_count,
         chip::Credentials::GroupDataProvider::GroupKey(static_cast<uint16_t>(jGroupId), static_cast<uint16_t>(jKeySetId)));
@@ -1715,14 +1793,19 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
 
     size_t index                                             = 0;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
-    auto iter       = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
-    size_t maxCount = iter->Count();
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
+        groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
+    if (!iter.IsValid())
+    {
+        return JNI_FALSE;
+    }
+    size_t maxCount = iter.Count();
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
 
     GroupId groupId   = static_cast<GroupId>(jGroupId);
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
 
-    while (iter->Next(groupKey))
+    while (iter.Next(groupKey))
     {
         if (groupKey.group_id == groupId && groupKey.keyset_id == keysetId)
         {
@@ -1730,7 +1813,6 @@ JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jin
         }
         index++;
     }
-    iter->Release();
     if (index >= maxCount)
     {
         return JNI_FALSE;
@@ -1758,8 +1840,7 @@ JNI_METHOD(jboolean, addKeySet)
         static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
     chip::JniByteArray jniEpochKey(env, epochKey);
     size_t epochKeySize = static_cast<size_t>(jniEpochKey.size());
-    if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
-         keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
+    if (keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst ||
         epochKeySize != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
     {
         return JNI_FALSE;
@@ -1788,33 +1869,35 @@ JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jin
     CHIP_ERROR err                                           = CHIP_NO_ERROR;
     chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
-    size_t index      = 0;
-    auto iter         = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t index = 0;
+
+    GroupDataProvider::GroupKeyIterator::AutoReleasing iter(
+        groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex()));
     uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
     chip::Credentials::GroupDataProvider::GroupKey groupKey;
-    if (iter)
+    if (!iter.IsValid())
     {
-        while (iter->Next(groupKey))
-        {
-            if (groupKey.keyset_id == keysetId)
-            {
-                err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
-                if (err != CHIP_NO_ERROR)
-                {
-                    break;
-                }
-            }
-            index++;
-        }
-        iter->Release();
-        if (err == CHIP_NO_ERROR)
-        {
-            err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
-        }
-        return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+        return JNI_FALSE;
     }
 
-    return JNI_FALSE;
+    while (iter.Next(groupKey))
+    {
+        if (groupKey.keyset_id == keysetId)
+        {
+            err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
+        }
+        index++;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
+    }
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
 }
 
 JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
@@ -2157,7 +2240,7 @@ JNI_METHOD(void, shutdownCommissioning)
     chip::DeviceLayer::StackLock lock;
 
     // Stop the IO thread, so that the controller can be safely shut down.
-    StopIOThread();
+    TEMPORARY_RETURN_IGNORED StopIOThread();
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     wrapper->Shutdown();
@@ -2271,8 +2354,8 @@ JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteA
                         ChipLogError(Controller, "csrNonce is not matched!"));
 
     jbyteArray javaCsr;
-    chip::JniReferences::GetInstance().N2J_ByteArray(chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(),
-                                                     static_cast<jsize>(csrSpan.size()), javaCsr);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().N2J_ByteArray(
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(), static_cast<jsize>(csrSpan.size()), javaCsr);
     return javaCsr;
 }
 
@@ -2332,7 +2415,7 @@ CHIP_ERROR StopIOThread()
         ChipLogProgress(Controller, "IO thread stopping");
         chip::DeviceLayer::StackUnlock unlock;
 
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
         pthread_join(sIOThread, nullptr);
         sIOThread = PTHREAD_NULL;

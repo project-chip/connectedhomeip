@@ -160,7 +160,7 @@ CHIP_ERROR AppTask::Init()
     );
     VerifyOrReturnError(sFunctionTimer != NULL, CHIP_ERROR_NO_MEMORY, ESP_LOGE(TAG, "Failed to create function selection timer"));
 
-    statusLED1.Init(STATUS_LED_GPIO_NUM);
+    statusLED1.Init(static_cast<gpio_num_t>(CONFIG_STATUS_LED_GPIO_NUM));
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
     // "LED"s on devices with screens.
     statusLED2.Init(GPIO_NUM_MAX);

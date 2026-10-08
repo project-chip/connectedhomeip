@@ -162,10 +162,8 @@ protected:
         {
             return TrustVerificationStage::kComplete;
         }
-        else
-        {
-            return mStageToRun;
-        }
+
+        return mStageToRun;
     }
 
     CHIP_ERROR ReadAdminFabricIndexAttribute(
@@ -212,38 +210,40 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType));
 
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
-                   ByteSpan(kDummyRootKey, sizeof(kDummyRootKey)));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
-                   static_cast<uint16_t>(0x1234));
-        writer.Put(TLV::ContextTag(
-                       static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
-                   static_cast<FabricId>(0x1122334455667788ULL));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(
-                       Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
-                   fabricIndex);
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                           Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kRootPublicKey)),
+                       ByteSpan(kDummyRootKey, sizeof(kDummyRootKey))));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kVendorID)),
+                                        static_cast<uint16_t>(0x1234)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
+                                        static_cast<FabricId>(0x1122334455667788ULL)));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                           Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
+                       fabricIndex));
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.EndContainer(structType));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, FabricsAttr::GetClusterId(), FabricsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -260,28 +260,27 @@ protected:
             return CHIP_ERROR_INTERNAL;
         }
 
-        constexpr uint8_t kDummyRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
-
         CertsAttr::DecodableType value;
 
-        uint8_t buffer[64];
+        // Include extra space in the buffer for TLV header
+        std::vector<uint8_t> buffer(TestCerts::sTestCert_Root01_Chip.size() + 16);
         TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        writer.Init(buffer.data(), buffer.size());
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
-        writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert)));
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), ByteSpan(TestCerts::sTestCert_Root01_Chip)));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
-        reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        reader.Init(buffer.data(), writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, CertsAttr::GetClusterId(), CertsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -310,32 +309,34 @@ protected:
         TLV::TLVWriter writer;
         writer.Init(buffer, sizeof(buffer));
         TLV::TLVType outerType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
         TLV::TLVType structType;
-        writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType);
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
-                   ByteSpan(kDummyNoc, sizeof(kDummyNoc)));
-        writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
-                   ByteSpan(kDummyIcac, sizeof(kDummyIcac)));
-        writer.Put(
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kNoc)),
+                       ByteSpan(kDummyNoc, sizeof(kDummyNoc))));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kIcac)),
+                       ByteSpan(kDummyIcac, sizeof(kDummyIcac))));
+        ReturnErrorOnFailure(writer.Put(
             TLV::ContextTag(static_cast<uint8_t>(Clusters::OperationalCredentials::Structs::NOCStruct::Fields::kFabricIndex)),
-            fabricIndex);
+            fabricIndex));
 
-        writer.EndContainer(structType);
-        writer.EndContainer(outerType);
+        ReturnErrorOnFailure(writer.EndContainer(structType));
+        ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
-        reader.EnterContainer(innerType);
+        ReturnErrorOnFailure(reader.EnterContainer(innerType));
 
         value.SetReader(reader);
         value.SetFabricIndex(fabricIndex);
 
-        reader.ExitContainer(innerType);
+        ReturnErrorOnFailure(reader.ExitContainer(innerType));
 
         ConcreteAttributePath path(kRootEndpointId, NOCsAttr::GetClusterId(), NOCsAttr::GetAttributeId());
         onSuccess(path, value);
@@ -343,13 +344,13 @@ protected:
     }
 };
 
-class TestJCMCommissionee : public chip::Test::AppContext
+class TestJCMCommissionee : public chip::Testing::AppContext
 {
 public:
     static void SetUpTestSuite()
     {
         ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        chip::Test::AppContext::SetUpTestSuite();
+        chip::Testing::AppContext::SetUpTestSuite();
     }
 
     static void TearDownTestSuite()
@@ -373,12 +374,17 @@ protected:
     void TestReadAdminFabricsPopulatesCommissionerInfo();
     void TestReadAdminCertsPopulatesCommissionerRcac();
     void TestReadAdminNOCsPopulatesCommissionerCerts();
+    void TestPerformVendorIdVerificationCompletesOnceOnReadFailure();
+    void TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure();
+    void FailSafeAsyncReadUseAfterFree();
 };
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestNextStageFollowsExpectedOrder)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
@@ -405,6 +411,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestSuccessfulProgressionAdvancesAllSta
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_ERROR_INTERNAL;
@@ -447,6 +455,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestErrorDuringStagePropagatesToComplet
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     bool completionCalled      = false;
     CHIP_ERROR completionError = CHIP_NO_ERROR;
@@ -473,6 +483,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointIdSuccess)
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     constexpr EndpointId kExpectedEndpointId{ 55 };
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
@@ -496,6 +508,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointIdError)
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     constexpr EndpointId kExpectedEndpointId{ 55 };
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kExpectedEndpointId);
@@ -518,6 +532,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadCommissionerAdminFabricIndexSuc
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 77 }, [](CHIP_ERROR) {});
     commissionee.mStageToRun = TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
@@ -532,6 +548,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminFabricsPopulatesCommission
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 78 }, [](CHIP_ERROR) {});
     commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
@@ -563,8 +581,11 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissioner
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 79 }, [](CHIP_ERROR) {});
+    commissionee.mInfo.rootPublicKey.CopyFromSpan(TestCerts::sTestCert_Root01_PublicKey);
 
     bool callbackCalled      = false;
     CHIP_ERROR callbackError = CHIP_ERROR_INTERNAL;
@@ -578,17 +599,19 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissioner
     EXPECT_TRUE(callbackCalled);
     EXPECT_EQ(callbackError, CHIP_NO_ERROR);
 
-    constexpr uint8_t kExpectedRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
-
-    ASSERT_EQ(commissionee.mInfo.adminRCAC.AllocatedSize(), sizeof(kExpectedRootCert));
+    ASSERT_EQ(commissionee.mInfo.adminRCAC.AllocatedSize(), TestCerts::sTestCert_Root01_Chip.size());
     ASSERT_NE(commissionee.mInfo.adminRCAC.Get(), nullptr);
-    EXPECT_EQ(memcmp(commissionee.mInfo.adminRCAC.Get(), kExpectedRootCert, sizeof(kExpectedRootCert)), 0);
+    EXPECT_EQ(memcmp(commissionee.mInfo.adminRCAC.Get(), TestCerts::sTestCert_Root01_Chip.data(),
+                     TestCerts::sTestCert_Root01_Chip.size()),
+              0);
 }
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminNOCsPopulatesCommissionerCerts)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 80 }, [](CHIP_ERROR) {});
     commissionee.mInfo.adminFabricIndex = FabricIndex{ 1 };
@@ -621,6 +644,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
 {
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 92 }, [](CHIP_ERROR) {});
 
@@ -654,6 +679,162 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestValidateAdministratorIdsMatch)
     commissionee.mInfo.rootPublicKey.CopyFromSpan(ByteSpan(adminRootKey, Crypto::kP256_PublicKey_Length - 1));
     ASSERT_EQ(commissionee.mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length - 1);
     EXPECT_EQ(commissionee.ValidateAdministratorIdsMatch(kAdminFabricId, matchingKey), TrustVerificationError::kInternalError);
+}
+
+// Harness for PerformVendorIdVerification()'s FetchCommissionerInfo error path: it forces the commissioner read
+// to fail and counts how many times the verification completes. The error path must complete exactly once and
+// stop, not continue into VerifyVendorId(&mInfo). In production, continuing would be a use-after-free, since
+// OnVendorIdVerificationComplete() destroys *this (mOnCompletion -> CleanupAnnounceJFA ->
+// mActiveCommissionee.reset()); this test detects the defect by counting completions, without that teardown.
+class ReadFailureJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    int completionCount = 0;
+
+protected:
+    // Drive StartTrustVerification() straight into kPerformingVendorIDVerification.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kPerformingVendorIDVerification)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kPerformingVendorIDVerification;
+    }
+
+    // Counts how many times the verification completes; the error path must complete once.
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override
+    {
+        ++completionCount;
+        JCMCommissionee::OnVendorIdVerificationComplete(err);
+    }
+
+    // Simulate a dispatched read whose response is an error: invoke onError but return
+    // CHIP_NO_ERROR (returning an error would make FetchCommissionerInfo complete on its own).
+    CHIP_ERROR
+    ReadAdminFabricsAttribute(std::function<void(const ConcreteAttributePath &, const FabricsAttr::DecodableType &)>,
+                              ReadErrorHandler onError) override
+    {
+        onError(nullptr, CHIP_ERROR_INTERNAL);
+        return CHIP_NO_ERROR;
+    }
+};
+
+// A failed commissioner read must complete the verification exactly once. If the error path
+// continued into VerifyVendorId (session released below), that call would complete a second
+// time and completionCount would exceed 1.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationCompletesOnceOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    ReadFailureJCMCommissionee commissionee(handle, EndpointId{ 41 }, [](CHIP_ERROR) {});
+
+    // Release the session so that if the error path ever continues into VerifyVendorId, that
+    // call completes synchronously (its "session missing" path) and the extra completion is
+    // caught by the assertion below.
+    commissionee.mSessionHolder.Release();
+
+    commissionee.VerifyTrustAgainstCommissionerAdmin();
+
+    EXPECT_EQ(commissionee.completionCount, 1);
+}
+
+// Heap-allocates the commissionee and frees it from the completion callback (mirroring
+// production's mActiveCommissionee.reset()). If the read-failure path continues into
+// VerifyVendorId(&mInfo) after completing, it touches freed memory and ASan aborts. There is
+// nothing to assert; in non-ASan builds it is a no-op, so the counting test above is the guard.
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestPerformVendorIdVerificationDoesNotUseFreedCommissioneeOnReadFailure)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // The completion callback owns the teardown and, like production's onComplete, does nothing
+    // after the delete -- so the only post-free access that can occur is the buggy fall-through.
+    ReadFailureJCMCommissionee * commissionee = nullptr;
+    commissionee = new ReadFailureJCMCommissionee(handle, EndpointId{ 41 }, [&commissionee](CHIP_ERROR) { delete commissionee; });
+
+    // Release the session so a continued VerifyVendorId resolves synchronously (dereferencing the
+    // freed commissionee in the regression).
+    commissionee->mSessionHolder.Release();
+
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+}
+// Regression for the JCMCommissionee heap use-after-free when a FailSafe teardown destroys the
+// commissionee while a Controller::ReadAttribute is in flight.
+//
+// MECHANISM: JCMCommissionee issues attribute reads whose [this]-capturing callbacks are owned by a
+// heap TypedReadAttributeCallback that adopts the ReadClient and outlives the commissionee. On
+// FailSafe expiry, OnFailSafeTimerExpired -> CleanupAnnounceJFA -> mActiveCommissionee.reset()
+// destroys the commissionee; a late OnAttributeData/OnError then runs the read callback through the
+// freed `this`. This test stashes the read's error callback, deletes the commissionee (standing in
+// for the failsafe-driven reset()), then delivers the late response.
+//
+//   Without the fix: ASan heap-use-after-free in TrustVerificationStageFinished.
+//   With the fix:    the read callbacks are wrapped by VendorIdVerificationClient::GuardWithLiveness,
+//                    so once the commissionee is destroyed the late callback is a no-op (the trust
+//                    verification completion is never re-entered).
+class DeferredReadJCMCommissionee : public JCMCommissionee
+{
+public:
+    using JCMCommissionee::JCMCommissionee;
+
+    ReadErrorHandler pendingError;
+    bool hasPending = false;
+
+protected:
+    // Drive verification straight into the AdministratorFabricIndex read stage.
+    TrustVerificationStage GetNextTrustVerificationStage(const TrustVerificationStage & currentStage) override
+    {
+        return (currentStage == TrustVerificationStage::kReadingCommissionerAdminFabricIndex)
+            ? TrustVerificationStage::kComplete
+            : TrustVerificationStage::kReadingCommissionerAdminFabricIndex;
+    }
+
+    // Model an in-flight ReadClient: stash the [this]-capturing error callback and return success,
+    // so the stage reports kAsync and the commissionee stays alive awaiting the response.
+    CHIP_ERROR
+    ReadAdminFabricIndexAttribute(std::function<void(const ConcreteAttributePath &, const FabricIndexAttr::DecodableType &)>,
+                                  ReadErrorHandler onError) override
+    {
+        pendingError = std::move(onError);
+        hasPending   = true;
+        return CHIP_NO_ERROR;
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestJCMCommissionee, FailSafeAsyncReadUseAfterFree)
+{
+    FakeCommandHandler commandHandler;
+    CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx);
+
+    // Sentinel that the trust-verification completion would flip if the late callback re-entered the
+    // (destroyed) state machine. The liveness guard must prevent that, so it stays false.
+    bool completionInvoked = false;
+    auto * commissionee =
+        new DeferredReadJCMCommissionee(handle, EndpointId{ 42 }, [&completionInvoked](CHIP_ERROR) { completionInvoked = true; });
+
+    // Launch verification -> issues the (deferred) AdministratorFabricIndex read; object stays alive.
+    commissionee->VerifyTrustAgainstCommissionerAdmin();
+    ASSERT_TRUE(commissionee->hasPending);
+    ASSERT_FALSE(completionInvoked);
+
+    // Copy the in-flight callback out, then simulate OnFailSafeTimerExpired ->
+    // mActiveCommissionee.reset() destroying the commissionee mid-read.
+    auto savedError = commissionee->pendingError;
+    delete commissionee;
+
+    // Late ReadClient response. Without the fix this fires this->TrustVerificationStageFinished on the
+    // freed object (ASan heap-use-after-free). With the liveness guard it is a no-op.
+    savedError(nullptr, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_FALSE(completionInvoked);
 }
 
 } // namespace JointFabricAdministrator

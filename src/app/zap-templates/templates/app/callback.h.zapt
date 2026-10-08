@@ -80,12 +80,14 @@ void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId
 {{#zcl_commands}}
 {{#if (isClient source)}}
 {{#unless (isInConfigList parent.name "CommandHandlerInterfaceOnlyClusters")}}
+{{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
 /**
  * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
  */
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
       const chip::app::ConcreteCommandPath & commandPath,
       const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
+{{/unless}}
 {{/unless}}
 {{/if}}
 {{/zcl_commands}}

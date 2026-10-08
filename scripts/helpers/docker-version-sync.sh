@@ -18,8 +18,11 @@ VERSION=$(sed 's/ .*//' ./integrations/docker/images/base/chip-build/version)
 echo "Current version: $VERSION"
 
 echo "Syncing GitHub Action Workflows"
-sed -r -i "s|image: ghcr\.io/project-chip/(.*):[0-9]+|image: ghcr.io/project-chip/\1:$VERSION|" .github/workflows/*.{yaml,yml}
+sed -r -i "s|(image: ghcr\.io/project-chip/.*):[0-9]+|\1:$VERSION|" .github/workflows/*.{yaml,yml}
 
-echo "Syncing README.md Files"
+echo "Syncing Cloud Build configuration files"
+sed -r -i "s|(name: \"ghcr\.io/project-chip/.*):[0-9]+\"|\1:$VERSION\"|" integrations/cloudbuild/*.yaml
+
+echo "Syncing README.md files"
 find . -iname README.md -not -path './third_party/*' -exec \
-    sed -r -i "s|ghcr\.io/project-chip/(.*):[0-9]+|ghcr.io/project-chip/\1:$VERSION|" {} +
+    sed -r -i "s|(ghcr\.io/project-chip/.*):[0-9]+|\1:$VERSION|" {} +

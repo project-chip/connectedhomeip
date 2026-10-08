@@ -45,7 +45,6 @@ enum class DatastoreAccessControlEntryAuthModeEnum : uint8_t
 enum class DatastoreAccessControlEntryPrivilegeEnum : uint8_t
 {
     kView       = 0x01,
-    kProxyView  = 0x02,
     kOperate    = 0x03,
     kManage     = 0x04,
     kAdminister = 0x05,
@@ -54,18 +53,6 @@ enum class DatastoreAccessControlEntryPrivilegeEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
-};
-
-// Enum for DatastoreGroupKeyMulticastPolicyEnum
-enum class DatastoreGroupKeyMulticastPolicyEnum : uint8_t
-{
-    kPerGroupID = 0x00,
-    kAllNodes   = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
 };
 
 // Enum for DatastoreGroupKeySecurityPolicyEnum

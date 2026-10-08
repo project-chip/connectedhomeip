@@ -43,5 +43,14 @@ void SetDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * provider)
     gDeviceInstanceInfoProvider = provider;
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+// Only for unit tests: return the current DeviceInstanceInfoProvider, which may be nullptr. This is needed since
+// GetDeviceInstanceInfoProvider() does not allow nullptr returns.
+DeviceInstanceInfoProvider * TestOnlyTryGetDeviceInstanceInfoProvider()
+{
+    return gDeviceInstanceInfoProvider;
+}
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 } // namespace DeviceLayer
 } // namespace chip

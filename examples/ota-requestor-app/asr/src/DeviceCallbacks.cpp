@@ -101,8 +101,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         // It depends on your application!
         if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
             isOTAInitialized = true;
         }
 #endif
@@ -119,8 +119,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         // Init OTA requestor only when we have gotten IPv6 address
         if (!isOTAInitialized)
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
             isOTAInitialized = true;
         }
 #endif

@@ -16,7 +16,8 @@ import dataclasses
 import enum
 import logging
 import sys
-from typing import Callable, Dict, List, Optional, Protocol, TypeVar
+from collections.abc import Callable
+from typing import Protocol, TypeVar
 
 import click
 import coloredlogs
@@ -24,7 +25,7 @@ import coloredlogs
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Compatibility(enum.Enum):
@@ -43,14 +44,14 @@ class HasName(Protocol):
 NAMED = TypeVar('NAMED', bound=HasName)
 
 
-def group_list(items: List[T], get_id: Callable[[T], str]) -> Dict[str, T]:
+def group_list(items: list[T], get_id: Callable[[T], str]) -> dict[str, T]:
     result = {}
     for item in items:
         result[get_id(item)] = item
     return result
 
 
-def group_list_by_name(items: List[NAMED]) -> Dict[str, NAMED]:
+def group_list_by_name(items: list[NAMED]) -> dict[str, NAMED]:
     return group_list(items, lambda x: x.name)
 
 
@@ -71,14 +72,14 @@ class CompatibilityChecker:
         self._original_idl = original
         self._updated_idl = updated
         self.compatible = Compatibility.UNKNOWN
-        self.errors: List[str] = []
+        self.errors: list[str] = []
 
     def _mark_incompatible(self, reason: str):
-        LOGGER.error(reason)
+        log.error(reason)
         self.errors.append(reason)
         self.compatible = Compatibility.INCOMPATIBLE
 
-    def _check_field_lists_are_the_same(self, location: str, original: List[Field], updated: List[Field]):
+    def _check_field_lists_are_the_same(self, location: str, original: list[Field], updated: list[Field]):
         """Validates no compatibility changes in a list of fields.
 
         Specifically no changes are allowed EXCEPT names of fields.
@@ -100,7 +101,7 @@ class CompatibilityChecker:
         if a != b:
             self._mark_incompatible(f"{location} has field changes")
 
-    def _check_enum_compatible(self, cluster_name: str, original: Enum, updated: Optional[Enum]):
+    def _check_enum_compatible(self, cluster_name: str, original: Enum, updated: Enum | None):
         if not updated:
             self._mark_incompatible(
                 f"Enumeration {cluster_name}::{original.name} was deleted")
@@ -122,7 +123,7 @@ class CompatibilityChecker:
                 self._mark_incompatible(
                     f"Enumeration {cluster_name}::{original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
-    def _check_bitmap_compatible(self, cluster_name: str, original: Bitmap, updated: Optional[Bitmap]):
+    def _check_bitmap_compatible(self, cluster_name: str, original: Bitmap, updated: Bitmap | None):
         if not updated:
             self._mark_incompatible(
                 f"Bitmap {cluster_name}::{original.name} was deleted")
@@ -144,7 +145,7 @@ class CompatibilityChecker:
                 self._mark_incompatible(
                     f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
-    def _check_event_compatible(self, cluster_name: str, event: Event, updated_event: Optional[Event]):
+    def _check_event_compatible(self, cluster_name: str, event: Event, updated_event: Event | None):
         if not updated_event:
             self._mark_incompatible(
                 f"Event {cluster_name}::{event.name} was removed")
@@ -157,8 +158,8 @@ class CompatibilityChecker:
         self._check_field_lists_are_the_same(
             f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
 
-    def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Optional[Command]):
-        LOGGER.debug(f"  Checking command {cluster_name}::{command.name}")
+    def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Command | None):
+        log.debug("  Checking command '%s::%s'", cluster_name, command.name)
         if not updated_command:
             self._mark_incompatible(
                 f"Command {cluster_name}::{command.name} was removed")
@@ -180,8 +181,8 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Command {cluster_name}::{command.name} qualities changed from {command.qualities} to {updated_command.qualities}")
 
-    def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Optional[Struct]):
-        LOGGER.debug(f"  Checking struct {original.name}")
+    def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Struct | None):
+        log.debug("  Checking struct '%s'", original.name)
         if not updated:
             self._mark_incompatible(
                 f"Struct {cluster_name}::{original.name} has been deleted.")
@@ -202,9 +203,8 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Struct {cluster_name}::{original.name} has modified qualities")
 
-    def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Optional[Attribute]):
-        LOGGER.debug(
-            f"  Checking attribute {cluster_name}::{original.definition.name}")
+    def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Attribute | None):
+        log.debug("  Checking attribute '%s::%s'", cluster_name, original.definition.name)
         if not updated:
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} has been deleted.")
@@ -232,7 +232,7 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")
 
-    def _check_enum_list_compatible(self, cluster_name: str, original: List[Enum], updated: List[Enum]):
+    def _check_enum_list_compatible(self, cluster_name: str, original: list[Enum], updated: list[Enum]):
         updated_enums = group_list_by_name(updated)
 
         for original_enum in original:
@@ -240,7 +240,7 @@ class CompatibilityChecker:
             self._check_enum_compatible(
                 cluster_name, original_enum, updated_enum)
 
-    def _check_bitmap_list_compatible(self, cluster_name: str, original: List[Bitmap], updated: List[Bitmap]):
+    def _check_bitmap_list_compatible(self, cluster_name: str, original: list[Bitmap], updated: list[Bitmap]):
         updated_bitmaps = {}
         for item in updated:
             updated_bitmaps[item.name] = item
@@ -250,14 +250,14 @@ class CompatibilityChecker:
             self._check_bitmap_compatible(
                 cluster_name, original_bitmap, updated_bitmap)
 
-    def _check_struct_list_compatible(self, cluster_name: str, original: List[Struct], updated: List[Struct]):
+    def _check_struct_list_compatible(self, cluster_name: str, original: list[Struct], updated: list[Struct]):
         updated_structs = group_list_by_name(updated)
 
         for struct in original:
             self._check_struct_compatible(
                 cluster_name, struct, updated_structs.get(struct.name))
 
-    def _check_command_list_compatible(self, cluster_name: str, original: List[Command], updated: List[Command]):
+    def _check_command_list_compatible(self, cluster_name: str, original: list[Command], updated: list[Command]):
         updated_commands = group_list_by_name(updated)
 
         for command in original:
@@ -265,21 +265,21 @@ class CompatibilityChecker:
             self._check_command_compatible(
                 cluster_name, command, updated_command)
 
-    def _check_event_list_compatible(self, cluster_name: str, original: List[Event], updated: List[Event]):
+    def _check_event_list_compatible(self, cluster_name: str, original: list[Event], updated: list[Event]):
         updated_events = group_list_by_name(updated)
 
         for event in original:
             updated_event = updated_events.get(event.name)
             self._check_event_compatible(cluster_name, event, updated_event)
 
-    def _check_attribute_list_compatible(self, cluster_name: str, original: List[Attribute], updated: List[Attribute]):
+    def _check_attribute_list_compatible(self, cluster_name: str, original: list[Attribute], updated: list[Attribute]):
         updated_attributes = group_list(updated, attribute_name)
 
         for attribute in original:
             self._check_attribute_compatible(
                 cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
 
-    def _check_cluster_list_compatible(self, original: List[Cluster], updated: List[Cluster]):
+    def _check_cluster_list_compatible(self, original: list[Cluster], updated: list[Cluster]):
         updated_clusters = group_list(updated, lambda c: c.name)
 
         for original_cluster in original:
@@ -293,9 +293,8 @@ class CompatibilityChecker:
 
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
-    def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
-        LOGGER.debug(
-            f"Checking cluster {original_cluster.name}")
+    def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Cluster | None):
+        log.debug("Checking cluster '%s'", original_cluster.name)
         if not updated_cluster:
             self._mark_incompatible(
                 f"Cluster {original_cluster.name} was deleted")
@@ -345,12 +344,7 @@ def is_backwards_compatible(original: Idl, updated: Idl):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @click.command()
@@ -378,11 +372,13 @@ def main(log_level, old_idl, new_idl):
         fmt='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    LOGGER.info("Parsing OLD idl from %s" % old_idl)
-    old_tree = CreateParser().parse(open(old_idl, "rt").read())
+    log.info("Parsing OLD idl from '%s'", old_idl)
+    with open(old_idl) as f:
+        old_tree = CreateParser().parse(f.read())
 
-    LOGGER.info("Parsing NEW idl from %s" % new_idl)
-    new_tree = CreateParser().parse(open(new_idl, "rt").read())
+    log.info("Parsing NEW idl from '%s'", new_idl)
+    with open(new_idl) as f:
+        new_tree = CreateParser().parse(f.read())
 
     if not is_backwards_compatible(original=old_tree, updated=new_tree):
         sys.exit(1)

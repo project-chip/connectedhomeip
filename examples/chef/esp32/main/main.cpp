@@ -34,6 +34,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
@@ -44,9 +45,11 @@
 #include <app/server/Dnssd.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
+#if CONFIG_HAVE_DISPLAY
 #include "Display.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#endif // CONFIG_HAVE_DISPLAY
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -151,6 +154,7 @@ void printQRCode()
 
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 extern void ApplicationInit();
 
@@ -160,10 +164,13 @@ void InitServer(intptr_t)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    LogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
     sWiFiNetworkCommissioningInstance.Init();
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 

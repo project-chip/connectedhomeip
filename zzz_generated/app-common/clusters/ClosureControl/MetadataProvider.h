@@ -55,6 +55,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Closur
             return MoveTo::kMetadataEntry;
         case Calibrate::Id:
             return Calibrate::kMetadataEntry;
+        case GroupedMoveTo::Id:
+            return GroupedMoveTo::kMetadataEntry;
 
         default:
             return std::nullopt;

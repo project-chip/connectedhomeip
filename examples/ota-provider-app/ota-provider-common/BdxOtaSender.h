@@ -18,6 +18,9 @@
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
+#include <string>
+#include <unordered_map>
+
 #pragma once
 
 class BdxOtaSender : public chip::bdx::Responder
@@ -30,6 +33,13 @@ public:
 
     void AbortTransfer();
 
+    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
+
+protected:
+    // Inherited from bdx::TransferFacilitator
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override final;
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
@@ -38,7 +48,7 @@ private:
 
     // Null-terminated string representing file designator
     char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
-
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
     uint32_t mNumBytesSent = 0;
 
     bool mInitialized = false;

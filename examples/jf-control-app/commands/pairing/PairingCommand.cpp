@@ -122,7 +122,7 @@ CHIP_ERROR PairingCommand::RunCommand()
                      ChipLogValueX64(anchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else
+    else if (!mRegularDevice.ValueOr(false))
     {
         // Skip commissioning complete for JCM and other device commissioning methods but not Anchor Administrator commissioning.
         mSkipCommissioningComplete = MakeOptional(true);
@@ -217,6 +217,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::AlreadyDiscoveredByIndexWithCode:
         err = PairWithMdnsOrBleByIndexWithCode(remoteId, mIndex);
         break;
+    case PairingMode::Proxy:
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        break;
     }
 
     return err;
@@ -286,7 +289,9 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -659,7 +664,7 @@ void OnGetStreamOnNext(const RequestOptions & requestOptions)
 
     if (options)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
     }
 }
 
@@ -681,10 +686,14 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        if (!mSkipCommissioningComplete.ValueOr(false))
+        if (mRegularDevice.ValueOr(false))
+        {
+            ChipLogProgress(JointFabric, "Device (nodeId=%ld) commissioned with success", nodeId);
+        }
+        else if (!mSkipCommissioningComplete.ValueOr(false))
         {
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
-            SetAnchorNodeId(nodeId);
+            TEMPORARY_RETURN_IGNORED SetAnchorNodeId(nodeId);
 
             _pw_protobuf_Empty request;
 
@@ -741,10 +750,6 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error",
                              nodeId);
             }
-            else
-            {
-                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", nodeId);
-            }
         }
     }
     else
@@ -796,8 +801,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.check_in_node     = ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());

@@ -143,6 +143,7 @@ template("chip_test_suite") {
                                    "public_deps",
                                    "cflags",
                                    "configs",
+                                   "defines",
                                  ])
 
           # Link to the common lib for this suite so we get its `sources`.
@@ -154,6 +155,8 @@ template("chip_test_suite") {
 
           if (pw_unit_test_BACKEND == "$dir_pw_unit_test:googletest") {
             test_main = "$dir_pigweed/third_party/googletest:gmock_main"
+          } else {
+            test_main = "${chip_root}/src/test_driver/posix"
           }
 
           # Set variables that the platform executable may need.

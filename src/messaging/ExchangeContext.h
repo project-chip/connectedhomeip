@@ -177,10 +177,13 @@ public:
     void Abort();
 
     // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
-    // the next message to the exchange. The exchange context must have a valid session when calling this function.
+    // the next message to the exchange.
     //
     // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout))
-    void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
+    //
+    // @retval CHIP_NO_ERROR if response timeout was computed and applied.
+    // @retval CHIP_ERROR_MISSING_SECURE_SESSION if no session is attached to the exchange.
+    CHIP_ERROR UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
 
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using
     // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of

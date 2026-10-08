@@ -61,7 +61,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace KeepActive.
+} // namespace KeepActive
 } // namespace Commands
 } // namespace BridgedDeviceBasicInformation
 } // namespace Clusters

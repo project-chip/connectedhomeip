@@ -80,7 +80,7 @@ void TizenServiceAppMain::AppTerminate()
 {
     ChipLogProgress(NotSpecified, "Tizen app terminate");
     chip::Server::GetInstance().GenerateShutDownEvent();
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 static void TizenMainLoopWrapper()

@@ -37,10 +37,12 @@
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
 
-class TC_TIMESYNC_3_1(MatterBaseTest):
+class TC_TIMESYNC_3_1(MatterTestCommissionedDevice):
 
     def pics_TC_TIMESYNC_3_1(self) -> list[str]:
         return ["TIMESYNC.S"]

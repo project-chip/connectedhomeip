@@ -44,22 +44,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::D
     switch (val)
     {
     case EnumType::kView:
-    case EnumType::kProxyView:
     case EnumType::kOperate:
     case EnumType::kManage:
     case EnumType::kAdminister:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum val)
-{
-    using EnumType = JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum;
-    switch (val)
-    {
-    case EnumType::kPerGroupID:
-    case EnumType::kAllNodes:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

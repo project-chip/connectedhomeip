@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/AttributeChangeListener.h>
 
 /** @brief Reporting Attribute Change
  *
@@ -36,4 +37,4 @@ void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePa
 /*
  * Same but only with an EndpointId, this is used when adding / enabling an endpoint during runtime.
  */
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint);
+void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::app::DataModel::EndpointChangeType type);

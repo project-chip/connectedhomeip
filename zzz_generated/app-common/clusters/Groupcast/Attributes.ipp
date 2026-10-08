@@ -36,6 +36,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, membership);
     case Attributes::MaxMembershipCount::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxMembershipCount);
+    case Attributes::MaxMcastAddrCount::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxMcastAddrCount);
+    case Attributes::UsedMcastAddrCount::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, usedMcastAddrCount);
+    case Attributes::FabricUnderTest::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, fabricUnderTest);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    Copyright 2023-2025 NXP
  *    All rights reserved.
  *
@@ -20,12 +20,13 @@
 #pragma once
 
 #include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/CodegenIntegration.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 
 #ifndef CONFIG_APP_FREERTOS_OS
-#include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
+#include <platform/Zephyr/OTAImageProcessorImpl.h>
 #else
 #include "platform/nxp/common/ota/OTAImageProcessorImpl.h"
 #endif /* CONFIG_APP_FREERTOS_OS */

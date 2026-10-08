@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2025 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_device_platform == "webos")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -95,7 +95,7 @@ static_library("webos") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
@@ -155,9 +155,10 @@ static_library("webos") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",

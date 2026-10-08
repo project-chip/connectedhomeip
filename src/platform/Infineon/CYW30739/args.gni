@@ -29,7 +29,7 @@ chip_crypto = "mbedtls"
 chip_device_platform = "cyw30739"
 chip_mdns = "platform"
 
-chip_enable_openthread = true
+chip_enable_thread = true
 
 lwip_platform = "cyw30739"
 

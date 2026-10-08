@@ -90,8 +90,7 @@ void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 
 ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore,
                                            FabricTable & fabricTable, ICDConfigurationData & icdConfigurationData,
-                                           OptionalAttributeSet optionalAttributeSet,
-                                           BitMask<IcdManagement::OptionalCommands> enabledCommands,
+                                           OptionalAttributeSet optionalAttributeSet, OptionalCommandSet enabledCommands,
                                            BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
                                            CharSpan userActiveModeTriggerInstruction) :
     DefaultServerCluster({ endpointId, IcdManagement::Id }),
@@ -120,7 +119,7 @@ CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ICDManagementCluster::Shutdown()
+void ICDManagementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
 // TODO(#32321): Remove #if after issue is resolved
 // Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
@@ -129,6 +128,7 @@ void ICDManagementCluster::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     Server::GetInstance().GetICDManager().ReleaseObserver(this);
 #endif
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -216,7 +216,7 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(OptionalCommands::kStayActive))
+        mEnabledCommands.IsSet(Commands::StayActiveRequest::Id))
     {
         static constexpr DataModel::AcceptedCommandEntry kStayActiveCommand[] = {
             Commands::StayActiveRequest::kMetadataEntry,
@@ -229,7 +229,7 @@ CHIP_ERROR ICDManagementCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     if (mICDConfigurationData.GetFeatureMap().Has(Feature::kLongIdleTimeSupport) ||
-        mEnabledCommands.Has(OptionalCommands::kStayActive))
+        mEnabledCommands.IsSet(Commands::StayActiveRequest::Id))
     {
         static constexpr CommandId kStayActiveResponse[] = {
             Commands::StayActiveResponse::Id,
@@ -257,8 +257,7 @@ CHIP_ERROR ICDManagementCluster::ReadOperatingMode(AttributeValueEncoder & encod
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 ICDManagementClusterWithCIP::ICDManagementClusterWithCIP(
     EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
-    ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
-    BitMask<IcdManagement::OptionalCommands> enabledCommands,
+    ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet, OptionalCommandSet enabledCommands,
     BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap, CharSpan userActiveModeTriggerInstruction) :
     ICDManagementCluster(endpointId, symmetricKeystore, fabricTable, icdConfigurationData, optionalAttributeSet, enabledCommands,
                          userActiveModeTriggerBitmap, userActiveModeTriggerInstruction)
@@ -272,11 +271,11 @@ CHIP_ERROR ICDManagementClusterWithCIP::Startup(ServerClusterContext & context)
     return mFabricTable.AddFabricDelegate(&mFabricDelegate);
 }
 
-void ICDManagementClusterWithCIP::Shutdown()
+void ICDManagementClusterWithCIP::Shutdown(ClusterShutdownType shutdownType)
 {
     mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
 
-    ICDManagementCluster::Shutdown();
+    ICDManagementCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ICDManagementClusterWithCIP::ReadAttribute(const DataModel::ReadAttributeRequest & request,

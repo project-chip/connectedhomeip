@@ -19,6 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/bindings/binding-table.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -180,6 +181,56 @@ TEST(TestBindingTable, TestPersistentStorage)
     EXPECT_EQ(table.RemoveAt(iter), CHIP_NO_ERROR);
     VerifyTableSame(table, { expected[1], expected[3] });
     VerifyRestored(testStorage, { expected[1], expected[3] });
+}
+
+TEST(TestBindingTable, TestLoadRejectsOutOfRangeIndex)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+
+    // Populate one valid entry so a well-formed serialized entry blob exists in storage.
+    {
+        Binding::Table table;
+        table.SetPersistentStorage(&testStorage);
+        EXPECT_EQ(table.Add(Binding::TableEntry::ForNode(0, 0, 0, 0, std::nullopt)), CHIP_NO_ERROR);
+    }
+
+    // One past the last valid slot; mBindingTable / mNextIndex are sized kMaxBindingEntries.
+    constexpr uint8_t kOutOfRangeIndex = static_cast<uint8_t>(Binding::Table::kMaxBindingEntries);
+
+    // Copy the serialized entry to the out-of-range index key so a full entry parses and the load reaches
+    // the mBindingTable[index] write.
+    {
+        uint8_t entryBuffer[128];
+        uint16_t entrySize = sizeof(entryBuffer);
+        EXPECT_EQ(
+            testStorage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::BindingTableEntry(0).KeyName(), entryBuffer, entrySize),
+            CHIP_NO_ERROR);
+        EXPECT_EQ(testStorage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::BindingTableEntry(kOutOfRangeIndex).KeyName(),
+                                              entryBuffer, entrySize),
+                  CHIP_NO_ERROR);
+    }
+
+    // Point the stored list head at the out-of-range index. Layout mirrors Table::SaveListInfo(): an
+    // anonymous structure of { storage version (context tag 1) = 1, head (context tag 2) }.
+    {
+        uint8_t listInfoBuffer[32];
+        chip::TLV::TLVWriter writer;
+        writer.Init(listInfoBuffer);
+        chip::TLV::TLVType container;
+        EXPECT_EQ(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(chip::TLV::ContextTag(1), static_cast<uint32_t>(1)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(chip::TLV::ContextTag(2), kOutOfRangeIndex), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        EXPECT_EQ(testStorage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::BindingTable().KeyName(), listInfoBuffer,
+                                              static_cast<uint16_t>(writer.GetLengthWritten())),
+                  CHIP_NO_ERROR);
+    }
+
+    // The load must fail cleanly instead of writing past the end of the table arrays.
+    Binding::Table table;
+    table.SetPersistentStorage(&testStorage);
+    EXPECT_NE(table.LoadFromStorage(), CHIP_NO_ERROR);
+    EXPECT_EQ(table.Size(), 0u);
 }
 
 } // namespace

@@ -105,26 +105,10 @@ void * __wrap_malloc(size_t size)
     return pvPortMalloc(size);
 }
 
-void * operator new(size_t size)
-{
-    return pvPortMalloc(size);
-}
-
-void operator delete(void * p)
-{
-    vPortFree(p);
-}
-
-void operator delete(void * p, unsigned int size)
-{
-    vPortFree(p);
-}
-
 void __wrap_free(void * ptr)
 {
     vPortFree(ptr);
 }
-
 void * __wrap_calloc(size_t num, size_t size)
 {
     size_t total_size = num * size;
@@ -208,3 +192,19 @@ int __wrap_printf(const char * fmt_s, ...)
 }
 
 } // extern "C"
+
+// C++ operators must be outside extern "C" block
+void * operator new(size_t size)
+{
+    return pvPortMalloc(size);
+}
+
+void operator delete(void * p)
+{
+    vPortFree(p);
+}
+
+void operator delete(void * p, size_t size)
+{
+    vPortFree(p);
+}

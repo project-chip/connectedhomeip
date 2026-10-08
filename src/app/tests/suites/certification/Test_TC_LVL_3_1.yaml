@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all-devices/speaker"
+      app: all-devices
+      args:
+          - --device
+          - speaker
+
 name: 24.3.1. [TC-LVL-3.1] MoveToLevel Verification (DUT as Server)
 
 PICS:

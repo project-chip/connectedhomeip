@@ -18,12 +18,13 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lwip/tcpip.h>
 
+#include <bl60x_wifi_driver/wifi_mgmr.h>
 #include <bl_sec.h>
 #include <wifi_mgmr_portable.h>
 
@@ -41,7 +42,6 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TaskHandle_t backup_eventLoopTask;
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
@@ -51,11 +51,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
-    backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
 
     wifi_start_firmware_task();
 exit:

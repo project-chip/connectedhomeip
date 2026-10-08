@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("fixed-label-server") {
   sources = [
-    "fixed-label-cluster.cpp",
-    "fixed-label-cluster.h",
+    "FixedLabelCluster.cpp",
+    "FixedLabelCluster.h",
   ]
 
   public_deps = [

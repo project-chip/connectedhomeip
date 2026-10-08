@@ -12,6 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all-devices/speaker"
+      app: all-devices
+      args:
+          - --device
+          - speaker
+    - name: "Test against all-devices/dimmable-plug-in-unit"
+      app: all-devices
+      args:
+          - --device
+          - dimmable-plug-in-unit
+    - name: "Test against all-devices/mounted-dimmable-load-control"
+      app: all-devices
+      args:
+          - --device
+          - mounted-dimmable-load-control
+
 name: 24.2.1. [TC-LVL-2.1] Read cluster attributes (DUT as Server)
 
 PICS:

@@ -39,7 +39,7 @@ public:
     {
 #ifndef CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
         static AppFabricTableDelegate sAppFabricDelegate;
-        chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
         k_timer_init(&sFabricRemovedTimer, &OnFabricRemovedTimerCallback, nullptr);
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
     }
@@ -67,7 +67,7 @@ private:
 #ifndef CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
                 chip::Server::GetInstance().ScheduleFactoryReset();
 #elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY) || defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START)

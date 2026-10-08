@@ -33,6 +33,10 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     mUnalignmentNum = 0;
 #endif
 
+#if CONFIG_NXP_USE_LOW_POWER
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgrImpl().EnableOTAStorage();
+#endif
+
     VerifyOrReturnError(gOtaSuccess_c == OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
 #if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
@@ -142,7 +146,12 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
     OTA_CancelImage();
     OTA_ServiceDeInit();
 
-    Clear();
+#if CONFIG_NXP_USE_LOW_POWER
+    // Disable OTA storage
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgrImpl().DisableOTAStorage();
+#endif
+
+    TEMPORARY_RETURN_IGNORED Clear();
 
     return CHIP_NO_ERROR;
 }

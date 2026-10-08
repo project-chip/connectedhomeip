@@ -17,7 +17,14 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/UDPEndPointImplOpenThread.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 #include <inet/UDPEndPointImplSockets.h>
+#endif
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -25,6 +32,7 @@
 #include <platform/internal/BLEManager.h>
 
 #ifndef CONFIG_ARCH_POSIX
+#include <zephyr/net/mld.h>
 #include <zephyr/net/net_if.h>
 #endif
 
@@ -50,6 +58,7 @@ namespace chip {
 namespace DeviceLayer {
 
 namespace {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & address,
                                    UDPEndPointImplSockets::MulticastOperation operation)
 {
@@ -70,20 +79,22 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    const in6_addr in6Addr = InetUtils::ToZephyrAddr(address);
+    // Use MLD join/leave so Ethernet/Wi-Fi L2 installs the HW multicast MAC
+    // filter (e.g. 33:33:00:00:00:fb for ff02::fb). Plain maddr_add/join does
+    // not program HW multicast MAC filters, so mDNS queries are dropped after other
+    // filters (all-nodes / solicited-node) enable filtering.
+    const InetUtils::ZephyrIn6Addr in6Addr = InetUtils::ToZephyrAddr(address);
+    int status;
 
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
-        net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &in6Addr);
-
-        if (maddr && !net_if_ipv6_maddr_is_joined(maddr))
-        {
-            net_if_ipv6_maddr_join(iface, maddr);
-        }
+        status = net_ipv6_mld_join(iface, &in6Addr);
+        VerifyOrReturnError((status == 0 || status == -EALREADY || status == -ENETDOWN), System::MapErrorZephyr(status));
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)
     {
-        VerifyOrReturnError(net_if_ipv6_maddr_rm(iface, &in6Addr), CHIP_ERROR_INVALID_ADDRESS);
+        status = net_ipv6_mld_leave(iface, &in6Addr);
+        VerifyOrReturnError((status == 0 || status == -ENETDOWN), System::MapErrorZephyr(status));
     }
     else
     {
@@ -93,6 +104,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 } // namespace
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
@@ -105,8 +117,12 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(InitWiFi());
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    ReturnErrorOnFailure(InitWiFiPAF());
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
     UDPEndPointImplSockets::SetMulticastGroupHandler(
         [](InterfaceId interfaceId, const IPAddress & address, UDPEndPointImplSockets::MulticastOperation operation) {
             if (interfaceId.IsPresent())
@@ -125,6 +141,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
             return CHIP_NO_ERROR;
         });
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     return CHIP_NO_ERROR;
@@ -136,6 +153,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    OnWiFiPAFPlatformEvent(event);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 }
 
 } // namespace DeviceLayer

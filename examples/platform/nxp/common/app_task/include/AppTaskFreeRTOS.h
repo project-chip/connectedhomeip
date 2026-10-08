@@ -86,6 +86,10 @@ public:
      */
     TickType_t ticksToWait;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    chip::CharSpan GetBorderRouterName() override;
+#endif
+
 private:
     void DispatchEvent(const AppEvent & event);
 };

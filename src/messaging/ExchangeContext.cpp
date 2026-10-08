@@ -32,7 +32,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPKeyIds.h>
-#include <lib/support/Defer.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ApplicationExchangeDispatch.h>
@@ -75,9 +75,11 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     SetWaitingForResponseOrAck(inResponseExpected);
 }
 
-void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+CHIP_ERROR ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
+    VerifyOrReturnError(mSession, CHIP_ERROR_MISSING_SECURE_SESSION);
     SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, !HasReceivedAtLeastOneMessage()));
+    return CHIP_NO_ERROR;
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
@@ -422,6 +424,11 @@ void ExchangeContext::OnSessionReleased()
     }
     else
     {
+        // The session was released while a send was pending. Call DoClose so
+        // the exchange is marked closed (kFlagClosed set) without dropping the
+        // ref.  kFlagWillSendMessage is intentionally left set so that
+        // ExchangeHolder::OnExchangeClosing keeps its raw pointer and
+        // ExchangeHolder::Release later calls Abort() to free the EC.
         DoClose(true /* clearRetransTable */);
     }
 }
@@ -515,7 +522,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
-    auto deferred = MakeDefer([&]() {
+    auto deferred = ScopeExit([&]() {
         // Duplicates and standalone acks are not application-level messages, so they should generally not lead to any state
         // changes.  The one exception to that is that if we have a null mDelegate then our lifetime is not application-defined,
         // since we don't interact with the application at that point.  That can happen when we are already closed (in which case

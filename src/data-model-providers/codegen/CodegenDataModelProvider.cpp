@@ -38,14 +38,14 @@
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/ScopedBuffer.h>
-#include <lib/support/SpanSearchValue.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstdint>
 #include <optional>
@@ -127,6 +127,13 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
+#if CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
+    // Shutdown ember cluster implementations (symmetric to InitDataModelForTesting()
+    // in Startup which creates them). This calls the per-cluster shutdown callbacks
+    // and unregisters AAI/CHI so clusters can be re-created on the next Startup().
+    emAfCallShutdowns(MatterClusterShutdownType::kClusterShutdown);
+    ChipLogProgress(DataManagement, "CodegenDataModelProvider::Shutdown() complete");
+#endif // CHIP_CONFIG_ENABLE_SERVER_RESTART_SUPPORT
     Reset();
     mContext.reset();
     mRegistry.ClearContext();
@@ -188,7 +195,8 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
-    // Ember always sets the return in the handler
+    // Ember always returns responses via the handler, so std::nullopt must be returned here to follow the InvokeCommand API
+    // contract
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
 }
@@ -453,11 +461,10 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
     if (interface != nullptr)
     {
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
-        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
         // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
-
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 
     const chip::CommandId * endOfList = serverCluster->acceptedCommandList;
@@ -536,12 +543,7 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
-    char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
-    MutableCharSpan epUniqueIdSpan(buffer);
-    ReturnErrorOnFailure(emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan));
-
-    memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
-    return CHIP_NO_ERROR;
+    return emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueId);
 }
 #endif
 

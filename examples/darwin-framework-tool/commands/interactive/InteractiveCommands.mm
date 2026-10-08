@@ -342,28 +342,28 @@ char * GetCommand(const chip::Optional<char *> & mAdditionalPrompt, char * comma
 el_status_t RestartFunction()
 {
     RestartCommand cmd;
-    cmd.RunCommand();
+    TEMPORARY_RETURN_IGNORED cmd.RunCommand();
     return CSstay;
 }
 
 el_status_t StopFunction()
 {
     StopCommand cmd;
-    cmd.RunCommand();
+    TEMPORARY_RETURN_IGNORED cmd.RunCommand();
     return CSstay;
 }
 
 el_status_t SuspendOrResumeFunction()
 {
     SuspendOrResumeCommand cmd;
-    cmd.RunCommand();
+    TEMPORARY_RETURN_IGNORED cmd.RunCommand();
     return CSstay;
 }
 
 el_status_t TriggerResubscriptionFunction()
 {
     TriggerResubscriptionCommand cmd;
-    cmd.RunCommand();
+    TEMPORARY_RETURN_IGNORED cmd.RunCommand();
     return CSstay;
 }
 

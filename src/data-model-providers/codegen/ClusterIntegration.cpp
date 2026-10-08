@@ -16,7 +16,6 @@
  */
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -51,21 +50,36 @@ bool FindEndpointWithLog(EndpointId endpointId, ClusterId clusterId, uint16_t fi
 /// on error 0 is returned
 uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    AttributeDefaultValue defaultValue;
     Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, readable, sizeof(temp));
-    if (status != Protocols::InteractionModel::Status::Success)
+        emberAfGetAttributeDefaultValue(endpointId, clusterId, Clusters::Globals::Attributes::FeatureMap::Id, defaultValue);
+    if (status == Protocols::InteractionModel::Status::Success)
     {
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
-                     ChipLogValueMEI(clusterId), static_cast<int>(status));
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+        return defaultValue.As<uint32_t>();
+    }
+    if (status == Protocols::InteractionModel::Status::NotFound)
+    {
         return 0;
     }
-    // note: we do not try to check if value is representable: all the uint32_t values are representable
-    return Traits::StorageToWorking(temp);
+
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+    ChipLogError(AppServer, "Failed to load feature map for %u/" ChipLogFormatMEI " (Status %d)", endpointId,
+                 ChipLogValueMEI(clusterId), static_cast<int>(status));
+#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+    return 0;
+}
+
+ClusterShutdownType ToServerClusterInterfaceShutdown(MatterClusterShutdownType t)
+{
+    switch (t)
+    {
+    case MatterClusterShutdownType::kPermanentRemove:
+        return ClusterShutdownType::kPermanentRemove;
+    case MatterClusterShutdownType::kClusterShutdown:
+        return ClusterShutdownType::kClusterShutdown;
+    }
+    // we are handling all cases above, but compiler does not seem to detect this...
+    return ClusterShutdownType::kClusterShutdown;
 }
 
 } // namespace
@@ -120,7 +134,8 @@ void CodegenClusterIntegration::RegisterServer(const RegisterServerOptions & opt
     }
 }
 
-void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate)
+void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions & options, Delegate & delegate,
+                                                 MatterClusterShutdownType shutdownType)
 {
     uint16_t clusterInstanceIndex;
     if (!FindEndpointWithLog(options.endpointId, options.clusterId, options.fixedClusterInstanceCount,
@@ -129,7 +144,8 @@ void CodegenClusterIntegration::UnregisterServer(const UnregisterServerOptions &
         return;
     }
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(delegate.FindRegistration(clusterInstanceIndex));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(delegate.FindRegistration(clusterInstanceIndex),
+                                                                                ToServerClusterInterfaceShutdown(shutdownType));
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS

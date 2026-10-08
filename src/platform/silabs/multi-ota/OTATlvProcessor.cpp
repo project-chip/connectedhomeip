@@ -20,18 +20,20 @@
 #include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
 
-#include <headers/ProvisionManager.h>
-#include <headers/ProvisionStorage.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#include <provision/ProvisionStorageReader.h>
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTATlvProcessor::Init()
 {
@@ -124,9 +126,15 @@ void OTADataAccumulator::Clear()
 CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 {
     uint32_t numBytes = std::min(mThreshold - mBufferOffset, static_cast<uint32_t>(block.size()));
-    memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
-    mBufferOffset += numBytes;
-    block = block.SubSpan(numBytes);
+    // Init() returns void; an alloc failure leaves mBuffer null.
+    // Only enforce the precondition when there is data to copy.
+    if (numBytes > 0)
+    {
+        VerifyOrReturnError(mBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        memcpy(&mBuffer[mBufferOffset], block.data(), numBytes);
+        mBufferOffset += numBytes;
+        block = block.SubSpan(numBytes);
+    }
 
     if (mBufferOffset < mThreshold)
     {
@@ -139,14 +147,15 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
+    auto & storageReader = Provision::ProvisionStorageReader::GetInstance();
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-    Provision::Manager::GetInstance().GetStorage().DecryptUsingOtaTlvEncryptionKey(block, mIVOffset);
+    ReturnErrorOnFailure(storageReader.DecryptUsingOtaTlvEncryptionKey(block, mIVOffset));
 #else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
-    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKeyId(keyId);
+    ReturnErrorOnFailure(storageReader.GetOtaTlvEncryptionKeyId(keyId));
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey key(keyId);
 
-    key.Decrypt(block, mIVOffset);
+    ReturnErrorOnFailure(key.Decrypt(block, mIVOffset));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     return CHIP_NO_ERROR;
@@ -189,4 +198,7 @@ CHIP_ERROR OTATlvProcessor::RemovePadding(MutableByteSpan & block)
     return CHIP_NO_ERROR;
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

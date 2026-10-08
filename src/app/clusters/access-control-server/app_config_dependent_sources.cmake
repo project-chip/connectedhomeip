@@ -19,12 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ArlEncoder.cpp"
-    "${CLUSTER_DIR}/ArlEncoder.h"
-    "${CLUSTER_DIR}/access-control-cluster.h"
-    "${CLUSTER_DIR}/access-control-cluster.cpp"
-)

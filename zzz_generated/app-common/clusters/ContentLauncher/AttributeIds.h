@@ -14,7 +14,7 @@ namespace ContentLauncher {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 7;
+inline constexpr uint32_t kAttributesCount = 9;
 
 namespace AcceptHeader {
 inline constexpr AttributeId Id = 0x00000000;
@@ -23,6 +23,14 @@ inline constexpr AttributeId Id = 0x00000000;
 namespace SupportedStreamingProtocols {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedStreamingProtocols
+
+namespace Movable {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace Movable
+
+namespace Presets {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Presets
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

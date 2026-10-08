@@ -17,7 +17,6 @@
 import relative_importer  # isort: split # noqa: F401
 
 import sys
-from typing import List
 
 import click
 from paths_finder import PathsFinder
@@ -46,9 +45,8 @@ def darwinframeworktool_runner_options(f):
                      help='Path to a set of files containing clusters definitions.')(f)
     f = click.option('--PICS', type=click.Path(exists=True), show_default=True, default=_DEFAULT_PICS_FILE,
                      help='Path to the PICS file to use.')(f)
-    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
-                     help='Path to a directory containing additional pseudo clusters.')(f)
-    return f
+    return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
+                        help='Path to a directory containing additional pseudo clusters.')(f)
 
 
 CONTEXT_SETTINGS['ignore_unknown_options'] = True
@@ -66,7 +64,7 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @darwinframeworktool_runner_options
 @click.pass_context
-def darwinframeworktool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
+def darwinframeworktool_py(ctx, commands: list[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
     server_arguments = ctx.params['server_arguments']

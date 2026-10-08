@@ -40,6 +40,7 @@ public:
 
     CHIP_ERROR WriteValue(const StorageKeyName & aKey, const ByteSpan & aValue);
     CHIP_ERROR ReadValue(const StorageKeyName & aKey, MutableByteSpan & aValue);
+    CHIP_ERROR DeleteKey(const StorageKeyName & aKey);
 
 private:
     PersistentStorageDelegate * mStorage = nullptr;

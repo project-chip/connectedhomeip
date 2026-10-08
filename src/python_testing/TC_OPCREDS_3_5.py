@@ -41,11 +41,13 @@ from datetime import timedelta
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 
-class TC_OPCREDS_3_5(MatterBaseTest):
+class TC_OPCREDS_3_5(MatterTestCommissionedDevice):
 
     def pics_TC_OPCREDS_3_5(self):
         return ["OPCREDS.S"]

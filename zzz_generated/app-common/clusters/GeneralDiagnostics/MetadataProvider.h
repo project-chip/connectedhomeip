@@ -41,6 +41,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralDiagn
             return ActiveNetworkFaults::kMetadataEntry;
         case TestEventTriggersEnabled::Id:
             return TestEventTriggersEnabled::kMetadataEntry;
+        case DeviceLoadStatus::Id:
+            return DeviceLoadStatus::kMetadataEntry;
         default:
             return std::nullopt;
         }

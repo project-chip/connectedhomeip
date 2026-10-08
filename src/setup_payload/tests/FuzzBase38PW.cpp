@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <iostream>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include "setup_payload/QRCodeSetupPayloadParser.h"
 #include <setup_payload/Base38Decode.h>
@@ -22,7 +22,7 @@ void Base38DecodeFuzz(const std::vector<uint8_t> & bytes)
 
     // Ignoring return value, because in general the data is garbage and won't decode properly.
     // We're just testing that the decoder does not crash on the fuzzer-generated inputs.
-    chip::base38Decode(base38EncodedString, decodedData);
+    RETURN_SAFELY_IGNORED chip::base38Decode(base38EncodedString, decodedData);
 }
 
 // The invocation of the FuzzTest
@@ -66,10 +66,10 @@ FUZZ_TEST(Base38Decoder, Base38RoundTripFuzz).WithDomains(Arbitrary<std::vector<
 
 void FuzzQRCodeSetupPayloadParser(const std::string & s)
 {
-    chip::Platform::MemoryInit();
+    RETURN_SAFELY_IGNORED chip::Platform::MemoryInit();
 
     SetupPayload payload;
-    QRCodeSetupPayloadParser(s).populatePayload(payload);
+    RETURN_SAFELY_IGNORED QRCodeSetupPayloadParser(s).populatePayload(payload);
 }
 
 FUZZ_TEST(Base38Decoder, FuzzQRCodeSetupPayloadParser).WithDomains(Arbitrary<std::string>());

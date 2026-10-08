@@ -11,5 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("on-off-server") {
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("on-off-server") {
+  sources = [
+    "OnOffCluster.cpp",
+    "OnOffCluster.h",
+    "OnOffDelegate.h",
+    "OnOffEffectDelegate.h",
+    "OnOffLightingCluster.cpp",
+    "OnOffLightingCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/OnOff",
+  ]
 }

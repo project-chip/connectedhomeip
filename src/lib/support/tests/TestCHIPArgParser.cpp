@@ -30,7 +30,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/EnforceFormat.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/Constants.h>
 
 using namespace chip::ArgParser;
@@ -662,6 +662,50 @@ TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Missing");
     VerifyArgErrorContains(0, "--run");
+}
+
+TEST_F(TestCHIPArgParser, LargeOptionIdTest)
+{
+    // clang-format off
+    static OptionDef optionDefsLarge[] =
+    {
+        { "large-id-1", kNoArgument, 65488 },
+        { "large-id-2", kArgumentRequired, 0xFFFF },
+        { }
+    };
+    static OptionSet optionSetLarge =
+    {
+        HandleOption,
+        optionDefsLarge,
+        "LARGE ID OPTION SET",
+        "help text\n"
+        "--large-id-1\n"
+        "--large-id-2\n"
+    };
+    // clang-format on
+
+    static OptionSet * optionSets[] = { &optionSetLarge, nullptr };
+    // clang-format off
+    static const char * argv[] =
+    {
+        "",
+        "--large-id-1",
+        "--large-id-2", "val",
+        nullptr
+    };
+    // clang-format on
+    static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    TestArgv argsDup = DupeArgs(argv, argc);
+    bool res         = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 3u) << "Invalid value returned for sCallbackRecordCount";
+    VerifyHandleOptionCallback(0, __FUNCTION__, &optionSetLarge, 65488, "--large-id-1", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &optionSetLarge, 0xFFFF, "--large-id-2", "val");
+    VerifyHandleNonOptionArgsCallback(2, __FUNCTION__, 0);
 }
 
 static void ClearCallbackRecords()

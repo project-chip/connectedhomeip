@@ -1015,7 +1015,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (strcmp(networkPath, "/") != 0)
+    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
     {
         GAutoPtr<GError> error;
 
@@ -1464,7 +1464,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
-    if (strcmp(networkPath, "/") == 0)
+    if (networkPath == nullptr || strcmp(networkPath, "/") == 0)
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
@@ -1478,7 +1478,10 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
 
     network.connected     = wpa_fi_w1_wpa_supplicant1_network_get_enabled(networkInfo.get());
     GVariant * properties = wpa_fi_w1_wpa_supplicant1_network_get_properties(networkInfo.get());
+    VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
+
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
+    VerifyOrReturnError(ssid, CHIP_ERROR_KEY_NOT_FOUND);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
@@ -1795,18 +1798,19 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen = ssidLen;
+    result.ssidLen     = ssidLen;
+    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
     if (signal < INT8_MIN)
     {
-        result.rssi = INT8_MIN;
+        result.signal.strength = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.rssi = INT8_MAX;
+        result.signal.strength = INT8_MAX;
     }
     else
     {
-        result.rssi = static_cast<uint8_t>(signal);
+        result.signal.strength = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);

@@ -20,7 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 #include <cstdint>
@@ -124,6 +124,7 @@ public:
     ReadOnlyBuffer(const T * buffer, size_t size, bool allocated) :
         Span<const T>(buffer, size), ScopedBuffer(allocated ? const_cast<void *>(static_cast<const void *>(buffer)) : nullptr)
     {}
+    ReadOnlyBuffer(ReadOnlyBuffer && other) : Span<const T>(other), ScopedBuffer(std::move(other)) {}
     ~ReadOnlyBuffer() = default;
 
     ReadOnlyBuffer & operator=(ReadOnlyBuffer && other)

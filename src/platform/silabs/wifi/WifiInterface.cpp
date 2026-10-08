@@ -27,6 +27,7 @@
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
 // TODO: We shouldn't need to have access to a global variable in the interface here
 extern WfxRsi_t wfx_rsi;
@@ -123,7 +124,7 @@ void WifiInterface::ResetIPNotificationStates()
 
 void WifiInterface::NotifyWifiTaskInitialized(void)
 {
-    sl_wfx_startup_ind_t evt = { 0 };
+    sl_wfx_startup_ind_t evt = { { 0 } };
 
     // TODO: We should move this to the init function and not the notification function
     // Creating a timer which will be used to retry connection with AP
@@ -134,15 +135,9 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
 
-    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
-    //        Issue is same structure name but different contents
-#if WF200_WIFI
-    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
-#else
-    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
-#endif // WF200_WIFI
+    MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 
-    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
+    TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
@@ -166,13 +161,13 @@ void WifiInterface::ScheduleConnectionAttempt()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         //  Remove High performance request before giving up due to a timer start error to save battery life
-        Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         return;
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+    TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);

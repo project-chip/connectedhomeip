@@ -117,7 +117,7 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(SubDev
     else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        MakeZclCharString(zclNameSpan, dev->GetName());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
     {
@@ -216,7 +216,7 @@ void CallReportingCallback(intptr_t closure)
 void ScheduleReportingCallback(SubDevice * dev, ClusterId cluster, AttributeId attribute)
 {
     auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
-    DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
 }
 } // anonymous namespace
 
@@ -260,6 +260,6 @@ void Init_Bridge_Endpoint()
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // A bridge has root node device type on EP0 and aggregate node device type (bridge) at EP1
-    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
-    emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
+    TEMPORARY_RETURN_IGNORED emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
+    TEMPORARY_RETURN_IGNORED emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 }

@@ -152,8 +152,13 @@ public:
 
     virtual void LogDeviceConfig() = 0;
 
-    virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                     = 0;
+    virtual bool IsCommissionableDeviceTypeEnabled()          = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) = 0;
+    // Override the device type id returned by GetDeviceTypeId() (and therefore
+    // advertised in the DNS-SD "_T<id>" commissioning subtype) for this session.
+    // The override is not persisted across reboots. Not all platforms implement
+    // this; the default returns CHIP_ERROR_NOT_IMPLEMENTED.
+    virtual CHIP_ERROR SetDeviceTypeId(uint32_t deviceType) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
     virtual CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize)    = 0;
     virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
@@ -191,7 +196,7 @@ protected:
 };
 
 /**
- * Returns a reference to a ConfigurationManager object.
+ * Returns a reference to a ConfigurationManager singleton object.
  *
  * Applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
@@ -199,7 +204,7 @@ protected:
 ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager object.
+ * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
  * Applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the selected platform.

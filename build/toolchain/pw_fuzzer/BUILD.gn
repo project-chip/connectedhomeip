@@ -16,55 +16,145 @@ import("//build_overrides/build.gni")
 import("//build_overrides/googletest.gni")
 import("//build_overrides/pigweed.gni")
 
-import("$dir_pigweed/targets/host/target_toolchains.gni")
+# Provides the `oss_fuzz` build arg (set true by OSS-Fuzz's build.sh).
+import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
+declare_args() {
+  # Build the FuzzTest targets in libFuzzer-compatibility mode (what OSS-Fuzz drives) instead
+  # of FuzzTest's native engine. Always on under `oss_fuzz`; set true locally to reproduce
+  # OSS-Fuzz or use libFuzzer corpus/merge/minimize. Default: native run mode.
+  chip_pw_fuzz_libfuzzer_compat = false
 
-# creating a secondary toolchain to be used with pw_fuzzer FuzzTests
-# This toolchain is downstreamed from pigweed's pw_target_toolchain_host.clang_fuzz
-# it allows us to specifically use googletest for fuzzing (instead of the lighter version of googletest used for unit testing)
+  # Build the local FuzzTest targets with UBSan in addition to the default ASan
+  # (set by the `ubsan` build_examples modifier on a -pw-fuzztest target). Local builds only;
+  # under OSS-Fuzz the engine drives sanitizers via $CFLAGS.
+  chip_pw_fuzz_ubsan = false
 
+  # Build the local FuzzTest targets with MemorySanitizer instead of the default
+  # ASan (set by the `msan` build_examples modifier on a -pw-fuzztest target). Requires an
+  # instrumented sysroot via msan_sysroot. Local builds only; under OSS-Fuzz the engine
+  # drives sanitizers via $CFLAGS.
+  chip_pw_fuzz_msan = false
+}
+
+assert(
+    !chip_pw_fuzz_msan || msan_sysroot != "",
+    "chip_pw_fuzz_msan=true requires msan_sysroot to be set. Build via " + "scripts/build/build_examples.py --target ...-pw-fuzztest-msan-clang, " + "or set SYSROOT_MSAN before `gn gen`.")
+
+# --- libFuzzer-compatibility-mode support for FuzzTest ---
+# Applied toolchain-wide (via _use_libfuzzer_compat) so the configs below reach the FuzzTest
+# library, not just the test harness.
+_use_libfuzzer_compat = oss_fuzz || chip_pw_fuzz_libfuzzer_compat
+
+# 1) Compatibility-mode define. compatibility_mode.cc defines FuzzTestExternalEngineAdaptor
+#    only under #ifdef FUZZTEST_COMPATIBILITY_MODE; a harness-only define leaves that library
+#    symbol undefined at link, so it MUST be toolchain-wide.
+config("fuzztest_compatibility_mode") {
+  defines = [ "FUZZTEST_COMPATIBILITY_MODE=libfuzzer" ]
+}
+
+# 2) libFuzzer driver. FuzzTest keeps its own main (fuzztest_gtest_main) and calls
+#    LLVMFuzzerRunDriver, so link the libFuzzer runtime WITHOUT its main (fuzzer_no_main) --
+#    never plain -fsanitize=fuzzer / $LIB_FUZZING_ENGINE, which carry a conflicting main.
+#    Resolved only in compatibility mode: the archive name is platform-specific and the
+#    lookup would fail `gn gen` where it is absent.
+config("fuzztest_libfuzzer_engine") {
+  if (_use_libfuzzer_compat) {
+    # $CXX under OSS-Fuzz, otherwise the clang++ this toolchain compiles with.
+    if (oss_fuzz) {
+      _fuzztest_compiler = getenv("CXX")
+    } else {
+      _fuzztest_compiler = "clang++"
+    }
+    ldflags = [ exec_script("print_file_name.py",
+                            [
+                              _fuzztest_compiler,
+                              "libclang_rt.fuzzer_no_main.a",
+                            ],
+                            "trim string") ]
+  }
+}
+
+# 3) Optional UBSan for LOCAL FuzzTest builds (`ubsan` modifier -> chip_pw_fuzz_ubsan): the
+#    fuzzing-specific deltas over chip's global UBSan config, which already reaches this
+#    toolchain via is_ubsan (it supplies -fsanitize=undefined, the ignorelist, and -fno-rtti vptr).
+config("fuzztest_ubsan") {
+  cflags = [
+    # make UB abort so FuzzTest records it as a crash (UBSan recovers by default)
+    "-fno-sanitize-recover=undefined",
+
+    # defined unsigned wraps, not UB -- fuzzing noise on first-party code
+    "-fno-sanitize=unsigned-integer-overflow",
+    "-fno-sanitize=unsigned-shift-base",
+  ]
+  ldflags = [ "-fsanitize=undefined" ]
+}
+
+# Coverage feedback for MSAN builds; with ASan, chip's sanitize_address config
+# carries the same -fsanitize-coverage flags.
+config("fuzztest_coverage") {
+  cflags = [ "-fsanitize-coverage=inline-8bit-counters,trace-cmp" ]
+}
+
+# In libFuzzer-compatibility mode the libFuzzer runtime archive is linked ahead
+# of the objects that use it, which GNU ld does not resolve; lld does. chip
+# applies target_ldflags (where OSS-Fuzz passes -fuse-ld=lld) to the default
+# toolchain only, so select lld here. Linux only: Apple clang ships no lld.
+config("fuzztest_lld") {
+  if (host_os == "linux") {
+    ldflags = [ "-fuse-ld=lld" ]
+  }
+}
+
+# Toolchain for FuzzTest binaries: chip's clang host toolchain with chip's own
+# sanitizer, fuzzing and coverage configs. //third_party/fuzztest builds
+# FuzzTest itself.
 gcc_toolchain("chip_pw_fuzztest") {
-  forward_variables_from(pw_target_toolchain_host.clang_fuzz, "*", [ "name" ])
+  # Under OSS-Fuzz, use the compiler OSS-Fuzz provides ($CC/$CXX) so the
+  # instrumentation it injects via $CFLAGS/$CXXFLAGS (chip's oss_fuzz config)
+  # matches the runtime we link.
+  if (oss_fuzz) {
+    cc = getenv("CC")
+    cxx = getenv("CXX")
+  }
 
   toolchain_args = {
-    # This is needed to have the defaults passed from pw_target_toolchain_host.clang_fuzz to the current scope
-    forward_variables_from(defaults, "*")
-
-    pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
-    pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
-
-    # The next three lines are needed by the gcc_toolchain template
     current_os = host_os
     current_cpu = host_cpu
     is_clang = true
 
-    # the upstream pigweed host_clang toolchain defines a default sysroot, which results in build errors
-    # since it does not include SSL lib and is supposed to be minimal by design.
-    # by removing this default config, we will use the system's libs. Otherwise we can define our own sysroot.
-    # discussion on: https://discord.com/channels/691686718377558037/1275092695764959232
-    remove_default_configs = [ "$dir_pw_toolchain/host_clang:linux_sysroot" ]
+    chip_fuzztest_dir = "//third_party/fuzztest/repo"
+    chip_abseil_cpp_dir = "//third_party/abseil-cpp/src"
 
-    # when is_debug = true, we pass -O0 to cflags and ldflags, while upstream pw_fuzzer toolchain defines "optimize_speed" config that passes -O2.
-    # This condition was added to prevent mixing the flags
-    if (is_debug) {
-      remove_default_configs += [ "$dir_pw_build:optimize_speed" ]
+    # chip's test-support libraries use pw_unit_test; back it with the
+    # GoogleTest that FuzzTest links so a binary holds a single copy.
+    pw_unit_test_BACKEND = "$dir_pw_unit_test:googletest"
+    dir_pw_third_party_googletest = "$dir_googletest"
+    chip_build_tests_googletest = true
+
+    default_configs_extra = []
+    if (_use_libfuzzer_compat) {
+      default_configs_extra += [
+        "//build/toolchain/pw_fuzzer:fuzztest_compatibility_mode",
+        "//build/toolchain/pw_fuzzer:fuzztest_libfuzzer_engine",
+        "//build/toolchain/pw_fuzzer:fuzztest_lld",
+      ]
     }
 
-    # removing pigweed downstreamed configs related to warnings
-    # These are triggering an error related to -Wcast-qual in third_party/nlio
-    remove_default_configs += [
-      "$dir_pw_build:strict_warnings",
-      "$dir_pw_build:extra_strict_warnings",
-    ]
-
-    # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]
-    treat_warnings_as_errors = false
-
-    dir_pw_third_party_abseil_cpp = "//third_party/abseil-cpp/src"
-    dir_pw_third_party_fuzztest = "//third_party/fuzztest"
-    dir_pw_third_party_googletest = "$dir_googletest"
-
-    # Since pw_fuzzer uses GoogleTest, activating this allows us to benefit from supporting functions
-    chip_build_tests_googletest = true
+    # Under OSS-Fuzz, $CFLAGS/$CXXFLAGS drive sanitizers and coverage through
+    # chip's fuzzing_default -> oss_fuzz config.
+    if (!oss_fuzz) {
+      if (chip_pw_fuzz_msan) {
+        is_msan = true
+        default_configs_extra +=
+            [ "//build/toolchain/pw_fuzzer:fuzztest_coverage" ]
+      } else {
+        is_asan = true
+        if (chip_pw_fuzz_ubsan) {
+          default_configs_extra +=
+              [ "//build/toolchain/pw_fuzzer:fuzztest_ubsan" ]
+        }
+      }
+    }
   }
 }

@@ -60,7 +60,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace BoostStarted.
+} // namespace BoostStarted
 namespace BoostEnded {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -82,7 +82,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace BoostEnded.
+} // namespace BoostEnded
 } // namespace Events
 } // namespace WaterHeaterManagement
 } // namespace Clusters

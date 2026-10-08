@@ -56,7 +56,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
@@ -71,7 +71,7 @@ public:
     CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
-#endif // SL_WIFI
+#endif // defined (SL_WIFI) && SL_WIFI
 };
 
 /**

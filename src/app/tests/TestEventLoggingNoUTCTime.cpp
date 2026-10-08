@@ -75,7 +75,7 @@ private:
     chip::System::Clock::ClockBase & mRealClock;
 };
 
-class TestEventLoggingNoUTCTime : public chip::Test::AppContext
+class TestEventLoggingNoUTCTime : public chip::Testing::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite

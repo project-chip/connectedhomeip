@@ -451,7 +451,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
     // Ignore all other attributes, we don't care above the global attributes.
 }
 
-class TestReadChunking : public chip::Test::AppContext
+class TestReadChunking : public chip::Testing::AppContext
 {
 protected:
     struct Instruction;

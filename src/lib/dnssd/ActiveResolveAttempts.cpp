@@ -17,6 +17,7 @@
 
 #include "ActiveResolveAttempts.h"
 
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -71,7 +72,7 @@ bool ActiveResolveAttempts::HasBrowseFor(chip::Dnssd::DiscoveryType type) const
     return false;
 }
 
-void ActiveResolveAttempts::CompleteIpResolution(SerializedQNameIterator targetHostName)
+void ActiveResolveAttempts::CompleteIpResolution(chip::Dnssd::SerializedQNameIterator targetHostName)
 {
     for (auto & item : mRetryQueue)
     {
@@ -284,7 +285,7 @@ bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const
     return false;
 }
 
-bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const
+bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(chip::Dnssd::SerializedQNameIterator hostName) const
 {
     for (auto & entry : mRetryQueue)
     {

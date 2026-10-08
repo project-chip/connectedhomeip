@@ -221,6 +221,7 @@ message AttributeData {
     int32 data_int32 = 8;
     float data_single = 10;
     string data_string = 11;
+    bool is_null = 12;
   };
   optional bytes tlv_data = 9;
 }

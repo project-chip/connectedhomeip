@@ -52,13 +52,11 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
-#include <platform/Tizen/ErrorUtils.h>
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -305,8 +303,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
                  ChipLogError(DeviceLayer, "FAIL: Thread get active dataset TLVs: %s", get_error_message(threadErr)));
 
     ChipLogProgress(DeviceLayer, "Thread get active dataset TLVs size [%u]", tlvsLen);
-    mDataset.Init(ByteSpan(tlvsData, tlvsLen));
-    dataset.Init(mDataset.AsByteSpan());
+    TEMPORARY_RETURN_IGNORED mDataset.Init(ByteSpan(tlvsData, tlvsLen));
+    TEMPORARY_RETURN_IGNORED dataset.Init(mDataset.AsByteSpan());
 
     return CHIP_NO_ERROR;
 
@@ -354,7 +352,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
             {
                 this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
@@ -365,7 +363,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
                      ChipLogError(DeviceLayer, "FAIL: Attach Thread network: %s", get_error_message(threadErr)));
 
         threadErr = thread_start(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr)
             {
                 this->mpConnectCallback->OnResult(threadErr == THREAD_ERROR_NONE ? NetworkCommissioning::Status::kSuccess
@@ -495,7 +493,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 
 #if defined(TIZEN_NETWORK_THREAD_VERSION) && TIZEN_NETWORK_THREAD_VERSION >= 0x000900
     int threadErr = thread_get_version(mThreadInstance, &version);
-    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, TizenToChipError(threadErr),
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, MATTER_PLATFORM_ERROR(threadErr),
                         ChipLogError(DeviceLayer, "FAIL: Get thread version: %s", get_error_message(threadErr)));
     ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
     return CHIP_NO_ERROR;

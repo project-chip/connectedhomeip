@@ -34,7 +34,7 @@ chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 
-chip_enable_openthread = true
+chip_enable_thread = true
 
 chip_inet_config_enable_ipv4 = false
 

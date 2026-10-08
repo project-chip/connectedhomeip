@@ -8,4 +8,3 @@ src/controller/tests/TestServerCommandDispatch.cpp
 src/controller/tests/TestWriteChunking.cpp
 src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm
 src/darwin/Framework/CHIP/ServerEndpoint/MTRServerEndpoint.mm
-src/app/storage/FabricTableImpl.ipp

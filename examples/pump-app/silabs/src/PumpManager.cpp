@@ -33,7 +33,7 @@ CHIP_ERROR PumpManager::Init()
     mTimerHandle = osTimerNew(TimerEventHandler, osTimerOnce, this, NULL);
     if (NULL == mTimerHandle)
     {
-        return CHIP_ERROR_INTERNAL;
+        return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
     mState = kState_StopCompleted;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,6 +67,9 @@ public:
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
+    static bool sIsCommissioningFailed;
+    static bool IsCommissioningFailed(void) { return sIsCommissioningFailed; }
+
 #ifdef CONFIG_TFLM_FEATURE
     void SetThreadStateChangedEventCapturedFlag(void) { mThreadStateChangedEventCaptured = true; }
 
@@ -115,8 +118,8 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
-    static void StartBleAdvButtonEventHandler(void);
-    static void StartBleAdvHandler(AppEvent * aEvent);
+    static void ToggleBleAdvButtonEventHandler(void);
+    static void ToggleBleAdvHandler(AppEvent * aEvent);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     static void StartThreadButtonEventHandler(void);
@@ -139,6 +142,8 @@ protected:
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void UpdateStatusLED(void);
+
+    static void OtaEventsHandler(const ChipDeviceEvent * event);
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;

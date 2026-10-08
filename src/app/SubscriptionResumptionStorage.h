@@ -141,6 +141,9 @@ public:
      * Iterate through persisted subscriptions
      *
      * @return A valid iterator on success. Use CommonIterator accessor to retrieve SubscriptionInfo
+     *
+     * Warning: Implementations using fixed-size pools may return nullptr if the iterator pool is exhausted.
+     * Callers should check for nullptr before using the iterator.
      */
     virtual SubscriptionInfoIterator * IterateSubscriptions() = 0;
 

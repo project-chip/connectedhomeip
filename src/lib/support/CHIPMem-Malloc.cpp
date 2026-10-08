@@ -24,8 +24,8 @@
  */
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/Assertions.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/VerificationMacrosNoLogging.h>
 
 #include <stdlib.h>
 

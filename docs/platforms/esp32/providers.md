@@ -36,34 +36,36 @@ Currently, there are two implementations for this provider:
     data via OTA, they should switch to the second implementation in the OTA
     image and use the `Set...()` APIs to set the fixed data.
 
-#### Example:
+#### Example
 
 ```cpp
-#include <platform/ESP32/StaticESP32FactoryDataProvider.h>
+#include <platform/ESP32/StaticESP32DeviceInfoProvider.h>
+
+using namespace chip;
+using namespace chip::app::Clusters::TimeFormatLocalization;
 
 DeviceLayer::StaticESP32DeviceInfoProvider deviceInfoProvider;
 
 // Define array for Supported Calendar Types
-using namespace chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 CalendarTypeEnum supportedCalendarTypes[] = {
     CalendarTypeEnum::kGregorian,
 };
 
 // Define array for Supported Locales
-const char* supportedLocales[] = {
-    "en-US",
-    "en-GB",
+CharSpan supportedLocales[] = {
+    "en-US"_span,
+    "en-GB"_span,
 };
 
 // Define array for Fixed labels { EndpointId, Label, Value }
-struct StaticESP32DeviceInfoProvider::FixedLabelEntry fixedLabels[] = {
-    { 0, "Orientation", "North" },
-    { 0, "Direction", "Up" },
+struct DeviceLayer::StaticESP32DeviceInfoProvider::FixedLabelEntry fixedLabels[] = {
+    { 0, "Orientation"_span, "North"_span },
+    { 0, "Direction"_span, "Up"_span },
 };
 
 Span<CalendarTypeEnum> sSupportedCalendarTypes(supportedCalendarTypes);
-Span<const char*> sSupportedLocales(supportedLocales);
-Span<StaticESP32DeviceInfoProvider::FixedLabelEntry> sFixedLabels(fixedLabels);
+Span<CharSpan> sSupportedLocales(supportedLocales);
+Span<DeviceLayer::StaticESP32DeviceInfoProvider::FixedLabelEntry> sFixedLabels(fixedLabels);
 
 {
     deviceInfoProvider.SetSupportedLocales(sSupportedLocales);

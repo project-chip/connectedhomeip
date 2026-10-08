@@ -41,6 +41,7 @@
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
+#include <transport/MessageStats.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/Session.h>
 #include <transport/SessionDelegate.h>
@@ -152,6 +153,7 @@ public:
     /**
      * @brief
      *   This function takes the payload and returns an encrypted message which can be sent multiple times.
+     *   Every successful call to this function MUST be followed by a send attempt with the prepared message.
      *
      * @details
      *   It does the following:
@@ -528,6 +530,8 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
+    MessageStats GetMessageStats() const { return mMessageStats; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -551,6 +555,7 @@ private:
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
+    MessageStats mMessageStats;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
@@ -619,6 +624,9 @@ private:
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
+
+    void CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
 };
 
 namespace MessagePacketBuffer {

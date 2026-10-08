@@ -116,9 +116,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
-        loop.close()
+        asyncio.run(main())
     except Exception as ex:
         logger.exception(ex)
         TestFail("Exception occurred when running tests.")

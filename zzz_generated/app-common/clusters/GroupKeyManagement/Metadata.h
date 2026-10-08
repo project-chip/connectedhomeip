@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 

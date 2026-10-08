@@ -20,8 +20,9 @@
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
-
-using namespace ::chip::DeviceLayer::Silabs;
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -30,23 +31,22 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
 #endif
     error = DecodeTlv();
 
-    if (error != CHIP_NO_ERROR)
+    // The factory data payload can contain a variable number of fields
+    // to be updated. CHIP_END_OF_TLV is returned if no more fields are
+    // found.
+    if (error == CHIP_END_OF_TLV)
     {
-        // The factory data payload can contain a variable number of fields
-        // to be updated. CHIP_END_OF_TLV is returned if no more fields are
-        // found.
-        if (error == CHIP_END_OF_TLV)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        Clear();
+        return CHIP_NO_ERROR;
     }
 
+    if (error != CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED Clear();
+    }
     return error;
 }
 
@@ -66,7 +66,7 @@ exit:
     }
     else
     {
-        error = Provision::Manager::GetInstance().GetStorage().Commit();
+        error = mStorageWriter.Commit();
         VerifyOrReturnError(error == CHIP_NO_ERROR, error,
                             ChipLogError(SoftwareUpdate, "Failed to commit factory data. Error: %s", ErrorStr(error)));
     }
@@ -134,21 +134,24 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     switch (tag)
     {
     case (int) FactoryTags::kDacKey:
-        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Key");
-        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationKey(newValue);
+        ChipLogDetail(SoftwareUpdate, "Set Device Attestation Key");
+        return mCrypto.ImportDeviceAttestationKey(newValue);
     case (int) FactoryTags::kDacCert:
-        ChipLogProgress(SoftwareUpdate, "Set Device Attestation Cert");
-        return Provision::Manager::GetInstance().GetStorage().SetDeviceAttestationCert(newValue);
+        ChipLogDetail(SoftwareUpdate, "Set Device Attestation Cert");
+        return mStorageWriter.SetDeviceAttestationCert(newValue);
     case (int) FactoryTags::kPaiCert:
-        ChipLogProgress(SoftwareUpdate, "Set Product Attestionation Intermediate Cert");
-        return Provision::Manager::GetInstance().GetStorage().SetProductAttestationIntermediateCert(newValue);
+        ChipLogDetail(SoftwareUpdate, "Set Product Attestation Intermediate Cert");
+        return mStorageWriter.SetProductAttestationIntermediateCert(newValue);
     case (int) FactoryTags::kCdCert:
-        ChipLogProgress(SoftwareUpdate, "Set Certification Declaration");
-        return Provision::Manager::GetInstance().GetStorage().SetCertificationDeclaration(newValue);
+        ChipLogDetail(SoftwareUpdate, "Set Certification Declaration");
+        return mStorageWriter.SetCertificationDeclaration(newValue);
     }
 
     ChipLogError(DeviceLayer, "Failed to find tag %d.", tag);
     return CHIP_ERROR_NOT_FOUND;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

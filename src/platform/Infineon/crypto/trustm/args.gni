@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/crypto/crypto.gni")
 
 infineon_crypto_impl = "trustm"
 infineon_crypto_root = "//third_party/infineon/trustm"

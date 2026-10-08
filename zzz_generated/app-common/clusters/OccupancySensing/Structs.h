@@ -62,6 +62,33 @@ public:
 using DecodableType = Type;
 
 } // namespace HoldTimeLimitsStruct
+namespace PredictedOccupancyStruct {
+enum class Fields : uint8_t
+{
+    kStartTimestamp = 0,
+    kEndTimestamp   = 1,
+    kOccupancy      = 2,
+    kConfidence     = 3,
+};
+
+struct Type
+{
+public:
+    uint32_t startTimestamp                  = static_cast<uint32_t>(0);
+    uint32_t endTimestamp                    = static_cast<uint32_t>(0);
+    chip::BitMask<OccupancyBitmap> occupancy = static_cast<chip::BitMask<OccupancyBitmap>>(0);
+    chip::Percent confidence                 = static_cast<chip::Percent>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PredictedOccupancyStruct
 } // namespace Structs
 } // namespace OccupancySensing
 } // namespace Clusters

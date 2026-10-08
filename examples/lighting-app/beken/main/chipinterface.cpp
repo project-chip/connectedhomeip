@@ -187,8 +187,10 @@ extern "C" void _init(void)
 
 static void InitServer(intptr_t context)
 {
-    BekenAppServer::Init();
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    BekenAppServer::Init();
     OTAHelpers::Instance().InitOTARequestor();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 }

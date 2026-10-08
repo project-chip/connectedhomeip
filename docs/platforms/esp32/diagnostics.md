@@ -9,7 +9,7 @@ Enable the following configuration options to use the ESP32 Diagnostic Logs
 Provider:
 
 ```
-CONFIG_ENABLE_ESP_DIAGNOSTICS=y
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=y
 ```
 
 This option enables the diagnostic logs storage functionality. By default, this
@@ -21,15 +21,15 @@ options accordingly:
 To enable only metrics:
 
 ```
-CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES=n
-CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS=y
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTIC_TRACES=n
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTIC_METRICS=y
 ```
 
 To enable only traces:
 
 ```
-CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES=y
-CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS=n
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTIC_TRACES=y
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTIC_METRICS=n
 ```
 
 After modifying the configuration options, make sure to perform a clean build to
@@ -67,12 +67,12 @@ Add the diagnostic logs provider delegate header to your application:
 Define buffers to store and retrieve diagnostic data:
 
 ```cpp
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS
+#ifdef CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
 static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Buffer for retrieving diagnostics
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Buffer for storing diagnostics
 
 using namespace chip::app::Clusters::DiagnosticLogs;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS
+#endif // CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
 ```
 
 The buffer sizes can be configured through Kconfig options:
@@ -87,14 +87,14 @@ The buffer sizes can be configured through Kconfig options:
 Implement the diagnostic logs cluster initialization callback:
 
 ```cpp
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS
+#ifdef CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = LogProvider::GetInstance();
     logProvider.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE, retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS
+#endif // CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
 ```
 
 This callback initializes the log provider with the configured buffers and sets
@@ -123,11 +123,49 @@ CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF=y
 
 The `examples/temperature-measurement-app/esp32/` demonstrates proper
 integration: For more information related to the retrieval of diagnostics
-through diagnosticlogs cluster refer readme.md in app folder.
+through diagnosticlogs cluster refer Readme.md in app folder.
+
+# Using ESP32 Insights Integration
+
+This section describes how to integrate ESP Insights functionality for automatic
+diagnostic data collection and cloud reporting.
+
+## Configuration Options
+
+Enable the following configuration options to use ESP Insights:
+
+```
+CONFIG_ESP_INSIGHTS_ENABLED=y
+CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=y
+```
+
+Both options are required:
+
+-   `CONFIG_ESP_INSIGHTS_ENABLED`: Enables ESP Insights cloud integration
+-   `CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS`: Enables diagnostic data collection
+
+## Implementation Reference
+
+The ESP32 Insights delegate implementation is available at:
+
+```
+examples/platform/esp32/diagnostics/insights/insights-delegate.h
+examples/platform/esp32/diagnostics/insights/insights-delegate.cpp
+```
+
+These files contain the implementation of the `InsightsDelegate` class which
+handles diagnostic data collection and transmission to ESP Insights.
+
+## Insights Example Integration
+
+The `examples/lighting-app/esp32/` demonstrates proper integration:
+
+For more detailed information about insights integration refer to the README.md
+file in each application folder.
 
 ## Important Notes
 
 -   The diagnostic logs provider **must** be explicitly enabled through the
-    `CONFIG_ENABLE_ESP_DIAGNOSTICS` option
+    `CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS` option
 -   Buffer sizes should be adjusted based on your application's needs
 -   The provider supports end-user support logs and crash logs (when configured)

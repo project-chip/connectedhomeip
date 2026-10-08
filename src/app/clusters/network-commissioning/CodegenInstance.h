@@ -20,6 +20,7 @@
 
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
@@ -45,9 +46,9 @@ public:
     /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
-    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
-    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
-    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
+    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mContext) {}
+    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mContext) {}
+    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mContext) {}
 
 private:
     // Does the tracking via the public general commissioning cluster (if available)
@@ -58,6 +59,12 @@ private:
     };
 
     CodegenGeneralCommissioningBreadcrumbTracker mTracker;
+    NetworkCommissioningCluster::Context mContext{
+        .breadcrumbTracker   = mTracker,
+        .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 

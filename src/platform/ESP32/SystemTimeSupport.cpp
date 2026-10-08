@@ -28,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <esp_timer.h>
+#include <sys/time.h>
 
 namespace chip {
 namespace System {

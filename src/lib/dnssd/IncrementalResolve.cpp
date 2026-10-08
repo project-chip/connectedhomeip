@@ -20,19 +20,20 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
 
 namespace chip {
 namespace Dnssd {
 
-using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace mdns::Minimal::Logging;
 
 namespace {
 
-ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
+ByteSpan GetSpan(const chip::Dnssd::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }
@@ -41,11 +42,11 @@ ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 ///
 /// Supported records are whatever `FillNodeDataFromTxt` supports.
 template <class DataType>
-class TxtParser : public mdns::Minimal::TxtRecordDelegate
+class TxtParser : public chip::Dnssd::TxtRecordDelegate
 {
 public:
     explicit TxtParser(DataType & data) : mData(data) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
+    void OnRecord(const chip::Dnssd::BytesRange & name, const chip::Dnssd::BytesRange & value) override
     {
         FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mData);
     }
@@ -137,10 +138,18 @@ SerializedQNameIterator StoredServerName::Get() const
     return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
-CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
-                                                  const mdns::Minimal::SrvRecord & srv)
+CHIP_ERROR IncrementalResolver::InitializeParsing(chip::Dnssd::SerializedQNameIterator name, const uint64_t ttl,
+                                                  const chip::Dnssd::SrvRecord & srv)
 {
     AutoInactiveResetter inactiveReset(*this);
+
+    // Reject non-matter service names before storing anything. Non-matter devices may use instance names larger than
+    // kMaxStoredNameLength, leading to errors such as CHIP_ERROR_NO_MEMORY.
+    mServiceNameType = ComputeServiceNameType(name);
+    if (mServiceNameType == ServiceNameType::kInvalid)
+    {
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
+    }
 
     ReturnErrorOnFailure(mRecordName.Set(name));
     ReturnErrorOnFailure(mTargetHostName.Set(srv.GetName()));
@@ -163,8 +172,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         // only save the first part: the MAC or 802.15.4 Extended Address in hex
         Platform::CopyString(mCommonResolutionData.hostName, serverName.Value());
     }
-
-    mServiceNameType = ComputeServiceNameType(name);
 
     switch (mServiceNameType)
     {
@@ -207,7 +214,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
     }
 
     inactiveReset.Disarm();

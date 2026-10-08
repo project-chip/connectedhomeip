@@ -129,7 +129,8 @@ public:
     }
 
     /**
-     * @brief Define the copy constructor
+     * @brief Copy constructor. Deep-copies Endpoint objects so that each Endpoint's
+     * mCastingPlayer raw pointer points to this new CastingPlayer instance.
      */
     CastingPlayer(const CastingPlayer & other);
 
@@ -142,6 +143,33 @@ public:
      * @return true if this CastingPlayer is connected to the CastingApp
      */
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
+
+    /**
+     * @brief Directly sends a User-directed Commissioning request with the provided idOptions.
+     * This bypasses additionals checks and processes around commissioning like setting up a
+     * commissioning-window and instead can be used to directly talk to the CastingPlayer.
+     *
+     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defined in
+     * ConnectCallbacks.h.
+     *
+     * For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the Commissioner replies with a
+     * CommissionerDeclaration message with PasscodeDialogDisplayed and CommissionerPasscode set to true. Given these Commissioner
+     * state details, the client is expected to perform some actions, detailed in the ContinueConnecting() API below, and then call
+     * the ContinueConnecting() API to complete the process.
+     *
+     * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
+     * These parameters specify the information relating to the requested commissioning session.
+     *
+     * For example: To invoke the CastingPlayer/Commissioner-Generated passcode commissioning flow, the client would call this API
+     * with IdentificationDeclarationOptions containing CommissionerPasscode set to true. See IdentificationDeclarationOptions.h for
+     * a complete list of optional parameters.
+     *
+     * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
+     * If this value is passed in, VerifyOrEstablishConnection() will force UDC, in case the desired
+     * TargetApp is not found in the on-device CastingStore.
+     */
+    void SendUDC(ConnectionCallbacks connectionCallbacks,
+                 IdentificationDeclarationOptions idOptions = IdentificationDeclarationOptions());
 
     /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new commissioning session request. If the
@@ -305,16 +333,19 @@ public:
     void OnCommissioningWindowOpened() override;
     void OnCommissioningWindowClosed() override;
 
-private:
-    std::vector<memory::Strong<Endpoint>> mEndpoints;
-    ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-    CastingPlayerAttributes mAttributes;
-    IdentificationDeclarationOptions mIdOptions;
+protected:
+    // Exposed for testing - allows test code to simulate the crash scenario
     // This is a std::weak_ptr. A std::weak_ptr is a non-owning reference to an object managed by one
     // or more std::shared_ptr instances. When the last std::shared_ptr instance that owns the managed
     // object is destroyed or reset, the object itself is automatically destroyed, and all
     // std::weak_ptr instances that reference that object become expired.
     static memory::Weak<CastingPlayer> mTargetCastingPlayer;
+
+private:
+    std::vector<memory::Strong<Endpoint>> mEndpoints;
+    ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+    CastingPlayerAttributes mAttributes;
+    IdentificationDeclarationOptions mIdOptions;
     uint16_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted            = {};
     bool mClientProvidedCommissionerDeclarationCallback;

@@ -27,12 +27,12 @@
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
 
-namespace Test {
+namespace Testing {
 // Provides access to private/protected members of AutoCommissioner class for testing
 class AutoCommissionerTestAccess
 {
@@ -49,6 +49,8 @@ public:
     Controller::CommissioningParameters & AccessParams() { return mCommissioner->mParams; }
 
     void CleanupCommissioning() { mCommissioner->CleanupCommissioning(); }
+
+    void ClearPDCParameters() { mCommissioner->ClearPDCParameters(); }
 
     CommissioneeDeviceProxy * GetCommissioneeDeviceProxy() { return mCommissioner->GetCommissioneeDeviceProxy(); }
 
@@ -95,13 +97,19 @@ public:
 
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
+    void TryPrimaryNetwork() { mCommissioner->TryPrimaryNetwork(); }
+
+    bool TryingPrimaryNetwork() const { return mCommissioner->TryingPrimaryNetwork(); }
+
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
+
+    bool WroteNetworkConfig() const { return mCommissioner->mWroteNetworkConfig; }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

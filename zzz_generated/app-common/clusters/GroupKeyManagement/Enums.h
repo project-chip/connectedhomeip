@@ -44,6 +44,7 @@ enum class GroupKeySecurityPolicyEnum : uint8_t
 enum class Feature : uint32_t
 {
     kCacheAndSync = 0x1,
+    kGroupcast    = 0x2,
 };
 } // namespace GroupKeyManagement
 } // namespace Clusters

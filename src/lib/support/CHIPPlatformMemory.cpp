@@ -26,7 +26,7 @@ extern "C" {
 
 extern int CHIPPlatformMemoryInit(void * buf, size_t bufSize)
 {
-    return static_cast<int>(chip::Platform::MemoryInit(buf, bufSize).AsInteger());
+    return static_cast<int>(chip::Platform::MemoryInit(buf, bufSize).GetError().AsInteger());
 }
 
 extern void CHIPPlatformMemoryShutdown()

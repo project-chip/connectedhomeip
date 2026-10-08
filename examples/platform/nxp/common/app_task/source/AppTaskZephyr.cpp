@@ -43,8 +43,20 @@
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #else
-#include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
+#include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
+
+#if CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#if CONFIG_SOC_FAMILY_NXP_RW
+#include <platform/nxp/common/crypto/S50/S50KeyAllocator.h>
+#endif // CONFIG_SOC_FAMILY_NXP_RW
+#endif // CONFIG_CHIP_CRYPTO_PSA
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+// Defined in the Zephyr border router implementation (border_agent.c), which is a C source file.
+extern "C" const char otbr_base_service_instance_name[];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TBR
 
 #include "AppFactoryData.h"
 
@@ -80,6 +92,16 @@ chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTas
         &(NetworkCommissioning::NxpEthDriver::Instance()));
 }
 #endif
+
+void chip::NXP::App::AppTaskZephyr::PreInitMatterServerInstance()
+{
+#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_SOC_FAMILY_NXP_RW
+    // Configure the PSA crypto subsystem to use the S50 secure element
+    // for hardware-backed key storage.
+    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
+#endif
+}
 
 CHIP_ERROR chip::NXP::App::AppTaskZephyr::AppMatter_Register()
 {
@@ -129,3 +151,10 @@ void chip::NXP::App::AppTaskZephyr::DispatchEvent(const AppEvent & event)
         LOG_INF("Event received with no handler. Dropping event.");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskZephyr::GetBorderRouterName()
+{
+    return BuildBorderRouterName(otbr_base_service_instance_name);
+}
+#endif

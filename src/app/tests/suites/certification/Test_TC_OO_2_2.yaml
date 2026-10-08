@@ -12,6 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/on-off-light"
+      app: all-devices
+      args:
+          - --device
+          - on-off-light
+
 name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
 
 PICS:

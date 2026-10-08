@@ -16,11 +16,12 @@
  */
 #pragma once
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <stdlib.h>
 
@@ -274,11 +275,12 @@ public:
     {
         AttestationInfo(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
                         const ByteSpan & attestationSignature, const ByteSpan & paiDer, const ByteSpan & dacDer,
-                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId) :
+                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId,
+                        DeviceAttestationCertProfile remoteAttestationProfile = DeviceAttestationCertProfile::kEcdsaMatterLegacy) :
             attestationElementsBuffer(attestationElements),
             attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
             paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
-            productId(remoteProductId)
+            productId(remoteProductId), attestationProfile(remoteAttestationProfile)
         {}
         const ByteSpan
             attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
@@ -289,6 +291,7 @@ public:
         const ByteSpan attestationNonceBuffer;     // Buffer containing attestation nonce.
         VendorId vendorId;
         uint16_t productId;
+        DeviceAttestationCertProfile attestationProfile;
     };
 
     // Copies the bytes passed to it, and holds the PAI, DAC, and CD for additional verification step
@@ -440,6 +443,9 @@ protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 
+    // Defaults to true for now. Should be set to false after a notification period.
+    // https://github.com/project-chip/connectedhomeip/issues/42460 to track.
+    static constexpr bool kEnableCdTestKeysForProvisionalCds = true;
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;

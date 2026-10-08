@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 
 namespace chip {
 namespace app {

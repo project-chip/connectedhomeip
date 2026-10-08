@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -30,9 +30,15 @@ set(EXTRA_COMPONENT_DIRS
 )
 
 if(${IDF_TARGET} STREQUAL "esp32")
-  list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework")
+  list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework")
+
+  # The m5stack-tft library builds only against the legacy `driver` component, which
+  # ESP-IDF 6.0 dissolved into per-peripheral components. Leaving it out of the build also
+  # rules out CONFIG_HAVE_DISPLAY; screen-framework enforces that.
+  if(IDF_VERSION_MAJOR LESS 6)
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
+      "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver")
+  endif()
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

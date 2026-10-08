@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 source_set("wifi-network-diagnostics-server") {
   sources = [
     "WiFiDiagnosticsTestEventTriggerHandler.h",
-    "wifi-network-diagnostics-cluster.cpp",
-    "wifi-network-diagnostics-cluster.h",
+    "WiFiNetworkDiagnosticsCluster.cpp",
+    "WiFiNetworkDiagnosticsCluster.h",
   ]
 
   public_deps = [

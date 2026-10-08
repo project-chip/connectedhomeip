@@ -47,7 +47,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 
     streamer_printf(sout, "done\r\n");
 
@@ -241,8 +241,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "startbcm") == 0)
     {
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-        return CHIP_NO_ERROR;
+        return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }

@@ -17,8 +17,8 @@
 
 #include "Reboot.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
-
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/reboot.h>
 
@@ -32,7 +32,11 @@ static constexpr char kRebootReason[] = "RebootReason";
 
 void Reboot(SoftwareRebootReason reason)
 {
-    KeyValueStoreMgr().Put(kRebootReason, &reason, sizeof(reason));
+    CHIP_ERROR err = KeyValueStoreMgr().Put(kRebootReason, &reason, sizeof(reason));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "RebootReason put err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     sys_reboot(SYS_REBOOT_WARM);
 }
@@ -45,7 +49,11 @@ SoftwareRebootReason GetSoftwareRebootReason()
 
     if (KeyValueStoreMgr().Get(kRebootReason, &reason, sizeof(reason)) == CHIP_NO_ERROR)
     {
-        KeyValueStoreMgr().Delete(kRebootReason);
+        CHIP_ERROR err = KeyValueStoreMgr().Delete(kRebootReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "RebootReason del err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     return reason;

@@ -22,8 +22,9 @@
 #include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <media-controller.h>
+#include <system/SystemLayer.h>
 #include <webrtc-transport.h>
 
 #include <map>
@@ -39,7 +40,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public Delegate, public WebRTCTransportProviderController
+class WebRTCProviderManager : public Delegate
 {
 public:
     WebRTCProviderManager() :
@@ -54,31 +55,31 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) override;
+    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
 
-    CHIP_ERROR
-    HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
+    CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
     CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                chip::app::DataModel::Nullable<uint16_t> videoStreamID,
-                                chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> & videoStreams,
+                                   chip::Optional<std::vector<uint16_t>> & audioStreams) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
     CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+
+    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
 
     CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
 
@@ -138,6 +139,16 @@ private:
     void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
     void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
 
+    void CleanupSession(uint16_t sessionId);
+
+    void StartConnectionTimer(uint16_t sessionId);
+
+    void CancelConnectionTimer(uint16_t sessionId);
+
+    void HandleConnectionTimeout(uint16_t sessionId);
+
+    static void OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context);
+
     WebrtcTransport * GetTransport(uint16_t sessionId);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
@@ -149,13 +160,22 @@ private:
 
     MediaController * mMediaController = nullptr;
 
-    std::unique_ptr<WebRTCTransportProviderServer> mWebRTCTransportProvider = nullptr;
+    WebRTCTransportProviderCluster * mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
     CameraDeviceInterface * mCameraDevice = nullptr;
 
     bool mSoftLiveStreamPrivacyEnabled = false;
+
+    struct ConnectionTimeoutContext
+    {
+        WebRTCProviderManager * manager;
+        uint16_t sessionId;
+    };
+
+    // Map to track active connection timeout timers for cancellation
+    std::unordered_map<uint16_t, ConnectionTimeoutContext *> mConnectionTimerContexts;
 };
 
 } // namespace WebRTCTransportProvider

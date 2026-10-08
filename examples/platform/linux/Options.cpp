@@ -31,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -73,6 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
+    kDeviceOption_ThreadNodeId,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -93,6 +95,7 @@ enum
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
+    kDeviceOption_AppPipeOut,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -144,6 +147,7 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
+    kDeviceOption_icdShortIdleModeDuration,
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
@@ -151,6 +155,8 @@ enum
     kDeviceOption_Camera_TestAudiosrc,
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
+    kDeviceOption_Camera_Framerate,
+    kDeviceOption_Camera_RemoteAnalysis,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -165,14 +171,23 @@ OptionDef sDeviceOptionDefs[] = {
     { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    // On Linux the interface managed by wpa_supplicant can be selected via --wifi=<interface>.
+    { "wifi", kArgumentOptional, kDeviceOption_WiFi },
+#else
     { "wifi", kNoArgument, kDeviceOption_WiFi },
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+#else
     { "thread", kNoArgument, kDeviceOption_Thread },
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
@@ -201,6 +216,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
+    { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -247,6 +263,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+    { "icdShortIdleModeDuration", kArgumentRequired, kDeviceOption_icdShortIdleModeDuration },
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
@@ -254,6 +271,8 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
+    { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
+    { "camera-remote-analysis", kNoArgument, kDeviceOption_Camera_RemoteAnalysis },
 #endif
     {}
 };
@@ -263,12 +282,15 @@ const char * sDeviceOptionHelp =
     "  --ble-controller <selector>\n"
     "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     "\n"
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    "  --wifi[=interface]\n"
+    "       Enable Wi-Fi management via wpa_supplicant, optionally specifying the interface name.\n"
+#else
     "  --wifi\n"
     "       Enable Wi-Fi management via wpa_supplicant.\n"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     "\n"
     "  --wifi-supports-5g\n"
     "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
@@ -280,9 +302,14 @@ const char * sDeviceOptionHelp =
     "       Give an empty string if not setting freq_list: \"\"\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAFs
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
+    "  --thread-node-id <node id>\n"
+    "       Enable Thread Simulation with the specified node id.\n"
+#else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --version <version>\n"
@@ -363,7 +390,10 @@ const char * sDeviceOptionHelp =
     "       A interface id to advertise on.\n"
     "\n"
     "  --app-pipe <filepath>\n"
-    "       Custom path for the current application to send out of band commands.\n"
+    "       Custom path for the current application to receive out of band commands from the test.\n"
+    "\n"
+    "  --app-pipe-out <filepath>\n"
+    "       Custom path for the current application to send out of band commands to the test.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -443,6 +473,7 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+    "       PQC Device Attestation is enabled automatically when the provider reports compatible credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"
@@ -472,6 +503,12 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-audio-playback\n"
     "       Enables audio playback gstreamer pipeline to play the audio received from remote peer.\n"
+    "\n"
+    "  --camera-framerate <fps>\n"
+    "       Framerate for video streaming (default: 30).\n"
+    "\n"
+    "  --camera-remote-analysis\n"
+    "       Runs camera-app as a Remote Analysis Node (REMCONDETECT) with analysis streams enabled.\n"
     "\n"
 #endif
     "\n";
@@ -540,17 +577,37 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        if (aValue != nullptr && *aValue != 0)
+        {
+            LinuxDeviceOptions::GetInstance().mWiFiInterface.Emplace(aValue);
+        }
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
         break;
 
     case kDeviceOption_WiFiSupports5g:
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    case kDeviceOption_ThreadNodeId:
+        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
+        {
+            PrintArgError("%s: invalid value specified for Thread node id: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+#else
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;
         break;
+#endif
+#endif
 
     case kDeviceOption_Version:
         LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));
@@ -681,18 +738,18 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     case kDeviceOption_SecuredDevicePort:
-        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_UnsecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     case kDeviceOption_SecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
     case kCommissionerOption_FabricID:
         LinuxDeviceOptions::GetInstance().commissionerFabricId = static_cast<chip::FabricId>(strtoull(aValue, nullptr, 0));
@@ -715,9 +772,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().app_pipe = aValue;
         break;
 
+    case kDeviceOption_AppPipeOut:
+        LinuxDeviceOptions::GetInstance().app_pipe_out = aValue;
+        break;
+
     case kDeviceOption_InterfaceId:
         LinuxDeviceOptions::GetInstance().interfaceId =
-            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(strtoul(aValue, nullptr, 0)));
         break;
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -725,13 +786,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
         break;
     case kDeviceOption_TraceLog:
-        if (atoi(aValue) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
         }
         break;
     case kDeviceOption_TraceDecode:
-        if (atoi(aValue) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled = true;
         }
@@ -807,15 +868,16 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 #if defined(PW_RPC_ENABLED)
     case kOptionRpcServerPort:
-        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     case kDeviceOption_SubscriptionCapacity:
-        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
-        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec =
+            static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_IdleRetransmitTimeout: {
         auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
@@ -867,10 +929,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
     case kDeviceOption_DacProvider: {
         LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
-        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
-        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
-
-        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
 #if CHIP_ATTESTATION_TRUSTY_OS
@@ -881,12 +939,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case kDeviceOption_TermsAndConditions_Version: {
-        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 
     case kDeviceOption_TermsAndConditions_Required: {
-        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 #endif
@@ -913,8 +971,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         else
         {
-            // Covert from seconds to mini seconds
+            // Covert from seconds to milli seconds
             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
+        break;
+    }
+    case kDeviceOption_icdShortIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdShortIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() &&
+                (value > std::chrono::duration_cast<System::Clock::Seconds32>(
+                             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value())
+                             .count()))
+            {
+                PrintArgError("%s: icdShortIdleModeDuration value (%s) must be <= icdIdleModeDuration\n", aProgram, aValue);
+                retval = false;
+            }
+            else
+            {
+                LinuxDeviceOptions::GetInstance().shortIdleModeDurationS = chip::System::Clock::Seconds32(value);
+            }
         }
         break;
     }
@@ -938,6 +1020,21 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
     case kDeviceOption_Camera_VideoDevice: {
         LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
+        break;
+    }
+    case kDeviceOption_Camera_Framerate: {
+        unsigned long value = strtoul(aValue, nullptr, 0);
+        if (value > UINT16_MAX)
+        {
+            PrintArgError("%s: Invalid camera framerate: %s\n", aProgram, aValue);
+            retval = false;
+            break;
+        }
+        LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
+        break;
+    }
+    case kDeviceOption_Camera_RemoteAnalysis: {
+        LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis = true;
         break;
     }
 #endif
@@ -975,15 +1072,34 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Resolve an explicitly requested provider for applications with their own initialization path.
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        ResolveDeviceAttestationCredentialsProvider();
+    }
     return CHIP_NO_ERROR;
 }
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
-    if (gDeviceOptions.dacProvider == nullptr)
+    return gDeviceOptions;
+}
+
+void ResolveDeviceAttestationCredentialsProvider()
+{
+    if (gDeviceOptions.dacProvider != nullptr)
     {
-        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+        return;
     }
 
-    return gDeviceOptions;
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+        gDeviceOptions.dacProvider = &testDacProvider;
+        return;
+    }
+
+    gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
 }

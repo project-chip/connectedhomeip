@@ -38,19 +38,20 @@ void LEDWidget::Init(const uint8_t led)
     mBlinkOffTimeMS   = 0;
     mLed              = led;
     mLedStatus        = false;
+    mLevel            = 0;
     Set(false);
 }
 
 void LEDWidget::Invert(void)
 {
-    GetPlatform().ToggleLed(mLed);
+    TEMPORARY_RETURN_IGNORED GetPlatform().ToggleLed(mLed);
     mLedStatus = !mLedStatus;
 }
 
 void LEDWidget::Set(bool state)
 {
     mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
-    GetPlatform().SetLed(state, mLed);
+    TEMPORARY_RETURN_IGNORED GetPlatform().SetLed(state, mLed);
     mLedStatus = state;
 }
 

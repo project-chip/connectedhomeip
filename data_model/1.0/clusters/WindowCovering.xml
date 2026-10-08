@@ -1,0 +1,690 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering Cluster" revision="5">
+  <revisionHistory>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added; CCB 1994 1995 1996 1997 2086 2094 2095 2096 2097"/>
+    <revision revision="2" summary="CCB 2328"/>
+    <revision revision="3" summary="CCB 2477 2555 2845 3028"/>
+    <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
+    <revision revision="5" summary="New data model format and notation. Created plus clarified Position Aware and Absolute Position features. General cleanup of functionality."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0102" name="Window Covering"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="WNCV" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="LF" name="Lift" summary="Lift Control and behavior for lifting/sliding window coverings">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="TL" name="Tilt" summary="Tilt Control and behavior for tilting window coverings">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="PA_LF" name="Position Aware Lift" summary="Position Aware lift control is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="ABS" name="Absolute Position" summary="Absolute positioning is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="PA_TL" name="Position Aware Tilt" summary="Position Aware tilt control is supported.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <attributes>
+    <attribute id="0x0000" name="Type" type="enum8" default="0">
+      <enum>
+        <item value="0x00" name="Rollershade" summary="Rollershade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x01" name="Rollershade2Motor" summary="Rollershade - 2 Motor">
+          <mandatoryConform/>
+        </item>
+        <item value="0x02" name="RollershadeExterior" summary="Rollershade - Exterior">
+          <mandatoryConform/>
+        </item>
+        <item value="0x03" name="RollershadeExterior2Motor" summary="Rollershade - Exterior - 2 Motor">
+          <mandatoryConform/>
+        </item>
+        <item value="0x04" name="Draperycurtain" summary="Drapery (curtain)">
+          <mandatoryConform/>
+        </item>
+        <item value="0x05" name="Awning" summary="Awning">
+          <mandatoryConform/>
+        </item>
+        <item value="0x06" name="Shutter" summary="Shutter">
+          <mandatoryConform/>
+        </item>
+        <item value="0x07" name="TiltBlindTiltOnly" summary="Tilt Blind - Tilt Only">
+          <mandatoryConform/>
+        </item>
+        <item value="0x08" name="TiltBlindLiftTilt" summary="Tilt Blind - Lift &amp; Tilt">
+          <mandatoryConform/>
+        </item>
+        <item value="0x09" name="ProjectorScreen" summary="Projector Screen">
+          <mandatoryConform/>
+        </item>
+        <item value="0xFF" name="Unknown" summary="Unknown">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="PhysicalClosedLimitLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0002" name="PhysicalClosedLimitTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0003" name="CurrentPositionLift" type="uint16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="InstalledOpenLimitLift"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitLift"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="CurrentPositionTilt" type="uint16" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="InstalledOpenLimitTilt"/>
+          </from>
+          <to>
+            <attribute name="InstalledClosedLimitTilt"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="NumberOfActuationsLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="LF"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0006" name="NumberOfActuationsTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="TL"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0007" name="ConfigStatus" type="map8" default="desc">
+      <bitmap>
+        <bitfield name="OperationalThisStatusBitDefinesIfTheWindowCoveringIsOperationalTheSafetyStatusModeAttributesMightAffectThisBit" bit="0" summary="Operational: This status bit defines if the Window Covering is operational. The _SafetyStatus_ &amp; _Mode_ attributes might affect this bit">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Deprecated" bit="1" summary="deprecated">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="ReversalThisStatusBitIdentifiesIfTheDirectionsOfTheLiftslideMovementsHaveBeenReversedInOrderForCommandsEGOpenCloseGoTosToMatchThePhysicalInstallationConditionsThisBitCanBeAdjustedBySettingTheAppropriateReversalBitValueInTheModeAttribute" bit="2" summary="Reversal: This status bit identifies if the directions of the lift/slide movements have been reversed in order for commands (e.g: Open, Close, GoTos) to match the physical installation conditions This bit can be adjusted by setting the appropriate reversal bit value in the Mode attribute">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="ControlLiftThisStatusBitIdentifiesIfTheWindowCoveringSupportsThePositionAwareLiftControl" bit="3" summary="Control - Lift: This status bit identifies if the window covering supports the Position Aware Lift Control">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="ControlTiltThisStatusBitIdentifiesIfTheWindowCoveringSupportsThePositionAwareTiltControl" bit="4" summary="Control - Tilt: This status bit identifies if the window covering supports the Position Aware Tilt Control">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="EncoderLiftThisStatusBitIdentifiesIfAPositionAwareControlledWindowCoveringIsEmployingAnEncoderForPositioningTheHeightOfTheWindowCovering" bit="5" summary="Encoder - Lift: This status bit identifies if a Position Aware Controlled Window Covering is employing an encoder for positioning the height of the window covering.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="EncoderTiltThisStatusBitIdentifiesIfAPositionAwareControlledWindowCoveringIsEmployingAnEncoderForTiltingTheWindowCovering" bit="6" summary="Encoder - Tilt: This status bit identifies if a Position Aware Controlled Window Covering is employing an encoder for tilting the window covering.">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="CurrentPositionLiftPercentage" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" scene="true" persistence="nonVolatile" reportable="true"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="CurrentPositionTiltPercentage" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" scene="true" persistence="nonVolatile" reportable="true"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="OperationalStatus" type="map8" default="0">
+      <bitmap>
+        <bitfield name="IndicatesInWhichDirectionTheCoveringIsCurrentlyMovingOrIfItHasStoppedIfItIsMovingFromClosedToOpenTheValueOfThisEnumerationIs01BIfItIsMovingFromOpenToClosedTheValueIs10BIfTheCoveringIsCurrentlyNotMovingTheValueIs00BTheValue11BIsReserved" from="0x00000000" to="0x00000001" summary="Indicates in which direction the covering is currently moving or if it has stopped. If it is moving from closed to open, the value of this enumeration is 01b; if it is moving from open to closed, the value is 10b; if the covering is currently not moving the value is 00b; the value 11b is reserved.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="IndicatesInWhichDirectionTheCoveringsLiftIsCurrentlyMovingOrIfItHasStoppedIfItIsMovingFromClosedToOpenTheValueOfThisEnumerationIs01BIfItIsMovingFromOpenToClosedTheValueIs10BIfItIsCurrentlyNotMovingTheValueIs00BTheValue11BIsReserved" from="0x00000002" to="0x00000003" summary="Indicates in which direction the covering&apos;s Lift is currently moving or if it has stopped. If it is moving from closed to open, the value of this enumeration is 01b; if it is moving from open to closed, the value is 10b; if it is currently not moving the value is 00b; the value 11b is reserved.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="IndicatesInWhichDirectionTheCoveringsTiltIsCurrentlyMovingOrIfItHasStoppedIfItIsMovingFromClosedToOpenTheValueOfThisEnumerationIs01BIfItIsMovingFromOpenToClosedTheValueIs10BIfItIsCurrentlyNotMovingTheValueIs00BTheValue11BIsReserved" from="0x00000004" to="0x00000005" summary="Indicates in which direction the covering&apos;s Tilt is currently moving or if it has stopped. If it is moving from closed to open, the value of this enumeration is 01b; if it is moving from open to closed, the value is 10b; if it is currently not moving the value is 00b; the value 11b is reserved.">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="63"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" scene="true" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" scene="true" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="EndProductType" type="enum8" default="0">
+      <enum>
+        <item value="0x00" name="RollerShade" summary="Roller Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x01" name="RomanShade" summary="Roman Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x02" name="BalloonShade" summary="Balloon Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x03" name="WovenWood" summary="Woven Wood">
+          <mandatoryConform/>
+        </item>
+        <item value="0x04" name="PleatedShade" summary="Pleated Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x05" name="CellularShade" summary="Cellular Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x06" name="LayeredShade" summary="Layered Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x07" name="LayeredShade2D" summary="Layered Shade 2D">
+          <mandatoryConform/>
+        </item>
+        <item value="0x08" name="SheerShade" summary="Sheer Shade">
+          <mandatoryConform/>
+        </item>
+        <item value="0x09" name="TiltOnlyInteriorBlind" summary="Tilt Only Interior Blind">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0A" name="InteriorBlind" summary="Interior Blind">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0B" name="VerticalBlindStripCurtain" summary="Vertical Blind, Strip Curtain">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0C" name="InteriorVenetianBlind" summary="Interior Venetian Blind">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0D" name="ExteriorVenetianBlind" summary="Exterior Venetian Blind">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0E" name="LateralLeftCurtain" summary="Lateral Left Curtain">
+          <mandatoryConform/>
+        </item>
+        <item value="0x0F" name="LateralRightCurtain" summary="Lateral Right Curtain">
+          <mandatoryConform/>
+        </item>
+        <item value="0x10" name="CentralCurtain" summary="Central Curtain">
+          <mandatoryConform/>
+        </item>
+        <item value="0x11" name="RollerShutter" summary="Roller Shutter">
+          <mandatoryConform/>
+        </item>
+        <item value="0x12" name="ExteriorVerticalScreen" summary="Exterior Vertical Screen">
+          <mandatoryConform/>
+        </item>
+        <item value="0x13" name="AwningTerracePatio" summary="Awning Terrace (Patio)">
+          <mandatoryConform/>
+        </item>
+        <item value="0x14" name="AwningVerticalScreen" summary="Awning Vertical Screen">
+          <mandatoryConform/>
+        </item>
+        <item value="0x15" name="TiltOnlyPergola" summary="Tilt Only Pergola">
+          <mandatoryConform/>
+        </item>
+        <item value="0x16" name="SwingingShutter" summary="Swinging Shutter">
+          <mandatoryConform/>
+        </item>
+        <item value="0x17" name="SlidingShutter" summary="Sliding Shutter">
+          <mandatoryConform/>
+        </item>
+        <item value="0xFF" name="Unknown" summary="Unknown">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="InstalledOpenLimitLift" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="65534"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="InstalledClosedLimitLift" type="uint16" default="65534">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="PA_LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="65534"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="InstalledOpenLimitTilt" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="65534"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="InstalledClosedLimitTilt" type="uint16" default="65534">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="PA_TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="65534"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0014" name="VelocityLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0015" name="AccelerationTimeLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0016" name="DecelerationTimeLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0017" name="Mode" type="map8" default="0">
+      <bitmap>
+        <bitfield name="Disables0OrEnables1LiftReversal" bit="0" summary="Disables (0) or Enables (1) Lift reversal">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Disabled0OrEnabled1PlacingTheWindowCoveringIntoCalibrationModeWhereLimitsAreEitherSetupUsingToolsOrLearnedByTheWindowCoveringByDoingSelfCalibrationIfInCalibrationModeAllCommandsEGUpOrOpenDownOrCloseGoTosThatCanResultInMovementCouldBeAcceptedAndResultInASelfCalibrationBeingInitiatedBeforeTheCommandIsExecutedInCaseTheWindowCoveringDoesNotHaveTheAbilityOrIsNotAbleToPerformASelfCalibrationTheCommandSHOULDBeIgnoredAndAFAILUREStatusSHOULDBeReturnedInAWriteInteractionSettingThisBitTo0WhileTheDeviceIsInCalibrationModeIsNotAllowedAndSHALLGenerateAFAILUREErrorStatusInOrderToLeaveCalibrationModeTheDeviceMustPerformItsCalibrationRoutineEitherAsASelfCalibrationOrAssistedByExternalToolSDependingOnTheDevicemanufacturerImplementationAManufacturerMightChooseToSetTheOperationalBitToItsNotOperationalValueIfApplicableDuringCalibrationMode" bit="1" summary="Disabled (0) or Enabled (1) placing the Window Covering into calibration Mode where limits are either setup using tools or learned by the Window Covering by doing self-calibration. If in calibration mode, all commands (e.g: UpOrOpen, DownOrClose, GoTos) that can result in movement, could be accepted and result in a self-calibration being initiated before the command is executed. In case the Window Covering does not have the ability or is not able to perform a self-calibration, the command SHOULD be ignored and a FAILURE status SHOULD be returned. In a write interaction, setting this bit to 0, while the device is in calibration mode, is not allowed and SHALL generate a FAILURE error status. In order to leave calibration mode, the device must perform its calibration routine, either as a self-calibration or assisted by external tool(s), depending on the device/manufacturer implementation. A manufacturer might choose to set the operational bit to its not operational value, if applicable during calibration mode">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Disables0OrEnables1PlacingTheWindowCoveringIntoMaintenanceModeWhereItCannotBeMovedOverTheNetworkOrByASwitchConnectedToALocalSwitchInputWhileInMaintenanceModeAllCommandsEGUpOrOpenDownOrCloseGoTosThatCanResultInMovementMustBeIgnoredAndRespondWithABUSYStatusAdditionallyTheOperationalBitOfTheConfigStatusAttributeShouldBeSetToItsNotOperationalValue" bit="2" summary="Disables (0) or Enables (1) placing the Window Covering into Maintenance Mode where it cannot be moved over the network or by a switch connected to a Local Switch Input. While in maintenance mode, all commands (e.g: UpOrOpen, DownOrClose, GoTos) that can result in movement, must be ignored and respond with a BUSY status. Additionally, the operational bit of the ConfigStatus attribute should be set to its not operational value.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Disables0OrEnables1TheDisplayOfAnyFeedbackLeDsResidentEspeciallyOnThePackagingOfAnEndpointWhereTheyMayCauseDistractionToTheOccupant" bit="3" summary="Disables (0) or Enables (1) the display of any feedback LEDs resident especially on the packaging of an endpoint where they may cause distraction to the occupant.">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="15"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0018" name="IntermediateSetpointsLift">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0019" name="IntermediateSetpointsTilt">
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x001A" name="SafetyStatus" type="map16" default="0">
+      <bitmap>
+        <bitfield name="MovementCommandsAreIgnoredLockedOutEGNotGrantedAuthorizationOutsideSomeTimedateRange" bit="0" summary="Movement commands are ignored (locked out). e.g. not granted authorization, outside some time/date range.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="TamperingDetectedOnSensorsOrAnyOtherSafetyEquipmentExADeviceHasBeenForcedlyMovedWithoutItsActuatorS" bit="1" summary="Tampering detected on sensors or any other safety equipment. Ex: a device has been forcedly moved without its actuator(s).">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CommunicationFailureToSensorsOrOtherSafetyEquipment" bit="2" summary="Communication failure to sensors or other safety equipment.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="DeviceHasFailedToReachTheDesiredPositionEGWithPositionAwareDeviceTimeExpiredBeforeTargetPositionIsReached" bit="3" summary="Device has failed to reach the desired position. e.g. with Position Aware device, time expired before TargetPosition is reached.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="MotorSAndorElectricCircuitThermalProtectionActivated" bit="4" summary="Motor(s) and/or electric circuit thermal protection activated.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="AnObstacleIsPreventingActuatorMovement" bit="5" summary="An obstacle is preventing actuator movement.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="DeviceHasPowerRelatedIssueOrLimitationEGDeviceIsRunningWTheHelpOfABackupBatteryOrPowerMightNotBeFullyAvailableAtTheMoment" bit="6" summary="Device has power related issue or limitation e.g. device is running w/ the help of a backup battery or power might not be fully available at the moment.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="LocalSafetySensorNotADirectObstacleIsPreventingMovementsEGSafetyEUStandardEN60335" bit="7" summary="Local safety sensor (not a direct obstacle) is preventing movements (e.g. Safety EU Standard EN60335).">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="MechanicalProblemRelatedToTheMotorSDetected" bit="8" summary="Mechanical problem related to the motor(s) detected.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="PcBFuseAndOtherElectricsProblems" bit="9" summary="PCB, fuse and other electrics problems.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="ActuatorIsManuallyOperatedAndIsPreventingActuatorMovementEGActuatorIsDisengageddecoupled" bit="10" summary="Actuator is manually operated and is preventing actuator movement (e.g. actuator is disengaged/decoupled).">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="ProtectionIsActivated" bit="11" summary="Protection is activated.">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="UpOrOpen" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="DownOrClose" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="StopMotion" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x04" name="GoToLiftValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="LF"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <field id="0" name="LiftValue" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="LF"/>
+            <feature name="PA_LF"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="LF"/>
+        </optionalConform>
+      </otherwiseConform>
+      <field id="0" name="LiftPercentageValue" type="percent">
+        <optionalConform choice="a"/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="LiftPercent100thsValue" type="percent100ths">
+        <optionalConform choice="a"/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <andTerm>
+          <feature name="TL"/>
+          <feature name="ABS"/>
+        </andTerm>
+      </optionalConform>
+      <field id="0" name="TiltValue" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x08" name="GoToTiltPercentage" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <andTerm>
+            <feature name="TL"/>
+            <feature name="PA_TL"/>
+          </andTerm>
+        </mandatoryConform>
+        <optionalConform>
+          <feature name="TL"/>
+        </optionalConform>
+      </otherwiseConform>
+      <field id="0" name="TiltPercentageValue" type="percent">
+        <optionalConform choice="a"/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="TiltPercent100thsValue" type="percent100ths">
+        <optionalConform choice="a"/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

@@ -19,10 +19,12 @@
 
 #include "QueryReplyFilter.h"
 
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <system/SystemClock.h>
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
 
 namespace {
 

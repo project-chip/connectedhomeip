@@ -26,7 +26,6 @@ struct AppEvent : public BaseAppEvent
     enum AppEventTypes
     {
         kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
-        kEventType_Install,
         kEventType_UpdateUI,
     };
 
@@ -34,5 +33,6 @@ struct AppEvent : public BaseAppEvent
     {
         uint8_t Action;
         uint16_t EndpointId;
+        uint32_t Generation;
     } ClosureEvent;
 };

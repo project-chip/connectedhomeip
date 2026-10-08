@@ -20,6 +20,6 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 app_data_model = "${chip_root}/examples/window-app/common:window-common"
 chip_enable_ota_requestor = true
-chip_enable_openthread = true
+chip_enable_thread = true
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

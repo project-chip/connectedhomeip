@@ -26,6 +26,8 @@ static_library("raw") {
 
   sources = [
     "Base.h",
+    "GroupcastTesting.cpp",
+    "GroupcastTesting.h",
     "MessageHeader.cpp",
     "MessageHeader.h",
     "PeerAddress.cpp",
@@ -64,6 +66,13 @@ static_library("raw") {
       "NfcApplicationDelegate.h",
     ]
   }
+
+  # ProxyTransport is always compiled in; it is a no-op unless activated
+  # via ProxyTransportBase::Activate().
+  sources += [
+    "ProxyTransport.cpp",
+    "ProxyTransport.h",
+  ]
 
   cflags = [ "-Wconversion" ]
 

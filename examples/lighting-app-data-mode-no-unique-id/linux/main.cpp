@@ -83,9 +83,9 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        RETURN_SAFELY_IGNORED sChipNamedPipeCommands.Stop();
     }
-    IdentifyInit();
+    SuccessOrDie(IdentifyInit());
 }
 
 void ApplicationShutdown()

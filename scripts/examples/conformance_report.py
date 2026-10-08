@@ -15,7 +15,7 @@ DEFAULT_TARGETS = [
     "linux-x64-bridge-no-ble-clang-boringssl",
     "linux-x64-contact-sensor-no-ble",
     "linux-x64-dishwasher-no-ble",
-    "linux-x64-energy-management-no-ble-clang-boringssl",
+    "linux-x64-evse-no-ble-clang-boringssl",
     "linux-x64-light-data-model-no-unique-id-no-ble",
     "linux-x64-light-no-ble",
     "linux-x64-lit-icd-no-ble",
@@ -31,12 +31,13 @@ DEFAULT_TARGETS = [
     "linux-x64-thermostat-no-ble",
     "linux-x64-tv-app-no-ble-clang-boringssl",
     "linux-x64-tv-casting-app-no-ble",
+    "linux-x64-water-heater-no-ble-clang-boringssl",
     "linux-x64-water-leak-detector-no-ble"
 ]
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]
 TMP_RESULTS_DIR = "/tmp/conformance_report"
 OUT_DIR = "./out"
-TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00 --bool-arg ignore_in_progress:True allow_provisional:True\"'"
+TEST_COMMAND = "scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app {} --factory-reset --app-args \"--trace-to json:log\" --script src/python_testing/{}.py --script-args \"--qr-code MT:-24J0AFN00KA0648G00 --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True\"'"
 BUILD_COMMAND = "python3 scripts/build/build_examples.py --ninja-jobs {} --target {} build"
 NINJA_JOBS = max(os.cpu_count() - 2, 1)  # Limit # of jobs to avoid using too much CPU and RAM
 
@@ -66,11 +67,11 @@ def find_executables(dirs):
       A list of paths to the first executable found in each directory.
     """
     executables = []
-    for dir in dirs:
-        if not os.path.isdir(dir):
+    for directory in dirs:
+        if not os.path.isdir(directory):
             continue
-        for filename in os.listdir(dir):
-            filepath = os.path.join(dir, filename)
+        for filename in os.listdir(directory):
+            filepath = os.path.join(directory, filename)
             if os.path.isfile(filepath) and os.access(filepath, os.X_OK):
                 executables.append(filepath)
                 break  # Move to the next directory
@@ -93,7 +94,7 @@ def parse_test_logs(test_log_paths):
     for test_log_path in test_log_paths:
         print(f"  Parsing {test_log_path}")
         try:
-            with open(test_log_path, "r") as f:
+            with open(test_log_path) as f:
                 output_lines = f.readlines()
         except FileNotFoundError:
             print(f"Result file not found {test_log_path}. Skipping...")
@@ -303,7 +304,7 @@ def csv_to_html_report(csv_file_paths, html_page_title, html_out_dir, sha):
     """
 
     for csv_file_path in csv_file_paths:
-        with open(csv_file_path, 'r') as csv_file:
+        with open(csv_file_path) as csv_file:
             reader = csv.reader(csv_file)
             table_title = next(reader)[0]
             headers = next(reader)

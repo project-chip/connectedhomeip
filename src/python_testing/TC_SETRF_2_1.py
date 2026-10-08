@@ -48,14 +48,16 @@ from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
+class TC_SETRF_2_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_1."""
 
     def desc_TC_SETRF_2_1(self) -> str:
@@ -70,7 +72,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
 
     def steps_TC_SETRF_2_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      "DUT is commissioned.", is_commissioning=True),
             TestStep("2", "TH reads from the DUT the TariffInfo attribute.", """
@@ -195,6 +197,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -240,6 +243,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                             - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -277,6 +281,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                             - Verify that Threshold is null if BlockModeValue is 0 (NoBlock);
                             - Verify that Threshold has type int64 or null if BlockModeValue is 1 (Combined) or 2 (Individual);
                         - Verify that if Label field is presented it is null or has type string with max length 128;
+                        - Verify that if ExternalID field is presented it has type string with max length 36;
                         - Predicted field:
                             - Verify that if Predicted field is presented it has type bool;
                         - Verify that it has at least one of the fields: Price, FriendlyCredit, AuxiliaryLoad, PeakPeriod, PowerThreshold;
@@ -317,8 +322,6 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                      - If defaultRandomizationTypeValue is 0x04 (RandomNegative), Verify that the DUT response contains an int16 value less or equal 0;
                      - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains an int16 value greater or equal 0."""),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_SETRF_2_1(self):
@@ -402,7 +405,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
             self.step("19")
 
             if not self.check_pics("SETRF.S.A0012"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
+                log.warning("DefaultRandomizationType attribute is actually supported by DUT, but PICS SETRF.S.A0012 is False")
 
             # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
             await self.check_default_randomization_type_attribute(endpoint)
@@ -420,7 +423,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
             self.step("20")
 
             if not self.check_pics("SETRF.S.A0011"):  # for cases when it is supported by DUT, but disabled in PICS
-                logger.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
+                log.warning("DefaultRandomizationOffset attribute is actually supported by DUT, but PICS SETRF.S.A0011 is False")
 
             # TH reads DefaultRandomizationOffset attribute, expects a int16
             await self.check_default_randomization_offset_attribute(endpoint)

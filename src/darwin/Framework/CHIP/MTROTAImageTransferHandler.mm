@@ -168,7 +168,13 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
     } else {
         blockSize = kMaxBdxBlockSize;
     }
-    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, blockSize, kBdxTimeout);
+
+    System::Clock::Timeout timeout = kBdxTimeout;
+    auto timeoutOverride = Platform::GetUserDefaultBDXTransferTimeout();
+    if (timeoutOverride.has_value()) {
+        timeout = timeoutOverride.value();
+    }
+    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, blockSize, timeout);
 }
 
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
@@ -176,8 +182,7 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
     assertChipStackLockedByCurrentThread();
 
     if (mNeedToCallTransferSessionEnd) {
-        // TODO: Store the actual error involved in error cases, so we can pass the right thing here.
-        InvokeTransferSessionEndCallback(CHIP_ERROR_INTERNAL);
+        InvokeTransferSessionEndCallback(mTransferEndError);
     }
 
     MTROTAUnsolicitedBDXMessageHandler::GetInstance()->OnTransferHandlerDestroyed(this);
@@ -319,13 +324,17 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
     }
 }
 
-CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSession::OutputEventType eventType)
+CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
+
+    TransferSession::OutputEventType eventType = event.EventType;
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (eventType == TransferSession::OutputEventType::kTransferTimeout) {
         error = CHIP_ERROR_TIMEOUT;
+    } else if (eventType == TransferSession::OutputEventType::kStatusReceived) {
+        error = GetChipErrorFromBdxStatusCode(event.statusData.statusCode);
     } else if (eventType != TransferSession::OutputEventType::kAckEOFReceived) {
         error = CHIP_ERROR_INTERNAL;
     }
@@ -480,7 +489,7 @@ void MTROTAImageTransferHandler::HandleTransferSessionOutput(TransferSession::Ou
     case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
-        err = OnTransferSessionEnd(eventType);
+        err = OnTransferSessionEnd(event);
         if (err != CHIP_NO_ERROR) {
             LogErrorOnFailure(err);
             NotifyEventHandled(eventType, err);
@@ -535,13 +544,12 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err;
 
     // If we receive a ReceiveInit message, then we prepare for transfer.
     //
     // If init succeeds, or is not needed, we send the message to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-        err = Init(ec);
+        CHIP_ERROR err = Init(ec);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
@@ -549,6 +557,5 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     }
 
     // Send the message to the AsyncFacilitator to drive the BDX session state machine.
-    AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
-    return err;
+    return AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }

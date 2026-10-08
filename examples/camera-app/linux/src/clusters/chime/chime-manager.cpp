@@ -49,7 +49,7 @@ CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
+Protocols::InteractionModel::Status ChimeManager::PlayChimeSound(uint8_t chimeID)
 {
     // check if we are enabled
     if (!mChimeServer->GetEnabled())
@@ -57,10 +57,7 @@ Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    // Get the Active Chime ID
-    auto selectedChime = mChimeServer->GetSelectedChime();
-
     // Play chime sound
-    ChipLogDetail(Camera, "Playing Chime with sound ID: %u", unsigned(selectedChime));
+    ChipLogDetail(Camera, "Playing Chime with sound ID: %u", unsigned(chimeID));
     return Protocols::InteractionModel::Status::Success;
 }

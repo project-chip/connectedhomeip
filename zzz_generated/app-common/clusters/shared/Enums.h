@@ -119,11 +119,13 @@ enum class MeasurementUnitEnum : uint8_t
     kNgm3 = 0x05,
     kPm3  = 0x06,
     kBqm3 = 0x07,
+    kDbpm = 0x08,
+    kPcft = 0x09,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 8,
+    kUnknownEnumValue = 10,
 };
 
 // Enum for ProductIdentifierTypeEnum
@@ -264,6 +266,50 @@ enum class AtomicRequestTypeEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
+// Enum for CertificationTypeEnum
+enum class CertificationTypeEnum : uint8_t
+{
+    kDeviceAttestationPKI = 0x00,
+    kOperationalPKI       = 0x01,
+    kVIDSignerPKI         = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for ClosurePanelTag
+enum class ClosurePanelTag : uint8_t
+{
+    kLift    = 0x00,
+    kTilt    = 0x01,
+    kSliding = 0x02,
+    kRotate  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ClosureTag
+enum class ClosureTag : uint8_t
+{
+    kCovering   = 0x00,
+    kWindow     = 0x01,
+    kBarrier    = 0x02,
+    kCabinet    = 0x03,
+    kGate       = 0x04,
+    kGarageDoor = 0x05,
+    kDoor       = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
 // Enum for LandmarkTag
 enum class LandmarkTag : uint8_t
 {
@@ -367,6 +413,18 @@ enum class MeasurementTypeEnum : uint16_t
     kUnknownEnumValue = 18,
 };
 
+// Enum for MediumType
+enum class MediumType : uint8_t
+{
+    kAir   = 0x00,
+    kWater = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for PositionTag
 enum class PositionTag : uint8_t
 {
@@ -412,6 +470,20 @@ enum class RelativePositionTag : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
+};
+
+// Enum for SoftwareVersionCertificationStatusEnum
+enum class SoftwareVersionCertificationStatusEnum : uint8_t
+{
+    kDevTest     = 0x00,
+    kProvisional = 0x01,
+    kCertified   = 0x02,
+    kRevoked     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for StreamUsageEnum

@@ -200,3 +200,56 @@ the device's public key, creating a valid client certificate. The server saves
 this certificate and returns its path in the response. The device can then fetch
 the certificate content from that path and use it with its private key to
 authenticate, just as in Step 2.
+
+## Running Tests
+
+To run the tests, follow these steps:
+
+### Install Test Dependencies
+
+First, install the test dependencies (assuming you have a virtual environment
+activated):
+
+```sh
+$ pip install -r requirements-test.txt
+```
+
+This will install dependencies required for running the test suite.
+
+### Run pytest
+
+To execute the test suite, run:
+
+```sh
+$ pytest
+```
+
+By default, pytest will discover and run all tests in the `test/` directory.
+
+### Run Specific Tests
+
+To run a specific test file:
+
+```sh
+$ pytest test/test_hls_validation.py
+```
+
+To run a specific test function or class:
+
+```sh
+$ pytest test/test_hls_validation.py::test_function_name
+```
+
+### Additional pytest Options
+
+For more verbose output, use:
+
+```sh
+$ pytest -v
+```
+
+To see detailed print statements in test output:
+
+```sh
+$ pytest -s
+```

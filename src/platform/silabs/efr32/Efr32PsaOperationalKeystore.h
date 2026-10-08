@@ -101,7 +101,7 @@ private:
             // This removes the PSA Keypair from storage and unloads it
             // using the EFR32OpaqueKeypair context.
             // We destroy it when the OperationKeyStore process failed.
-            mPendingKeypair->DestroyKey();
+            TEMPORARY_RETURN_IGNORED mPendingKeypair->DestroyKey();
         }
 
         Platform::Delete(mPendingKeypair);

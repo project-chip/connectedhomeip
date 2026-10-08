@@ -34,13 +34,13 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     // First, set up a way to easily track which entries correspond to the same peer.
     uint8_t bindingWithSamePeer[Table::kMaxBindingEntries];
 
-    for (auto iter = Table::GetInstance().begin(); iter != Table::GetInstance().end(); ++iter)
+    for (auto iter = mBindingTable.begin(); iter != mBindingTable.end(); ++iter)
     {
         if (iter->type != MATTER_UNICAST_BINDING)
         {
             continue;
         }
-        for (auto checkIter = Table::GetInstance().begin(); checkIter != Table::GetInstance().end(); ++checkIter)
+        for (auto checkIter = mBindingTable.begin(); checkIter != mBindingTable.end(); ++checkIter)
         {
             if (checkIter->type == MATTER_UNICAST_BINDING && checkIter->fabricIndex == iter->fabricIndex &&
                 checkIter->nodeId == iter->nodeId)
@@ -74,7 +74,7 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     }
     if (minLastAppearValue < UINT16_MAX)
     {
-        TableEntry entry = Table::GetInstance().GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
+        TableEntry entry = mBindingTable.GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
         nodeId           = ScopedNodeId(entry.nodeId, entry.fabricIndex);
         return CHIP_NO_ERROR;
     }
@@ -123,7 +123,7 @@ void PendingNotificationMap::RemoveAllEntriesForNode(const ScopedNodeId & nodeId
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        TableEntry entry = Table::GetInstance().GetAt(mPendingBindingEntries[i]);
+        TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != nodeId.GetFabricIndex() || entry.nodeId != nodeId.GetNodeId())
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
@@ -143,7 +143,7 @@ void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        TableEntry entry = Table::GetInstance().GetAt(mPendingBindingEntries[i]);
+        TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != fabric)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];

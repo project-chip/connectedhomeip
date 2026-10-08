@@ -40,8 +40,13 @@ private:
     Json::Value mJsonValue;
     Camera::CameraDevice * mCameraDevice = nullptr;
 
-    void OnZoneTriggeredHandler(uint16_t zoneId);
+    void OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds);
     void OnSetHardPrivacyModeOnHandler(bool value);
+    void OnAmbientContextTriggeredHandler(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                          uint16_t identifiedContextId);
+    void OnAvAnalysisSessionStartHandler();
+    void OnAvAnalysisPerceivedContextHandler();
+    void OnAvAnalysisSessionEndHandler();
 };
 
 class CameraAppCommandDelegate : public NamedPipeCommandDelegate

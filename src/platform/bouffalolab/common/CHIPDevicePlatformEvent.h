@@ -20,11 +20,6 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <bluetooth/bluetooth.h>
-#include <conn_internal.h>
-#endif
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -57,25 +52,25 @@ enum InternalPlatformSpecificEventTypes
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 struct BleConnEventType
 {
-    bt_conn * BtConn;
+    struct bt_conn * BtConn;
     uint8_t HciResult;
 };
 
 struct BleCCCWriteEventType
 {
-    bt_conn * BtConn;
+    struct bt_conn * BtConn;
     uint16_t Value;
 };
 
 struct BleC1WriteEventType
 {
-    bt_conn * BtConn;
+    struct bt_conn * BtConn;
     ::chip::System::PacketBuffer * Data;
 };
 
 struct BleC2IndDoneEventType
 {
-    bt_conn * BtConn;
+    struct bt_conn * BtConn;
     uint8_t Result;
 };
 

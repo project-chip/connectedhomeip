@@ -16,6 +16,4 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/camera-av-stream-management-server.cpp"
-    "${CLUSTER_DIR}/camera-av-stream-management-server.h"
 )

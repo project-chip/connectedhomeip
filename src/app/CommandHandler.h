@@ -114,6 +114,11 @@ public:
 
         void Invalidate() { mpHandler = nullptr; }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        // Test-only method to release the session held by the CommandHandler's exchange context.
+        void TestOnlyReleaseSession();
+#endif
+
     private:
         void Init(CommandHandler * handler);
 
@@ -177,6 +182,37 @@ public:
     virtual FabricIndex GetAccessingFabricIndex() const = 0;
 
     /**
+     * Non-virtual response payload descriptor binding an untyped pointer to command data with a type-erased encoding callback.
+     *
+     * Using a POD struct with a standalone function pointer callback explicitly avoids compiler-generated virtual class
+     * constructors, destructors (both complete object and deleting destructors), vtable arrays, and RTTI metadata per
+     * response command type.
+     *
+     * @note mEncodeFn MUST be non-null. Construction via EncodeTypedCommandPayload guarantees a valid function pointer callback.
+     */
+    struct EncodableResponsePayload
+    {
+        using EncodeFn = CHIP_ERROR (*)(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag);
+
+        const void * mData;
+        EncodeFn mEncodeFn;
+
+        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const { return mEncodeFn(mData, writer, tag); }
+
+        /// Adapter wrapping EncodableResponsePayload into EncodableToTLV for compatibility with EncodableToTLV APIs.
+        struct Adapter : public DataModel::EncodableToTLV
+        {
+            const EncodableResponsePayload & mPayload;
+            Adapter(const EncodableResponsePayload & payload) : mPayload(payload) {}
+            CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const override
+            {
+                return mPayload.EncodeTo(writer, tag);
+            }
+            CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return CHIP_ERROR_INCORRECT_STATE; }
+        };
+    };
+
+    /**
      * API for adding a data response.  The `aEncodable` is generally expected to encode
      * a ClusterName::Commands::CommandName::Type struct, however any object should work.
      *
@@ -194,7 +230,18 @@ public:
                                        const DataModel::EncodableToTLV & aEncodable) = 0;
 
     /**
-     * Attempts to encode a response to a command.
+     * Encodes and adds response data via the non-virtual EncodableResponsePayload callback descriptor.
+     * Default implementation adapts the payload to EncodableToTLV for compatibility with mock implementations.
+     */
+    virtual CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                                       const EncodableResponsePayload & aPayload)
+    {
+        EncodableResponsePayload::Adapter adapter(aPayload);
+        return AddResponseData(aRequestCommandPath, aResponseCommandId, adapter);
+    }
+
+    /**
+     * Attempts to encode a response to a command via the polymorphic EncodableToTLV virtual interface.
      *
      * `aRequestCommandPath` represents the request path (endpoint/cluster/commandid) and the reply
      * will preserve the same path and switch the command id to aResponseCommandId.
@@ -208,6 +255,17 @@ public:
      */
     virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
                              const DataModel::EncodableToTLV & aEncodable) = 0;
+
+    /**
+     * Attempts to encode a response to a command via the non-virtual EncodableResponsePayload callback descriptor.
+     * Default implementation adapts the payload to EncodableToTLV for compatibility with mock implementations.
+     */
+    virtual void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
+                             const EncodableResponsePayload & aPayload)
+    {
+        EncodableResponsePayload::Adapter adapter(aPayload);
+        AddResponse(aRequestCommandPath, aResponseCommandId, adapter);
+    }
 
     /**
      * Check whether the InvokeRequest we are handling is a timed invoke.
@@ -232,6 +290,11 @@ public:
     /**
      * Gets the inner exchange context object, without ownership.
      *
+     * GetExchangeContext() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     *
      * WARNING: This is dangerous, since it is directly interacting with the
      *          exchange being managed automatically by mpResponder and
      *          if not done carefully, may end up with use-after-free errors.
@@ -239,6 +302,10 @@ public:
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
+     *         nullptr is also returned if the CommandHandler has gone async.
+     *
+     * WARNING: This method must NOT be called when the command handler has gone async, and will return nullptr in that case. Use
+     * TryGetExchangeContextWhenAsync() instead for async code paths.
      */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
 
@@ -264,10 +331,16 @@ public:
      *             correct data structure for building a reply.
      */
     template <typename CommandData>
+    static inline CHIP_ERROR EncodeTypedCommandPayload(const void * data, DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag)
+    {
+        return DataModel::EncodeResponseCommandPayload(writer, tag, *static_cast<const CommandData *>(data));
+    }
+
+    template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        EncodableResponseCommandPayload<CommandData> encoder(aData);
-        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+        EncodableResponsePayload payload{ &aData, &EncodeTypedCommandPayload<CommandData> };
+        return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), payload);
     }
 
     /**
@@ -290,34 +363,9 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        EncodableResponseCommandPayload<CommandData> encodable(aData);
-        AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
+        EncodableResponsePayload payload{ &aData, &EncodeTypedCommandPayload<CommandData> };
+        AddResponse(aRequestCommandPath, CommandData::GetCommandId(), payload);
     }
-
-protected:
-    // Encoding a response command payload requires a fabric index, in general,
-    // because any fabric-scoped fields in the payload need it to deal with
-    // their fabric-sensitive fields.
-    template <typename CommandData>
-    class EncodableResponseCommandPayload : public DataModel::EncodableToTLV
-    {
-    public:
-        EncodableResponseCommandPayload(const CommandData & value) : mValue(value) {}
-
-        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const final
-        {
-            return DataModel::EncodeResponseCommandPayload(writer, tag, mValue);
-        }
-
-        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final
-        {
-            // Not used, keep it as small as we can.
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-    private:
-        const CommandData & mValue;
-    };
 
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.
@@ -332,6 +380,20 @@ protected:
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
     virtual void DecrementHoldOff(Handle * apHandle) {}
+
+    /**
+     * Returns the ExchangeContext, if one is still available, for use during asynchronous
+     * command processing.
+     *
+     * Once a command has gone async, the existence of an ExchangeContext must not be
+     * assumed. This method exists as a best-effort alternative to GetExchangeContext()
+     * for async code paths.
+     *
+     * WARNING: There is NO GUARANTEE that the ExchangeContext exists once a command has gone async. Callers must ALWAYS handle a
+     * nullptr return but must not store, retain, or assume lifetime beyond the current execution scope.
+     *
+     */
+    virtual Messaging::ExchangeContext * TryGetExchangeContextWhenAsync() const { return nullptr; }
 };
 
 } // namespace app

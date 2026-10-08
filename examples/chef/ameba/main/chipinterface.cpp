@@ -100,11 +100,9 @@ static void InitServer(intptr_t context)
 
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
-
-    chip::Server::GetInstance().Init(initParams);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
 
     NetWorkCommissioningInstInit();
 
@@ -114,6 +112,9 @@ static void InitServer(intptr_t context)
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
 }
 
 extern "C" void ChipTest(void)

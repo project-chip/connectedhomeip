@@ -19,6 +19,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(led_pool, CONFIG_CHIP_APP_LOG_LEVEL);
+
 /* Auxiliary data to support blink */
 struct led_pool_aux_data
 {
@@ -71,7 +74,7 @@ static void led_pool_aux_update(const struct led_pool_data * led_pool)
             {
                 led_pool_aux[i].current_state = !led_pool_aux[i].current_state;
                 led_pool_aux[i].t_event       = t_now;
-                (void) gpio_pin_set_dt(&led_pool->out[i], led_pool_aux[i].current_state);
+                gpio_pin_set_dt(&led_pool->out[i], led_pool_aux[i].current_state);
             }
         }
     }
@@ -83,7 +86,11 @@ static void led_pool_event_work(struct k_work * item)
     struct led_pool_data * led_pool = CONTAINER_OF(k_work_delayable_from_work(item), struct led_pool_data, work);
 
     led_pool_aux_update(led_pool);
-    (void) k_work_reschedule(&led_pool->work, led_pool_aux_timeout(led_pool));
+    int err = k_work_reschedule(&led_pool->work, led_pool_aux_timeout(led_pool));
+    if (err < 0)
+    {
+        LOG_ERR("k_work_reschedule err: %d", err);
+    }
 }
 
 /* Public APIs */

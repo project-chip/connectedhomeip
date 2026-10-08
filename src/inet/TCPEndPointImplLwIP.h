@@ -44,6 +44,11 @@ public:
         TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr)
     {}
 
+    // Test-only hook used by src/inet/tests/TestTCPEndPointLwIP.cpp to simulate the
+    // post-LwIPHandleError state (mState still kConnected, but mTCP cleared) without
+    // needing a real TCP three-way handshake.
+    friend class TCPTest;
+
     // TCPEndPoint overrides.
     CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override;
     CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const override;

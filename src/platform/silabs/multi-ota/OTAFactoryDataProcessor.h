@@ -18,14 +18,17 @@
 
 #pragma once
 
-#include <headers/ProvisionManager.h>
-#include <headers/ProvisionStorage.h>
+#include <headers/ProvisionCryptoInterface.h>
+#include <headers/ProvisionStorageInterfaces.h>
 #include <lib/core/Optional.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 /**
  * OTA custom payload that uses Matter TLVs.
@@ -51,7 +54,7 @@ struct OTAFactoryPayload
     }
 };
 
-enum class FactoryTags
+enum class FactoryTags : uint8_t
 {
     kDacKey  = 1,
     kDacCert = 2,
@@ -62,6 +65,16 @@ enum class FactoryTags
 class OTAFactoryDataProcessor : public OTATlvProcessor
 {
 public:
+    /**
+     * @param storageWriter Backend that persists the attestation certificates and commits the update.
+     * @param crypto        Backend that imports the device attestation private key.
+     *
+     * Both references must outlive the processor.
+     */
+    OTAFactoryDataProcessor(Provision::IProvisionStorageWriter & storageWriter, Provision::IProvisionCrypto & crypto) :
+        mStorageWriter(storageWriter), mCrypto(crypto)
+    {}
+
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 
@@ -71,10 +84,15 @@ private:
     CHIP_ERROR Update(uint8_t tag, Optional<ByteSpan> & optional);
     CHIP_ERROR UpdateValue(uint8_t tag, ByteSpan & newValue);
 
+    Provision::IProvisionStorageWriter & mStorageWriter;
+    Provision::IProvisionCrypto & mCrypto;
     OTAFactoryPayload mPayload;
-    uint8_t * mFactoryData = nullptr;
 
 protected:
     uint32_t GetAccumulatorLength() const override { return mLength; }
 };
+
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

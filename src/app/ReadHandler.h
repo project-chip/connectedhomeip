@@ -39,12 +39,14 @@
 #include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
+#include <app/reporting/Generations.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -230,6 +232,41 @@ public:
     const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
     /**
+     * @brief Checks if any attribute or event path in the handler's path lists targets any of the given endpoints
+     *        (or includes a wildcard endpoint).
+     *
+     * @param targetedEndpoints Span of endpoint IDs to check against. If empty, returns true (global deferral).
+     * @return true if targetedEndpoints is empty, or if any path matches one of targetedEndpoints or has a wildcard endpoint ID.
+     *         false if no paths match.
+     */
+    bool PathListsContainAnyEndpoint(Span<const EndpointId> targetedEndpoints) const
+    {
+        if (targetedEndpoints.empty())
+        {
+            return true;
+        }
+        auto containsAnyTargetedEndpoint = [&targetedEndpoints](const auto * pathList) {
+            for (const auto * path = pathList; path != nullptr; path = path->mpNext)
+            {
+                if (path->mValue.HasWildcardEndpointId())
+                {
+                    return true;
+                }
+                for (auto endpointId : targetedEndpoints)
+                {
+                    if (path->mValue.mEndpointId == endpointId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        return containsAnyTargetedEndpoint(mpAttributePathList) || containsAnyTargetedEndpoint(mpEventPathList);
+    }
+
+    /**
      * @brief Returns the reporting intervals that will used by the ReadHandler for the subscription being requested.
      *        After the subscription is established, these will be the set reporting intervals and cannot be changed.
      *
@@ -268,9 +305,21 @@ public:
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
+     * For ICD publishers, this is set to the IdleModeDuration defined in the ICD Management Cluster.
+     * If the new max interval is less than the idle mode duration for an ICD device, the function will return
+     * CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        if (aMaxInterval < mMaxInterval)
+        {
+            ChipLogProgress(DataManagement,
+                            "Fail to set MaxReportingInterval to %d as it is less than the current MaxInterval %d for ICD device",
+                            aMaxInterval, mMaxInterval);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval),
@@ -415,7 +464,7 @@ private:
     void AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
-        return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
+        return mDirtyGeneration.After(mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
     void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
@@ -452,7 +501,13 @@ private:
 
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
+    // Ensures mExchangeCtx is ready for a send. For priming/chunked reports, validates
+    // and captures the session from the existing exchange. For re-reports (subscription
+    // follow-ups), opens a fresh exchange from mSessionHandle.
+    CHIP_ERROR AcquireExchangeForSend();
+
     friend class TestReadInteraction;
+    friend class TestSessionRelease;
     friend class chip::app::reporting::TestReportingEngine;
     friend class chip::app::reporting::TestReportScheduler;
 
@@ -533,15 +588,15 @@ private:
     // This allows us to reset the iterator to the beginning of the current
     // cluster instead of the beginning of the whole report in AttributePathIsDirty, without
     // permanently missing dirty any paths.
-    uint64_t mDirtyGeneration = 0;
+    reporting::AttributeGeneration mDirtyGeneration{ 0 };
 
     // For subscriptions, we record the timestamp when we started to generate the last report.
     // The mCurrentReportsBeginGeneration records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
     // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we sent the last chunk of the current
     // report.
-    uint64_t mPreviousReportsBeginGeneration = 0;
-    uint64_t mCurrentReportsBeginGeneration  = 0;
+    reporting::AttributeGeneration mPreviousReportsBeginGeneration{ 0 };
+    reporting::AttributeGeneration mCurrentReportsBeginGeneration{ 0 };
     /*
      *           (mDirtyGeneration = b > a, this is a dirty read handler)
      *        +- Start Report -> mCurrentReportsBeginGeneration = c
@@ -560,7 +615,7 @@ private:
 
     // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
     // engine, the "oldest" subscription is the subscription with the smallest generation.
-    uint64_t mTransactionStartGeneration = 0;
+    reporting::AttributeGeneration mTransactionStartGeneration{ 0 };
 
     EventNumber mEventMin = 0;
 

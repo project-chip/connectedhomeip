@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/static-cluster-config/OperationalCredentials.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <credentials/GroupDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,12 +44,23 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                           .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                           .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                           .dnssdServer     = app::DnssdServer::Instance(),
-                                                           .commissioningWindowManager =
-                                                               Server::GetInstance().GetCommissioningWindowManager() };
+        auto & dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider();
+        BitFlags<OperationalCredentials::Feature> configuredFeatureMap(featureMap);
+        configuredFeatureMap.Set(OperationalCredentials::Feature::kPQCDeviceAttestation, dacProvider.HasRequiredPqcCredentials());
+
+        OperationalCredentialsCluster::Context context = {
+            .fabricTable                = Server::GetInstance().GetFabricTable(),
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .dnssdServer                = app::DnssdServer::Instance(),
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .dacProvider                = dacProvider,
+            .groupDataProvider          = *Credentials::GetGroupDataProvider(),
+            .accessControl              = Server::GetInstance().GetAccessControl(),
+            .platformManager            = DeviceLayer::PlatformMgr(),
+            .eventManagement            = EventManagement::GetInstance(),
+            .featureMap                 = configuredFeatureMap,
+        };
         gServer.Create(endpointId, context);
         return gServer.Registration();
     }
@@ -73,13 +85,13 @@ void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
             .clusterId                 = OperationalCredentials::Id,
             .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
 
-void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId)
+void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -89,7 +101,7 @@ void MatterOperationalCredentialsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = OperationalCredentials::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterOperationalCredentialsPluginServerInitCallback() {}

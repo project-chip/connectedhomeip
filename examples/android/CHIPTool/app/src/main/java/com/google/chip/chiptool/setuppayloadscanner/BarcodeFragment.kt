@@ -138,8 +138,9 @@ class BarcodeFragment : Fragment() {
     // workaround: can not use gms to scan the code in China, added a EditText to debug
     binding.manualCodeBtn.setOnClickListener {
       val code = binding.manualCodeEditText.text.toString()
+      val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
       Log.d(TAG, "Submit Code:$code")
-      handleInputCode(code)
+      handleInputCode(code, isLIT)
     }
   }
 
@@ -176,7 +177,7 @@ class BarcodeFragment : Fragment() {
     }
   }
 
-  private fun handleInputCode(code: String) {
+  private fun handleInputCode(code: String, isLIT: Boolean) {
     try {
       val payload =
         if (code.startsWith("MT:")) {
@@ -186,7 +187,7 @@ class BarcodeFragment : Fragment() {
         }
 
       FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized Code", ex)
       Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
@@ -197,13 +198,18 @@ class BarcodeFragment : Fragment() {
   }
 
   private fun handleScannedQrCode(barcode: Barcode) {
+    if (_binding == null) {
+      Log.d(TAG, "onDestroyView has already been called in BarcodeFragment.")
+      return
+    }
+    val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
       try {
         val payload =
           barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
 
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
       } catch (ex: UnrecognizedQrCodeException) {
         Log.e(TAG, "Unrecognized QR Code", ex)
         Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()

@@ -54,14 +54,23 @@
  * to exit the commissioning process.
  */
 @property (nonatomic, readonly) BOOL cancelPasscode;
-/** Feature: Commissioner-Generated Passcode - length of passcode displayed. */
+/**
+ * Feature: Commissioner-Generated Passcode - length of passcode displayed.
+ */
 @property (nonatomic, readonly) NSInteger passcodeLength;
+/**
+ * Feature: UDC request - custom instance name
+ */
+@property (nonatomic, readonly) NSString * instanceName;
 
 - (instancetype)init;
 
 - (instancetype)initWithCommissionerPasscodeOnly:(BOOL)commissionerPasscode;
 
 - (instancetype)initWithPasscodeLengthOnly:(NSInteger)passcodeLength;
+
+- (instancetype)initWithInstanceName:(NSString *)instanceName
+                          noPasscode:(BOOL)noPasscode;
 
 /**
  * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,

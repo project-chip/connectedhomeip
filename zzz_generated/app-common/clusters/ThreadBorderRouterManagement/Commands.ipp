@@ -50,7 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetActiveDatasetRequest.
+} // namespace GetActiveDatasetRequest
 namespace GetPendingDatasetRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -72,7 +72,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace GetPendingDatasetRequest.
+} // namespace GetPendingDatasetRequest
 namespace DatasetResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -100,7 +100,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace DatasetResponse.
+} // namespace DatasetResponse
 namespace SetActiveDatasetRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -133,7 +133,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetActiveDatasetRequest.
+} // namespace SetActiveDatasetRequest
 namespace SetPendingDatasetRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -161,7 +161,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetPendingDatasetRequest.
+} // namespace SetPendingDatasetRequest
 } // namespace Commands
 } // namespace ThreadBorderRouterManagement
 } // namespace Clusters

@@ -76,7 +76,7 @@ if [ "$USER_UID" = "0" ]; then
     USER_UID=1000
 fi
 
-docker build \
+docker buildx build \
     -t "$IMAGE_TAG" \
     --pull \
     --build-arg USER_UID="$USER_UID" \

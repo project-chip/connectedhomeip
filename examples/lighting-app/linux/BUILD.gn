@@ -27,6 +27,11 @@ if (chip_enable_pw_rpc) {
   import("$dir_pw_build/target_types.gni")
 }
 
+declare_args() {
+  # Default OFF: example lighting-app does not build Diagnostic Logs support unless explicitly enabled.
+  chip_examples_enable_diagnostic_logs = false
+}
+
 config("includes") {
   include_dirs = [
     ".",
@@ -41,6 +46,7 @@ executable("chip-lighting-app") {
     "main.cpp",
   ]
 
+  defines = []
   deps = [
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
@@ -50,6 +56,21 @@ executable("chip-lighting-app") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
+  if (chip_examples_enable_diagnostic_logs) {
+    sources += [
+      "AppOptions.cpp",
+      "diagnostic-logs-provider-delegate-impl.cpp",
+    ]
+
+    deps += [ "${chip_root}/src/app/clusters/diagnostic-logs-server" ]
+
+    defines += [
+      "CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS=1",
+      "CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER=1",
+    ]
+  } else {
+    defines += [ "CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS=0" ]
+  }
 
   if (chip_examples_enable_imgui_ui) {
     deps += [
@@ -64,7 +85,7 @@ executable("chip-lighting-app") {
   include_dirs = [ "include" ]
 
   if (chip_enable_pw_rpc) {
-    defines = [
+    defines += [
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",

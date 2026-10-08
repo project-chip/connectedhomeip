@@ -22,7 +22,6 @@
 
 #include "CHIPCryptoPAL.h"
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <trusty_matter.h>
 
 namespace chip {
@@ -102,6 +101,11 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     uint64_t p256_handle = 0;
     int rc               = 0;
 
+    if (!memcmp(&mKeypair, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
+    {
+        /* Fixed p256_handle consists of magic number and a fabric index. */
+        p256_handle = to_Handle(&mKeypair);
+    }
     rc = GetTrustyMatter().P256KeypairInitialize(p256_handle, public_key);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
@@ -117,23 +121,30 @@ exit:
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint8_t privkey[kP256_PrivateKey_Length];
-    int rc = 0;
+    int rc           = 0;
 
-    rc = GetTrustyMatter().P256KeypairSerialize(to_Handle(&mKeypair), privkey);
-    VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+    size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
+    bbuf.Put(mPublicKey, mPublicKey.Length());
 
+    if (!memcmp(&mKeypair, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
     {
-        size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::BufferWriter bbuf(output.Bytes(), len);
-        bbuf.Put(mPublicKey, mPublicKey.Length());
-        bbuf.Put(privkey, sizeof(privkey));
-        VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
-        output.SetLength(bbuf.Needed());
+        /* To keep confidential, private key not provided but p256_handle */
+        bbuf.Put(&mKeypair, sizeof(uint64_t));
     }
+    else
+    {
+        uint8_t privkey[kP256_PrivateKey_Length];
+        uint64_t p256_handle = to_Handle(&mKeypair);
+        rc                   = GetTrustyMatter().P256KeypairSerialize(p256_handle, privkey);
+        VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+        bbuf.Put(privkey, sizeof(privkey));
+        ClearSecretData(privkey, sizeof(privkey));
+    }
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    output.SetLength(bbuf.Needed());
 
 exit:
-    ClearSecretData(privkey, sizeof(privkey));
     return error;
 }
 
@@ -144,16 +155,28 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     int rc               = 0;
     uint64_t p256_handle = 0;
 
-    uint8_t * pubkey  = input.Bytes();
-    uint8_t * privkey = input.Bytes() + mPublicKey.Length();
-
-    VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    uint8_t * pubkey = input.Bytes();
+    VerifyOrExit(input.Length() >= mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    rc = GetTrustyMatter().P256KeypairDeserialize(p256_handle, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
+    if (!memcmp(input.Bytes() + kP256_PublicKey_Length, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
+    {
+        /* If the fixed p256_handle was passed in following the public key, then the private key should be interpreted as the
+         * p256_handle */
+        VerifyOrExit(input.Length() == mPublicKey.Length() + sizeof(uint64_t), error = CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(&p256_handle, input.Bytes() + kP256_PublicKey_Length, sizeof(uint64_t));
+    }
+    else
+    {
+        uint8_t * privkey;
+        VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+        privkey = input.Bytes() + kP256_PublicKey_Length;
+        rc = GetTrustyMatter().P256KeypairDeserialize(p256_handle, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
+        VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+    }
+
     from_Handle(&p256_handle, &mKeypair);
-    VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 

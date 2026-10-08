@@ -17,7 +17,6 @@
 
 import logging
 import os
-import typing
 
 from .. import clusters as Clusters
 from ..ChipDeviceCtrl import ChipDeviceController, NOCChain
@@ -34,16 +33,13 @@ LOGGER = logging.getLogger(__name__)
 async def _IsNodeInFabricList(devCtrl, nodeId):
     resp = await devCtrl.ReadAttribute(nodeId, [(opCreds.Attributes.Fabrics)])
     listOfFabricsDescriptor = resp[0][opCreds][Clusters.OperationalCredentials.Attributes.Fabrics]
-    for fabricDescriptor in listOfFabricsDescriptor:
-        if fabricDescriptor.nodeID == nodeId:
-            return True
-
-    return False
+    return any(fabricDescriptor.nodeID == nodeId
+               for fabricDescriptor in listOfFabricsDescriptor)
 
 
 async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController,
                          privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                         targetNodeId: int, targetCatTags: typing.List[int] = []):
+                         targetNodeId: int, targetCatTags: list[int] = []):
     ''' Given an existing controller with admin privileges over a target node, grants the specified privilege
         to the new ChipDeviceController instance to the entire Node. This is achieved
         by updating the ACL entries on the target.
@@ -109,17 +105,17 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
 
-    LOGGER.info(f'GrantPrivilege: Writing acls: {currentAcls}')
+    LOGGER.info('GrantPrivilege: Writing acls: %s', currentAcls)
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
 async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
                                     adminDevCtrl: ChipDeviceController,
-                                    controllerNodeIds: typing.List[int],
+                                    controllerNodeIds: list[int],
                                     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                                     targetNodeId: int,
-                                    catTags: typing.List[int] = [],
-                                    paaTrustStorePath: str = "") -> typing.List[ChipDeviceController]:
+                                    catTags: list[int] = [],
+                                    paaTrustStorePath: str = "") -> list[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:
@@ -144,7 +140,7 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     return controllerList
 
 
-async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, typing.Optional[Clusters.OperationalCredentials.Commands.NOCResponse], typing.Optional[NOCChain]]:
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId, omitCommissioningComplete: bool = False, failSafeDurationSeconds: int = 60) -> tuple[bool, Clusters.OperationalCredentials.Commands.NOCResponse | None, NOCChain | None]:
     ''' Perform sequence to commission new fabric using existing commissioned fabric.
 
     Args:
@@ -173,7 +169,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     if (chainForAddNOC.rcacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForAddNOC}. Disarming fail-safe!")
+        LOGGER.error("INTERNAL ERROR: Got invalid cert chain from issuer! Chain: %s. Disarming fail-safe!", chainForAddNOC)
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp, None
 
@@ -188,7 +184,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     if nocResp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"AddNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
+        LOGGER.error("AddNOC failed on DUT. Status code was: %s. Disarming fail-safe!", resp.statusCode)
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp
 
@@ -202,12 +198,12 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
+        LOGGER.error("CommissioningComplete failed on DUT. Status code was: %s. Disarming fail-safe!", resp.errorCode)
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp, chainForAddNOC
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
-        LOGGER.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
+        LOGGER.error("Failed to find new NodeID 0x%016X in Fabrics list after CommissioningComplete!", newNodeId)
         return False, nocResp, chainForAddNOC
 
     return True, nocResp, chainForAddNOC
@@ -238,7 +234,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
     chainForUpdateNOC = await devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if (chainForUpdateNOC.rcacBytes is None or
             chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):
-        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForUpdateNOC}. Disarming fail-safe!")
+        LOGGER.error("INTERNAL ERROR: Got invalid cert chain from issuer! Chain: %s. Disarming fail-safe!", chainForUpdateNOC)
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
@@ -246,7 +242,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
                                                                                    chainForUpdateNOC.icacBytes))
     if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"UpdateNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
+        LOGGER.error("UpdateNOC failed on DUT. Status code was: %s. Disarming fail-safe!", resp.statusCode)
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
@@ -262,12 +258,12 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        LOGGER.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
+        LOGGER.error("CommissioningComplete failed on DUT. Status code was: %s. Disarming fail-safe!", resp.errorCode)
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     if not await _IsNodeInFabricList(devCtrl, newNodeId):
-        LOGGER.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
+        LOGGER.error("Failed to find new NodeID 0x%016X in Fabrics list after CommissioningComplete!", newNodeId)
         return False
 
     return True

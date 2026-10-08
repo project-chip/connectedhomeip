@@ -19,16 +19,17 @@ import logging
 from enum import StrEnum
 from typing import Any
 
-from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
+
+log = logging.getLogger(__name__)
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
@@ -116,8 +117,11 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     return endpoint_tlv
 
 
-class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
+class TestConformanceTest(DeviceConformanceTests):
+    requires_dut = False
+
     def setup_class(self):
+        super().setup_class()
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
         self.xml_clusters, self.problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
@@ -133,14 +137,18 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
 
         # The CI flag here is to deal with example code that improperly implements the network commissioning cluster.
         # It does not apply here.
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         asserts.assert_false(success, "Unexpected success parsing endpoint with provisional cluster")
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
-        asserts.assert_true(success, "Unexpected failure parsing endpoint with provisional cluster and allow_provisional enabled")
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
+        asserts.assert_true(
+            success, "Unexpected failure parsing endpoint with provisional cluster and allow_provisional_test_event_only_disallowed_for_certification enabled")
 
         self.xml_clusters[Clusters.ScenesManagement.id].is_provisional = False
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         asserts.assert_true(success, "Unexpected failure parsing endpoint with no clusters marked as provisional")
 
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
@@ -177,20 +185,23 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         self.endpoints = {0: root_no_tlv, 1: nim_no_tlv}
         asserts.assert_true(self._has_device_type_supporting_macl(), "Did not find supported device in generated device")
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_true(success, "Unexpected failure parsing minimal dt")
 
         self.add_macl(root)
         # A MACL is allowed when there is a NIM, so this should succeed as well
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_true(success, "Unexpected failure with NIM and MACL")
 
         # A MACL is not allowed when there is no NIM
         self.endpoints[1] = create_minimal_dt(self.xml_clusters, self.xml_device_types,
                                               device_type_id=on_off_id, is_tlv_endpoint=False)
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
         self.problems.extend(problems)
         asserts.assert_false(success, "Unexpected success with On/Off and MACL")
 
@@ -244,9 +255,10 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         eevse = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id=eevse_id)
         self.endpoints_tlv = {0: root, 1: on_off, 2: eevse}
 
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         for p in problems:
-            logging.info(p)
+            log.info(p)
         asserts.assert_true(success, "Unexpected failure on minimal on/off device")
         asserts.assert_equal(len(problems), 0, "Unexpected problems reported for on/off device type")
 
@@ -258,11 +270,12 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
             kChoice = "choice"
 
         def run_check_with_expected_failure(msg_suffix: str, expected_location: ProblemLocation, problem_type: ProblemType):
-            success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+            success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                       is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
             asserts.assert_false(success, f"Unexpected success on minimal on/off device {msg_suffix}")
-            logging.info("Problems reported (expect at least 1)")
+            log.info("Problems reported (expect at least 1)")
             for p in problems:
-                logging.info(p)
+                log.info(p)
             asserts.assert_greater_equal(
                 len(problems), 1, "Did not receive expected number of problem reports for on/off device type (expected at least 1)")
             locations = [p.location for p in problems]
@@ -306,9 +319,10 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         # This will have no features populated by default - mark ethernet - this doesn't require any additional attributes or commands
         feature_map_id = Clusters.NetworkCommissioning.Attributes.FeatureMap.attribute_id
         self.endpoints_tlv[0][cluster_id][feature_map_id] = Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface
-        success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         for p in problems:
-            logging.info(p)
+            log.info(p)
         asserts.assert_true(success, f"Unexpected failure on device {msg_suffix}")
         asserts.assert_equal(len(problems), 0, f"Unexpected problems reported on device {msg_suffix}")
 
@@ -412,16 +426,16 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
-        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
-        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
-        window_covering_id = [id for id, xml in xml_device_types.items() if xml.name == 'Window Covering'][0]
-        on_off_id = [id for id, xml in xml_device_types.items() if xml.name == 'On/Off Light'][0]
+        closure_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        window_covering_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Window Covering'][0]
+        on_off_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'On/Off Light'][0]
 
-        def run_checks_for_device_type(id: int):
-            one_five_revision = xml_device_types[id].revision
+        def run_checks_for_device_type(tid: int):
+            one_five_revision = xml_device_types[tid].revision
 
             def create_endpoint(rev: int, cluster_list: list[Clusters.Objects.Cluster]):
-                self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+                self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, tid, is_tlv_endpoint=False)}
                 self.endpoints[1].pop(Clusters.ClosureControl, None)
                 self.endpoints[1].pop(Clusters.ClosureDimension, None)
                 self.endpoints[1].pop(Clusters.WindowCovering, None)
@@ -503,13 +517,13 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         xml_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
         xml_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
         # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
-        closure_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
-        closure_panel_id = [id for id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
-        closure_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
-        closure_panel_namespace_id = [id for id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
+        closure_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure'][0]
+        closure_panel_id = [_id for _id, xml in xml_device_types.items() if xml.name == 'Closure Panel'][0]
+        closure_namespace_id = [_id for _id, xml in xml_namespaces.items() if xml.name == 'Closure'][0]
+        closure_panel_namespace_id = [_id for _id, xml in xml_namespaces.items() if xml.name == 'Closure Panel'][0]
 
-        def create_endpoint(id: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
-            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, id, is_tlv_endpoint=False)}
+        def create_endpoint(eid: int, rev: int, tag_list: list[Clusters.Globals.Structs.SemanticTagStruct]):
+            self.endpoints = {1: create_minimal_dt(xml_clusters, xml_device_types, eid, is_tlv_endpoint=False)}
             # For the purposes of this test, I don't care that no clusters are present
 
             self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].revision = rev

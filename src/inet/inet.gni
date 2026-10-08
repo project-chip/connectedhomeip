@@ -18,7 +18,8 @@ import("${chip_root}/src/system/system.gni")
 
 declare_args() {
   # Enable IPv4 support.
-  chip_inet_config_enable_ipv4 = true
+  chip_inet_config_enable_ipv4 =
+      !chip_system_config_use_openthread_inet_endpoints
 
   # Enable UDP endpoint.
   chip_inet_config_enable_udp_endpoint = true
@@ -28,6 +29,12 @@ declare_args() {
 
   # TODO: Set to false when using Network.framework until a Network.framework TCP endpoint backend is implemented.
   if (chip_system_config_use_network_framework) {
+    chip_inet_config_enable_tcp_endpoint = false
+  }
+
+  # TODO: TCP may be supported https://github.com/project-chip/connectedhomeip/issues/42715
+  if (chip_system_config_use_openthread_inet_endpoints &&
+      current_os == "linux") {
     chip_inet_config_enable_tcp_endpoint = false
   }
 

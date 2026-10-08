@@ -159,6 +159,20 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
+    case app::Clusters::ContentLauncher::Attributes::Movable::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.Encode(false);
+        }
+        return aEncoder.Encode(delegate->HandleGetMovable());
+    }
+    case app::Clusters::ContentLauncher::Attributes::Presets::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+        return delegate->HandleGetPresets(aEncoder);
+    }
     case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
@@ -168,6 +182,8 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::ClusterRevision::Id: {
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     }
     default:
@@ -278,6 +294,48 @@ exit:
     {
         commandObj->AddStatus(commandPath, Status::Failure);
     }
+
+    return true;
+}
+
+bool emberAfContentLauncherClusterContentReplicationRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const ContentLauncher::Commands::ContentReplicationRequest::DecodableType & commandData)
+{
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    app::CommandResponseHelper<Commands::ContentReplicationResponse::Type> responder(commandObj, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kContentReplication))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return true;
+    }
+
+    delegate->HandleContentReplicationRequest(responder);
+
+    if (!responder.HasSentResponse())
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+    }
+
+    return true;
+}
+
+bool emberAfContentLauncherClusterPlayPresetCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                     const ContentLauncher::Commands::PlayPreset::DecodableType & commandData)
+{
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kPresets))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return true;
+    }
+
+    delegate->HandlePlayPreset(commandObj, commandPath, commandData.presetID);
 
     return true;
 }

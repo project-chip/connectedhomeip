@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ static_library("SiWx") {
     "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
     "${silabs_platform_dir}/CHIPMem-Platform.cpp",
     "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ChipDie.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
@@ -71,7 +72,6 @@ static_library("SiWx") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "SiWxPlatformInterface.h",
     "ble/BLEManagerImpl.cpp",
     "ble/sl_si91x_ble_init.cpp",
     "ble/sl_si91x_ble_init.h",
@@ -98,6 +98,7 @@ static_library("SiWx") {
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
       "OTAImageProcessorImpl.cpp",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   # Add platform crypto implementation

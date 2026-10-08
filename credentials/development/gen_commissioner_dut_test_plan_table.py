@@ -20,6 +20,7 @@ import argparse
 import json
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass
@@ -29,7 +30,7 @@ class TestInfo:
     pid: int
 
 
-CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')
 
 
@@ -48,7 +49,7 @@ def write_validation_steps(filename: str, cases: TestInfo):
     with open(filename, "w") as output:
         for f in cases:
             cmd = f'./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/{f.dir}/test_case_vector.json --product-id {f.pid}'
-            output.write(f'{f.desc.replace(",","")}, {f.dir}, {f.pid}, {cmd}\n')
+            output.write(f'{f.desc.replace(",", "")}, {f.dir}, {f.pid}, {cmd}\n')
 
 
 def main():
@@ -83,7 +84,7 @@ def main():
         if p in skip_cases:
             continue
         path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
-        with open(path, 'r') as f:
+        with open(path) as f:
             j = json.loads(f.read())
             success_expected = j['is_success_case'].lower() == 'true'
             desc = TestInfo(desc=j['description'], dir=p, pid=int(j['basic_info_pid']))
