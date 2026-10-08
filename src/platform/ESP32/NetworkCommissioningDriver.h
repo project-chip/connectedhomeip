@@ -200,6 +200,8 @@ private:
     // Associates with mStagingNetwork using EAP-TLS, authenticating with the Client Identity
     // and validating the access point against the Network Identity.
     CHIP_ERROR ConnectWiFiNetworkWithPDC();
+    // Makes the committed PDC record match mStagingNetwork, removing it for a passphrase network.
+    CHIP_ERROR StoreCommittedPDCNetwork();
     CHIP_ERROR InstallEapTlsCredentials();
     void ReleaseEapTlsCredentials();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC

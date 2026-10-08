@@ -26,7 +26,9 @@
 #include "devices/FanLoadScreen.h"
 #include "devices/OccupancySensorScreen.h"
 #include "devices/OnOffLoadScreen.h"
+#include "devices/SpeakerScreen.h"
 #include "devices/TemperatureSensorScreen.h"
+#include "devices/WaterValveScreen.h"
 
 #include <cstdio>
 #include <devices/Ids.h>
@@ -218,6 +220,24 @@ void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry)
         .title      = "Chime",
         .endpointId = device.GetEndpointId(),
         .renderFn   = [&device](lv_obj_t * parent) { ShowChimeScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(Speaker & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Speaker",
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowSpeakerScreen(parent, device); },
+    });
+}
+
+void RegisterDeviceScreen(WaterValve & device, DeviceScreenRegistry & registry)
+{
+    registry.Register({
+        .title      = "Water Valve",
+        .endpointId = device.GetEndpointId(),
+        .renderFn   = [&device](lv_obj_t * parent) { ShowWaterValveScreen(parent, device); },
     });
 }
 

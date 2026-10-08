@@ -76,7 +76,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         return "[TC-DA-1.12] ML-DSA Device Attestation Request Validation Scenario [DUT-Commissionee]"
 
     def pics_TC_DA_1_12(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
+        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
                 "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_DA_1_12(self) -> list[TestStep]:

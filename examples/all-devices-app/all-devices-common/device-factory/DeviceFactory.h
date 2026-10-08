@@ -74,6 +74,7 @@
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/WaterValve.h>
+#include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -400,8 +401,22 @@ private:
             RegisterCreator("closure", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                    SimulatedClosure::ThreePanelDoorClosureConfig(), mContext->groupDataProvider,
+                                                    SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
                                                     mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-ps-no-sp", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-lt", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
@@ -771,7 +786,38 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate);
+                // Combined smoke + CO alarm exposing every optional attribute and both concentration measurement clusters,
+                // to showcase the device type's full surface.
+                // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
+                constexpr uint32_t kExampleExpiryDate = 3976214400;
+                SmokeCoAlarm::Config config;
+                config.alarmConfig
+                    .WithSmokeAlarm({
+                        .withContaminationState = true,
+                        .sensitivityLevel       = Clusters::SmokeCoAlarm::SensitivityEnum::kStandard,
+                    })
+                    .WithCOAlarm()
+                    .WithDeviceMuted()
+                    .WithInterconnectSmokeAlarm()
+                    .WithInterconnectCOAlarm()
+                    .WithExpiryDate(kExampleExpiryDate)
+                    .WithUnmounted();
+                config
+                    .WithCoConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    })
+                    .WithSmokeConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+                    });
+                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }
 
@@ -875,6 +921,16 @@ private:
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
+        {
+            RegisterCreator("window-covering", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWindowCovering>(
+                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
             });
         }
 
