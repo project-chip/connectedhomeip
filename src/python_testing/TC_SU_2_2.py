@@ -41,8 +41,8 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_provider_port:5541
-#       --string-arg provider_app_pipe:/tmp/provider_2_7_fifo
-#       --string-arg provider_app_pipe_out:/tmp/provider_2_7_fifo_out
+#       --string-arg provider_app_pipe:/tmp/provider_2_2_fifo
+#       --string-arg provider_app_pipe_out:/tmp/provider_2_2_fifo_out
 #       --timeout 3100
 #     factory-reset: true
 #     quiet: true
@@ -146,7 +146,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
-        return ["MCORE.OTA.Requestor"]
+        return ["MCORE.OTA.Requestor", "MCORE.OTA.RequestorConsent"]
 
     def steps_TC_SU_2_2(self) -> list[TestStep]:
         # Steps are executed in order: 0 through 10.
@@ -198,8 +198,11 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                      "DUT successfully finishes applying a software update, and the new software image version is being executed on the DUT. "
                      "OTA-Subscriber sends a read request to read the VersionApplied event from the DUT.",
                      "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT. "
-                     "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional). "
-                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."),
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."
+                     "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnApply."
+                     "Verify that the VersionApplied event is generated whenever a new version starts executing after being applied due to a software update.Verify that the data in this event has the following"
+                     "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version"
+                     "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster"),
             TestStep(10, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable' "
                      "and SoftwareVersion is set to the same version the DUT just applied (V2), which is numerically equal to the current version.",
                      "Verify that the DUT does not start transferring the software image."),
@@ -1885,6 +1888,13 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         asserts.assert_equal(ota_image_version, version_applied_event_data.softwareVersion,
                              f"Software version from the VersionApplied event is not {ota_image_version}")
         asserts.assert_is_not_none(version_applied_event_data.productID, "Product ID from the VersionApplied event is None")
+        # Read the ProducID from the BasicInformationCluster and compare against the VersionAppliedEvent.ProductID.
+        product_id = await self.read_single_attribute_check_success(
+                    dev_ctrl=controller,
+                    cluster=Clusters.BasicInformation,
+                    attribute=Clusters.BasicInformation.Attributes.ProductID)
+        asserts.assert_equal(version_applied_event_data.productID, product_id, "ProductID from BasicInformationCluster is not the same from the VersionAppliedEvent")
+        # Software version already validated at verify_applied_basic_information and compared with ota_image_version
         # [End of Step #1 from TC_SU_2_7]
 
         self.step(10)
