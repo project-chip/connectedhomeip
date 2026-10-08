@@ -845,7 +845,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance() -> StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)
