@@ -3,7 +3,10 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip"],
+    "xmlRoot": [
+        ".",
+        "./data-model/chip"
+    ],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -167,9 +170,15 @@
     "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {
@@ -208,8 +217,14 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
-        "Ambient Sensing Union": ["UnionName", "UnionHealth"],
+        "Ambient Context Sensing": [
+            "HoldTimeLimits",
+            "ObjectCountConfig"
+        ],
+        "Ambient Sensing Union": [
+            "UnionName",
+            "UnionHealth"
+        ],
         "Audio Control": [
             "ClusterRevision",
             "FeatureMap",
@@ -262,13 +277,23 @@
             "DeviceLocation",
             "ConfigurationVersion"
         ],
-        "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
+        "Boolean State": [
+            "ClusterRevision",
+            "FeatureMap",
+            "StateValue"
+        ],
         "Bridged Device Basic Information": [
             "DeviceLocation",
             "ProductAppearance"
         ],
-        "Binding": ["FeatureMap", "ClusterRevision"],
-        "Chime": ["SelectedChime", "Enabled"],
+        "Binding": [
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Chime": [
+            "SelectedChime",
+            "Enabled"
+        ],
         "Dynamic Lighting": [
             "ClusterRevision",
             "FeatureMap",
@@ -337,7 +362,11 @@
             "TariffUnit",
             "MaximumMeteredQuantities"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueID"],
+        "Descriptor": [
+            "ClusterRevision",
+            "FeatureMap",
+            "EndpointUniqueID"
+        ],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -355,7 +384,10 @@
             "CurrentMode",
             "FeatureMap"
         ],
-        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
+        "Diagnostic Logs": [
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -391,7 +423,11 @@
             "SessionEnergyDischarged",
             "FeatureMap"
         ],
-        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Energy EVSE Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -470,7 +506,9 @@
             "FeatureMap",
             "MeasuredValue"
         ],
-        "Joint Fabric Datastore": ["Status"],
+        "Joint Fabric Datastore": [
+            "Status"
+        ],
         "Laundry Dryer Controls": [
             "ClusterRevision",
             "SelectedDrynessLevel",
@@ -534,7 +572,9 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Scenes Management": ["ClusterRevision"],
+        "Scenes Management": [
+            "ClusterRevision"
+        ],
         "Software Diagnostics": [
             "ClusterRevision",
             "CurrentHeapFree",
@@ -543,7 +583,10 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Switch": ["ClusterRevision", "CurrentPosition"],
+        "Switch": [
+            "ClusterRevision",
+            "CurrentPosition"
+        ],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -552,8 +595,16 @@
             "global_struct",
             "nullable_global_struct"
         ],
-        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
-        "Flow Measurement": ["ClusterRevision", "FeatureMap", "MeasuredValue"],
+        "User Label": [
+            "LabelList",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
+        "Flow Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Temperature Measurement": [
             "ClusterRevision",
             "FeatureMap",
@@ -648,15 +699,22 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": ["Lineup", "CurrentChannel"],
+        "Channel": [
+            "Lineup",
+            "CurrentChannel"
+        ],
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
             "ActiveTextTrack",
             "ContentInfo"
         ],
-        "Application Launcher": ["CurrentApp"],
-        "Application Basic": ["Application"],
+        "Application Launcher": [
+            "CurrentApp"
+        ],
+        "Application Basic": [
+            "Application"
+        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -696,8 +754,16 @@
             },
             "ClusterRevision"
         ],
-        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Microwave Oven Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Mode Select": [
             "ClusterRevision",
             "SupportedModes",
@@ -718,8 +784,16 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Oven Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Refrigerator Alarm": [
             {
                 "name": "Mask",
@@ -744,8 +818,16 @@
             "CurrentMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Operational State": [
             "PhaseList",
             "CurrentPhase",
@@ -933,7 +1015,11 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "ClusterRevision", "FeatureMap"],
+        "Air Quality": [
+            "AirQuality",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
@@ -985,7 +1071,9 @@
             "CurrentEnergyBalance",
             "CurrentLowPowerModeSensitivity"
         ],
-        "Power Topology": ["FeatureMap"],
+        "Power Topology": [
+            "FeatureMap"
+        ],
         "Power Source": [
             "ClusterRevision",
             "ActiveWiredFaults",
@@ -1041,14 +1129,25 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Water Heater Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Wi-Fi Network Management": [
+            "SSID",
+            "PassphraseSurrogate"
+        ],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
+        "Service Area": [
+            "CurrentArea",
+            "EstimatedEndTime",
+            "FeatureMap"
+        ],
         "Camera AV Stream Management": [
             "VideoSensorParams",
             "MinViewportResolution",
@@ -1098,15 +1197,33 @@
             "PanMax",
             "MovementState"
         ],
-        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Fixed Label": [
+            "LabelList",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
             "ClusterRevision",
             "FeatureMap"
         ],
-        "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
-        "Localization Configuration": ["SupportedLocales", "ClusterRevision"],
+        "Unit Localization": [
+            "ClusterRevision",
+            "TemperatureUnit"
+        ],
+        "Localization Configuration": [
+            {
+                "name": "ActiveLocale",
+                "keepDefault": true
+            },
+            "SupportedLocales",
+            {
+                "name": "FeatureMap",
+                "keepDefault": true
+            },
+            "ClusterRevision"
+        ],
         "Smoke CO Alarm": [
             "ExpressedState",
             "SmokeState",
@@ -1154,7 +1271,10 @@
             "MaxRootCertificates",
             "MaxClientCertificates"
         ],
-        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
+        "TLS Client Management": [
+            "ClusterRevision",
+            "MaxProvisioned"
+        ],
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
@@ -1165,7 +1285,9 @@
             "ClusterRevision",
             "FeatureMap"
         ],
-        "Time Format Localization": ["ClusterRevision"],
+        "Time Format Localization": [
+            "ClusterRevision"
+        ],
         "Window Covering": [
             "ClusterRevision",
             "OperationalStatus",
@@ -1183,7 +1305,14 @@
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT"
+    ],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
