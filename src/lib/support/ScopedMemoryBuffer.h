@@ -85,6 +85,7 @@ public:
 protected:
     void * Ptr() { return mBuffer; }
     const void * Ptr() const { return mBuffer; }
+    void SetPtr(void * ptr) { mBuffer = ptr; }
 
     /**
      * Releases the underlying buffer.
@@ -98,18 +99,6 @@ protected:
         return buffer;
     }
 
-    void Alloc(size_t size)
-    {
-        Free();
-        mBuffer = Impl::MemoryAlloc(size);
-    }
-
-    void Calloc(size_t elementCount, size_t elementSize)
-    {
-        Free();
-        mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
-    }
-
 private:
     void * mBuffer = nullptr;
 };
@@ -121,8 +110,28 @@ class PlatformMemoryManagement
 {
 public:
     static void MemoryFree(void * p) { chip::Platform::MemoryFree(p); }
-    static void * MemoryAlloc(size_t size) { return chip::Platform::MemoryAlloc(size); }
-    static void * MemoryCalloc(size_t num, size_t size) { return chip::Platform::MemoryCalloc(num, size); }
+    template <typename T>
+    static void * MemoryAlloc(size_t elementCount)
+    {
+        return chip::Platform::MemoryAllocTyped<T>(elementCount);
+    }
+    template <typename T>
+    static void * MemoryCalloc(size_t elementCount)
+    {
+        return chip::Platform::MemoryCallocTyped<T>(elementCount);
+    }
+};
+
+template <class MemoryManagement, typename T, typename = void>
+struct HasElementCountAllocators : std::false_type
+{
+};
+
+template <class MemoryManagement, typename T>
+struct HasElementCountAllocators<MemoryManagement, T,
+                                 std::void_t<decltype(MemoryManagement::template MemoryAlloc<T>(size_t())),
+                                             decltype(MemoryManagement::template MemoryCalloc<T>(size_t()))>> : std::true_type
+{
 };
 
 } // namespace Impl
@@ -134,6 +143,9 @@ public:
  * Use for RAII to auto-free after use.
  *
  * For a single element RAII with dtor, use Platform::UniquePtr<>
+ *
+ * MemoryManagement provides static MemoryFree(void *) and static member templates
+ * MemoryAlloc<T>/MemoryCalloc<T>(size_t elementCount) that return nullptr on overflow.
  */
 template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
 class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
@@ -144,6 +156,8 @@ public:
     using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
     static_assert(std::is_trivially_destructible<T>::value, "Destructors won't get run");
+    static_assert(Impl::HasElementCountAllocators<MemoryManagement, T>::value,
+                  "MemoryManagement must provide template <typename T> MemoryAlloc/MemoryCalloc(size_t elementCount)");
 
     T * Get() { return static_cast<T *>(Base::Ptr()); }
     T & operator[](size_t index) { return Get()[index]; }
@@ -160,14 +174,16 @@ public:
 
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
-        Base::Calloc(elementCount, sizeof(T));
+        Base::Free();
+        Base::SetPtr(MemoryManagement::template MemoryCalloc<T>(elementCount));
         ExecuteConstructors(elementCount);
         return *this;
     }
 
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::Alloc(elementCount * sizeof(T));
+        Base::Free();
+        Base::SetPtr(MemoryManagement::template MemoryAlloc<T>(elementCount));
         ExecuteConstructors(elementCount);
         return *this;
     }

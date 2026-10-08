@@ -25,6 +25,8 @@
 #pragma once
 
 #include <lib/core/CriticalFailure.h>
+#include <lib/support/CHIPMemTyped.h>
+#include <limits>
 #include <stdlib.h>
 
 #include <memory>
@@ -33,6 +35,12 @@
 
 namespace chip {
 namespace Platform {
+
+#if CHIP_SYSTEM_CONFIG_TYPED_MALLOC
+extern void * MemoryAllocTyped(size_t size, malloc_type_id_t typeId);
+extern void * MemoryCallocTyped(size_t num, size_t size, malloc_type_id_t typeId);
+extern void * MemoryReallocTyped(void * p, size_t size, malloc_type_id_t typeId);
+#endif
 
 #define CHIP_ZERO_AT(value)                                                                                                        \
     do                                                                                                                             \
@@ -86,7 +94,33 @@ extern void MemoryShutdown();
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryAlloc(size_t size);
+extern void * MemoryAlloc(size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryAllocTyped, 1);
+
+CHIP_TYPED_MALLOC_WRAPPER_BEGIN
+
+/**
+ * This is a helper mainly intended for implementing wrappers that forward to MemoryAlloc.
+ * Use it instead of MemoryAlloc(num * sizeof(T)) when allocating an array of T, so that the
+ * typed allocator sees T and the size cannot overflow. The memory is not zeroed; use
+ * MemoryCallocTyped when it has to be. Other code should prefer ScopedMemoryBuffer or New.
+ *
+ * @param[in]  num              Specifies number of elements (of size sizeof(T)) to allocate.
+ *
+ * @retval  Pointer to a memory block in case of success.
+ * @retval  NULL-pointer if memory allocation fails.
+ *
+ */
+template <typename T>
+T * MemoryAllocTyped(size_t num)
+{
+    if (num > std::numeric_limits<size_t>::max() / sizeof(T))
+    {
+        return nullptr;
+    }
+    return static_cast<T *>(MemoryAlloc(num * sizeof(T)));
+}
+
+CHIP_TYPED_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory for an array of num
@@ -100,7 +134,28 @@ extern void * MemoryAlloc(size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryCalloc(size_t num, size_t size);
+extern void * MemoryCalloc(size_t num, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryCallocTyped, 2);
+
+CHIP_TYPED_MALLOC_WRAPPER_BEGIN
+
+/**
+ * This is a helper mainly intended for implementing wrappers that forward to MemoryCalloc.
+ * Use it instead of MemoryCalloc(num, sizeof(T)) when allocating a zeroed array of T. When
+ * every element is written right away, MemoryAllocTyped avoids zeroing the memory.
+ *
+ * @param[in]  num              Specifies number of elements (of size sizeof(T)) to allocate.
+ *
+ * @retval  Pointer to a memory block in case of success.
+ * @retval  NULL-pointer if memory allocation fails.
+ *
+ */
+template <typename T>
+T * MemoryCallocTyped(size_t num)
+{
+    return static_cast<T *>(MemoryCalloc(num, sizeof(T)));
+}
+
+CHIP_TYPED_MALLOC_WRAPPER_END
 
 /**
  * This function is called by the Chip layer to change the size of the memory block pointed to by p.
@@ -120,7 +175,7 @@ extern void * MemoryCalloc(size_t num, size_t size);
  * @retval  NULL-pointer if memory allocation fails.
  *
  */
-extern void * MemoryRealloc(void * p, size_t size);
+extern void * MemoryRealloc(void * p, size_t size) CHIP_OVERRIDE_MALLOC_TYPED(MemoryReallocTyped, 2);
 
 /**
  * This function is called by the Chip layer to release a memory block allocated by
