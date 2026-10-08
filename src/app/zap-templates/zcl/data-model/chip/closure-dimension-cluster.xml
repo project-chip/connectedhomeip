@@ -116,7 +116,7 @@ Alchemy: v1.7.10
   </struct>
 
   <cluster>
-    <domain>Closures</domain>
+    <domain>General</domain>
     <name>Closure Dimension</name>
     <code>0x0105</code>
     <define>CLOSURE_DIMENSION_CLUSTER</define>
@@ -161,7 +161,7 @@ Alchemy: v1.7.10
           <feature name="PS"/>
         </optionalConform>
       </feature>
-      <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area" apiMaturity="provisional">
+      <feature bit="8" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
         <otherwiseConform>
           <provisionalConform/>
           <optionalConform/>
@@ -170,12 +170,12 @@ Alchemy: v1.7.10
     </features>
     <attribute code="0x0000" side="server" name="CurrentState" define="CURRENT_STATE" type="DimensionStateStruct" isNullable="true"/>
     <attribute code="0x0001" side="server" name="TargetState" define="TARGET_STATE" type="DimensionStateStruct" isNullable="true"/>
-    <attribute code="0x0002" side="server" name="Resolution" define="RESOLUTION" type="percent100ths" max="10000" default="0" optional="true">
+    <attribute code="0x0002" side="server" name="Resolution" define="RESOLUTION" type="percent100ths" max="10000" default="1" optional="true" min="1">
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0003" side="server" name="StepValue" define="STEP_VALUE" type="percent100ths" max="10000" default="0" optional="true">
+    <attribute code="0x0003" side="server" name="StepValue" define="STEP_VALUE" type="percent100ths" max="10000" default="1" optional="true" min="1">
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
@@ -222,9 +222,9 @@ Alchemy: v1.7.10
     </attribute>
     <command code="0x00" source="client" name="SetTarget" mustUseTimedInvoke="true">
       <description>This command is used to move a dimension of the closure to a target position.</description>
-      <arg fieldId="0" name="Position" type="percent100ths" optional="true"/>
+      <arg fieldId="0" name="Position" type="percent100ths" optional="true" max="10000"/>
       <arg fieldId="1" name="Latch" type="boolean" optional="true"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03"/>
       <mandatoryConform/>
     </command>
 
@@ -232,7 +232,7 @@ Alchemy: v1.7.10
       <description>This command is used to move a dimension of the closure to a target position by a number of steps.</description>
       <arg fieldId="0" name="Direction" type="StepDirectionEnum" max="0x01"/>
       <arg fieldId="1" name="NumberOfSteps" type="int16u" min="1"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03"/>
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
@@ -240,9 +240,9 @@ Alchemy: v1.7.10
 
     <command code="0x02" source="client" name="GroupedSetTarget" optional="true" apiMaturity="provisional">
       <description>This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position, latch, and/or perform the movement at a specific speed.</description>
-      <arg fieldId="0" name="Position" type="percent100ths" optional="true" apiMaturity="provisional"/>
+      <arg fieldId="0" name="Position" type="percent100ths" optional="true" apiMaturity="provisional" max="10000"/>
       <arg fieldId="1" name="Latch" type="boolean" optional="true" apiMaturity="provisional"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03" apiMaturity="provisional"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03" apiMaturity="provisional"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -257,7 +257,7 @@ Alchemy: v1.7.10
       <description>This command is intended to be invoked using groupcast addressing to move a group of closures dimensions to a target position by a number of steps.</description>
       <arg fieldId="0" name="Direction" type="StepDirectionEnum" max="0x01" apiMaturity="provisional"/>
       <arg fieldId="1" name="NumberOfSteps" type="int16u" min="1" apiMaturity="provisional"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03" apiMaturity="provisional"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03" apiMaturity="provisional"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
