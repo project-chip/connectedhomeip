@@ -118,6 +118,9 @@ CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aE
     Structs::ContentInfoStruct::Type contentInfo;
     contentInfo.contentType = MediaType::kTVShow;
     contentInfo.title       = chip::MakeOptional(chip::app::DataModel::MakeNullable("Example Show"_span));
+    contentInfo.show        = chip::MakeOptional(chip::app::DataModel::MakeNullable("Example Show"_span));
+    contentInfo.season      = chip::MakeOptional(chip::app::DataModel::MakeNullable("1"_span));
+    contentInfo.episode     = chip::MakeOptional(chip::app::DataModel::MakeNullable("1"_span));
     return aEncoder.Encode(contentInfo);
 }
 

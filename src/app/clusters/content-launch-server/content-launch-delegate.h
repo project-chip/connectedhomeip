@@ -49,12 +49,15 @@ public:
     virtual void HandleContentReplicationRequest(CommandResponseHelper<Commands::ContentReplicationResponse::Type> & helper)
     {
         Commands::ContentReplicationResponse::Type response;
+        response.status          = StatusEnum::kReplicationNotSupported;
+        response.replicationInfo = MakeOptional(DataModel::NullNullable);
         LogErrorOnFailure(helper.Success(response));
     }
 
     virtual void HandlePlayPreset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint16_t presetID)
     {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        // The default Presets attribute is empty, so no PresetID can match.
+        LogErrorOnFailure(commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusEnum::kPresetNotFound)));
     }
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;

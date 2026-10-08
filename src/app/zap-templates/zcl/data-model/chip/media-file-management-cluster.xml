@@ -66,9 +66,7 @@ Alchemy: v1.6.20
     <attribute code="0x0002" side="server" name="AvailableFiles" define="AVAILABLE_FILES" type="array" entryType="FileDescriptionStruct" length="256" apiMaturity="provisional">
       <access op="read" privilege="manage"/>
     </attribute>
-    <attribute code="0x0003" side="server" name="SupportedMimeTypes" define="SUPPORTED_MIME_TYPES" type="array" entryType="char_string" length="64" apiMaturity="provisional">
-      <access op="read" privilege="manage"/>
-    </attribute>
+    <attribute code="0x0003" side="server" name="SupportedMimeTypes" define="SUPPORTED_MIME_TYPES" type="array" entryType="char_string" length="64" apiMaturity="provisional"/>
     <command code="0x00" source="client" name="AddFile" response="AddFileResponse" apiMaturity="provisional">
       <description>Upon receipt, this command SHALL initiate the process of adding a new media file to the device&apos;s storage.</description>
       <access op="invoke" privilege="manage"/>
