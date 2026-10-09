@@ -93,6 +93,39 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
+static NSDictionary<NSString *, id> * TestAttributeResponseValue(NSNumber * endpointID, NSNumber * clusterID, NSNumber * attributeID, unsigned int testValue)
+{
+    return @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(testValue),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(testValue),
+        }
+    };
+}
+
+static NSDictionary<NSString *, id> * TestEventResponseValue(NSNumber * endpointID, NSNumber * clusterID, NSNumber * eventID)
+{
+    // Pick a large event number, so that in practice these event reports will
+    // all have larger event numbers than anything that might have been observed
+    // before.
+    static uint64_t eventNumber = 0x100000000llu;
+    return @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+        MTREventIsHistoricalKey : @(NO),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : @(eventNumber++),
+        // Empty payload.
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
+    };
+}
+
 @interface MTRDeviceTests : MTRTestCase
 
 @end
@@ -4348,39 +4381,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
 }
 
-- (NSDictionary<NSString *, id> *)_testAttributeResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID value:(unsigned int)testValue
-{
-    return @{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID],
-        MTRDataKey : @ {
-            MTRDataVersionKey : @(testValue),
-            MTRTypeKey : MTRUnsignedIntegerValueType,
-            MTRValueKey : @(testValue),
-        }
-    };
-}
-
-- (NSDictionary<NSString *, id> *)_testEventResponseValueWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
-{
-    // Pick a large event number, so that in practice these event reports will
-    // all have larger event numbers than anything that might have been observed
-    // before.
-    static uint64_t eventNumber = 0x100000000llu;
-    return @{
-        MTREventPathKey : [MTREventPath eventPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID],
-        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
-        MTREventTimestampDateKey : [NSDate date],
-        MTREventIsHistoricalKey : @(NO),
-        MTREventPriorityKey : @(MTREventPriorityInfo),
-        MTREventNumberKey : @(eventNumber++),
-        // Empty payload.
-        MTRDataKey : @ {
-            MTRTypeKey : MTRStructureValueType,
-            MTRValueKey : @[],
-        },
-    };
-}
-
 - (void)test038_MTRDeviceMultipleDelegatesInterestedPaths
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -4530,7 +4530,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4546,7 +4546,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4601,7 +4601,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int endpointID = i;
                 int clusterID = i * 10 + j;
                 int eventID = i * 100 + j * 10 + k;
-                [eventReport addObject:[self _testEventResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) eventID:@(eventID)]];
+                [eventReport addObject:TestEventResponseValue(@(endpointID), @(clusterID), @(eventID))];
             }
         }
     }
@@ -4616,7 +4616,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 20000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -4673,7 +4673,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 int clusterID = i * 10 + j;
                 int attributeID = i * 100 + j * 10 + k;
                 int value = attributeID + 10000;
-                [attributeReport addObject:[self _testAttributeResponseValueWithEndpointID:@(endpointID) clusterID:@(clusterID) attributeID:@(attributeID) value:value]];
+                [attributeReport addObject:TestAttributeResponseValue(@(endpointID), @(clusterID), @(attributeID), value)];
             }
         }
     }
@@ -7033,6 +7033,134 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertNotNil(values);
     // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
     XCTAssertGreaterThan(values.count, 100);
+}
+
+@end
+
+@interface MTRDeviceReportFilterTests : MTRTestCase
+@end
+
+@implementation MTRDeviceReportFilterTests {
+    BOOL _localTestStorageEnabledBeforeTest;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    _localTestStorageEnabledBeforeTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
+}
+
+- (void)tearDown
+{
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeTest;
+    [super tearDown];
+}
+
+- (MTRDeviceTestDelegateWithSubscriptionSetupOverride *)addDelegateToDevice:(MTRDevice *)device
+                                               interestedPathsForAttributes:(NSArray *)interestedPathsForAttributes
+                                                   interestedPathsForEvents:(NSArray *)interestedPathsForEvents
+                                                             attributePaths:(NSMutableArray<MTRAttributePath *> *)attributePaths
+                                                                 eventPaths:(NSMutableArray<MTREventPath *> *)eventPaths
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * value in data) {
+            [attributePaths addObject:value[MTRAttributePathKey]];
+        }
+    };
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * value in data) {
+            [eventPaths addObject:value[MTREventPathKey]];
+        }
+    };
+    XCTestExpectation * gotReportEnd = [self expectationWithDescription:@"Report end"];
+    delegate.onReportEnd = ^{
+        [gotReportEnd fulfill];
+    };
+    [device addDelegate:delegate queue:dispatch_get_main_queue() interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
+    return delegate;
+}
+
+- (void)test001_AttributePathMatchesItsEndpointClusterAndAttribute
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    NSMutableArray<MTRAttributePath *> * attributePaths = [NSMutableArray array];
+    __auto_type * interestedPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)];
+    __auto_type * delegate = [self addDelegateToDevice:device interestedPathsForAttributes:@[ interestedPath ] interestedPathsForEvents:@[] attributePaths:attributePaths eventPaths:[NSMutableArray array]];
+
+    [device unitTestInjectAttributeReport:@[
+        TestAttributeResponseValue(@(1), @(6), @(0), 1),
+        TestAttributeResponseValue(@(2), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(6), @(1), 1),
+        TestAttributeResponseValue(@(1), @(8), @(0), 1),
+    ]
+                         fromSubscription:YES];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    XCTAssertEqualObjects(attributePaths, @[ interestedPath ]);
+    [device removeDelegate:delegate];
+}
+
+- (void)test002_EventPathMatchesItsEndpointClusterAndEvent
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    NSMutableArray<MTREventPath *> * eventPaths = [NSMutableArray array];
+    __auto_type * interestedPath = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)];
+    __auto_type * delegate = [self addDelegateToDevice:device interestedPathsForAttributes:@[] interestedPathsForEvents:@[ interestedPath ] attributePaths:[NSMutableArray array] eventPaths:eventPaths];
+
+    [device unitTestInjectEventReport:@[
+        TestEventResponseValue(@(1), @(59), @(1)),
+        TestEventResponseValue(@(2), @(59), @(1)),
+        TestEventResponseValue(@(1), @(59), @(2)),
+        TestEventResponseValue(@(1), @(6), @(1)),
+    ]];
+    // Event reports have no report end; the empty attribute report that follows them on the device queue supplies one.
+    [device unitTestInjectAttributeReport:@[] fromSubscription:YES];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    XCTAssertEqualObjects(eventPaths, @[ interestedPath ]);
+    [device removeDelegate:delegate];
+}
+
+- (void)test003_ClusterPathMatchesItsEndpointAndCluster
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    NSMutableArray<MTRAttributePath *> * attributePaths = [NSMutableArray array];
+    NSMutableArray<MTREventPath *> * eventPaths = [NSMutableArray array];
+    __auto_type * delegate = [self addDelegateToDevice:device
+                          interestedPathsForAttributes:@[ [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)] ]
+                              interestedPathsForEvents:@[ [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(59)] ]
+                                        attributePaths:attributePaths
+                                            eventPaths:eventPaths];
+
+    [device unitTestInjectEventReport:@[
+        TestEventResponseValue(@(1), @(59), @(1)),
+        TestEventResponseValue(@(1), @(59), @(2)),
+        TestEventResponseValue(@(2), @(59), @(1)),
+        TestEventResponseValue(@(1), @(6), @(1)),
+    ]];
+    [device unitTestInjectAttributeReport:@[
+        TestAttributeResponseValue(@(1), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(6), @(1), 1),
+        TestAttributeResponseValue(@(2), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(8), @(0), 1),
+    ]
+                         fromSubscription:YES];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    NSArray * expectedAttributePaths = @[
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(1)],
+    ];
+    NSArray * expectedEventPaths = @[
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(2)],
+    ];
+    XCTAssertEqualObjects(attributePaths, expectedAttributePaths);
+    XCTAssertEqualObjects(eventPaths, expectedEventPaths);
+    [device removeDelegate:delegate];
 }
 
 @end
