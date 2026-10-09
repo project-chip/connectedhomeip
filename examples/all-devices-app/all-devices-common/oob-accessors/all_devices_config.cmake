@@ -60,5 +60,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensorAccessor.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValveAccessor.cpp"
     )
 endif()

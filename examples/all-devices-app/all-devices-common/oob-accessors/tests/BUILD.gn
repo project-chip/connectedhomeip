@@ -25,6 +25,7 @@ if (chip_build_tests) {
       "TestOOBAccessors.cpp",
       "TestOOBDataSerializer.cpp",
       "TestSoilSensorAccessor.cpp",
+      "TestWaterValveAccessor.cpp",
     ]
 
     cflags = [ "-Wconversion" ]
@@ -32,6 +33,7 @@ if (chip_build_tests) {
     public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor:increasing",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:ambient-context",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:basic-information",

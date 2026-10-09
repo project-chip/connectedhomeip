@@ -39,6 +39,13 @@ public:
 
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
 
+    /// The level the valve was most recently opened to.
+    ///
+    /// Used to restore the level when an open is requested without an explicit target level (for
+    /// example an out-of-band write of CurrentState), so that a previously configured level is not
+    /// silently replaced by the fully-open default.
+    Percent LastOpenLevel() const { return mLastOpenLevel; }
+
     // Clusters::ValveConfigurationAndControl::Delegate implementation
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
     CHIP_ERROR HandleCloseValve() override;
@@ -46,6 +53,7 @@ public:
 
 protected:
     TimerDelegate & mTimerDelegate;
+    Percent mLastOpenLevel = Clusters::ValveConfigurationAndControlCluster::kDefaultOpenLevel;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };

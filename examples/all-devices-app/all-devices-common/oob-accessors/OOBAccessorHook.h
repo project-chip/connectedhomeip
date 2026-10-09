@@ -36,6 +36,7 @@
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>
+#include <device/types/water-valve/OOBAccessors.h>
 
 namespace chip::app {
 
