@@ -31,6 +31,11 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 using namespace chip::literals;
 
+namespace {
+constexpr uint8_t kMorningNewsPresetID     = 1;
+constexpr uint8_t kEveningPlaylistPresetID = 2;
+} // namespace
+
 ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
     mAcceptHeaderList            = acceptHeaderList;
@@ -185,6 +190,14 @@ void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelp
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
     ContentReplicationResponseType response;
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+
+    // On success, ReplicationInfo is required to carry at least one of LaunchUrlInfo or ContentAppInfo.
+    Structs::LaunchUrlInfo::Type launchUrlInfo;
+    launchUrlInfo.url = "https://csa-iot.org/allowed"_span;
+    Structs::ReplicationInfo::Type replicationInfo;
+    replicationInfo.launchUrlInfo = chip::MakeOptional(MakeNullable(launchUrlInfo));
+    response.replicationInfo      = chip::MakeOptional(MakeNullable(replicationInfo));
+
     LogErrorOnFailure(helper.Success(response));
 }
 
@@ -192,6 +205,11 @@ void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * comman
                                               const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
+    if (presetID != kMorningNewsPresetID && presetID != kEveningPlaylistPresetID)
+    {
+        LogErrorOnFailure(commandObj->AddClusterSpecificFailure(commandPath, chip::to_underlying(StatusEnum::kPresetNotFound)));
+        return;
+    }
     commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
 }
 
@@ -226,12 +244,12 @@ CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEnc
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         ContentPresetStructType preset1;
-        preset1.presetID   = 1;
+        preset1.presetID   = kMorningNewsPresetID;
         preset1.presetName = "Morning News"_span;
         ReturnErrorOnFailure(encoder.Encode(preset1));
 
         ContentPresetStructType preset2;
-        preset2.presetID   = 2;
+        preset2.presetID   = kEveningPlaylistPresetID;
         preset2.presetName = "Evening Playlist"_span;
         ReturnErrorOnFailure(encoder.Encode(preset2));
 
