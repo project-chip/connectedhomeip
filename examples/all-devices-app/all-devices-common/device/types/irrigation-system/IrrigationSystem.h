@@ -29,6 +29,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 
+#include <optional>
+
 namespace chip {
 namespace app {
 
@@ -59,7 +61,7 @@ public:
 
     struct ValveList
     {
-        DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
+        std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
