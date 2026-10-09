@@ -40,7 +40,7 @@ CHIP_ERROR IrrigationSystem::Register(EndpointIdAllocator & allocator, CodeDrive
     }
     if (mConfig.withOperationalState)
     {
-        mOperationalStateCluster.Create(mEndpointId, *mOperationalStateDelegate);
+        mOperationalStateCluster.Create(mEndpointId, mOperationalStateDelegate);
         ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
     }
     if (mConfig.withFlowMeasurement)

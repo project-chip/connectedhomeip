@@ -59,13 +59,12 @@ public:
 
     struct ValveList
     {
-        DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> startupConfiguration;
         DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
     IrrigationSystem(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
-                     Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate, const Config & config) :
+                     Clusters::OperationalState::OperationalStateCluster::Delegate & ODelegate, const Config & config) :
         DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
 
         mTimerDelegate(TDelegate), mIdentifyDelegate(IDelegate), mOperationalStateDelegate(ODelegate), mConfig(config)
@@ -74,7 +73,7 @@ public:
     ~IrrigationSystem() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::IdentifyCluster & IdentifyCluster()
@@ -105,7 +104,7 @@ private:
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
     EndpointId mEndpointId                                               = kInvalidEndpointId;
     Clusters::IdentifyDelegate & mIdentifyDelegate;
-    Clusters::OperationalState::OperationalStateCluster::Delegate * mOperationalStateDelegate;
+    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
     const Config mConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;

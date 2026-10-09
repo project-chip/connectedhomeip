@@ -152,7 +152,7 @@ CHIP_ERROR LoggingIrrigationSystem::RegisterParts(EndpointIdAllocator & allocato
 
     for (auto & context : mValveContext)
     {
-        auto valve = std::make_unique<WaterValve>(mTimerDelegate, context.startupConfiguration, context.valveContext, this);
+        auto valve = std::make_unique<WaterValve>(mTimerDelegate, context.valveContext, this);
         EndpointComposition valveEndpointComposition(GetEndpointId(), composition.pattern, context.tags);
         ReturnErrorOnFailure(valve->Register(allocator.Allocate(), provider, valveEndpointComposition));
         mWaterValves.push_back(std::move(valve));

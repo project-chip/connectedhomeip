@@ -29,11 +29,10 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate) :
 {}
 
 WaterValve::WaterValve(TimerDelegate & timerDelegate,
-                       const DataModel::Nullable<ValveConfigurationAndControlCluster::StartupConfiguration> & config,
                        const DataModel::Nullable<ValveConfigurationAndControlCluster::ValveContext> & context,
                        WaterValveListener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
-    mTimerDelegate(timerDelegate), mStartupConfiguration(config), mValveContext(context), mListener(listener)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
+    mValveContext(context), mListener(listener)
 {}
 
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -46,7 +45,7 @@ CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mValveCluster.Create(endpoint, SetUpValveContext().Value());
+    mValveCluster.Create(endpoint, SetUpValveContext());
     ReturnErrorOnFailure(provider.AddCluster(mValveCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

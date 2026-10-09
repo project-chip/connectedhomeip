@@ -38,7 +38,6 @@ public:
 
     WaterValve(TimerDelegate & timerDelegate);
     WaterValve(TimerDelegate & timerDelegate,
-               const DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> & config,
                const DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> & context,
                WaterValveListener * listener = nullptr);
     ~WaterValve() override = default;
@@ -54,7 +53,7 @@ public:
 
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
 
-    DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> SetUpValveContext()
+    Clusters::ValveConfigurationAndControlCluster::ValveContext SetUpValveContext()
     {
         if (mValveContext.IsNull())
         {
@@ -62,36 +61,15 @@ public:
                 .features = BitFlags<Clusters::ValveConfigurationAndControl::Feature>(
                     Clusters::ValveConfigurationAndControl::Feature::kLevel),
                 .optionalAttributeSet = {},
-                .config               = SetUpStartUpConfiguration().Value(),
+                .config               = { DataModel::NullNullable, Clusters::ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                          Clusters::ValveConfigurationAndControlCluster::kDefaultLevelStep },
                 .tsTracker            = nullptr,
                 .delegate             = this,
             };
         }
-        return Clusters::ValveConfigurationAndControlCluster::ValveContext{
-
-            .features             = mValveContext.Value().features,
-            .optionalAttributeSet = mValveContext.Value().optionalAttributeSet,
-            .config               = mValveContext.Value().config,
-            .tsTracker            = mValveContext.Value().tsTracker,
-            .delegate             = this,
-        };
-    }
-    DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> SetUpStartUpConfiguration()
-    {
-        if (mStartupConfiguration.IsNull())
-        {
-            return Clusters::ValveConfigurationAndControlCluster::StartupConfiguration{
-                DataModel::NullNullable, Clusters::ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                Clusters::ValveConfigurationAndControlCluster::kDefaultLevelStep
-            };
-        }
-
-        return Clusters::ValveConfigurationAndControlCluster::StartupConfiguration{
-
-            .defaultOpenDuration = mStartupConfiguration.Value().defaultOpenDuration,
-            .defaultOpenLevel    = mStartupConfiguration.Value().defaultOpenLevel,
-            .levelStep           = mStartupConfiguration.Value().levelStep,
-        };
+        auto context     = mValveContext.Value();
+        context.delegate = this;
+        return context;
     }
     bool IsOpen() const { return mOpenLevel.has_value(); }
     std::optional<Percent> OpenLevel() const { return mOpenLevel; }
@@ -106,7 +84,6 @@ protected:
     std::optional<Percent> mOpenLevel;
     std::optional<uint32_t> mRemainingDuration;
     TimerDelegate & mTimerDelegate;
-    DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> mStartupConfiguration;
     DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
     WaterValveListener * mListener = nullptr;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
