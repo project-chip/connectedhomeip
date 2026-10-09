@@ -29433,6 +29433,55 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ThreadNetworkDirectory
 
+namespace ThreadBorderRouterDiagnostics {
+namespace Attributes {
+
+namespace Status {
+
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterDiagnostics::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<chip::app::Clusters::ThreadBorderRouterDiagnostics::BorderRouterOperationalStatusEnum>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace Status
+
+namespace FeatureMap {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterDiagnostics::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<uint32_t>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::ThreadBorderRouterDiagnostics::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<uint16_t>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ThreadBorderRouterDiagnostics
+
 namespace CommissioningProxy {
 namespace Attributes {
 

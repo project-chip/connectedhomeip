@@ -6065,6 +6065,37 @@ static BOOL AttributeIsSpecifiedInThreadNetworkDirectoryCluster(AttributeId aAtt
     }
     }
 }
+static BOOL AttributeIsSpecifiedInThreadBorderRouterDiagnosticsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadBorderRouterDiagnostics;
+    switch (aAttributeId) {
+    case Attributes::Status::Id: {
+        return YES;
+    }
+    case Attributes::ActiveFaultsList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known ThreadBorderRouterDiagnostics attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInCommissioningProxyCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CommissioningProxy;
@@ -8238,6 +8269,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return AttributeIsSpecifiedInThreadNetworkDirectoryCluster(aAttributeId);
+    }
+    case Clusters::ThreadBorderRouterDiagnostics::Id: {
+        return AttributeIsSpecifiedInThreadBorderRouterDiagnosticsCluster(aAttributeId);
     }
     case Clusters::CommissioningProxy::Id: {
         return AttributeIsSpecifiedInCommissioningProxyCluster(aAttributeId);

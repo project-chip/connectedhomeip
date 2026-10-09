@@ -141,6 +141,7 @@
         "thermostat-cluster.xml",
         "thermostat-mode-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
+        "thread-border-router-diagnostics-cluster.xml",
         "thread-border-router-management-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
         "thread-network-directory-cluster.xml",
@@ -558,6 +559,12 @@
             "ClusterRevision",
             "FeatureMap",
             "MeasuredValue"
+        ],
+        "Thread Border Router Diagnostics": [
+            "Status",
+            "ActiveFaultsList",
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Thread Border Router Management": [
             "BorderRouterName",

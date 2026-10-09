@@ -3170,6 +3170,8 @@ public class ClusterWriteMapping {
     );
     writeThreadNetworkDirectoryInteractionInfo.put("writePreferredExtendedPanIDAttribute", writeThreadNetworkDirectoryPreferredExtendedPanIDAttributeInteractionInfo);
     writeAttributeMap.put("threadNetworkDirectory", writeThreadNetworkDirectoryInteractionInfo);
+    Map<String, InteractionInfo> writeThreadBorderRouterDiagnosticsInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("threadBorderRouterDiagnostics", writeThreadBorderRouterDiagnosticsInteractionInfo);
     Map<String, InteractionInfo> writeCommissioningProxyInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeCommissioningProxyScanMaxTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo commissioningProxyscanMaxTimeCommandParameterInfo =
