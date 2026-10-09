@@ -6992,6 +6992,9 @@ static BOOL AttributeIsSpecifiedInWebRTCTransportProviderCluster(AttributeId aAt
     case Attributes::CurrentSessions::Id: {
         return YES;
     }
+    case Attributes::SupportedSFrameCipherSuites::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

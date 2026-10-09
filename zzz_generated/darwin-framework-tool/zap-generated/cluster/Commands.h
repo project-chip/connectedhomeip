@@ -187143,9 +187143,11 @@ public:
 | * ProvideAnswer                                                     |   0x04 |
 | * ProvideICECandidates                                              |   0x05 |
 | * EndSession                                                        |   0x06 |
+| * UpdateSession                                                     |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentSessions                                                   | 0x0000 |
+| * SupportedSFrameCipherSuites                                       | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -187295,10 +187297,29 @@ public:
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.SFrameConfig.HasValue()) {
-            params.sFrameConfig = [MTRWebRTCTransportProviderClusterSFrameStruct new];
-            params.sFrameConfig.cipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().cipherSuite];
-            params.sFrameConfig.baseKey = [NSData dataWithBytes:mRequest.SFrameConfig.Value().baseKey.data() length:mRequest.SFrameConfig.Value().baseKey.size()];
-            params.sFrameConfig.kid = [NSData dataWithBytes:mRequest.SFrameConfig.Value().kid.data() length:mRequest.SFrameConfig.Value().kid.size()];
+            params.sFrameConfig = [MTRDataTypeSFrameStruct new];
+            params.sFrameConfig.audioCipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().audioCipherSuite];
+            params.sFrameConfig.videoCipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().videoCipherSuite];
+            params.sFrameConfig.senderKey = [MTRDataTypeSFrameKeyStruct new];
+            params.sFrameConfig.senderKey.kid = [NSData dataWithBytes:mRequest.SFrameConfig.Value().senderKey.kid.data() length:mRequest.SFrameConfig.Value().senderKey.kid.size()];
+            params.sFrameConfig.senderKey.baseKey = [NSData dataWithBytes:mRequest.SFrameConfig.Value().senderKey.baseKey.data() length:mRequest.SFrameConfig.Value().senderKey.baseKey.size()];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                for (auto & entry_2 : mRequest.SFrameConfig.Value().receiveKeys) {
+                    MTRDataTypeSFrameKeyStruct * newElement_2;
+                    newElement_2 = [MTRDataTypeSFrameKeyStruct new];
+                    newElement_2.kid = [NSData dataWithBytes:entry_2.kid.data() length:entry_2.kid.size()];
+                    newElement_2.baseKey = [NSData dataWithBytes:entry_2.baseKey.data() length:entry_2.baseKey.size()];
+                    [array_2 addObject:newElement_2];
+                }
+                params.sFrameConfig.receiveKeys = array_2;
+            }
+            params.sFrameConfig.ratchetBits = [NSNumber numberWithUnsignedChar:mRequest.SFrameConfig.Value().ratchetBits];
+            if (mRequest.SFrameConfig.Value().ratchetTime.HasValue()) {
+                params.sFrameConfig.ratchetTime = [NSNumber numberWithUnsignedChar:mRequest.SFrameConfig.Value().ratchetTime.Value()];
+            } else {
+                params.sFrameConfig.ratchetTime = nil;
+            }
         } else {
             params.sFrameConfig = nil;
         }
@@ -187361,7 +187382,7 @@ public:
 private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type mRequest;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>> mComplex_ICEServers;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>> mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::Globals::Structs::SFrameStruct::Type>> mComplex_SFrameConfig;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
@@ -187441,10 +187462,18 @@ public:
         params.sdp = [[NSString alloc] initWithBytes:mRequest.sdp.data() length:mRequest.sdp.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.streamUsage)];
+        if (mRequest.streamUsage.HasValue()) {
+            params.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.streamUsage.Value())];
+        } else {
+            params.streamUsage = nil;
+        }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.originatingEndpointID = [NSNumber numberWithUnsignedShort:mRequest.originatingEndpointID];
+        if (mRequest.originatingEndpointID.HasValue()) {
+            params.originatingEndpointID = [NSNumber numberWithUnsignedShort:mRequest.originatingEndpointID.Value()];
+        } else {
+            params.originatingEndpointID = nil;
+        }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.videoStreamID.HasValue()) {
@@ -187523,10 +187552,29 @@ public:
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.SFrameConfig.HasValue()) {
-            params.sFrameConfig = [MTRWebRTCTransportProviderClusterSFrameStruct new];
-            params.sFrameConfig.cipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().cipherSuite];
-            params.sFrameConfig.baseKey = [NSData dataWithBytes:mRequest.SFrameConfig.Value().baseKey.data() length:mRequest.SFrameConfig.Value().baseKey.size()];
-            params.sFrameConfig.kid = [NSData dataWithBytes:mRequest.SFrameConfig.Value().kid.data() length:mRequest.SFrameConfig.Value().kid.size()];
+            params.sFrameConfig = [MTRDataTypeSFrameStruct new];
+            params.sFrameConfig.audioCipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().audioCipherSuite];
+            params.sFrameConfig.videoCipherSuite = [NSNumber numberWithUnsignedShort:mRequest.SFrameConfig.Value().videoCipherSuite];
+            params.sFrameConfig.senderKey = [MTRDataTypeSFrameKeyStruct new];
+            params.sFrameConfig.senderKey.kid = [NSData dataWithBytes:mRequest.SFrameConfig.Value().senderKey.kid.data() length:mRequest.SFrameConfig.Value().senderKey.kid.size()];
+            params.sFrameConfig.senderKey.baseKey = [NSData dataWithBytes:mRequest.SFrameConfig.Value().senderKey.baseKey.data() length:mRequest.SFrameConfig.Value().senderKey.baseKey.size()];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                for (auto & entry_2 : mRequest.SFrameConfig.Value().receiveKeys) {
+                    MTRDataTypeSFrameKeyStruct * newElement_2;
+                    newElement_2 = [MTRDataTypeSFrameKeyStruct new];
+                    newElement_2.kid = [NSData dataWithBytes:entry_2.kid.data() length:entry_2.kid.size()];
+                    newElement_2.baseKey = [NSData dataWithBytes:entry_2.baseKey.data() length:entry_2.baseKey.size()];
+                    [array_2 addObject:newElement_2];
+                }
+                params.sFrameConfig.receiveKeys = array_2;
+            }
+            params.sFrameConfig.ratchetBits = [NSNumber numberWithUnsignedChar:mRequest.SFrameConfig.Value().ratchetBits];
+            if (mRequest.SFrameConfig.Value().ratchetTime.HasValue()) {
+                params.sFrameConfig.ratchetTime = [NSNumber numberWithUnsignedChar:mRequest.SFrameConfig.Value().ratchetTime.Value()];
+            } else {
+                params.sFrameConfig.ratchetTime = nil;
+            }
         } else {
             params.sFrameConfig = nil;
         }
@@ -187589,7 +187637,7 @@ public:
 private:
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mRequest;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::ICEServerStruct::Type>>> mComplex_ICEServers;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>> mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::Globals::Structs::SFrameStruct::Type>> mComplex_SFrameConfig;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
     TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
@@ -187793,6 +187841,115 @@ private:
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+/*
+ * Command UpdateSession
+ */
+class WebRTCTransportProviderUpdateSession : public ClusterCommand {
+public:
+    WebRTCTransportProviderUpdateSession()
+        : ClusterCommand("update-session")
+        , mComplex_SFrameSenderKey(&mRequest.SFrameSenderKey)
+        , mComplex_SFrameReceiveKeysToAdd(&mRequest.SFrameReceiveKeysToAdd)
+        , mComplex_SFrameReceiveKIDsToRemove(&mRequest.SFrameReceiveKIDsToRemove)
+    {
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("SFrameSenderKey", &mComplex_SFrameSenderKey, "", Argument::kOptional);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("SFrameReceiveKeysToAdd", &mComplex_SFrameReceiveKeysToAdd, "", Argument::kOptional);
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        AddArgument("SFrameReceiveKIDsToRemove", &mComplex_SFrameReceiveKIDsToRemove, "", Argument::kOptional);
+#endif // MTR_ENABLE_PROVISIONAL
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::WebRTCTransportProvider::Commands::UpdateSession::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId, commandId, endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterWebRTCTransportProvider alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRWebRTCTransportProviderClusterUpdateSessionParams alloc] init];
+        params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+#if MTR_ENABLE_PROVISIONAL
+        params.webRTCSessionID = [NSNumber numberWithUnsignedShort:mRequest.webRTCSessionID];
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.SFrameSenderKey.HasValue()) {
+            params.sFrameSenderKey = [MTRDataTypeSFrameKeyStruct new];
+            params.sFrameSenderKey.kid = [NSData dataWithBytes:mRequest.SFrameSenderKey.Value().kid.data() length:mRequest.SFrameSenderKey.Value().kid.size()];
+            params.sFrameSenderKey.baseKey = [NSData dataWithBytes:mRequest.SFrameSenderKey.Value().baseKey.data() length:mRequest.SFrameSenderKey.Value().baseKey.size()];
+        } else {
+            params.sFrameSenderKey = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.SFrameReceiveKeysToAdd.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.SFrameReceiveKeysToAdd.Value()) {
+                    MTRDataTypeSFrameKeyStruct * newElement_1;
+                    newElement_1 = [MTRDataTypeSFrameKeyStruct new];
+                    newElement_1.kid = [NSData dataWithBytes:entry_1.kid.data() length:entry_1.kid.size()];
+                    newElement_1.baseKey = [NSData dataWithBytes:entry_1.baseKey.data() length:entry_1.baseKey.size()];
+                    [array_1 addObject:newElement_1];
+                }
+                params.sFrameReceiveKeysToAdd = array_1;
+            }
+        } else {
+            params.sFrameReceiveKeysToAdd = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        if (mRequest.SFrameReceiveKIDsToRemove.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.SFrameReceiveKIDsToRemove.Value()) {
+                    NSData * newElement_1;
+                    newElement_1 = [NSData dataWithBytes:entry_1.data() length:entry_1.size()];
+                    [array_1 addObject:newElement_1];
+                }
+                params.sFrameReceiveKIDsToRemove = array_1;
+            }
+        } else {
+            params.sFrameReceiveKIDsToRemove = nil;
+        }
+#endif // MTR_ENABLE_PROVISIONAL
+        uint16_t repeatCount = mRepeatCount.ValueOr(1);
+        uint16_t __block responsesNeeded = repeatCount;
+        while (repeatCount--) {
+            [cluster updateSessionWithParams:params completion:
+                    ^(NSError * _Nullable error) {
+                        responsesNeeded--;
+                        if (error != nil) {
+                            mError = error;
+                            LogNSError("Error", error);
+                            TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
+                        }
+                        if (responsesNeeded == 0) {
+                            SetCommandExitStatus(mError);
+                        }
+                    }];
+        }
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    chip::app::Clusters::WebRTCTransportProvider::Commands::UpdateSession::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::Globals::Structs::SFrameKeyStruct::Type>> mComplex_SFrameSenderKey;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SFrameKeyStruct::Type>>> mComplex_SFrameReceiveKeysToAdd;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::ByteSpan>>> mComplex_SFrameReceiveKIDsToRemove;
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
 
 #if MTR_ENABLE_PROVISIONAL
 
@@ -187870,6 +188027,91 @@ public:
             subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                 NSLog(@"WebRTCTransportProvider.CurrentSessions response %@", [value description]);
+                if (error == nil) {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+                } else {
+                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+                }
+                SetCommandExitStatus(error);
+            }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+
+/*
+ * Attribute SupportedSFrameCipherSuites
+ */
+class ReadWebRTCTransportProviderSupportedSFrameCipherSuites : public ReadAttribute {
+public:
+    ReadWebRTCTransportProviderSupportedSFrameCipherSuites()
+        : ReadAttribute("supported-sframe-cipher-suites")
+    {
+    }
+
+    ~ReadWebRTCTransportProviderSupportedSFrameCipherSuites()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterWebRTCTransportProvider alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        [cluster readAttributeSupportedSFrameCipherSuitesWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"WebRTCTransportProvider.SupportedSFrameCipherSuites response %@", [value description]);
+            if (error == nil) {
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+                LogNSError("WebRTCTransportProvider SupportedSFrameCipherSuites read Error", error);
+                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
+            SetCommandExitStatus(error);
+        }];
+        return CHIP_NO_ERROR;
+    }
+};
+
+class SubscribeAttributeWebRTCTransportProviderSupportedSFrameCipherSuites : public SubscribeAttribute {
+public:
+    SubscribeAttributeWebRTCTransportProviderSupportedSFrameCipherSuites()
+        : SubscribeAttribute("supported-sframe-cipher-suites")
+    {
+    }
+
+    ~SubscribeAttributeWebRTCTransportProviderSupportedSFrameCipherSuites()
+    {
+    }
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::WebRTCTransportProvider::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        __auto_type * cluster = [[MTRBaseClusterWebRTCTransportProvider alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeAutomatically = mAutoResubscribe.Value();
+        }
+        [cluster subscribeAttributeSupportedSFrameCipherSuitesWithParams:params
+            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
+            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"WebRTCTransportProvider.SupportedSFrameCipherSuites response %@", [value description]);
                 if (error == nil) {
                     TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
                 } else {
@@ -227115,12 +227357,19 @@ void registerClusterWebRTCTransportProvider(Commands & commands)
 #if MTR_ENABLE_PROVISIONAL
         make_unique<WebRTCTransportProviderEndSession>(), //
 #endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<WebRTCTransportProviderUpdateSession>(), //
+#endif // MTR_ENABLE_PROVISIONAL
         make_unique<ReadAttribute>(Id), //
         make_unique<WriteAttribute>(Id), //
         make_unique<SubscribeAttribute>(Id), //
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadWebRTCTransportProviderCurrentSessions>(), //
         make_unique<SubscribeAttributeWebRTCTransportProviderCurrentSessions>(), //
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+        make_unique<ReadWebRTCTransportProviderSupportedSFrameCipherSuites>(), //
+        make_unique<SubscribeAttributeWebRTCTransportProviderSupportedSFrameCipherSuites>(), //
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         make_unique<ReadWebRTCTransportProviderGeneratedCommandList>(), //

@@ -42868,9 +42868,39 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.sFrameConfig != nil) {
             auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
-            definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
-            definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
-            definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+            definedValue_0.audioCipherSuite = self.sFrameConfig.audioCipherSuite.unsignedShortValue;
+            definedValue_0.videoCipherSuite = self.sFrameConfig.videoCipherSuite.unsignedShortValue;
+            definedValue_0.senderKey.kid = AsByteSpan(self.sFrameConfig.senderKey.kid);
+            definedValue_0.senderKey.baseKey = AsByteSpan(self.sFrameConfig.senderKey.baseKey);
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_0.receiveKeys)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.sFrameConfig.receiveKeys.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.sFrameConfig.receiveKeys.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.sFrameConfig.receiveKeys.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.sFrameConfig.receiveKeys[i_2], MTRDataTypeSFrameKeyStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.sFrameConfig.receiveKeys[i_2], NSStringFromClass(MTRDataTypeSFrameKeyStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].kid = AsByteSpan(element_2.kid);
+                        listHolder_2->mList[i_2].baseKey = AsByteSpan(element_2.baseKey);
+                    }
+                    definedValue_0.receiveKeys = ListType_2(listHolder_2->mList, self.sFrameConfig.receiveKeys.count);
+                } else {
+                    definedValue_0.receiveKeys = ListType_2();
+                }
+            }
+            definedValue_0.ratchetBits = self.sFrameConfig.ratchetBits.unsignedCharValue;
+            if (self.sFrameConfig.ratchetTime != nil) {
+                auto & definedValue_2 = definedValue_0.ratchetTime.Emplace();
+                definedValue_2 = self.sFrameConfig.ratchetTime.unsignedCharValue;
+            }
         }
     }
     {
@@ -43100,9 +43130,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _sdp = @"";
 
-        _streamUsage = @(0);
+        _streamUsage = nil;
 
-        _originatingEndpointID = @(0);
+        _originatingEndpointID = nil;
 
         _videoStreamID = nil;
 
@@ -43173,10 +43203,16 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.sdp = AsCharSpan(self.sdp);
     }
     {
-        encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+        if (self.streamUsage != nil) {
+            auto & definedValue_0 = encodableStruct.streamUsage.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.streamUsage.unsignedCharValue);
+        }
     }
     {
-        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
+        if (self.originatingEndpointID != nil) {
+            auto & definedValue_0 = encodableStruct.originatingEndpointID.Emplace();
+            definedValue_0 = self.originatingEndpointID.unsignedShortValue;
+        }
     }
     {
         if (self.videoStreamID != nil) {
@@ -43277,9 +43313,39 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.sFrameConfig != nil) {
             auto & definedValue_0 = encodableStruct.SFrameConfig.Emplace();
-            definedValue_0.cipherSuite = self.sFrameConfig.cipherSuite.unsignedShortValue;
-            definedValue_0.baseKey = AsByteSpan(self.sFrameConfig.baseKey);
-            definedValue_0.kid = AsByteSpan(self.sFrameConfig.kid);
+            definedValue_0.audioCipherSuite = self.sFrameConfig.audioCipherSuite.unsignedShortValue;
+            definedValue_0.videoCipherSuite = self.sFrameConfig.videoCipherSuite.unsignedShortValue;
+            definedValue_0.senderKey.kid = AsByteSpan(self.sFrameConfig.senderKey.kid);
+            definedValue_0.senderKey.baseKey = AsByteSpan(self.sFrameConfig.senderKey.baseKey);
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_0.receiveKeys)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.sFrameConfig.receiveKeys.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.sFrameConfig.receiveKeys.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.sFrameConfig.receiveKeys.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.sFrameConfig.receiveKeys[i_2], MTRDataTypeSFrameKeyStruct);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.sFrameConfig.receiveKeys[i_2], NSStringFromClass(MTRDataTypeSFrameKeyStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2].kid = AsByteSpan(element_2.kid);
+                        listHolder_2->mList[i_2].baseKey = AsByteSpan(element_2.baseKey);
+                    }
+                    definedValue_0.receiveKeys = ListType_2(listHolder_2->mList, self.sFrameConfig.receiveKeys.count);
+                } else {
+                    definedValue_0.receiveKeys = ListType_2();
+                }
+            }
+            definedValue_0.ratchetBits = self.sFrameConfig.ratchetBits.unsignedCharValue;
+            if (self.sFrameConfig.ratchetTime != nil) {
+                auto & definedValue_2 = definedValue_0.ratchetTime.Emplace();
+                definedValue_2 = self.sFrameConfig.ratchetTime.unsignedCharValue;
+            }
         }
     }
     {
@@ -43743,6 +43809,158 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.reason = static_cast<std::remove_reference_t<decltype(encodableStruct.reason)>>(self.reason.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRWebRTCTransportProviderClusterUpdateSessionParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _webRTCSessionID = @(0);
+
+        _sFrameSenderKey = nil;
+
+        _sFrameReceiveKeysToAdd = nil;
+
+        _sFrameReceiveKIDsToRemove = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRWebRTCTransportProviderClusterUpdateSessionParams alloc] init];
+
+    other.webRTCSessionID = self.webRTCSessionID;
+    other.sFrameSenderKey = self.sFrameSenderKey;
+    other.sFrameReceiveKeysToAdd = self.sFrameReceiveKeysToAdd;
+    other.sFrameReceiveKIDsToRemove = self.sFrameReceiveKIDsToRemove;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sFrameSenderKey:%@; sFrameReceiveKeysToAdd:%@; sFrameReceiveKIDsToRemove:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sFrameSenderKey, _sFrameReceiveKeysToAdd, _sFrameReceiveKIDsToRemove];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWebRTCTransportProviderClusterUpdateSessionParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::WebRTCTransportProvider::Commands::UpdateSession::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.webRTCSessionID = self.webRTCSessionID.unsignedShortValue;
+    }
+    {
+        if (self.sFrameSenderKey != nil) {
+            auto & definedValue_0 = encodableStruct.SFrameSenderKey.Emplace();
+            definedValue_0.kid = AsByteSpan(self.sFrameSenderKey.kid);
+            definedValue_0.baseKey = AsByteSpan(self.sFrameSenderKey.baseKey);
+        }
+    }
+    {
+        if (self.sFrameReceiveKeysToAdd != nil) {
+            auto & definedValue_0 = encodableStruct.SFrameReceiveKeysToAdd.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.sFrameReceiveKeysToAdd.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.sFrameReceiveKeysToAdd.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.sFrameReceiveKeysToAdd.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.sFrameReceiveKeysToAdd[i_1], MTRDataTypeSFrameKeyStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.sFrameReceiveKeysToAdd[i_1], NSStringFromClass(MTRDataTypeSFrameKeyStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1].kid = AsByteSpan(element_1.kid);
+                        listHolder_1->mList[i_1].baseKey = AsByteSpan(element_1.baseKey);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.sFrameReceiveKeysToAdd.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
+    }
+    {
+        if (self.sFrameReceiveKIDsToRemove != nil) {
+            auto & definedValue_0 = encodableStruct.SFrameReceiveKIDsToRemove.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.sFrameReceiveKIDsToRemove.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.sFrameReceiveKIDsToRemove.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.sFrameReceiveKIDsToRemove.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.sFrameReceiveKIDsToRemove[i_1], NSData);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.sFrameReceiveKIDsToRemove[i_1], NSStringFromClass(NSData.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1] = AsByteSpan(element_1);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.sFrameReceiveKIDsToRemove.count);
+                } else {
+                    definedValue_0 = ListType_1();
+                }
+            }
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
