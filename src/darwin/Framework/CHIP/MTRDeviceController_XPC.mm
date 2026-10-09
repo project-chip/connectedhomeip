@@ -63,6 +63,9 @@ NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTR
 @implementation MTRDeviceController_XPC {
     // Protects access to the data set in controllerConfigurationUpdated:
     os_unfair_lock _configurationLock;
+    // Protects _shutDown.
+    os_unfair_lock _shutdownLock;
+    BOOL _shutDown;
 }
 
 #pragma mark - Node ID Management
@@ -301,6 +304,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 - (void)_xpcConnectionRetry
 {
     MTR_LOG("%@: XPC Connection retry - timer hit", self);
+    if (!self.running) {
+        MTR_LOG("%@: XPC Connection retry - controller is shut down, not reconnecting", self);
+        return;
+    }
     if (!self.xpcConnectedOrConnecting) {
         if (![self _setupXPCConnection]) {
 #if 0 // FIXME: Not sure why this retry is not working, but I will fix this later
@@ -336,12 +343,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
         self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
         self.xpcConnection.exportedObject = self;
 
+        NSXPCConnection * connection = self.xpcConnection;
+        mtr_weakify(connection);
         self.xpcConnection.interruptionHandler = ^{
             mtr_strongify(self);
+            mtr_strongify(connection);
             MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", self.xpcParameters.uniqueIdentifier);
-            self.xpcConnectedOrConnecting = NO;
-            self.xpcConnection = nil;
-            [self _startXPCConnectionRetry];
+            [connection invalidate];
         };
 
         self.xpcConnection.invalidationHandler = ^{
@@ -399,6 +407,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
         self.xpcParameters = xpcParameters;
         _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _configurationLock = OS_UNFAIR_LOCK_INIT;
+        _shutdownLock = OS_UNFAIR_LOCK_INIT;
 
         if (![self _setupXPCConnection]) {
             return nil;
@@ -443,7 +452,9 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
-    [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+    if ([self isRunning]) {
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+    }
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
     return deviceToReturn;
@@ -476,41 +487,41 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 // All pass through, we could do some fancy redirection here based on protocol, but that's that for another day
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ stateChanged: %lu   found device: %@", nodeID, (unsigned long) state, device);
     [device device:nodeID stateChanged:state];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
 
     [device device:nodeID receivedAttributeReport:attributeReport];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received device: %@ receivedEventReport: %@     found device: %@", nodeID, eventReport, device);
 
     [device device:nodeID receivedEventReport:eventReport];
 }
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceBecameActive: %@ found device: %@", nodeID, device);
 
     [device deviceBecameActive:nodeID];
 }
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceCachePrimed: %@ found device: %@", nodeID, device);
 
     [device deviceCachePrimed:nodeID];
 }
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
 
     [device deviceConfigurationChanged:nodeID];
@@ -518,7 +529,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
-    MTRDevice_XPC * device = (MTRDevice_XPC *) [self deviceForNodeID:nodeID];
+    MTRDevice_XPC * device = (MTRDevice_XPC *) [self _deviceForNodeID:nodeID createIfNeeded:NO];
     MTR_LOG("Received internalStateUpdated: %@ found device: %@", nodeID, device);
 
     [device device:nodeID internalStateUpdated:dictionary];
@@ -585,8 +596,41 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(nodesWithStoredData,
 
 - (BOOL)isRunning
 {
-    // For XPC controller, always return yes
-    return YES;
+    std::lock_guard lock(_shutdownLock);
+    return !_shutDown;
+}
+
+- (void)shutdown
+{
+    {
+        std::lock_guard lock(_shutdownLock);
+        if (_shutDown) {
+            return;
+        }
+        _shutDown = YES;
+    }
+
+    MTR_LOG("%@ shutdown called", self);
+
+    __block NSXPCConnection * connection;
+    dispatch_sync(self.workQueue, ^{
+        connection = self.xpcConnection;
+        self.xpcConnection = nil;
+    });
+    [connection invalidate];
+
+    NSArray<MTRDevice *> * devices;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+        [self.nodeIDToDeviceMap removeAllObjects];
+    }
+
+    for (MTRDevice * device in devices) {
+        [device invalidate];
+    }
+
+    [super shutdown];
 }
 
 // Not Supported via XPC
