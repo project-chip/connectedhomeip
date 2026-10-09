@@ -203,6 +203,7 @@ TEST_F(TestAccessControlCluster, AttributesTest)
     ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
 }
 
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 // Helper function to count elements in a decodable list
 // Returns CHIP_ERROR to allow callers to use ASSERT_EQ/EXPECT_EQ for better error messages
 template <typename DecodableListType>
@@ -217,6 +218,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
     // Return the iterator status to the caller for assertion
     return it.GetStatus();
 }
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 // Test that all available attributes (mandatory and optional) can be read
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
