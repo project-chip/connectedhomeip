@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>

@@ -96,7 +96,10 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Open)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto state = mDevice.ValveConfigurationAndControlCluster().GetCurrentState();
     ASSERT_FALSE(state.IsNull());
@@ -127,7 +130,10 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Closed)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto state = mDevice.ValveConfigurationAndControlCluster().GetCurrentState();
     ASSERT_FALSE(state.IsNull());
@@ -157,7 +163,10 @@ TEST_F(TestWaterValveAccessor, SetCurrentLevel_Level60)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto level = mDevice.ValveConfigurationAndControlCluster().GetCurrentLevel();
     ASSERT_FALSE(level.IsNull());
@@ -191,7 +200,10 @@ TEST_F(TestWaterValveAccessor, SetCurrentLevel_ZeroClosesValve)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto state = mDevice.ValveConfigurationAndControlCluster().GetCurrentState();
     ASSERT_FALSE(state.IsNull());
@@ -302,7 +314,10 @@ TEST_F(TestWaterValveAccessor, RejectsInvalidCurrentState)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
 }
 
 // Test 7: Rejects null or out-of-range CurrentLevel
@@ -330,7 +345,10 @@ TEST_F(TestWaterValveAccessor, RejectsInvalidCurrentLevel)
         auto status =
             accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
         ASSERT_TRUE(status.has_value());
-        EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        if (status.has_value())
+        {
+            EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        }
     }
 }
 

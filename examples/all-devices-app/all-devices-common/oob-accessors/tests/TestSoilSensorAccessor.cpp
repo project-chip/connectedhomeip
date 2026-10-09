@@ -103,7 +103,10 @@ TEST_F(TestSoilSensorAccessor, SetMoisture_DirectValue42)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto moisture = mDevice.SoilMeasurementCluster().GetSoilMoistureMeasuredValue();
     ASSERT_FALSE(moisture.IsNull());
@@ -133,7 +136,10 @@ TEST_F(TestSoilSensorAccessor, SetMoisture_NullProbeFault)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto moisture = mDevice.SoilMeasurementCluster().GetSoilMoistureMeasuredValue();
     EXPECT_TRUE(moisture.IsNull());
@@ -162,7 +168,10 @@ TEST_F(TestSoilSensorAccessor, SetTemperature_ZeroDegreesFrostAlert)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto temp = mDevice.TemperatureMeasurementCluster().GetMeasuredValue();
     ASSERT_FALSE(temp.IsNull());
@@ -192,7 +201,10 @@ TEST_F(TestSoilSensorAccessor, SetTemperature_2150Degrees)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto temp = mDevice.TemperatureMeasurementCluster().GetMeasuredValue();
     ASSERT_FALSE(temp.IsNull());
@@ -222,7 +234,10 @@ TEST_F(TestSoilSensorAccessor, SetBattery_24HalfPercent)
     auto status =
         batteryAccessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto battery = mDevice.PowerSourceCluster().GetBatPercentRemaining();
     ASSERT_FALSE(battery.IsNull());
@@ -257,7 +272,10 @@ TEST_F(TestSoilSensorAccessor, StandaloneBatteryPowerSourceAccessor)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_NO_ERROR);
+    }
 
     auto battery = batteryDevice.BatteryPowerSourceCluster().GetBatPercentRemaining();
     ASSERT_FALSE(battery.IsNull());
@@ -294,7 +312,10 @@ TEST_F(TestSoilSensorAccessor, OptionalTemperature_Disabled)
     auto status =
         accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    if (status.has_value())
+    {
+        EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    }
 
     soilSensorWithoutTemp.Unregister(mProvider);
 }
