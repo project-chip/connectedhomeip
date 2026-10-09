@@ -724,9 +724,10 @@ private:
         {
             RegisterCreator("irrigation-system", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingIrrigationSystem>(mContext->identifyDelegate, mContext->timerDelegate,
-                                                           LoggingIrrigationSystem::ValveConfiguration(),
-                                                           LoggingIrrigationSystem::kHasMasterValve);
+                return MakeDevice<LoggingIrrigationSystem>(
+                    mContext->identifyDelegate, mContext->timerDelegate, LoggingIrrigationSystem::ValveConfiguration(),
+                    LoggingIrrigationSystem::kHasMasterValve,
+                    IrrigationSystem::Config{ .withIdentify = true, .withOperationalState = true, .withFlowMeasurement = true });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FAN)

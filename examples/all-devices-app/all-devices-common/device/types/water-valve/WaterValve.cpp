@@ -14,8 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/data-model/Nullable.h"
 #include <device/types/water-valve/WaterValve.h>
+
+#include <app/data-model/Nullable.h>
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -31,8 +32,8 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate,
                        const DataModel::Nullable<ValveConfigurationAndControlCluster::StartupConfiguration> & config,
                        const DataModel::Nullable<ValveConfigurationAndControlCluster::ValveContext> & context,
                        WaterValveListener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
-    mTimerDelegate(timerDelegate), mStartupConfiguration(config), mValveContext(context), mListener(listener)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
+    mStartupConfiguration(config), mValveContext(context), mListener(listener)
 {}
 
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
