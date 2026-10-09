@@ -496,18 +496,19 @@ public:
     T * CreateObject(Args &&... args)
     {
         T * object = Platform::New<T>(std::forward<Args>(args)...);
-        if (object != nullptr)
+        VerifyOrReturnValue(object != nullptr, nullptr);
+
+        auto node = Platform::New<internal::HeapObjectListNode>();
+        if (node == nullptr)
         {
-            auto node = Platform::New<internal::HeapObjectListNode>();
-            if (node != nullptr)
-            {
-                node->mObject = object;
-                mObjects.Append(node);
-                IncreaseUsage();
-                return object;
-            }
+            Platform::Delete(object);
+            return nullptr;
         }
-        return nullptr;
+
+        node->mObject = object;
+        mObjects.Append(node);
+        IncreaseUsage();
+        return object;
     }
 
     /*
