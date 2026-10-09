@@ -98,11 +98,11 @@ bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::Decodabl
     {
         return false;
     }
-    
-    // Spec constraints applied to the contents of the Receive Keys List. Also make sure the list size is within 
+
+    // Spec constraints applied to the contents of the Receive Keys List. Also make sure the list size is within
     // constraints
-    size_t count = 0; 
-    auto iter = sframeConfig.receiveKeys.begin();
+    size_t count = 0;
+    auto iter    = sframeConfig.receiveKeys.begin();
     while (iter.Next())
     {
         const auto & key = iter.GetValue();
@@ -114,20 +114,20 @@ bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::Decodabl
         if (key.kid.size() < 2 || key.kid.size() > 8)
         {
             return false;
-        }   
+        }
         ++count;
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
         return false;
-    }   
-    
+    }
+
     if (count > 64)
     {
         return false;
     }
-    
+
     // Spec constraint: Ratchet Bits must be 0-16
     if (sframeConfig.ratchetBits > 16)
     {
@@ -254,7 +254,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-    
+
 WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
@@ -1104,16 +1104,18 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(
-                    Zcl, "HandleProvideOffer: SFrame configuration validation for the video cipher suite failed: %" CHIP_ERROR_FORMAT, 
+                    Zcl,
+                    "HandleProvideOffer: SFrame configuration validation for the video cipher suite failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
                 return Status::DynamicConstraintError;
             }
-            
+
             err = mDelegate.ValidateSFrameConfig(sframeConfig.audioCipherSuite, sframeConfig.senderKey.baseKey.size());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(
-                    Zcl, "HandleProvideOffer: SFrame configuration validation for the audio cipher suite failed: %" CHIP_ERROR_FORMAT,
+                    Zcl,
+                    "HandleProvideOffer: SFrame configuration validation for the audio cipher suite failed: %" CHIP_ERROR_FORMAT,
                     err.Format());
                 return Status::DynamicConstraintError;
             }
