@@ -144,8 +144,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestAttributes)
     WebRTCTransportProviderCluster server(kTestEndpointId, mockDelegate);
 
     ASSERT_TRUE(IsAttributesListEqualTo(server,
-                                        { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry,
-                                          WebRTCTransportProvider::Attributes::SupportedSFrameCipherSuites::kMetadataEntry }));
+                                        { WebRTCTransportProvider::Attributes::CurrentSessions::kMetadataEntry }));
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestCommands)
@@ -353,7 +352,7 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSFrameConfigRejectsTooManyReceive
     auto result = tester.Invoke(Commands::SolicitOffer::Id, request);
 
     ASSERT_TRUE(result.status.has_value() &&
-                (result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::InvalidCommand));
+                (result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::ConstraintError));
 
     // The delegate must not have received a partial configuration.
     EXPECT_FALSE(mockDelegate.mCapturedSFrameConfig.HasValue());

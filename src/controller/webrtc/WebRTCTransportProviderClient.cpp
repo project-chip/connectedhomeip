@@ -223,7 +223,7 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     mProvideOfferData.ICETransportPolicy = NullOptional;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
-    mCurrentStreamUsage = value.streamUsage.Value();
+    mCurrentStreamUsage = value.streamUsage.ValueOr(mCurrentStreamUsage);
 
     // Attempt to find or establish a CASE session to the target PeerId.
     InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();

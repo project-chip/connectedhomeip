@@ -41,6 +41,11 @@ namespace {
 
 static constexpr uint16_t kMaxSessionId = 65534;
 
+constexpr std::array<DataModel::AttributeEntry, 1> kSupportedAttributes = {
+    CurrentSessions::kMetadataEntry,
+
+};
+
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::SolicitOffer::kMetadataEntry,         Commands::ProvideOffer::kMetadataEntry, Commands::ProvideAnswer::kMetadataEntry,
     Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
@@ -90,6 +95,41 @@ bool SFrameFollowsSpecConstraints(const Globals::Structs::SFrameStruct::Decodabl
 
     // Spec constraint: KID length must be 2-8
     if (sframeConfig.senderKey.kid.size() < 2 || sframeConfig.senderKey.kid.size() > 8)
+    {
+        return false;
+    }
+    
+    // Spec constraints applied to the contents of the Receive Keys List. Also make sure the list size is within 
+    // constraints
+    size_t count = 0; 
+    auto iter = sframeConfig.receiveKeys.begin();
+    while (iter.Next())
+    {
+        const auto & key = iter.GetValue();
+        if (key.baseKey.size() > 128)
+        {
+            return false;
+        }
+
+        if (key.kid.size() < 2 || key.kid.size() > 8)
+        {
+            return false;
+        }   
+        ++count;
+    }
+
+    if (iter.GetStatus() != CHIP_NO_ERROR)
+    {
+        return false;
+    }   
+    
+    if (count > 64)
+    {
+        return false;
+    }
+    
+    // Spec constraint: Ratchet Bits must be 0-16
+    if (sframeConfig.ratchetBits > 16)
     {
         return false;
     }
@@ -214,7 +254,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-
+    
 WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
@@ -288,7 +328,7 @@ CHIP_ERROR WebRTCTransportProviderCluster::Attributes(const ConcreteClusterPath 
                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryMetadata), {});
+    return listBuilder.Append(Span(kSupportedAttributes), {});
 }
 
 // Helper functions
@@ -1063,7 +1103,18 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             err = mDelegate.ValidateSFrameConfig(sframeConfig.videoCipherSuite, sframeConfig.senderKey.baseKey.size());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(
+                    Zcl, "HandleProvideOffer: SFrame configuration validation for the video cipher suite failed: %" CHIP_ERROR_FORMAT, 
+                    err.Format());
+                return Status::DynamicConstraintError;
+            }
+            
+            err = mDelegate.ValidateSFrameConfig(sframeConfig.audioCipherSuite, sframeConfig.senderKey.baseKey.size());
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(
+                    Zcl, "HandleProvideOffer: SFrame configuration validation for the audio cipher suite failed: %" CHIP_ERROR_FORMAT,
+                    err.Format());
                 return Status::DynamicConstraintError;
             }
         }
@@ -1088,13 +1139,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         args.sessionId = sessionId;
     }
 
-    args.streamUsage           = req.streamUsage.Value();
+    args.streamUsage           = req.streamUsage.ValueOr(outSession.streamUsage);
     args.videoStreams          = videoStreams;
     args.audioStreams          = audioStreams;
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-    args.originatingEndpointId = req.originatingEndpointID.Value();
+    args.originatingEndpointId = req.originatingEndpointID.ValueOr(outSession.peerEndpointID);
 
     if (req.SFrameConfig.HasValue())
     {
@@ -1151,13 +1202,13 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     // Set VideoStreamID only if present in the original request.
     if (req.videoStreamID.HasValue())
     {
-        resp.videoStreamID.SetValue(outSession.videoStreamID.Value());
+        resp.videoStreamID = outSession.videoStreamID;
     }
 
     // Set AudioStreamID only if present in the original request.
     if (req.audioStreamID.HasValue())
     {
-        resp.audioStreamID.SetValue(outSession.audioStreamID.Value());
+        resp.audioStreamID = outSession.audioStreamID;
     }
 
     ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);
