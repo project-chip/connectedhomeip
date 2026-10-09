@@ -54,12 +54,13 @@ tests:
 
     - label:
           "Step 2: TH sends a QueryImage command to the DUT. RequestorCanConsent
-          is set to True by TH. DUT responds with a QueryImageResponse with
-          UserConsentNeeded field set to True."
-      PICS: OTAP.S.M.UserConsentNeeded
+          is set to True by TH. DUT responds with a QueryImageResponse."
       verification: |
           Run the OTA Requestor App using command
+
           chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
+
+          Run the OTA Provider App (DUT). When the example app is used, the -c option makes it set UserConsentNeeded to True in the QueryImageResponse, and omitting it leaves the field False:
 
           out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -c
 
@@ -67,30 +68,13 @@ tests:
 
           Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Verify that the DUT does not try to obtain User Consent from the user prior to transfer of software update image.
+          Verify the UserConsentNeeded field in the QueryImageResponse received on the OTA Requestor.
+          - If UserConsentNeeded is True, verify that the DUT does not try to obtain User Consent from the user prior to transfer of software update image.
+          - If UserConsentNeeded is False or not present, verify that the DUT tries to obtain User Consent from the user prior to transfer of software update image.
       disabled: true
 
     - label:
-          "Step 3: TH sends a QueryImage command to the DUT. RequestorCanConsent
-          is set to True by TH. DUT responds with a QueryImageResponse with
-          UserConsentNeeded field set to False."
-      PICS: OTAP.S.M.UserConsentNeeded
-      verification: |
-          Run the OTA Requestor App using command
-
-          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
-
-          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
-
-          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
-
-          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
-
-          Verify that the DUT tries to obtain User Consent from the user prior to transfer of software update image.
-      disabled: true
-
-    - label:
-          "Step 4: During the transfer of the image from the DUT, force fail the
+          "Step 3: During the transfer of the image from the DUT, force fail the
           transfer before it completely transfers the image. Wait for the Idle
           timeout. Initiate another QueryImage Command from OTA-R/TH to the DUT."
       verification: |
@@ -113,7 +97,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 5: During the transfer of the image from the DUT, force fail the
+          "Step 4: During the transfer of the image from the DUT, force fail the
           transfer before it completely transfers the image. Initiate another
           QueryImage Command from OTA-R/TH to the DUT. Set the RC[STARTOFS] bit
           and associated STARTOFS field in the ReceiveInit Message sent from the

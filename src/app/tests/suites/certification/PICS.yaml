@@ -5248,11 +5248,6 @@ PICS:
           QueryImageResponse Command?"
       id: OTAP.S.M.DelayedActionTime
 
-    - label:
-          "Does the DUT support sending the UserConsentNeeded field in
-          QueryImageResponse Command?"
-      id: OTAP.S.M.UserConsentNeeded
-
     #
     # client / manually
     #
