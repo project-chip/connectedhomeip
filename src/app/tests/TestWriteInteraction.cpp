@@ -21,6 +21,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/reporting/tests/MockReportScheduler.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
 #include <app/util/mock/MockNodeConfig.h>
@@ -165,6 +166,7 @@ public:
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
     void TestWriteHandlerReceiveEmptyWriteRequest();
+    void TestWriteToUnavailableEndpoint();
     void TestWriteInvalidMessage1();
     void TestWriteInvalidMessage2();
     void TestWriteInvalidMessage3();
@@ -512,6 +514,86 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
         // The WriteClient should be shutdown once we SendWriteRequest for group.
         EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
     }
+}
+
+void TestWriteInteraction::TestWriteToUnavailableEndpoint()
+{
+    using namespace DataModel;
+    using Protocols::InteractionModel::Status;
+
+    class WriteValidationCluster : public DefaultServerCluster
+    {
+    public:
+        using DefaultServerCluster::DefaultServerCluster;
+
+        ActionReturnStatus ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder) override
+        {
+            return Status::UnsupportedRead;
+        }
+
+        CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder) override
+        {
+            static constexpr AttributeEntry attributes[] = {
+                { 1, {}, Access::Privilege::kView, std::nullopt },
+                { 2, {}, Access::Privilege::kView, Access::Privilege::kOperate },
+                { 3, AttributeQualityFlags::kTimed, Access::Privilege::kView, Access::Privilege::kOperate },
+            };
+            ReturnErrorOnFailure(builder.ReferenceExisting(attributes));
+            return DefaultServerCluster::Attributes(path, builder);
+        }
+    };
+
+    auto & model = TestImCustomDataModel::Instance();
+    const ConcreteClusterPath clusterPath(kMockEndpoint1, MockClusterId(2));
+    WriteValidationCluster cluster(clusterPath);
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+    auto unregister = ScopeExit([&] { EXPECT_SUCCESS(model.Registry().Unregister(&cluster)); });
+
+    WriteHandler handler;
+    ASSERT_EQ(handler.Init(&model, InteractionModelEngine::GetInstance()), CHIP_NO_ERROR);
+    auto closeHandler = ScopeExit([&] { handler.Close(); });
+    const Access::SubjectDescriptor subject{ .authMode = Access::AuthMode::kInternalDeviceAccess };
+
+    // Hide the endpoint from Ember metadata without unregistering its cluster, as happens for disabled endpoints.
+    const MockNodeConfig noEndpoints({});
+    auto restoreConfig = ScopeExit([&] { SetMockNodeConfig(TestMockNodeConfig()); });
+    for (bool endpointVisible : { true, false, true })
+    {
+        SetMockNodeConfig(endpointVisible ? TestMockNodeConfig() : noEndpoints);
+        model.Reset();
+        for (bool hasDataVersion : { false, true })
+        {
+            for (AttributeId attributeId : { 1u, 2u, 3u })
+            {
+                ConcreteDataAttributePath path(clusterPath.mEndpointId, clusterPath.mClusterId, attributeId);
+                if (hasDataVersion)
+                {
+                    path.mDataVersion.SetValue(cluster.GetDataVersion(clusterPath));
+                }
+
+                // Endpoint existence must be checked before writability, timed-write and DataVersion checks.
+                Status expectedStatus = Status::UnsupportedEndpoint;
+                if (endpointVisible)
+                {
+                    expectedStatus = attributeId == 1 ? Status::UnsupportedWrite
+                        : attributeId == 3            ? Status::NeedsTimedInteraction
+                                                      : Status::Success;
+                }
+                EXPECT_EQ(handler.CheckWriteAllowed(subject, path).GetStatusCode().GetStatus(), expectedStatus);
+            }
+        }
+
+        ConcreteDataAttributePath mismatchedVersion(clusterPath.mEndpointId, clusterPath.mClusterId, 2);
+        mismatchedVersion.mDataVersion.SetValue(cluster.GetDataVersion(clusterPath) ^ 1u);
+        EXPECT_EQ(handler.CheckWriteAllowed(subject, mismatchedVersion).GetStatusCode().GetStatus(),
+                  endpointVisible ? Status::DataVersionMismatch : Status::UnsupportedEndpoint);
+    }
+}
+
+TEST_F(TestWriteInteraction, WriteToUnavailableEndpoint)
+{
+    TestWriteToUnavailableEndpoint();
 }
 
 TEST_F(TestWriteInteraction, TestWriteHandler)

@@ -125,7 +125,10 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
                                                                  DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
-    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
+    // End notifications must reach a retained cluster even after its endpoint is removed.
+    ServerClusterInterface * serverCluster = opType == DataModel::ListWriteOperation::kListWriteBegin
+        ? GetServerClusterInterface(path)
+        : mServerClusterRegistry.Get(path);
     VerifyOrReturn(serverCluster != nullptr);
     serverCluster->ListAttributeWriteNotification(path, opType, accessingFabric);
 }
@@ -383,6 +386,8 @@ EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId
 
 ServerClusterInterface * CodeDrivenDataModelProvider::GetServerClusterInterface(const ConcreteClusterPath & clusterPath)
 {
+    // Cluster registrations are retained when an endpoint is removed, but its children must no longer be visible.
+    VerifyOrReturnValue(GetEndpointInterface(clusterPath.mEndpointId) != nullptr, nullptr);
     return mServerClusterRegistry.Get(clusterPath);
 }
 
