@@ -2002,13 +2002,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return NO;
     }
 
-    if (self.highestObservedEventNumberNeedsPersisting) {
-        [self _storePersistedDeviceData];
-    }
-
     // Nothing to persist
     if (!_clusterDataToPersist.count) {
+        if (self.highestObservedEventNumberNeedsPersisting) {
+            [self _storePersistedDeviceData];
+        }
         return NO;
+    }
+
+    NSDictionary<NSString *, id> * deviceData = nil;
+    if (self.highestObservedEventNumberNeedsPersisting) {
+        deviceData = [self _deviceDataToPersist];
     }
 
     MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
@@ -2016,7 +2020,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // storage implementation, which will try to read them later.  Make sure
     // we snapshot the state here instead of handing out live copies.
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataToPersistSnapshot];
-    [self._concreteController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
+    [self._concreteController.controllerDataStore storeClusterData:clusterData deviceData:deviceData forNodeID:_nodeID];
     for (MTRClusterPath * clusterPath in _clusterDataToPersist) {
         [_persistedClusterData setObject:_clusterDataToPersist[clusterPath] forKey:clusterPath];
         [_persistedClusters addObject:clusterPath];
@@ -4978,6 +4982,13 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         return;
     }
 
+    [datastore storeDeviceData:[self _deviceDataToPersist] forNodeID:self.nodeID];
+}
+
+- (NSDictionary<NSString *, id> *)_deviceDataToPersist
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
     NSMutableDictionary<NSString *, id> * data = [NSMutableDictionary dictionary];
     if (_estimatedSubscriptionLatency != nil) {
         data[sLastInitialSubscribeLatencyKey] = _estimatedSubscriptionLatency;
@@ -4987,9 +4998,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         self.highestObservedEventNumberNeedsPersisting = NO;
     }
 
-    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
+    MTR_LOG_DEBUG("%@ device data to persist: %@", self, data);
 
-    [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
+    return [data copy];
 }
 
 #ifdef DEBUG

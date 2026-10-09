@@ -93,6 +93,9 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  */
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
+// Stores both in one storage delegate call when the delegate supports bulk stores.
+// If that call fails, deviceData is stored on its own.
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(nullable NSDictionary<NSString *, id> *)deviceData forNodeID:(NSNumber *)nodeID;
 - (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
 
 /**
