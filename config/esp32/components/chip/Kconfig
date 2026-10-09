@@ -843,6 +843,7 @@ menu "CHIP Device Layer"
             default 48 if IDF_TARGET_ESP32S3
             default 26 if IDF_TARGET_ESP32H2
             default 54 if IDF_TARGET_ESP32P4
+            default 61 if IDF_TARGET_ESP32S31
 
         config ETH_MDC_GPIO
             int "SMI MDC GPIO number"
