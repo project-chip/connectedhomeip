@@ -88,3 +88,14 @@ tests:
       response:
           constraints:
               type: list
+
+    - label:
+          "Step 8: TH reads from the DUT the Medium attribute"
+      PICS: HEPAFREMON.S.A0006
+      command: "readAttribute"
+      attribute: "Medium"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1

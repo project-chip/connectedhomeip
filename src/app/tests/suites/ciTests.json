@@ -234,7 +234,8 @@
         "TestActivatedCarbonFilterMonitoring",
         "TestHepaFilterMonitoring",
         "Test_TC_ACFREMON_2_1",
-        "Test_TC_HEPAFREMON_2_1"
+        "Test_TC_HEPAFREMON_2_1",
+        "Test_TC_WTLREPMON_2_1"
     ],
     "AirQuality": ["Test_TC_AIRQUAL_2_1"],
     "ConcentrationMeasurement": [
