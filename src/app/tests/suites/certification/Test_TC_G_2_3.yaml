@@ -45,7 +45,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 0: TH reads Groups cluster revision from DUT. If revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a"
+          "Step 0: TH reads Groups cluster revision from DUT. If revision is
+          greater or equal to 5, Skip to step 24. Else, continue with step 1a"
       verification: |
           If Groups cluster revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a
 
@@ -1258,7 +1259,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 24: If the cluster revision obtained at step 0 is less than 5, skip the remaining tests. Otherwise, TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast"
+          "Step 24: If the cluster revision obtained at step 0 is less than 5,
+          skip the remaining tests. Otherwise, TH sends GetGroupMembership
+          command to DUT on PIXIT.G.ENDPOINT as unicast"
       verification: |
           If the groups cluster revision obtained at step 0 is less than 5, skip the  test step 24 and step 25 . Otherwise, run the below steps
 
@@ -1300,7 +1303,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 25: TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT"
+          "Step 25: TH sends AddGroupIfIdentifying command to DUT on
+          PIXIT.G.ENDPOINT"
       verification: |
           ./chip-tool groups add-group-if-identifying 0x0001 Gp20 1 1
 
