@@ -141,8 +141,6 @@
     ],
     "ModeSelect": ["Test_TC_MOD_2_2"],
     "OTASoftwareUpdate": [
-        "Test_TC_SU_1_1",
-        "Test_TC_SU_2_1",
         "Test_TC_SU_2_3",
         "Test_TC_SU_2_4",
         "Test_TC_SU_2_5",
