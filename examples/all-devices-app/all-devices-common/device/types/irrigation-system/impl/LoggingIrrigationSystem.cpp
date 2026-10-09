@@ -54,13 +54,6 @@ CHIP_ERROR LoggingIrrigationSystem::GetOperationalPhaseAtIndex(size_t index, Mut
 void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError & err)
 {
     ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandlePauseStateCallback()");
-    // Set Paused first so the valve close notifications do not move the system to Stopped.
-    CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kPaused);
-    if (error != CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
-        return;
-    }
 
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
@@ -80,6 +73,12 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
         }
+    }
+    // Set Paused last: closing the last zone above sets Stopped via OnValveClosed(); this overrides it.
+    CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kPaused);
+    if (error != CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
@@ -119,12 +118,6 @@ void LoggingIrrigationSystem::HandleStopStateCallback(GenericOperationalError & 
 {
     ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandleStopStateCallback()");
 
-    // Needed when stopping from Paused: the valves are already closed, so no close notification sets Stopped.
-    if (OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped) != CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
-    }
-
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
         if (!mWaterValves[i]->IsOpen())
@@ -142,6 +135,13 @@ void LoggingIrrigationSystem::HandleStopStateCallback(GenericOperationalError & 
     for (auto & zone : mPausedZones)
     {
         zone.reset();
+    }
+
+    // Set Stopped last so a failed close above does not report Stopped while a zone is still open.
+    // Still needed when stopping from Paused: the valves are already closed, so no close notification sets Stopped.
+    if (OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped) != CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 

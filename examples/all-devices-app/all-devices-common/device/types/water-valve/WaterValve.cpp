@@ -94,6 +94,7 @@ CHIP_ERROR WaterValve::HandleCloseValve()
     if (mValveCluster.IsConstructed())
     {
         mValveCluster.Cluster().UpdateCurrentLevel(0);
+        mValveCluster.Cluster().UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kClosed);
     }
     mOpenLevel.reset();
     mRemainingDuration.reset();
