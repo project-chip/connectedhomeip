@@ -90,20 +90,14 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
-// which is where these singletons normally live. Provide local instances instead so that the
-// requestor init below can hand them to DefaultOTARequestor::Init. Events are dropped until
-// a code-driven OTARequestorCluster is composed on the root endpoint.
+// which is where these singletons normally live. The application composes the cluster
+// using the platform-owned storage supplied here.
 namespace chip {
-namespace {
-
-class NoOpOtaRequestorEventGenerator : public DefaultOTARequestorEventGenerator
+app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> & GetOTARequestorCluster()
 {
-public:
-    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent &) override { return CHIP_NO_ERROR; }
-};
-
-} // namespace
+    static app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> cluster;
+    return cluster;
+}
 
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
@@ -113,8 +107,7 @@ OTARequestorAttributes & GetOTARequestorAttributes()
 
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
-    static NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
-    return gOtaRequestorEventGenerator;
+    return GetOTARequestorCluster().Cluster();
 }
 
 } // namespace chip
@@ -128,6 +121,10 @@ chip::BDXDownloader gDownloader;
 
 void OTAConfig::Init()
 {
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+    VerifyOrReturn(chip::GetOTARequestorCluster().IsConstructed(),
+                   ChipLogError(AppServer, "OTA Requestor cluster is not registered"));
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 

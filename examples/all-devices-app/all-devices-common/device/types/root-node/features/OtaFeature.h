@@ -38,8 +38,8 @@ namespace app {
 /// client cluster (for outgoing bindings), and composes an `OTARequestorCluster`
 /// server so attribute reads/writes, commands, and events actually have an
 /// implementation on the endpoint. The requestor state machine (and the
-/// attributes storage it shares with the cluster) is owned by the platform
-/// stack and passed in via `Context`.
+/// attributes storage it shares with the cluster) and cluster storage are owned
+/// by the platform stack and passed in via `Context`.
 class OtaFeature
 {
 public:
@@ -47,6 +47,7 @@ public:
     {
         OTARequestorCommandInterface & otaCommands;
         OTARequestorAttributes & attributes;
+        LazyRegisteredServerCluster<Clusters::OTARequestorCluster> & cluster;
     };
 
     explicit OtaFeature(const Context & context) : mContext(context) {}
@@ -62,7 +63,6 @@ public:
 
 private:
     Context mContext;
-    LazyRegisteredServerCluster<Clusters::OTARequestorCluster> mOtaRequestorCluster;
 };
 
 } // namespace app

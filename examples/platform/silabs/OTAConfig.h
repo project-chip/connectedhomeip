@@ -24,6 +24,15 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+
+namespace chip {
+app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> & GetOTARequestorCluster();
+} // namespace chip
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
 #if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #else
