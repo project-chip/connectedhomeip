@@ -55,8 +55,8 @@ app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0 /* en
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(
-    0 /* endpoint */);
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /* endpoint */);
 #endif
 
 } // namespace
