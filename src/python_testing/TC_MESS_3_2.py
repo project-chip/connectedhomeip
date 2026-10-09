@@ -44,6 +44,7 @@ _TRUNCATION_TOLERANCE_SEC = 5
 # 20 seconds, so the message still finishes.
 _SHORT_AUDIO_DURATION_MS = 10000
 
+
 class TC_MESS_3_2(MatterTestCommissionedDevice, MESSTestBase):
 
     def desc_TC_MESS_3_2(self) -> str:
