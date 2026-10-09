@@ -81,7 +81,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Open)
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)),
+              CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
@@ -92,7 +93,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Open)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -110,7 +112,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Closed)
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kClosed)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kClosed)),
+              CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
@@ -121,7 +124,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentState_Closed)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -150,7 +154,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentLevel_Level60)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -183,7 +188,8 @@ TEST_F(TestWaterValveAccessor, SetCurrentLevel_ZeroClosesValve)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -199,7 +205,8 @@ TEST_F(TestWaterValveAccessor, ReopenPreservesLastOpenLevel)
 
     // 1. Set level to 75
     {
-        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::CurrentLevel::Id);
+        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id,
+                                       ValveConfigurationAndControl::Attributes::CurrentLevel::Id);
         uint8_t buffer[64];
         TLV::TLVWriter writer;
         writer.Init(buffer);
@@ -213,17 +220,21 @@ TEST_F(TestWaterValveAccessor, ReopenPreservesLastOpenLevel)
         auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
         ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
         auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        EXPECT_EQ(accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())), CHIP_NO_ERROR);
+        EXPECT_EQ(
+            accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())),
+            CHIP_NO_ERROR);
     }
     EXPECT_EQ(mDevice.LastOpenLevel(), 75);
 
     // 2. Close valve via CurrentState
     {
-        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::CurrentState::Id);
+        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id,
+                                       ValveConfigurationAndControl::Attributes::CurrentState::Id);
         uint8_t buffer[64];
         TLV::TLVWriter writer;
         writer.Init(buffer);
-        EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kClosed)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kClosed)),
+                  CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
         TLV::TLVReader reader;
@@ -233,17 +244,22 @@ TEST_F(TestWaterValveAccessor, ReopenPreservesLastOpenLevel)
         auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
         ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
         auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        EXPECT_EQ(accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())), CHIP_NO_ERROR);
+        EXPECT_EQ(
+            accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())),
+            CHIP_NO_ERROR);
     }
-    EXPECT_EQ(mDevice.ValveConfigurationAndControlCluster().GetCurrentState().Value(), ValveConfigurationAndControl::ValveStateEnum::kClosed);
+    EXPECT_EQ(mDevice.ValveConfigurationAndControlCluster().GetCurrentState().Value(),
+              ValveConfigurationAndControl::ValveStateEnum::kClosed);
 
     // 3. Reopen valve via CurrentState
     {
-        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::CurrentState::Id);
+        ConcreteDataAttributePath path(1, ValveConfigurationAndControl::Id,
+                                       ValveConfigurationAndControl::Attributes::CurrentState::Id);
         uint8_t buffer[64];
         TLV::TLVWriter writer;
         writer.Init(buffer);
-        EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)),
+                  CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
         TLV::TLVReader reader;
@@ -253,9 +269,12 @@ TEST_F(TestWaterValveAccessor, ReopenPreservesLastOpenLevel)
         auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, reader);
         ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
         auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        EXPECT_EQ(accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())), CHIP_NO_ERROR);
+        EXPECT_EQ(
+            accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size())),
+            CHIP_NO_ERROR);
     }
-    EXPECT_EQ(mDevice.ValveConfigurationAndControlCluster().GetCurrentState().Value(), ValveConfigurationAndControl::ValveStateEnum::kOpen);
+    EXPECT_EQ(mDevice.ValveConfigurationAndControlCluster().GetCurrentState().Value(),
+              ValveConfigurationAndControl::ValveStateEnum::kOpen);
     EXPECT_EQ(mDevice.ValveConfigurationAndControlCluster().GetCurrentLevel().Value(), 75);
 }
 
@@ -268,7 +287,8 @@ TEST_F(TestWaterValveAccessor, RejectsInvalidCurrentState)
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kTransitioning)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kTransitioning)),
+              CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
@@ -279,7 +299,8 @@ TEST_F(TestWaterValveAccessor, RejectsInvalidCurrentState)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
@@ -306,7 +327,8 @@ TEST_F(TestWaterValveAccessor, RejectsInvalidCurrentLevel)
         ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
         auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-        auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+        auto status =
+            accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
         ASSERT_TRUE(status.has_value());
         EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
@@ -317,15 +339,17 @@ TEST_F(TestWaterValveAccessor, UnhandledActionOrEndpoint)
 {
     WaterValveAccessor accessor(mDevice);
 
-    uint8_t dummy[4] = { 0 };
+    uint8_t dummy[4]  = { 0 };
     auto actionStatus = accessor.HandleAction("UnknownAction"_span, ByteSpan(dummy, sizeof(dummy)));
     EXPECT_FALSE(actionStatus.has_value());
 
-    ConcreteDataAttributePath path(99, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::CurrentState::Id);
+    ConcreteDataAttributePath path(99, ValveConfigurationAndControl::Id,
+                                   ValveConfigurationAndControl::Attributes::CurrentState::Id);
     uint8_t buffer[64];
     TLV::TLVWriter writer;
     writer.Init(buffer);
-    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(ValveConfigurationAndControl::ValveStateEnum::kOpen)),
+              CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
 
     TLV::TLVReader reader;
@@ -336,6 +360,7 @@ TEST_F(TestWaterValveAccessor, UnhandledActionOrEndpoint)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto epStatus = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto epStatus =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     EXPECT_FALSE(epStatus.has_value());
 }

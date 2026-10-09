@@ -59,15 +59,9 @@ protected:
         EXPECT_EQ(mAttrStorage.Init(&mStorage), CHIP_NO_ERROR);
     }
 
-    void SetUp() override
-    {
-        EXPECT_EQ(mDevice.Register(1, mProvider), CHIP_NO_ERROR);
-    }
+    void SetUp() override { EXPECT_EQ(mDevice.Register(1, mProvider), CHIP_NO_ERROR); }
 
-    void TearDown() override
-    {
-        mDevice.Unregister(mProvider);
-    }
+    void TearDown() override { mDevice.Unregister(mProvider); }
 };
 
 // Initial state: verifies non-null default values on first registration
@@ -106,7 +100,8 @@ TEST_F(TestSoilSensorAccessor, SetMoisture_DirectValue42)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -135,7 +130,8 @@ TEST_F(TestSoilSensorAccessor, SetMoisture_NullProbeFault)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -163,7 +159,8 @@ TEST_F(TestSoilSensorAccessor, SetTemperature_ZeroDegreesFrostAlert)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -192,7 +189,8 @@ TEST_F(TestSoilSensorAccessor, SetTemperature_2150Degrees)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -221,7 +219,8 @@ TEST_F(TestSoilSensorAccessor, SetBattery_24HalfPercent)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = batteryAccessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        batteryAccessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -255,8 +254,8 @@ TEST_F(TestSoilSensorAccessor, StandaloneBatteryPowerSourceAccessor)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status          = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction,
-                                                 ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_NO_ERROR);
 
@@ -292,7 +291,8 @@ TEST_F(TestSoilSensorAccessor, OptionalTemperature_Disabled)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto status = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto status =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     ASSERT_TRUE(status.has_value());
     EXPECT_EQ(status.value(), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
 
@@ -305,7 +305,7 @@ TEST_F(TestSoilSensorAccessor, UnhandledActionOrEndpoint)
     SoilSensorAccessor accessor(mDevice);
 
     // Wrong action
-    uint8_t dummy[4] = { 0 };
+    uint8_t dummy[4]  = { 0 };
     auto actionStatus = accessor.HandleAction("UnknownAction"_span, ByteSpan(dummy, sizeof(dummy)));
     EXPECT_FALSE(actionStatus.has_value());
 
@@ -325,6 +325,7 @@ TEST_F(TestSoilSensorAccessor, UnhandledActionOrEndpoint)
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
 
     auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
-    auto epStatus = accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    auto epStatus =
+        accessor.HandleAction(OOBDataSerializer::kSetAttributeAction, ByteSpan(requestBuffer.data(), requestBuffer.size()));
     EXPECT_FALSE(epStatus.has_value());
 }

@@ -29,9 +29,7 @@ namespace {
 constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, /* includeTemperature = */ true)
-{}
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() : SoilSensor(mTimerDelegate, /* includeTemperature = */ true) {}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
 {

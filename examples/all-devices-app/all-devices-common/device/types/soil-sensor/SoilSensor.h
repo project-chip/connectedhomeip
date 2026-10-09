@@ -34,7 +34,8 @@ class SoilSensor : public SingleEndpoint
 public:
     using SimpleBatteryPowerSourceCluster = BatteryPowerSource::SimpleBatteryPowerSourceCluster;
 
-    static Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type DefaultSoilMoistureMeasurementLimits();
+    static Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
+    DefaultSoilMoistureMeasurementLimits();
     static Clusters::TemperatureMeasurementCluster::StartupConfiguration DefaultTemperatureConfiguration();
 
     SoilSensor(TimerDelegate & timerDelegate, bool includeTemperature = true);

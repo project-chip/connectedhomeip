@@ -25,8 +25,8 @@ namespace chip::app {
 void RegisterOOBAccessors(SoilSensor & device, OOBAccessorRegistry & registry)
 {
     LogErrorOnFailure(registry.Register(std::make_unique<SoilSensorAccessor>(device)));
-    LogErrorOnFailure(registry.Register(
-        std::make_unique<BatteryPowerSourceAccessor>(device.PowerSourceCluster(), device.GetEndpointId())));
+    LogErrorOnFailure(
+        registry.Register(std::make_unique<BatteryPowerSourceAccessor>(device.PowerSourceCluster(), device.GetEndpointId())));
 }
 
 } // namespace chip::app

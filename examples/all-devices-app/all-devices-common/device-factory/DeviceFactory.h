@@ -805,10 +805,9 @@ private:
             {
                 RegisterCreator("power-source", [this]() {
                     VerifyOrDie(mContext.has_value());
-                    return MakeDevice<BatteryPowerSource>(
-                        "Power Source Battery"_span,
-                        Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
-                        mContext->timerDelegate);
+                    return MakeDevice<BatteryPowerSource>("Power Source Battery"_span,
+                                                          Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
+                                                          mContext->timerDelegate);
                 });
             }
             else

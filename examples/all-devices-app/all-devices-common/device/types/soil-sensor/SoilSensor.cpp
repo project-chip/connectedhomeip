@@ -36,15 +36,13 @@ const DataModel::DeviceTypeEntry kSoilSensorDeviceTypes[] = {
 
 SoilMoistureMeasurementLimits::TypeInfo::Type SoilSensor::DefaultSoilMoistureMeasurementLimits()
 {
-    static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange[] = {
-        []() {
-            Globals::Structs::MeasurementAccuracyRangeStruct::Type range = {};
-            range.rangeMin   = 0;
-            range.rangeMax   = 100;
-            range.percentMax = MakeOptional(static_cast<chip::Percent100ths>(10));
-            return range;
-        }()
-    };
+    static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kAccuracyRange[] = { []() {
+        Globals::Structs::MeasurementAccuracyRangeStruct::Type range                     = {};
+        range.rangeMin                                                                   = 0;
+        range.rangeMax                                                                   = 100;
+        range.percentMax                                                                 = MakeOptional(static_cast<chip::Percent100ths>(10));
+        return range;
+    }() };
     return {
         .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
         .measured         = true,
@@ -87,8 +85,8 @@ CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
 
     // Create the soil measurement cluster with initial 50% reading.
     mSoilMeasurementCluster.Create(endpoint, mMoistureLimits);
-    ReturnErrorOnFailure(mSoilMeasurementCluster.Cluster().SetSoilMoistureMeasuredValue(
-        DataModel::MakeNullable(static_cast<chip::Percent>(50))));
+    ReturnErrorOnFailure(
+        mSoilMeasurementCluster.Cluster().SetSoilMoistureMeasuredValue(DataModel::MakeNullable(static_cast<chip::Percent>(50))));
     ReturnErrorOnFailure(provider.AddCluster(mSoilMeasurementCluster.Registration()));
 
     // Create the optional temperature measurement cluster with initial 21.00 deg C reading.
@@ -96,16 +94,15 @@ CHIP_ERROR SoilSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     {
         TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributeSet{ 0 };
         mTemperatureMeasurementCluster.Create(endpoint, optionalAttributeSet, *mTempConfig);
-        ReturnErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(
-            DataModel::MakeNullable(static_cast<int16_t>(2100))));
+        ReturnErrorOnFailure(
+            mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(static_cast<int16_t>(2100))));
         ReturnErrorOnFailure(provider.AddCluster(mTemperatureMeasurementCluster.Registration()));
     }
 
     // Create the power source cluster with initial 100% battery reading.
     constexpr auto BatPercentRemainingId = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
-    SimpleBatteryPowerSourceCluster::Config powerConfig("Soil Sensor Battery"_span,
-                                                        Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
-                                                        mTimerDelegate);
+    SimpleBatteryPowerSourceCluster::Config powerConfig(
+        "Soil Sensor Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable, mTimerDelegate);
     powerConfig.usedOptionalAttributes.Set<BatPercentRemainingId>();
     powerConfig.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     powerConfig.order  = 0;
