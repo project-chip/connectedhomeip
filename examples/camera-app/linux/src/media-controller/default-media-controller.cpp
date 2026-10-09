@@ -21,6 +21,17 @@
 #include <algorithm>
 #include <lib/support/logging/CHIPLogging.h>
 
+DefaultMediaController::~DefaultMediaController()
+{
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (auto & entry : mSinkMap)
+    {
+        mPreRollBuffer.DeregisterTransportFromBuffer(entry.second.get());
+    }
+    mSinkMap.clear();
+    mConnections.clear();
+}
+
 void DefaultMediaController::SetCameraDevice(Camera::CameraDevice * device)
 {
     mCameraDevice = device;
@@ -45,9 +56,14 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
                     static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
 
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    // Clean up any existing registration for this transport before adding the new one.
+    // Overwriting mSinkMap[transport] without first deregistering from mPreRollBuffer
+    // would leave a dangling BufferSink* in mPreRollBuffer and duplicate mConnections entries.
+    UnregisterTransportLocked(transport);
+
     mConnections.push_back({ transport, videoStreams, audioStreams });
 
-    auto * bufferSink     = new BufferSink();
+    auto bufferSink       = std::make_unique<BufferSink>();
     bufferSink->transport = transport;
     // 0: Deliver with the minimum I-frame duration
     // 1: Deliver with a delay of up to 1 ms (default)
@@ -81,22 +97,26 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
         ChipLogProgress(Camera, "  Registered videoStream=%u", videoStream);
     }
 
-    mPreRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
-    mSinkMap[transport] = bufferSink;
+    mPreRollBuffer.RegisterTransportToBuffer(bufferSink.get(), streamKeys);
+    mSinkMap[transport] = std::move(bufferSink);
     ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) mConnections.size());
 }
 
 void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    UnregisterTransportLocked(transport);
+}
+
+void DefaultMediaController::UnregisterTransportLocked(Transport * transport)
+{
     mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
                                       [transport](const Connection & c) { return c.transport == transport; }),
                        mConnections.end());
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end())
     {
-        mPreRollBuffer.DeregisterTransportFromBuffer(it->second);
-        delete it->second;
+        mPreRollBuffer.DeregisterTransportFromBuffer(it->second.get());
         mSinkMap.erase(it);
         ChipLogProgress(Camera, "Sink deregistered for transport.");
     }
@@ -115,8 +135,8 @@ void DefaultMediaController::DistributeAudio(const uint8_t * data, size_t size, 
 }
 
 void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t preRollBufferLength)
-
 {
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end() && it->second != nullptr)
     {
@@ -163,6 +183,7 @@ Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStr
 
 void DefaultMediaController::ResetTransportSinkState(Transport * transport)
 {
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
     auto it = mSinkMap.find(transport);
     if (it != mSinkMap.end() && it->second != nullptr)
     {
