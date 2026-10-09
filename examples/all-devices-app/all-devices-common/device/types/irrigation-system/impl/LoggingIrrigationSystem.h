@@ -58,7 +58,8 @@ public:
     LoggingIrrigationSystem(Clusters::IdentifyDelegate & identifyDelegate, TimerDelegate & timerDelegate,
                             std::vector<IrrigationSystem::ValveList> valves, bool hasMasterValve,
                             const IrrigationSystem::Config & config) :
-        IrrigationSystem(timerDelegate, identifyDelegate, this, config), mValveContext(std::move(valves))
+        IrrigationSystem(timerDelegate, identifyDelegate, this, config),
+        mValveContext(std::move(valves))
     {
         if (hasMasterValve)
         {
