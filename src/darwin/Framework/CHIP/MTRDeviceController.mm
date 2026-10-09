@@ -368,11 +368,7 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
-                [delegate devicesChangedForController:self];
-            }
-        } logString:__PRETTY_FUNCTION__];
+        [self _notifyDelegatesOfDevicesChanged];
     }
 
     return deviceToReturn;
@@ -422,11 +418,20 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)deviceDeallocated
 {
-    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
-            [delegate devicesChangedForController:self];
-        }
-    } logString:__PRETTY_FUNCTION__];
+    [self _notifyDelegatesOfDevicesChanged];
+}
+
+- (void)_notifyDelegatesOfDevicesChanged
+{
+    [self _iterateDelegateInfoWithBlock:^(MTRDelegateInfo<id<MTRDeviceControllerDelegate>> * delegateInfo) {
+        __weak id<MTRDeviceControllerDelegate> weakDelegate = delegateInfo.delegate;
+        dispatch_async(delegateInfo.queue, ^{
+            id<MTRDeviceControllerDelegate> delegate = weakDelegate;
+            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+                [delegate devicesChangedForController:self];
+            }
+        });
+    }];
 }
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer

@@ -973,9 +973,9 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
 - (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
-    // Don't bother checking our indices here, since this will only be called
-    // when the consumer knows that we're supposed to have data for this cluster
-    // path.
+    // Don't bother checking our indices here: callers either know that we're
+    // supposed to have data for this cluster path, or (Thread detection for a
+    // node with no MTRDevice) only need whatever is stored for it.
     __block MTRDeviceClusterData * clusterDataToReturn = nil;
     NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
