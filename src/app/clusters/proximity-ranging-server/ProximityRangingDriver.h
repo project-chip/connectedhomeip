@@ -196,6 +196,10 @@ public:
     std::optional<WiFiUsdConfig> GetWiFiUsdConfig();
     std::optional<BltcsConfig> GetBltcsConfig();
 
+    /// Encodes the RangingConstraints entries of every bound adapter.
+    /// (an empty list when no adapter publishes a Constraint).
+    CHIP_ERROR GetRangingConstraints(AttributeValueEncoder & encoder);
+
     // RangingAdapter::Callback
     void OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status) override;
     void OnMeasurementData(uint8_t sessionId, const Structs::RangingMeasurementDataStruct::Type & measurement) override;

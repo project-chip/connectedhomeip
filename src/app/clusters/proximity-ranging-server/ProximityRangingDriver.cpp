@@ -319,6 +319,20 @@ std::optional<BltcsConfig> ProximityRangingDriver::GetBltcsConfig()
     return adapter->GetBltcsConfig();
 }
 
+CHIP_ERROR ProximityRangingDriver::GetRangingConstraints(AttributeValueEncoder & encoder)
+{
+    return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+        for (size_t i = 0; i < mAdapters.size(); i++)
+        {
+            for (const auto & entry : mAdapters[i]->GetConstraints())
+            {
+                ReturnErrorOnFailure(listEncoder.Encode(entry));
+            }
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 void ProximityRangingDriver::OnRangingSessionStopped(uint8_t sessionId, RangingSessionStatusEnum status)
 {
     // For "normal end" terminations (kSessionEndTimeReached), only the driver

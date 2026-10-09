@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
+#include <iterator>
+#include <lib/support/CodeUtils.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -26,12 +29,59 @@ namespace app {
 // pointer list — it does not dereference until Register() runs, by which
 // point all members are fully constructed.
 LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
-    ProximityRanger(timerDelegate, { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter }),
+    ProximityRanger(timerDelegate, { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter },
+                    Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet()
+                        .Set<Clusters::ProximityRanging::Attributes::RangingConstraints::Id>()),
     mBleRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, timerDelegate, &storage,
                        /*periodicRangingSupport=*/true),
     mWiFiRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, timerDelegate),
     mBltcsRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, timerDelegate)
 {}
+
+// Returns RangingAdapter based on technology enum
+Clusters::ProximityRanging::LoggingRangingAdapter *
+LoggingProximityRanger::AdapterFor(Clusters::ProximityRanging::RangingTechEnum technology)
+{
+    using Clusters::ProximityRanging::RangingTechEnum;
+    switch (technology)
+    {
+    case RangingTechEnum::kBLEBeaconRSSIRanging:
+        return &mBleRangingAdapter;
+    case RangingTechEnum::kWiFiRoundTripTimeRanging:
+        return &mWiFiRangingAdapter;
+    case RangingTechEnum::kBluetoothChannelSounding:
+        return &mBltcsRangingAdapter;
+    default:
+        return nullptr;
+    }
+}
+
+// Set accessor updating the RangingConstraints published by this device:
+// Each entry will be routed to the RangingAdapter matching its technology.
+// adapters not named by any entry are cleared. Fails with CHIP_ERROR_INVALID_ARGUMENT,
+// when an entry names a technology this device has no adapter for.
+CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
+    Span<const Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type> constraints)
+{
+    using Clusters::ProximityRanging::LoggingRangingAdapter;
+    using RangingConstraint = Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type;
+
+    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter };
+
+    std::vector<RangingConstraint> perAdapter[std::size(adapters)];
+    for (const auto & entry : constraints)
+    {
+        LoggingRangingAdapter * adapter = AdapterFor(entry.technology);
+        VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        for (size_t i = 0; i < std::size(adapters); i++)
+            if (adapters[i] == adapter)
+                perAdapter[i].push_back(entry);
+    }
+    for (size_t i = 0; i < std::size(adapters); i++)
+        adapters[i]->SetConstraints(Span<const RangingConstraint>(perAdapter[i].data(), perAdapter[i].size()));
+
+    return CHIP_NO_ERROR;
+}
 
 } // namespace app
 } // namespace chip
