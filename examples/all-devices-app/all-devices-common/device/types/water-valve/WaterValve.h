@@ -21,31 +21,71 @@
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
+#include <optional>
 
 namespace chip::app {
 
 class WaterValve : public SingleEndpoint, public Clusters::ValveConfigurationAndControl::Delegate
 {
 public:
+    class WaterValveListener
+    {
+    public:
+        virtual ~WaterValveListener() = default;
+        virtual void OnValveOpened()  = 0;
+        virtual void OnValveClosed()  = 0;
+    };
+
     WaterValve(TimerDelegate & timerDelegate);
+    WaterValve(TimerDelegate & timerDelegate,
+               const std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> & context,
+               WaterValveListener * listener = nullptr);
     ~WaterValve() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+    CHIP_ERROR CloseValve();
+    CHIP_ERROR OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration);
     // Public getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
     Clusters::ValveConfigurationAndControlCluster & ValveConfigurationAndControlCluster();
 
+    Clusters::ValveConfigurationAndControlCluster::ValveContext SetUpValveContext()
+    {
+        if (!mValveContext.has_value())
+        {
+            return Clusters::ValveConfigurationAndControlCluster::ValveContext{
+                .features = BitFlags<Clusters::ValveConfigurationAndControl::Feature>(
+                    Clusters::ValveConfigurationAndControl::Feature::kLevel),
+                .optionalAttributeSet = {},
+                .config               = { DataModel::NullNullable, Clusters::ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                          Clusters::ValveConfigurationAndControlCluster::kDefaultLevelStep },
+                .tsTracker            = nullptr,
+                .delegate             = this,
+            };
+        }
+        auto context     = *mValveContext;
+        context.delegate = this;
+        return context;
+    }
+    bool IsOpen() const { return mOpenLevel.has_value(); }
+    std::optional<Percent> OpenLevel() const { return mOpenLevel; }
+    std::optional<uint32_t> RemainingDuration() const { return mRemainingDuration; }
+
+protected:
     // Clusters::ValveConfigurationAndControl::Delegate implementation
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
     CHIP_ERROR HandleCloseValve() override;
     void HandleRemainingDurationTick(uint32_t duration) override;
 
-protected:
+    std::optional<Percent> mOpenLevel;
+    std::optional<uint32_t> mRemainingDuration;
     TimerDelegate & mTimerDelegate;
+    std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
+    WaterValveListener * mListener = nullptr;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };

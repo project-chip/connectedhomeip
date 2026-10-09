@@ -147,6 +147,10 @@ _available_devices = [
     "HUMIDITY_SENSOR",
   ],
   [
+    "irrigation-system",
+    "IRRIGATION_SYSTEM",
+  ],
+  [
     "laundry-dryer",
     "LAUNDRY_DRYER",
   ],
