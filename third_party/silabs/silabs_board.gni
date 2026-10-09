@@ -62,7 +62,9 @@ declare_args() {
   sl_enable_rgb_led = false
 
   #Si917Y boards
-  is_si917y_mcu = false
+  is_si917y_acx = false
+  is_si91x_32khz_xo = false
+  is_si917y_devkit = false
 }
 
 declare_args() {
@@ -103,6 +105,7 @@ si917_wifi_boards = [
   "BRD4338A",
   "BRD2605A",
   "BRD4343A",
+  "BRD4343C",
   "BRD4342A",
   "BRD2708A",
   "BRD2911A",
@@ -126,8 +129,13 @@ if (is_si917_board) {
   # Enabling BLE on 917 NCP by default
   sl_matter_enable_siwx_ble = true
 
-  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
-    is_si917y_mcu = true
+  if (silabs_board == "BRD4343C") {
+    is_si917y_acx = true
+    silabs_mcu = "SIWG917Y111MGAXA"
+  } else if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+    is_si917y_acx = true
+    is_si91x_32khz_xo = true
+    is_si917y_devkit = true
     silabs_mcu = "SIWG917Y111MGABA"
   } else {
     silabs_mcu = "SiWG917M111MGTBA"
