@@ -1776,8 +1776,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
-        mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode),
+        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
@@ -2645,7 +2645,8 @@ public:
     CloseTCPConnectionOnSend(Testing::LoopbackTransport & loopback, SessionManager & sessionManager,
                              const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR sendError,
                              Optional<Protocols::SecureChannel::MsgType> targetMsgType = NullOptional) :
-        mLoopback(loopback), mSessionManager(sessionManager), mConn(conn), mSendError(sendError), mTargetMsgType(targetMsgType)
+        mLoopback(loopback),
+        mSessionManager(sessionManager), mConn(conn), mSendError(sendError), mTargetMsgType(targetMsgType)
     {}
 
     void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
@@ -2723,7 +2724,8 @@ class LoopbackWithSyncTCPConnectTransport : public Transport::Base
 public:
     LoopbackWithSyncTCPConnectTransport(Testing::LoopbackTransport & loopback, const Transport::ActiveTCPConnectionHandle & conn,
                                         CHIP_ERROR connectCompleteErr) :
-        mLoopback(loopback), mConn(conn), mConnectCompleteErr(connectCompleteErr)
+        mLoopback(loopback),
+        mConn(conn), mConnectCompleteErr(connectCompleteErr)
     {}
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
@@ -2980,9 +2982,9 @@ TEST_F_FROM_FIXTURE(TestCASESession, TCPSyncConnectAttemptDuringEstablishSession
         // EstablishSession must return the synchronous failure directly and NOT invoke OnSessionEstablishmentError
         // before EstablishSession returns.
         CHIP_ERROR expectedError = (sendError != CHIP_NO_ERROR) ? sendError : CHIP_ERROR_CONNECTION_ABORTED;
-        CHIP_ERROR err = pairing->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
-                                                   ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
-                                                   &delegate, Optional<ReliableMessageProtocolConfig>::Missing());
+        CHIP_ERROR err           = pairing->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                             ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, context, nullptr, nullptr,
+                                                             &delegate, Optional<ReliableMessageProtocolConfig>::Missing());
         EXPECT_EQ(err, expectedError);
         EXPECT_TRUE(closeOnSend.WasTriggered());
         EXPECT_NE(pairing, nullptr);
