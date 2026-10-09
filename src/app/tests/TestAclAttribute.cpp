@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <vector>
+
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
@@ -664,6 +666,135 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     EXPECT_TRUE(aclDelegate.mWriterRevoked);
 
     Access::GetAccessControl().Finish();
+}
+
+namespace {
+
+// WriteClient callback that records the Status of every AttributeStatusIB in order, so a
+// multi-AttributeDataIB write can be asserted IB-by-IB rather than only on the last response.
+class RecordingWriteClientCallback : public WriteClient::Callback
+{
+public:
+    void OnResponse(const WriteClient *, const ConcreteDataAttributePath &, StatusIB status) override
+    {
+        mStatuses.push_back(status.mStatus);
+    }
+    void OnError(const WriteClient *, CHIP_ERROR chipError) override { mError = chipError; }
+    void OnDone(WriteClient *) override { mOnDoneCalled++; }
+
+    std::vector<Protocols::InteractionModel::Status> mStatuses;
+    int mOnDoneCalled = 0;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
+};
+
+} // namespace
+
+namespace {
+
+// Drives one "cache-revoked two-IB write" scenario, used by the four tests below.
+// Caller provides the two AttributeDataIB paths and the expected status for IB #2; this helper
+// installs WriterRevokedAfterFirstAttributeDataIBDelegate (grants the two Check() calls for IB #1
+// then revokes), encodes both IBs into one WriteRequestMessage, drains, and asserts:
+//
+//   * IB #1 must succeed (ACL still granting; the write populates mLastSuccessfullyWrittenPath)
+//   * IB #2 status == expectedSecondStatus
+//   * delegate Check() count == 2 (when IB #2 hits the cache) or 3 (when it misses — IB #1's
+//     two calls plus IB #2's kView pre-check that the revoked delegate denies)
+//
+// So if IB #2 hits the path cache, its two CheckWriteAccess calls bypass the delegate and IB #2
+// succeeds. If it misses, the live ACL re-check denies and IB #2 returns UnsupportedAccess. This
+// shape is calibrated via mutation testing — see the per-test header comments.
+//
+// The helper requires fixture access (GetSessionBobToAlice / DrainAndServiceIO), so it takes the
+// callables that wrap them rather than living on the fixture class itself.
+template <typename SessionFn, typename DrainFn>
+void RunCacheRevokedTwoIBWrite(SessionFn && sessionFn, DrainFn && drainFn, const AttributePathParams & firstPath,
+                               const AttributePathParams & secondPath, Protocols::InteractionModel::Status expectedSecondStatus)
+{
+    using namespace Protocols::InteractionModel;
+
+    WriterRevokedAfterFirstAttributeDataIBDelegate aclDelegate;
+    Access::GetAccessControl().Finish();
+    EXPECT_SUCCESS(Access::GetAccessControl().Init(&aclDelegate, gDeviceTypeResolver));
+
+    auto * engine = InteractionModelEngine::GetInstance();
+
+    RecordingWriteClientCallback callback;
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(firstPath, static_cast<uint8_t>(1)));
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(secondPath, static_cast<uint8_t>(2)));
+
+    EXPECT_SUCCESS(writeClient.SendWriteRequest(sessionFn()));
+    drainFn();
+
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    ASSERT_EQ(callback.mStatuses.size(), 2u);
+
+    // IB #1 must succeed: ACL is still granting; the write populates the cache.
+    EXPECT_EQ(callback.mStatuses[0], Status::Success);
+
+    // IB #2 outcome is the cache-behavior assertion.
+    EXPECT_EQ(callback.mStatuses[1], expectedSecondStatus);
+
+    // Hit-cache => 2 Check() calls total (only IB #1's). Miss-cache => 3: IB #1 made 2 (kView
+    // pre-check + actual privilege), and IB #2's kView pre-check makes the 3rd, which the
+    // revoked delegate denies — short-circuiting the rest of ProcessAttributeDataIB so the
+    // would-be 4th call (IB #2's actual-privilege re-check) never runs.
+    EXPECT_EQ(aclDelegate.mCheckCount, (expectedSecondStatus == Status::Success) ? 2 : 3);
+    EXPECT_TRUE(aclDelegate.mWriterRevoked);
+
+    Access::GetAccessControl().Finish();
+}
+
+} // namespace
+
+// Same-path positive guard: with ACL revoked between IB #1 and IB #2 but both IBs targeting the
+// SAME (endpoint, cluster, attribute), the WriteHandler path cache must short-circuit IB #2's
+// re-check and IB #2 must succeed. Mutation-calibrated: removing the cache (forcing checkAcl =
+// true) makes IB #2's live re-check return CHIP_ERROR_ACCESS_DENIED and this test fails. Generic-
+// attribute counterpart of LegacyEncodingCacheReuseDuringWrite (which exercises the same property
+// via the ACL list legacy-encoding ReplaceAll+AppendItem path).
+TEST_F(TestAclAttribute, WriteCacheReusesGrantWhenSamePathRevokedMidMessage)
+{
+    AttributePathParams path(kTestEndpointId, kTestClusterId, kTestAttributeId);
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, path, path,
+                              Protocols::InteractionModel::Status::Success);
+}
+
+// Endpoint-only differs: IB #1 (E1, C, A) caches; IB #2 (E2, C, A) must NOT reuse the cached
+// grant because endpoints differ. Mutation-calibrated: dropping the endpoint field from the
+// cache-key comparison in CheckWriteAccess would wrongly let IB #2 hit the cache and succeed,
+// failing this test.
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentEndpoint)
+{
+    AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
+    AttributePathParams secondPath(kTestDeniedEndpointId, kTestClusterId, kTestAttributeId);
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
+                              secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+}
+
+// Cluster-only differs: IB #1 (E, C1, A) caches; IB #2 (E, C2, A) must NOT reuse the cached
+// grant because clusters differ. Mutation-calibrated: dropping the cluster field from the
+// cache-key comparison would wrongly let IB #2 hit the cache and succeed, failing this test.
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentCluster)
+{
+    AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
+    AttributePathParams secondPath(kTestEndpointId, kTestDeniedClusterId2, kTestAttributeId);
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
+                              secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
+}
+
+// Attribute-only differs: IB #1 (E, C, A1) caches; IB #2 (E, C, A2) must NOT reuse the cached
+// grant because attributes differ. Mutation-calibrated: dropping the attribute field from the
+// cache-key comparison would wrongly let IB #2 hit the cache and succeed, failing this test.
+// (Attribute id 1 is registered on (kTestEndpointId, kTestClusterId) by TestMockNodeConfig.)
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentAttribute)
+{
+    AttributePathParams firstPath(kTestEndpointId, kTestClusterId, kTestAttributeId);
+    AttributePathParams secondPath(kTestEndpointId, kTestClusterId, static_cast<AttributeId>(1));
+    RunCacheRevokedTwoIBWrite([this]() -> auto { return GetSessionBobToAlice(); }, [] { DrainAndServiceIO(); }, firstPath,
+                              secondPath, Protocols::InteractionModel::Status::UnsupportedAccess);
 }
 
 } // namespace app
