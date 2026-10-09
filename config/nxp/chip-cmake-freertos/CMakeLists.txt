@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024-2025 Project CHIP Authors
+# Copyright (c) 2024-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -130,6 +130,12 @@ if(NOT "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}" STREQUAL "")
     matter_add_gn_arg_string("nxp_custom_unit_tests_dir" "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}")
 endif()
 
+if(CONFIG_CHIP_APP_JF_ADMIN)
+    matter_add_gn_arg_bool("chip_build_controller" true)
+    matter_add_gn_arg_bool("chip_enable_read_client" true)
+    matter_add_gn_arg_bool("chip_device_config_enable_joint_fabric" true)
+endif()
+
 matter_generate_args_tmp_file()
 
 # ==============================================================================
@@ -142,6 +148,14 @@ matter_build(chip
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES ${CONFIG_GN_DEPENDENCIES}
 )
+
+if(CONFIG_CHIP_APP_JF_ADMIN)
+    # Joint Fabric Administrator runs both the commissionee and commissioner
+    # roles. Propagate this to the chip library and the application.
+    target_compile_definitions(chip INTERFACE
+        CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE=1
+    )
+endif()
 
 if(CONFIG_BT)
     if(CONFIG_CHIP_DEVICE_USE_ZEPHYR_BLE)

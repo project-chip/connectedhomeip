@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,13 @@
 #include <lib/core/CHIPError.h>
 
 namespace chip {
-namespace rpc {
 
-class LightingService;
+class JFARpc
+{
+public:
+    virtual ~JFARpc() {}
+    virtual CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR) = 0;
+    virtual void CloseStreams()                                   = 0;
+};
 
-CHIP_ERROR Init();
-void RunRpcService(void *);
-
-} // namespace rpc
 } // namespace chip

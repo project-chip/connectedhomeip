@@ -664,6 +664,8 @@ def BuildNxpTarget():
     target.AppendModifier(name="log-error", log_level=NxpLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
     target.AppendModifier(name="log-none", log_level=NxpLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
     target.AppendModifier(name="mtd", enable_mtd=True).OnlyIfRe("thread").OnlyIfRe("mcxw72")
+    target.AppendModifier(name="jfa", enable_jfa=True).OnlyIfRe(
+        'thermostat').OnlyIfRe('rw61x').OnlyIfRe('freertos').OnlyIfRe('thread').OnlyIfRe('wifi').OnlyIfRe('ota').ExceptIfRe('-gn')
     target.AppendModifier(name="no-ble", disable_ble=True)
     target.AppendModifier(name="se05x", se05x_enable=True).OnlyIfRe('cmake').OnlyIfRe('rw61x')
     target.AppendModifier(name="iw610", iw610_transceiver=True).OnlyIfRe('rt1060').OnlyIfRe('evkc').OnlyIfRe('cmake')
