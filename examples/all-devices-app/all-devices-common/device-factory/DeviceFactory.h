@@ -38,6 +38,7 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
@@ -528,6 +529,19 @@ private:
                         .identifyDelegate  = mContext->identifyDelegate,
                     },
                     MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
+        {
+            RegisterCreator("doorbell", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<Doorbell>(Doorbell::Config{
+                    .timerDelegate    = mContext->timerDelegate,
+                    .platformManager  = mContext->platformManager,
+                    .bindingTable     = mContext->bindingTable,
+                    .bindingManager   = mContext->bindingManager,
+                    .identifyDelegate = mContext->identifyDelegate,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
