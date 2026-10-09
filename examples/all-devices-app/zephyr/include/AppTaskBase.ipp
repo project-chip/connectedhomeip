@@ -90,6 +90,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitCredentials()
 {
 #if CONFIG_CHIP_FACTORY_DATA
     // Reaching this means no derived AppTask overrode InitCredentials. Fail rather than
+    // silently falling back to test credentials in a build that asked for factory data.
     ChipLogError(AppServer, "CONFIG_CHIP_FACTORY_DATA is set but no AppTask provides it");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #else
