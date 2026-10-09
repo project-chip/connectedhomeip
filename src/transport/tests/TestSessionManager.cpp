@@ -44,6 +44,7 @@
 #include <transport/MessageStats.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/MessageHeader.h>
 #include <transport/tests/LoopbackTransportManager.h>
 
 #undef CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API
@@ -1105,6 +1106,81 @@ TEST_F(TestSessionManager, TestMessageStats)
     EXPECT_EQ(messageStatistics.interactionModelMessagesReceived, static_cast<uint32_t>(1));
 
     // Shutdown
+    sessionManager.Shutdown();
+}
+
+TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
+{
+    FabricTableHolder fabricTableHolder;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    EXPECT_EQ(CHIP_NO_ERROR,
+              fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey,
+                                                                &aliceFabricIndex));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey,
+                                                                &bobFabricIndex));
+
+    // 1. Non-TCP (UDP) session should return kMaxAppMessageLen.
+    Transport::PeerAddress udpPeer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+    SessionHolder udpSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(udpSession, 1,
+                                                          fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 2,
+                                                          aliceFabricIndex, udpPeer, CryptoContext::SessionRole::kInitiator));
+    EXPECT_FALSE(udpSession->AllowsLargePayload());
+    EXPECT_EQ(udpSession->GetMaxAppMessageLen(), kMaxAppMessageLen);
+
+    // 2. TCP session with unadvertised MaxTCPPayloadSize (0) should fall back to kLegacyDefaultMaxLargeAppMessageLen.
+    Transport::PeerAddress tcpPeer(Transport::PeerAddress::TCP(addr, CHIP_PORT));
+    SessionHolder tcpSessionLegacy;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(tcpSessionLegacy, 3,
+                                                          fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 4,
+                                                          aliceFabricIndex, tcpPeer, CryptoContext::SessionRole::kInitiator));
+    EXPECT_TRUE(tcpSessionLegacy->AllowsLargePayload());
+    EXPECT_EQ(tcpSessionLegacy->GetRemoteSessionParameters().GetMaxTCPPayloadSize(), 0u);
+    EXPECT_EQ(tcpSessionLegacy->GetMaxAppMessageLen(), kLegacyDefaultMaxLargeAppMessageLen);
+
+    // 3. TCP session with explicitly negotiated MaxTCPPayloadSize (e.g. 4096).
+    SessionHolder tcpSessionNegotiated;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(tcpSessionNegotiated, 5,
+                                                          fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 6,
+                                                          aliceFabricIndex, tcpPeer, CryptoContext::SessionRole::kInitiator));
+    SessionParameters paramsNegotiated;
+    paramsNegotiated.SetMaxTCPPayloadSize(4096);
+    tcpSessionNegotiated->AsSecureSession()->SetRemoteSessionParameters(paramsNegotiated);
+    EXPECT_EQ(tcpSessionNegotiated->GetRemoteSessionParameters().GetMaxTCPPayloadSize(), 4096u);
+    EXPECT_EQ(tcpSessionNegotiated->GetMaxAppMessageLen(), static_cast<size_t>(4096));
+
+    // 4. TCP session with negotiated MaxTCPPayloadSize exceeding kMaxLargeAppMessageLen should be clamped.
+    SessionHolder tcpSessionClamped;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectPaseSessionWithTestKey(tcpSessionClamped, 7,
+                                                          fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(), 8,
+                                                          aliceFabricIndex, tcpPeer, CryptoContext::SessionRole::kInitiator));
+    SessionParameters paramsLarge;
+    paramsLarge.SetMaxTCPPayloadSize(kMaxLargeAppMessageLen + 1000);
+    tcpSessionClamped->AsSecureSession()->SetRemoteSessionParameters(paramsLarge);
+    EXPECT_EQ(tcpSessionClamped->GetMaxAppMessageLen(), kMaxLargeAppMessageLen);
+
     sessionManager.Shutdown();
 }
 

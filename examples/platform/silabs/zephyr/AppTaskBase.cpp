@@ -20,7 +20,8 @@
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
 #if CONFIG_CHIP_FACTORY_DATA
-#include "headers/ProvisionStorage.h"
+#include <platform/Zephyr/ZephyrConfig.h>
+#include <provision/ProvisionStorageReader.h>
 #endif
 
 #include <app/server/Dnssd.h>
@@ -454,11 +455,11 @@ void chip::Zephyr::App::AppTaskBase::PrintCurrentVersion()
 CHIP_ERROR chip::Zephyr::App::AppTaskBase::InitFactoryDataProvider(void)
 {
 #if CONFIG_CHIP_FACTORY_DATA
-    static Silabs::Provision::Storage sStorage;
-    ReturnErrorOnFailure(sStorage.Initialize());
-    SetDeviceInstanceInfoProvider(&sStorage);
-    SetDeviceAttestationCredentialsProvider(&sStorage);
-    SetCommissionableDataProvider(&sStorage);
+    ReturnErrorOnFailure(Internal::ZephyrConfig::Init());
+    auto & storageReader = Silabs::Provision::ProvisionStorageReader::GetInstance();
+    SetDeviceInstanceInfoProvider(&storageReader);
+    SetDeviceAttestationCredentialsProvider(&storageReader);
+    SetCommissionableDataProvider(&storageReader);
 #else
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

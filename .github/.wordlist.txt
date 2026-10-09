@@ -269,6 +269,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+ClosureControl
 CMAC
 cmake
 CMakeLists
@@ -840,6 +841,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg

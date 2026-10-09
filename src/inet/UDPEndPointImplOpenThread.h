@@ -61,9 +61,19 @@ private:
 
     static void handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo);
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    static void HandleIcmp6Receive(void * aContext, otMessage * aMsg, const otMessageInfo * aInfo,
+                                   const otIcmp6Header * aIcmpHeader);
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
     InterfaceId mBoundIntfId;
-    uint16_t mBoundPort;
+    uint16_t mBoundPort = 0;
     otUdpSocket mSocket;
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    UDPEndPointImplOT * mNextBoundEndPoint = nullptr;
+    bool mIsBoundEndPointLinked            = false;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;
