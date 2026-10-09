@@ -39,20 +39,25 @@ class InvokeCallbackJni(val wrappedInvokeCallback: InvokeCallback) {
     wrappedInvokeCallback.onError(e)
   }
 
+  // tlv and jsonString are null for status-only responses (e.g. OnOff::Toggle) —
+  // the native caller passes nullptr when the invoke response carries no data payload.
+  // A null InvokeResponse is the documented contract for that case (see InvokeCallback).
   private fun onResponse(
     endpointId: Int,
     clusterId: Long,
     commandId: Long,
-    tlv: ByteArray,
-    jsonString: String,
+    tlv: ByteArray?,
+    jsonString: String?,
     successCode: Long
   ) {
     wrappedInvokeCallback.onResponse(
-      InvokeResponse(
-        tlv,
-        CommandPath(endpointId.toUShort(), clusterId.toUInt(), commandId.toUInt()),
-        jsonString
-      ),
+      tlv?.let {
+        InvokeResponse(
+          it,
+          CommandPath(endpointId.toUShort(), clusterId.toUInt(), commandId.toUInt()),
+          jsonString
+        )
+      },
       successCode
     )
   }
