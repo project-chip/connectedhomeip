@@ -22,10 +22,14 @@ chip_test_suite("tests") {
 
   sources = [ "../JCMCommissionee.cpp" ]
 
-  test_sources = [ "TestJCMCommissionee.cpp" ]
+  test_sources = [
+    "TestAddICACInstallation.cpp",
+    "TestJCMCommissionee.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server:joint_fabric",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/credentials/jcm",
     "${chip_root}/src/credentials/tests:cert_test_vectors",
