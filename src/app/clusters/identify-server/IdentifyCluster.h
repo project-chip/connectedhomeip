@@ -20,6 +20,7 @@
 #include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters {
@@ -56,9 +57,23 @@ public:
     virtual bool IsTriggerEffectEnabled() const = 0;
 };
 
-class IdentifyCluster : public DefaultServerCluster, public TimerContext, public IdentifyIntegrationDelegate
+class IdentifyCluster : public DefaultServerCluster,
+                        public TimerContext,
+                        public IdentifyIntegrationDelegate,
+                        public IntrusiveListNodeBase<IntrusiveMode::AutoUnlink>
 {
+
 public:
+    /**
+     * @brief Find a registered IdentifyCluster instance by endpoint ID.
+     *
+     * Searches the internal instance list for an IdentifyCluster that serves the given endpoint.
+     * This covers both legacy (struct Identify) and code-driven registrations.
+     *
+     * @param endpointId The endpoint to search for.
+     * @return Pointer to the IdentifyCluster, or nullptr if not found.
+     */
+    static IdentifyCluster * FindByEndpoint(EndpointId endpointId);
     /**
      * @brief Configuration struct for IdentifyCluster.
      *
@@ -110,9 +125,12 @@ public:
     /**
      * @brief Constructs a new IdentifyCluster object.
      *
+     * Automatically registers the instance in the internal instance list for FindByEndpoint() lookup.
+     *
      * @param config The configuration object for the cluster.
      */
     IdentifyCluster(const Config & config);
+    ~IdentifyCluster() override = default;
 
     /**
      * @brief Implementation of ServerClusterInterface methods.
