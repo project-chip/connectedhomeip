@@ -45,7 +45,7 @@ tests:
       disabled: true
       
     - label:
-          "Step 0: TH reads Groups cluster revision from DUT. If revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a.
+          "Step 0: TH reads Groups cluster revision from DUT. If revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a"
       verification: |
           If Groups cluster revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a
             
