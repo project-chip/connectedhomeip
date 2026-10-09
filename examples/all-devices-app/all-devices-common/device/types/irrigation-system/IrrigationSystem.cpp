@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
-#include "IrrigationSystem.h" // IWYU pragma: keep.
-#include "lib/support/CodeUtils.h"
+#include "IrrigationSystem.h"
+
+#include <lib/support/CodeUtils.h>
+
 namespace chip {
 namespace app {
 
@@ -28,18 +30,24 @@ CHIP_ERROR IrrigationSystem::Register(EndpointIdAllocator & allocator, CodeDrive
     mEndpointId = allocator.Allocate();
     ReturnErrorOnFailure(RegisterDescriptor(mEndpointId, provider, composition));
 
-    Clusters::IdentifyCluster::Config Iconfig(mEndpointId, mTimerDelegate);
-    Iconfig.WithDelegate(mIdentifyDelegate);
-    mIdentifyCluster.Create(Iconfig);
+    if (mConfig.withIdentify)
+    {
+        Clusters::IdentifyCluster::Config Iconfig(mEndpointId, mTimerDelegate);
+        Iconfig.WithDelegate(&mIdentifyDelegate);
+        mIdentifyCluster.Create(Iconfig);
 
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-
-    mOperationalStateCluster.Create(mEndpointId, *mOperationalStateDelegate);
-    ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
-
-    mFlowMeasurementCluster.Create(mEndpointId);
-    ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
-
+        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+    }
+    if (mConfig.withOperationalState)
+    {
+        mOperationalStateCluster.Create(mEndpointId, *mOperationalStateDelegate);
+        ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
+    }
+    if (mConfig.withFlowMeasurement)
+    {
+        mFlowMeasurementCluster.Create(mEndpointId);
+        ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
+    }
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(RegisterParts(allocator, provider, composition));

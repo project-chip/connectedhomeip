@@ -16,20 +16,22 @@
  */
 
 #pragma once
-#include "app/clusters/flow-measurement-server/FlowMeasurementCluster.h"
-#include "app/clusters/identify-server/IdentifyCluster.h"
-#include "app/server-cluster/ServerClusterInterfaceRegistry.h"
-#include "lib/core/CHIPError.h"
-#include "lib/support/TimerDelegate.h"
+
+#include <app/clusters/flow-measurement-server/FlowMeasurementCluster.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <clusters/shared/Enums.h>
 #include <device/api/Interface.h>
 #include <devices/Types.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
+
 /// Physical master valve on the main supply line. Optional in irrigation systems and not a Matter endpoint:
 /// the irrigation system opens it before the first zone opens and closes it after the last zone closes.
 /// Implementations must update mOpen when Open() / Close() succeed.
@@ -48,6 +50,13 @@ protected:
 class IrrigationSystem : public DeviceInterface
 {
 public:
+    struct Config
+    {
+        bool withIdentify         = false;
+        bool withOperationalState = false;
+        bool withFlowMeasurement  = false;
+    };
+
     struct ValveList
     {
         DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::StartupConfiguration> startupConfiguration;
@@ -56,10 +65,10 @@ public:
     };
 
     IrrigationSystem(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
-                     Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate) :
+                     Clusters::OperationalState::OperationalStateCluster::Delegate * ODelegate, const Config & config) :
         DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
 
-        mTimerDelegate(TDelegate), mIdentifyDelegate(&IDelegate), mOperationalStateDelegate(ODelegate)
+        mTimerDelegate(TDelegate), mIdentifyDelegate(IDelegate), mOperationalStateDelegate(ODelegate), mConfig(config)
 
     {}
     ~IrrigationSystem() override = default;
@@ -85,6 +94,8 @@ public:
     }
     EndpointId GetEndpointId() const { return mEndpointId; }
 
+    bool HasOperationalState() const { return mOperationalStateCluster.IsConstructed(); }
+
 protected:
     TimerDelegate & mTimerDelegate;
 
@@ -93,8 +104,9 @@ private:
                                      EndpointComposition composition)    = 0;
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
     EndpointId mEndpointId                                               = kInvalidEndpointId;
-    Clusters::IdentifyDelegate * mIdentifyDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
     Clusters::OperationalState::OperationalStateCluster::Delegate * mOperationalStateDelegate;
+    const Config mConfig;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
     LazyRegisteredServerCluster<Clusters::FlowMeasurementCluster> mFlowMeasurementCluster;

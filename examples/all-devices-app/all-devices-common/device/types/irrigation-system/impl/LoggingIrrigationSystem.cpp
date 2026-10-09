@@ -16,12 +16,12 @@
  */
 
 #include "LoggingIrrigationSystem.h"
-#include "device/types/irrigation-system/IrrigationSystem.h"
 
-#include <cstddef>
+#include <device/types/irrigation-system/IrrigationSystem.h>
 #include <lib/support/TypeTraits.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 
 using namespace chip::app::Clusters::OperationalState;
@@ -50,6 +50,7 @@ CHIP_ERROR LoggingIrrigationSystem::GetOperationalPhaseAtIndex(size_t index, Mut
     return CHIP_ERROR_NOT_FOUND;
 }
 
+// OperationalState delegate callbacks: only invoked when the OperationalState cluster is registered.
 void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError & err)
 {
     ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::HandlePauseStateCallback()");
@@ -180,8 +181,11 @@ void LoggingIrrigationSystem::OnValveOpened()
     {
         LogErrorOnFailure(mMasterValve->Open());
     }
-    // Any open zone means water is flowing, even if it was opened directly while Paused.
-    LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));
+    if (HasOperationalState())
+    {
+        // Any open zone means water is flowing, even if it was opened directly while Paused.
+        LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));
+    }
 }
 
 void LoggingIrrigationSystem::OnValveClosed()
@@ -199,7 +203,8 @@ void LoggingIrrigationSystem::OnValveClosed()
         LogErrorOnFailure(mMasterValve->Close());
     }
     // A close never means Running; keep Paused so pausing several zones does not end in Stopped.
-    if (OperationalStateCluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
+    if (HasOperationalState() &&
+        OperationalStateCluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
     {
         LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped));
     }
