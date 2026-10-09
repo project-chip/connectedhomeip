@@ -473,6 +473,11 @@ public:
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * ctxt = nullptr) override;
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    /// Marks defunct each active CASE session to @p peer that recently sent the message @p quotedPayload quotes.
+    void OnPortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload) override;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
                           Transport::ActiveTCPConnectionHandle & peerConnState);

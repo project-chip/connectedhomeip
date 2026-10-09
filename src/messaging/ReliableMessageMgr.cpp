@@ -183,17 +183,18 @@ void ReliableMessageMgr::ExecuteActions()
         }
 #endif // CHIP_ERROR_LOGGING || CHIP_DETAIL_LOGGING
 
-        if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
+        const bool sessionDefunct = session->IsSecureSession() && session->AsSecureSession()->IsDefunct();
+        if (sessionDefunct || sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             // Make sure our exchange stays alive until we are done working with it.
             ExchangeHandle ec(entry->ec);
 
             ChipLogError(ExchangeManager,
                          "<<%d [E:" ChipLogFormatExchange " S:%u M:" ChipLogFormatMessageCounter
-                         "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " failure (max retries:%d)",
+                         "] (%s) Msg Retransmission to %u:" ChipLogFormatX64 " failure (%s, max retries:%d)",
                          sendCount + 1, ChipLogValueExchange(&entry->ec.Get()), session->SessionIdForLogging(), messageCounter,
                          Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination),
-                         CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+                         sessionDefunct ? "session defunct" : "retries exhausted", CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
             NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
@@ -201,8 +202,9 @@ void ReliableMessageMgr::ExecuteActions()
 
             // If the exchange is expecting a response, it will handle sending
             // this notification once it detects that it has not gotten a
-            // response.  Otherwise, we need to do it.
-            if (!ec->IsResponseExpected())
+            // response.  Otherwise, we need to do it, unless the session was
+            // already marked defunct.
+            if (!sessionDefunct && !ec->IsResponseExpected())
             {
                 if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
                 {
