@@ -1,0 +1,183 @@
+From 1b7df1f6259433f7150385e42ad15e3cfd03eb6a Mon Sep 17 00:00:00 2001
+From: "Restyled.io" <commits@restyled.io>
+Date: Fri, 9 Oct 2026 05:23:18 +0000
+Subject: [PATCH 1/2] Restyled by whitespace
+
+---
+ .../suites/certification/Test_TC_G_2_3.yaml   | 46 +++++++++----------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/src/app/tests/suites/certification/Test_TC_G_2_3.yaml b/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
+index 1fe06618..3a1e65a8 100644
+--- a/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
++++ b/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
+@@ -43,20 +43,20 @@ tests:
+           Note: 1. For Groups operation, each endpoint will support at least 4 groups per fabric; the supported capacity may vary by device implementation. the max capacity per fabric is 65535.
+                 2. If GCAST is enabled and either the Groups cluster revision is >= 5 or the Groups cluster is not present on the device, MaxGroupsPerFabric shall be 0.
+       disabled: true
+-      
++
+     - label:
+           "Step 0: TH reads Groups cluster revision from DUT. If revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a"
+       verification: |
+           If Groups cluster revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a
+-            
++
+           ./chip-tool groups read cluster-revision 1 1
+-            
++
+           Verify that the DUT responds with the Groups cluster revision in the TH (Chip-tool) log:
+-            
++
+           [1789468891.544] [822397:822399] [TOO] Endpoint: 1 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 2995356509
+           [1789468891.544] [822397:822399] [TOO]   ClusterRevision: 5
+       disabled: true
+-      
++
+     - label:
+           "Step 1a: TH sends KeySetWrite command in the GroupKeyManagement
+           cluster to DUT on EP0 using a key that is pre-installed on the TH.
+@@ -1256,19 +1256,19 @@ tests:
+           [1658317914.656772][4650:4655] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3844079664
+           [1658317914.656843][4650:4655] CHIP:TOO:   GroupTable: 0 entries
+       disabled: true
+-      
++
+     - label:
+           "Step 24: If the cluster revision obtained at step 0 is less than 5, skip the remaining tests. Otherwise, TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast"
+       verification: |
+           If the groups cluster revision obtained at step 0 is less than 5, skip the  test step 24 and step 25 . Otherwise, run the below steps
+ 
+           ./chip-tool groups get-group-membership '[1]' 1 1
+-        
++
+           Verify that the DUT responds with an INVALID_IN_STATE status response in the TH (Chip-tool) log.
+-        
++
+           [1789469729.667] [823950:823952] [DMG] InvokeResponseMessage =
+           [1789469729.667] [823950:823952] [DMG] {
+-          [1789469729.667] [823950:823952] [DMG]         suppressResponse = false, 
++          [1789469729.667] [823950:823952] [DMG]         suppressResponse = false,
+           [1789469729.667] [823950:823952] [DMG]         InvokeResponseIBs =
+           [1789469729.667] [823950:823952] [DMG]         [
+           [1789469729.667] [823950:823952] [DMG]                 InvokeResponseIB =
+@@ -1281,22 +1281,22 @@ tests:
+           [1789469729.667] [823950:823952] [DMG]                                         ClusterId = 0x4,
+           [1789469729.667] [823950:823952] [DMG]                                         CommandId = 0x2,
+           [1789469729.667] [823950:823952] [DMG]                                 },
+-          [1789469729.667] [823950:823952] [DMG]                                 
++          [1789469729.667] [823950:823952] [DMG]
+           [1789469729.667] [823950:823952] [DMG]                                 StatusIB =
+           [1789469729.667] [823950:823952] [DMG]                                 {
+           [1789469729.667] [823950:823952] [DMG]                                         status = 0xcb (INVALID_IN_STATE),
+           [1789469729.667] [823950:823952] [DMG]                                 },
+-          [1789469729.667] [823950:823952] [DMG]                                 
++          [1789469729.667] [823950:823952] [DMG]
+           [1789469729.667] [823950:823952] [DMG]                         },
+-          [1789469729.667] [823950:823952] [DMG]                         
++          [1789469729.667] [823950:823952] [DMG]
+           [1789469729.667] [823950:823952] [DMG]                 },
+-          [1789469729.667] [823950:823952] [DMG]                 
++          [1789469729.667] [823950:823952] [DMG]
+           [1789469729.667] [823950:823952] [DMG]         ],
+-          [1789469729.667] [823950:823952] [DMG]         
++          [1789469729.667] [823950:823952] [DMG]
+           [1789469729.667] [823950:823952] [DMG]         InteractionModelRevision = 12
+           [1789469729.667] [823950:823952] [DMG] },
+           [1789469729.667] [823950:823952] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0002 Status=0xcb
+-          [1789469729.667] [823950:823952] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE) 
++          [1789469729.667] [823950:823952] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE)
+       disabled: true
+ 
+     - label:
+@@ -1305,10 +1305,10 @@ tests:
+           ./chip-tool groups add-group-if-identifying 0x0001 Gp20 1 1
+ 
+           Verify that the DUT responds with an INVALID_IN_STATE status response in the TH (Chip-tool) log.
+-            
++
+           [1789470493.387] [825390:825392] [DMG] InvokeResponseMessage =
+           [1789470493.387] [825390:825392] [DMG] {
+-          [1789470493.387] [825390:825392] [DMG]         suppressResponse = false, 
++          [1789470493.387] [825390:825392] [DMG]         suppressResponse = false,
+           [1789470493.387] [825390:825392] [DMG]         InvokeResponseIBs =
+           [1789470493.387] [825390:825392] [DMG]         [
+           [1789470493.387] [825390:825392] [DMG]                 InvokeResponseIB =
+@@ -1321,20 +1321,20 @@ tests:
+           [1789470493.387] [825390:825392] [DMG]                                         ClusterId = 0x4,
+           [1789470493.387] [825390:825392] [DMG]                                         CommandId = 0x5,
+           [1789470493.387] [825390:825392] [DMG]                                 },
+-          [1789470493.387] [825390:825392] [DMG]                                 
++          [1789470493.387] [825390:825392] [DMG]
+           [1789470493.387] [825390:825392] [DMG]                                 StatusIB =
+           [1789470493.387] [825390:825392] [DMG]                                 {
+           [1789470493.387] [825390:825392] [DMG]                                         status = 0xcb (INVALID_IN_STATE),
+           [1789470493.387] [825390:825392] [DMG]                                 },
+-          [1789470493.387] [825390:825392] [DMG]                                 
++          [1789470493.387] [825390:825392] [DMG]
+           [1789470493.387] [825390:825392] [DMG]                         },
+-          [1789470493.387] [825390:825392] [DMG]                         
++          [1789470493.387] [825390:825392] [DMG]
+           [1789470493.387] [825390:825392] [DMG]                 },
+-          [1789470493.387] [825390:825392] [DMG]                 
++          [1789470493.387] [825390:825392] [DMG]
+           [1789470493.387] [825390:825392] [DMG]         ],
+-          [1789470493.387] [825390:825392] [DMG]         
++          [1789470493.387] [825390:825392] [DMG]
+           [1789470493.387] [825390:825392] [DMG]         InteractionModelRevision = 12
+           [1789470493.387] [825390:825392] [DMG] },
+           [1789470493.387] [825390:825392] [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0004 Command=0x0000_0005 Status=0xcb
+-          [1789470493.387] [825390:825392] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE) 
++          [1789470493.387] [825390:825392] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE)
+       disabled: true
+-- 
+2.55.0
+
+
+From 9f6810195290021d8410727b5286465200cdda8a Mon Sep 17 00:00:00 2001
+From: "Restyled.io" <commits@restyled.io>
+Date: Fri, 9 Oct 2026 05:23:23 +0000
+Subject: [PATCH 2/2] Restyled by prettier-yaml
+
+---
+ src/app/tests/suites/certification/Test_TC_G_2_3.yaml | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/app/tests/suites/certification/Test_TC_G_2_3.yaml b/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
+index 3a1e65a8..cc9bb247 100644
+--- a/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
++++ b/src/app/tests/suites/certification/Test_TC_G_2_3.yaml
+@@ -45,7 +45,8 @@ tests:
+       disabled: true
+ 
+     - label:
+-          "Step 0: TH reads Groups cluster revision from DUT. If revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a"
++          "Step 0: TH reads Groups cluster revision from DUT. If revision is
++          greater or equal to 5, Skip to step 24. Else, continue with step 1a"
+       verification: |
+           If Groups cluster revision is greater or equal to 5, Skip to step 24. Else, continue with step 1a
+ 
+@@ -1258,7 +1259,9 @@ tests:
+       disabled: true
+ 
+     - label:
+-          "Step 24: If the cluster revision obtained at step 0 is less than 5, skip the remaining tests. Otherwise, TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast"
++          "Step 24: If the cluster revision obtained at step 0 is less than 5,
++          skip the remaining tests. Otherwise, TH sends GetGroupMembership
++          command to DUT on PIXIT.G.ENDPOINT as unicast"
+       verification: |
+           If the groups cluster revision obtained at step 0 is less than 5, skip the  test step 24 and step 25 . Otherwise, run the below steps
+ 
+@@ -1300,7 +1303,8 @@ tests:
+       disabled: true
+ 
+     - label:
+-          "Step 25: TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT"
++          "Step 25: TH sends AddGroupIfIdentifying command to DUT on
++          PIXIT.G.ENDPOINT"
+       verification: |
+           ./chip-tool groups add-group-if-identifying 0x0001 Gp20 1 1
+ 
+-- 
+2.55.0
+
