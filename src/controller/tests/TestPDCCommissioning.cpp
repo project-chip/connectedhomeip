@@ -24,6 +24,8 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <lib/support/CHIPMem.h>
+
 #include <app/DeviceProxy.h>
 #include <app/clusters/network-commissioning/constants.h>
 #include <controller/AutoCommissioner.h>
@@ -245,6 +247,10 @@ public:
 
 class AutoCommissionerPDCTest : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
 protected:
     // Sets up a commissionee that only supports Wi-Fi, and applies the given parameters.
     void Configure(const CommissioningParameters & params, bool supportsPDC)
@@ -927,6 +933,10 @@ private:
 // so a fixed possession nonce stands in for the generated one.
 class DeviceCommissionerPDCTest : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
 protected:
     // Puts the commissioner into the state it would be in after a successful kPDCRegisterClientIdentity:
     // holding an obligation to roll mClientIdentity's registration back.
@@ -1185,6 +1195,10 @@ TEST_F(DeviceCommissionerPDCTest, DelegateManagedRollbackAllowsSeveralRegistrati
 // Commissioning problem -- and so gets the same failover to the secondary network.
 class DeviceCommissionerPDCResponseTest : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
 protected:
     void SetUp() override
     {
@@ -1311,6 +1325,10 @@ TEST_F(DeviceCommissionerPDCResponseTest, IgnoresPDCFieldsWhenPDCWasNotRequested
 // identity, against this registrar or a different one.
 class DeviceCommissionerRevocationTest : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
 protected:
     void SetUp() override
     {
