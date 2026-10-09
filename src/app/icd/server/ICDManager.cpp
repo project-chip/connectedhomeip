@@ -92,6 +92,14 @@ void ICDManager::Init()
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
+
+#if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_CONFIG_ENABLE_ICD_CIP
+    if (SupportsFeature(Feature::kCheckInProtocolSupport) && DeviceLayer::ConnectivityMgr().IsThreadEnabled() &&
+        CheckInMessagesWouldBeSent([](FabricIndex, NodeId) { return true; }))
+    {
+        mPendingActiveModeOnNetworkAttach = true;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
 void ICDManager::Shutdown()
@@ -384,8 +392,7 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier,
-                                        CheckInTriggerReason reason)
+void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
@@ -397,12 +404,10 @@ void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeS
     VerifyOrReturn(CheckInMessagesWouldBeSent(verifier));
 
 #if CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && reason == CheckInTriggerReason::kColdBoot)
+    if (DeviceLayer::ConnectivityMgr().IsThreadEnabled() && !DeviceLayer::ConnectivityMgr().IsThreadAttached())
     {
-        // On cold boot, enter ActiveMode immediately below for its threshold duration and
-        // latch mPendingActiveModeOnNetworkAttach so HandlePlatformEvent arms the settle timer
-        // once both Thread attachment and kServerReady complete.
         mPendingActiveModeOnNetworkAttach = true;
+        return;
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_DEFER_ACTIVEMODE_THREAD_ATTACH && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
