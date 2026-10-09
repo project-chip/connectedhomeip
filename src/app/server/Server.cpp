@@ -463,8 +463,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
+    VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 #endif
-    SuccessOrExit(err);
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
                          *mSessionKeystore);
@@ -482,11 +482,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mUnsolicitedStatusHandler.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
+    mCommissioningWindowManager.Init({
+        .fabricTable = mFabrics, .sessionManager = mSessions, .exchangeManager = mExchangeMgr, .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+        .bleLayer = *mBleLayer,
+#endif
+    });
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    app::DnssdServer::Instance().SetTransportMgrBase(&mTransports);
+#endif
 
     TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
@@ -912,6 +920,9 @@ void Server::Shutdown()
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    app::DnssdServer::Instance().SetTransportMgrBase(nullptr);
+#endif
     Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

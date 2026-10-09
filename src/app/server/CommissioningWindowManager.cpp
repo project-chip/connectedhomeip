@@ -22,12 +22,16 @@
 #endif
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
-#include <app/server/Server.h>
+#include <clusters/AdministratorCommissioning/AttributeIds.h>
+#include <clusters/AdministratorCommissioning/ClusterId.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <transport/raw/WiFiPAF.h>
+#endif
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -64,17 +68,20 @@ namespace chip {
 
 void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
+    VerifyOrReturn(mContext.has_value());
+    Context & context = *mContext;
+
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         ChipLogProgress(AppServer, "Commissioning completed successfully");
         DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
-        mServer->GetSecureSessionManager().ExpireAllPASESessions();
+        context.sessionManager.ExpireAllPASESessions();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         // If in NonConcurrentConnection, this will already have been completed
-        mServer->GetBleLayerObject()->CloseAllBleConnections();
+        context.bleLayer.CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown();
@@ -92,7 +99,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        CHIP_ERROR err = app::DnssdServer::Instance().AdvertiseOperational();
+        CHIP_ERROR err = context.dnssdServer.AdvertiseOperational();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Operational advertising failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -106,14 +113,14 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
     {
         ChipLogProgress(AppServer, "Received kCloseAllBleConnections:%d", static_cast<int>(event->Type));
-        mServer->GetBleLayerObject()->Shutdown();
+        context.bleLayer.Shutdown();
     }
 #endif
 }
 
 void CommissioningWindowManager::Shutdown()
 {
-    VerifyOrReturn(nullptr != mServer);
+    VerifyOrReturn(mContext.has_value());
 
     TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ true);
 
@@ -162,7 +169,10 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %" CHIP_ERROR_FORMAT, mFailedCommissioningAttempts, err.Format());
 #if CONFIG_NETWORK_LAYER_BLE
-    mServer->GetBleLayerObject()->CloseAllBleConnections();
+    if (mContext.has_value())
+    {
+        mContext->bleLayer.CloseAllBleConnections();
+    }
 #endif
 
     CHIP_ERROR prevErr = err;
@@ -210,6 +220,9 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 
 void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
 {
+    VerifyOrReturn(mContext.has_value());
+    Context & context = *mContext;
+
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
 
     ChipLogProgress(AppServer, "Commissioning completed session establishment step");
@@ -223,7 +236,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     // commissioning, and cancelling publish here tears it down mid-flow.
     TEMPORARY_RETURN_IGNORED StopAdvertisement(/* aShuttingDown = */ false, /* aKeepPAFPublish = */ true);
 
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext = context.failSafeContext;
     // This should never be armed because we don't allow CASE sessions to arm the failsafe when the commissioning window is open and
     // we check that the failsafe is not armed before opening the commissioning window. None the less, it is good to double-check.
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -257,9 +270,11 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commissioningTimeout)
 {
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    Context & context = *mContext;
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext = context.failSafeContext;
     VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Dnssd::ServiceAdvertiser::Instance().UpdateCommissionableInstanceName());
@@ -273,18 +288,20 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commiss
 
 CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 {
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    Context & context = *mContext;
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
 
-    ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+    ReturnErrorOnFailure(context.exchangeManager.RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));
     mListeningForPASE = true;
 
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), mECMPASEVerifier, mECMIterations,
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(context.sessionManager, mECMPASEVerifier, mECMIterations,
                                                             ByteSpan(mECMSalt, mECMSaltLength), GetLocalMRPConfig(), this));
     }
     else
@@ -306,8 +323,8 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mServer->GetSecureSessionManager(), verifier, iterationCount, saltSpan,
-                                                            GetLocalMRPConfig(), this));
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(context.sessionManager, verifier, iterationCount, saltSpan, GetLocalMRPConfig(), this));
     }
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -319,7 +336,7 @@ System::Clock::Seconds32 CommissioningWindowManager::MaxCommissioningTimeout() c
 {
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     /* Allow for extended announcement only if the device is uncomissioned. */
-    if (mServer->GetFabricTable().FabricCount() == 0)
+    if (mContext.has_value() && mContext->fabricTable.FabricCount() == 0)
     {
         // Specification section 2.3.1 - Extended Announcement Duration up to 48h
         return System::Clock::Seconds32(60 * 60 * 48);
@@ -429,12 +446,12 @@ void CommissioningWindowManager::CloseCommissioningWindow()
     if (IsCommissioningWindowOpen())
     {
 #if CONFIG_NETWORK_LAYER_BLE
-        if (mListeningForPASE)
+        if (mListeningForPASE && mContext.has_value())
         {
             // We never established PASE, so never armed a fail-safe and hence
             // can't rely on it expiring to close our BLE connection.  Do that
             // manually here.
-            mServer->GetBleLayerObject()->CloseAllBleConnections();
+            mContext->bleLayer.CloseAllBleConnections();
         }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
@@ -548,16 +565,23 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     }
 
     // reset all advertising, switching to our new commissioning mode.
-    app::DnssdServer::Instance().StartServer();
+    if (mContext.has_value())
+    {
+        mContext->dnssdServer.StartServer();
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, bool aKeepPAFPublish)
 {
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    Context & context = *mContext;
+
     TEMPORARY_RETURN_IGNORED RestoreDiscriminator();
 
-    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(
+    // Handler may already be unregistered (e.g. after OnUnsolicitedMessageReceived or when called from Cleanup/Shutdown).
+    RETURN_SAFELY_IGNORED context.exchangeManager.UnregisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
     mPairingSession.Clear();
@@ -568,7 +592,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
         // Stop advertising commissioning mode, since we're not accepting PASE
         // connections right now.  If we start accepting them again (via
         // AdvertiseAndListenForPASE) that will call StartAdvertisement as needed.
-        app::DnssdServer::Instance().StartServer();
+        context.dnssdServer.StartServer();
     }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -605,12 +629,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown, boo
 
 CHIP_ERROR CommissioningWindowManager::SetTemporaryDiscriminator(uint16_t discriminator)
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(MakeOptional(discriminator));
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(MakeOptional(discriminator));
 }
 
 CHIP_ERROR CommissioningWindowManager::RestoreDiscriminator()
 {
-    return app::DnssdServer::Instance().SetEphemeralDiscriminator(NullOptional);
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    return mContext->dnssdServer.SetEphemeralDiscriminator(NullOptional);
 }
 
 void CommissioningWindowManager::HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
@@ -640,7 +666,8 @@ void CommissioningWindowManager::OnSessionReleased()
 
 void CommissioningWindowManager::ExpireFailSafeIfArmed()
 {
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    VerifyOrReturn(mContext.has_value());
+    auto & failSafeContext = mContext->failSafeContext;
     if (failSafeContext.IsFailSafeArmed())
     {
         failSafeContext.ForceFailSafeTimerExpiry();
@@ -723,6 +750,8 @@ CHIP_ERROR CommissioningWindowManager::OnUnsolicitedMessageReceived(const Payloa
 {
     using Protocols::SecureChannel::MsgType;
 
+    VerifyOrReturnError(mContext.has_value(), CHIP_ERROR_INCORRECT_STATE);
+
     // Must be a PBKDFParamRequest message.  Stop listening to new
     // PBKDFParamRequest messages and hand it off to mPairingSession.  If
     // mPairingSession's OnMessageReceived fails, it will call our
@@ -731,7 +760,7 @@ CHIP_ERROR CommissioningWindowManager::OnUnsolicitedMessageReceived(const Payloa
     //
     // It's very important that we stop listening here, so that new incoming
     // PASE establishment attempts don't interrupt our existing establishment.
-    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest);
+    LogErrorOnFailure(mContext->exchangeManager.UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest));
     newDelegate = &mPairingSession;
     return CHIP_NO_ERROR;
 }
@@ -740,11 +769,12 @@ void CommissioningWindowManager::OnExchangeCreationFailed(Messaging::ExchangeDel
 {
     using Protocols::SecureChannel::MsgType;
 
+    VerifyOrReturn(mContext.has_value());
+
     // We couldn't create an exchange, so didn't manage to call
     // OnMessageReceived on mPairingSession.  Just go back to listening for
     // PBKDFParamRequest messages.
-    TEMPORARY_RETURN_IGNORED mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest,
-                                                                                                    this);
+    LogErrorOnFailure(mContext->exchangeManager.RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest, this));
 }
 
 } // namespace chip

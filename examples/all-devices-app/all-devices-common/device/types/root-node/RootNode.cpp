@@ -79,10 +79,7 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
         endpointId, BitFlags<AdministratorCommissioning::Feature>{},
         AdministratorCommissioningCluster::Context{ .commissioningWindowManager = mContext.commissioningWindowManager,
                                                     .fabricTable                = mContext.fabricTable,
-                                                    // Note: We pull FailSafeContext directly from Server instead of via
-                                                    // CommissioningWindowManager because the WindowManager's internal
-                                                    // Server pointer is not yet initialized at this stage of registration.
-                                                    .failSafeContext = mContext.failSafeContext });
+                                                    .failSafeContext            = mContext.failSafeContext });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
