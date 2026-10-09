@@ -1621,7 +1621,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises. */
-provisional cluster CommodityPrice = 149 {
+cluster CommodityPrice = 149 {
   revision 4;
 
   bitmap CommodityPriceDetailBitmap : bitmap16 {
