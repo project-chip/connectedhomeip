@@ -27,20 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-namespace chip {
-namespace python {
-
-// The callback methods provided by python.
-OnOfferCallback gOnOfferCallback                 = nullptr;
-OnAnswerCallback gOnAnswerCallback               = nullptr;
-OnICECandidatesCallback gOnICECandidatesCallback = nullptr;
-OnEndCallback gOnEndCallback                     = nullptr;
-
-} // namespace python
-} // namespace chip
-
-using namespace chip::python;
-
 void WebRTCTransportRequestorManager::Init()
 {
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
@@ -67,29 +53,33 @@ void WebRTCTransportRequestorManager::Shutdown()
 void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
                                                     OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback)
 {
-    gOnOfferCallback         = onOnOfferCallback;
-    gOnAnswerCallback        = onAnswerCallback;
-    gOnICECandidatesCallback = onICECandidatesCallback;
-    gOnEndCallback           = onEndCallback;
+    mOnOfferCallback         = onOnOfferCallback;
+    mOnAnswerCallback        = onAnswerCallback;
+    mOnICECandidatesCallback = onICECandidatesCallback;
+    mOnEndCallback           = onEndCallback;
 }
 
 CHIP_ERROR WebRTCTransportRequestorManager::HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args)
 {
+    VerifyOrReturnError(mOnOfferCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     std::string offer = args.sdp;
-    int err           = gOnOfferCallback(session.id, offer.c_str());
-    return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+    return mOnOfferCallback(session.id, offer.c_str());
 }
 
 CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer)
 {
+    VerifyOrReturnError(mOnAnswerCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     std::string answer = sdpAnswer;
-    int err            = gOnAnswerCallback(session.id, answer.c_str());
-    return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+    return mOnAnswerCallback(session.id, answer.c_str());
 }
 
 CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(const WebRTCSessionStruct & session,
                                                                 const std::vector<ICECandidateStruct> & candidates)
 {
+    VerifyOrReturnError(mOnICECandidatesCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     std::vector<OwnedIceCandidate> remoteCandidates;
     remoteCandidates.reserve(candidates.size());
     std::vector<IceCandidate> cStrings;
@@ -120,15 +110,14 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(const WebRTCSess
         cStrings.push_back(candidate.view);
     }
 
-    int err = gOnICECandidatesCallback(session.id, cStrings.data(), static_cast<int>(cStrings.size()));
-    return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+    return mOnICECandidatesCallback(session.id, cStrings.data(), static_cast<int>(cStrings.size()));
 }
 
 CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(const WebRTCSessionStruct & session,
                                                       WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode)
 {
-    int err = gOnEndCallback(session.id, static_cast<uint8_t>(reasonCode));
-    return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mOnEndCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mOnEndCallback(session.id, static_cast<uint8_t>(reasonCode));
 }
 
 void WebRTCTransportRequestorManager::UpsertSession(
