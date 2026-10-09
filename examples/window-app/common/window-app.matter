@@ -2645,7 +2645,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2732,7 +2732,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2755,8 +2755,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2771,7 +2771,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
   }
 
@@ -2782,7 +2782,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2894,32 +2894,32 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type default = 0x08;
-    ram      attribute physicalClosedLimitLift default = 0xFFFF;
-    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
-    persist  attribute currentPositionLift default = 0;
-    persist  attribute currentPositionTilt default = 0;
-    persist  attribute numberOfActuationsLift default = 0x0000;
-    persist  attribute numberOfActuationsTilt default = 0x0000;
-    persist  attribute configStatus default = 0x03;
-    persist  attribute currentPositionLiftPercentage default = 0;
-    persist  attribute currentPositionTiltPercentage default = 0;
+    callback attribute type default = 0x08;
+    callback attribute physicalClosedLimitLift;
+    callback attribute physicalClosedLimitTilt;
+    callback attribute currentPositionLift;
+    callback attribute currentPositionTilt;
+    callback attribute numberOfActuationsLift;
+    callback attribute numberOfActuationsTilt;
+    callback attribute configStatus default = 0x03;
+    callback attribute currentPositionLiftPercentage;
+    callback attribute currentPositionTiltPercentage;
     callback attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths;
-    ram      attribute targetPositionTiltPercent100ths;
-    ram      attribute endProductType default = 0x00;
-    persist  attribute currentPositionLiftPercent100ths default = 0;
-    persist  attribute currentPositionTiltPercent100ths default = 0;
-    persist  attribute installedOpenLimitLift default = 0x0000;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt default = 0x0000;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x0;
+    callback attribute targetPositionLiftPercent100ths;
+    callback attribute targetPositionTiltPercent100ths;
+    callback attribute endProductType default = 0x00;
+    callback attribute currentPositionLiftPercent100ths default = 0;
+    callback attribute currentPositionTiltPercent100ths default = 0;
+    callback attribute installedOpenLimitLift;
+    callback attribute installedClosedLimitLift;
+    callback attribute installedOpenLimitTilt;
+    callback attribute installedClosedLimitTilt;
+    callback attribute mode default = 0x0;
     callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x001F;
+    callback attribute featureMap default = 0x001F;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;
@@ -2976,32 +2976,32 @@ endpoint 2 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type default = 0x08;
-    ram      attribute physicalClosedLimitLift default = 0xFFFF;
-    ram      attribute physicalClosedLimitTilt default = 0xFFFF;
-    persist  attribute currentPositionLift default = 0;
-    persist  attribute currentPositionTilt default = 0;
-    persist  attribute numberOfActuationsLift default = 0x0000;
-    persist  attribute numberOfActuationsTilt default = 0x0000;
-    persist  attribute configStatus default = 0x03;
-    persist  attribute currentPositionLiftPercentage default = 0;
-    persist  attribute currentPositionTiltPercentage default = 0;
+    callback attribute type default = 0x08;
+    callback attribute physicalClosedLimitLift;
+    callback attribute physicalClosedLimitTilt;
+    callback attribute currentPositionLift;
+    callback attribute currentPositionTilt;
+    callback attribute numberOfActuationsLift;
+    callback attribute numberOfActuationsTilt;
+    callback attribute configStatus default = 0x03;
+    callback attribute currentPositionLiftPercentage;
+    callback attribute currentPositionTiltPercentage;
     callback attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths;
-    ram      attribute targetPositionTiltPercent100ths;
-    ram      attribute endProductType default = 0x00;
-    persist  attribute currentPositionLiftPercent100ths default = 0;
-    persist  attribute currentPositionTiltPercent100ths default = 0;
-    persist  attribute installedOpenLimitLift default = 0x0000;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt default = 0x0000;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x00;
+    callback attribute targetPositionLiftPercent100ths;
+    callback attribute targetPositionTiltPercent100ths;
+    callback attribute endProductType default = 0x00;
+    callback attribute currentPositionLiftPercent100ths default = 0;
+    callback attribute currentPositionTiltPercent100ths default = 0;
+    callback attribute installedOpenLimitLift;
+    callback attribute installedClosedLimitLift;
+    callback attribute installedOpenLimitTilt;
+    callback attribute installedClosedLimitTilt;
+    callback attribute mode default = 0x00;
     callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0017;
+    callback attribute featureMap default = 0x0017;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;

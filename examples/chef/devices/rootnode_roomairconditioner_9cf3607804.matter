@@ -2325,7 +2325,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2338,7 +2338,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2466,27 +2466,27 @@ endpoint 1 {
 
   server cluster FanControl {
     callback attribute fanMode;
-    ram      attribute fanModeSequence default = 2;
+    callback attribute fanModeSequence default = 2;
     callback attribute percentSetting;
     callback attribute percentCurrent;
-    ram      attribute speedMax default = 100;
+    callback attribute speedMax default = 100;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x01;
+    callback attribute rockSupport default = 0x01;
     callback attribute rockSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 53;
+    callback attribute featureMap default = 53;
     callback attribute clusterRevision;
 
     handle command Step;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    ram      attribute temperatureDisplayMode default = 0x00;
-    ram      attribute keypadLockout default = 0x00;
+    callback attribute temperatureDisplayMode default = 0x00;
+    callback attribute keypadLockout default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2525,8 +2525,8 @@ endpoint 2 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 1500;
-    ram      attribute maxMeasuredValue default = 4500;
+    callback attribute minMeasuredValue default = 1500;
+    callback attribute maxMeasuredValue default = 4500;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2565,8 +2565,8 @@ endpoint 3 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 3000;
-    ram      attribute maxMeasuredValue default = 10000;
+    callback attribute minMeasuredValue default = 3000;
+    callback attribute maxMeasuredValue default = 10000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

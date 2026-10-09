@@ -2674,7 +2674,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2698,7 +2698,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2804,9 +2804,9 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    persist  attribute minMeasuredValue default = -5000;
-    persist  attribute maxMeasuredValue default = 7500;
-    persist  attribute tolerance default = 0;
+    callback attribute minMeasuredValue default = -5000;
+    callback attribute maxMeasuredValue default = 7500;
+    callback attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2816,9 +2816,9 @@ endpoint 1 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    persist  attribute minMeasuredValue default = 0;
-    persist  attribute maxMeasuredValue default = 0x2710;
-    persist  attribute tolerance;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 0x2710;
+    callback attribute tolerance;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -1888,7 +1888,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1912,7 +1912,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -1988,9 +1988,9 @@ endpoint 1 {
 
   server cluster FlowMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x1;
-    ram      attribute maxMeasuredValue default = 0xFFF;
-    ram      attribute tolerance default = 8;
+    callback attribute minMeasuredValue default = 0x1;
+    callback attribute maxMeasuredValue default = 0xFFF;
+    callback attribute tolerance default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

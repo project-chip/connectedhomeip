@@ -173,9 +173,9 @@ public:
         WindowCoveringCluster::Config config(gDelegateWrappers[clusterInstanceIndex]);
         config.WithFeatures(features).WithOptionalAttributes(optionalAttributes);
 
-        // RAM attributes whose default is defined per-endpoint in the application Matter files
-        // are passed to the constructor via Config (per the Default Value Rule). If a default is
-        // not present in ZAP, the Config's own default (spec conformance value) is used.
+        // Attributes whose default is defined per-endpoint in the application Matter files
+        // (flash metadata) are passed to the constructor via Config (per the Default Value Rule).
+        // If a default is not present in ZAP, the Config's own default (spec conformance value) is used.
         WindowCovering::Type type{};
         if (Attributes::Type::GetDefault(endpointId, type) == Status::Success)
         {

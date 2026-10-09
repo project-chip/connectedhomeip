@@ -2744,7 +2744,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2828,7 +2828,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2851,8 +2851,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2867,7 +2867,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2877,7 +2877,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2928,8 +2928,8 @@ endpoint 0 {
     callback attribute registeredClients;
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
-    ram      attribute userActiveModeTriggerHint;
-    ram      attribute userActiveModeTriggerInstruction;
+    callback attribute userActiveModeTriggerHint;
+    callback attribute userActiveModeTriggerInstruction;
     callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;
@@ -2982,8 +2982,8 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2993,8 +2993,8 @@ endpoint 1 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

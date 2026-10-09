@@ -2731,7 +2731,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2807,7 +2807,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2820,7 +2820,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2879,8 +2879,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 1;
+    callback attribute clusterRevision;
 
     handle command JoinGroup;
     handle command LeaveGroup;
@@ -2983,12 +2983,12 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute sceneTableSize default = 16;
+    callback attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command AddScene;

@@ -2930,7 +2930,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2943,7 +2943,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0x0001;
+    callback attribute featureMap default = 0x0001;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3066,21 +3066,21 @@ endpoint 1 {
 
   server cluster FanControl {
     callback attribute fanMode;
-    ram      attribute fanModeSequence default = 2;
+    callback attribute fanModeSequence default = 2;
     callback attribute percentSetting;
     callback attribute percentCurrent;
-    ram      attribute speedMax default = 10;
+    callback attribute speedMax default = 10;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x07;
+    callback attribute rockSupport default = 0x07;
     callback attribute rockSetting;
-    ram      attribute windSupport default = 0x03;
+    callback attribute windSupport default = 0x03;
     callback attribute windSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x3F;
+    callback attribute featureMap default = 0x3F;
     callback attribute clusterRevision;
 
     handle command Step;
@@ -3344,9 +3344,9 @@ endpoint 3 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    persist  attribute minMeasuredValue default = -5000;
-    persist  attribute maxMeasuredValue default = 7500;
-    persist  attribute tolerance default = 10;
+    callback attribute minMeasuredValue default = -5000;
+    callback attribute maxMeasuredValue default = 7500;
+    callback attribute tolerance default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3385,9 +3385,9 @@ endpoint 4 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 10000;
-    ram      attribute tolerance default = 1;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 10000;
+    callback attribute tolerance default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

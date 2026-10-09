@@ -2025,7 +2025,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2049,7 +2049,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2139,24 +2139,24 @@ endpoint 1 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type default = 8;
-    persist  attribute numberOfActuationsLift default = 0x0000;
-    persist  attribute numberOfActuationsTilt default = 0x0000;
-    persist  attribute configStatus default = 0x19;
-    persist  attribute currentPositionLiftPercentage default = 0;
-    persist  attribute currentPositionTiltPercentage default = 0;
+    callback attribute type default = 8;
+    callback attribute numberOfActuationsLift;
+    callback attribute numberOfActuationsTilt;
+    callback attribute configStatus default = 0x19;
+    callback attribute currentPositionLiftPercentage;
+    callback attribute currentPositionTiltPercentage;
     callback attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths default = 0;
-    ram      attribute targetPositionTiltPercent100ths default = 0;
-    ram      attribute endProductType default = 8;
-    persist  attribute currentPositionLiftPercent100ths default = 0;
-    persist  attribute currentPositionTiltPercent100ths default = 0;
-    persist  attribute mode default = 0x00;
+    callback attribute targetPositionLiftPercent100ths default = 0;
+    callback attribute targetPositionTiltPercent100ths default = 0;
+    callback attribute endProductType default = 8;
+    callback attribute currentPositionLiftPercent100ths default = 0;
+    callback attribute currentPositionTiltPercent100ths default = 0;
+    callback attribute mode default = 0x00;
     callback attribute safetyStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x17;
+    callback attribute featureMap default = 0x17;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;

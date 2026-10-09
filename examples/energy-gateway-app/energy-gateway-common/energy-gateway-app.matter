@@ -2047,7 +2047,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -2088,7 +2088,7 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    ram      attribute testEventTriggersEnabled;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2107,7 +2107,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;

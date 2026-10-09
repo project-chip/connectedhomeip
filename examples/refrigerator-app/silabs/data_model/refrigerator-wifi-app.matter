@@ -1970,7 +1970,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1999,8 +1999,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -2012,7 +2012,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2143,14 +2143,14 @@ endpoint 2 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = -1800;
-    ram      attribute minTemperature default = -1800;
-    ram      attribute maxTemperature default = -1500;
-    ram      attribute step default = 10;
+    callback attribute temperatureSetpoint default = -1800;
+    callback attribute minTemperature default = -1800;
+    callback attribute maxTemperature default = -1500;
+    callback attribute step default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap default = 5;
     callback attribute clusterRevision;
 
     handle command SetTemperature;
@@ -2173,14 +2173,14 @@ endpoint 3 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 200;
-    ram      attribute minTemperature default = 200;
-    ram      attribute maxTemperature default = 400;
-    ram      attribute step default = 10;
+    callback attribute temperatureSetpoint default = 200;
+    callback attribute minTemperature default = 200;
+    callback attribute maxTemperature default = 400;
+    callback attribute step default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap default = 5;
     callback attribute clusterRevision;
 
     handle command SetTemperature;

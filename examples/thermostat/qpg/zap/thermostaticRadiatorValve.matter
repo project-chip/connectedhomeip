@@ -2929,7 +2929,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -3015,7 +3015,7 @@ endpoint 0 {
     callback attribute activeNetworkFaultsList;
     callback attribute extAddress;
     callback attribute rloc16;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap default = 0x000F;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -3028,7 +3028,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3171,8 +3171,8 @@ endpoint 1 {
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    ram      attribute temperatureDisplayMode default = 0x00;
-    ram      attribute keypadLockout default = 0x00;
+    callback attribute temperatureDisplayMode default = 0x00;
+    callback attribute keypadLockout default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

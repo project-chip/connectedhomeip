@@ -20,6 +20,7 @@
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/IcdManagement/Metadata.h>
@@ -181,6 +182,47 @@ TEST_F(TestIcdManagementCluster, TestAttributes)
     {
         // No commands
         ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
+    }
+}
+
+TEST_F(TestIcdManagementCluster, TestUserActiveModeTriggerInstruction)
+{
+    chip::Crypto::DefaultSessionKeystore keystore;
+    FabricTable fabricTable;
+    ICDConfigurationData & icdConfig = ICDConfigurationData::GetInstance();
+    ICDManagementCluster::OptionalCommandSet optionalCommands;
+    BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
+    const auto optionalAttributes =
+        ICDManagementCluster::OptionalAttributeSet().Set<IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id>();
+
+    // Short instruction is preserved intact.
+    {
+        static constexpr CharSpan kShortInstruction = "Press button for 3s"_span;
+        ICDManagementCluster cluster(kRootEndpointId, keystore, fabricTable, icdConfig, optionalAttributes, optionalCommands,
+                                     userActiveModeTriggerHint, kShortInstruction);
+        chip::Testing::ClusterTester tester(cluster);
+
+        CharSpan readValue;
+        ASSERT_EQ(tester.ReadAttribute(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_TRUE(readValue.data_equal(kShortInstruction));
+    }
+
+    // Instruction exceeding kUserActiveModeTriggerInstructionMaxLength (128 bytes) is truncated.
+    {
+        static constexpr char kLongBuffer[200] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        const CharSpan longInstruction(kLongBuffer, sizeof(kLongBuffer) - 1);
+        ASSERT_GT(longInstruction.size(), IcdManagement::kUserActiveModeTriggerInstructionMaxLength);
+
+        ICDManagementCluster cluster(kRootEndpointId, keystore, fabricTable, icdConfig, optionalAttributes, optionalCommands,
+                                     userActiveModeTriggerHint, longInstruction);
+        chip::Testing::ClusterTester tester(cluster);
+
+        CharSpan readValue;
+        ASSERT_EQ(tester.ReadAttribute(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_EQ(readValue.size(), IcdManagement::kUserActiveModeTriggerInstructionMaxLength);
+        EXPECT_TRUE(readValue.data_equal(longInstruction.SubSpan(0, IcdManagement::kUserActiveModeTriggerInstructionMaxLength)));
     }
 }
 

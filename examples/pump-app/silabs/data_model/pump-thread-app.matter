@@ -2332,7 +2332,7 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2365,7 +2365,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0000;
+    callback attribute featureMap default = 0x0000;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2378,7 +2378,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2534,9 +2534,9 @@ endpoint 1 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x8000;
-    ram      attribute maxMeasuredValue default = 0x8000;
-    ram      attribute tolerance default = 0;
+    callback attribute minMeasuredValue default = 0x8000;
+    callback attribute maxMeasuredValue default = 0x8000;
+    callback attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2546,26 +2546,26 @@ endpoint 1 {
 
   server cluster PressureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute tolerance default = 0;
-    ram      attribute scaledValue default = 0x0000;
-    ram      attribute minScaledValue default = 0;
-    ram      attribute maxScaledValue default = 0;
-    ram      attribute scaledTolerance default = 0;
-    ram      attribute scale default = 0;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute tolerance default = 0;
+    callback attribute scaledValue;
+    callback attribute minScaledValue default = 0;
+    callback attribute maxScaledValue default = 0;
+    callback attribute scaledTolerance default = 0;
+    callback attribute scale default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
   }
 
   server cluster FlowMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute tolerance default = 0;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -1993,7 +1993,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    ram      attribute testEventTriggersEnabled;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2021,7 +2021,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2072,7 +2072,7 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
-    ram      attribute userActiveModeTriggerInstruction;
+    callback attribute userActiveModeTriggerInstruction;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2139,13 +2139,13 @@ endpoint 1 {
 
   server cluster FanControl {
     callback attribute fanMode;
-    ram      attribute fanModeSequence;
+    callback attribute fanModeSequence;
     callback attribute percentSetting;
     callback attribute percentCurrent;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 }

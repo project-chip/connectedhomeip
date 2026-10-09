@@ -2845,7 +2845,7 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    ram      attribute testEventTriggersEnabled;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2864,7 +2864,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3046,8 +3046,8 @@ endpoint 2 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 90;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 90;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3086,8 +3086,8 @@ endpoint 3 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 90;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 90;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
