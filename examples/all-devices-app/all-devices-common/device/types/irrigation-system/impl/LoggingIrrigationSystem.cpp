@@ -38,7 +38,7 @@ DataModel::Nullable<uint32_t> LoggingIrrigationSystem::GetCountdownTime()
 CHIP_ERROR LoggingIrrigationSystem::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     static constexpr OperationalStateEnum kStates[] = { OperationalStateEnum::kStopped, OperationalStateEnum::kRunning,
-                                                        OperationalStateEnum::kPaused };
+                                                        OperationalStateEnum::kPaused, OperationalStateEnum::kError };
     VerifyOrReturnError(index < std::size(kStates), CHIP_ERROR_NOT_FOUND);
     operationalState = GenericOperationalState(to_underlying(kStates[index]));
     return CHIP_NO_ERROR;

@@ -60,7 +60,7 @@ public:
 
     DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> SetUpValveContext()
     {
-        if (mValveContext.IsNull())
+        if (!mValveContext.has_value())
         {
             return Clusters::ValveConfigurationAndControlCluster::ValveContext{
                 .features = BitFlags<Clusters::ValveConfigurationAndControl::Feature>(
@@ -72,7 +72,7 @@ public:
                 .delegate             = this,
             };
         }
-        auto context     = mValveContext.Value();
+        auto context     = *mValveContext;
         context.delegate = this;
         return context;
     }
