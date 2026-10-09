@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Pool.h>
+#include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -107,8 +108,27 @@ public:
     /// (used to roll back BeginMessage when the transport send fails).
     void AbortPending(uint16_t sessionId);
 
+    /// Largest commissionee message the proxy forwards: the constraint on the Message
+    /// field of ProxyMessageResponse.
+    static constexpr size_t kMaxProxyMessageLength = 1280;
+
+    /**
+     * @brief Check that commissionee data may be forwarded in a ProxyMessageResponse.
+     *
+     * The data must fit the Message field and conform to the Matter Message Format: a
+     * message header and a payload header that decode or, for an encrypted message, a
+     * message header and room for the smallest payload header and the MIC.
+     * Data that fails is not permitted to be forwarded, and the spec then requires the
+     * proxy to terminate the transport connection and remove the session. A transport
+     * driver therefore calls this on every message from the commissionee and tears the
+     * session down on an error, before calling DispatchMessageResponse(). Logs nothing;
+     * the caller logs.
+     */
+    static CHIP_ERROR ValidateCommissioneeMessage(ByteSpan message);
+
     /// Forward a commissionee reply as a ProxyMessageResponse. No-op if nothing is
-    /// pending for @p sessionId.
+    /// pending for @p sessionId, or if the data fails ValidateCommissioneeMessage(): such
+    /// data is never forwarded, but tearing the session down is the caller's job.
     void DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length);
 
     /// Fail a pending ProxyMessageRequest (e.g. session dropped mid-message).
