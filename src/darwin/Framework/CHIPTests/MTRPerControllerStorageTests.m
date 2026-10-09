@@ -21,6 +21,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
+#import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
@@ -41,6 +42,15 @@ static const uint16_t kSubscriptionTimeoutInSeconds = 60;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
+// An operational instance name nothing can advertise: node ID 0 is kUndefinedNodeId, so no
+// commissioned node has it, and a resolve for it never answers.
+static NSString * const kUnresolvableOperationalInstanceName = @"0000000000000000-0000000000000000";
+
+#ifdef DEBUG
+@interface MTRDeviceConnectivityMonitor (PerControllerStorageTests)
++ (void)unitTestSetInstanceNameOverride:(nullable NSString *)instanceName;
+@end
+#endif
 
 @interface MTRPerControllerStorageTestsSuspensionDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -334,6 +344,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 - (void)tearDown
 {
     // Per-test teardown, runs after each test.
+#ifdef DEBUG
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:nil];
+#endif
     [self stopFactory];
     _storageQueue = nil;
 
@@ -3886,5 +3899,265 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
+
+#ifdef DEBUG
+// A Thread node whose operational resolve never answers, while its CASE session is up and its
+// subscription is live, must still be controllable: an invoke must not wait on a resolve when
+// there is already a session to send it on. Otherwise the node keeps acking subscription
+// keepalives while every invoke to it sits in its MTRDevice work queue indefinitely.
+- (void)testThreadDeviceInvokesUseExistingSessionWhenResolveNeverAnswers
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(555)
+                                                                  nodeID:@(556)
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(23);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // From here on, nothing answers the connectivity monitor's resolve for this node.
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:kUnresolvableOperationalInstanceName];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.subscriptionMaxIntervalOverride = @(3600); // seconds; no drops during the test
+
+    XCTestExpectation * subscriptionPrimed = [self expectationWithDescription:@"Subscription primed"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionPrimed fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionPrimed ] timeout:kSubscriptionTimeoutInSeconds];
+
+    // Two invokes: the second queues behind the first in the device's work queue, so both finish
+    // only if the first is not stuck.
+    __auto_type * cluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    XCTestExpectation * toggle1Expectation = [self expectationWithDescription:@"toggle 1"];
+    XCTestExpectation * toggle2Expectation = [self expectationWithDescription:@"toggle 2"];
+    [cluster toggleWithExpectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [toggle1Expectation fulfill];
+    }];
+    [cluster toggleWithExpectedValues:nil expectedValueInterval:nil completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [toggle2Expectation fulfill];
+    }];
+    // Wait without failing, so the commissionee is reset even when the invokes never finish.
+    XCTWaiterResult togglesResult = [XCTWaiter waitForExpectations:@[ toggle1Expectation, toggle2Expectation ] timeout:kTimeoutInSeconds enforceOrder:YES];
+
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:nil];
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    XCTAssertEqual(togglesResult, XCTWaiterResultCompleted);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+// A Thread node's existing session must be handed over in the same Matter-queue turn that finds
+// it. Otherwise work already queued there, such as evicting that session, can run in between,
+// and the request then sets up a new session without the throttling the Thread path applies.
+- (void)testThreadDeviceInvokeUsesExistingSessionBeforeOtherQueuedWork
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(555)
+                                                                  nodeID:@(556)
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(23);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.subscriptionMaxIntervalOverride = @(3600); // seconds; no drops during the test
+
+    XCTestExpectation * subscriptionPrimed = [self expectationWithDescription:@"Subscription primed"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionPrimed fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionPrimed ] timeout:kSubscriptionTimeoutInSeconds];
+
+    // The hook stands in for work already queued when a lookup finds the session: by the time it
+    // runs, an invoke going out on that session must already have been sent. The invoke looks the
+    // session up twice, first to read the peer's MaxPathsPerInvoke and then to send, so the last
+    // lookup is the one it is sent on.
+    [MTRBaseDevice unitTestResetInvokeRequestMessageCount];
+    NSMutableArray<NSNumber *> * invokesSentWhenQueuedWorkRan = [NSMutableArray array];
+    [controller unitTestSetExistingSessionFoundHook:^{
+        @synchronized(invokesSentWhenQueuedWorkRan) {
+            [invokesSentWhenQueuedWorkRan addObject:@([MTRBaseDevice unitTestInvokeRequestMessageCount])];
+        }
+    }];
+
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * toggle = [[MTRCommandWithRequiredResponse alloc] initWithPath:togglePath commandFields:nil requiredResponse:nil];
+    XCTestExpectation * invokeExpectation = [self expectationWithDescription:@"toggle"];
+    [device invokeCommands:@[ @[ toggle ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    [invokeExpectation fulfill];
+                }];
+    // Wait without failing, so the commissionee is reset either way. The response is handled on the
+    // Matter queue after the hook for the sending lookup has run.
+    XCTWaiterResult waitResult = [XCTWaiter waitForExpectations:@[ invokeExpectation ] timeout:kTimeoutInSeconds];
+    [controller unitTestSetExistingSessionFoundHook:nil];
+    NSNumber * invokesSentWhenLastQueuedWorkRan;
+    @synchronized(invokesSentWhenQueuedWorkRan) {
+        invokesSentWhenLastQueuedWorkRan = invokesSentWhenQueuedWorkRan.lastObject;
+    }
+
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    XCTAssertEqual(waitResult, XCTWaiterResultCompleted);
+    XCTAssertEqualObjects(invokesSentWhenLastQueuedWorkRan, @(1));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+// A session request for a Thread node that is waiting on a resolve that never answers must fail
+// when the controller shuts down, rather than when the wait would have timed out.
+- (void)testThreadDeviceSessionRequestFailsOnShutdownWhileResolveNeverAnswers
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_queue_create("test.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(559);
+    NSNumber * fabricID = @(560);
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(25);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // Restart the controller so no CASE session to the node survives.
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:kUnresolvableOperationalInstanceName];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    // Not registered with the test case and held weakly by the completion, so a completion that only
+    // arrives after the test has ended does nothing.
+    __auto_type * toggleHeldExpectation = [[XCTestExpectation alloc] initWithDescription:@"toggle still held"];
+    toggleHeldExpectation.inverted = YES;
+    __auto_type * toggleExpectation = [[XCTestExpectation alloc] initWithDescription:@"toggle failed"];
+    __weak XCTestExpectation * weakToggleHeldExpectation = toggleHeldExpectation;
+    __weak XCTestExpectation * weakToggleExpectation = toggleExpectation;
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:baseDevice endpointID:@(1) queue:queue];
+    [cluster toggleWithCompletion:^(NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        [weakToggleHeldExpectation fulfill];
+        [weakToggleExpectation fulfill];
+    }];
+
+    // The request is held by the connectivity check, not failed.
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ toggleHeldExpectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+    XCTWaiterResult shutdownResult = [XCTWaiter waitForExpectations:@[ toggleExpectation ] timeout:kTimeoutInSeconds];
+
+    [MTRDeviceConnectivityMonitor unitTestSetInstanceNameOverride:nil];
+    controller = [self startControllerWithRootKeys:rootKeys
+                                   operationalKeys:operationalKeys
+                                          fabricID:fabricID
+                                            nodeID:nodeID
+                                           storage:storageDelegate
+                                             error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    ResetCommissionee([MTRBaseDevice deviceWithNodeID:deviceID controller:controller], queue, self, kTimeoutInSeconds);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    XCTAssertEqual(shutdownResult, XCTWaiterResultCompleted);
+}
+#endif // DEBUG
 
 @end

@@ -85,6 +85,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+// Runs the hook on the Matter queue each time a Thread node's session request is handed an existing session.
+- (void)unitTestSetExistingSessionFoundHook:(nullable dispatch_block_t)hook;
 @end
 
 @interface MTRBaseDevice (TestDebug)
