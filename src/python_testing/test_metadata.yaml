@@ -1,5 +1,5 @@
-# Tests that are NOT executed in CI, along with the reason on
-# why they are not.
+# Tests that are not executed by the generic Python test runners, along with
+# the reason why.
 not_automated:
     - name: TC_DD_3_23.py
       reason:
@@ -36,11 +36,15 @@ not_automated:
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
-      reason: Required commissioning not implemented on CI
+      reason:
+          Requires the dedicated mocked BLE-WiFi commissioning environment and
+          is executed separately in the Linux CI test suite.
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
-      reason: It has no CI execution block, is not executed in CI
+      reason:
+          Requires the dedicated mocked BLE-WiFi commissioning environment and
+          is executed separately in the Linux CI test suite.
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
@@ -48,7 +52,9 @@ not_automated:
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
-      reason: It has no CI execution block, is not executed in CI
+      reason:
+          Requires the dedicated mocked BLE-WiFi commissioning environment and
+          is executed separately in the Linux CI test suite.
     - name: TC_CNET_4_16.py
       reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
