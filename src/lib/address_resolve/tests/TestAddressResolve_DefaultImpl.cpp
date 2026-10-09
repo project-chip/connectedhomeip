@@ -865,4 +865,161 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShut
     EXPECT_EQ(expectedError, CHIP_ERROR_SHUT_DOWN);
 }
 
+// Regression test for stale-operational-address re-resolve on CASE timeout.
+//
+// Scenario: a controller commissions a Thread Sleepy End Device. The device
+// first advertises a pre-operational address (A). The initial operational
+// lookup resolves to A, so the resolver delivers A and erases the lookup
+// handle (just like CASE locking onto A). The device then publishes its real
+// operational SRP record (~12s later) advertising a NEW address (B).
+//
+// Before the fix, OperationalSessionSetup only walked the stale cached snapshot
+// (containing A) on CASE timeout, so a fresh OnOperationalNodeResolved carrying
+// B was dropped because no lookup was active, and CASE kept retransmitting
+// Sigma1 to the dead address A until the commissioning watchdog timed out.
+//
+// After the fix, OperationalSessionSetup::OnSessionEstablishmentError(TIMEOUT)
+// starts a FRESH LookupNode rather than only consuming the stale snapshot. This
+// test exercises the resolver behavior that fix relies on: a fresh lookup for
+// the same peer after a prior resolution must surface the newer address B (and
+// must NOT re-deliver the stale address A from a leftover cached snapshot).
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, FreshLookupAfterTimeoutSurfacesNewerOperationalAddress)
+{
+    chip::Dnssd::Resolver::SetInstance(mMockResolver);
+
+    chip::AddressResolve::Impl::Resolver resolver;
+    ASSERT_EQ(resolver.Init(&mSystemLayer), CHIP_NO_ERROR);
+
+    System::Clock::Internal::RAIIMockClock clock;
+
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+    request.SetMinLookupTime(0_ms32); // Deliver as soon as the first reply arrives.
+    request.SetMaxLookupTime(200_ms32);
+
+    AddressResolve::NodeLookupHandle handle;
+    handle.SetListener(&mNodeListener);
+
+    // The pre-operational (stale) address A and the operational (live) address B.
+    const Transport::PeerAddress staleAddressA = GetAddressWithLowScore(static_cast<uint16_t>(0x1111));
+    const Transport::PeerAddress liveAddressB  = GetAddressWithLowScore(static_cast<uint16_t>(0x2222));
+    ASSERT_NE(staleAddressA, liveAddressB);
+
+    int resolvedCount = 0;
+    Transport::PeerAddress lastResolvedAddress;
+    mNodeListener.SetOnNodeAddressResolved([&](const chip::PeerId &, const chip::AddressResolve::ResolveResult & result) {
+        ++resolvedCount;
+        lastResolvedAddress = result.address;
+    });
+
+    auto MakeNodeData = [&](const Transport::PeerAddress & address) {
+        Dnssd::ResolvedNodeData nodeData;
+        nodeData.resolutionData.numIPs       = 1;
+        nodeData.resolutionData.ipAddress[0] = address.GetIPAddress();
+        nodeData.resolutionData.interfaceId  = address.GetInterface();
+        nodeData.resolutionData.port         = address.GetPort();
+        nodeData.operationalData.peerId      = request.GetPeerId();
+        return nodeData;
+    };
+
+    // --- Initial lookup resolves to the stale pre-operational address A. ---
+    ASSERT_EQ(resolver.LookupNode(request, handle), CHIP_NO_ERROR);
+    resolver.OnOperationalNodeResolved(MakeNodeData(staleAddressA));
+
+    ASSERT_EQ(resolvedCount, 1);
+    EXPECT_EQ(lastResolvedAddress, staleAddressA);
+    // The handle has been delivered and is no longer active (CASE now owns A).
+    EXPECT_FALSE(handle.IsActive());
+
+    // --- The live operational address B is published ~12s later. ---
+    // Simulate the stale-address CASE attempt timing out by advancing the clock,
+    // then doing what OnSessionEstablishmentError(TIMEOUT) now does: a fresh
+    // LookupNode for the same peer.
+    clock.AdvanceMonotonic(12000_ms64);
+
+    ASSERT_EQ(resolver.LookupNode(request, handle), CHIP_NO_ERROR);
+    EXPECT_TRUE(handle.IsActive());
+
+    // The newer operational advertisement arrives and must be delivered.
+    resolver.OnOperationalNodeResolved(MakeNodeData(liveAddressB));
+
+    ASSERT_EQ(resolvedCount, 2);
+    // Crux of the regression: we must now be targeting the LIVE address B, not
+    // the stale address A. Before the fix the setup path would have kept
+    // retrying only A from the cached snapshot.
+    EXPECT_EQ(lastResolvedAddress, liveAddressB);
+    EXPECT_NE(lastResolvedAddress, staleAddressA);
+
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+}
+
+// Focused coverage: a fresh operational advertisement for a peer that still has
+// an in-flight lookup must surface the refreshed address. This is the resolver
+// half of the re-resolve fix: while a lookup is active, OnOperationalNode-
+// Resolved must accept a newer/better address rather than ignoring it.
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
+       OnOperationalNodeResolvedAcceptsRefreshedAddressForInFlightLookup)
+{
+    chip::Dnssd::Resolver::SetInstance(mMockResolver);
+
+    chip::AddressResolve::Impl::Resolver resolver;
+    ASSERT_EQ(resolver.Init(&mSystemLayer), CHIP_NO_ERROR);
+
+    System::Clock::Internal::RAIIMockClock clock;
+
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+    // Keep the lookup active across multiple advertisements: do not deliver
+    // until the min lookup time elapses.
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(2000_ms32);
+
+    AddressResolve::NodeLookupHandle handle;
+    handle.SetListener(&mNodeListener);
+
+    // A low-score (pre-operational) address arrives first, then a higher-score
+    // (operational) address arrives while the lookup is still in flight. The
+    // higher-score address must be the one delivered.
+    const Transport::PeerAddress firstAddress  = GetAddressWithLowScore(static_cast<uint16_t>(0x3333));
+    const Transport::PeerAddress betterAddress = GetAddressWithHighScore();
+
+    int resolvedCount = 0;
+    Transport::PeerAddress lastResolvedAddress;
+    mNodeListener.SetOnNodeAddressResolved([&](const chip::PeerId &, const chip::AddressResolve::ResolveResult & result) {
+        ++resolvedCount;
+        lastResolvedAddress = result.address;
+    });
+
+    auto MakeNodeData = [&](const Transport::PeerAddress & address) {
+        Dnssd::ResolvedNodeData nodeData;
+        nodeData.resolutionData.numIPs       = 1;
+        nodeData.resolutionData.ipAddress[0] = address.GetIPAddress();
+        nodeData.resolutionData.interfaceId  = address.GetInterface();
+        nodeData.resolutionData.port         = address.GetPort();
+        nodeData.operationalData.peerId      = request.GetPeerId();
+        return nodeData;
+    };
+
+    ASSERT_EQ(resolver.LookupNode(request, handle), CHIP_NO_ERROR);
+
+    // First advertisement, still within min lookup time: must NOT deliver yet
+    // (the lookup stays active so it can pick up a better address).
+    resolver.OnOperationalNodeResolved(MakeNodeData(firstAddress));
+    EXPECT_EQ(resolvedCount, 0);
+    EXPECT_TRUE(handle.IsActive());
+
+    // A refreshed, higher-score advertisement arrives while still in flight.
+    resolver.OnOperationalNodeResolved(MakeNodeData(betterAddress));
+    EXPECT_EQ(resolvedCount, 0);
+    EXPECT_TRUE(handle.IsActive());
+
+    // After the min lookup time elapses, the lookup completes with the better
+    // (refreshed) address at the top of the result list.
+    clock.AdvanceMonotonic(150_ms64);
+    resolver.OnOperationalNodeResolved(MakeNodeData(betterAddress)); // re-arms HandleAction
+
+    ASSERT_EQ(resolvedCount, 1);
+    EXPECT_EQ(lastResolvedAddress, betterAddress);
+
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+}
+
 } // namespace
