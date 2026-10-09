@@ -69,7 +69,6 @@ CHIP_ERROR AppTaskBase<Derived>::Run()
     ReturnErrorOnFailure(Self().InitPersistence());
     ReturnErrorOnFailure(Self().InitRootNode());
     ReturnErrorOnFailure(Self().RegisterDeviceCreators());
-    ReturnErrorOnFailure(Self().RegisterOTACluster());
     ReturnErrorOnFailure(Self().RegisterAppDevices());
     ReturnErrorOnFailure(Self().InitServer());
     ReturnErrorOnFailure(Self().InitBoardControls());
@@ -226,6 +225,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     OtaFeature::Context otaContext{
         .otaCommands = mOTARequestorCore,
         .attributes  = mOTARequestorAttributes,
+        .cluster     = mOTARequestorCluster,
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
@@ -278,18 +278,6 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
 }
 
 template <class Derived>
-CHIP_ERROR AppTaskBase<Derived>::RegisterOTACluster()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    // Must be registered before Server::Init() starts the provider.
-    mOTARequestorCluster.Create(kRootEndpointId, mOTARequestorCore, mOTARequestorAttributes,
-                                Server::GetInstance().GetFabricTable());
-    ReturnErrorOnFailure(mDataModelProvider->AddCluster(mOTARequestorCluster.Registration()));
-#endif
-    return CHIP_NO_ERROR;
-}
-
-template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
     return Server::GetInstance().Init(mInitParams);
@@ -336,6 +324,7 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    VerifyOrReturnError(mOTARequestorCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,

@@ -64,6 +64,7 @@
 #include <device/types/root-node/RootNodeWith.h>
 
 #if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+#include "OTAConfig.h"
 #include <device/types/root-node/features/OtaFeature.h>
 #endif
 
@@ -262,6 +263,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::OtaFeature::Context otaContext{
         .otaCommands = gRequestorCore,
         .attributes  = chip::GetOTARequestorAttributes(),
+        .cluster     = chip::GetOTARequestorCluster(),
     };
 #endif // SILABS_OTA_ENABLED
 
