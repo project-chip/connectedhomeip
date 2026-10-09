@@ -35,25 +35,15 @@ not_automated:
           BINFO-3.1, which is run in the CI
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
-    - name: TC_CNET_4_1.py
-      reason: Required commissioning not implemented on CI
-    - name: TC_CNET_4_4.py
-      reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_9.py
-      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_15.py
-      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_16.py
       reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
-      reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_25.py
       reason:
@@ -296,10 +286,33 @@ not_automated:
           CI has been temporarily removed as it was blocking the roll to 1.7.
           https://github.com/project-chip/connectedhomeip/issues/74154
 
-# Tests whose `app` is a script that brings up a mocked topology. CI runs them
-# like any other test. `local.py python-tests` skips them, because they need
-# root and applications built with BLE and Wi-Fi.
+# Tests requiring mocked topologies and applications built with BLE and Wi-Fi.
 dedicated_runner:
+    - name: TC_CNET_4_1.py
+      runner: ble-wifi
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_4.py
+      runner: ble-wifi
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_9.py
+      runner: ble-wifi
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_15.py
+      runner: ble-wifi
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_23.py
+      runner: ble-wifi
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_COMPRO_2_1.py
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
