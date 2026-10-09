@@ -812,6 +812,27 @@ static const NSTimeInterval kShortMonitorWaitElapsedSeconds = 0.5;
 static const uint16_t kControllerPeerPort = 5547;
 static const NSTimeInterval kCASEEstablishmentSeconds = 30;
 
+static void TestBrowseCallback(
+    DNSServiceRef sdRef,
+    DNSServiceFlags flags,
+    uint32_t interfaceIndex,
+    DNSServiceErrorType errorCode,
+    const char * serviceName,
+    const char * regtype,
+    const char * replyDomain,
+    void * context)
+{
+    if (errorCode != kDNSServiceErr_NoError || serviceName == NULL) {
+        return;
+    }
+    NSCountedSet<NSString *> * browsedInstances = (__bridge NSCountedSet<NSString *> *) context;
+    if (flags & kDNSServiceFlagsAdd) {
+        [browsedInstances addObject:@(serviceName)];
+    } else {
+        [browsedInstances removeObject:@(serviceName)];
+    }
+}
+
 - (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys nodeID:(NSNumber *)nodeID poolSize:(NSUInteger)poolSize
 {
     NSError * error;
@@ -851,8 +872,13 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitSeconds];
 
     NSString * peerInstanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+    // Local-only, so no other responder can cache the record and keep answering for it once it is deregistered.
     DNSServiceRef peerAdvertiser = NULL;
-    XCTAssertEqual(DNSServiceRegister(&peerAdvertiser, kDNSServiceFlagsNoAutoRename, 0, peerInstanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceRegister(&peerAdvertiser, kDNSServiceFlagsNoAutoRename, kDNSServiceInterfaceIndexLocalOnly, peerInstanceName.UTF8String, kOperationalType, kLocalDot, "localhost", htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    NSCountedSet<NSString *> * browsedInstances = [NSCountedSet set];
+    DNSServiceRef peerBrowser = NULL;
+    XCTAssertEqual(DNSServiceBrowse(&peerBrowser, 0, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, TestBrowseCallback, (__bridge void *) browsedInstances), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceSetDispatchQueue(peerBrowser, dispatch_get_main_queue()), kDNSServiceErr_NoError);
     __block BOOL readCompleted = NO;
     [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)] ]
                                                                                eventPaths:nil
@@ -863,7 +889,12 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
                                                                                    readCompleted = YES;
                                                                                }];
     XCTAssertTrue([self waitUntil:^{ return readCompleted; } timeout:kCASEEstablishmentSeconds description:@"CASE session to the peer established"]);
+
+    // The callers need the peer's connectivity monitor to never report, so the record must be gone before they start.
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([browsedInstances countForObject:peerInstanceName] > 0); } timeout:kPromptSeconds description:@"peer record seen by browsing"]);
     DNSServiceRefDeallocate(peerAdvertiser);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([browsedInstances countForObject:peerInstanceName] == 0); } timeout:kPromptSeconds description:@"peer record removed"]);
+    DNSServiceRefDeallocate(peerBrowser);
     return controller;
 }
 #endif
