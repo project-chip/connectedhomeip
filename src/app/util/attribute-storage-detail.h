@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/config.h>
@@ -46,9 +47,11 @@ void emAfCallInits();
 /// Note: AAI/CHI registered outside of cluster init callbacks will not be restored on re-init.
 void emAfCallShutdowns(MatterClusterShutdownType shutdownType);
 
-chip::Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
-                                                                   const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
-                                                                   uint16_t readLength, bool write);
+/// subjectDescriptor is borrowed for external reads only; nullptr denotes an absent access context.
+chip::Protocols::InteractionModel::Status
+emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+                         uint8_t * buffer, uint16_t readLength, bool write,
+                         const chip::Access::SubjectDescriptor * subjectDescriptor = nullptr);
 
 //
 // Given a cluster ID, endpoint ID and a cluster mask, finds a matching cluster within that endpoint

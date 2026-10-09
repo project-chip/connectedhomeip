@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
@@ -81,6 +82,23 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
 chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,
                                                                                uint8_t * buffer, uint16_t maxReadLength);
+
+/** @brief External Attribute Read With Context
+ *
+ * Like emberAfExternalAttributeReadCallback, with the accessing subject supplied
+ * for Interaction Model reads, including subscription reports. Local reads may
+ * supply nullptr. A non-null descriptor may still have no associated fabric;
+ * applications must check authMode before interpreting subject as a CASE NodeId.
+ * The descriptor is valid only for the duration of this call and must not be retained.
+ *
+ * The default implementation forwards to emberAfExternalAttributeReadCallback,
+ * preserving existing application overrides. Applications may override this
+ * callback instead to select values using the accessing subject.
+ */
+chip::Protocols::InteractionModel::Status
+emberAfExternalAttributeReadWithContextCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                uint16_t maxReadLength, const chip::Access::SubjectDescriptor * subjectDescriptor);
 
 /** @brief External Attribute Write
  *
