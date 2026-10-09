@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -657,6 +658,21 @@ bool emberAfLevelControlClusterMoveToLevelCallback(CommandHandler * commandObj, 
 }
 
 namespace LevelControlServer {
+
+CHIP_ERROR SetCurrentLevel(EndpointId endpointId, uint8_t level)
+{
+    EmberAfLevelControlState * state = getState(endpointId);
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(level >= state->minLevel && level <= state->maxLevel, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // An internal controller replaces the transition, rather than changing the attribute underneath it.
+    cancelEndpointTimerCallback(endpointId);
+    state->storedLevel              = INVALID_STORED_LEVEL;
+    state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+    writeRemainingTime(endpointId, 0);
+    return StatusIB(SetCurrentLevelQuietReport(endpointId, state, DataModel::MakeNullable(level), true /*isEndOfTransition*/))
+        .ToChipError();
+}
 
 Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::DecodableType & commandData)
 {

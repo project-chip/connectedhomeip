@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPError.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/SceneTable.h> // nogncheck
@@ -51,6 +52,13 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId end
 bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::Feature feature);
 
 namespace LevelControlServer {
+
+/**
+ * Immediately set the level for an internal controller taking over from a command transition.
+ * Cancels the endpoint's transition and synchronizes CurrentLevel, its reporting cache, and RemainingTime.
+ * Does not apply command Options processing or change OnOff. Call from the Matter thread with the stack locked.
+ */
+CHIP_ERROR SetCurrentLevel(chip::EndpointId endpointId, uint8_t level);
 
 chip::Protocols::InteractionModel::Status
 MoveToLevel(chip::EndpointId endpointId,
