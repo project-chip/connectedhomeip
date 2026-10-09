@@ -91,7 +91,7 @@ enum class Fields : uint8_t
     kName     = 0,
     kSize     = 1,
     kMimeType = 2,
-    kImageUri = 3,
+    kImageURI = 3,
 };
 
 struct Type
@@ -104,7 +104,7 @@ public:
     chip::CharSpan name;
     uint64_t size = static_cast<uint64_t>(0);
     chip::CharSpan mimeType;
-    chip::CharSpan imageUri;
+    chip::CharSpan imageURI;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -123,7 +123,7 @@ public:
     chip::CharSpan name;
     uint64_t size = static_cast<uint64_t>(0);
     chip::CharSpan mimeType;
-    chip::CharSpan imageUri;
+    chip::CharSpan imageURI;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -215,7 +215,7 @@ public:
 
     chip::CharSpan clientName;
     uint16_t requestID = static_cast<uint16_t>(0);
-    Optional<DataModel::Nullable<DataModel::List<const chip::CharSpan>>> supportedMimeTypes;
+    Optional<DataModel::List<const chip::CharSpan>> supportedMimeTypes;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -233,7 +233,7 @@ public:
 
     chip::CharSpan clientName;
     uint16_t requestID = static_cast<uint16_t>(0);
-    Optional<DataModel::Nullable<DataModel::DecodableList<chip::CharSpan>>> supportedMimeTypes;
+    Optional<DataModel::DecodableList<chip::CharSpan>> supportedMimeTypes;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -287,7 +287,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaFileManagement::Id; }
 
     FileStatusEnum status = static_cast<FileStatusEnum>(0);
-    Optional<DataModel::Nullable<Structs::FileDescriptionStruct::Type>> fileDescription;
+    DataModel::Nullable<Structs::FileDescriptionStruct::Type> fileDescription;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -303,7 +303,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::MediaFileManagement::Id; }
 
     FileStatusEnum status = static_cast<FileStatusEnum>(0);
-    Optional<DataModel::Nullable<Structs::FileDescriptionStruct::DecodableType>> fileDescription;
+    DataModel::Nullable<Structs::FileDescriptionStruct::DecodableType> fileDescription;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -315,7 +315,7 @@ enum class Fields : uint8_t
     kName       = 1,
     kSize       = 2,
     kMimeType   = 3,
-    kImageUri   = 4,
+    kImageURI   = 4,
 };
 
 struct Type
@@ -329,7 +329,7 @@ public:
     chip::CharSpan name;
     uint64_t size = static_cast<uint64_t>(0);
     chip::CharSpan mimeType;
-    chip::CharSpan imageUri;
+    chip::CharSpan imageURI;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -349,7 +349,7 @@ public:
     chip::CharSpan name;
     uint64_t size = static_cast<uint64_t>(0);
     chip::CharSpan mimeType;
-    chip::CharSpan imageUri;
+    chip::CharSpan imageURI;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

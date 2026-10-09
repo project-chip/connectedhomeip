@@ -2758,7 +2758,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
     }
     return self;
 }
@@ -2770,14 +2770,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 
@@ -2795,7 +2795,7 @@ NS_ASSUME_NONNULL_BEGIN
         cppStruct.mimeType = AsCharSpan(self.mimeType);
     }
     {
-        cppStruct.imageUri = AsCharSpan(self.imageUri);
+        cppStruct.imageURI = AsCharSpan(self.imageURI);
     }
 
     return std::any(cppStruct);
@@ -2948,31 +2948,26 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.supportedMimeTypes != nil) {
             auto & definedValue_0 = cppStruct.supportedMimeTypes.Emplace();
-            if (self.supportedMimeTypes == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                {
-                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (self.supportedMimeTypes.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.supportedMimeTypes.count);
-                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.supportedMimeTypes.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.supportedMimeTypes.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.supportedMimeTypes.count; ++i_1) {
+                        if (![self.supportedMimeTypes[i_1] isKindOfClass:[NSString class]]) {
+                            // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < self.supportedMimeTypes.count; ++i_2) {
-                            if (![self.supportedMimeTypes[i_2] isKindOfClass:[NSString class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_2 = (NSString *) self.supportedMimeTypes[i_2];
-                            listHolder_2->mList[i_2] = AsCharSpan(element_2);
-                        }
-                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.supportedMimeTypes.count);
-                    } else {
-                        nonNullValue_1 = ListType_2();
+                        auto element_1 = (NSString *) self.supportedMimeTypes[i_1];
+                        listHolder_1->mList[i_1] = AsCharSpan(element_1);
                     }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.supportedMimeTypes.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
             }
         }
@@ -3074,31 +3069,27 @@ NS_ASSUME_NONNULL_BEGIN
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppDecodableStruct.status)];
     }
     {
-        if (cppDecodableStruct.fileDescription.HasValue()) {
-            if (cppDecodableStruct.fileDescription.Value().IsNull()) {
-                self.fileDescription = nil;
-            } else {
-                self.fileDescription = [MCMediaFileManagementClusterFileDescriptionStruct new];
-                self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().Value().fileID];
-                self.fileDescription.name = AsString(cppDecodableStruct.fileDescription.Value().Value().name);
-                if (self.fileDescription.name == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().Value().size];
-                self.fileDescription.mimeType = AsString(cppDecodableStruct.fileDescription.Value().Value().mimeType);
-                if (self.fileDescription.mimeType == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                self.fileDescription.imageUri = AsString(cppDecodableStruct.fileDescription.Value().Value().imageUri);
-                if (self.fileDescription.imageUri == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-            }
-        } else {
+        if (cppDecodableStruct.fileDescription.IsNull()) {
             self.fileDescription = nil;
+        } else {
+            self.fileDescription = [MCMediaFileManagementClusterFileDescriptionStruct new];
+            self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().fileID];
+            self.fileDescription.name = AsString(cppDecodableStruct.fileDescription.Value().name);
+            if (self.fileDescription.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:cppDecodableStruct.fileDescription.Value().size];
+            self.fileDescription.mimeType = AsString(cppDecodableStruct.fileDescription.Value().mimeType);
+            if (self.fileDescription.mimeType == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.imageURI = AsString(cppDecodableStruct.fileDescription.Value().imageURI);
+            if (self.fileDescription.imageURI == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         }
     }
     return CHIP_NO_ERROR;
@@ -3118,7 +3109,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
     }
     return self;
 }
@@ -3131,14 +3122,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 
@@ -3159,7 +3150,7 @@ NS_ASSUME_NONNULL_BEGIN
         cppStruct.mimeType = AsCharSpan(self.mimeType);
     }
     {
-        cppStruct.imageUri = AsCharSpan(self.imageUri);
+        cppStruct.imageURI = AsCharSpan(self.imageURI);
     }
 
     return std::any(cppStruct);

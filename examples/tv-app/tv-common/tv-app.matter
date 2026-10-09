@@ -3980,7 +3980,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
   provisional info event SharedFilesAdded = 0 {
@@ -3991,7 +3991,7 @@ provisional cluster MediaFileManagement = 1297 {
   provisional readonly attribute access(read: manage) int64u totalStorage = 0;
   provisional readonly attribute access(read: manage) int64u availableStorage = 1;
   provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
-  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  provisional readonly attribute char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4002,7 +4002,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 0;
     int64u size = 1;
     long_char_string<256> mimeType = 2;
-    long_char_string<256> imageUri = 3;
+    long_char_string<256> imageURI = 3;
   }
 
   response struct AddFileResponse = 1 {
@@ -4017,7 +4017,7 @@ provisional cluster MediaFileManagement = 1297 {
   request struct RequestSharedFilesRequest {
     char_string<128> clientName = 0;
     int16u requestID = 1;
-    optional nullable char_string supportedMimeTypes[] = 2;
+    optional char_string supportedMimeTypes[] = 2;
   }
 
   request struct GetSharedFileRequest {
@@ -4026,7 +4026,7 @@ provisional cluster MediaFileManagement = 1297 {
 
   response struct GetSharedFileResponse = 5 {
     FileStatusEnum status = 0;
-    optional nullable FileDescriptionStruct fileDescription = 1;
+    nullable FileDescriptionStruct fileDescription = 1;
   }
 
   request struct OfferFileRequest {
@@ -4034,10 +4034,10 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
-  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX). */
   command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
   /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
   command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;

@@ -118,7 +118,7 @@ public:
     Protocols::InteractionModel::Status HandleDeleteFile(uint64_t fileID) override;
     Protocols::InteractionModel::Status
     HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
-                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override;
+                             const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes) override;
     Protocols::InteractionModel::Status HandleGetSharedFile(ScopedNodeId peer, uint16_t responseID,
                                                             Commands::GetSharedFileResponse::Type & response) override;
     Protocols::InteractionModel::Status HandleOfferFile(ScopedNodeId peer, const CharSpan & clientName, const CharSpan & name,

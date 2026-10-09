@@ -8809,7 +8809,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.mimeType", "mimeType", value.isMember("mimeType")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.imageUri", "imageUri", value.isMember("imageUri")));
+        ComplexArgumentParser::EnsureMemberExist("FileDescriptionStruct.imageURI", "imageURI", value.isMember("imageURI")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fileID");
@@ -8828,9 +8828,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mimeType, value["mimeType"]));
     valueCopy.removeMember("mimeType");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageUri");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageUri, value["imageUri"]));
-    valueCopy.removeMember("imageUri");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageURI");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageURI, value["imageURI"]));
+    valueCopy.removeMember("imageURI");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -8841,7 +8841,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaFileManagement::S
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.size);
     ComplexArgumentParser::Finalize(request.mimeType);
-    ComplexArgumentParser::Finalize(request.imageUri);
+    ComplexArgumentParser::Finalize(request.imageURI);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

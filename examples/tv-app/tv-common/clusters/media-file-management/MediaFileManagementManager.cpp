@@ -192,7 +192,7 @@ CHIP_ERROR MediaFileManagementManager::GetFileAtIndex(size_t index, Structs::Fil
     file.name               = CharSpan(entry.name.data(), entry.name.size());
     file.size               = entry.size;
     file.mimeType           = CharSpan(entry.mimeType.data(), entry.mimeType.size());
-    file.imageUri           = CharSpan(entry.imageUri.data(), entry.imageUri.size());
+    file.imageURI           = CharSpan(entry.imageUri.data(), entry.imageUri.size());
     return CHIP_NO_ERROR;
 }
 
@@ -240,7 +240,7 @@ bool MediaFileManagementManager::GetFileById(uint64_t fileID, Structs::FileDescr
             file.name     = CharSpan(entry.name.data(), entry.name.size());
             file.size     = entry.size;
             file.mimeType = CharSpan(entry.mimeType.data(), entry.mimeType.size());
-            file.imageUri = CharSpan(entry.imageUri.data(), entry.imageUri.size());
+            file.imageURI = CharSpan(entry.imageUri.data(), entry.imageUri.size());
             return true;
         }
     }
@@ -300,9 +300,8 @@ Status MediaFileManagementManager::HandleDeleteFile(uint64_t fileID)
     return Status::NotFound;
 }
 
-Status MediaFileManagementManager::HandleRequestSharedFiles(
-    ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
-    const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes)
+Status MediaFileManagementManager::HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
+                                                            const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes)
 {
     ChipLogProgress(Zcl, "MediaFileManagementManager: RequestSharedFiles requestID=%u", requestID);
 
@@ -315,10 +314,10 @@ Status MediaFileManagementManager::HandleRequestSharedFiles(
     // only files whose MIME type the requester declared it can handle.
     std::vector<std::string> mimeFilter;
     bool haveFilter = false;
-    if (supportedMimeTypes.HasValue() && !supportedMimeTypes.Value().IsNull())
+    if (supportedMimeTypes.HasValue())
     {
         haveFilter    = true;
-        auto iterator = supportedMimeTypes.Value().Value().begin();
+        auto iterator = supportedMimeTypes.Value().begin();
         while (iterator.Next())
         {
             const CharSpan & mime = iterator.GetValue();
@@ -377,11 +376,11 @@ Status MediaFileManagementManager::HandleGetSharedFile(ScopedNodeId peer, uint16
     if (mBdxCoordinator->MakeSelfBdxUri(fileID, file.name, uri) == CHIP_NO_ERROR)
     {
         mSharedFileUri.assign(uri.data(), uri.size());
-        file.imageUri = CharSpan(mSharedFileUri.data(), mSharedFileUri.size());
+        file.imageURI = CharSpan(mSharedFileUri.data(), mSharedFileUri.size());
     }
 
     response.status = FileStatusEnum::kSuccess;
-    response.fileDescription.SetValue(DataModel::MakeNullable(file));
+    response.fileDescription.SetNonNull(file);
     return Status::Success;
 }
 

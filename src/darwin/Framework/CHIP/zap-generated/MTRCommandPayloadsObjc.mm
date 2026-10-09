@@ -38890,7 +38890,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -38904,7 +38904,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -38913,7 +38913,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 
@@ -38935,7 +38935,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.mimeType = AsCharSpan(self.mimeType);
     }
     {
-        encodableStruct.imageUri = AsCharSpan(self.imageUri);
+        encodableStruct.imageURI = AsCharSpan(self.imageURI);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -39206,32 +39206,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.supportedMimeTypes != nil) {
             auto & definedValue_0 = encodableStruct.supportedMimeTypes.Emplace();
-            if (self.supportedMimeTypes == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                {
-                    using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (self.supportedMimeTypes.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.supportedMimeTypes.count);
-                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.supportedMimeTypes.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.supportedMimeTypes.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.supportedMimeTypes.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.supportedMimeTypes[i_1], NSString);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.supportedMimeTypes[i_1], NSStringFromClass(NSString.class));
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < self.supportedMimeTypes.count; ++i_2) {
-                            auto element_2 = MTR_SAFE_CAST(self.supportedMimeTypes[i_2], NSString);
-                            if (!element_2) {
-                                // Wrong kind of value.
-                                MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.supportedMimeTypes[i_2], NSStringFromClass(NSString.class));
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            listHolder_2->mList[i_2] = AsCharSpan(element_2);
-                        }
-                        nonNullValue_1 = ListType_2(listHolder_2->mList, self.supportedMimeTypes.count);
-                    } else {
-                        nonNullValue_1 = ListType_2();
+                        listHolder_1->mList[i_1] = AsCharSpan(element_1);
                     }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.supportedMimeTypes.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
             }
         }
@@ -39442,31 +39437,27 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        if (decodableStruct.fileDescription.HasValue()) {
-            if (decodableStruct.fileDescription.Value().IsNull()) {
-                self.fileDescription = nil;
-            } else {
-                self.fileDescription = [MTRMediaFileManagementClusterFileDescriptionStruct new];
-                self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().Value().fileID];
-                self.fileDescription.name = AsString(decodableStruct.fileDescription.Value().Value().name);
-                if (self.fileDescription.name == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().Value().size];
-                self.fileDescription.mimeType = AsString(decodableStruct.fileDescription.Value().Value().mimeType);
-                if (self.fileDescription.mimeType == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-                self.fileDescription.imageUri = AsString(decodableStruct.fileDescription.Value().Value().imageUri);
-                if (self.fileDescription.imageUri == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    return err;
-                }
-            }
-        } else {
+        if (decodableStruct.fileDescription.IsNull()) {
             self.fileDescription = nil;
+        } else {
+            self.fileDescription = [MTRMediaFileManagementClusterFileDescriptionStruct new];
+            self.fileDescription.fileID = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().fileID];
+            self.fileDescription.name = AsString(decodableStruct.fileDescription.Value().name);
+            if (self.fileDescription.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.size = [NSNumber numberWithUnsignedLongLong:decodableStruct.fileDescription.Value().size];
+            self.fileDescription.mimeType = AsString(decodableStruct.fileDescription.Value().mimeType);
+            if (self.fileDescription.mimeType == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+            self.fileDescription.imageURI = AsString(decodableStruct.fileDescription.Value().imageURI);
+            if (self.fileDescription.imageURI == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         }
     }
     return CHIP_NO_ERROR;
@@ -39487,7 +39478,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39502,7 +39493,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39511,7 +39502,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientName:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _clientName, _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 
@@ -39536,7 +39527,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.mimeType = AsCharSpan(self.mimeType);
     }
     {
-        encodableStruct.imageUri = AsCharSpan(self.imageUri);
+        encodableStruct.imageURI = AsCharSpan(self.imageURI);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

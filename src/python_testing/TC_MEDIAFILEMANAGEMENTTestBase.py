@@ -34,7 +34,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.bdx import BdxTransfer
-from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 
@@ -101,9 +100,9 @@ class MEDIAFILEMANAGEMENTTestBase:
         matter_asserts.assert_is_string(file_description.mimeType, f"{label}.MimeType")
         matter_asserts.assert_string_length(
             file_description.mimeType, f"{label}.MimeType", max_length=MAX_MIME_TYPE_LENGTH)
-        matter_asserts.assert_is_string(file_description.imageUri, f"{label}.ImageURI")
+        matter_asserts.assert_is_string(file_description.imageURI, f"{label}.ImageURI")
         matter_asserts.assert_string_length(
-            file_description.imageUri, f"{label}.ImageURI", max_length=MAX_IMAGE_URI_LENGTH)
+            file_description.imageURI, f"{label}.ImageURI", max_length=MAX_IMAGE_URI_LENGTH)
 
     # MIME type selection
 
@@ -185,7 +184,7 @@ class MEDIAFILEMANAGEMENTTestBase:
     async def send_add_file(self, endpoint, name: str, size: int, mime_type: str, image_uri: str):
         """Send AddFile and return the AddFileResponse."""
         return await self.send_single_cmd(
-            cmd=_CLUSTER.Commands.AddFile(name=name, size=size, mimeType=mime_type, imageUri=image_uri),
+            cmd=_CLUSTER.Commands.AddFile(name=name, size=size, mimeType=mime_type, imageURI=image_uri),
             endpoint=endpoint)
 
     async def send_delete_file(self, endpoint, file_id: int) -> None:
@@ -217,19 +216,19 @@ class MEDIAFILEMANAGEMENTTestBase:
                               image_uri: str) -> None:
         await self.send_single_cmd(
             cmd=_CLUSTER.Commands.OfferFile(clientName=client_name, name=name, size=size,
-                                            mimeType=mime_type, imageUri=image_uri),
+                                            mimeType=mime_type, imageURI=image_uri),
             endpoint=endpoint)
 
     def offer_file_command(self, client_name: str, name: str, size: int, mime_type: str, image_uri: str):
         return _CLUSTER.Commands.OfferFile(clientName=client_name, name=name, size=size,
-                                           mimeType=mime_type, imageUri=image_uri)
+                                           mimeType=mime_type, imageURI=image_uri)
 
     async def send_request_shared_files(self, endpoint, client_name: str, request_id: int,
                                         supported_mime_types=None) -> None:
         await self.send_single_cmd(
             cmd=_CLUSTER.Commands.RequestSharedFiles(
                 clientName=client_name, requestID=request_id,
-                supportedMimeTypes=supported_mime_types if supported_mime_types is not None else NullValue),
+                supportedMimeTypes=supported_mime_types),
             endpoint=endpoint)
 
     async def send_get_shared_file(self, endpoint, response_id: int):

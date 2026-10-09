@@ -27,7 +27,7 @@ class MediaFileManagementClusterFileDescriptionStruct(
   val name: String,
   val size: ULong,
   val mimeType: String,
-  val imageUri: String,
+  val imageURI: String,
 ) {
   override fun toString(): String = buildString {
     append("MediaFileManagementClusterFileDescriptionStruct {\n")
@@ -35,7 +35,7 @@ class MediaFileManagementClusterFileDescriptionStruct(
     append("\tname : $name\n")
     append("\tsize : $size\n")
     append("\tmimeType : $mimeType\n")
-    append("\timageUri : $imageUri\n")
+    append("\timageURI : $imageURI\n")
     append("}\n")
   }
 
@@ -46,7 +46,7 @@ class MediaFileManagementClusterFileDescriptionStruct(
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_SIZE), size)
       put(ContextSpecificTag(TAG_MIME_TYPE), mimeType)
-      put(ContextSpecificTag(TAG_IMAGE_URI), imageUri)
+      put(ContextSpecificTag(TAG_IMAGE_URI), imageURI)
       endStructure()
     }
   }
@@ -67,11 +67,11 @@ class MediaFileManagementClusterFileDescriptionStruct(
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val size = tlvReader.getULong(ContextSpecificTag(TAG_SIZE))
       val mimeType = tlvReader.getString(ContextSpecificTag(TAG_MIME_TYPE))
-      val imageUri = tlvReader.getString(ContextSpecificTag(TAG_IMAGE_URI))
+      val imageURI = tlvReader.getString(ContextSpecificTag(TAG_IMAGE_URI))
 
       tlvReader.exitContainer()
 
-      return MediaFileManagementClusterFileDescriptionStruct(fileID, name, size, mimeType, imageUri)
+      return MediaFileManagementClusterFileDescriptionStruct(fileID, name, size, mimeType, imageURI)
     }
   }
 }
