@@ -21,7 +21,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ _NON_SUCCESS_REPLICATION_STATUSES = (
 )
 
 
-class TC_CONTENTLAUNCHER_10_8(MatterBaseTest):
+class TC_CONTENTLAUNCHER_10_8(MatterTestCommissionedDevice):
 
     def desc_TC_CONTENTLAUNCHER_10_8(self) -> str:
         return "[TC-CONTENTLAUNCHER-10.8] Content Replication Verification"
