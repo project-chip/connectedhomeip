@@ -280,6 +280,26 @@ struct ResolveContext : public GenericContext
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
+    // The interfaceId / service type / domain the consumer originally asked
+    // for. Persisted so the rescue path in Resolve() can refuse to coalesce a
+    // new request whose interface, service type, or domain doesn't match the
+    // existing context (which would silently inherit the previous caller's
+    // subscription scope, or worse hand the new caller results from a
+    // DNSServiceResolve started for a different service type). Named
+    // 'requested...' to avoid shadowing the local 'interfaceId' params/locals
+    // that ResolveContext member functions already use.
+    uint32_t requestedInterfaceId{ kDNSServiceInterfaceIndexAny };
+    std::string requestedType;
+    std::string requestedDomain;
+
+    // Set to true while a deferred teardown timer is scheduled against this
+    // context (i.e. consumerCounter dropped to 0 but we have not yet torn the
+    // context/serviceRef down). A new ChipDnssdResolve for the same instance
+    // name during this window will cancel the timer and reuse the context
+    // rather than open a fresh DNSServiceCreateConnection. See
+    // ChipDnssdResolveNoLongerNeeded for the rationale.
+    bool deferredTeardownScheduled = false;
+
     ResolveContextWithType resolveContextWithSRPType    = { this, true };
     ResolveContextWithType resolveContextWithNonSRPType = { this, false };
 
@@ -301,6 +321,25 @@ struct ResolveContext : public GenericContext
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 };
+
+// Helper used by DnssdContexts.cpp to cancel any pending deferred-teardown
+// timer when a ResolveContext is finalized via the regular dispatch path. It
+// is the narrow surface DnssdContexts needs from the deferred-teardown timer
+// machinery; the timer callback itself stays internal to DnssdImpl.cpp.
+void CancelDeferredTeardownIfScheduled(ResolveContext * rctx);
+
+#if CHIP_CONFIG_TEST
+// Returns the deferred-teardown delay used by ChipDnssdResolveNoLongerNeeded.
+// Tests may override this via SetResolveDeferredTeardownDelay to make timing
+// observable without waiting the full default window.
+chip::System::Clock::Milliseconds32 GetResolveDeferredTeardownDelay();
+void SetResolveDeferredTeardownDelay(chip::System::Clock::Milliseconds32 delay);
+
+// Timer callback for the deferred-teardown window. Exposed under
+// CHIP_CONFIG_TEST so tests can synthesize stale-timer-fire scenarios; not
+// part of the production symbol surface.
+void OnResolveDeferredTeardown(chip::System::Layer * aLayer, void * aAppState);
+#endif // CHIP_CONFIG_TEST
 
 } // namespace Dnssd
 } // namespace chip
