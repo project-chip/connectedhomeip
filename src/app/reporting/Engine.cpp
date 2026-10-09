@@ -303,6 +303,15 @@ CHIP_ERROR CheckEventValidity(const ConcreteEventPath & path, const SubjectDescr
     return CHIP_NO_ERROR;
 }
 
+// Whether aWide covers endpoints, clusters or attributes that aNarrow does not. A list index alone does not count:
+// a change to one entry of a dirty attribute is the same attribute.
+bool IsWiderPath(const AttributePathParams & aWide, const AttributePathParams & aNarrow)
+{
+    return (aWide.HasWildcardEndpointId() && !aNarrow.HasWildcardEndpointId()) ||
+        (aWide.HasWildcardClusterId() && !aNarrow.HasWildcardClusterId()) ||
+        (aWide.HasWildcardAttributeId() && !aNarrow.HasWildcardAttributeId());
+}
+
 } // namespace
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
@@ -968,11 +977,18 @@ void Engine::Run()
     }
 }
 
-bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttributePath)
+bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttributePath, bool aRenewWiderPath)
 {
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
         {
+            // Renewing a wider path makes every handler re-report all of it. The dirty set is only released when all
+            // ReadHandlers are clean at once, so a wider path that keeps being renewed never ages out: on a device
+            // that changes something during each full report, every report stays a full report.
+            if (!aRenewWiderPath && IsWiderPath(*path, aAttributePath))
+            {
+                return Loop::Continue;
+            }
             path->mGeneration = GetDirtySetGeneration();
             return Loop::Break;
         }
@@ -1077,17 +1093,24 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
 CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
 {
+    // An equal entry, or one the new path widens, is preferred to renewing a wider entry.
     VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
 
-    if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
+    if (mGlobalDirtySet.Exhausted())
     {
-        ChipLogDetail(DataManagement, "Global dirty set pool exhausted, merge all paths.");
-        mGlobalDirtySet.ReleaseAll();
-        auto object         = mGlobalDirtySet.CreateObject();
-        object->mGeneration = GetDirtySetGeneration();
-    }
+        // With no room left for the new path, folding it into a wider path is the fallback.
+        VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath, /* aRenewWiderPath = */ true), CHIP_NO_ERROR);
 
-    VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+        if (!MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
+        {
+            ChipLogDetail(DataManagement, "Global dirty set pool exhausted, merge all paths.");
+            mGlobalDirtySet.ReleaseAll();
+            auto object         = mGlobalDirtySet.CreateObject();
+            object->mGeneration = GetDirtySetGeneration();
+        }
+
+        VerifyOrReturnError(!MergeOverlappedAttributePath(aAttributePath, /* aRenewWiderPath = */ true), CHIP_NO_ERROR);
+    }
     ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
 
     auto object = mGlobalDirtySet.CreateObject();
