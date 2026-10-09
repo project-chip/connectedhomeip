@@ -37,6 +37,13 @@ set(EXTRA_COMPONENT_DIRS
 
 if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
+else()
+    # screen-framework draws through the vendored TFT library, which only builds
+    # for the ESP32.  "main" implicitly requires every discovered component, so
+    # the framework has to be excluded rather than just left unused: its headers
+    # pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set, whichever renderer
+    # that display happens to use.
+    list(APPEND EXCLUDE_COMPONENTS screen-framework)
 endif()
 
 # Compute project (output binary) name from the device selection.

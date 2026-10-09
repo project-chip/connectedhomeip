@@ -57,7 +57,6 @@ _UNSUPPORTED_LANGUAGE_CODE = "xx-XX"
 # ignore it and complete when speech ends.
 _SPOKEN_MESSAGE_DURATION_MS = 2000
 
-
 class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
     def desc_TC_MESS_3_1(self) -> str:

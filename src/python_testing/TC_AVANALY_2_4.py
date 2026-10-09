@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_4(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_4(self) -> str:
         return "[TC-AVANALY-2.4] Validate EnableContextTriggers and DisableContextTriggers functionality with remote context with Server as DUT"
@@ -129,8 +129,8 @@ class TC_AVANALY_2_4(MatterBaseTest, AVANALYTestBase):
         )
 
         self.step(3)
-        # Establish analysis stream with TH node id or valid NodeID
-        node_id = self.dut_node_id
+        # Establish analysis stream with camera node id
+        node_id = self.get_camera_node_id()
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStream response: %s", resp)
         asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")

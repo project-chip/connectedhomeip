@@ -66,11 +66,10 @@ SpeakerAudioCoordinator::SpeakerAudioCoordinator(const Config & config) : mHardw
     mOnOff.Create(config.endpoint, onOffContext);
     mOnOff.Cluster().AddDelegate(this);
 
-    // Level Control config binds this coordinator as delegate, so it is built here.
-    // WithLighting() sets MinLevel/MaxLevel to the spec 1/254; WithOnOff() lets Level Control's
-    // own *WithOnOff commands drive On/Off.
+    // WithLighting() sets MinLevel=1 and MaxLevel=254. WithOnOffCluster() links On/Off so
+    // *WithOnOff commands update OnOff and On/Off commands transition CurrentLevel.
     LevelControlCluster::Config levelControlConfig(config.timerDelegate, *this);
-    levelControlConfig.WithOnOff(mOnOff.Cluster());
+    levelControlConfig.WithOnOffCluster(mOnOff.Cluster());
     levelControlConfig.WithLighting(config.levelControlStartUpCurrentLevel);
     levelControlConfig.WithOnOffTransitionTime(config.levelControlOnOffTransitionTime);
     levelControlConfig.WithOnTransitionTime(config.levelControlOnTransitionTime);
@@ -79,14 +78,9 @@ SpeakerAudioCoordinator::SpeakerAudioCoordinator(const Config & config) : mHardw
     levelControlConfig.WithInitialCurrentLevel(config.levelControlInitialCurrentLevel);
     mLevelControl.Create(config.endpoint, levelControlConfig);
 
-    // OnLevel NULL is deliberate (see the header): a raw Off then runs Level Control's internal
-    // fade-to-off and restores CurrentLevel to the pre-off value (LevelControlCluster.cpp
-    // kInternalOffTransition), so CurrentLevel -- and the mirrored Volume -- survives a mute.
+    // config.levelControlOnLevel is expected NULL, so an Off transition restores CurrentLevel (and Volume)
+    // to the pre-off value.
     mLevelControl.Cluster().SetOnLevel(config.levelControlOnLevel);
-
-    // Level Control is the endpoint's second On/Off delegate (see the header): raw On/Off/Toggle
-    // then runs its CurrentLevel choreography, mirrored to AudioControl.Volume by OnLevelChanged().
-    mOnOff.Cluster().AddDelegate(&mLevelControl.Cluster());
 
     // Audio Control: delegate is this coordinator (constructor argument), config is caller-built.
     mAudioControl.Create(config.endpoint, *this, config.audioControl);
@@ -94,10 +88,7 @@ SpeakerAudioCoordinator::SpeakerAudioCoordinator(const Config & config) : mHardw
 
 SpeakerAudioCoordinator::~SpeakerAudioCoordinator()
 {
-    // Detach both On/Off delegates while all clusters are still alive; the members then destroy
-    // in reverse (Audio Control, Level Control, On/Off). The owner must have unregistered all
-    // three from the registry before this runs.
-    mOnOff.Cluster().RemoveDelegate(&mLevelControl.Cluster());
+    // The owner unregisters all three clusters before destroying the coordinator.
     mOnOff.Cluster().RemoveDelegate(this);
 }
 
@@ -197,8 +188,8 @@ void SpeakerAudioCoordinator::OnOnOffChanged(bool on)
 
     ReentrancyGuard guard(mSyncing);
     // SetSoftMuted reports but does not call the Audio Control delegate, so cannot re-enter.
-    // This method leaves CurrentLevel alone; Level Control (the other On/Off delegate) runs its
-    // own choreography and, OnLevel being NULL, settles back at the pre-off level.
+    // CurrentLevel is not changed here: Level Control (also an On/Off delegate) runs its own
+    // On/Off transition and, with OnLevel NULL, returns to the pre-off level.
     LogErrorOnFailure(mAudioControl.Cluster().SetSoftMuted(!on));
     NotifyHardware();
 }

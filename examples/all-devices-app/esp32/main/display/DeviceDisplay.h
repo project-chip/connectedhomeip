@@ -18,4 +18,17 @@
 
 #pragma once
 
+/**
+ * Interface between the application and whichever display implementation is
+ * compiled in.  Exactly one implementation is built, selected by the board
+ * configuration; callers never depend on the underlying rendering library.
+ */
+
+/// Brings up the panel and the initial screen contents.
 void InitDeviceDisplay();
+
+/// Tells the user a restart is imminent.  Returns once the notice is visible.
+void ShowRestartingMessage();
+
+/// Connects data model change listeners once the Matter server is initialized.
+void InitDisplayDataModelListener();

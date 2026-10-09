@@ -81,12 +81,13 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
                   "octet nonce Nonce_1.",
                   is_commissioning=True)
         nonce_1 = os.urandom(POSSESSION_NONCE_LENGTH)
-        # Checked here rather than where the cleanup needs it, since by then the DUT is on
-        # PDC_SSID and this is the only way of getting it off again.
+
         credentials = self.get_credentials()
-        asserts.assert_true(credentials, "This test case commits the DUT to the network the TH runs, so it needs "
-                                         "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS (--wifi-passphrase) to put it "
-                                         "back on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID afterwards.")
+        operational_ssid_pixit = self.get_wifi_ssid().encode()
+        asserts.assert_true(credentials and operational_ssid_pixit,
+                            "This test case commits the DUT to the network the TH runs, so it needs "
+                            "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_{SSID,CREDENTIALS} (--wifi-{ssid,passphrase}) "
+                            "to be able to restore the DUTs network configuration during cleanup.")
 
         radio = self.wifi_fixture.require_radios(1)[0]
         access_point = PDCAccessPointFixture(radio, _PDC_SSID.decode(), _AP_OPTIONS)
@@ -103,8 +104,8 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
 
             self.step(2, "TH reads the Networks attribute and saves it as InitialNetworks.",
                       expectation="Exactly one entry has Connected set to TRUE, which is the network the DUT was "
-                                  "commissioned on and whose NetworkID is saved as OPERATIONAL_SSID. No entry refers "
-                                  "to PDC_SSID.")
+                                  "commissioned on. Its NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and is "
+                                  "saved as OPERATIONAL_SSID. No entry refers to PDC_SSID.")
             initial_networks = await self.read_networks(endpoint)
             connected = [network.networkID for network in initial_networks if network.connected]
             asserts.assert_equal(len(connected), 1,
@@ -112,6 +113,12 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
                                  f"{len(connected)}.")
             operational_ssid = connected[0]
             log.info("The DUT is commissioned on %r", operational_ssid)
+            # A DUT on any other network cannot be put back once step 12 has committed it to
+            # PDC_SSID, since the credentials the TH has are for this one. Stopping here leaves
+            # the DUT where it started, rather than stranding it in the cleanup.
+            asserts.assert_equal(operational_ssid, operational_ssid_pixit,
+                                 "The DUT is not commissioned on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID, so the "
+                                 "credentials this test case was given cannot put it back on the network it is on.")
             asserts.assert_not_in(_PDC_SSID, [network.networkID for network in initial_networks],
                                   f"The DUT already has a network configuration for {_PDC_SSID!r}, which this test "
                                   "case requires to be absent.")
@@ -120,8 +127,8 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
                       expectation="DUT sends an ArmFailSafeResponse.")
             await self.arm_failsafe(_CONNECT_FAILSAFE_EXPIRY_SECONDS)
 
-            self.step(4, "TH sends RemoveNetwork with the NetworkID field set to OPERATIONAL_SSID and the Breadcrumb "
-                         "field set to 1.",
+            self.step(4, "TH sends RemoveNetwork with the NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID "
+                      "and the Breadcrumb field set to 1.",
                       expectation="DUT sends a NetworkConfigResponse with NetworkingStatus Success.")
             response = await self.send_single_cmd(
                 cmd=cnet.Commands.RemoveNetwork(networkID=operational_ssid, breadcrumb=1), endpoint=endpoint)
@@ -325,9 +332,9 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
             await self._assert_identity_retained(endpoint, nci, nci_id, nonce_1)
 
             self.step(28, "(Cleanup) TH restores the network configuration saved as InitialNetworks, connects the DUT "
-                          "back to OPERATIONAL_SSID and sends the CommissioningComplete command. TH ensures that NCI is "
-                          "no longer an authorized client of the network PDC_SSID.",
-                      expectation="The TH can communicate with the DUT on OPERATIONAL_SSID.")
+                          "back to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and sends the CommissioningComplete command. "
+                      "TH ensures that NCI is no longer an authorized client of the network PDC_SSID.",
+                      expectation="The TH can communicate with the DUT on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID.")
         finally:
             # The cleanup runs whether the test case passed or not, since a failure from step
             # 12 onwards otherwise strands the DUT on a network that is about to disappear. A
