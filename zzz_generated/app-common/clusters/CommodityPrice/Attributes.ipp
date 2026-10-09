@@ -33,23 +33,23 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TariffUnit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffUnit);
+        return DataModel::Decode(reader, tariffUnit, DataModel::DecodeContext::kRead);
     case Attributes::Currency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currency);
+        return DataModel::Decode(reader, currency, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPrice::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPrice);
+        return DataModel::Decode(reader, currentPrice, DataModel::DecodeContext::kRead);
     case Attributes::PriceForecast::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, priceForecast);
+        return DataModel::Decode(reader, priceForecast, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

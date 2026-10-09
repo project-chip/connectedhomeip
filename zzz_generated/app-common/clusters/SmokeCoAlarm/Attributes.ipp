@@ -33,43 +33,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ExpressedState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, expressedState);
+        return DataModel::Decode(reader, expressedState, DataModel::DecodeContext::kRead);
     case Attributes::SmokeState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, smokeState);
+        return DataModel::Decode(reader, smokeState, DataModel::DecodeContext::kRead);
     case Attributes::COState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, COState);
+        return DataModel::Decode(reader, COState, DataModel::DecodeContext::kRead);
     case Attributes::BatteryAlert::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batteryAlert);
+        return DataModel::Decode(reader, batteryAlert, DataModel::DecodeContext::kRead);
     case Attributes::DeviceMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, deviceMuted);
+        return DataModel::Decode(reader, deviceMuted, DataModel::DecodeContext::kRead);
     case Attributes::TestInProgress::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, testInProgress);
+        return DataModel::Decode(reader, testInProgress, DataModel::DecodeContext::kRead);
     case Attributes::HardwareFaultAlert::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, hardwareFaultAlert);
+        return DataModel::Decode(reader, hardwareFaultAlert, DataModel::DecodeContext::kRead);
     case Attributes::EndOfServiceAlert::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, endOfServiceAlert);
+        return DataModel::Decode(reader, endOfServiceAlert, DataModel::DecodeContext::kRead);
     case Attributes::InterconnectSmokeAlarm::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, interconnectSmokeAlarm);
+        return DataModel::Decode(reader, interconnectSmokeAlarm, DataModel::DecodeContext::kRead);
     case Attributes::InterconnectCOAlarm::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, interconnectCOAlarm);
+        return DataModel::Decode(reader, interconnectCOAlarm, DataModel::DecodeContext::kRead);
     case Attributes::ContaminationState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, contaminationState);
+        return DataModel::Decode(reader, contaminationState, DataModel::DecodeContext::kRead);
     case Attributes::SmokeSensitivityLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, smokeSensitivityLevel);
+        return DataModel::Decode(reader, smokeSensitivityLevel, DataModel::DecodeContext::kRead);
     case Attributes::ExpiryDate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, expiryDate);
+        return DataModel::Decode(reader, expiryDate, DataModel::DecodeContext::kRead);
     case Attributes::Unmounted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unmounted);
+        return DataModel::Decode(reader, unmounted, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

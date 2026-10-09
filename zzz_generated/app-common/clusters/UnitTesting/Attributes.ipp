@@ -33,195 +33,195 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Boolean::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, boolean);
+        return DataModel::Decode(reader, boolean, DataModel::DecodeContext::kRead);
     case Attributes::Bitmap8::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bitmap8);
+        return DataModel::Decode(reader, bitmap8, DataModel::DecodeContext::kRead);
     case Attributes::Bitmap16::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bitmap16);
+        return DataModel::Decode(reader, bitmap16, DataModel::DecodeContext::kRead);
     case Attributes::Bitmap32::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bitmap32);
+        return DataModel::Decode(reader, bitmap32, DataModel::DecodeContext::kRead);
     case Attributes::Bitmap64::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bitmap64);
+        return DataModel::Decode(reader, bitmap64, DataModel::DecodeContext::kRead);
     case Attributes::Int8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int8u);
+        return DataModel::Decode(reader, int8u, DataModel::DecodeContext::kRead);
     case Attributes::Int16u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int16u);
+        return DataModel::Decode(reader, int16u, DataModel::DecodeContext::kRead);
     case Attributes::Int24u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int24u);
+        return DataModel::Decode(reader, int24u, DataModel::DecodeContext::kRead);
     case Attributes::Int32u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int32u);
+        return DataModel::Decode(reader, int32u, DataModel::DecodeContext::kRead);
     case Attributes::Int40u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int40u);
+        return DataModel::Decode(reader, int40u, DataModel::DecodeContext::kRead);
     case Attributes::Int48u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int48u);
+        return DataModel::Decode(reader, int48u, DataModel::DecodeContext::kRead);
     case Attributes::Int56u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int56u);
+        return DataModel::Decode(reader, int56u, DataModel::DecodeContext::kRead);
     case Attributes::Int64u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int64u);
+        return DataModel::Decode(reader, int64u, DataModel::DecodeContext::kRead);
     case Attributes::Int8s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int8s);
+        return DataModel::Decode(reader, int8s, DataModel::DecodeContext::kRead);
     case Attributes::Int16s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int16s);
+        return DataModel::Decode(reader, int16s, DataModel::DecodeContext::kRead);
     case Attributes::Int24s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int24s);
+        return DataModel::Decode(reader, int24s, DataModel::DecodeContext::kRead);
     case Attributes::Int32s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int32s);
+        return DataModel::Decode(reader, int32s, DataModel::DecodeContext::kRead);
     case Attributes::Int40s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int40s);
+        return DataModel::Decode(reader, int40s, DataModel::DecodeContext::kRead);
     case Attributes::Int48s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int48s);
+        return DataModel::Decode(reader, int48s, DataModel::DecodeContext::kRead);
     case Attributes::Int56s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int56s);
+        return DataModel::Decode(reader, int56s, DataModel::DecodeContext::kRead);
     case Attributes::Int64s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, int64s);
+        return DataModel::Decode(reader, int64s, DataModel::DecodeContext::kRead);
     case Attributes::Enum8::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enum8);
+        return DataModel::Decode(reader, enum8, DataModel::DecodeContext::kRead);
     case Attributes::Enum16::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enum16);
+        return DataModel::Decode(reader, enum16, DataModel::DecodeContext::kRead);
     case Attributes::FloatSingle::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, floatSingle);
+        return DataModel::Decode(reader, floatSingle, DataModel::DecodeContext::kRead);
     case Attributes::FloatDouble::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, floatDouble);
+        return DataModel::Decode(reader, floatDouble, DataModel::DecodeContext::kRead);
     case Attributes::OctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, octetString);
+        return DataModel::Decode(reader, octetString, DataModel::DecodeContext::kRead);
     case Attributes::ListInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listInt8u);
+        return DataModel::Decode(reader, listInt8u, DataModel::DecodeContext::kRead);
     case Attributes::ListOctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listOctetString);
+        return DataModel::Decode(reader, listOctetString, DataModel::DecodeContext::kRead);
     case Attributes::ListStructOctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listStructOctetString);
+        return DataModel::Decode(reader, listStructOctetString, DataModel::DecodeContext::kRead);
     case Attributes::LongOctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, longOctetString);
+        return DataModel::Decode(reader, longOctetString, DataModel::DecodeContext::kRead);
     case Attributes::CharString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, charString);
+        return DataModel::Decode(reader, charString, DataModel::DecodeContext::kRead);
     case Attributes::LongCharString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, longCharString);
+        return DataModel::Decode(reader, longCharString, DataModel::DecodeContext::kRead);
     case Attributes::EpochUs::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, epochUs);
+        return DataModel::Decode(reader, epochUs, DataModel::DecodeContext::kRead);
     case Attributes::EpochS::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, epochS);
+        return DataModel::Decode(reader, epochS, DataModel::DecodeContext::kRead);
     case Attributes::VendorId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, vendorId);
+        return DataModel::Decode(reader, vendorId, DataModel::DecodeContext::kRead);
     case Attributes::ListNullablesAndOptionalsStruct::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listNullablesAndOptionalsStruct);
+        return DataModel::Decode(reader, listNullablesAndOptionalsStruct, DataModel::DecodeContext::kRead);
     case Attributes::EnumAttr::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enumAttr);
+        return DataModel::Decode(reader, enumAttr, DataModel::DecodeContext::kRead);
     case Attributes::StructAttr::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, structAttr);
+        return DataModel::Decode(reader, structAttr, DataModel::DecodeContext::kRead);
     case Attributes::RangeRestrictedInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rangeRestrictedInt8u);
+        return DataModel::Decode(reader, rangeRestrictedInt8u, DataModel::DecodeContext::kRead);
     case Attributes::RangeRestrictedInt8s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rangeRestrictedInt8s);
+        return DataModel::Decode(reader, rangeRestrictedInt8s, DataModel::DecodeContext::kRead);
     case Attributes::RangeRestrictedInt16u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rangeRestrictedInt16u);
+        return DataModel::Decode(reader, rangeRestrictedInt16u, DataModel::DecodeContext::kRead);
     case Attributes::RangeRestrictedInt16s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rangeRestrictedInt16s);
+        return DataModel::Decode(reader, rangeRestrictedInt16s, DataModel::DecodeContext::kRead);
     case Attributes::ListLongOctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listLongOctetString);
+        return DataModel::Decode(reader, listLongOctetString, DataModel::DecodeContext::kRead);
     case Attributes::ListFabricScoped::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, listFabricScoped);
+        return DataModel::Decode(reader, listFabricScoped, DataModel::DecodeContext::kRead);
     case Attributes::TimedWriteBoolean::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timedWriteBoolean);
+        return DataModel::Decode(reader, timedWriteBoolean, DataModel::DecodeContext::kRead);
     case Attributes::GeneralErrorBoolean::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generalErrorBoolean);
+        return DataModel::Decode(reader, generalErrorBoolean, DataModel::DecodeContext::kRead);
     case Attributes::ClusterErrorBoolean::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterErrorBoolean);
+        return DataModel::Decode(reader, clusterErrorBoolean, DataModel::DecodeContext::kRead);
     case Attributes::GlobalEnum::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, globalEnum);
+        return DataModel::Decode(reader, globalEnum, DataModel::DecodeContext::kRead);
     case Attributes::GlobalStruct::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, globalStruct);
+        return DataModel::Decode(reader, globalStruct, DataModel::DecodeContext::kRead);
     case Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unsupportedAttributeRequiringAdminPrivilege);
+        return DataModel::Decode(reader, unsupportedAttributeRequiringAdminPrivilege, DataModel::DecodeContext::kRead);
     case Attributes::Unsupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unsupported);
+        return DataModel::Decode(reader, unsupported, DataModel::DecodeContext::kRead);
     case Attributes::ReadFailureCode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, readFailureCode);
+        return DataModel::Decode(reader, readFailureCode, DataModel::DecodeContext::kRead);
     case Attributes::FailureInt32U::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, failureInt32U);
+        return DataModel::Decode(reader, failureInt32U, DataModel::DecodeContext::kRead);
     case Attributes::NullableBoolean::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableBoolean);
+        return DataModel::Decode(reader, nullableBoolean, DataModel::DecodeContext::kRead);
     case Attributes::NullableBitmap8::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableBitmap8);
+        return DataModel::Decode(reader, nullableBitmap8, DataModel::DecodeContext::kRead);
     case Attributes::NullableBitmap16::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableBitmap16);
+        return DataModel::Decode(reader, nullableBitmap16, DataModel::DecodeContext::kRead);
     case Attributes::NullableBitmap32::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableBitmap32);
+        return DataModel::Decode(reader, nullableBitmap32, DataModel::DecodeContext::kRead);
     case Attributes::NullableBitmap64::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableBitmap64);
+        return DataModel::Decode(reader, nullableBitmap64, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt8u);
+        return DataModel::Decode(reader, nullableInt8u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt16u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt16u);
+        return DataModel::Decode(reader, nullableInt16u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt24u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt24u);
+        return DataModel::Decode(reader, nullableInt24u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt32u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt32u);
+        return DataModel::Decode(reader, nullableInt32u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt40u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt40u);
+        return DataModel::Decode(reader, nullableInt40u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt48u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt48u);
+        return DataModel::Decode(reader, nullableInt48u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt56u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt56u);
+        return DataModel::Decode(reader, nullableInt56u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt64u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt64u);
+        return DataModel::Decode(reader, nullableInt64u, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt8s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt8s);
+        return DataModel::Decode(reader, nullableInt8s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt16s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt16s);
+        return DataModel::Decode(reader, nullableInt16s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt24s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt24s);
+        return DataModel::Decode(reader, nullableInt24s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt32s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt32s);
+        return DataModel::Decode(reader, nullableInt32s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt40s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt40s);
+        return DataModel::Decode(reader, nullableInt40s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt48s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt48s);
+        return DataModel::Decode(reader, nullableInt48s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt56s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt56s);
+        return DataModel::Decode(reader, nullableInt56s, DataModel::DecodeContext::kRead);
     case Attributes::NullableInt64s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableInt64s);
+        return DataModel::Decode(reader, nullableInt64s, DataModel::DecodeContext::kRead);
     case Attributes::NullableEnum8::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableEnum8);
+        return DataModel::Decode(reader, nullableEnum8, DataModel::DecodeContext::kRead);
     case Attributes::NullableEnum16::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableEnum16);
+        return DataModel::Decode(reader, nullableEnum16, DataModel::DecodeContext::kRead);
     case Attributes::NullableFloatSingle::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableFloatSingle);
+        return DataModel::Decode(reader, nullableFloatSingle, DataModel::DecodeContext::kRead);
     case Attributes::NullableFloatDouble::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableFloatDouble);
+        return DataModel::Decode(reader, nullableFloatDouble, DataModel::DecodeContext::kRead);
     case Attributes::NullableOctetString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableOctetString);
+        return DataModel::Decode(reader, nullableOctetString, DataModel::DecodeContext::kRead);
     case Attributes::NullableCharString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableCharString);
+        return DataModel::Decode(reader, nullableCharString, DataModel::DecodeContext::kRead);
     case Attributes::NullableEnumAttr::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableEnumAttr);
+        return DataModel::Decode(reader, nullableEnumAttr, DataModel::DecodeContext::kRead);
     case Attributes::NullableStruct::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableStruct);
+        return DataModel::Decode(reader, nullableStruct, DataModel::DecodeContext::kRead);
     case Attributes::NullableRangeRestrictedInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableRangeRestrictedInt8u);
+        return DataModel::Decode(reader, nullableRangeRestrictedInt8u, DataModel::DecodeContext::kRead);
     case Attributes::NullableRangeRestrictedInt8s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableRangeRestrictedInt8s);
+        return DataModel::Decode(reader, nullableRangeRestrictedInt8s, DataModel::DecodeContext::kRead);
     case Attributes::NullableRangeRestrictedInt16u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableRangeRestrictedInt16u);
+        return DataModel::Decode(reader, nullableRangeRestrictedInt16u, DataModel::DecodeContext::kRead);
     case Attributes::NullableRangeRestrictedInt16s::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableRangeRestrictedInt16s);
+        return DataModel::Decode(reader, nullableRangeRestrictedInt16s, DataModel::DecodeContext::kRead);
     case Attributes::WriteOnlyInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, writeOnlyInt8u);
+        return DataModel::Decode(reader, writeOnlyInt8u, DataModel::DecodeContext::kRead);
     case Attributes::NullableGlobalEnum::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableGlobalEnum);
+        return DataModel::Decode(reader, nullableGlobalEnum, DataModel::DecodeContext::kRead);
     case Attributes::NullableGlobalStruct::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nullableGlobalStruct);
+        return DataModel::Decode(reader, nullableGlobalStruct, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     case Attributes::MeiInt8u::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, meiInt8u);
+        return DataModel::Decode(reader, meiInt8u, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

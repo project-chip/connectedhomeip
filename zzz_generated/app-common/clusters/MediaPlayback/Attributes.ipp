@@ -33,41 +33,41 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentState);
+        return DataModel::Decode(reader, currentState, DataModel::DecodeContext::kRead);
     case Attributes::StartTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startTime);
+        return DataModel::Decode(reader, startTime, DataModel::DecodeContext::kRead);
     case Attributes::Duration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, duration);
+        return DataModel::Decode(reader, duration, DataModel::DecodeContext::kRead);
     case Attributes::SampledPosition::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sampledPosition);
+        return DataModel::Decode(reader, sampledPosition, DataModel::DecodeContext::kRead);
     case Attributes::PlaybackSpeed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, playbackSpeed);
+        return DataModel::Decode(reader, playbackSpeed, DataModel::DecodeContext::kRead);
     case Attributes::SeekRangeEnd::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, seekRangeEnd);
+        return DataModel::Decode(reader, seekRangeEnd, DataModel::DecodeContext::kRead);
     case Attributes::SeekRangeStart::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, seekRangeStart);
+        return DataModel::Decode(reader, seekRangeStart, DataModel::DecodeContext::kRead);
     case Attributes::ActiveAudioTrack::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeAudioTrack);
+        return DataModel::Decode(reader, activeAudioTrack, DataModel::DecodeContext::kRead);
     case Attributes::AvailableAudioTracks::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, availableAudioTracks);
+        return DataModel::Decode(reader, availableAudioTracks, DataModel::DecodeContext::kRead);
     case Attributes::ActiveTextTrack::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeTextTrack);
+        return DataModel::Decode(reader, activeTextTrack, DataModel::DecodeContext::kRead);
     case Attributes::AvailableTextTracks::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, availableTextTracks);
+        return DataModel::Decode(reader, availableTextTracks, DataModel::DecodeContext::kRead);
     case Attributes::AvailableCommands::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, availableCommands);
+        return DataModel::Decode(reader, availableCommands, DataModel::DecodeContext::kRead);
     case Attributes::ContentInfo::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, contentInfo);
+        return DataModel::Decode(reader, contentInfo, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

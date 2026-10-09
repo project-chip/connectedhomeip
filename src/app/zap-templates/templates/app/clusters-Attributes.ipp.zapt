@@ -16,7 +16,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const Concret
     {
 {{#zcl_attributes_server}}
     case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, {{asLowerCamelCase label}});
+        return DataModel::Decode(reader, {{asLowerCamelCase label}}, DataModel::DecodeContext::kRead);
 {{/zcl_attributes_server}}
     default:
         return CHIP_NO_ERROR;

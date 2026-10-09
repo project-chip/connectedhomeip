@@ -20,6 +20,7 @@
 
 #include <clusters/SoftwareDiagnostics/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -43,33 +44,48 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldId,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kId))
         {
-            err = DataModel::Decode(reader, id);
+            err = DataModel::Decode(reader, id, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldId));
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            err = DataModel::Decode(reader, name);
+            err = DataModel::Decode(reader, name, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kStackFreeCurrent))
         {
-            err = DataModel::Decode(reader, stackFreeCurrent);
+            err = DataModel::Decode(reader, stackFreeCurrent, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kStackFreeMinimum))
         {
-            err = DataModel::Decode(reader, stackFreeMinimum);
+            err = DataModel::Decode(reader, stackFreeMinimum, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kStackSize))
         {
-            err = DataModel::Decode(reader, stackSize);
+            err = DataModel::Decode(reader, stackSize, aContext);
         }
 
         ReturnErrorOnFailure(err);

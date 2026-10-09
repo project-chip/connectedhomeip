@@ -33,59 +33,59 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Type::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, type);
+        return DataModel::Decode(reader, type, DataModel::DecodeContext::kRead);
     case Attributes::PhysicalClosedLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalClosedLimitLift);
+        return DataModel::Decode(reader, physicalClosedLimitLift, DataModel::DecodeContext::kRead);
     case Attributes::PhysicalClosedLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalClosedLimitTilt);
+        return DataModel::Decode(reader, physicalClosedLimitTilt, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionLift);
+        return DataModel::Decode(reader, currentPositionLift, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionTilt);
+        return DataModel::Decode(reader, currentPositionTilt, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfActuationsLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfActuationsLift);
+        return DataModel::Decode(reader, numberOfActuationsLift, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfActuationsTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfActuationsTilt);
+        return DataModel::Decode(reader, numberOfActuationsTilt, DataModel::DecodeContext::kRead);
     case Attributes::ConfigStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, configStatus);
+        return DataModel::Decode(reader, configStatus, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionLiftPercentage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionLiftPercentage);
+        return DataModel::Decode(reader, currentPositionLiftPercentage, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionTiltPercentage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionTiltPercentage);
+        return DataModel::Decode(reader, currentPositionTiltPercentage, DataModel::DecodeContext::kRead);
     case Attributes::OperationalStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, operationalStatus);
+        return DataModel::Decode(reader, operationalStatus, DataModel::DecodeContext::kRead);
     case Attributes::TargetPositionLiftPercent100ths::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetPositionLiftPercent100ths);
+        return DataModel::Decode(reader, targetPositionLiftPercent100ths, DataModel::DecodeContext::kRead);
     case Attributes::TargetPositionTiltPercent100ths::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetPositionTiltPercent100ths);
+        return DataModel::Decode(reader, targetPositionTiltPercent100ths, DataModel::DecodeContext::kRead);
     case Attributes::EndProductType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, endProductType);
+        return DataModel::Decode(reader, endProductType, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionLiftPercent100ths::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionLiftPercent100ths);
+        return DataModel::Decode(reader, currentPositionLiftPercent100ths, DataModel::DecodeContext::kRead);
     case Attributes::CurrentPositionTiltPercent100ths::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionTiltPercent100ths);
+        return DataModel::Decode(reader, currentPositionTiltPercent100ths, DataModel::DecodeContext::kRead);
     case Attributes::InstalledOpenLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedOpenLimitLift);
+        return DataModel::Decode(reader, installedOpenLimitLift, DataModel::DecodeContext::kRead);
     case Attributes::InstalledClosedLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedClosedLimitLift);
+        return DataModel::Decode(reader, installedClosedLimitLift, DataModel::DecodeContext::kRead);
     case Attributes::InstalledOpenLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedOpenLimitTilt);
+        return DataModel::Decode(reader, installedOpenLimitTilt, DataModel::DecodeContext::kRead);
     case Attributes::InstalledClosedLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedClosedLimitTilt);
+        return DataModel::Decode(reader, installedClosedLimitTilt, DataModel::DecodeContext::kRead);
     case Attributes::Mode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mode);
+        return DataModel::Decode(reader, mode, DataModel::DecodeContext::kRead);
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, safetyStatus);
+        return DataModel::Decode(reader, safetyStatus, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

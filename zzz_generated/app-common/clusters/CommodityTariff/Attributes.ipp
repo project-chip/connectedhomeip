@@ -33,53 +33,53 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::TariffInfo::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffInfo);
+        return DataModel::Decode(reader, tariffInfo, DataModel::DecodeContext::kRead);
     case Attributes::TariffUnit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffUnit);
+        return DataModel::Decode(reader, tariffUnit, DataModel::DecodeContext::kRead);
     case Attributes::StartDate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startDate);
+        return DataModel::Decode(reader, startDate, DataModel::DecodeContext::kRead);
     case Attributes::DayEntries::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dayEntries);
+        return DataModel::Decode(reader, dayEntries, DataModel::DecodeContext::kRead);
     case Attributes::DayPatterns::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dayPatterns);
+        return DataModel::Decode(reader, dayPatterns, DataModel::DecodeContext::kRead);
     case Attributes::CalendarPeriods::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, calendarPeriods);
+        return DataModel::Decode(reader, calendarPeriods, DataModel::DecodeContext::kRead);
     case Attributes::IndividualDays::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, individualDays);
+        return DataModel::Decode(reader, individualDays, DataModel::DecodeContext::kRead);
     case Attributes::CurrentDay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentDay);
+        return DataModel::Decode(reader, currentDay, DataModel::DecodeContext::kRead);
     case Attributes::NextDay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nextDay);
+        return DataModel::Decode(reader, nextDay, DataModel::DecodeContext::kRead);
     case Attributes::CurrentDayEntry::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentDayEntry);
+        return DataModel::Decode(reader, currentDayEntry, DataModel::DecodeContext::kRead);
     case Attributes::CurrentDayEntryDate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentDayEntryDate);
+        return DataModel::Decode(reader, currentDayEntryDate, DataModel::DecodeContext::kRead);
     case Attributes::NextDayEntry::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nextDayEntry);
+        return DataModel::Decode(reader, nextDayEntry, DataModel::DecodeContext::kRead);
     case Attributes::NextDayEntryDate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nextDayEntryDate);
+        return DataModel::Decode(reader, nextDayEntryDate, DataModel::DecodeContext::kRead);
     case Attributes::TariffComponents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffComponents);
+        return DataModel::Decode(reader, tariffComponents, DataModel::DecodeContext::kRead);
     case Attributes::TariffPeriods::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tariffPeriods);
+        return DataModel::Decode(reader, tariffPeriods, DataModel::DecodeContext::kRead);
     case Attributes::CurrentTariffComponents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentTariffComponents);
+        return DataModel::Decode(reader, currentTariffComponents, DataModel::DecodeContext::kRead);
     case Attributes::NextTariffComponents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nextTariffComponents);
+        return DataModel::Decode(reader, nextTariffComponents, DataModel::DecodeContext::kRead);
     case Attributes::DefaultRandomizationOffset::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultRandomizationOffset);
+        return DataModel::Decode(reader, defaultRandomizationOffset, DataModel::DecodeContext::kRead);
     case Attributes::DefaultRandomizationType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultRandomizationType);
+        return DataModel::Decode(reader, defaultRandomizationType, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

@@ -33,35 +33,35 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MPTZPosition::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, MPTZPosition);
+        return DataModel::Decode(reader, MPTZPosition, DataModel::DecodeContext::kRead);
     case Attributes::MaxPresets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxPresets);
+        return DataModel::Decode(reader, maxPresets, DataModel::DecodeContext::kRead);
     case Attributes::MPTZPresets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, MPTZPresets);
+        return DataModel::Decode(reader, MPTZPresets, DataModel::DecodeContext::kRead);
     case Attributes::DPTZStreams::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, DPTZStreams);
+        return DataModel::Decode(reader, DPTZStreams, DataModel::DecodeContext::kRead);
     case Attributes::ZoomMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, zoomMax);
+        return DataModel::Decode(reader, zoomMax, DataModel::DecodeContext::kRead);
     case Attributes::TiltMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tiltMin);
+        return DataModel::Decode(reader, tiltMin, DataModel::DecodeContext::kRead);
     case Attributes::TiltMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, tiltMax);
+        return DataModel::Decode(reader, tiltMax, DataModel::DecodeContext::kRead);
     case Attributes::PanMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, panMin);
+        return DataModel::Decode(reader, panMin, DataModel::DecodeContext::kRead);
     case Attributes::PanMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, panMax);
+        return DataModel::Decode(reader, panMax, DataModel::DecodeContext::kRead);
     case Attributes::MovementState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, movementState);
+        return DataModel::Decode(reader, movementState, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

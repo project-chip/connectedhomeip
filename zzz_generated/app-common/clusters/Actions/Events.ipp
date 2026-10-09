@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -43,25 +44,39 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldActionID,
+        kFieldInvokeID,
+        kFieldNewState,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            err = DataModel::Decode(reader, actionID);
+            err = DataModel::Decode(reader, actionID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldActionID));
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            err = DataModel::Decode(reader, invokeID);
+            err = DataModel::Decode(reader, invokeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldInvokeID));
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            err = DataModel::Decode(reader, newState);
+            err = DataModel::Decode(reader, newState, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldNewState));
         }
         else
         {
@@ -85,29 +100,45 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldActionID,
+        kFieldInvokeID,
+        kFieldNewState,
+        kFieldError,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            err = DataModel::Decode(reader, actionID);
+            err = DataModel::Decode(reader, actionID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldActionID));
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            err = DataModel::Decode(reader, invokeID);
+            err = DataModel::Decode(reader, invokeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldInvokeID));
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            err = DataModel::Decode(reader, newState);
+            err = DataModel::Decode(reader, newState, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldNewState));
         }
         else if (__context_tag == to_underlying(Fields::kError))
         {
-            err = DataModel::Decode(reader, error);
+            err = DataModel::Decode(reader, error, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldError));
         }
         else
         {

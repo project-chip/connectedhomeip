@@ -33,39 +33,39 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::FanMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, fanMode);
+        return DataModel::Decode(reader, fanMode, DataModel::DecodeContext::kRead);
     case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, fanModeSequence);
+        return DataModel::Decode(reader, fanModeSequence, DataModel::DecodeContext::kRead);
     case Attributes::PercentSetting::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, percentSetting);
+        return DataModel::Decode(reader, percentSetting, DataModel::DecodeContext::kRead);
     case Attributes::PercentCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, percentCurrent);
+        return DataModel::Decode(reader, percentCurrent, DataModel::DecodeContext::kRead);
     case Attributes::SpeedMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speedMax);
+        return DataModel::Decode(reader, speedMax, DataModel::DecodeContext::kRead);
     case Attributes::SpeedSetting::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speedSetting);
+        return DataModel::Decode(reader, speedSetting, DataModel::DecodeContext::kRead);
     case Attributes::SpeedCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speedCurrent);
+        return DataModel::Decode(reader, speedCurrent, DataModel::DecodeContext::kRead);
     case Attributes::RockSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rockSupport);
+        return DataModel::Decode(reader, rockSupport, DataModel::DecodeContext::kRead);
     case Attributes::RockSetting::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rockSetting);
+        return DataModel::Decode(reader, rockSetting, DataModel::DecodeContext::kRead);
     case Attributes::WindSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, windSupport);
+        return DataModel::Decode(reader, windSupport, DataModel::DecodeContext::kRead);
     case Attributes::WindSetting::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, windSetting);
+        return DataModel::Decode(reader, windSetting, DataModel::DecodeContext::kRead);
     case Attributes::AirflowDirection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, airflowDirection);
+        return DataModel::Decode(reader, airflowDirection, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

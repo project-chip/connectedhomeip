@@ -33,35 +33,35 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::NetworkInterfaces::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, networkInterfaces);
+        return DataModel::Decode(reader, networkInterfaces, DataModel::DecodeContext::kRead);
     case Attributes::RebootCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rebootCount);
+        return DataModel::Decode(reader, rebootCount, DataModel::DecodeContext::kRead);
     case Attributes::UpTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, upTime);
+        return DataModel::Decode(reader, upTime, DataModel::DecodeContext::kRead);
     case Attributes::TotalOperationalHours::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, totalOperationalHours);
+        return DataModel::Decode(reader, totalOperationalHours, DataModel::DecodeContext::kRead);
     case Attributes::BootReason::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bootReason);
+        return DataModel::Decode(reader, bootReason, DataModel::DecodeContext::kRead);
     case Attributes::ActiveHardwareFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeHardwareFaults);
+        return DataModel::Decode(reader, activeHardwareFaults, DataModel::DecodeContext::kRead);
     case Attributes::ActiveRadioFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeRadioFaults);
+        return DataModel::Decode(reader, activeRadioFaults, DataModel::DecodeContext::kRead);
     case Attributes::ActiveNetworkFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeNetworkFaults);
+        return DataModel::Decode(reader, activeNetworkFaults, DataModel::DecodeContext::kRead);
     case Attributes::TestEventTriggersEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, testEventTriggersEnabled);
+        return DataModel::Decode(reader, testEventTriggersEnabled, DataModel::DecodeContext::kRead);
     case Attributes::DeviceLoadStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, deviceLoadStatus);
+        return DataModel::Decode(reader, deviceLoadStatus, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

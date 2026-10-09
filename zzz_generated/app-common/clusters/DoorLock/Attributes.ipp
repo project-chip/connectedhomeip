@@ -33,105 +33,105 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LockState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lockState);
+        return DataModel::Decode(reader, lockState, DataModel::DecodeContext::kRead);
     case Attributes::LockType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lockType);
+        return DataModel::Decode(reader, lockType, DataModel::DecodeContext::kRead);
     case Attributes::ActuatorEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, actuatorEnabled);
+        return DataModel::Decode(reader, actuatorEnabled, DataModel::DecodeContext::kRead);
     case Attributes::DoorState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, doorState);
+        return DataModel::Decode(reader, doorState, DataModel::DecodeContext::kRead);
     case Attributes::DoorOpenEvents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, doorOpenEvents);
+        return DataModel::Decode(reader, doorOpenEvents, DataModel::DecodeContext::kRead);
     case Attributes::DoorClosedEvents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, doorClosedEvents);
+        return DataModel::Decode(reader, doorClosedEvents, DataModel::DecodeContext::kRead);
     case Attributes::OpenPeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, openPeriod);
+        return DataModel::Decode(reader, openPeriod, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfTotalUsersSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfTotalUsersSupported);
+        return DataModel::Decode(reader, numberOfTotalUsersSupported, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfPINUsersSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfPINUsersSupported);
+        return DataModel::Decode(reader, numberOfPINUsersSupported, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfRFIDUsersSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfRFIDUsersSupported);
+        return DataModel::Decode(reader, numberOfRFIDUsersSupported, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfWeekDaySchedulesSupportedPerUser);
+        return DataModel::Decode(reader, numberOfWeekDaySchedulesSupportedPerUser, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfYearDaySchedulesSupportedPerUser);
+        return DataModel::Decode(reader, numberOfYearDaySchedulesSupportedPerUser, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfHolidaySchedulesSupported);
+        return DataModel::Decode(reader, numberOfHolidaySchedulesSupported, DataModel::DecodeContext::kRead);
     case Attributes::MaxPINCodeLength::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxPINCodeLength);
+        return DataModel::Decode(reader, maxPINCodeLength, DataModel::DecodeContext::kRead);
     case Attributes::MinPINCodeLength::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minPINCodeLength);
+        return DataModel::Decode(reader, minPINCodeLength, DataModel::DecodeContext::kRead);
     case Attributes::MaxRFIDCodeLength::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxRFIDCodeLength);
+        return DataModel::Decode(reader, maxRFIDCodeLength, DataModel::DecodeContext::kRead);
     case Attributes::MinRFIDCodeLength::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minRFIDCodeLength);
+        return DataModel::Decode(reader, minRFIDCodeLength, DataModel::DecodeContext::kRead);
     case Attributes::CredentialRulesSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, credentialRulesSupport);
+        return DataModel::Decode(reader, credentialRulesSupport, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfCredentialsSupportedPerUser);
+        return DataModel::Decode(reader, numberOfCredentialsSupportedPerUser, DataModel::DecodeContext::kRead);
     case Attributes::Language::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, language);
+        return DataModel::Decode(reader, language, DataModel::DecodeContext::kRead);
     case Attributes::LEDSettings::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, LEDSettings);
+        return DataModel::Decode(reader, LEDSettings, DataModel::DecodeContext::kRead);
     case Attributes::AutoRelockTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, autoRelockTime);
+        return DataModel::Decode(reader, autoRelockTime, DataModel::DecodeContext::kRead);
     case Attributes::SoundVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, soundVolume);
+        return DataModel::Decode(reader, soundVolume, DataModel::DecodeContext::kRead);
     case Attributes::OperatingMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, operatingMode);
+        return DataModel::Decode(reader, operatingMode, DataModel::DecodeContext::kRead);
     case Attributes::SupportedOperatingModes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedOperatingModes);
+        return DataModel::Decode(reader, supportedOperatingModes, DataModel::DecodeContext::kRead);
     case Attributes::DefaultConfigurationRegister::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultConfigurationRegister);
+        return DataModel::Decode(reader, defaultConfigurationRegister, DataModel::DecodeContext::kRead);
     case Attributes::EnableLocalProgramming::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enableLocalProgramming);
+        return DataModel::Decode(reader, enableLocalProgramming, DataModel::DecodeContext::kRead);
     case Attributes::EnableOneTouchLocking::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enableOneTouchLocking);
+        return DataModel::Decode(reader, enableOneTouchLocking, DataModel::DecodeContext::kRead);
     case Attributes::EnableInsideStatusLED::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enableInsideStatusLED);
+        return DataModel::Decode(reader, enableInsideStatusLED, DataModel::DecodeContext::kRead);
     case Attributes::EnablePrivacyModeButton::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enablePrivacyModeButton);
+        return DataModel::Decode(reader, enablePrivacyModeButton, DataModel::DecodeContext::kRead);
     case Attributes::LocalProgrammingFeatures::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localProgrammingFeatures);
+        return DataModel::Decode(reader, localProgrammingFeatures, DataModel::DecodeContext::kRead);
     case Attributes::WrongCodeEntryLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wrongCodeEntryLimit);
+        return DataModel::Decode(reader, wrongCodeEntryLimit, DataModel::DecodeContext::kRead);
     case Attributes::UserCodeTemporaryDisableTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, userCodeTemporaryDisableTime);
+        return DataModel::Decode(reader, userCodeTemporaryDisableTime, DataModel::DecodeContext::kRead);
     case Attributes::SendPINOverTheAir::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sendPINOverTheAir);
+        return DataModel::Decode(reader, sendPINOverTheAir, DataModel::DecodeContext::kRead);
     case Attributes::RequirePINforRemoteOperation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, requirePINforRemoteOperation);
+        return DataModel::Decode(reader, requirePINforRemoteOperation, DataModel::DecodeContext::kRead);
     case Attributes::ExpiringUserTimeout::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, expiringUserTimeout);
+        return DataModel::Decode(reader, expiringUserTimeout, DataModel::DecodeContext::kRead);
     case Attributes::AliroReaderVerificationKey::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroReaderVerificationKey);
+        return DataModel::Decode(reader, aliroReaderVerificationKey, DataModel::DecodeContext::kRead);
     case Attributes::AliroReaderGroupIdentifier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroReaderGroupIdentifier);
+        return DataModel::Decode(reader, aliroReaderGroupIdentifier, DataModel::DecodeContext::kRead);
     case Attributes::AliroReaderGroupSubIdentifier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroReaderGroupSubIdentifier);
+        return DataModel::Decode(reader, aliroReaderGroupSubIdentifier, DataModel::DecodeContext::kRead);
     case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroExpeditedTransactionSupportedProtocolVersions);
+        return DataModel::Decode(reader, aliroExpeditedTransactionSupportedProtocolVersions, DataModel::DecodeContext::kRead);
     case Attributes::AliroGroupResolvingKey::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroGroupResolvingKey);
+        return DataModel::Decode(reader, aliroGroupResolvingKey, DataModel::DecodeContext::kRead);
     case Attributes::AliroSupportedBLEUWBProtocolVersions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroSupportedBLEUWBProtocolVersions);
+        return DataModel::Decode(reader, aliroSupportedBLEUWBProtocolVersions, DataModel::DecodeContext::kRead);
     case Attributes::AliroBLEAdvertisingVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, aliroBLEAdvertisingVersion);
+        return DataModel::Decode(reader, aliroBLEAdvertisingVersion, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfAliroCredentialIssuerKeysSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfAliroCredentialIssuerKeysSupported);
+        return DataModel::Decode(reader, numberOfAliroCredentialIssuerKeysSupported, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfAliroEndpointKeysSupported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfAliroEndpointKeysSupported);
+        return DataModel::Decode(reader, numberOfAliroEndpointKeysSupported, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

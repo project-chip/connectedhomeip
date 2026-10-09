@@ -33,53 +33,53 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::SoftMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, softMuted);
+        return DataModel::Decode(reader, softMuted, DataModel::DecodeContext::kRead);
     case Attributes::PhysicallyMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicallyMuted);
+        return DataModel::Decode(reader, physicallyMuted, DataModel::DecodeContext::kRead);
     case Attributes::Volume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, volume);
+        return DataModel::Decode(reader, volume, DataModel::DecodeContext::kRead);
     case Attributes::MinDeviceVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minDeviceVolume);
+        return DataModel::Decode(reader, minDeviceVolume, DataModel::DecodeContext::kRead);
     case Attributes::MaxDeviceVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxDeviceVolume);
+        return DataModel::Decode(reader, maxDeviceVolume, DataModel::DecodeContext::kRead);
     case Attributes::MaxDeviceVolumeDB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxDeviceVolumeDB);
+        return DataModel::Decode(reader, maxDeviceVolumeDB, DataModel::DecodeContext::kRead);
     case Attributes::MaxUserVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxUserVolume);
+        return DataModel::Decode(reader, maxUserVolume, DataModel::DecodeContext::kRead);
     case Attributes::DefaultStepSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultStepSize);
+        return DataModel::Decode(reader, defaultStepSize, DataModel::DecodeContext::kRead);
     case Attributes::SetVolumeUnmutePolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, setVolumeUnmutePolicy);
+        return DataModel::Decode(reader, setVolumeUnmutePolicy, DataModel::DecodeContext::kRead);
     case Attributes::IncreaseVolumeUnmutePolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, increaseVolumeUnmutePolicy);
+        return DataModel::Decode(reader, increaseVolumeUnmutePolicy, DataModel::DecodeContext::kRead);
     case Attributes::IncreaseVolumeUnmuteVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, increaseVolumeUnmuteVolume);
+        return DataModel::Decode(reader, increaseVolumeUnmuteVolume, DataModel::DecodeContext::kRead);
     case Attributes::DecreaseVolumeUnmutePolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, decreaseVolumeUnmutePolicy);
+        return DataModel::Decode(reader, decreaseVolumeUnmutePolicy, DataModel::DecodeContext::kRead);
     case Attributes::StartUpMuted::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpMuted);
+        return DataModel::Decode(reader, startUpMuted, DataModel::DecodeContext::kRead);
     case Attributes::StartUpVolume::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpVolume);
+        return DataModel::Decode(reader, startUpVolume, DataModel::DecodeContext::kRead);
     case Attributes::Bass::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, bass);
+        return DataModel::Decode(reader, bass, DataModel::DecodeContext::kRead);
     case Attributes::Mid::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mid);
+        return DataModel::Decode(reader, mid, DataModel::DecodeContext::kRead);
     case Attributes::Treble::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, treble);
+        return DataModel::Decode(reader, treble, DataModel::DecodeContext::kRead);
     case Attributes::MinCorrection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minCorrection);
+        return DataModel::Decode(reader, minCorrection, DataModel::DecodeContext::kRead);
     case Attributes::MaxCorrection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxCorrection);
+        return DataModel::Decode(reader, maxCorrection, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }
