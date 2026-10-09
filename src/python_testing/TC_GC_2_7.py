@@ -60,7 +60,7 @@ class TC_GC_2_7(MatterTestCommissionedDevice):
 
     def steps_TC_GC_2_7(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "TH subscribes to UsedMcastAddrCount attribute with min interval 0s and max interval 30s"),

@@ -47,7 +47,7 @@ class TC_CNET_4_9(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_9(self):
         return [
             TestStep("Precondition", test_plan_support.commission_if_required(
-            ), "DUT is commissioned on wifi network provided in --wifi-ssid parameter; TH can communicate with the DUT", is_commissioning=True),
+            ), "DUT is commissioned on wifi network provided in --wifi-ssid parameter; TH can communicate with the DUT"),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900.",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH."),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",

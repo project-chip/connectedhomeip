@@ -64,7 +64,7 @@ class TC_BOOL_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_BOOL_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH", is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
             TestStep("3", "Bring the DUT into a state so StateValue is FALSE"),
             TestStep("4", "TH prompt operator to verify the device is in FALSE state"),

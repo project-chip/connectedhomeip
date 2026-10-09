@@ -52,7 +52,7 @@ class TC_VALCC_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "Send Open command", "DUT returns SUCCESS"),

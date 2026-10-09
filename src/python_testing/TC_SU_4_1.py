@@ -68,7 +68,7 @@ class TC_SU_4_1(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     def steps_TC_SU_4_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(
                 1,
                 "TH sends a write request for the DefaultOTAProviders Attribute on the first fabric to the DUT. "

@@ -62,7 +62,7 @@ class TC_CADMIN_1_22_24(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_22(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using ECM with a value of 900 seconds",
                      "DUT_CE opens its Commissioning window to allow a second commissioning"),
             TestStep(3, "TH_CR1 sends an RevokeCommissioning command to the DUT"),

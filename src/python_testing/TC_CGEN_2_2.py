@@ -228,7 +228,7 @@ class TC_CGEN_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, 'Commissioning, already done', is_commissioning=True),
+            TestStep(0, 'Commissioning, already done'),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
             TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute

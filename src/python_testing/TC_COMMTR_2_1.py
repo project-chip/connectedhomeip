@@ -68,7 +68,7 @@ class TC_COMMTR_2_1(MatterTestCommissionedDevice, CommodityMeteringTestBaseHelpe
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
         return [
-            TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
+            TestStep("1", "Commissioning, already done", "DUT is commissioned"),
             TestStep("2", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
                      - Store value as MaxMeteredQuantities."""),

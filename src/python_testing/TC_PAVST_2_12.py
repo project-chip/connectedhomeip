@@ -85,7 +85,7 @@ class TC_PAVST_2_12(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_12(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(
                 1,
                 "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",

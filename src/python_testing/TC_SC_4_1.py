@@ -118,7 +118,7 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_SC_4_1(self):
         return [
-            TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned on the same fabric as TH."),
 
             # DUT DETAILS
             #

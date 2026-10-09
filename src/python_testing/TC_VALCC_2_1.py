@@ -55,7 +55,7 @@ class TC_VALCC_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read attribute list to determine supported attributes"),
             TestStep(3, "Read OpenDuration attribute, if supported"),
             TestStep(4, "Read DefaultOpenDuration attribute, if supported"),

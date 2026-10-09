@@ -241,7 +241,7 @@ class TC_ECOINFO_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_ECOINFO_2_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "Identify endpoints with Ecosystem Information Cluster"),
             TestStep(2, "Reading DeviceDirectory Attribute"),
             TestStep(3, "Reading LocationDirectory Attribute"),

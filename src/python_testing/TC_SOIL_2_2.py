@@ -58,7 +58,7 @@ class TC_SOIL_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_SOIL_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Set up a subscription wildcard subscription, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
 
             TestStep(3, "Read SoilMoistureMeasurementLimits attribute, save the MinMeasuredValue field as min_bound and save the MaxMeasuredValue field as max_bound"),

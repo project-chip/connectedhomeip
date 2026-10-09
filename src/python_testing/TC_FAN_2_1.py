@@ -82,7 +82,7 @@ class TC_FAN_2_1(MatterTestCommissionedDevice):
         return "[TC-FAN-2.1] Mandatory functionality with DUT as Server"
 
     def steps_TC_FAN_2_1(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH checks for support of the Auto feature.",
                          "Save result for future use."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",

@@ -129,8 +129,7 @@ class TC_TSTAT_4_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
                      " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling AtomicRequest command."),
             TestStep("3", "TH writes to the Presets attribute after calling the AtomicRequest begin command but doesn't call AtomicRequest commit",

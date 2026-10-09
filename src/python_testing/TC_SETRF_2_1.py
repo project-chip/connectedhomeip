@@ -74,7 +74,7 @@ class TC_SETRF_2_1(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned.", is_commissioning=True),
+                     "DUT is commissioned."),
             TestStep("2", "TH reads from the DUT the TariffInfo attribute.", """
                      - Verify that the DUT response contains a null or a value of TariffInformationStruct type;
                         - Verify that TariffLabel field has type string with max length 128 or null;

@@ -150,7 +150,7 @@ class TC_ICDM_3_2(MatterTestCommissionedDevice):
 
     def steps_TC_ICDM_3_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute. RegisteredClients is empty."),
             TestStep("2a", "TH sends RegisterClient command."),
             TestStep("2b", "TH reads from the DUT the RegisteredClients attribute."),

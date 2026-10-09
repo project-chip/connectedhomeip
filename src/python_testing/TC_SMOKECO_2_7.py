@@ -65,7 +65,7 @@ class TC_SMOKECO_2_7(MatterTestCommissionedDevice):
 
     def steps_TC_SMOKECO_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH.", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH."),
             TestStep(2, "TH reads from the DUT the BatteryAlert attribute."),
             TestStep(3, "TH reads from the DUT the HardwareFaultAlert attribute."),
             TestStep(4, "TH subscribes to Unmounted attribute with  min interval 0s and max interval 30s."),

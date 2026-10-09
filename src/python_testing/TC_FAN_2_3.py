@@ -67,7 +67,7 @@ class TC_FAN_2_3(MatterTestCommissionedDevice):
         return "[TC-FAN-2.3] Optional rock attributes with DUT as Server"
 
     def steps_TC_FAN_2_3(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH reads from the DUT the RockSupport attribute.",
                          "Verify that the RockSupport attribute value is a map8 bitmap. Verify that the RockSupport attribute's value is between 1 and 3 inclusive."),
                 TestStep(3, "[FC] TH reads from the DUT the RockSetting attribute.",
