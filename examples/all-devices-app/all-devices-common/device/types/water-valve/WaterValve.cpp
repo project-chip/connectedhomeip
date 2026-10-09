@@ -34,8 +34,8 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurati
 WaterValve::WaterValve(TimerDelegate & timerDelegate,
                        const std::optional<ValveConfigurationAndControlCluster::ValveContext> & context,
                        WaterValveListener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
-    mValveContext(context), mListener(listener)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
+    mTimerDelegate(timerDelegate), mValveContext(context), mListener(listener)
 {}
 
 >>>>>>> 8d7c3280396 ([pre-commit.ci] auto fixes from pre-commit.com hooks)
