@@ -12,24 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("door-lock-server") {
-  sources = [
-    "DoorLockCluster.cpp",
-    "DoorLockCluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  # NOTE (transition): door-lock-delegate.h is intentionally NOT listed here
-  # yet: the legacy door-lock-server.h (consumed by targets that do not depend
-  # on this code-driven source_set, e.g. controller/data_model and example
-  # apps) includes it, and gn include-checking would reject that. Move it here
-  # when CodegenIntegration removes the legacy consumers.
+chip_test_suite("tests") {
+  output_name = "TestDoorLockCluster"
+
+  test_sources = [ "TestDoorLockCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/door-lock-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/DoorLock",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }
