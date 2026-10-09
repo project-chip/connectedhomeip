@@ -85,7 +85,7 @@ Alchemy: v1.7.10
   </struct>
 
   <cluster>
-    <domain>Closures</domain>
+    <domain>General</domain>
     <name>Closure Control</name>
     <code>0x0104</code>
     <define>CLOSURE_CONTROL_CLUSTER</define>
@@ -94,7 +94,7 @@ Alchemy: v1.7.10
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="2"/>
     <features>
-      <feature bit="0" code="PS" name="Positioning" summary="Supports Positioning with at least Fully Opened (0%) and Fully Closed (100%) discrete positions">
+      <feature bit="0" code="PS" name="Positioning" summary="Supports Positioning with at least Fully Opened and Fully Closed discrete positions">
         <optionalConform choice="a" more="true" min="1"/>
       </feature>
       <feature bit="1" code="LT" name="MotionLatching" summary="Supports a latch (securing a position, or a state)">
@@ -134,7 +134,7 @@ Alchemy: v1.7.10
       <feature bit="8" code="MO" name="ManuallyOperable" summary="Supports the manual operation feature">
         <optionalConform/>
       </feature>
-      <feature bit="9" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area" apiMaturity="provisional">
+      <feature bit="9" code="ACC" name="Access" summary="The closure can grant access to a secured building or restricted area">
         <otherwiseConform>
           <provisionalConform/>
           <optionalConform/>
@@ -173,7 +173,7 @@ Alchemy: v1.7.10
       <description>On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed.</description>
       <arg fieldId="0" name="Position" type="TargetPositionEnum" optional="true" max="0x04"/>
       <arg fieldId="1" name="Latch" type="boolean" optional="true"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03"/>
       <mandatoryConform/>
     </command>
 
@@ -189,7 +189,7 @@ Alchemy: v1.7.10
       <description>This command is intended to be invoked using groupcast addressing to move a group of closures to a target position, latch, and/or perform the movement at a specific speed.</description>
       <arg fieldId="0" name="Position" type="TargetPositionEnum" optional="true" max="0x04" apiMaturity="provisional"/>
       <arg fieldId="1" name="Latch" type="boolean" optional="true" apiMaturity="provisional"/>
-      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" default="0x00" max="0x03" apiMaturity="provisional"/>
+      <arg fieldId="2" name="Speed" type="ThreeLevelAutoEnum" optional="true" max="0x03" apiMaturity="provisional"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
