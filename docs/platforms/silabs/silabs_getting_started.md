@@ -177,6 +177,7 @@ command.
 | chip_enable_icd_server | Configure device as an intermittently connected device <br /> For Thread builds, chip_openthread_ftd must also be set to false. | false                          |
 |      disable_lcd       | Disable the LCD on devices with an LCD                                                                                          | false                          |
 |      show_qr_code      | Enables QR code on LCD for devices with an LCD                                                                                  | true                           |
+|        is_clang        | Build with Clang/LLVM instead of GCC                                                                                            | false                          |
 
 On top of the GN arguments specified here, each sample app will specify, if need
 be, the GN arguments specific to it.
