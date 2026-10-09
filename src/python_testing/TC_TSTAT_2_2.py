@@ -41,7 +41,7 @@ from mobly import asserts
 from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterTestCommissionedDevice
@@ -98,12 +98,20 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             TestStep("11b", "Test Harness Writes the value below MinSetpointDeadBand"),
             TestStep("11c", "Test Harness Writes the min limit of MinSetpointDeadBand"),
             TestStep("12", "Test Harness Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is true"),
-            TestStep("13", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("14", "Sets OccupiedHeatingSetpoint to default value"),
-            TestStep("15", "Test Harness Sends SetpointRaise Command Cool Only"),
-            TestStep("16", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
+            TestStep("13a", "Sets OccupiedHeatingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("13b", "Validate INVALID_COMMAND if Heat is not supported"),
+            TestStep("13c", "Validate received events"),
+            TestStep("14a", "Sets OccupiedHeatingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("14b", "Validate received events"),
+            TestStep("15a", "Sets OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("15b", "Validate INVALID_COMMAND if Cool is not supported"),
+            TestStep("15c", "Validate received events"),
+            TestStep("16a", "Sets OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("16b", "Validate received events"),
+            TestStep("17a", "Sets OccupiedHeatingSetpoint and OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("17b", "Validate received events"),
+            TestStep("18a", "Sets OccupiedHeatingSetpoint and OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("18b", "Validate received events"),
         ]
 
     async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
@@ -655,28 +663,58 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating)
 
-        self.step("13")
+        self.step("13a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30)
 
-        self.step("14")
+        self.step("13b")
+        if not self.pics_guard(hasHeatingFeature):
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
+                asserts.fail("Expected InvalidCommand")
+
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected status returned")
+
+        self.step("13c")
+        # Verified in 13a
+
+        self.step("14a")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30)
 
-        self.step("15")
+        self.step("14b")
+        # Verified in 14a
+
+        self.step("15a")
         if self.pics_guard(hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30)
 
-        self.step("16")
+        self.step("15b")
+        if not self.pics_guard(hasCoolingFeature):
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
+                asserts.fail("Expected InvalidCommand")
+
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected status returned")
+
+        self.step("15c")
+        # Verified in 15a
+
+        self.step("16a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30)
 
-        self.step("17")
+        self.step("16b")
+        # Verified in 16a
+
+        self.step("17a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
@@ -684,13 +722,19 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30)
 
-        self.step("18")
+        self.step("17b")
+        # Verified in 17a
+
+        self.step("18a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
+
+        self.step("18b")
+        # Verified in 18a
 
 
 if __name__ == "__main__":
