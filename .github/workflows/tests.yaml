@@ -526,10 +526,10 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
-                      [[ "$f" == *"purposeful-failures"* ]] && continue
+                      case "$f" in *"purposeful-failures"*) continue ;; esac
                       echo ""
                       echo ">>> $f"
-                      if [[ "$f" == "test-summaries/cnet-ble-wifi.json" ]]; then
+                      if [ "$f" = "test-summaries/cnet-ble-wifi.json" ]; then
                           ./scripts/run_in_python_env.sh out/venv \
                             "src/python_testing/execute_python_tests.py summarize --summary-file $f --compact-failures-file test-summaries/compact-failures.txt" || true
                       else
