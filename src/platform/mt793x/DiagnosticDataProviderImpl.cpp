@@ -222,8 +222,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = InterfaceTypeEnum::kWiFi;
 #endif
-<<<<<<< HEAD
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    <<<<<<< HEAD uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
 =======
