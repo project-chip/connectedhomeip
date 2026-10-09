@@ -33,6 +33,11 @@
 #include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
 #include <zephyr/drivers/gpio.h>
 
 using namespace ::chip;
@@ -47,6 +52,11 @@ DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0 /* endpoint */,
                                                                          &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /* endpoint */);
 #endif
 
 } // namespace
@@ -77,6 +87,12 @@ CHIP_ERROR AppTask::Init()
     ReturnErrorOnFailure(sWiFiCommissioningInstance.Init());
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
+    ReturnErrorOnFailure(sThreadNetworkDriver.Init());
+#endif
+
     if (gpio_is_ready_dt(&sLightLed))
     {
         gpio_pin_configure_dt(&sLightLed, GPIO_OUTPUT_INACTIVE);
@@ -99,8 +115,7 @@ CHIP_ERROR AppTask::Init()
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 
     // The rendezvous flag must match the radios actually compiled in.
-    // TODO: advertise Wi-Fi PAF and commissioning over Thread once those transports
-    // are supported by this example.
+    // TODO: advertise Wi-Fi PAF once that transport is supported by this example.
     ConfigurationMgr().LogDeviceConfig();
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
