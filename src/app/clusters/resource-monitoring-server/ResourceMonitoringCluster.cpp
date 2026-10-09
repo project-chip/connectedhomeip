@@ -35,13 +35,13 @@ namespace Clusters {
 namespace ResourceMonitoring {
 
 ResourceMonitoringCluster::ResourceMonitoringCluster(
-    EndpointId aEndpointId, ClusterId aClusterId, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+    EndpointId aEndpointId, ClusterEntry aCluster, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
     OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported) :
-    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
+    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aCluster.id)),
     mDegradationDirection(aDegradationDirection), mResetConditionCommandSupported(aResetConditionCommandSupported),
-    mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
+    mClusterRevision(aCluster.revision), mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 CHIP_ERROR ResourceMonitoringCluster::SetDelegate(Delegate * aDelegate)
@@ -99,11 +99,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
     case ResourceMonitoring::Attributes::ReplacementProductList::Id:
         return ReadReplaceableProductList(encoder);
     case ResourceMonitoring::Attributes::ClusterRevision::Id:
-        if (mPath.mClusterId == HepaFilterMonitoring::Id)
-        {
-            return encoder.Encode(HepaFilterMonitoring::kRevision);
-        }
-        return encoder.Encode(ActivatedCarbonFilterMonitoring::kRevision);
+        return encoder.Encode(mClusterRevision);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
