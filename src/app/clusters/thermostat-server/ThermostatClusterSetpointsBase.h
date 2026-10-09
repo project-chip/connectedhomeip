@@ -50,6 +50,16 @@ public:
     void GenerateSetpointEvent(AttributeId attributeId, temperature oldTemp, temperature newTemp) const;
     void NotifyAttributesChanged(const SetpointAttributes & changedAttributes);
 
+    /**
+     * @brief Apply new occupied heating and/or cooling setpoints and persist them, clamped to the user setpoint
+     *        limits. A no-op that returns Success if neither @p heat nor @p cool has a value.
+     *
+     * @param[in] heat The new occupied heating setpoint to apply, if any.
+     * @param[in] cool The new occupied cooling setpoint to apply, if any.
+     * @return The status of the operation.
+     */
+    Protocols::InteractionModel::Status ApplyOccupiedSetpoints(chip::Optional<temperature> heat, chip::Optional<temperature> cool);
+
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
 

@@ -361,6 +361,58 @@ TEST_F(ThermostatTestFixture, TestSetActivePresetRequestCommand)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestSetActivePresetAppliesSetpoints)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);
+
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handle[4] = { 'P', 'R', 'S', 'T' };
+    EXPECT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))), CHIP_NO_ERROR);
+    preset.SetHeatingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(1900)));
+    preset.SetCoolingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2400)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    // A second preset that does not specify any setpoints, matching the "unspecified, keep existing" semantics.
+    PresetStructWithOwnedMembers noSetpointPreset;
+    noSetpointPreset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t noSetpointHandle[4] = { 'N', 'O', 'S', 'P' };
+    EXPECT_EQ(noSetpointPreset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(noSetpointHandle))), CHIP_NO_ERROR);
+    mPresetsDelegate.mPresets.push_back(noSetpointPreset);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Activating the preset applies its setpoints to the occupied setpoint range.
+    Commands::SetActivePresetRequest::Type cmd;
+    cmd.presetHandle = DataModel::MakeNullable(ByteSpan(handle));
+    auto result      = tester.Invoke(cmd);
+    EXPECT_TRUE(result.IsSuccess());
+
+    temperature heat = 0;
+    EXPECT_EQ(tester.ReadAttribute(OccupiedHeatingSetpoint::Id, heat), Status::Success);
+    EXPECT_EQ(heat, 1900);
+
+    temperature cool = 0;
+    EXPECT_EQ(tester.ReadAttribute(OccupiedCoolingSetpoint::Id, cool), Status::Success);
+    EXPECT_EQ(cool, 2400);
+
+    // Activating a preset with no setpoints of its own leaves the occupied setpoint range unchanged.
+    cmd.presetHandle = DataModel::MakeNullable(ByteSpan(noSetpointHandle));
+    result           = tester.Invoke(cmd);
+    EXPECT_TRUE(result.IsSuccess());
+
+    EXPECT_EQ(tester.ReadAttribute(OccupiedHeatingSetpoint::Id, heat), Status::Success);
+    EXPECT_EQ(heat, 1900);
+    EXPECT_EQ(tester.ReadAttribute(OccupiedCoolingSetpoint::Id, cool), Status::Success);
+    EXPECT_EQ(cool, 2400);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatTestFixture, TestManualSetpointChangeClearsActivePreset)
 {
     BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets);

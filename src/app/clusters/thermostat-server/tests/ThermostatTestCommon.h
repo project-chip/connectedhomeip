@@ -21,6 +21,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
@@ -560,6 +561,18 @@ public:
         {
             mCurrentSuggestion.SetNull();
         }
+
+        // Simulate a delegate implementation (like the example ThermostatSuggestionsDelegate) that follows the
+        // current suggestion by activating its preset directly via the Presets delegate, bypassing
+        // ThermostatPresets::SetActivePreset / SetActivePresetRequest entirely.
+        if (mPresetsDelegateToFollow != nullptr)
+        {
+            CHIP_ERROR followErr = mCurrentSuggestion.IsNull()
+                ? mPresetsDelegateToFollow->SetActivePresetHandle(DataModel::NullNullable)
+                : mPresetsDelegateToFollow->SetActivePresetHandle(
+                      DataModel::MakeNullable(ByteSpan(mCurrentSuggestion.Value().GetPresetHandle())));
+            LogErrorOnFailure(followErr);
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -571,6 +584,8 @@ public:
     std::vector<ThermostatSuggestionStructWithOwnedMembers> mSuggestions;
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> mCurrentSuggestion    = DataModel::NullNullable;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
+    // When set, ReEvaluateCurrentSuggestion() activates the current suggestion's preset directly on this delegate.
+    MockPresetsDelegate * mPresetsDelegateToFollow = nullptr;
 };
 
 class MockSensorsDelegate : public ThermostatSensors::Delegate

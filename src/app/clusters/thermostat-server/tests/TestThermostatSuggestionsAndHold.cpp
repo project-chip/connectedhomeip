@@ -241,4 +241,55 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestSuggestionAcceptanceAppliesPresetSetpoints)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handle[4] = { 1, 2, 3, 4 };
+    EXPECT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))), CHIP_NO_ERROR);
+    preset.SetHeatingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(1850)));
+    preset.SetCoolingSetpoint(MakeOptional<int16_t>(static_cast<int16_t>(2450)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    // Simulate a delegate implementation (like the example ThermostatSuggestionsDelegate) that follows an
+    // accepted suggestion by activating its preset directly via the Presets delegate, bypassing
+    // SetActivePresetRequest entirely.
+    mSuggestionsDelegate.mPresetsDelegateToFollow = &mPresetsDelegate;
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    System::Clock::Internal::RAIIMockClock mockClock;
+    EXPECT_EQ(mockClock.SetClock_RealTime(Microseconds64(kValidRealTimeMicroseconds)), CHIP_NO_ERROR);
+
+    Commands::AddThermostatSuggestion::Type addCmd;
+    addCmd.presetHandle        = ByteSpan(handle);
+    addCmd.expirationInMinutes = 60;
+    addCmd.effectiveTime       = DataModel::NullNullable;
+
+    // Adding the suggestion re-evaluates it as current, which the mock delegate treats as accepted: it moves
+    // ActivePresetHandle on the Presets delegate directly, the same way the example delegate does.
+    auto result = tester.Invoke(addCmd);
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_FALSE(mPresetsDelegate.mActivePresetHandle.IsNull());
+    EXPECT_TRUE(mPresetsDelegate.mActivePresetHandle.Value().data_equal(ByteSpan(handle)));
+
+    // The occupied setpoints must reflect the newly-active preset even though it was activated by the delegate
+    // rather than by SetActivePresetRequest.
+    temperature heat = 0;
+    EXPECT_EQ(tester.ReadAttribute(OccupiedHeatingSetpoint::Id, heat), Status::Success);
+    EXPECT_EQ(heat, 1850);
+
+    temperature cool = 0;
+    EXPECT_EQ(tester.ReadAttribute(OccupiedCoolingSetpoint::Id, cool), Status::Success);
+    EXPECT_EQ(cool, 2450);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace
