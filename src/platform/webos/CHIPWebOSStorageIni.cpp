@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,7 +86,7 @@ CHIP_ERROR ChipWebOSStorageIni::AddConfig(const std::string & configFile)
     return retval;
 }
 
-// Updating a file atomically and durably on Linux requires:
+// Updating a file atomically and durably on WebOS requires:
 // 1. Writing to a temporary file
 // 2. Sync'ing the temp file to commit updated data
 // 3. Using rename() to overwrite the existing file

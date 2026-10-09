@@ -176,6 +176,7 @@ nrfconnect:
 # webos:
 #   maintainers:
 #     - joonhaengHeo
+#     - jungwook-park
 #   paths:
 #     - "src/platform/webos/**"
 # 
