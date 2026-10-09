@@ -56,7 +56,7 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
         return "[TC-OPCREDS-3.9] PQC Device Attestation CertificateChainRequest behavior [DUT-Server]"
 
     def pics_TC_OPCREDS_3_9(self) -> list[str]:
-        return ["OPCREDS.S", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
+        return ["OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_OPCREDS_3_9(self) -> list[TestStep]:
         return [

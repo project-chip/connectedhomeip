@@ -20,7 +20,6 @@ import("${chip_root}/src/platform/silabs/efr32/args.gni")
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_build_libshell = true
 
-chip_openthread_ftd = true
 chip_enable_thread = true
 
 openthread_external_platform =

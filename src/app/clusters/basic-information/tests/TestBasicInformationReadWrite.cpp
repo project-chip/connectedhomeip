@@ -359,6 +359,31 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestBasicInformationReadWrite, TestNodeLabelConstraintErrorKeepsOldValue)
+{
+    const BasicInformationOptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
+    CharSpan validLabel = "Valid Label"_span;
+    ASSERT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, validLabel), CHIP_NO_ERROR);
+
+    CharSpan tooLongLabel = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456"_span;
+    ASSERT_EQ(tooLongLabel.size(), 33u);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, tooLongLabel),
+              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+
+    char readBuffer[32];
+    CharSpan readSpan(readBuffer);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(readSpan.data_equal(validLabel));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;

@@ -26,6 +26,22 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+/**
+ * A node entry carries the union of its delegates' interested paths, sorted, under
+ * MTRDeviceControllerRegistrationInterestedPathsForAttributesKey and MTRDeviceControllerRegistrationInterestedPathsForEventsKey.
+ * The attribute paths include those of pending attribute-value waiters, so a node with only waiters is listed too.
+ * A missing key means every path. Each element is an NSNumber endpoint ID, or a dictionary of NSNumbers holding
+ * MTRDeviceControllerRegistrationInterestedPathEndpointIDKey and MTRDeviceControllerRegistrationInterestedPathClusterIDKey,
+ * plus MTRDeviceControllerRegistrationInterestedPathAttributeIDKey for an attribute path or
+ * MTRDeviceControllerRegistrationInterestedPathEventIDKey for an event path.
+ */
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey MTR_NEWLY_AVAILABLE;
+
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 

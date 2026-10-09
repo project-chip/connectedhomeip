@@ -48,8 +48,8 @@
 #include <utility>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
@@ -75,7 +75,7 @@ using chip::System::PacketBufferHandle;
 
 constexpr System::Clock::Timestamp kNoAdvanceTime = System::Clock::kZero;
 
-// Upper bound on the number of steps per sequence (template arg to pw::fuzzer::VectorOf).
+// Upper bound on the number of steps per sequence.
 constexpr size_t kMaxSteps = 24;
 
 void EnsureInitialized()
