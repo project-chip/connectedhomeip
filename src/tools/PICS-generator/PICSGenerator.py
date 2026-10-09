@@ -24,8 +24,11 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
-from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
+from pics_generator_support import (CaseMismatchedPicsItem, format_case_mismatch_warning, is_case_only_mismatch,
+                                    map_cluster_name_to_pics_xml, normalize_pics_item_number, pics_xml_file_list_loader)
 from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AsyncReadTransaction
@@ -43,6 +46,10 @@ from matter.testing.spec_parsing import XmlEvent, build_xml_clusters, dm_from_sp
 
 console = None
 xml_clusters = None
+
+# Supported items whose template itemNumber differs from the PICS code only in
+# case, keyed by (output file, itemNumber). Reported once at the end of the run.
+case_mismatched_pics_items: dict[tuple[str, str], CaseMismatchedPicsItem] = {}
 
 # Matches the trailing ".E<hex>" event-id suffix in a PICS itemNumber like "ACL.S.E01".
 _EVENT_ID_RE = re.compile(r'\.E([0-9A-Fa-f]+)$')
@@ -89,6 +96,30 @@ def _extract_event_id(item_number: str | None) -> int | None:
     if match is None:
         return None
     return int(match.group(1), 16)
+
+
+def _mark_pics_item_supported(pics_item: ET.Element, pics_code: str, output_file: str) -> None:
+    """Set a template item's support to true.
+
+    pics_code is the PICS code the item matched, in the lowercase-hex format
+    TC-IDM-10.4 looks up. If the template's itemNumber differs from it only in
+    case, the item is still marked, but it's recorded for the end-of-run
+    warning because TC-IDM-10.4 will fail on it.
+    """
+    pics_item.find('support').text = "true"
+
+    item_number = pics_item.find('itemNumber').text
+    if is_case_only_mismatch(item_number, pics_code):
+        console.print(f"[bold red]⚠ Template itemNumber {item_number} uses uppercase hex; "
+                      f"TC-IDM-10.4 expects {pics_code} and will fail ❌")
+        case_mismatched_pics_items[(output_file, item_number)] = CaseMismatchedPicsItem(output_file, item_number, pics_code)
+
+
+def _print_case_mismatch_warning() -> None:
+    if not case_mismatched_pics_items:
+        return
+    warning = format_case_mismatch_warning(list(case_mismatched_pics_items.values()))
+    console.print(Panel(Text(warning, style="bold"), title="WARNING: TC-IDM-10.4 will fail", border_style="bold red"))
 
 
 def GenerateBasePicsXmlFile(facts: _BasePicsFacts, outputPathStr: str) -> None:
@@ -180,32 +211,24 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                                assessment_data: ConformanceAssessmentData | None = None):
 
     xmlPath = xmlTemplatePathStr
-    fileName = ""
 
     console.print(f"Handling PICS for {clusterName}")
 
-    picsFileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
+    # Skip clusters without a template. Falling through here would let the
+    # empty name prefix-match the first template in the folder and write an
+    # unmarked copy of it over any real output for that template.
+    fileName = map_cluster_name_to_pics_xml(clusterName, xmlFileList)
+    if not fileName:
+        console.print(f"[red]Could not find matching file for \"{clusterName}\" ❌")
+        return
 
     # If we've already written an output for this cluster's template
     # (e.g. OTA Software Update Provider and Requestor both resolve to
     # the same template, or a cluster appears as both server and client
     # on this endpoint), reuse the existing file as input so the new
     # markings get merged in instead of writing a fresh copy.
-    if picsFileName:
-        existing_output = Path(outputPathStr) / picsFileName
-        if existing_output.is_file():
-            xmlPath = outputPathStr
-            fileName = picsFileName
-
-    # If no file is found in output folder, determine if there is a match for the cluster name in input folder
-    if fileName == "":
-        for file in xmlFileList:
-            if file.lower().startswith(picsFileName.lower()):
-                fileName = file
-                break
-        else:
-            console.print(f"[red]Could not find matching file for \"{clusterName}\" ❌")
-            return
+    if (Path(outputPathStr) / fileName).is_file():
+        xmlPath = outputPathStr
 
     try:
         # Open the XML PICS template file
@@ -217,6 +240,17 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         console.print(f"[red]Could not find \"{fileName}\" ❌")
         return
 
+    # The generated PICS codes use lowercase hex, as the PICS Guidelines
+    # require, but some templates use uppercase. Every itemNumber comparison
+    # below uses the normalized form, and each map keeps the generated code so
+    # a case-only match can be flagged when the item is marked.
+    clusterPicsCodeNormalized = normalize_pics_item_number(clusterPicsCode)
+    featurePicsCodes = {normalize_pics_item_number(pics): pics for pics in featurePicsList}
+    attributePicsCodes = {normalize_pics_item_number(pics): pics for pics in attributePicsList}
+    acceptedCommandPicsCodes = {normalize_pics_item_number(pics): pics for pics in acceptedCommandPicsList}
+    generatedCommandPicsCodes = {normalize_pics_item_number(pics): pics for pics in generatedCommandPicsList}
+    outputFile = f"{Path(outputPathStr).name}/{fileName}"
+
     # Usage PICS
     usageNode = root.find('usage')
     for picsItem in usageNode:
@@ -224,10 +258,9 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
         console.print(f"Searching for {itemNumberElement.text}")
 
-        if itemNumberElement.text == f"{clusterPicsCode}":
+        if normalize_pics_item_number(itemNumberElement.text) == clusterPicsCodeNormalized:
             console.print("Found usage PICS value in XML template ✅")
-            supportElement = picsItem.find('support')
-            supportElement.text = "true"
+            _mark_pics_item_supported(picsItem, clusterPicsCode, outputFile)
 
             # Since usage PICS (server or client) is not a list, we can break out when a match is found,
             # no reason to keep iterating through the elements.
@@ -242,10 +275,10 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in featurePicsList:
+            picsCode = featurePicsCodes.get(normalize_pics_item_number(itemNumberElement.text))
+            if picsCode is not None:
                 console.print("Found feature PICS value in XML template ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
+                _mark_pics_item_supported(picsItem, picsCode, outputFile)
 
     # Attributes PICS
     # TODO: Only check if list is not empty
@@ -257,10 +290,10 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in attributePicsList:
+            picsCode = attributePicsCodes.get(normalize_pics_item_number(itemNumberElement.text))
+            if picsCode is not None:
                 console.print("Found attribute PICS value in XML template ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
+                _mark_pics_item_supported(picsItem, picsCode, outputFile)
 
     # AcceptedCommandList PICS
     # TODO: Only check if list is not empty
@@ -272,10 +305,10 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in acceptedCommandPicsList:
+            picsCode = acceptedCommandPicsCodes.get(normalize_pics_item_number(itemNumberElement.text))
+            if picsCode is not None:
                 console.print("Found acceptedCommand PICS value in XML template ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
+                _mark_pics_item_supported(picsItem, picsCode, outputFile)
 
     # GeneratedCommandList PICS
     # console.print(generatedCommandPicsList)
@@ -287,10 +320,10 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             console.print(f"Searching for {itemNumberElement.text}")
 
-            if f"{itemNumberElement.text}" in generatedCommandPicsList:
+            picsCode = generatedCommandPicsCodes.get(normalize_pics_item_number(itemNumberElement.text))
+            if picsCode is not None:
                 console.print("Found generatedCommand PICS value in XML template ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
+                _mark_pics_item_supported(picsItem, picsCode, outputFile)
 
     # Event PICS.
     # EventList (0xFFFA) is deprecated and the SDK no longer implements it, so
@@ -325,8 +358,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
             if decision.is_mandatory():
                 console.print(f"Event {itemNumberElement.text} is mandatory by spec conformance ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
+                _mark_pics_item_supported(picsItem, f"{clusterPicsCode}.E{event_id:02x}", outputFile)
             else:
                 console.print(f"  → not mandatory for this device (decision={decision.decision.name})")
 
@@ -575,6 +607,8 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
     # Base/MCORE PICS are per-device, not per-endpoint, so this runs once after
     # the parts list walk completes and writes Base.xml at the device root.
     GenerateBasePicsXmlFile(base_pics_facts, outputPathStr)
+
+    _print_case_mismatch_warning()
 
 
 def cleanDirectory(pathToClean):
