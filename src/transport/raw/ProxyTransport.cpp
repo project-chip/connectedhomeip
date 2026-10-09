@@ -19,6 +19,7 @@
 #include <transport/raw/ProxyTransport.h>
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Transport {
@@ -35,6 +36,10 @@ CHIP_ERROR ProxyTransportBase::Activate(uint16_t sessionId, ProxyTransportDelega
     VerifyOrReturnError(!mActive, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Inet, "ProxyTransport: activating session %u", sessionId);
+    if (mSessionVerifier == nullptr)
+    {
+        ChipLogProgress(Inet, "ProxyTransport: no session verifier, so Session IDs of received messages are not checked");
+    }
     mSessionId = sessionId;
     mDelegate  = delegate;
     mActive    = true;
@@ -90,6 +95,30 @@ CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSp
     // zero-length packet carries nothing for the stack to parse.
     VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Inet, "ProxyTransport: empty message for session %u", sessionId));
+
+    PacketHeader header;
+    uint16_t headerLength = 0;
+    CHIP_ERROR err        = header.Decode(message.data(), message.size(), &headerLength);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "ProxyTransport: message for session %u is not a Matter message: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        return err;
+    }
+
+    // Only the Unsecured Session (used until PASE completes) and the PASE session
+    // established through this proxy session may arrive here. A group message never may.
+    if (header.IsEncrypted())
+    {
+        bool allowed = header.IsUnicastSession() &&
+            (mSessionVerifier == nullptr || mSessionVerifier->IsPaseSessionThroughProxy(header.GetSessionId(), sessionId));
+        if (!allowed)
+        {
+            ChipLogError(Inet, "ProxyTransport: message for session %u is for Session ID %u, not this proxy session's", sessionId,
+                         header.GetSessionId());
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
+    }
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(message.data(), message.size());
     VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY,

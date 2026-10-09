@@ -43,6 +43,7 @@
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #include <protocols/secure_channel/UnsolicitedStatusHandler.h>
 
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 #if CONFIG_DEVICE_LAYER
@@ -155,6 +156,33 @@ inline Transport::ProxyTransportBase * GetDeviceProxyTransport(DeviceTransportMg
 
 namespace Controller {
 
+/**
+ * Checks a Session ID received through the proxy transport against the controller's
+ * session table: it must be a PASE session whose peer is that proxy session, in a state
+ * SessionManager still accepts messages on.
+ */
+class ProxyPaseSessionVerifier : public Transport::ProxySessionVerifier
+{
+public:
+    explicit ProxyPaseSessionVerifier(SessionManager * sessionMgr) : mSessionMgr(sessionMgr) {}
+
+    bool IsPaseSessionThroughProxy(uint16_t localSessionId, uint16_t proxySessionId) override
+    {
+        VerifyOrReturnValue(mSessionMgr != nullptr, false);
+        Optional<SessionHandle> session = mSessionMgr->GetSecureSessions().FindSecureSessionByLocalKey(localSessionId);
+        VerifyOrReturnValue(session.HasValue(), false);
+        const Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
+        // Same states SessionManager admits on receive, so a last ack on a session that is
+        // pending eviction is not rejected here.
+        bool usable = secureSession->IsActiveSession() || secureSession->IsPendingEviction() || secureSession->IsDefunct();
+        return usable && secureSession->IsPASESession() &&
+            secureSession->GetPeerAddress() == Transport::PeerAddress::Proxy(proxySessionId);
+    }
+
+private:
+    SessionManager * mSessionMgr;
+};
+
 struct DeviceControllerSystemStateParams
 {
     using SessionSetupPool = OperationalSessionSetupPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
@@ -232,7 +260,8 @@ public:
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider), mTimerDelegate(params.timerDelegate),
         mReportScheduler(params.reportScheduler), mSessionKeystore(params.sessionKeystore),
         mFabricTableDelegate(params.fabricTableDelegate),
-        mOwnedSessionResumptionStorage(std::move(params.ownedSessionResumptionStorage))
+        mOwnedSessionResumptionStorage(std::move(params.ownedSessionResumptionStorage)),
+        mProxyPaseSessionVerifier(params.sessionMgr)
     {
         if (mOwnedSessionResumptionStorage)
         {
@@ -246,6 +275,10 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
+        if (Transport::ProxyTransportBase * proxyTransport = GetDeviceProxyTransport(mTransportMgr))
+        {
+            proxyTransport->SetSessionVerifier(&mProxyPaseSessionVerifier);
+        }
         VerifyOrDie(IsInitialized());
     };
 
@@ -338,6 +371,7 @@ private:
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                           = nullptr;
     Platform::UniquePtr<SimpleSessionResumptionStorage> mOwnedSessionResumptionStorage;
+    ProxyPaseSessionVerifier mProxyPaseSessionVerifier{ nullptr };
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be
