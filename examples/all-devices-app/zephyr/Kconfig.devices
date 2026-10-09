@@ -68,6 +68,9 @@ config ALL_DEVICES_DEVICE_DIMMABLE_PLUG_IN_UNIT
 config ALL_DEVICES_DEVICE_DISHWASHER
 	bool "Dishwasher"
 
+config ALL_DEVICES_DEVICE_DOORBELL
+	bool "Doorbell"
+
 config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
 	bool "Electrical sensor"
 

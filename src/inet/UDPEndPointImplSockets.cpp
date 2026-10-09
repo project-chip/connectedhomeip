@@ -39,10 +39,17 @@
 #include <sys/ioctl.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+#include <linux/errqueue.h>
+#include <netinet/icmp6.h>
+#include <netinet/in.h>
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 #include "ZephyrSocket.h" // nogncheck
 #endif
 
+#include <algorithm>
 #include <cerrno>
 #include <unistd.h>
 #include <utility>
@@ -86,6 +93,25 @@ namespace chip {
 namespace Inet {
 
 namespace {
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+// The errnos Linux maps ICMPv6 errors to (icmpv6_err_convert).
+bool IsIcmpV6Errno(int err)
+{
+    switch (err)
+    {
+    case ECONNREFUSED:
+    case EHOSTUNREACH:
+    case ENETUNREACH:
+    case EACCES:
+    case EMSGSIZE:
+    case EPROTO:
+        return true;
+    default:
+        return false;
+    }
+}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, InterfaceId interface)
 {
@@ -441,7 +467,15 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
 
     // Send IP packet.
     // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
-    const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
+    ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    // With IPV6_RECVERR, an ICMP error about an earlier datagram fails the next send; this send was not attempted.
+    if (lenSent == -1 && mErrorQueueEnabled && IsIcmpV6Errno(errno))
+    {
+        // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions): GetSocket calls ensure mSocket is valid
+        lenSent = sendmsg(mSocket, &msgHeader, 0);
+    }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
     if (lenSent == -1)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -571,6 +605,10 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
             }
         }
 #endif // defined(SO_NOSIGPIPE)
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+        EnableErrorQueue();
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
     }
     else if (mAddrType != addressType)
     {
@@ -632,7 +670,16 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 
         if (rcvLen == -1)
         {
-            lStatus = CHIP_ERROR_POSIX(errno);
+            const int recvErrno = errno;
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+            // A queued ICMP error wakes the socket and fails recvmsg with its errno, or with EAGAIN once that is consumed.
+            if (mErrorQueueEnabled && (recvErrno == EAGAIN || recvErrno == EWOULDBLOCK || IsIcmpV6Errno(recvErrno)))
+            {
+                DrainErrorQueue();
+                return;
+            }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+            lStatus = CHIP_ERROR_POSIX(recvErrno);
         }
         else if (lBuffer->AvailableDataLength() < static_cast<size_t>(rcvLen))
         {
@@ -916,6 +963,130 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
+void UDPEndPointImplSockets::PortUnreachableHandlerChanged()
+{
+    EnableErrorQueue();
+}
+
+void UDPEndPointImplSockets::EnableErrorQueue()
+{
+    if (mErrorQueueEnabled || OnPortUnreachable == nullptr || mSocket == kInvalidSocketFd || mAddrType != IPAddressType::kIPv6)
+    {
+        return;
+    }
+    int one = 1;
+    if (setsockopt(mSocket, IPPROTO_IPV6, IPV6_RECVERR, &one, sizeof(one)) != 0)
+    {
+        ChipLogError(Inet, "IPV6_RECVERR failed: %d", errno);
+        return;
+    }
+    mErrorQueueEnabled = true;
+}
+
+void UDPEndPointImplSockets::DrainErrorQueue()
+{
+    if (mState == State::kClosed || mSocket == kInvalidSocketFd)
+    {
+        return;
+    }
+
+    for (;;)
+    {
+        uint8_t quoted[kMaxQuotedPayloadLen];
+        uint8_t cmsgBuf[256];
+        struct iovec iov   = { quoted, sizeof(quoted) };
+        SockAddr from      = {};
+        struct msghdr msg  = {};
+        msg.msg_name       = &from;
+        msg.msg_namelen    = sizeof(from);
+        msg.msg_iov        = &iov;
+        msg.msg_iovlen     = 1;
+        msg.msg_control    = cmsgBuf;
+        msg.msg_controllen = sizeof(cmsgBuf);
+
+        ssize_t n = recvmsg(mSocket, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
+        if (n < 0)
+        {
+            if (errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR)
+            {
+                ChipLogDetail(Inet, "recvmsg(MSG_ERRQUEUE) failed: %d", errno);
+            }
+            return;
+        }
+
+        if ((msg.msg_flags & MSG_CTRUNC) != 0)
+        {
+            ChipLogDetail(Inet, "Truncated MSG_ERRQUEUE control data; ignoring entry");
+            continue;
+        }
+
+        for (struct cmsghdr * cm = CMSG_FIRSTHDR(&msg); cm != nullptr; cm = CMSG_NXTHDR(&msg, cm))
+        {
+            if (cm->cmsg_level != IPPROTO_IPV6 || cm->cmsg_type != IPV6_RECVERR)
+            {
+                continue;
+            }
+
+            if (cm->cmsg_len < CMSG_LEN(sizeof(sock_extended_err) + sizeof(sockaddr_in6)))
+            {
+                continue;
+            }
+
+            auto * extendedErr = reinterpret_cast<sock_extended_err *>(CMSG_DATA(cm));
+            if (extendedErr->ee_origin != SO_EE_ORIGIN_ICMP6 || extendedErr->ee_type != ICMP6_DST_UNREACH ||
+                extendedErr->ee_code != ICMP6_DST_UNREACH_NOPORT)
+            {
+                continue;
+            }
+
+            if (from.any.sa_family != AF_INET6)
+            {
+                continue;
+            }
+
+            // RFC 4443 section 3.1: port-unreachable comes from the destination host.
+            const auto * offender = reinterpret_cast<const sockaddr_in6 *>(SO_EE_OFFENDER(extendedErr));
+            if (offender->sin6_family != AF_INET6 ||
+                memcmp(&offender->sin6_addr, &from.in6.sin6_addr, sizeof(offender->sin6_addr)) != 0)
+            {
+                continue;
+            }
+
+            IPPacketInfo info;
+            info.Clear();
+            info.DestAddress = IPAddress(from.in6.sin6_addr);
+            info.DestPort    = ntohs(from.in6.sin6_port);
+            info.SrcPort     = mBoundPort;
+            if (from.in6.sin6_scope_id != 0 && CanCastTo<InterfaceId::PlatformType>(from.in6.sin6_scope_id))
+            {
+                info.Interface = InterfaceId(static_cast<InterfaceId::PlatformType>(from.in6.sin6_scope_id));
+            }
+
+#if CHIP_DETAIL_LOGGING
+            {
+                char peerStr[Inet::IPAddress::kMaxStringLength];
+                info.DestAddress.ToString(peerStr, sizeof(peerStr));
+                ChipLogDetail(Inet, "ICMPv6 port unreachable from [%s]:%u (sent from local port %u)", peerStr, info.DestPort,
+                              info.SrcPort);
+            }
+#endif // CHIP_DETAIL_LOGGING
+
+            if (OnPortUnreachable != nullptr)
+            {
+                OnPortUnreachable(this, info, ByteSpan(quoted, std::min(static_cast<size_t>(n), sizeof(quoted))));
+            }
+            if (mState == State::kClosed || mSocket == kInvalidSocketFd)
+            {
+                return;
+            }
+        }
+    }
+}
+
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 } // namespace Inet
 } // namespace chip

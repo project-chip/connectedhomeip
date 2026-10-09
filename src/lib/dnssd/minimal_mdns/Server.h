@@ -124,7 +124,8 @@ public:
     /// Listen on the given interfaces/address types.
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
-    /// non-loopback interfaces.
+    /// non-loopback interfaces. An interface that cannot be listened on is skipped;
+    /// IsListening() tells whether any could be.
     CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
                       uint16_t port);
 
