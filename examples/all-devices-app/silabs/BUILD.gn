@@ -76,6 +76,10 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}/freertos_config",
   ]
 
+  if (sl_enable_rgb_led) {
+    include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
+  }
+
   defines = []
 }
 
@@ -109,6 +113,8 @@ silabs_executable("all_devices_app") {
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
+    "src/delegates/SilabsColorLight.cpp",
+    "src/delegates/SilabsColorLight.h",
     "src/delegates/SilabsDimmableLight.cpp",
     "src/delegates/SilabsDimmableLight.h",
     "src/delegates/SilabsHumiditySensor.cpp",
@@ -134,6 +140,7 @@ silabs_executable("all_devices_app") {
 
     # All devices common targets
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/color-light:color-converter",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
@@ -144,6 +151,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
@@ -215,7 +223,10 @@ silabs_executable("all_devices_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-lm",  # powf/fmodf used by color conversion
+  ]
 
   if (chip_print_memory_usage) {
     ldflags += [
