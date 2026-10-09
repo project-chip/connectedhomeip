@@ -75,6 +75,7 @@ CHIP_ERROR BdxTransfer::Reject()
 {
     VerifyOrReturnError(mAwaitingAccept, CHIP_ERROR_INCORRECT_STATE);
     mAwaitingAccept = false;
+    mRejected       = true;
     return mTransfer.RejectTransfer(StatusCode::kTransferFailedUnknownError);
 }
 
@@ -115,6 +116,11 @@ void BdxTransfer::HandleTransferSessionOutput(TransferSession::OutputEvent & eve
         if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
         {
             // TODO: Ending the session here means the StandaloneAck for the BlockAckEOF message hasn't been received.
+            EndSession(CHIP_NO_ERROR);
+        }
+        else if (mRejected && event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            // A rejected session emits no further event; end it here so the transfer is released.
             EndSession(CHIP_NO_ERROR);
         }
         break;
