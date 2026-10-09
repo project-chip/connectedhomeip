@@ -314,14 +314,19 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     VerifyOrReturnError(!activeConnection.IsNull(), CHIP_ERROR_NO_MEMORY);
     activeConnection->mAppState        = appState;
     activeConnection->mConnectionState = TCPState::kConnecting;
+    outPeerConnState                   = activeConnection;
 
     mUsedEndPointCount++;
 
-    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-
-    // Set the return value of the peer connection state to the allocated
-    // connection.
-    outPeerConnState = activeConnection;
+    CHIP_ERROR err = endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface());
+    if (err != CHIP_NO_ERROR)
+    {
+        outPeerConnState.Release();
+        activeConnection->mConnectionState = TCPState::kClosed;
+        activeConnection->Free();
+        mUsedEndPointCount--;
+        return err;
+    }
 
     return CHIP_NO_ERROR;
 #else
