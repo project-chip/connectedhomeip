@@ -972,6 +972,13 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-camera-controller-${BUILD_VARIANT}"
 
+            - name: Build linux-x64-av-analysis
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-av-analysis-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-av-analysis-${BUILD_VARIANT}"
+
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -1179,6 +1186,7 @@ jobs:
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-${BUILD_VARIANT}/chip-camera-controller" >> /tmp/test_env.yaml
+                  echo "AV_ANALYSIS_APP: objdir-clone/linux-x64-av-analysis-${BUILD_VARIANT}/chip-av-analysis-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
