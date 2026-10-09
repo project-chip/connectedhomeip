@@ -39,6 +39,19 @@ struct ReadPrepareParams
     size_t mAttributePathParamsListSize             = 0;
     DataVersionFilter * mpDataVersionFilterList     = nullptr;
     size_t mDataVersionFilterListSize               = 0;
+    // Caller-supplied minimum event number. Set this to "the highest EventNumber the client has
+    // already received, plus one" to filter out duplicate events on the resulting (re)subscribe.
+    //
+    // The effective event minimum sent on the wire is max(mEventNumber, callbackValue+1) when
+    // the ReadClient's Callback implements GetHighestReceivedEventNumber and returns a value;
+    // see ReadClient::Callback::GetHighestReceivedEventNumber for the blending semantics.
+    //
+    // Note on UINT64_MAX: The ReadClient applies a saturating-increment guard ONLY to the
+    // callback-derived value (highest-received + 1) so a callback returning UINT64_MAX does
+    // not wrap to 0 when the +1 is applied; in that case the callback's contribution is
+    // dropped. A caller-supplied mEventNumber=UINT64_MAX is NOT transformed and will be
+    // sent on the wire as the EventFilter minimum (which is operationally meaningless but
+    // not rejected by the implementation).
     Optional<EventNumber> mEventNumber;
     // The timeout for waiting for the response or System::Clock::kZero to let the interaction model decide the timeout based on the
     // MRP timeouts of the session.
