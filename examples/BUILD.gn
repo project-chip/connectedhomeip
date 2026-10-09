@@ -27,7 +27,10 @@ if (chip_build_tests) {
     tests = []
 
     if (chip_device_platform == "linux" && current_os == "linux") {
-      tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
+      tests += [
+        "${chip_root}/examples/evse-app/evse-common/tests",
+        "${chip_root}/examples/evse-app/evse-common/tests:tests-delegate",
+      ]
     }
     tests += [
       "${chip_root}/examples/all-devices-app/posix/app_options/tests",
