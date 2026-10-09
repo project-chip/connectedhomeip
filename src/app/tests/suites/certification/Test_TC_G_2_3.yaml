@@ -1299,7 +1299,7 @@ tests:
           [1789469729.667] [823950:823952] [TOO] Error: IM Error 0x000005CB: General error: 0xcb (INVALID_IN_STATE) 
       disabled: true
 
-       - label:
+    - label:
           "Step 25: TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT"
       verification: |
           ./chip-tool groups add-group-if-identifying 0x0001 Gp20 1 1
