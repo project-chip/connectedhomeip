@@ -1,13 +1,13 @@
 # Matter ESP32 Lighting Example (Zephyr)
 
 This example demonstrates the Matter Lighting application on the ESP32-C6
-running Zephyr RTOS, with Wi-Fi transport and BLE commissioning.
+running Zephyr RTOS, with Wi-Fi or Thread transport and BLE commissioning.
 
 ## Supported Hardware
 
-| Board                            | SoC      | Transport                  |
-| -------------------------------- | -------- | -------------------------- |
-| `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz), BLE setup |
+| Board                            | SoC      | Transport                            |
+| -------------------------------- | -------- | ------------------------------------ |
+| `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz) or Thread, BLE setup |
 
 The light output is GPIO2 (`led0` alias in the board overlay).
 
@@ -99,6 +99,12 @@ west build -b esp32c6_devkitc/esp32c6/hpcore
     uart:~$ wifi connect "MyNetwork" -p "MyPassword" -k 1
     ```
 
+-   Thread only build (Wi-Fi radio off, BLE-Thread commissioning):
+
+    ```shell
+    west build -p always -b esp32c6_devkitc/esp32c6/hpcore -- -DEXTRA_CONF_FILE=overlay-thread.conf
+    ```
+
 -   Configure options with menuconfig:
 
     ```shell
@@ -128,6 +134,15 @@ The example uses the test passcode `20202021` and discriminator `3840`.
 
     ```shell
     ./out/linux-x64-chip-tool/chip-tool pairing onnetwork <NODE ID> 20202021
+    ```
+
+-   Commission over BLE-Thread (Thread only build): requires a Thread Border
+    Router reachable from the host running `chip-tool`. Get the active
+    operational dataset as a hex TLV from the Border Router (for example
+    `ot-ctl dataset active -x`):
+
+    ```shell
+    ./out/linux-x64-chip-tool/chip-tool pairing ble-thread <NODE ID> hex:<operational dataset> 20202021 3840
     ```
 
 -   Control the light:
