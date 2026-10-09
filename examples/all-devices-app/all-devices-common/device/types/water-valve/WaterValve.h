@@ -38,13 +38,6 @@ public:
     explicit WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurationAndControl::Delegate & delegate,
                         const WaterValveConfig & config = {});
 
-<<<<<<< HEAD
-=======
-    WaterValve(TimerDelegate & timerDelegate);
-    WaterValve(TimerDelegate & timerDelegate,
-               const DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> & context,
-               WaterValveListener * listener = nullptr);
->>>>>>> ac852fc6351 (Minor fixes)
     ~WaterValve() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -96,13 +89,8 @@ protected:
     std::optional<Percent> mOpenLevel;
     std::optional<uint32_t> mRemainingDuration;
     TimerDelegate & mTimerDelegate;
-<<<<<<< HEAD
     Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
     const WaterValveConfig mConfig;
-=======
-    DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
-    WaterValveListener * mListener = nullptr;
->>>>>>> ac852fc6351 (Minor fixes)
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };
