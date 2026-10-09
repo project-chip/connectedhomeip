@@ -172,6 +172,10 @@ public:
     void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
     {
         EXPECT_TRUE(conn);
+        if (mExpectedOutConnHandle != nullptr)
+        {
+            EXPECT_EQ(*mExpectedOutConnHandle, conn);
+        }
         ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
                         PeerAddrString(conn->mPeerAddr), conErr.Format());
         mHandleConnectionCompleteCalled = &*conn;
@@ -217,6 +221,7 @@ public:
         mHandleConnectionCompleteError  = CHIP_NO_ERROR;
         mHandleConnectionCloseCalled    = nullptr;
         mHandleConnectionReceivedCalled = nullptr;
+        mExpectedOutConnHandle          = nullptr;
 
         return CHIP_NO_ERROR;
     }
@@ -355,13 +360,26 @@ public:
     void HandleConnectCompleteCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
     {
         // Connect and wait for seeing active connection and connection complete
-        // handler being called.
-        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        // handler being called. Verify outPeerConnState (activeTCPConnState) is
+        // already populated at the moment HandleConnectionAttemptComplete fires
+        // (including when connect() completes synchronously).
+        mExpectedOutConnHandle = &activeTCPConnState;
+        CHIP_ERROR err         = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
         EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+
+        // Reusing the already-connected TCP connection must populate refHolder and invoke
+        // HandleConnectionAttemptComplete synchronously before TCPConnect returns.
+        mHandleConnectionCompleteCalled = nullptr;
+        mExpectedOutConnHandle          = &refHolder;
+        err                             = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(refHolder, activeTCPConnState);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*refHolder);
+        mExpectedOutConnHandle = nullptr;
     }
 
     void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -473,11 +491,12 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount              = 0;
-    void * mHandleConnectionCompleteCalled    = nullptr;
-    CHIP_ERROR mHandleConnectionCompleteError = CHIP_NO_ERROR;
-    void * mHandleConnectionCloseCalled       = nullptr;
-    void * mHandleConnectionReceivedCalled    = nullptr;
+    int mReceiveHandlerCallCount                       = 0;
+    void * mHandleConnectionCompleteCalled             = nullptr;
+    CHIP_ERROR mHandleConnectionCompleteError          = CHIP_NO_ERROR;
+    void * mHandleConnectionCloseCalled                = nullptr;
+    void * mHandleConnectionReceivedCalled             = nullptr;
+    ActiveTCPConnectionHandle * mExpectedOutConnHandle = nullptr;
 
 private:
     IOContext * mIOContext;
