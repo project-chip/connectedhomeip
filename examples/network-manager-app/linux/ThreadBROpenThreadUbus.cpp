@@ -39,13 +39,6 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::Init(AttributeChangeCallback * at
 {
     mAttributeChangeCallback = attributeChangeCallback;
 
-    // The cluster uses Init() for two opposite things: Startup() passes the
-    // callback, and Shutdown() passes nullptr to detach it. The second runs on
-    // the way down, by which point ApplicationShutdown() has already stopped
-    // the ubus manager -- and registering a watch on a stopped manager is a
-    // VerifyOrDie. Detaching is not a fresh initialisation, so stop here.
-    VerifyOrReturnValue(attributeChangeCallback != nullptr, CHIP_NO_ERROR);
-
     mOtbr.SetResolvedCallback([](UbusWatch & watch, void * appState) {
         auto * self = static_cast<decltype(this)>(appState);
         ubus_invoke(&self->mUbusManager.Context(), watch.ObjectID(), "status", nullptr,
@@ -59,6 +52,13 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::Init(AttributeChangeCallback * at
     mUbusManager.Register(mOtbr);
 
     return CHIP_NO_ERROR;
+}
+
+void OpenThreadUbusBorderRouterDelegate::Shutdown()
+{
+    mUbusManager.Unregister(mOtbr);
+    mAttributeChangeCallback = nullptr;
+    mActivateDatasetCallback = nullptr;
 }
 
 void OpenThreadUbusBorderRouterDelegate::GetBorderRouterName(MutableCharSpan & borderRouterName)
@@ -91,8 +91,8 @@ CHIP_ERROR OpenThreadUbusBorderRouterDelegate::GetDataset(Thread::OperationalDat
 
 using ErrorField = BlobMsgField<uint16_t, CHIP_CTST("Error")>;
 
-void OpenThreadUbusBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset, uint32_t sequenceNum,
-                                                          ActivateDatasetCallback * callback)
+void OpenThreadUbusBorderRouterDelegate::SetActiveDataset(const Thread::OperationalDataset & activeDataset,
+                                                          ActivateDatasetCompleteCallback callback, void * context)
 {
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     VerifyOrExit(activeDataset.IsCommissioned(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -116,11 +116,11 @@ void OpenThreadUbusBorderRouterDelegate::SetActiveDataset(const Thread::Operatio
 
     mActiveDataset           = activeDataset;
     mActivateDatasetCallback = callback;
-    mActivateDatasetSequence = sequenceNum;
+    mActivateDatasetContext  = context;
     return;
 
 exit:
-    callback->OnActivateDatasetComplete(sequenceNum, err);
+    callback(context, err);
 }
 
 void OpenThreadUbusBorderRouterDelegate::OnDataReceived(blob_attr * msg, bool notification)
@@ -157,9 +157,9 @@ void OpenThreadUbusBorderRouterDelegate::OnDataReceived(blob_attr * msg, bool no
         ChipLogProgress(AppServer, "Received OTBR Attached = %d", attached.value());
         if (attached.value() && mActivateDatasetCallback)
         {
-            auto * callback          = mActivateDatasetCallback;
+            auto callback            = mActivateDatasetCallback;
             mActivateDatasetCallback = nullptr;
-            callback->OnActivateDatasetComplete(mActivateDatasetSequence, CHIP_NO_ERROR);
+            callback(mActivateDatasetContext, CHIP_NO_ERROR);
         }
     }
 }

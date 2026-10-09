@@ -138,8 +138,7 @@ CHIP_ERROR ThreadBorderRouterManagementCluster::Startup(ServerClusterContext & c
 void ThreadBorderRouterManagementCluster::Shutdown(ClusterShutdownType reason)
 {
     mPlatformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    // clearing the delegate MUST always succeed.
-    RETURN_SAFELY_IGNORED mDelegate.Init(nullptr);
+    mDelegate.Shutdown();
     mAsyncCommandHandle = CommandHandler::Handle();
     app::DefaultServerCluster::Shutdown(reason);
 }
@@ -236,11 +235,9 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
 
         mAsyncCommandHandle = CommandHandler::Handle(ctx);
         mBreadcrumb         = req.breadcrumb;
-        mSetActiveDatasetSequenceNumber++;
 
         ctx->FlushAcksRightAwayOnSlowCommand();
-        mDelegate.SetActiveDataset(activeDataset, mSetActiveDatasetSequenceNumber,
-                                   static_cast<ThreadBorderRouterManagementDelegate::ActivateDatasetCallback *>(this));
+        mDelegate.SetActiveDataset(activeDataset, OnActivateDatasetComplete, this);
 
         // Return nullopt because this is an async operation. The response will be sent
         // later in the OnActivateDatasetComplete callback.
@@ -269,27 +266,25 @@ ThreadBorderRouterManagementCluster::InvokeCommand(const DataModel::InvokeReques
     }
 }
 
-void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error)
+void ThreadBorderRouterManagementCluster::OnActivateDatasetComplete(void * context, CHIP_ERROR error)
 {
-    if (mSetActiveDatasetSequenceNumber != sequenceNum)
-    {
-        return;
-    }
+    auto * cluster = static_cast<ThreadBorderRouterManagementCluster *>(context);
 
-    auto commandHandleRef = std::move(mAsyncCommandHandle);
+    // Nothing pending: the request was withdrawn when the fail-safe expired, or answered already.
+    auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
         return;
     }
 
-    if (error == CHIP_NO_ERROR && mBreadcrumb.HasValue())
+    if (error == CHIP_NO_ERROR && cluster->mBreadcrumb.HasValue())
     {
-        mBreadcrumbTracker.SetBreadCrumb(mBreadcrumb.Value());
+        cluster->mBreadcrumbTracker.SetBreadCrumb(cluster->mBreadcrumb.Value());
     }
-    mBreadcrumb.ClearValue();
+    cluster->mBreadcrumb.ClearValue();
 
-    commandHandle->AddStatus(ConcreteCommandPath(mPath.mEndpointId, mPath.mClusterId,
+    commandHandle->AddStatus(ConcreteCommandPath(cluster->mPath.mEndpointId, cluster->mPath.mClusterId,
                                                  ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id),
                              app::StatusIB(error).mStatus);
 }
@@ -300,10 +295,9 @@ void ThreadBorderRouterManagementCluster::OnPlatformEventHandler(const DeviceLay
 
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        // Take the pending command and invalidate its sequence number before calling the delegate, so
-        // OnActivateDatasetComplete ignores a completion the delegate reports from RevertActiveDataset.
+        // Take the pending command before calling the delegate, so a completion it reports from
+        // RevertActiveDataset finds nothing left to answer.
         auto commandHandleRef = std::move(cluster->mAsyncCommandHandle);
-        cluster->mSetActiveDatasetSequenceNumber++;
         cluster->mBreadcrumb.ClearValue();
 
         (void) cluster->mDelegate.RevertActiveDataset();
