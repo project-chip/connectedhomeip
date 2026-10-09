@@ -48,6 +48,12 @@ public:
     template <typename Encodable, typename Decodable>
     void NullablesOptionalsEncodeDecodeCheck();
 
+    template <typename Encodable, typename Decodable>
+    void ChannelRecordingOptionalFieldsEncodeDecodeCheck();
+
+    template <typename Decodable>
+    void ChannelRecordingNullFieldsDecodeCheck();
+
     void SetupBuf();
     void DumpBuf();
     void SetupReader();
@@ -486,6 +492,141 @@ TEST_F(TestDataModelSerialization, EncAndDecDecodableDoubleNestedStructList)
         EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
         EXPECT_EQ(i, 4u);
     }
+}
+
+template <typename Encodable, typename Decodable>
+void TestDataModelSerialization::ChannelRecordingOptionalFieldsEncodeDecodeCheck()
+{
+    const Channel::Structs::AdditionalInfoStruct::Type externalIds[] = { { "provider"_span, "program"_span } };
+    const uint8_t data[]                                             = { 1, 2, 3 };
+
+    // Exercise absence, an explicitly empty value, and a non-empty value independently for both fields.
+    for (uint8_t idsState = 0; idsState < 3; ++idsState)
+    {
+        for (uint8_t dataState = 0; dataState < 3; ++dataState)
+        {
+            Encodable command;
+            command.programIdentifier  = "program"_span;
+            command.shouldRecordSeries = false;
+            if (idsState != 0)
+            {
+                command.externalIDList.SetValue(
+                    DataModel::List<const Channel::Structs::AdditionalInfoStruct::Type>(externalIds, idsState == 1 ? 0 : 1));
+            }
+            if (dataState != 0)
+            {
+                command.data.SetValue(ByteSpan(data, dataState == 1 ? 0 : sizeof(data)));
+            }
+
+            uint8_t raw[128];
+            TLV::TLVWriter rawWriter;
+            rawWriter.Init(raw);
+            TLV::TLVType structure;
+            ASSERT_EQ(rawWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structure), CHIP_NO_ERROR);
+            ASSERT_EQ(rawWriter.PutString(TLV::ContextTag(0), "program"), CHIP_NO_ERROR);
+            ASSERT_EQ(rawWriter.Put(TLV::ContextTag(1), false), CHIP_NO_ERROR);
+            if (idsState != 0)
+            {
+                TLV::TLVType array;
+                ASSERT_EQ(rawWriter.StartContainer(TLV::ContextTag(2), TLV::kTLVType_Array, array), CHIP_NO_ERROR);
+                if (idsState == 2)
+                {
+                    TLV::TLVType item;
+                    ASSERT_EQ(rawWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item), CHIP_NO_ERROR);
+                    ASSERT_EQ(rawWriter.PutString(TLV::ContextTag(0), "provider"), CHIP_NO_ERROR);
+                    ASSERT_EQ(rawWriter.PutString(TLV::ContextTag(1), "program"), CHIP_NO_ERROR);
+                    ASSERT_EQ(rawWriter.EndContainer(item), CHIP_NO_ERROR);
+                }
+                ASSERT_EQ(rawWriter.EndContainer(array), CHIP_NO_ERROR);
+            }
+            if (dataState != 0)
+            {
+                ASSERT_EQ(rawWriter.PutBytes(TLV::ContextTag(3), data, dataState == 1 ? 0 : sizeof(data)), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(rawWriter.EndContainer(structure), CHIP_NO_ERROR);
+            ASSERT_EQ(rawWriter.Finalize(), CHIP_NO_ERROR);
+
+            // Compare generated encoding with independently written TLV, including omitted tags.
+            uint8_t encoded[128];
+            TLV::TLVWriter writer;
+            writer.Init(encoded);
+            ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), command), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+            EXPECT_TRUE(ByteSpan(encoded, writer.GetLengthWritten()).data_equal(ByteSpan(raw, rawWriter.GetLengthWritten())));
+
+            TLV::TLVReader reader;
+            reader.Init(raw, rawWriter.GetLengthWritten());
+            ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+            Decodable decoded;
+            ASSERT_EQ(DataModel::Decode(reader, decoded), CHIP_NO_ERROR);
+            EXPECT_TRUE(decoded.programIdentifier.data_equal("program"_span));
+            EXPECT_FALSE(decoded.shouldRecordSeries);
+            ASSERT_EQ(decoded.externalIDList.HasValue(), idsState != 0);
+            ASSERT_EQ(decoded.data.HasValue(), dataState != 0);
+            if (idsState != 0)
+            {
+                auto iter = decoded.externalIDList.Value().begin();
+                if (idsState == 2)
+                {
+                    ASSERT_TRUE(iter.Next());
+                    EXPECT_TRUE(iter.GetValue().name.data_equal("provider"_span));
+                    EXPECT_TRUE(iter.GetValue().value.data_equal("program"_span));
+                }
+                EXPECT_FALSE(iter.Next());
+                EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            }
+            if (dataState != 0)
+            {
+                EXPECT_TRUE(decoded.data.Value().data_equal(ByteSpan(data, dataState == 1 ? 0 : sizeof(data))));
+            }
+        }
+    }
+}
+
+template <typename Decodable>
+void TestDataModelSerialization::ChannelRecordingNullFieldsDecodeCheck()
+{
+    for (uint8_t tag = 2; tag <= 3; ++tag)
+    {
+        uint8_t raw[128];
+        TLV::TLVWriter writer;
+        writer.Init(raw);
+        TLV::TLVType structure;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structure), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.PutString(TLV::ContextTag(0), "program"), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), false), CHIP_NO_ERROR);
+        // Optional fields may be absent, but neither field permits a TLV Null value.
+        ASSERT_EQ(writer.PutNull(TLV::ContextTag(tag)), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(structure), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        TLV::TLVReader reader;
+        reader.Init(raw, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        Decodable decoded;
+        EXPECT_EQ(DataModel::Decode(reader, decoded), tag == 2 ? CHIP_ERROR_SCHEMA_MISMATCH : CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+}
+
+TEST_F(TestDataModelSerialization, ChannelRecordProgramOptionalFields)
+{
+    ChannelRecordingOptionalFieldsEncodeDecodeCheck<Channel::Commands::RecordProgram::Type,
+                                                    Channel::Commands::RecordProgram::DecodableType>();
+}
+
+TEST_F(TestDataModelSerialization, ChannelCancelRecordProgramOptionalFields)
+{
+    ChannelRecordingOptionalFieldsEncodeDecodeCheck<Channel::Commands::CancelRecordProgram::Type,
+                                                    Channel::Commands::CancelRecordProgram::DecodableType>();
+}
+
+TEST_F(TestDataModelSerialization, ChannelRecordProgramRejectsNullFields)
+{
+    ChannelRecordingNullFieldsDecodeCheck<Channel::Commands::RecordProgram::DecodableType>();
+}
+
+TEST_F(TestDataModelSerialization, ChannelCancelRecordProgramRejectsNullFields)
+{
+    ChannelRecordingNullFieldsDecodeCheck<Channel::Commands::CancelRecordProgram::DecodableType>();
 }
 
 TEST_F(TestDataModelSerialization, OptionalFields)

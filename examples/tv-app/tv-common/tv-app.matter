@@ -2897,15 +2897,15 @@ cluster Channel = 1284 {
   request struct RecordProgramRequest {
     char_string programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string data = 3;
   }
 
   request struct CancelRecordProgramRequest {
     char_string programIdentifier = 0;
     boolean shouldRecordSeries = 1;
-    AdditionalInfoStruct externalIDList[] = 2;
-    octet_string data = 3;
+    optional AdditionalInfoStruct externalIDList[] = 2;
+    optional octet_string data = 3;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */

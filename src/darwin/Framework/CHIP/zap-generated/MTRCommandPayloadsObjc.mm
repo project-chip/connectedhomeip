@@ -32824,9 +32824,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _shouldRecordSeries = @(0);
 
-        _externalIDList = [NSArray array];
+        _externalIDList = nil;
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -32868,33 +32868,39 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.shouldRecordSeries = self.shouldRecordSeries.boolValue;
     }
     {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.externalIDList)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.externalIDList.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.externalIDList.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.externalIDList[i_0], MTRChannelClusterAdditionalInfoStruct);
-                    if (!element_0) {
-                        // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
+        if (self.externalIDList != nil) {
+            auto & definedValue_0 = encodableStruct.externalIDList.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.externalIDList.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.externalIDList.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
-                    listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.externalIDList.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.externalIDList[i_1], MTRChannelClusterAdditionalInfoStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_1], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
+                        listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.externalIDList.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
-                encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
-            } else {
-                encodableStruct.externalIDList = ListType_0();
             }
         }
     }
     {
-        encodableStruct.data = AsByteSpan(self.data);
+        if (self.data != nil) {
+            auto & definedValue_0 = encodableStruct.data.Emplace();
+            definedValue_0 = AsByteSpan(self.data);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -32944,9 +32950,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _shouldRecordSeries = @(0);
 
-        _externalIDList = [NSArray array];
+        _externalIDList = nil;
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -32988,33 +32994,39 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.shouldRecordSeries = self.shouldRecordSeries.boolValue;
     }
     {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.externalIDList)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.externalIDList.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.externalIDList.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.externalIDList[i_0], MTRChannelClusterAdditionalInfoStruct);
-                    if (!element_0) {
-                        // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_0], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
+        if (self.externalIDList != nil) {
+            auto & definedValue_0 = encodableStruct.externalIDList.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.externalIDList.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.externalIDList.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
-                    listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.externalIDList.count; ++i_1) {
+                        auto element_1 = MTR_SAFE_CAST(self.externalIDList[i_1], MTRChannelClusterAdditionalInfoStruct);
+                        if (!element_1) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.externalIDList[i_1], NSStringFromClass(MTRChannelClusterAdditionalInfoStruct.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
+                        listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.externalIDList.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
-                encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
-            } else {
-                encodableStruct.externalIDList = ListType_0();
             }
         }
     }
     {
-        encodableStruct.data = AsByteSpan(self.data);
+        if (self.data != nil) {
+            auto & definedValue_0 = encodableStruct.data.Emplace();
+            definedValue_0 = AsByteSpan(self.data);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

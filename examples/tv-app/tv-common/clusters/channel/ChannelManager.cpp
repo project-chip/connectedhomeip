@@ -294,8 +294,8 @@ void ChannelManager::HandleGetProgramGuide(
 }
 
 bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                         const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                         const chip::ByteSpan & data)
+                                         const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                         const chip::Optional<chip::ByteSpan> & data)
 {
     // Start recording
     std::string idString(programIdentifier.data(), programIdentifier.size());
@@ -312,8 +312,8 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
 }
 
 bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                               const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                               const chip::ByteSpan & data)
+                                               const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                               const chip::Optional<chip::ByteSpan> & data)
 {
     // Cancel recording
     std::string idString(programIdentifier.data(), programIdentifier.size());

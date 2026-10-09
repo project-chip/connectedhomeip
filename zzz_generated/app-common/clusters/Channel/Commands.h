@@ -337,8 +337,8 @@ public:
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
-    DataModel::List<const Structs::AdditionalInfoStruct::Type> externalIDList;
-    chip::ByteSpan data;
+    Optional<DataModel::List<const Structs::AdditionalInfoStruct::Type>> externalIDList;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -356,8 +356,8 @@ public:
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
-    DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType> externalIDList;
-    chip::ByteSpan data;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -380,8 +380,8 @@ public:
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
-    DataModel::List<const Structs::AdditionalInfoStruct::Type> externalIDList;
-    chip::ByteSpan data;
+    Optional<DataModel::List<const Structs::AdditionalInfoStruct::Type>> externalIDList;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -399,8 +399,8 @@ public:
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
-    DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType> externalIDList;
-    chip::ByteSpan data;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

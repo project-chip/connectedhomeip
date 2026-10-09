@@ -118,8 +118,8 @@ limitations under the License.
       <description>Record a specific program or series when it goes live. This functionality enables DVR recording features.</description>
       <arg name="ProgramIdentifier" type="char_string"/>
       <arg name="ShouldRecordSeries" type="boolean"/>
-      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
-      <arg name="Data" type="octet_string"/>
+      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
+      <arg name="Data" type="octet_string" optional="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="RP"/>
@@ -132,8 +132,8 @@ limitations under the License.
       <description>Cancel recording for a specific program or series.</description>
       <arg name="ProgramIdentifier" type="char_string"/>
       <arg name="ShouldRecordSeries" type="boolean"/>
-      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
-      <arg name="Data" type="octet_string"/>
+      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
+      <arg name="Data" type="octet_string" optional="true"/>
       <mandatoryConform>
         <andTerm>
           <feature name="RP"/>
