@@ -49,16 +49,9 @@ CHIP_ERROR NFCOnboardingPayloadManagerImpl::_StartTagEmulation(const char * payl
 
     int err;
 
-    if (device_is_ready(dev))
+    if (!device_is_ready(dev))
     {
         ChipLogError(DeviceLayer, "NFC device is not ready for use");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    err = device_init(dev);
-    if (err != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize NFC device: %d", err);
         return CHIP_ERROR_INTERNAL;
     }
 

@@ -1,4 +1,5 @@
 # Copyright 2023 The Pigweed Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -12,26 +13,22 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import("//build_overrides/pigweed.gni")
-
-import("$dir_pw_build/target_types.gni")
+# Derived from Pigweed's third_party/abseil-cpp/abseil-cpp.gni; builds on plain
+# GN source_set instead of pw_source_set.
 
 declare_args() {
-  # If compiling tests with Abseil C++, this variable is set to the path to the
-  # Abseil C++ installation. When set, a pw_source_set for the Abseil C++
-  # library is created at "//third_party/abseil-cpp".
+  # Path to the Abseil source tree. Set only in the FuzzTest toolchain
+  # (//build/toolchain/pw_fuzzer:chip_pw_fuzztest).
   chip_abseil_cpp_dir = ""
 }
 
-# Like `pw_source_set`, but with modified configs for building Abseil C++.
 template("abseil_cpp_source_set") {
-  pw_source_set(target_name) {
-    configs = []
-    public_configs = []
-    remove_configs = []
+  source_set(target_name) {
     forward_variables_from(invoker, "*")
-    configs += [ "//third_party/abseil-cpp:absl_config" ]
-    public_configs += [ "//third_party/abseil-cpp:absl_public_config" ]
-    remove_configs += [ "$dir_pw_fuzzer:instrumentation" ]
+    public_configs = [ "//third_party/abseil-cpp:absl_public_config" ]
+    configs += [
+      "//third_party/abseil-cpp:absl_config",
+      "//third_party/fuzztest:fuzztest_runtime",
+    ]
   }
 }
