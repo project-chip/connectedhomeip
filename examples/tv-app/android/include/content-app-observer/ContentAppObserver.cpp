@@ -29,7 +29,7 @@ ContentAppObserver::ContentAppObserver()
 }
 
 void ContentAppObserver::HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper,
-                                                 const chip::Optional<chip::CharSpan> & data, const chip::CharSpan & encodingHint)
+                                                 chip::CharSpan data, const chip::Optional<chip::CharSpan> & encodingHint)
 {
     ChipLogProgress(Zcl, "ContentAppObserver::HandleContentAppMessage");
 }

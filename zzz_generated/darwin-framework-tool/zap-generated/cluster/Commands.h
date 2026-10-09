@@ -173775,12 +173775,12 @@ public:
         __auto_type * cluster = [[MTRBaseClusterContentAppObserver alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
         __auto_type * params = [[MTRContentAppObserverClusterContentAppMessageParams alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        if (mRequest.data.HasValue()) {
-            params.data = [[NSString alloc] initWithBytes:mRequest.data.Value().data() length:mRequest.data.Value().size() encoding:NSUTF8StringEncoding];
+        params.data = [[NSString alloc] initWithBytes:mRequest.data.data() length:mRequest.data.size() encoding:NSUTF8StringEncoding];
+        if (mRequest.encodingHint.HasValue()) {
+            params.encodingHint = [[NSString alloc] initWithBytes:mRequest.encodingHint.Value().data() length:mRequest.encodingHint.Value().size() encoding:NSUTF8StringEncoding];
         } else {
-            params.data = nil;
+            params.encodingHint = nil;
         }
-        params.encodingHint = [[NSString alloc] initWithBytes:mRequest.encodingHint.data() length:mRequest.encodingHint.size() encoding:NSUTF8StringEncoding];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
