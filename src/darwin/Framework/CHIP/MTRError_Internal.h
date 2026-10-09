@@ -30,6 +30,28 @@ MTR_DIRECT_MEMBERS
 @interface MTRError ()
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id _Nullable)contextToLog;
+
+/**
+ * Variant that allows the caller to merge additional userInfo keys (e.g.
+ * MTRAttestationVerificationResultKey) into the resulting NSError. Intended for
+ * failure sites that have structured context worth preserving alongside the
+ * bridged CHIP_ERROR.
+ *
+ * On both the IM-status and non-IM-status paths, the framework reserves
+ * NSLocalizedDescriptionKey and MTRUnderlyingErrorCodeKey (and on the IM path
+ * additionally @"clusterStatus"). Framework-set values for these reserved keys
+ * always win over caller-supplied values in additionalUserInfo. Other
+ * caller-supplied keys are preserved.
+ *
+ * The reserved-key contract exists because errorToCHIPErrorCode: relies on
+ * MTRUnderlyingErrorCodeKey (and, on the IM path, @"clusterStatus") to recover
+ * the original CHIP_ERROR integer when the MTRErrorHolder associated object is
+ * absent (post-XPC, post-NSCoding, post-custom-NSCopying). Allowing callers to
+ * overwrite these keys would silently corrupt the integer round-trip.
+ */
++ (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                                  logContext:(id _Nullable)contextToLog
+                          additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> * _Nullable)additionalUserInfo;
 + (NSError * _Nullable)errorForIMStatus:(const chip::app::StatusIB &)status;
 + (NSError * _Nullable)errorForIMStatusCode:(chip::Protocols::InteractionModel::Status)status;
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;
