@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <optional>
 #include <utility>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -33,6 +34,7 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
@@ -75,7 +77,7 @@ const MockNodeConfig & TestMockNodeConfig()
                 Clusters::UnitTesting::Attributes::Boolean::Id,
                 Clusters::UnitTesting::Attributes::Int16u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
-                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+                MockAttributeConfig(Clusters::UnitTesting::Attributes::ListStructOctetString::Id, ZCL_ARRAY_ATTRIBUTE_TYPE),
             }),
         }),
         MockEndpointConfig(kMockEndpoint1, {
@@ -164,6 +166,7 @@ public:
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
+    void TestWriteHandlerListWriteEndAfterExchangeRelease();
     void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
     void TestWriteInvalidMessage2();
@@ -240,6 +243,28 @@ public:
     StatusIB mLastErrorReason;
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
+
+namespace {
+
+class ListWriteNotificationProvider : public TestImCustomDataModel
+{
+public:
+    void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation operation,
+                                        FabricIndex accessingFabric) override
+    {
+        mNotificationCount++;
+        mLastPath      = path;
+        mLastOperation = operation;
+        mLastFabric    = accessingFabric;
+    }
+
+    uint32_t mNotificationCount = 0;
+    std::optional<ConcreteAttributePath> mLastPath;
+    DataModel::ListWriteOperation mLastOperation = DataModel::ListWriteOperation::kListWriteBegin;
+    FabricIndex mLastFabric                      = kUndefinedFabricIndex;
+};
+
+} // namespace
 
 void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
@@ -551,6 +576,68 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
             EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
         }
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExchangeRelease)
+{
+    using namespace Protocols::InteractionModel;
+
+    ListWriteNotificationProvider provider;
+    WriteHandler writeHandler;
+    auto cleanup = MakeDefer([&] {
+        writeHandler.Close();
+        DrainAndServiceIO();
+    });
+    const AttributePathParams attributePath(kTestEndpointId, Clusters::UnitTesting::Id,
+                                            Clusters::UnitTesting::Attributes::ListStructOctetString::Id);
+    const ConcreteAttributePath concretePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+
+    // Reuse the handler on both fabrics to check that the cached identity belongs to the current transaction.
+    for (const bool toBob : { true, false })
+    {
+        ASSERT_SUCCESS(writeHandler.Init(&provider, InteractionModelEngine::GetInstance()));
+        TestWriteClientCallback writeCallback;
+        WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
+        ASSERT_SUCCESS(writeClient.EncodeAttribute(attributePath, DataModel::List<uint8_t>()));
+        ASSERT_SUCCESS(writeClient.FinalizeMessage(true /* aHasMoreChunks */));
+        ASSERT_FALSE(writeClient.mChunks.IsNull());
+
+        TestExchangeDelegate delegate;
+        Messaging::ExchangeContext * exchange = toBob ? NewExchangeToBob(&delegate) : NewExchangeToAlice(&delegate);
+        ASSERT_NE(exchange, nullptr);
+        const FabricIndex fabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
+        ASSERT_NE(fabricIndex, kUndefinedFabricIndex);
+        ASSERT_EQ(fabricIndex, toBob ? GetAliceFabricIndex() : GetBobFabricIndex());
+        const uint32_t notificationCount = provider.mNotificationCount;
+
+        ASSERT_EQ(writeHandler.OnWriteRequest(exchange, writeClient.mChunks.PopHead(), false /* aIsTimedWrite */), Status::Success);
+        ASSERT_FALSE(writeHandler.IsFree());
+        ASSERT_TRUE(writeHandler.mProcessingAttributePath.HasValue());
+        ASSERT_TRUE(writeHandler.mStateFlags.Has(WriteHandler::StateBits::kProcessingAttributeIsList));
+        EXPECT_EQ(writeHandler.GetAccessingFabricIndex(), fabricIndex);
+        EXPECT_EQ(provider.mNotificationCount, notificationCount + 1);
+        EXPECT_EQ(provider.mLastPath, concretePath);
+        EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteBegin);
+        EXPECT_EQ(provider.mLastFabric, fabricIndex);
+
+        // Isolate teardown from the exchange lifetime: the pending end notification must survive an empty holder.
+        writeHandler.mExchangeCtx.Release();
+        ASSERT_EQ(writeHandler.mExchangeCtx.Get(), nullptr);
+        writeHandler.Close();
+
+        EXPECT_EQ(provider.mNotificationCount, notificationCount + 2);
+        EXPECT_EQ(provider.mLastPath, concretePath);
+        EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteFailure);
+        EXPECT_EQ(provider.mLastFabric, fabricIndex);
+        EXPECT_FALSE(writeHandler.mProcessingAttributePath.HasValue());
+        EXPECT_TRUE(writeHandler.IsFree());
+        EXPECT_EQ(writeHandler.GetAccessingFabricIndex(), kUndefinedFabricIndex);
+
+        writeHandler.Close();
+        EXPECT_EQ(provider.mNotificationCount, notificationCount + 2);
+        DrainAndServiceIO();
+        EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
     }
 }
 

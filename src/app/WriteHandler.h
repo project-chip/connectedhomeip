@@ -246,7 +246,8 @@ private:
     };
 
     BitFlags<StateBits> mStateFlags;
-    State mState = State::Uninitialized;
+    State mState                      = State::Uninitialized;
+    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace app
