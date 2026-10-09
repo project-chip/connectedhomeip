@@ -37,6 +37,11 @@ public:
     SetSoilMoistureMeasuredValue(
         const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
 
+    const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & GetSoilMoistureMeasuredValue() const
+    {
+        return mSoilMoistureMeasuredValue;
+    }
+
 protected:
     const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;
     SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;

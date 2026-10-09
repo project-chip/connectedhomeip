@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
@@ -60,6 +62,7 @@
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
 #include <device/types/oven/impl/LoggingOven.h>
+#include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
 #include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
 #include <device/types/proximity-ranger/ProximityRanger.h>
@@ -69,6 +72,7 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -86,6 +90,8 @@
 #include <map>
 
 namespace chip::app {
+
+class OOBAccessorHook;
 
 /**
  * Centralized factory registry for instantiating Matter devices in all-devices-app.
@@ -186,6 +192,8 @@ template <typename... Hooks>
 class DeviceFactory
 {
 public:
+    static constexpr bool kHasOOBAccessorHook = (sizeof...(Hooks) > 0) && (std::is_same_v<Hooks, OOBAccessorHook> || ...);
+
     /// Bundles an allocated device with its post-registration hook callback.
     struct DeviceRegistrationEntry
     {
@@ -694,7 +702,17 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            if constexpr (kHasOOBAccessorHook)
+            {
+                RegisterCreator("soil-sensor", [this]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SoilSensor>(mContext->timerDelegate, /* includeTemperature = */ true);
+                });
+            }
+            else
+            {
+                RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            }
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
@@ -785,7 +803,19 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", []() { return MakeDevice<DecreasingBatteryPowerSource>(); });
+            if constexpr (kHasOOBAccessorHook)
+            {
+                RegisterCreator("power-source", [this]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<BatteryPowerSource>("Power Source Battery"_span,
+                                                          Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
+                                                          mContext->timerDelegate);
+                });
+            }
+            else
+            {
+                RegisterCreator("power-source", []() { return MakeDevice<DecreasingBatteryPowerSource>(); });
+            }
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {

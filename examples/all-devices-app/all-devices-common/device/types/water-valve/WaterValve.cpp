@@ -81,8 +81,13 @@ Clusters::ValveConfigurationAndControlCluster & WaterValve::ValveConfigurationAn
 
 DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Percent> level)
 {
-    Percent targetLevel = level.ValueOr(100);
+    Percent targetLevel = level.ValueOr(mLastOpenLevel);
     ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
+    // Remember the level so a later open without an explicit level reopens to the same place.
+    if (targetLevel > 0)
+    {
+        mLastOpenLevel = targetLevel;
+    }
     return DataModel::MakeNullable(targetLevel);
 }
 

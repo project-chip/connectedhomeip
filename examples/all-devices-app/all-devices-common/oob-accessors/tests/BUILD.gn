@@ -24,11 +24,16 @@ if (chip_build_tests) {
     test_sources = [
       "TestOOBAccessors.cpp",
       "TestOOBDataSerializer.cpp",
+      "TestSoilSensorAccessor.cpp",
+      "TestWaterValveAccessor.cpp",
     ]
 
     cflags = [ "-Wconversion" ]
 
     public_deps = [
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor:increasing",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:ambient-context",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:basic-information",
@@ -38,7 +43,9 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:occupancy",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:rvc",
+      "${chip_root}/src/app/persistence:default",
       "${chip_root}/src/app/server-cluster/testing",
+      "${chip_root}/src/data-model-providers/codedriven",
       "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/platform",
     ]
