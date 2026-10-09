@@ -125,7 +125,7 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600, keepSubscriptions=False)
         attrib_listener.reset()
 
         self.step("3", "TH writes DUT HoldTime attribute to enable proper testing completion using PIXIT.ACS.Holdtime input")
@@ -251,12 +251,12 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         attrib_listener.reset()
 
-        self.step("8", "Wait until HoldTime seconds are passed from the step 4 execution.")
+        self.step("8", "Wait until HoldTime seconds are passed from the step 6 execution.")
         # timer ends
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
         if elapsed_time > holdTime_input:
-            log.info("HoldTime already elapsed since the step 4 trigger; no additional wait needed.")
+            log.info("HoldTime already elapsed since the step 6 trigger; no additional wait needed.")
         else:
             log.info("Waiting for the HoldTime input to expire.")
             await asyncio.sleep(holdTime_input - elapsed_time + 1)
@@ -265,6 +265,9 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         # check the subscription of AmbientContextType attribute (to be empty list)
         subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
         asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
+        ambientContextType = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+        asserts.assert_true(len(ambientContextType) == 0, "AmbientContext attribute is not empty.")
 
         # check boolean attributes
         if namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID and self.HumanActivitySupported:
