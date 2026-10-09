@@ -52,6 +52,10 @@ using chip::app::Clusters::AccountLogin::Delegate;
 using chip::Protocols::InteractionModel::Status;
 using LoggedOutEvent = chip::app::Clusters::AccountLogin::Events::LoggedOut::Type;
 
+// Spec constraint on the Login command's SetupPIN field: a string of at least 8 characters.
+// This is a length check only; the PIN is never interpreted as a number, so leading zeros are fine.
+constexpr size_t kMinSetupPinLength = 8;
+
 static constexpr size_t kAccountLoginDeletageTableSize =
     MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kAccountLoginDeletageTableSize <= kEmberInvalidEndpointIndex, "AccountLogin Delegate table size error");
@@ -244,6 +248,12 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (setupPin.size() < kMinSetupPinLength)
+    {
+        command->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
 
     if (!delegate->HandleLogin(tempAccountIdentifier, setupPin, nodeId))
     {

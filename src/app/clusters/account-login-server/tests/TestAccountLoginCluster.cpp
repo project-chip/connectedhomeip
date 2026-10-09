@@ -266,7 +266,7 @@ TEST_F(TestAccountLoginCluster, LoginSucceedsMapsToSuccess)
 
     Commands::Login::DecodableType request;
     request.tempAccountIdentifier = "account-1"_span;
-    request.setupPIN              = "1234"_span;
+    request.setupPIN              = "12345678"_span;
 
     chip::Testing::MockCommandHandler mockHandler;
     auto commandPath = MakeCommandPath(Commands::Login::Id);
@@ -282,7 +282,7 @@ TEST_F(TestAccountLoginCluster, LoginFailureMapsToUnsupportedAccess)
 
     Commands::Login::DecodableType request;
     request.tempAccountIdentifier = "account-1"_span;
-    request.setupPIN              = "wrong"_span;
+    request.setupPIN              = "wrongpin"_span;
 
     chip::Testing::MockCommandHandler mockHandler;
     auto commandPath = MakeCommandPath(Commands::Login::Id);
@@ -292,13 +292,49 @@ TEST_F(TestAccountLoginCluster, LoginFailureMapsToUnsupportedAccess)
     EXPECT_EQ(mockHandler.GetLastStatus().status.GetStatus(), Status::UnsupportedAccess);
 }
 
+TEST_F(TestAccountLoginCluster, LoginWithShortSetupPinReturnsConstraintError)
+{
+    mDelegate.mLoginResult = true;
+
+    Commands::Login::DecodableType request;
+    request.tempAccountIdentifier = "account-1"_span;
+    request.setupPIN              = "1234567"_span; // one character below the spec minimum of 8
+
+    chip::Testing::MockCommandHandler mockHandler;
+    auto commandPath = MakeCommandPath(Commands::Login::Id);
+    emberAfAccountLoginClusterLoginCallback(&mockHandler, commandPath, request);
+
+    ASSERT_TRUE(mockHandler.HasStatus());
+    EXPECT_EQ(mockHandler.GetLastStatus().status.GetStatus(), Status::ConstraintError);
+}
+
+TEST_F(TestAccountLoginCluster, LoginSetupPinIsLengthCheckedNotNumeric)
+{
+    mDelegate.mLoginResult = true;
+
+    // Leading zeros are significant characters: "00001234" is 8 characters and must be accepted.
+    for (CharSpan setupPin : { "00001234"_span, "12345678901"_span })
+    {
+        Commands::Login::DecodableType request;
+        request.tempAccountIdentifier = "account-1"_span;
+        request.setupPIN              = setupPin;
+
+        chip::Testing::MockCommandHandler mockHandler;
+        auto commandPath = MakeCommandPath(Commands::Login::Id);
+        emberAfAccountLoginClusterLoginCallback(&mockHandler, commandPath, request);
+
+        ASSERT_TRUE(mockHandler.HasStatus());
+        EXPECT_EQ(mockHandler.GetLastStatus().status.GetStatus(), Status::Success);
+    }
+}
+
 TEST_F(TestAccountLoginCluster, LoginWithNoDelegateFails)
 {
     SetDefaultDelegate(kTestEndpointId, nullptr);
 
     Commands::Login::DecodableType request;
     request.tempAccountIdentifier = "account-1"_span;
-    request.setupPIN              = "1234"_span;
+    request.setupPIN              = "12345678"_span;
 
     chip::Testing::MockCommandHandler mockHandler;
     auto commandPath = MakeCommandPath(Commands::Login::Id);
