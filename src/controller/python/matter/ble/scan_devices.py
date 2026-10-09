@@ -17,8 +17,9 @@
 import ctypes
 from collections.abc import Generator
 from dataclasses import dataclass
-from queue import Queue
+from queue import Empty, Queue
 from threading import Thread
+from time import monotonic
 
 from .library_handle import _GetBleLibraryHandle
 from .types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
@@ -66,10 +67,7 @@ class _DeviceInfoReceiver:
         self.queue.put(None)
 
     def OnScanError(self, errorCode):
-        # TODO need to determine what we do with this error. Most of the time this
-        # error is just a timeout introduced in PR #24873, right before we get a
-        # ScanCompleted.
-        pass
+        self.OnScanComplete()
 
 
 def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, None]:
@@ -103,6 +101,7 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
                 continue
 
             receiver = _DeviceInfoReceiver()
+            deadline = monotonic() + timeoutMs / 1000
             scanner = handle.pychip_ble_scanner_start(
                 ctypes.py_object(receiver),
                 handle.pychip_ble_adapter_list_get_raw_adapter(nativeList),
@@ -111,13 +110,20 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
             if scanner == 0:
                 raise Exception('Failed to start BLE scan')
 
-            while True:
-                data = receiver.queue.get()
-                if not data:
-                    break
-                yield data
-
-            handle.pychip_ble_scanner_delete(scanner)
+            try:
+                while True:
+                    remaining = deadline - monotonic()
+                    if remaining <= 0:
+                        break
+                    try:
+                        data = receiver.queue.get(timeout=remaining)
+                    except Empty:
+                        break
+                    if data is None:
+                        break
+                    yield data
+            finally:
+                handle.pychip_ble_scanner_delete(scanner)
             break
     finally:
         handle.pychip_ble_adapter_list_delete(nativeList)

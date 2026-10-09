@@ -120,17 +120,19 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to initiate BLE scan stop: %" CHIP_ERROR_FORMAT, err.Format());
-        return CHIP_ERROR_INTERNAL;
     }
 
     // Stop scanning and return to initialization state
     mScannerState = ChipDeviceScannerState::INITIALIZED;
 
-    ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
+    }
 
     mDelegate->OnScanComplete();
 
-    return CHIP_NO_ERROR;
+    return err == CHIP_NO_ERROR ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScanImpl()
