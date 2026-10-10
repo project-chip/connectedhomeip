@@ -263,6 +263,7 @@ assert_valid_dn_key("Kitchen")
 | `assert_valid_sat_key` | `assert_valid_product_id`                   |
 | `assert_valid_t_key`   | `assert_valid_vendor_id`                    |
 | `assert_valid_icd_key` | `assert_valid_hostname`                     |
+|                        | `assert_txt_record_present`                 |
 
 ## 🛜 Network Utilities
 

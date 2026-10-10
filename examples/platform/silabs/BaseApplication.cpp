@@ -52,8 +52,12 @@
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include "provision/ProvisionStorageReader.h"
+
 #include <assert.h>
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
 #include <headers/ProvisionManager.h>
+#endif // SL_MATTER_PROVISION_CHANNEL_ENABLED
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -168,10 +172,15 @@ SilabsLCD slLCD;
 
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
 ObjectPool<Identify, MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT> IdentifyPool;
-
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+int sCodeDrivenIdentifyActiveCount                                 = 0;
+Clusters::Identify::EffectIdentifierEnum sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+[[maybe_unused]] Clusters::Identify::EffectVariantEnum sCodeDrivenIdentifyVariant = Clusters::Identify::EffectVariantEnum::kDefault;
+
+// Protects the three sCodeDrivenIdentify* variables above.
+osSemaphoreId_t sCodeDrivenIdentifyLock = nullptr;
 
 } // namespace
 
@@ -183,28 +192,16 @@ BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate(
 void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     isComissioningStarted = false;
-
-#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
-    WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
-#endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
@@ -297,6 +294,13 @@ CHIP_ERROR BaseApplication::Init()
 CHIP_ERROR BaseApplication::BaseInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    sCodeDrivenIdentifyLock = osSemaphoreNew(1, 1, nullptr);
+    if (sCodeDrivenIdentifyLock == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to create code-driven identify lock");
+        appError(APP_ERROR_ALLOCATION_FAILED);
+    }
 
 #if SL_MATTER_DISPLAY_ENABLED
     TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) APP_TASK_NAME);
@@ -413,8 +417,10 @@ bool BaseApplication::ActivateStatusLedPatterns()
 {
     bool isPatternSet = false;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
+    // Local copy to prevent race condition
+    Clusters::Identify::EffectIdentifierEnum activeEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+    bool isIdentifyActive                                 = false;
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
-    bool isIdentifyActive = false;
     for (const auto & obj : IdentifyPool)
     {
         if (obj->mActive)
@@ -423,6 +429,21 @@ bool BaseApplication::ActivateStatusLedPatterns()
             break;
         }
     }
+    activeEffect = sIdentifyEffect;
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+    if (sCodeDrivenIdentifyActiveCount > 0)
+    {
+        isIdentifyActive = true;
+    }
+    if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect &&
+        sCodeDrivenIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+    {
+        activeEffect = sCodeDrivenIdentifyEffect;
+    }
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+
     if (isIdentifyActive)
     {
         // Identify in progress
@@ -430,25 +451,25 @@ bool BaseApplication::ActivateStatusLedPatterns()
         sStatusLED.Blink(250, 250);
         isPatternSet = true;
     }
-    else if (sIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+    else if (activeEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
     {
         // Identify trigger effect received. Do some on/off patterns on the status led
-        if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
+        if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
         {
             // Fast blink
             sStatusLED.Blink(50, 50);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
         {
             // Slow blink
             sStatusLED.Blink(1000, 1000);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
         {
             // Pulse effect
             sStatusLED.Blink(300, 700);
         }
-        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+        else if (activeEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
         {
             // Alternate between Short and Long pulses effect
             static uint64_t mLastChangeTimeMS = 0;
@@ -466,7 +487,6 @@ bool BaseApplication::ActivateStatusLedPatterns()
         }
         isPatternSet = true;
     }
-#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 #if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
@@ -731,7 +751,6 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 
 void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-    ChipLogDetail(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -774,7 +793,6 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         break;
     default:
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        ChipLogDetail(Zcl, "No identifier effect");
     }
 }
 
@@ -784,6 +802,101 @@ void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint)
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, BaseApplication::OnTriggerIdentifyEffect);
 }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
+
+namespace {
+void CodeDrivenTriggerEffectCompleted(chip::System::Layer *, void *)
+{
+    ChipLogDetail(Zcl, "Trigger Identify Complete (code-driven)");
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+    sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    const bool wentIdle =
+        (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+#endif
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (wentIdle)
+    {
+        BaseApplication::StopStatusLEDTimer();
+    }
+#endif
+}
+} // namespace
+
+void BaseApplication::NotifyCodeDrivenIdentifyStart()
+{
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+    ++sCodeDrivenIdentifyActiveCount;
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    StartStatusLEDTimer();
+#endif
+}
+
+void BaseApplication::NotifyCodeDrivenIdentifyStop()
+{
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+    if (sCodeDrivenIdentifyActiveCount > 0)
+    {
+        --sCodeDrivenIdentifyActiveCount;
+    }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    const bool wentIdle =
+        (sCodeDrivenIdentifyActiveCount == 0 && sCodeDrivenIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kStopEffect);
+#endif
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (wentIdle)
+    {
+        StopStatusLEDTimer();
+    }
+#endif
+}
+
+void BaseApplication::NotifyCodeDrivenTriggerEffect(Clusters::Identify::EffectIdentifierEnum effect,
+                                                    Clusters::Identify::EffectVariantEnum variant)
+{
+    osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+    sCodeDrivenIdentifyEffect  = effect;
+    sCodeDrivenIdentifyVariant = variant;
+    osSemaphoreRelease(sCodeDrivenIdentifyLock);
+
+    if (variant != Clusters::Identify::EffectVariantEnum::kDefault)
+    {
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
+    }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    StartStatusLEDTimer();
+#endif
+
+    switch (effect)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(10), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(CodeDrivenTriggerEffectCompleted, nullptr);
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), CodeDrivenTriggerEffectCompleted,
+                                                           nullptr);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(CodeDrivenTriggerEffectCompleted, nullptr);
+        break;
+    default:
+        osSemaphoreAcquire(sCodeDrivenIdentifyLock, osWaitForever);
+        sCodeDrivenIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+        osSemaphoreRelease(sCodeDrivenIdentifyLock);
+        ChipLogDetail(Zcl, "No identifier effect");
+    }
+}
 
 void BaseApplication::LightTimerEventHandler(void * timerCbArg)
 {
@@ -886,11 +999,13 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
 void BaseApplication::ScheduleFactoryReset()
 {
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
-        // Press both buttons to request provisioning
+    // Press both buttons to request provisioning
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
         if (GetPlatform().GetButtonState(APP_ACTION_BUTTON))
         {
             TEMPORARY_RETURN_IGNORED Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
+#endif // SL_MATTER_PROVISION_CHANNEL_ENABLED
 #if defined(SL_WIFI) && SL_WIFI
         // Removing the matter services on factory reset
         TEMPORARY_RETURN_IGNORED chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
@@ -1011,12 +1126,12 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 void BaseApplication::OutputQrCode(bool refreshLCD)
 {
     (void) refreshLCD; // could be unused
-
+#if SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
     // Create buffer for the Qr code setup payload that can fit max size and null terminator.
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
 
-    CHIP_ERROR err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
+    CHIP_ERROR err = Provision::ProvisionStorageReader::GetInstance().GetSetupPayload(setupPayload);
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
@@ -1034,6 +1149,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     {
         ChipLogError(AppServer, "Getting QR code failed!");
     }
+#endif // SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
 }
 
 bool BaseApplication::GetProvisionStatus()

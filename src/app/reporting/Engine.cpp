@@ -134,10 +134,6 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     TLV::TLVWriter checkpoint;
     reportBuilder.Checkpoint(checkpoint);
 
-    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
-    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
-    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
-
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
     //       explicitly ignores that case).
     //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
@@ -150,6 +146,15 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::AttributeFinder finder(dataModel);
     std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+
+    // Fabric-sensitive attributes are always reported fabric-filtered, regardless of the
+    // FabricFiltered flag on the request.
+    const bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered) ||
+        (entry.has_value() && entry->HasFlags(DataModel::AttributeQualityFlags::kFabricSensitive));
+    readRequest.readFlags.Set(ReadFlags::kFabricFiltered, isFabricFiltered);
+
+    DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     if (auto access_status = ValidateReadAttributeACL(subjectDescriptor, path, Privilege::kView); access_status.has_value())
     {
@@ -486,7 +491,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
-                                     ", attributeId: " ChipLogFormatMEI "err = %" CHIP_ERROR_FORMAT,
+                                     ", attributeId: " ChipLogFormatMEI " err = %" CHIP_ERROR_FORMAT,
                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                      err.Format());
                         // Try to encode our error as a status response.

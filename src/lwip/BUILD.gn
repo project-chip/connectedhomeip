@@ -193,6 +193,10 @@ if (current_os == "zephyr") {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
+    if (lwip_platform == "silabs") {
+      include_dirs += [ "${lwip_platform}/config" ]
+    }
+
     if (lwip_platform != "standalone") {
       include_dirs += [ "freertos" ]
     }
@@ -202,8 +206,13 @@ if (current_os == "zephyr") {
     public = [
       "${lwip_platform}/arch/cc.h",
       "${lwip_platform}/arch/perf.h",
-      "${lwip_platform}/lwipopts.h",
     ]
+
+    if (lwip_platform == "silabs") {
+      public += [ "${lwip_platform}/config/lwipopts.h" ]
+    } else {
+      public += [ "${lwip_platform}/lwipopts.h" ]
+    }
 
     sources = []
 

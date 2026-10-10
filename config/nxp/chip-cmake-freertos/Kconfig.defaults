@@ -193,6 +193,9 @@ endif # CHIP_OTA_REQUESTOR
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 	default y
 
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	default y
+
 # Include defaults for SDK Kconfig
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig.defconfig"
 

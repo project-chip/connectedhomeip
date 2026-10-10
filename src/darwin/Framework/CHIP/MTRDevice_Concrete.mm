@@ -79,11 +79,12 @@
 // can be changed in the future)
 #define MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC (60 * 5)
 
-// We only respond to time synchronization issues once every hour after
-// detecting an issue for the first time. Unit tests can override this using
-// unitTestTimeSynchronizationLossDetectionCadenceIsZero, so you should
-// probably use shouldDetectTimeSynchronizationLoss instead of this constant.
+// We repair a device's clock at most BUDGET times per CADENCE, so a device that cannot
+// keep its clock does not have us updating it forever. It's a budget rather than a single
+// repair because a device with no battery-backed RTC loses its clock on every power cycle,
+// and several power cycles in a row are expected during setup.
 #define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE (1 * 60 * 60)
+#define MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET 5
 
 #pragma mark - Constant string definitions
 
@@ -386,6 +387,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
  */
 @property (nonatomic, readonly) MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder;
 
+- (void)_invokeCommandsBatched:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+             maxPathsPerInvoke:(uint16_t)maxPathsPerInvoke
+             timedInvokeCutoff:(nullable NSDate *)timedInvokeCutoff
+                    baseDevice:(MTRBaseDevice *)baseDevice
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> * responses))completion;
+
 @end
 
 // Declaring selector so compiler won't complain about testing and calling it in _handleReportEnd
@@ -406,7 +414,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
-- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
+- (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 @end
 #endif
@@ -450,8 +458,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // This boolean keeps track, during a priming read, of whether time
     // synchronization loss has been detected.
     BOOL _timeSynchronizationLossDetected;
-    // Keep track of the last time we detected a time synchronization loss.
-    NSDate * _Nullable _timeSynchronizationLossDetectedTime;
+    // Times at which we scheduled a time synchronization repair, oldest first. Pruned
+    // lazily, so only the count after a prune says how much budget is left.
+    NSMutableArray<NSDate *> * _Nullable _timeSynchronizationRepairTimes;
 
     // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
     //   1. Subscription establishes
@@ -730,6 +739,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return delay;
 }
 
+// Whether we have budget left to repair a time synchronization loss. Prunes the window as
+// a side effect, so it is not a pure query.
 - (BOOL)shouldDetectTimeSynchronizationLoss
 {
     os_unfair_lock_assert_owner(&self->_lock);
@@ -739,26 +750,53 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return NO;
     }
 
-    if (_timeSynchronizationLossDetectedTime == nil) {
-        return YES;
-    }
+    [self _dropExpiredTimeSynchronizationRepairTimes];
+
+    return _timeSynchronizationRepairTimes.count < MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET;
+}
+
+- (void)_dropExpiredTimeSynchronizationRepairTimes
+{
+    os_unfair_lock_assert_owner(&self->_lock);
 
     __block NSTimeInterval cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
 
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
-        if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectionCadenceIsZero:)]
-            && [testDelegate unitTestTimeSynchronizationLossDetectionCadenceIsZero:self]) {
-            cadence = 0;
+        if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectionCadenceOverride:)]) {
+            NSNumber * override = [testDelegate unitTestTimeSynchronizationLossDetectionCadenceOverride:self];
+            if (override != nil) {
+                cadence = override.doubleValue;
+            }
         }
     }];
 #endif
 
-    if ([_timeSynchronizationLossDetectedTime timeIntervalSinceNow] * -1 >= cadence) {
-        return YES;
+    NSUInteger countBeforePruning = _timeSynchronizationRepairTimes.count;
+
+    // Oldest first, so the first entry still inside the window ends this.
+    while (_timeSynchronizationRepairTimes.count > 0
+        && [_timeSynchronizationRepairTimes.firstObject timeIntervalSinceNow] * -1 >= cadence) {
+        [_timeSynchronizationRepairTimes removeObjectAtIndex:0];
     }
 
-    return NO;
+    if (countBeforePruning != _timeSynchronizationRepairTimes.count) {
+        MTR_LOG_DEBUG("%@ %lu time synchronization repair(s) aged out, %lu still counted", self,
+            static_cast<unsigned long>(countBeforePruning - _timeSynchronizationRepairTimes.count),
+            static_cast<unsigned long>(_timeSynchronizationRepairTimes.count));
+    }
+}
+
+// Spends one unit of budget. Call this where the repair is issued, not where the loss is
+// noticed, so seeing one loss several times only costs one repair.
+- (void)_noteTimeSynchronizationRepairScheduledAt:(NSDate *)date
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (!_timeSynchronizationRepairTimes) {
+        _timeSynchronizationRepairTimes = [NSMutableArray array];
+    }
+    [_timeSynchronizationRepairTimes addObject:date];
 }
 
 - (void)_setTimeOnDevice
@@ -862,24 +900,32 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
+    std::lock_guard lock(_timeSyncLock);
+
+    // The source that invoked us has already cancelled itself, so this timer is spent
+    // whichever way we exit. Leaving it set would block all future scheduling.
+    BOOL hadScheduledTimer = self.timeUpdateTimer != nil;
+    self.timeUpdateTimer = nil;
+
+    // Device must not be invalidated
+    if (!hadScheduledTimer) {
+        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
+        return;
+    }
+
+    // Read the state under _timeSyncLock so it cannot go stale while we wait for the lock.
     MTRDeviceState currentState;
     {
-        std::lock_guard lock(_lock);
+        std::lock_guard stateLock(_lock);
         currentState = _state;
     }
 
-    std::lock_guard lock(_timeSyncLock);
-    // Device needs to still be reachable
+    // Nothing to reschedule here: _handleSubscriptionEstablished does it when the device
+    // comes back.
     if (currentState != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
         return;
     }
-    // Device must not be invalidated
-    if (self.timeUpdateTimer == nil) {
-        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
-        return;
-    }
-    self.timeUpdateTimer = nil;
     [self _updateDeviceTimeAndScheduleNextUpdate];
 }
 
@@ -1436,6 +1482,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_timeSyncLock);
 
+    // Baseline update for this subscription rather than a repair, so it costs no budget.
     if (self.timeUpdateTimer == nil) {
         [self _scheduleNextUpdate:newUpdateDelay];
     }
@@ -1894,10 +1941,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeState:MTRDeviceStateReachable];
     }
 
-    // Reset _timeSynchronizationLossDetected, so that it will get set based
-    // on the values in this report.
-    _timeSynchronizationLossDetected = NO;
-
     // If we currently don't have an established subscription, this must be a
     // priming report.
     _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
@@ -2288,6 +2331,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         newUpdateDelay = [self timeUpdateShortDelayInSeconds];
 
         timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+        // Reset here, not in _handleReportBegin. Report begin runs on the Matter queue,
+        // while attribute handling and report end run on self.queue, so the next report's
+        // begin can run before this report's end and wipe a loss we already detected.
+        _timeSynchronizationLossDetected = NO;
     }
 
     std::lock_guard timeSyncLock(_timeSyncLock);
@@ -2302,6 +2349,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     if (timeSynchronizationLossDetected && longTimeUpdateScheduled) {
         MTR_LOG("%@ Trying to correct time synchronization loss, reschedule time update", self);
+        {
+            // Lock order is _timeSyncLock then _lock, as in _setTimeOnDevice.
+            std::lock_guard lock(_lock);
+            [self _noteTimeSynchronizationRepairScheduledAt:[NSDate now]];
+        }
         dispatch_source_cancel(self.timeUpdateTimer);
         self.timeUpdateTimer = nil;
         [self _scheduleNextUpdate:newUpdateDelay];
@@ -2478,6 +2530,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     [self _injectAttributeReport:attributeReport fromSubscription:isFromSubscription];
+}
+
+// Dates must not be earlier than ones already recorded, since the list is kept oldest first.
+- (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date
+{
+    std::lock_guard lock(_lock);
+    [self _noteTimeSynchronizationRepairScheduledAt:date];
+}
+
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss
+{
+    std::lock_guard lock(_lock);
+    return [self shouldDetectTimeSynchronizationLoss];
 }
 #endif
 
@@ -3986,79 +4051,225 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {
-    // We will generally do our work on self.queue, and just dispatch to the provided queue when
-    // calling the provided completion.
-    auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
+    NSMutableArray<NSArray<MTRCommandWithRequiredResponse *> *> * commandsSnapshot =
+        [[NSMutableArray alloc] initWithCapacity:commands.count];
+    NSArray<MTRCommandWithRequiredResponse *> * firstGroupToInvoke;
+    NSDate * cutoffTime;
+    for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in commands) {
+        NSMutableArray<MTRCommandWithRequiredResponse *> * commandGroupSnapshot =
+            [[NSMutableArray alloc] initWithCapacity:commandGroup.count];
+        for (MTRCommandWithRequiredResponse * command in commandGroup) {
+            [commandGroupSnapshot addObject:[[MTRCommandWithRequiredResponse alloc] initWithPath:command.path
+                                                                                   commandFields:[command.commandFields copy]
+                                                                                requiredResponse:command.requiredResponse]];
+            if (cutoffTime == nil && MTRCommandNeedsTimedInvoke(command.path.cluster, command.path.command)) {
+                cutoffTime = [NSDate dateWithTimeIntervalSinceNow:(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS / 1000.0)];
+            }
+        }
+        if (firstGroupToInvoke == nil && commandGroupSnapshot.count > 0) {
+            firstGroupToInvoke = commandGroupSnapshot;
+        }
+        [commandsSnapshot addObject:commandGroupSnapshot];
+    }
+    commands = commandsSnapshot;
+
+    if (firstGroupToInvoke == nil) {
         dispatch_async(queue, ^{
-            completion(responses, nil);
+            completion(@[], nil);
         });
+        return;
+    }
+
+    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
+    uint64_t workItemID = workItem.uniqueID;
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        *isDuplicate = NO;
+        *stop = YES;
+    }];
+    [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        auto workDone = ^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses) {
+            dispatch_async(queue, ^{
+                completion(responses, nil);
+            });
+            workCompletion(MTRAsyncWorkComplete);
+        };
+
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
+        mtr_weakify(self);
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:self.queue
+                                              completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+                                                  mtr_strongify(self);
+                                                  VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands: called back with nil MTRDevice"));
+                                                  uint16_t pathsPerMessage = MAX(maxPathsPerInvoke, static_cast<uint16_t>(1));
+                                                  if (error != nil) {
+                                                      MTR_LOG_ERROR("Invoke work item [%llu] could not read peer MaxPathsPerInvoke (%@); sending one command per message", workItemID, error);
+                                                  } else {
+                                                      MTR_LOG("Invoke work item [%llu] running; peer MaxPathsPerInvoke=%u", workItemID, maxPathsPerInvoke);
+                                                  }
+                                                  [self _invokeCommandsBatched:commands
+                                                             maxPathsPerInvoke:pathsPerMessage
+                                                             timedInvokeCutoff:cutoffTime
+                                                                    baseDevice:baseDevice
+                                                                         queue:self.queue
+                                                                    completion:workDone];
+                                              }];
+    }];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invokeCommands (%llu groups)", static_cast<unsigned long long>(commands.count)];
+}
+
+// A command whose fields are not a structure-typed data-value cannot be encoded; the single-command path
+// rejected it locally rather than sending it, so it must not be packed in with commands that would encode.
+static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
+{
+    return command.commandFields == nil
+        || (MTRDataValueDictionaryIsWellFormed(command.commandFields)
+            && [MTRStructureValueType isEqual:command.commandFields[MTRTypeKey]]);
+}
+
+- (void)_invokeCommandsBatched:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+             maxPathsPerInvoke:(uint16_t)maxPathsPerInvoke
+             timedInvokeCutoff:(nullable NSDate *)timedInvokeCutoff
+                    baseDevice:(MTRBaseDevice *)baseDevice
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSArray<MTRDeviceResponseValueDictionary> * responses))completion
+{
+    auto nextCompletion = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * responses) {
+        completion(responses);
     };
 
-    // We want to invoke the command groups in order, stopping after failures as needed.  Build up a
-    // linked list of groups via chaining the completions, with calls out to the original
-    // completion instead of going to the next list item when we want to stop.
     for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
-        // We want to invoke all the commands in the group in order, propagating along the list of
-        // current responses.  Build up that linked list of command invokes via chaining the completions.
+        // One message may not carry a concrete command path twice (the server rejects the whole message) but
+        // a group may repeat one, so a repeat also cuts a message; otherwise it would depend on the boundary.
+        NSMutableArray<NSArray<MTRCommandWithRequiredResponse *> *> * chunks = [NSMutableArray array];
+        NSMutableArray<MTRCommandWithRequiredResponse *> * currentChunk = [NSMutableArray array];
+        NSMutableSet<MTRCommandPath *> * pathsInCurrentChunk = [NSMutableSet set];
+        for (MTRCommandWithRequiredResponse * command in commandGroup) {
+            BOOL canEncode = MTRInvokeCommandCanEncode(command);
+            if (currentChunk.count > 0
+                && (!canEncode || currentChunk.count == maxPathsPerInvoke
+                    || [pathsInCurrentChunk containsObject:command.path])) {
+                [chunks addObject:currentChunk];
+                currentChunk = [NSMutableArray array];
+                [pathsInCurrentChunk removeAllObjects];
+            }
+            [currentChunk addObject:command];
+            [pathsInCurrentChunk addObject:command.path];
+            if (!canEncode) {
+                [chunks addObject:currentChunk];
+                currentChunk = [NSMutableArray array];
+                [pathsInCurrentChunk removeAllObjects];
+            }
+        }
+        if (currentChunk.count > 0) {
+            [chunks addObject:currentChunk];
+        }
+
         mtr_weakify(self);
-        for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
-            auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+        for (NSArray<MTRCommandWithRequiredResponse *> * chunk in [chunks reverseObjectEnumerator]) {
+            auto chunkInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
                 mtr_strongify(self);
-                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch block called back with nil MTRDevice"));
 
-                [self invokeCommandWithEndpointID:command.path.endpoint
-                                        clusterID:command.path.cluster
-                                        commandID:command.path.command
-                                    commandFields:command.commandFields
-                                   expectedValues:nil
-                            expectedValueInterval:nil
-                                            queue:self.queue
-                                       completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
-                                           mtr_strongify(self);
-                                           VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands invokeCommandWithEndpointID completion called back with nil MTRDevice"));
-                                           if (error != nil) {
-                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
-                                                   MTRCommandPathKey : command.path,
-                                                   MTRErrorKey : error,
-                                               }]);
-                                               return;
-                                           }
+                if (!MTRInvokeCommandCanEncode(chunk.firstObject)) {
+                    // Chunked on its own above, so failing it here leaves the commands around it alone and
+                    // stops the following groups the same way any other failure does.
+                    MTR_LOG_ERROR("%@ invokeCommands: %@ has commandFields that are not a structure-typed "
+                                  "data-value; not invoking it",
+                        self, chunk.firstObject);
+                    nextCompletion(NO,
+                        [previousResponses arrayByAddingObject:@{
+                            MTRCommandPathKey : chunk.firstObject.path,
+                            MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT],
+                        }]);
+                    return;
+                }
 
-                                           if (responses.count != 1) {
-                                               // Very much unexpected for invoking a single command.
-                                               MTR_LOG_ERROR("%@ invokeCommands unexpectedly got multiple responses for %@", self, command.path);
-                                               nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
-                                                   MTRCommandPathKey : command.path,
-                                                   MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
-                                               }]);
-                                               return;
-                                           }
+                // Each batch is its own timed interaction; the queue wait is charged against the chunk that
+                // actually needs one, so a stale timed invoke fails in its own position rather than blaming
+                // an earlier group that did not need one.
+                NSNumber * timedInvokeTimeout = nil;
+                for (MTRCommandWithRequiredResponse * command in chunk) {
+                    if (MTRCommandNeedsTimedInvoke(command.path.cluster, command.path.command)) {
+                        timedInvokeTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+                        break;
+                    }
+                }
 
-                                           BOOL nextAllSucceeded = allSucceededSoFar;
-                                           MTRDeviceResponseValueDictionary response = responses[0];
-                                           if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
-                                               nextAllSucceeded = NO;
-                                           }
+                if (timedInvokeTimeout != nil && timedInvokeCutoff != nil
+                    && [[NSDate now] compare:timedInvokeCutoff] == NSOrderedDescending) {
+                    MTR_LOG("%@ invokeCommands: waited past the timed invoke timeout; not sending %@", self, chunk);
+                    NSMutableArray<MTRDeviceResponseValueDictionary> * newResponses = [previousResponses mutableCopy];
+                    __auto_type * timeoutError = [MTRError errorForIMStatusCode:Status::Timeout];
+                    for (MTRCommandWithRequiredResponse * command in chunk) {
+                        [newResponses addObject:@{
+                            MTRCommandPathKey : command.path,
+                            MTRErrorKey : timeoutError,
+                        }];
+                    }
+                    nextCompletion(NO, newResponses);
+                    return;
+                }
 
-                                           nextCompletion(nextAllSucceeded, [previousResponses arrayByAddingObject:response]);
-                                       }];
+                [baseDevice _invokeCommandBatch:chunk
+                             timedInvokeTimeout:timedInvokeTimeout
+                    serverSideProcessingTimeout:nil
+                                        logCall:YES
+                                          queue:queue
+                                     completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable responses, NSError * _Nullable error) {
+                                         mtr_strongify(self);
+                                         VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch completion called back with nil MTRDevice"));
+
+                                         if (error != nil) {
+                                             NSMutableArray<MTRDeviceResponseValueDictionary> * newResponses = [previousResponses mutableCopy];
+                                             for (MTRCommandWithRequiredResponse * command in chunk) {
+                                                 [newResponses addObject:@ {
+                                                     MTRCommandPathKey : command.path,
+                                                     MTRErrorKey : error,
+                                                 }];
+                                             }
+                                             nextCompletion(NO, newResponses);
+                                             return;
+                                         }
+
+                                         if (responses.count != chunk.count) {
+                                             MTR_LOG_ERROR("%@ invokeCommands batch got %llu responses for %llu commands", self,
+                                                 static_cast<unsigned long long>(responses.count), static_cast<unsigned long long>(chunk.count));
+                                             NSMutableArray<MTRDeviceResponseValueDictionary> * newResponses = [previousResponses mutableCopy];
+                                             for (MTRCommandWithRequiredResponse * command in chunk) {
+                                                 [newResponses addObject:@ {
+                                                     MTRCommandPathKey : command.path,
+                                                     MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL],
+                                                 }];
+                                             }
+                                             nextCompletion(NO, newResponses);
+                                             return;
+                                         }
+
+                                         BOOL nextAllSucceeded = allSucceededSoFar;
+                                         for (NSUInteger i = 0; i < chunk.count; i++) {
+                                             MTRCommandWithRequiredResponse * command = chunk[i];
+                                             MTRDeviceResponseValueDictionary response = responses[i];
+                                             if (response[MTRErrorKey] != nil) {
+                                                 nextAllSucceeded = NO;
+                                             } else if (command.requiredResponse != nil && ![self _invokeResponse:response matchesRequiredResponse:command.requiredResponse]) {
+                                                 nextAllSucceeded = NO;
+                                             }
+                                         }
+
+                                         nextCompletion(nextAllSucceeded, [previousResponses arrayByAddingObjectsFromArray:responses]);
+                                     }];
             };
 
-            nextCompletion = commandInvokeBlock;
+            nextCompletion = chunkInvokeBlock;
         }
 
         auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
             mtr_strongify(self);
-            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandGroupInvokeBlock called back with nil MTRDevice"));
+            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands batch group block called back with nil MTRDevice"));
 
             if (allSucceededSoFar == NO) {
-                // Don't start a new command group if something failed in the
-                // previous one.  Note that we might be running on self.queue here, so make sure we
-                // dispatch to the correct queue.
-                MTR_LOG_ERROR("%@ failed a preceding command, not invoking command group %@ or later ones", self, commandGroup);
-                dispatch_async(queue, ^{
-                    completion(previousResponses, nil);
-                });
+                MTR_LOG_ERROR("%@ failed a preceding command, not invoking further command groups", self);
+                completion(previousResponses);
                 return;
             }
 
@@ -4068,7 +4279,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         nextCompletion = commandGroupInvokeBlock;
     }
 
-    // Kick things off with a "everything succeeded so far and we have no responses yet".
     nextCompletion(YES, @[]);
 }
 
@@ -4533,9 +4743,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
             }
 
-            // If we've never detected a time synchronization loss, or it's
-            // been a while since we last detected a time synchronization
-            // loss then check for a time synchronization loss now.
+            // Check for a loss if we still have repair budget. Noticing is free; the
+            // budget is spent when _handleReportEnd schedules the repair.
             //
             // This check must be done unconditionally (not just when the
             // cache value changed) because CurrentTime has the C (non-
@@ -4555,7 +4764,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
                         MTR_LOG("%@ Time synchronization loss detected", self);
                         _timeSynchronizationLossDetected = YES;
-                        _timeSynchronizationLossDetectedTime = [NSDate now];
 #ifdef DEBUG
                         [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
                             if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectedForDevice:)]) {

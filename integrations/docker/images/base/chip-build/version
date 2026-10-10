@@ -1,1 +1,1 @@
-207 : [Silabs] Keep generative_ai; JDK 21; Bake SLT python/apack registry + slt CLI
+216 : [Silabs] Use curl to install SLT-CLI and update the sisdk folder to support wake-on-matter

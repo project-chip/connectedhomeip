@@ -41,7 +41,6 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --string-arg provider_app_pipe_out:/tmp/provider_app_pipe_out_2_5
 #       --string-arg provider_app_pipe:/tmp/provider_app_pipe_2_5
-#       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
 #       --timeout 2100
@@ -61,13 +60,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_5(SoftwareUpdateBaseTest):
+class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
     provider_kvs_path = None
     provider_log = None
@@ -92,7 +91,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     async def setup_test(self):
         # Set up Provider configuration and values for step1
         self.ota_image = self.user_params.get('ota_image')
-        self.expected_software_version = self.user_params.get('ota_image_expected_version')
+
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
@@ -108,9 +107,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         if self.ota_image_download_timeout <= 0:
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal to or greater than 1.")
-
-        if not self.expected_software_version:
-            asserts.fail("Missing OTA image software version. Specify using --int-arg ota_image_expected_version:<ota_image_expected_version>")
 
         if not self.provider_app_path:
             asserts.fail("Missing provider app path. Specify using --string-arg provider_app_path:<provider_app_path>")
@@ -133,6 +129,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         delayed_apply_action_time = 60
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction',
                            '--delayedApplyActionTimeSec', str(delayed_apply_action_time)] + self.provider_pipe_arguments
+
+        # Check ota image and running software version, this will fail if is not suited to update the device else return the version to update
+        self.expected_software_version = await self.check_ota_image_version(
+            controller=self.controller, requestor_node_id=self.requestor_node_id, ota_image_path=self.ota_image)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,

@@ -53,6 +53,11 @@
 #endif // CONFIG_SOC_FAMILY_NXP_RW
 #endif // CONFIG_CHIP_CRYPTO_PSA
 
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+// Defined in the Zephyr border router implementation (border_agent.c), which is a C source file.
+extern "C" const char otbr_base_service_instance_name[];
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TBR
+
 #include "AppFactoryData.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -146,3 +151,10 @@ void chip::NXP::App::AppTaskZephyr::DispatchEvent(const AppEvent & event)
         LOG_INF("Event received with no handler. Dropping event.");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+chip::CharSpan chip::NXP::App::AppTaskZephyr::GetBorderRouterName()
+{
+    return BuildBorderRouterName(otbr_base_service_instance_name);
+}
+#endif

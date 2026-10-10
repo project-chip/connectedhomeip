@@ -1,0 +1,68 @@
+# Copyright 2023 The Pigweed Authors
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+# GN build for Google FuzzTest, whose sources are in repo/. fuzztest/ and
+# common/ hold BUILD.gn files generated from FuzzTest's Bazel build with
+# Pigweed's bazel_to_gn.py; this file and fuzztest.gni are maintained here.
+# Built only in //build/toolchain/pw_fuzzer:chip_pw_fuzztest.
+
+import("//build_overrides/build.gni")
+
+import("//third_party/fuzztest/fuzztest.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+config("fuzztest_public_config") {
+  cflags = [
+    "-Wno-sign-compare",
+    "-Wno-sign-conversion",
+    "-Wno-shorten-64-to-32",
+    "-Wno-unused-parameter",
+    "-Wno-missing-field-initializers",
+    "-Wno-shadow-all",
+  ]
+  cflags_cc = [ "-Wno-extra-semi" ]
+  defines = [ "CENTIPEDE_DISABLE_RIEGELI" ]
+  if (chip_fuzztest_dir != "") {
+    include_dirs = [ "$chip_fuzztest_dir" ]
+  }
+}
+
+# Applied to the FuzzTest and Abseil sources only.
+config("fuzztest_runtime") {
+  # These sources are compiled by whichever clang OSS-Fuzz ships, and a new
+  # warning there must not stop the fuzz build; chip code keeps -Werror.
+  cflags = [ "-Wno-error" ]
+
+  # Coverage-instrumenting them makes FuzzTest trace its own comparisons, which
+  # recurses without bound. Under OSS-Fuzz the instrumentation comes from
+  # $CFLAGS and is left as it is.
+  if (!oss_fuzz) {
+    cflags += [ "-fno-sanitize-coverage=inline-8bit-counters,trace-cmp" ]
+  }
+}
+
+if (chip_fuzztest_dir != "") {
+  # Everything a FuzzTest binary needs, including main().
+  group("fuzztest") {
+    public_deps = [
+      "//third_party/fuzztest/fuzztest:fuzztest_core",
+      "//third_party/fuzztest/fuzztest:fuzztest_gtest_main",
+    ]
+  }
+} else {
+  assert(
+      false,
+      "//third_party/fuzztest builds only in //build/toolchain/pw_fuzzer:chip_pw_fuzztest; declare fuzz targets with chip_pw_fuzz_target() from //build/chip/fuzz_test.gni")
+}

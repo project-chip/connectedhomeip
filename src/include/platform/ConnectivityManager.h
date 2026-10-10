@@ -25,6 +25,7 @@
 #include <memory>
 
 #include <app/icd/server/ICDServerConfig.h>
+#include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -222,6 +223,10 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
+
+    // Network interface accessors (primarily meaningful on LwIP platforms).
+    Inet::InterfaceId GetThreadInterface();
+    Inet::InterfaceId GetExternalInterface();
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
@@ -544,6 +549,15 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
+}
+
+inline Inet::InterfaceId ConnectivityManager::GetThreadInterface()
+{
+    return static_cast<ImplClass *>(this)->_GetThreadInterface();
+}
+inline Inet::InterfaceId ConnectivityManager::GetExternalInterface()
+{
+    return static_cast<ImplClass *>(this)->_GetExternalInterface();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

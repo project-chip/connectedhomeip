@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/level-control/LevelControlCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
@@ -38,9 +37,6 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // Public getters for programmatic control
-    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
-
     // Accessors for subclasses/implementations to interact with clusters
     Clusters::OnOffCluster & OnOffCluster();
     Clusters::LevelControlCluster & LevelControlCluster();
@@ -50,7 +46,6 @@ protected:
     Clusters::OnOffDelegate & mOnOffDelegate;
     TimerDelegate & mTimerDelegate;
 
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::LevelControlCluster> mLevelControlCluster;
 };

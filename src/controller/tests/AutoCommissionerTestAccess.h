@@ -50,6 +50,8 @@ public:
 
     void CleanupCommissioning() { mCommissioner->CleanupCommissioning(); }
 
+    void ClearPDCParameters() { mCommissioner->ClearPDCParameters(); }
+
     CommissioneeDeviceProxy * GetCommissioneeDeviceProxy() { return mCommissioner->GetCommissioneeDeviceProxy(); }
 
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, Controller::CommissioningStage stage) const
@@ -95,9 +97,15 @@ public:
 
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
+    void TryPrimaryNetwork() { mCommissioner->TryPrimaryNetwork(); }
+
+    bool TryingPrimaryNetwork() const { return mCommissioner->TryingPrimaryNetwork(); }
+
     void TrySecondaryNetwork() { mCommissioner->TrySecondaryNetwork(); }
 
     bool TryingSecondaryNetwork() const { return mCommissioner->TryingSecondaryNetwork(); }
+
+    bool WroteNetworkConfig() const { return mCommissioner->mWroteNetworkConfig; }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;

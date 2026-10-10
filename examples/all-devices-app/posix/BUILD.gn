@@ -24,75 +24,136 @@ if (chip_enable_pw_rpc) {
   import("$dir_pw_build/target_types.gni")
 }
 
-executable("all-devices-app") {
-  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+config("posix-includes") {
+  include_dirs = [
+    ".",
+    "include",
+    "${chip_root}/examples/common",
+  ]
+}
 
+source_set("device-instances") {
   sources = [
-    "AppCommandDelegate.cpp",
-    "ClusterTypeMappings.cpp",
-    "PosixAudioManager.cpp",
-    "PosixChime.cpp",
-    "PosixSpeaker.cpp",
-    "include/CHIPProjectAppConfig.h",
-    "main.cpp",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/OOBAccessorHook.h",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe/Hook.h",
+    "DeviceInstances.cpp",
+    "DeviceInstances.h",
+    "PosixDeviceFactory.h",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/chime",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/closure",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/closure-panel",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/color-temperature-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/cooktop",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-light:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/flow-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-conditioner",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-dryer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/microwave-oven",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mode-select",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mode-select:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/network-infrastructure-manager",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/room-air-conditioner:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
+    "${chip_root}/examples/all-devices-app/posix/app_options:device-type-parser",
+    "${chip_root}/examples/all-devices-app/posix/named_pipe",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/persistence:default",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+
+  if (chip_device_platform == "darwin") {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
+  } else {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
+  }
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
+  }
+
+  public_configs = [ ":posix-includes" ]
+}
+
+executable("all-devices-app") {
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+
+  sources = [
+    "PosixAudioManager.cpp",
+    "PosixChime.cpp",
+    "PosixSpeaker.cpp",
+    "include/CHIPProjectAppConfig.h",
+    "include/DeviceFactoryPlatformOverride.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    ":device-instances",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/identify:LoggingIdentifyDelegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-dac-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
     "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
     "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main-loop",
-    "${chip_root}/examples/platform/linux:commissionable-init",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
-    "${chip_root}/examples/platform/linux:named-pipes",
-    "${chip_root}/src/app/persistence",
-    "${chip_root}/src/app/persistence:default",
-    "${chip_root}/src/data-model-providers/codedriven",
-    "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
     "${chip_root}/third_party/miniaudio:miniaudio",
-    "${chip_root}/zzz_generated/app-common/devices/",
   ]
-  defines = []
 
   if (chip_enable_transport_trace) {
     deps += [
@@ -107,15 +168,13 @@ executable("all-devices-app") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
   }
 
-  include_dirs = [
-    "include",
-    "${chip_root}/examples/common",
-  ]
+  configs += [ ":posix-includes" ]
 
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
     ]
 
     sources += [ "${chip_root}/examples/platform/linux/Rpc.cpp" ]
@@ -129,6 +188,7 @@ executable("all-devices-app") {
       # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into,
       # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/platform/linux:pw_rpc",
     ]
 

@@ -102,11 +102,16 @@ endif()
 
 matter_add_gn_arg_string("chip_crypto"                           ${CONFIG_CHIP_CRYPTO})
 
-if (CONFIG_CHIP_FACTORY_DATA)
+if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
-    matter_add_gn_arg_bool("chip_enable_factory_data"                           TRUE)
-elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
-    matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
+endif()
+
+# SiWx917: compile RPS OTA processor into the Zephyr platform library
+# (not a separate GN source_set) so CHIPDeviceLayer.h include checks pass.
+if(CONFIG_CHIP_OTA_BACKEND_SIWX91X)
+    matter_add_gn_arg_list("chip_zephyr_ota_image_processor_sources"
+        "\"//src/platform/silabs/zephyr/OTAImageProcessorImplSiWx.cpp\""
+        "\"//src/platform/silabs/zephyr/OTAImageProcessorImplSiWx.h\"")
 endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)

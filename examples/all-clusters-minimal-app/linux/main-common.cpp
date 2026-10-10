@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
 #include <app/server/Server.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
@@ -28,6 +30,12 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+
+#include "thermostat-delegate-impl.h"
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 #include <Options.h>
 
@@ -38,6 +46,19 @@ using namespace chip::DeviceLayer;
 namespace {
 static LowPowerManager lowPowerManager;
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
+
+constexpr EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gThermostatHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gThermostatPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gThermostatSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gThermostatSuggestionsDelegate(gThermostatEndpoint,
+                                                                                          gThermostatPresetsDelegate);
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
+    Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+    Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+    Clusters::Thermostat::ThermostatSuggestionsDelegate>;
 } // namespace
 
 void OnIdentifyStart(::Identify *)
@@ -80,9 +101,17 @@ static Identify gIdentify1 = {
 void ApplicationInit()
 {
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gThermostatSetpointsDelegate,
+                                                            gThermostatHoldDelegate, gThermostatPresetsDelegate,
+                                                            gThermostatSuggestionsDelegate);
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    chip::app::Clusters::Thermostat::ServerShutdown<ThermostatClusterType>(gThermostatEndpoint,
+                                                                           MatterClusterShutdownType::kClusterShutdown);
+}
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {

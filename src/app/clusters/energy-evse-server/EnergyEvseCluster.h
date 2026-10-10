@@ -44,25 +44,23 @@ enum class OptionalAttributes : uint32_t
     kSupportsApproximateEvEfficiency    = 0x4
 };
 
-enum class OptionalCommands : uint32_t
-{
-    kSupportsStartDiagnostics = 0x1
-};
-
 class EnergyEvseCluster : public DefaultServerCluster
 {
 
 public:
+    /// Commands that this cluster supports only if the application opts into them.
+    using OptionalCommandSet = app::OptionalAttributeSet<Commands::StartDiagnostics::Id>;
+
     struct Config
     {
         EndpointId endpointId;
         EnergyEvse::Delegate & delegate;
         BitMask<EnergyEvse::Feature> feature;
-        BitMask<EnergyEvse::OptionalCommands> optionalCmds;
+        OptionalCommandSet optionalCmds;
         BitMask<EnergyEvse::OptionalAttributes> optionalAttrs;
 
         Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
-               BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
+               BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, OptionalCommandSet aOptionalCmds) :
             endpointId(aEndpointId),
             delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds), optionalAttrs(aOptionalAttrs)
         {}
@@ -84,7 +82,9 @@ public:
 
     const BitFlags<EnergyEvse::Feature> & Features() const { return mFeatureFlags; }
     const BitFlags<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
-    const BitFlags<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }
+
+    /// StartDiagnostics is optionally conformant and only accepted when the application opts into it.
+    bool SupportsStartDiagnostics() const { return mOptionalCmds.IsSet(Commands::StartDiagnostics::Id); }
 
     // Attribute getters and setters - cluster owns the data
     StateEnum GetState() const { return mState; }
@@ -192,7 +192,7 @@ private:
     EnergyEvse::Delegate & mDelegate;
     const BitFlags<EnergyEvse::Feature> mFeatureFlags;
     const BitFlags<EnergyEvse::OptionalAttributes> mOptionalAttrs;
-    const BitFlags<EnergyEvse::OptionalCommands> mOptionalCmds;
+    const OptionalCommandSet mOptionalCmds;
 
     // Attribute storage
     StateEnum mState                                       = StateEnum::kNotPluggedIn;

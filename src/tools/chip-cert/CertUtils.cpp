@@ -31,6 +31,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -524,13 +525,14 @@ bool SetKeyUsageExtension(X509 * cert, bool isCA, CertStructConfig & certConfig)
  */
 bool AddSubjectKeyId(X509 * cert, bool isSKIDLengthValid)
 {
-    bool res             = true;
-    ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(cert);
+    bool res                   = true;
+    const ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(cert);
     unsigned char pkHash[EVP_MAX_MD_SIZE];
     unsigned int pkHashLen;
     std::unique_ptr<ASN1_STRING, void (*)(ASN1_STRING *)> pkHashOS(ASN1_STRING_type_new(V_ASN1_OCTET_STRING), &ASN1_STRING_free);
 
-    if (!EVP_Digest(pk->data, static_cast<size_t>(pk->length), pkHash, &pkHashLen, EVP_sha1(), nullptr))
+    if (!EVP_Digest(ASN1_STRING_get0_data(pk), static_cast<size_t>(ASN1_STRING_length(pk)), pkHash, &pkHashLen, EVP_sha1(),
+                    nullptr))
     {
         ReportOpenSSLErrorAndExit("EVP_Digest", res = false);
     }
@@ -575,7 +577,23 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert, bool isAKIDLengthValid)
 
     if (!isAKIDLengthValid)
     {
-        akid->keyid->length = 19;
+        // Intentionally truncate the key identifier by one byte to produce an invalid AKID
+        // for negative testing. ASN1_STRING_length_set() only exists in OpenSSL (and is
+        // deprecated since 3.0); BoringSSL has no equivalent. Re-set the string from a copy
+        // of its own (now-shorter) data instead, which OpenSSL 1.1.x/3.x/4.x and BoringSSL
+        // all support identically.
+        int origLen = ASN1_STRING_length(akid->keyid);
+        if (origLen <= 19)
+        {
+            fprintf(stderr, "Unexpected key identifier length in AUTHORITY_KEYID\n");
+            ExitNow(res = false);
+        }
+        uint8_t truncated[19];
+        memcpy(truncated, ASN1_STRING_get0_data(akid->keyid), sizeof(truncated));
+        if (!ASN1_STRING_set(akid->keyid, truncated, static_cast<int>(sizeof(truncated))))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
     if (!X509_add1_ext_i2d(cert, NID_authority_key_identifier, akid.get(), 0, X509V3_ADD_APPEND))
@@ -585,6 +603,20 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert, bool isAKIDLengthValid)
 
 exit:
     return res;
+}
+
+CHIP_ERROR EncodeCompactIdentityCert(ChipCertificateData const & cert, MutableByteSpan & outCompactCert)
+{
+    TLVWriter writer;
+    writer.Init(outCompactCert);
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurvePublicKey), cert.mPublicKey));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), cert.mSignature));
+    ReturnErrorOnFailure(writer.EndContainer(containerType));
+    ReturnErrorOnFailure(writer.Finalize());
+    outCompactCert.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -799,6 +831,23 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
 
         VerifyOrReturnError(X509ToChipCert(cert, chipCert), false);
 
+        // Parse the CHIP certificate again to determine if it is a PDC Identity certificate,
+        // and if so re-encode it in compact format. This is a little clunky, but CHIPCert.h
+        // does not expose any APIs to do this directly, as this conversion is not needed
+        // in normal operation. Note that the certificate type is determined from the Subject
+        // DN field; it does not validate the remainder of PDC Identity requirements.
+        ChipCertificateData certData;
+        CertType certType;
+        if (DecodeChipCert(chipCert, certData) == CHIP_NO_ERROR && certData.mSubjectDN.GetCertType(certType) == CHIP_NO_ERROR &&
+            certType == CertType::kNetworkIdentity)
+        {
+            fprintf(stderr, "Subject DN identifies a PDC Identity, using compact TLV format\n");
+            uint8_t compactCertBuf[kMaxCHIPCompactNetworkIdentityLength];
+            MutableByteSpan compactCert(compactCertBuf);
+            ReturnValueOnFailure(EncodeCompactIdentityCert(certData, compactCert), false);
+            return WriteChipCert(fileName, compactCert, certFmt);
+        }
+
         return WriteChipCert(fileName, chipCert, certFmt);
     }
 
@@ -886,10 +935,11 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     }
 
     // Set the issuer name for the certificate. In the case of a self-signed cert, this will be
-    // the new cert's subject name.
+    // the new cert's subject name. Note that the subject DN is only applied to `newCert` further
+    // below, so for a self-signed cert it must be taken from `subjectDN` rather than from `caCert`.
     if (certConfig.IsIssuerPresent())
     {
-        if (certType == CertType::kRoot)
+        if (certType == CertType::kRoot || caCert == newCert)
         {
             res = subjectDN->SetCertIssuerDN(newCert);
             VerifyTrueOrExit(res);
@@ -916,8 +966,13 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     // Injuct error into public key value.
     if (certConfig.IsPublicKeyError())
     {
-        ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(newCert);
-        pk->data[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+        const ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(newCert);
+        std::vector<uint8_t> pkBuf(ASN1_STRING_get0_data(pk), ASN1_STRING_get0_data(pk) + ASN1_STRING_length(pk));
+        pkBuf[CertStructConfig::kPublicKeyErrorByte] ^= 0xFF;
+        if (!ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(pk), pkBuf.data(), static_cast<int>(pkBuf.size())))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
     // Set certificate subject DN.
@@ -1010,7 +1065,12 @@ bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EV
     {
         const ASN1_BIT_STRING * sig = nullptr;
         X509_get0_signature(&sig, nullptr, newCert);
-        sig->data[20] ^= 0xFF;
+        std::vector<uint8_t> sigBuf(ASN1_STRING_get0_data(sig), ASN1_STRING_get0_data(sig) + ASN1_STRING_length(sig));
+        sigBuf[20] ^= 0xFF;
+        if (!ASN1_STRING_set(const_cast<ASN1_BIT_STRING *>(sig), sigBuf.data(), static_cast<int>(sigBuf.size())))
+        {
+            ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
+        }
     }
 
 exit:
@@ -1260,9 +1320,7 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
 
             for (uint8_t i = 0; i < futureExtsCount; i++)
             {
-                ReturnErrorOnFailure(
-                    writer.Put(ContextTag(kTag_FutureExtension),
-                               ByteSpan(reinterpret_cast<const uint8_t *>(futureExts[i].info), strlen(futureExts[i].info))));
+                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_FutureExtension), ByteSpan::fromCharString(futureExts[i].info)));
             }
         }
         ReturnErrorOnFailure(writer.EndContainer(containerType2));
@@ -1275,7 +1333,8 @@ CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * c
     uint8_t signatureRawBuf[chip::Crypto::kP256_ECDSA_Signature_Length_Raw];
     MutableByteSpan signatureRaw(signatureRawBuf);
     ReturnErrorOnFailure(chip::Crypto::EcdsaAsn1SignatureToRaw(
-        chip::Crypto::kP256_FE_Length, ByteSpan(asn1Signature->data, static_cast<size_t>(asn1Signature->length)), signatureRaw));
+        chip::Crypto::kP256_FE_Length,
+        ByteSpan(ASN1_STRING_get0_data(asn1Signature), static_cast<size_t>(ASN1_STRING_length(asn1Signature))), signatureRaw));
 
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), signatureRaw));
 
@@ -1331,6 +1390,11 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
     uint16_t pid = certConfig.IsSubjectPIDMismatch() ? static_cast<uint16_t>(subjectPID + 1) : subjectPID;
     bool isCA    = (attCertType != kAttCertType_DAC);
+    // Declared here (default-constructed, no OpenSSL call yet) so that the goto's below -
+    // via ReportOpenSSLErrorAndExit()/VerifyTrueOrExit() - don't jump over its initialization.
+    // The actual X509_NAME_dup() happens later, via reset(), which is a plain function call
+    // and not a declaration, so it's safe to jump over.
+    std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> subjectName(nullptr, &X509_NAME_free);
 
     VerifyOrReturnError(subjectCN != nullptr, false);
     VerifyOrReturnError(caCert != nullptr, false);
@@ -1355,6 +1419,18 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     if (!X509_set_pubkey(newCert, newKey))
     {
         ReportOpenSSLErrorAndExit("X509_set_pubkey", res = false);
+    }
+
+    // Duplicate the cert's subject name into an owned copy before mutating it below. On
+    // OpenSSL 4.0, X509_get_subject_name() returns a const-qualified name embedded in newCert;
+    // the supported way to change it is to install a whole new name via
+    // X509_set_subject_name(), not to cast away const and mutate the embedded one in place.
+    // This dup/mutate/install-back pattern requires no const_cast and works identically on
+    // OpenSSL 1.1.x/3.x/4.x and BoringSSL.
+    subjectName.reset(X509_NAME_dup(X509_get_subject_name(newCert)));
+    if (!subjectName)
+    {
+        ReportOpenSSLErrorAndExit("X509_NAME_dup", res = false);
     }
 
     // Encode Common Name (CN) Attribute.
@@ -1419,8 +1495,8 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         }
 
         // Add common name attribute to the certificate subject DN.
-        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), NID_commonName, MBSTRING_UTF8,
-                                        reinterpret_cast<uint8_t *>(cnAttrStr), static_cast<int>(cnAttrStrLen), -1, 0))
+        if (!X509_NAME_add_entry_by_NID(subjectName.get(), NID_commonName, MBSTRING_UTF8, reinterpret_cast<uint8_t *>(cnAttrStr),
+                                        static_cast<int>(cnAttrStrLen), -1, 0))
         {
             ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
         }
@@ -1436,7 +1512,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrVID, MBSTRING_UTF8,
+            if (!X509_NAME_add_entry_by_NID(subjectName.get(), gNIDChipAttAttrVID, MBSTRING_UTF8,
                                             reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
@@ -1451,12 +1527,18 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
 
-            if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrPID, MBSTRING_UTF8,
+            if (!X509_NAME_add_entry_by_NID(subjectName.get(), gNIDChipAttAttrPID, MBSTRING_UTF8,
                                             reinterpret_cast<unsigned char *>(chipAttrStr), sizeof(chipAttrStr), -1, 0))
             {
                 ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
             }
         }
+    }
+
+    // Install the mutated subject name back onto the certificate.
+    if (!X509_set_subject_name(newCert, subjectName.get()))
+    {
+        ReportOpenSSLErrorAndExit("X509_set_subject_name", res = false);
     }
 
     // Set the issuer name for the certificate. In the case of a self-signed cert, this will be
@@ -1523,9 +1605,13 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Sign the new certificate.
-    if (!X509_sign(newCert, caKey, certConfig.GetSignatureAlgorithmDER()))
+    // ML-DSA keys use a built-in hash; pass nullptr as the digest algorithm.
     {
-        ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        const EVP_MD * md = IsMLDSAKey(caKey) ? nullptr : certConfig.GetSignatureAlgorithmDER();
+        if (!X509_sign(newCert, caKey, md))
+        {
+            ReportOpenSSLErrorAndExit("X509_sign", res = false);
+        }
     }
 
 exit:
