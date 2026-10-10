@@ -812,6 +812,27 @@ static const NSTimeInterval kShortMonitorWaitElapsedSeconds = 0.5;
 static const uint16_t kControllerPeerPort = 5547;
 static const NSTimeInterval kCASEEstablishmentSeconds = 30;
 
+static void TestBrowseCallback(
+    DNSServiceRef sdRef,
+    DNSServiceFlags flags,
+    uint32_t interfaceIndex,
+    DNSServiceErrorType errorCode,
+    const char * serviceName,
+    const char * regtype,
+    const char * replyDomain,
+    void * context)
+{
+    if (errorCode != kDNSServiceErr_NoError || serviceName == NULL) {
+        return;
+    }
+    NSCountedSet<NSString *> * browsedInstances = (__bridge NSCountedSet<NSString *> *) context;
+    if (flags & kDNSServiceFlagsAdd) {
+        [browsedInstances addObject:@(serviceName)];
+    } else {
+        [browsedInstances removeObject:@(serviceName)];
+    }
+}
+
 - (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys nodeID:(NSNumber *)nodeID poolSize:(NSUInteger)poolSize
 {
     NSError * error;
@@ -851,8 +872,13 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitSeconds];
 
     NSString * peerInstanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+    // Local-only, so no other responder can cache the record and keep answering for it once it is deregistered.
     DNSServiceRef peerAdvertiser = NULL;
-    XCTAssertEqual(DNSServiceRegister(&peerAdvertiser, kDNSServiceFlagsNoAutoRename, 0, peerInstanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceRegister(&peerAdvertiser, kDNSServiceFlagsNoAutoRename, kDNSServiceInterfaceIndexLocalOnly, peerInstanceName.UTF8String, kOperationalType, kLocalDot, "localhost", htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    NSCountedSet<NSString *> * browsedInstances = [NSCountedSet set];
+    DNSServiceRef peerBrowser = NULL;
+    XCTAssertEqual(DNSServiceBrowse(&peerBrowser, 0, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, TestBrowseCallback, (__bridge void *) browsedInstances), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceSetDispatchQueue(peerBrowser, dispatch_get_main_queue()), kDNSServiceErr_NoError);
     __block BOOL readCompleted = NO;
     [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)] ]
                                                                                eventPaths:nil
@@ -863,7 +889,12 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
                                                                                    readCompleted = YES;
                                                                                }];
     XCTAssertTrue([self waitUntil:^{ return readCompleted; } timeout:kCASEEstablishmentSeconds description:@"CASE session to the peer established"]);
+
+    // The callers need the peer's connectivity monitor to never report, so the record must be gone before they start.
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([browsedInstances countForObject:peerInstanceName] > 0); } timeout:kPromptSeconds description:@"peer record seen by browsing"]);
     DNSServiceRefDeallocate(peerAdvertiser);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([browsedInstances countForObject:peerInstanceName] == 0); } timeout:kPromptSeconds description:@"peer record removed"]);
+    DNSServiceRefDeallocate(peerBrowser);
     return controller;
 }
 #endif
@@ -968,16 +999,20 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
 
     // The timeout is queued behind this hold, and the check right behind the timeout.
-    dispatch_semaphore_t holding = dispatch_semaphore_create(0);
-    dispatch_semaphore_t releaseHold = dispatch_semaphore_create(0);
+    // Flags, not semaphores: a wait on a semaphore that a lower-QoS thread signals is reported as a priority inversion, and XCTest's
+    // recording of that report can hold up the wait the check is polled by.
+    __block atomic_bool holding = false;
+    __block atomic_bool releaseHold = false;
     dispatch_queue_t resultQueue = dispatch_queue_create("session-result", DISPATCH_QUEUE_SERIAL);
     __block BOOL sessionDelivered = NO;
     __block BOOL checked = NO;
     __block BOOL deliveredByTimeoutTurn = NO;
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         [controller syncRunOnWorkQueue:^{
-            dispatch_semaphore_signal(holding);
-            dispatch_semaphore_wait(releaseHold, DISPATCH_TIME_FOREVER);
+            atomic_store(&holding, true);
+            while (!atomic_load(&releaseHold)) {
+                usleep(1000);
+            }
             [controller asyncDispatchToMatterQueue:^{
                 dispatch_sync(resultQueue, ^{
                     deliveredByTimeoutTurn = sessionDelivered;
@@ -986,7 +1021,11 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
             } errorHandler:nil];
         } error:nil];
     });
-    XCTAssertEqual(dispatch_semaphore_wait(holding, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0);
+    NSDate * holdDeadline = [NSDate dateWithTimeIntervalSinceNow:kPromptSeconds];
+    while (!atomic_load(&holding) && holdDeadline.timeIntervalSinceNow > 0) {
+        usleep(1000);
+    }
+    XCTAssertTrue(atomic_load(&holding), @"Matter queue held");
 
     NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
     MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
@@ -996,7 +1035,7 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     }];
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"session request waits on its connectivity monitor");
     [NSThread sleepForTimeInterval:kShortMonitorWaitElapsedSeconds];
-    dispatch_semaphore_signal(releaseHold);
+    atomic_store(&releaseHold, true);
 
     XCTAssertTrue([self waitUntil:^{ return checked; } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
     XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
