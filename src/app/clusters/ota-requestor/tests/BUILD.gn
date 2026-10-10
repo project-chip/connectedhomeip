@@ -45,7 +45,18 @@ chip_test_suite("tests") {
   ]
 
   if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
-    test_sources += [ "TestOTAImageProcessorImpl.cpp" ]
+    test_sources += [
+      "TestDefaultOTARequestor.cpp",
+      "TestOTAImageProcessorImpl.cpp",
+    ]
+    sources += [
+      "${chip_root}/src/app/clusters/ota-requestor/CodegenIntegrationInternal.h",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestor.h",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.h",
+    ]
+    public_deps += [ "${chip_root}/src/app/server" ]
 
     # With the OTA requestor enabled, the platform library already builds the processor.
     if (!chip_enable_ota_requestor) {

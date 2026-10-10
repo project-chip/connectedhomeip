@@ -111,12 +111,14 @@ class RecordingStateDelegate : public BDXDownloader::StateDelegate
 public:
     void OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason) override
     {
-        mState = state;
+        mState  = state;
+        mReason = reason;
         mIdleCount += (state == OTADownloader::State::kIdle) ? 1 : 0;
     }
     void OnUpdateProgressChanged(app::DataModel::Nullable<uint8_t> percent) override {}
 
     OTADownloader::State mState = OTADownloader::State::kIdle;
+    OTAChangeReasonEnum mReason = OTAChangeReasonEnum::kSuccess;
     uint32_t mIdleCount         = 0;
 };
 
@@ -193,6 +195,11 @@ public:
             {
             case TransferSession::OutputEventType::kInitReceived: {
                 mRequestedOffsets.push_back(event.transferInitData.StartOffset);
+                if (mRejectInitWith.has_value())
+                {
+                    ASSERT_EQ(mProvider.AbortTransfer(*mRejectInitWith), CHIP_NO_ERROR);
+                    break;
+                }
                 if (mRejectStartOffset && event.transferInitData.StartOffset != 0)
                 {
                     ASSERT_EQ(mProvider.AbortTransfer(StatusCode::kStartOffsetNotSupported), CHIP_NO_ERROR);
@@ -268,6 +275,7 @@ public:
     size_t mServeOffset     = 0;
     std::optional<uint64_t> mAcceptOffset;
     std::optional<size_t> mServeFrom;
+    std::optional<StatusCode> mRejectInitWith;
     bool mRejectStartOffset = false;
 };
 
@@ -466,6 +474,57 @@ TEST_F(TestBDXDownloader, RejectedAcceptReportsFailureOnce)
     StartDownload(kUnlimited);
 
     EXPECT_EQ(mStateDelegate.mIdleCount, 1u);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyIsReportedAsDelayByProvider)
+{
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kDelayByProvider);
+    EXPECT_EQ(mStateDelegate.mIdleCount, 1u);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyKeepsPartialImage)
+{
+    InterruptAfter(5);
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mProcessor.mAbortCount, 0u);
+    EXPECT_EQ(mProcessor.GetResumeOffset(), 5u * kBlockSize);
+
+    mRejectInitWith.reset();
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mRequestedOffsets.size(), 3u);
+    EXPECT_EQ(mRequestedOffsets[2], 5u * kBlockSize);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    EXPECT_EQ(mProcessor.mBytesReceived, kImageSize);
+}
+
+TEST_F(TestBDXDownloader, OtherStatusReportIsReportedAsFailure)
+{
+    mRejectInitWith = StatusCode::kTransferFailedUnknownError;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
+}
+
+TEST_F(TestBDXDownloader, LocalPrepareFailureIsReportedAsFailure)
+{
+    TransferSession::TransferInitData init;
+    init.TransferCtlFlags = TransferControlFlags::kReceiverDrive;
+    init.MaxBlockSize     = kBlockSize;
+    init.FileDesignator   = reinterpret_cast<const uint8_t *>(kFileDesignator);
+    init.FileDesLength    = static_cast<uint16_t>(sizeof(kFileDesignator) - 1);
+    ASSERT_EQ(mDownloader.SetBDXParams(init, kTimeout), CHIP_NO_ERROR);
+    ASSERT_EQ(mDownloader.BeginPrepareDownload(), CHIP_NO_ERROR);
+    ASSERT_EQ(mDownloader.OnPreparedForDownload(CHIP_ERROR_INTERNAL), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
 }
 
 TEST_F(TestBDXDownloader, LocalFailureDiscardsPartialImage)

@@ -640,6 +640,10 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
         mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
+        if (reason == OTAChangeReasonEnum::kDelayByProvider)
+        {
+            TEMPORARY_RETURN_IGNORED mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::kBusy, System::Clock::kZero);
+        }
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);

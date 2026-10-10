@@ -342,6 +342,15 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
+        if (outEvent.statusData.statusCode == bdx::StatusCode::kResponderBusy)
+        {
+            // The provider will serve the image later, so keep what was received for a resumed download.
+            Reset();
+            mBdxTransfer.Reset();
+            LogErrorOnFailure(mImageProcessor->SuspendDownload());
+            SetState(State::kIdle, OTAChangeReasonEnum::kDelayByProvider);
+            break;
+        }
         CleanupOnError(OTAChangeReasonEnum::kFailure);
         break;
     case TransferSession::OutputEventType::kInternalError:
