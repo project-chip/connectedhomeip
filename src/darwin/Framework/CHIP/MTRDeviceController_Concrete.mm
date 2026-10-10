@@ -46,7 +46,7 @@
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
-#import "MTRSetupPayload.h"
+#import "MTRSetupPayload_Internal.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
@@ -1384,8 +1384,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             // OnCommissioningComplete notification ourselves.
             MTR_LOG("%@ Notifying commissioning complete manually because %@ is being canceled while waiting after PASE establishment",
                 self, commissioning);
-            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue,
-                CHIP_ERROR_CANCELLED);
+            chip::Controller::CompletionStatus completionStatus;
+            completionStatus.err = CHIP_ERROR_CANCELLED;
+            self->_deviceControllerDelegateBridge->NotifyCommissioningComplete(nodeID.unsignedLongLongValue, &completionStatus);
         }
         return ok;
     };
@@ -1524,6 +1525,28 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         count = self->_shutdownHandlersForDeviceConnectivityMonitors.count;
     });
     return count;
+}
+
+- (void)unitTestReportCommissioningFailureForNodeID:(NSNumber *)nodeID
+                         networkCommissioningStatus:(nullable NSNumber *)networkCommissioningStatus
+                                         errorValue:(nullable NSNumber *)errorValue
+                                          debugText:(nullable NSString *)debugText
+{
+    [self syncRunOnWorkQueue:^{
+        chip::Controller::CompletionStatus completionStatus;
+        completionStatus.err = CHIP_ERROR_INTERNAL;
+        if (networkCommissioningStatus != nil) {
+            completionStatus.networkCommissioningStatus.SetValue(
+                static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>(networkCommissioningStatus.unsignedCharValue));
+        }
+        if (errorValue != nil) {
+            completionStatus.connectNetworkErrorValue.SetValue(errorValue.intValue);
+        }
+        if (debugText != nil) {
+            completionStatus.networkCommissioningDebugText = debugText.UTF8String;
+        }
+        self->_deviceControllerDelegateBridge->OnCommissioningFailure(chip::PeerId(0, nodeID.unsignedLongLongValue), completionStatus);
+    } error:nil];
 }
 
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
@@ -2476,11 +2499,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
+    auto * setupPayload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload error:error];
     if (!setupPayload) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return NO;
     }
 
