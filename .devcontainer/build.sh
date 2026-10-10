@@ -76,11 +76,18 @@ if [ "$USER_UID" = "0" ]; then
     USER_UID=1000
 fi
 
+NXP_ZEPHYR_REVISION=$(grep "NXP_ZEPHYR_REVISION:" "$CHIP_ROOT/.github/workflows/examples-nxp.yaml" | awk '{print $2}' | tr -d ' ')
+if [ -z "$NXP_ZEPHYR_REVISION" ]; then
+    echo "Error: NXP_ZEPHYR_REVISION not found in .github/workflows/examples-nxp.yaml"
+    exit 1
+fi
+
 docker buildx build \
     -t "$IMAGE_TAG" \
     --pull \
     --build-arg USER_UID="$USER_UID" \
     --build-arg BUILD_VERSION="$BUILD_VERSION" \
     --build-arg LOCAL_WORKSPACE_ROOT="$CHIP_ROOT" \
+    --build-arg NXP_ZEPHYR_REVISION="$NXP_ZEPHYR_REVISION" \
     --network=host \
     "$HERE"
