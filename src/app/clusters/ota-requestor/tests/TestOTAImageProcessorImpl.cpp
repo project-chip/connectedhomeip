@@ -34,13 +34,6 @@
 
 using namespace chip;
 
-namespace chip {
-OTARequestorInterface * GetRequestorInstance()
-{
-    return nullptr;
-}
-} // namespace chip
-
 namespace {
 
 constexpr uint8_t kHeader[]        = { 0x1e, 0xf1, 0xee, 0x1b, 0xa2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x52, 0x00,
