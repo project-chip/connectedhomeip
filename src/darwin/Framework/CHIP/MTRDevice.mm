@@ -57,56 +57,55 @@
 
 @end
 
-static NSUInteger MTRInterestedPathRank(id path)
+static MTRAttributeRequestPath * _Nullable MTRAttributeRequestPathForInterestedPath(id interestedPath)
 {
-    if ([path isKindOfClass:[NSNumber class]]) {
-        return 0;
+    if ([interestedPath isKindOfClass:[NSNumber class]]) {
+        return [MTRAttributeRequestPath requestPathWithEndpointID:interestedPath clusterID:nil attributeID:nil];
     }
-    Class pathClass = [path class];
-    if (pathClass == [MTRClusterPath class]) {
-        return 1;
+    if ([interestedPath isKindOfClass:[MTRAttributePath class]]) {
+        MTRAttributePath * attributePath = interestedPath;
+        return [MTRAttributeRequestPath requestPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster attributeID:attributePath.attribute];
     }
-    return pathClass == [MTRAttributePath class] ? 2 : 3;
+    if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+        MTRClusterPath * clusterPath = interestedPath;
+        return [MTRAttributeRequestPath requestPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:nil];
+    }
+    return nil;
 }
 
-static void MTRAddCanonicalInterestedPaths(NSMutableSet<id> * unionOfPaths, NSArray<id> * paths, Class leafPathClass)
+static MTREventRequestPath * _Nullable MTREventRequestPathForInterestedPath(id interestedPath)
 {
-    for (id path in paths) {
-        if ([path isKindOfClass:[NSNumber class]] || [path class] == leafPathClass || [path class] == [MTRClusterPath class]) {
-            [unionOfPaths addObject:path];
-        } else if ([path isKindOfClass:[MTRClusterPath class]]) {
-            MTRClusterPath * clusterPath = path;
-            [unionOfPaths addObject:[MTRClusterPath clusterPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster]];
-        }
+    if ([interestedPath isKindOfClass:[NSNumber class]]) {
+        return [MTREventRequestPath requestPathWithEndpointID:interestedPath clusterID:nil eventID:nil];
     }
+    if ([interestedPath isKindOfClass:[MTREventPath class]]) {
+        MTREventPath * eventPath = interestedPath;
+        return [MTREventRequestPath requestPathWithEndpointID:eventPath.endpoint clusterID:eventPath.cluster eventID:eventPath.event];
+    }
+    if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+        MTRClusterPath * clusterPath = interestedPath;
+        return [MTREventRequestPath requestPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster eventID:nil];
+    }
+    return nil;
 }
 
-static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
+// nil sorts first, so a wildcard sorts before any specific ID.
+static NSComparisonResult MTRCompareInterestedPathIDs(NSNumber * _Nullable a, NSNumber * _Nullable b)
 {
-    return [paths.allObjects sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-        NSUInteger rankA = MTRInterestedPathRank(a);
-        NSUInteger rankB = MTRInterestedPathRank(b);
-        if (rankA != rankB) {
-            return rankA < rankB ? NSOrderedAscending : NSOrderedDescending;
-        }
-        if (rankA == 0) {
-            return [(NSNumber *) a compare:(NSNumber *) b];
-        }
+    if (a == nil || b == nil) {
+        return a == b ? NSOrderedSame : (a == nil ? NSOrderedAscending : NSOrderedDescending);
+    }
+    return [a compare:b];
+}
 
-        MTRClusterPath * clusterPathA = a;
-        MTRClusterPath * clusterPathB = b;
-        NSComparisonResult result = [clusterPathA.endpoint compare:clusterPathB.endpoint];
-        if (result == NSOrderedSame) {
-            result = [clusterPathA.cluster compare:clusterPathB.cluster];
-        }
-        if (result != NSOrderedSame || rankA == 1) {
-            return result;
-        }
-        if (rankA == 2) {
-            return [((MTRAttributePath *) a).attribute compare:((MTRAttributePath *) b).attribute];
-        }
-        return [((MTREventPath *) a).event compare:((MTREventPath *) b).event];
-    }];
+static NSComparisonResult MTRCompareInterestedPaths(NSNumber * _Nullable endpointA, NSNumber * _Nullable clusterA, NSNumber * _Nullable leafA,
+    NSNumber * _Nullable endpointB, NSNumber * _Nullable clusterB, NSNumber * _Nullable leafB)
+{
+    NSComparisonResult result = MTRCompareInterestedPathIDs(endpointA, endpointB);
+    if (result == NSOrderedSame) {
+        result = MTRCompareInterestedPathIDs(clusterA, clusterB);
+    }
+    return result != NSOrderedSame ? result : MTRCompareInterestedPathIDs(leafA, leafB);
 }
 
 #pragma mark - MTRDevice
@@ -273,51 +272,73 @@ MTR_DIRECT_MEMBERS
     return [self _delegateExists];
 }
 
-- (nullable NSMutableSet<id> *)_unionOfDelegateInterestedPaths:(NSArray<id> * _Nullable (^)(MTRDeviceDelegateInfo * delegateInfo))pathsForDelegate leafPathClass:(Class)leafPathClass
+// Returns nil if some delegate wants every path.
+- (nullable NSArray *)_allDelegatesInterestedPaths:(NSArray * _Nullable (^)(MTRDeviceDelegateInfo * delegateInfo))pathsForDelegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    NSMutableSet<id> * unionOfPaths = [NSMutableSet set];
+    NSMutableArray * allPaths = [NSMutableArray array];
     __block BOOL wantsEverything = NO;
 
     [_delegateManager iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
-        NSArray<id> * interestedPaths = pathsForDelegate(delegateInfo);
+        NSArray * interestedPaths = pathsForDelegate(delegateInfo);
         if (interestedPaths == nil) {
             wantsEverything = YES;
-        } else if (!wantsEverything) {
-            MTRAddCanonicalInterestedPaths(unionOfPaths, interestedPaths, leafPathClass);
+        } else {
+            [allPaths addObjectsFromArray:interestedPaths];
         }
     }];
 
-    return wantsEverything ? nil : unionOfPaths;
+    return wantsEverything ? nil : allPaths;
 }
 
-- (nullable NSArray<id> *)unionOfInterestedPathsForAttributes
+- (nullable NSArray<MTRAttributeRequestPath *> *)unionOfInterestedPathsForAttributes
 {
     std::lock_guard lock(_lock);
-    NSMutableSet<id> * unionOfPaths = [self _unionOfDelegateInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
+    NSArray * delegatesPaths = [self _allDelegatesInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
         return delegateInfo.interestedPathsForAttributes;
-    } leafPathClass:[MTRAttributePath class]];
-    if (unionOfPaths == nil) {
+    }];
+    if (delegatesPaths == nil) {
         return nil;
     }
 
+    NSMutableArray * interestedPaths = [delegatesPaths mutableCopy];
     for (MTRAttributeValueWaiter * attributeValueWaiter in self.attributeValueWaiters) {
-        MTRAddCanonicalInterestedPaths(unionOfPaths, attributeValueWaiter.attributePaths, [MTRAttributePath class]);
+        [interestedPaths addObjectsFromArray:attributeValueWaiter.attributePaths];
     }
-    return MTRSortedInterestedPaths(unionOfPaths);
+
+    NSMutableSet<MTRAttributeRequestPath *> * unionOfPaths = [NSMutableSet set];
+    for (id interestedPath in interestedPaths) {
+        MTRAttributeRequestPath * requestPath = MTRAttributeRequestPathForInterestedPath(interestedPath);
+        if (requestPath != nil) {
+            [unionOfPaths addObject:requestPath];
+        }
+    }
+    return [unionOfPaths.allObjects sortedArrayUsingComparator:^NSComparisonResult(MTRAttributeRequestPath * a, MTRAttributeRequestPath * b) {
+        return MTRCompareInterestedPaths(a.endpoint, a.cluster, a.attribute, b.endpoint, b.cluster, b.attribute);
+    }];
 }
 
-- (nullable NSArray<id> *)unionOfInterestedPathsForEvents
+- (nullable NSArray<MTREventRequestPath *> *)unionOfInterestedPathsForEvents
 {
     std::lock_guard lock(_lock);
-    NSMutableSet<id> * unionOfPaths = [self _unionOfDelegateInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
+    NSArray * delegatesPaths = [self _allDelegatesInterestedPaths:^(MTRDeviceDelegateInfo * delegateInfo) {
         return delegateInfo.interestedPathsForEvents;
-    } leafPathClass:[MTREventPath class]];
-    if (unionOfPaths == nil) {
+    }];
+    if (delegatesPaths == nil) {
         return nil;
     }
-    return MTRSortedInterestedPaths(unionOfPaths);
+
+    NSMutableSet<MTREventRequestPath *> * unionOfPaths = [NSMutableSet set];
+    for (id interestedPath in delegatesPaths) {
+        MTREventRequestPath * requestPath = MTREventRequestPathForInterestedPath(interestedPath);
+        if (requestPath != nil) {
+            [unionOfPaths addObject:requestPath];
+        }
+    }
+    return [unionOfPaths.allObjects sortedArrayUsingComparator:^NSComparisonResult(MTREventRequestPath * a, MTREventRequestPath * b) {
+        return MTRCompareInterestedPaths(a.endpoint, a.cluster, a.event, b.endpoint, b.cluster, b.event);
+    }];
 }
 
 - (BOOL)_delegateExists
@@ -330,9 +351,9 @@ MTR_DIRECT_MEMBERS
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
+    NSUInteger oldDelegateInfoCount = _delegateManager.delegateInfoCount;
     NSUInteger remainingCount = [_delegateManager iterateDelegatesWithBlock:block];
-    [self _noteDelegatesPrunedFromCount:delegateInfoCount];
+    [self _noteDelegatesPrunedFromCount:oldDelegateInfoCount];
     return remainingCount > 0;
 }
 
@@ -340,17 +361,17 @@ MTR_DIRECT_MEMBERS
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
+    NSUInteger oldDelegateInfoCount = _delegateManager.delegateInfoCount;
     BOOL delegatesCalled = [_delegateManager callDelegatesWithBlock:block];
-    [self _noteDelegatesPrunedFromCount:delegateInfoCount];
+    [self _noteDelegatesPrunedFromCount:oldDelegateInfoCount];
     return delegatesCalled;
 }
 
-- (void)_noteDelegatesPrunedFromCount:(NSUInteger)delegateInfoCount
+- (void)_noteDelegatesPrunedFromCount:(NSUInteger)oldDelegateInfoCount
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    if (_delegateManager.delegateInfoCount < delegateInfoCount) {
+    if (_delegateManager.delegateInfoCount < oldDelegateInfoCount) {
         [self _interestedPathsChanged];
     }
 }
@@ -869,7 +890,6 @@ MTR_DIRECT_MEMBERS
             self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
         }
         [self.attributeValueWaiters addObject:attributeWaiter];
-        attributeWaiter.registeredWithDevice = YES;
         [self _interestedPathsChanged];
     }
 
@@ -895,7 +915,6 @@ MTR_DIRECT_MEMBERS
 
     for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
         [self.attributeValueWaiters removeObject:attributeValueWaiter];
-        attributeValueWaiter.registeredWithDevice = NO;
         [attributeValueWaiter _notifyWithError:nil];
     }
 
@@ -907,11 +926,16 @@ MTR_DIRECT_MEMBERS
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter
 {
     std::lock_guard lock(_lock);
-    if (!attributeValueWaiter.registeredWithDevice) {
+    if (![self.attributeValueWaiters containsObject:attributeValueWaiter]) {
         return;
     }
     [self.attributeValueWaiters removeObject:attributeValueWaiter];
-    attributeValueWaiter.registeredWithDevice = NO;
+    [self _interestedPathsChanged];
+}
+
+- (void)_pendingAttributeWaiterDeallocated
+{
+    std::lock_guard lock(_lock);
     [self _interestedPathsChanged];
 }
 
@@ -922,7 +946,6 @@ MTR_DIRECT_MEMBERS
     auto * attributeValueWaiters = self.attributeValueWaiters;
     self.attributeValueWaiters = nil;
     for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
-        attributeValueWaiter.registeredWithDevice = NO;
         [attributeValueWaiter _notifyCancellation];
     }
 }
