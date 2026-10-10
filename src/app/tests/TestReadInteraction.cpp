@@ -51,7 +51,9 @@
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
 
+#include <algorithm>
 #include <optional>
+#include <vector>
 
 namespace {
 using namespace chip::app::Clusters::Globals::Attributes;
@@ -559,6 +561,9 @@ public:
     void TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter();
     void TestReadRoundtripWithNoMatchPathDataVersionFilter();
     void TestReadRoundtripWithSameDifferentPathsDataVersionFilter();
+    void TestReadRoundtripWithCallbackAndParamsDataVersionFilters();
+    void TestReadClientDataVersionFilterSpaceForCallback();
+    void TestReadClientGetMinEventNumber();
     void TestReadShutdown();
     void TestReadUnexpectedSubscriptionId();
     void TestReadWildcard();
@@ -1532,6 +1537,169 @@ void TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilt
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+class DataVersionFilterAndEventNumberCallback : public MockInteractionModelApp
+{
+public:
+    CHIP_ERROR OnUpdateDataVersionFilterList(chip::app::DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             const chip::Span<chip::app::AttributePathParams> & aAttributePaths,
+                                             bool & aEncodedDataVersionList) override
+    {
+        aEncodedDataVersionList = false;
+        mNumEncodedFilters      = 0;
+        for (const auto & filter : mFilters)
+        {
+            ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter));
+            aEncodedDataVersionList = true;
+            ++mNumEncodedFilters;
+        }
+        chip::ClusterId cluster = 0;
+        while (mFillBuffer)
+        {
+            chip::TLV::TLVWriter backup;
+            aDataVersionFilterIBsBuilder.Checkpoint(backup);
+            if (aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(
+                    chip::app::DataVersionFilter(kTestEndpointId, cluster++, kTestDataVersion1)) != CHIP_NO_ERROR)
+            {
+                aDataVersionFilterIBsBuilder.Rollback(backup);
+                break;
+            }
+            aEncodedDataVersionList = true;
+            ++mNumEncodedFilters;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetHighestReceivedEventNumber(chip::Optional<chip::EventNumber> & aEventNumber) override
+    {
+        aEventNumber = mHighestReceivedEventNumber;
+        return mEventNumberError;
+    }
+
+    size_t NumAttributesFromCluster(chip::ClusterId aCluster) const
+    {
+        return static_cast<size_t>(std::count_if(mReceivedAttributePaths.begin(), mReceivedAttributePaths.end(),
+                                                 [aCluster](const auto & path) { return path.mClusterId == aCluster; }));
+    }
+
+    std::vector<chip::app::DataVersionFilter> mFilters;
+    bool mFillBuffer          = false;
+    size_t mNumEncodedFilters = 0;
+    chip::Optional<chip::EventNumber> mHighestReceivedEventNumber;
+    CHIP_ERROR mEventNumberError = CHIP_NO_ERROR;
+};
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadRoundtripWithCallbackAndParamsDataVersionFilters)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadRoundtripWithCallbackAndParamsDataVersionFilters)
+void TestReadInteraction::TestReadRoundtripWithCallbackAndParamsDataVersionFilters()
+{
+    DataVersionFilterAndEventNumberCallback delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    chip::app::AttributePathParams attributePathParams[2];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+    attributePathParams[0].mClusterId  = kTestClusterId;
+    attributePathParams[1].mEndpointId = kTestEndpointId;
+    attributePathParams[1].mClusterId  = kInvalidTestClusterId;
+
+    delegate.mFilters.emplace_back(kTestEndpointId, kTestClusterId, kTestDataVersion1);
+
+    chip::app::DataVersionFilter dataVersionFilters[2] = {
+        { kTestEndpointId, kTestClusterId, kTestDataVersion2 },
+        { kTestEndpointId, kInvalidTestClusterId, kTestDataVersion1 },
+    };
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mpDataVersionFilterList      = dataVersionFilters;
+    readPrepareParams.mDataVersionFilterListSize   = 2;
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Read);
+
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+        EXPECT_FALSE(delegate.mReadError);
+        EXPECT_EQ(delegate.NumAttributesFromCluster(kTestClusterId), 0u);
+        EXPECT_EQ(delegate.NumAttributesFromCluster(kInvalidTestClusterId), 0u);
+    }
+
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    engine->Shutdown();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientDataVersionFilterSpaceForCallback)
+void TestReadInteraction::TestReadClientDataVersionFilterSpaceForCallback()
+{
+    DataVersionFilterAndEventNumberCallback delegate;
+    delegate.mFillBuffer = true;
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId = kTestEndpointId;
+
+    chip::app::DataVersionFilter dataVersionFilters[1] = { { kTestEndpointId, chip::Testing::MockClusterId(1),
+                                                             kTestDataVersion1 } };
+
+    auto generate = [&](chip::Span<chip::app::DataVersionFilter> aFilters) {
+        System::PacketBufferTLVWriter writer;
+        ReadRequestMessage::Builder request;
+        EXPECT_EQ(InitWriterWithSpaceReserved(writer, 0), CHIP_NO_ERROR);
+        EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
+        DataVersionFilterIBs::Builder & builder = request.CreateDataVersionFilters();
+        EXPECT_EQ(request.GetError(), CHIP_NO_ERROR);
+        bool encoded = false;
+        EXPECT_EQ(readClient.GenerateDataVersionFilterList(builder, chip::Span<chip::app::AttributePathParams>(attributePathParams),
+                                                           aFilters, encoded),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(encoded);
+        EXPECT_EQ(builder.EndOfDataVersionFilterIBs(), CHIP_NO_ERROR);
+        return delegate.mNumEncodedFilters;
+    };
+
+    size_t encodedWithoutParamsFilters = generate(chip::Span<chip::app::DataVersionFilter>());
+    EXPECT_GT(encodedWithoutParamsFilters, 0u);
+    EXPECT_EQ(generate(chip::Span<chip::app::DataVersionFilter>(dataVersionFilters)), encodedWithoutParamsFilters);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientGetMinEventNumber)
+void TestReadInteraction::TestReadClientGetMinEventNumber()
+{
+    DataVersionFilterAndEventNumberCallback delegate;
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Subscribe);
+    ReadPrepareParams params;
+    Optional<EventNumber> eventMin;
+
+    delegate.mHighestReceivedEventNumber.SetValue(10);
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_NO_ERROR);
+    EXPECT_EQ(eventMin.ValueOr(0), 11u);
+
+    params.mEventNumber.SetValue(5);
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_NO_ERROR);
+    EXPECT_EQ(eventMin.ValueOr(0), 11u);
+
+    params.mEventNumber.SetValue(20);
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_NO_ERROR);
+    EXPECT_EQ(eventMin.ValueOr(0), 20u);
+
+    delegate.mHighestReceivedEventNumber.ClearValue();
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_NO_ERROR);
+    EXPECT_EQ(eventMin.ValueOr(0), 20u);
+
+    delegate.mHighestReceivedEventNumber.SetValue(30);
+    delegate.mEventNumberError = CHIP_ERROR_INTERNAL;
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_NO_ERROR);
+    EXPECT_EQ(eventMin.ValueOr(0), 20u);
+
+    params.mEventNumber.ClearValue();
+    EXPECT_EQ(readClient.GetMinEventNumber(params, eventMin), CHIP_ERROR_INTERNAL);
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadWildcard)
