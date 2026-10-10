@@ -90,6 +90,10 @@ protected:
      */
     void PollForOutput();
 
+    // While this returns false, PollForOutput leaves all TransferSession output, timeouts included, pending.
+    // An override must not need PollForOutput to run for this to become true again.
+    virtual bool CanHandleOutput() const { return true; }
+
     /**
      * Starts the poll timer with a very short timeout.
      */
