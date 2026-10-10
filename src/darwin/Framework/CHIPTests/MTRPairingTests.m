@@ -167,6 +167,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
     succeededForNodeID:(NSNumber *)nodeID
                metrics:(MTRMetrics *)metrics
+               context:(NSDictionary<NSString *, id> *)context
 {
     if (self.expectFailure) {
         XCTFail("Did not expect commissioning to succeed");
@@ -374,6 +375,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 @property (atomic, readwrite) BOOL commissioningCompleteCalled;
 @property (atomic, readwrite) BOOL readCommissioneeInfoCalled;
 @property (atomic, readwrite, strong) XCTestExpectation * allCallbacksCalledExpectation;
+@property (atomic, readwrite, strong) XCTestExpectation * deprecatedCallbackExpectation;
 @end
 
 @implementation MTRPairingTestMonitoringControllerDelegate
@@ -406,8 +408,30 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
+{
+    [self.deprecatedCallbackExpectation fulfill];
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+{
+    [self.deprecatedCallbackExpectation fulfill];
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID
                   metrics:(MTRMetrics *)metrics
+{
+    [self.deprecatedCallbackExpectation fulfill];
+}
+
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics
+                  context:(NSDictionary<NSString *, id> *)context
 {
     self.commissioningCompleteCalled = YES;
     [self _checkIfAllCallbacksCalled];
@@ -518,6 +542,9 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     __auto_type * monitoringControllerDelegate = [[MTRPairingTestMonitoringControllerDelegate alloc] init];
     XCTestExpectation * allCallbacksCalledExpectation = [self expectationWithDescription:@"All callbacks called on monitoring delegate"];
     monitoringControllerDelegate.allCallbacksCalledExpectation = allCallbacksCalledExpectation;
+    XCTestExpectation * deprecatedCallbackExpectation = [self expectationWithDescription:@"Deprecated callback called on monitoring delegate"];
+    deprecatedCallbackExpectation.inverted = YES;
+    monitoringControllerDelegate.deprecatedCallbackExpectation = deprecatedCallbackExpectation;
     [sController addDeviceControllerDelegate:monitoringControllerDelegate queue:callbackQueue];
     XCTAssertEqual([sController unitTestDelegateCount], 2);
 
@@ -537,7 +564,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(sDeviceId) error:&error]);
     XCTAssertNil(error);
 
-    [self waitForExpectations:@[ expectation, allCallbacksCalledExpectation ] timeout:kPairingTimeoutInSeconds];
+    [self waitForExpectations:@[ expectation, allCallbacksCalledExpectation, deprecatedCallbackExpectation ] timeout:kPairingTimeoutInSeconds];
     XCTAssertNil(controllerDelegate.commissioningCompleteError);
 
     // Test that the monitoring delegate got all the callbacks
