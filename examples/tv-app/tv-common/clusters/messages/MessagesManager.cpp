@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -87,6 +88,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     }
 
     mCachedMessages.push_back(cachedMessage);
+    NotifyMessagesChanged();
     LogErrorOnFailure(LogMessageQueuedEvent(mEndpointId, messageId));
 
     ScheduleOrPresentMessage(messageId);
@@ -115,6 +117,7 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
         else
         {
             mCachedMessages.erase(it);
+            NotifyMessagesChanged();
         }
     }
     return CHIP_NO_ERROR;
@@ -184,6 +187,17 @@ uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 
 // State machine
 
+void MessagesManager::NotifyMessagesChanged()
+{
+    // Messages lists every cached message and ActiveMessageIDs only the presented ones, so any
+    // change to the list or to a message's state can move either. Reporting both is cheaper
+    // than reasoning about which one moved, and a subscriber that never hears about a change
+    // is left holding a stale list.
+    VerifyOrReturn(mEndpointId != kInvalidEndpointId);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::Messages::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, Id, Attributes::ActiveMessageIDs::Id);
+}
+
 std::list<CachedMessage>::iterator MessagesManager::FindCachedMessage(ByteSpan messageId)
 {
     return std::find_if(mCachedMessages.begin(), mCachedMessages.end(),
@@ -234,13 +248,70 @@ void MessagesManager::ScheduleOrPresentMessage(ByteSpan messageId)
     PresentOrSuppressMessage(it);
 }
 
+void MessagesManager::SetDoNotDisturb(bool enabled)
+{
+    const bool wasEnabled = mDoNotDisturb;
+    mDoNotDisturb         = enabled;
+
+    // A High priority message held back while muted has to be presented once the device
+    // leaves the muted state, so release whatever is still queued.
+    if (wasEnabled && !enabled)
+    {
+        PresentQueuedMessages();
+    }
+}
+
+void MessagesManager::PresentQueuedMessages()
+{
+    // Copy the ids out first: releasing a message can erase it from the list, which would
+    // invalidate both the loop and any span pointing into the element being removed.
+    std::vector<MessageIdBuffer> queued;
+    for (CachedMessage & message : mCachedMessages)
+    {
+        if (message.GetState() == MessageState::kQueued)
+        {
+            MessageIdBuffer id;
+            memcpy(id.data(), message.GetMessageId().data(), id.size());
+            queued.push_back(id);
+        }
+    }
+
+    for (const MessageIdBuffer & id : queued)
+    {
+        // A message whose StartTime has not arrived yet is also queued, with a timer already
+        // pending for it. Going back through ScheduleOrPresentMessage re-checks StartTime so
+        // such a message is not presented early, and cancelling first leaves it with a single
+        // armed timer rather than two.
+        const ByteSpan messageId(id.data(), id.size());
+        CancelMessageTimers(messageId);
+        ScheduleOrPresentMessage(messageId);
+    }
+}
+
 void MessagesManager::PresentOrSuppressMessage(std::list<CachedMessage>::iterator it)
 {
     if (mDoNotDisturb)
     {
-        LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
-        mCachedMessages.erase(it);
-        return;
+        // While muted, how a message is handled depends on its Priority: Low and Medium are
+        // dropped outright, High waits in the queue until the device is unmuted, and Critical
+        // is presented anyway.
+        switch (it->GetPriority())
+        {
+        case MessagePriorityEnum::kLow:
+        case MessagePriorityEnum::kMedium:
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), true, it->GetFabricIndex()));
+            mCachedMessages.erase(it);
+            NotifyMessagesChanged();
+            return;
+        case MessagePriorityEnum::kHigh:
+            // Reported as not presented but kept queued, so RemovedFromQueue is false.
+            LogErrorOnFailure(LogMessageNotPresentedEvent(mEndpointId, it->GetMessageId(), false, it->GetFabricIndex()));
+            return;
+        case MessagePriorityEnum::kCritical:
+            break;
+        default:
+            break;
+        }
     }
     PresentMessage(*it);
 }
@@ -271,6 +342,7 @@ void MessagesManager::PresentMessage(CachedMessage & message)
     }
 
     message.SetState(MessageState::kPresented);
+    NotifyMessagesChanged();
     LogErrorOnFailure(LogMessagePresentedEvent(mEndpointId, message.GetMessageId()));
 
     const auto & duration = message.GetDuration();
@@ -300,6 +372,7 @@ void MessagesManager::CompleteMessage(ByteSpan messageId)
                                               DataModel::Nullable<FutureMessagePreferenceEnum>()));
 
     mCachedMessages.erase(it);
+    NotifyMessagesChanged();
 }
 
 void MessagesManager::StartMessageTimer(ByteSpan messageId, MessageTimerType type, uint32_t delayMs)

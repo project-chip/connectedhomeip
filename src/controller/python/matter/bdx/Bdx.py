@@ -20,7 +20,7 @@ import builtins
 import ctypes
 from asyncio.futures import Future
 from collections.abc import Callable
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
@@ -178,7 +178,8 @@ def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
     return _PrepareForBdxTransfer(future, data)
 
 
-def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None], transferComplete: Future):
+def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callable[[bytes], None],
+                                 transferComplete: Future) -> PyChipError:
     ''' Accepts a BDX transfer with the intent of receiving data.
 
     The data will be returned block-by-block in dataReceivedClosure.
@@ -199,7 +200,7 @@ def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callab
     return res
 
 
-def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferComplete: Future):
+def AcceptTransferAndSendData(transfer: c_void_p, data: bytes | bytearray, transferComplete: Future) -> PyChipError:
     ''' Accepts a BDX transfer with the intent of sending data.
 
     The data will be copied by C++.
@@ -210,8 +211,13 @@ def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferCompl
     handle = GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
+    # The native function is declared as taking a c_uint8_p, and ctypes rejects a c_char_p
+    # there, so the payload goes across as a c_uint8 array. BdxTransfer holds a bytearray,
+    # which from_buffer_copy accepts directly. The array is bound to a local so it outlives
+    # the call.
+    payload = (c_uint8 * len(data)).from_buffer_copy(data)
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, c_char_p(data), len(data), complete_transaction)
+        lambda: handle.pychip_Bdx_AcceptTransferAndSendData(transfer, payload, len(payload), complete_transaction)
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(complete_transaction))
@@ -242,7 +248,7 @@ def Init():
         setter.Set('pychip_Bdx_AcceptTransferAndReceiveData',
                    PyChipError, [c_void_p, py_object, py_object])
         setter.Set('pychip_Bdx_AcceptTransferAndSendData',
-                   PyChipError, [c_void_p, c_uint8_p, c_size_t])
+                   PyChipError, [c_void_p, c_uint8_p, c_size_t, py_object])
         setter.Set('pychip_Bdx_RejectTransfer',
                    PyChipError, [c_void_p])
         setter.Set('pychip_Bdx_InitCallbacks', None, [
