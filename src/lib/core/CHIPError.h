@@ -1836,7 +1836,13 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
 
-// AVAILABLE: 0xc7
+/**
+ *  @def CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING
+ *
+ *  @brief
+ *    The platform DNS-SD service is not running.
+ */
+#define CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING                 CHIP_CORE_ERROR(0xc7)
 
 /**
  *  @def CHIP_ERROR_DNS_SD_NXDOMAIN

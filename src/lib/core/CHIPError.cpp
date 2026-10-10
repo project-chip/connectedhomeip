@@ -496,6 +496,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.AsInteger():
         desc = "CASE session resumption MIC verification failed";
         break;
+    case CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING.AsInteger():
+        desc = "DNS-SD service is not running";
+        break;
     case CHIP_ERROR_DNS_SD_NXDOMAIN.AsInteger():
         desc = "DNS-SD name or record does not exist (NXDOMAIN)";
         break;

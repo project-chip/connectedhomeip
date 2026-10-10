@@ -109,6 +109,8 @@ CHIP_ERROR ToChipError(DNSServiceErrorType errorCode)
     case kDNSServiceErr_NoSuchName:
     case kDNSServiceErr_NoSuchRecord:
         return CHIP_ERROR_DNS_SD_NXDOMAIN;
+    case kDNSServiceErr_ServiceNotRunning:
+        return CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING;
     default:
         return CHIP_ERROR_INTERNAL;
     }

@@ -30,6 +30,7 @@ MTR_TESTABLE
 // here are integer representations of CHIP_ERROR.  Otherwise these functions
 // are just like errorForCHIPErrorCode and errorToCHIPErrorCode.
 + (NSError *)errorForCHIPIntegerCode:(uint32_t)code;
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)code additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> * _Nullable)additionalUserInfo;
 + (uint32_t)errorToCHIPIntegerCode:(NSError * _Nullable)error;
 
 @end
