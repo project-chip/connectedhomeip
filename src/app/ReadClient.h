@@ -230,8 +230,10 @@ public:
         virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
 
         /**
-         * This function is invoked when constructing a read/subscribeRequest that does not have data
-         * version filters specified, to give the callback a chance to provide some.
+         * This function is invoked when constructing a read/subscribeRequest, to give the callback a chance
+         * to provide data version filters.  Data version filters from the ReadPrepareParams are then added
+         * for clusters this function did not encode a filter for.  If those clusters cannot be determined,
+         * the ReadPrepareParams filters are added only if this function did not encode any filters.
          *
          * This function is expected to encode as many complete data version filters as will fit into
          * the buffer, rolling back any partially-encoded filters if it runs out of space, and set the
@@ -252,7 +254,9 @@ public:
         /**
          * Get highest received event number.
          * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
-         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
+         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction,
+         * unless ReadPrepareParams::mEventNumber is set.  On success, the larger of this value plus one and
+         * ReadPrepareParams::mEventNumber (if any) is used as the minimum event number.
          *
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
@@ -571,7 +575,8 @@ private:
                                              const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
-                                          const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+                                          const Span<DataVersionFilter> & aDataVersionFilters,
+                                          DataVersionFilterIBs::Parser * apCallbackFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
