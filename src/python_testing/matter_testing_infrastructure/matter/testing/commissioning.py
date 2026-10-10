@@ -221,7 +221,12 @@ class Commission:
 
 
 async def commission_device(
-    dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
+    dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+    node_id: int,
+    info: SetupPayloadInfo,
+    commissioning_info: CommissioningInfo,
+    *,
+    expected_failure: bool = False,
 ) -> PairingStatus:
     """
     Starts the commissioning process of a chip device.
@@ -234,6 +239,7 @@ async def commission_device(
         node_id: Unique identifier for the chip node.
         info: Contains setup information including passcode, filter_type, and filter_value.
         commissioning_info: Specifies the type of commissioning method to use.
+        expected_failure: If True, commissioning failures are logged without a traceback.
 
     Returns:
         PairingStatus object which can evaluated in conditional statements
@@ -247,7 +253,10 @@ async def commission_device(
         return PairingStatus()
 
     except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-        LOGGER.exception("Commissioning failed")
+        if expected_failure:
+            LOGGER.info("Commissioning failed as expected: %s", e)
+        else:
+            LOGGER.exception("Commissioning failed")
         return PairingStatus(exception=e)
 
     except Exception as e:
