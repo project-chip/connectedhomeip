@@ -999,16 +999,20 @@ static void TestBrowseCallback(
     [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
 
     // The timeout is queued behind this hold, and the check right behind the timeout.
-    dispatch_semaphore_t holding = dispatch_semaphore_create(0);
-    dispatch_semaphore_t releaseHold = dispatch_semaphore_create(0);
+    // Flags, not semaphores: a wait on a semaphore that a lower-QoS thread signals is reported as a priority inversion, and XCTest's
+    // recording of that report can hold up the wait the check is polled by.
+    __block atomic_bool holding = false;
+    __block atomic_bool releaseHold = false;
     dispatch_queue_t resultQueue = dispatch_queue_create("session-result", DISPATCH_QUEUE_SERIAL);
     __block BOOL sessionDelivered = NO;
     __block BOOL checked = NO;
     __block BOOL deliveredByTimeoutTurn = NO;
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
         [controller syncRunOnWorkQueue:^{
-            dispatch_semaphore_signal(holding);
-            dispatch_semaphore_wait(releaseHold, DISPATCH_TIME_FOREVER);
+            atomic_store(&holding, true);
+            while (!atomic_load(&releaseHold)) {
+                usleep(1000);
+            }
             [controller asyncDispatchToMatterQueue:^{
                 dispatch_sync(resultQueue, ^{
                     deliveredByTimeoutTurn = sessionDelivered;
@@ -1017,7 +1021,11 @@ static void TestBrowseCallback(
             } errorHandler:nil];
         } error:nil];
     });
-    XCTAssertEqual(dispatch_semaphore_wait(holding, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0);
+    NSDate * holdDeadline = [NSDate dateWithTimeIntervalSinceNow:kPromptSeconds];
+    while (!atomic_load(&holding) && holdDeadline.timeIntervalSinceNow > 0) {
+        usleep(1000);
+    }
+    XCTAssertTrue(atomic_load(&holding), @"Matter queue held");
 
     NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
     MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
@@ -1027,7 +1035,7 @@ static void TestBrowseCallback(
     }];
     XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"session request waits on its connectivity monitor");
     [NSThread sleepForTimeInterval:kShortMonitorWaitElapsedSeconds];
-    dispatch_semaphore_signal(releaseHold);
+    atomic_store(&releaseHold, true);
 
     XCTAssertTrue([self waitUntil:^{ return checked; } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
     XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
