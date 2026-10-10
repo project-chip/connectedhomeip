@@ -84,7 +84,8 @@ source_set("storage") {
   }
 
   defines =
-      [ "SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS=${sl_use_example_credentials}" ]
+      [ "SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS=${sl_use_example_credentials}",
+        "SL_MATTER_USE_FLASH_STORE=${use_provision_flash_storage}"]
 
   # Require the provision library when provision channel or flash storage is used
   if (sl_use_provision_channel || use_provision_flash_storage) {
