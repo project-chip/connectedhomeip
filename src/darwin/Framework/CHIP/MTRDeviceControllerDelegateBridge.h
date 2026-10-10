@@ -45,7 +45,8 @@ public:
 
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
 
-    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioningSuccess(chip::PeerId peerId) override;
+    void OnCommissioningFailure(chip::PeerId peerId, const chip::Controller::CompletionStatus & completionStatus) override;
     void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error) override;
     void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting) override;
 
@@ -57,6 +58,8 @@ public:
     CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     // Other helper methods
+    // A null completionStatus means success.
+    void NotifyCommissioningComplete(chip::NodeId nodeId, const chip::Controller::CompletionStatus * _Nullable completionStatus);
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
 
     void SetCommissioningParameters(MTRCommissioningParameters * commissioningParameters);

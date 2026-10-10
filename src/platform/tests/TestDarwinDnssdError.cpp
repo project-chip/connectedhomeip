@@ -28,6 +28,16 @@ TEST(TestDarwinDnssdError, NonexistentNameMapsToNxdomain)
     EXPECT_EQ(ToChipError(kDNSServiceErr_NoSuchRecord), CHIP_ERROR_DNS_SD_NXDOMAIN);
 }
 
+TEST(TestDarwinDnssdError, ServiceNotRunningMapsToServiceNotRunning)
+{
+    EXPECT_EQ(ToChipError(kDNSServiceErr_ServiceNotRunning), CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING);
+}
+
+TEST(TestDarwinDnssdError, TimeoutMapsToTimeout)
+{
+    EXPECT_EQ(ToChipError(kDNSServiceErr_Timeout), CHIP_ERROR_TIMEOUT);
+}
+
 TEST(TestDarwinDnssdError, OtherErrorsUnchanged)
 {
     EXPECT_EQ(ToChipError(kDNSServiceErr_NoError), CHIP_NO_ERROR);

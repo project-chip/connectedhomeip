@@ -33,6 +33,14 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
 
+NSErrorUserInfoKey const MTRUnderlyingErrorCodeKey = @"errorCode";
+NSErrorUserInfoKey const MTRAttestationVerificationResultKey = @"attestationVerificationResult";
+NSErrorUserInfoKey const MTRDeviceBasicInformationVendorIDKey = @"deviceBasicInformationVendorID";
+NSErrorUserInfoKey const MTRDeviceBasicInformationProductIDKey = @"deviceBasicInformationProductID";
+NSErrorUserInfoKey const MTRNetworkCommissioningStatusKey = @"networkCommissioningStatus";
+NSErrorUserInfoKey const MTRNetworkCommissioningConnectErrorValueKey = @"networkCommissioningConnectErrorValue";
+NSErrorUserInfoKey const MTRNetworkCommissioningDebugTextKey = @"networkCommissioningDebugText";
+
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
 @interface MTRErrorHolder : NSObject
@@ -58,6 +66,13 @@ NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
 {
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:contextToLog additionalUserInfo:nil];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
+                        logContext:(id)contextToLog
+                additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> *)additionalUserInfo
+{
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
@@ -66,12 +81,19 @@ NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
-        return [MTRError errorForIMStatus:status];
+        NSError * imError = [MTRError errorForIMStatus:status];
+        if (imError == nil) {
+            return nil;
+        }
+        NSMutableDictionary<NSErrorUserInfoKey, id> * userInfo = [NSMutableDictionary dictionaryWithDictionary:additionalUserInfo ?: @{}];
+        [userInfo addEntriesFromDictionary:imError.userInfo ?: @{}];
+        // Reflect our errorCode, not whatever additionalUserInfo or errorForIMStatus put under this key.
+        userInfo[MTRUnderlyingErrorCodeKey] = @(errorCode.AsInteger());
+        return [NSError errorWithDomain:imError.domain code:imError.code userInfo:userInfo];
     }
 
     MTRErrorCode code;
     NSString * description;
-    NSDictionary * additionalUserInfo;
     switch (errorCode.AsInteger()) {
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         code = MTRErrorCodeInvalidStringLength;
@@ -143,40 +165,31 @@ NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
     case CHIP_ERROR_CASE_WRONG_FABRIC.AsInteger():
         code = MTRErrorCodeGeneralError;
         description = NSLocalizedString(@"CASE handshake failed: peer fabric ID mismatch.", nil);
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
         break;
     case CHIP_ERROR_CASE_WRONG_PEER_NODEID.AsInteger():
         code = MTRErrorCodeGeneralError;
         description = NSLocalizedString(@"CASE handshake failed: peer node ID mismatch.", nil);
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
         break;
     case CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE.AsInteger():
         code = MTRErrorCodeGeneralError;
         description = NSLocalizedString(@"CASE handshake failed: Sigma payload decryption failed.", nil);
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
         break;
     case CHIP_ERROR_CASE_SIGNATURE_MISMATCH.AsInteger():
         code = MTRErrorCodeGeneralError;
         description = NSLocalizedString(@"CASE handshake failed: ECDSA signature verification failed.", nil);
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
         break;
     case CHIP_ERROR_CASE_RESUME_MIC_MISMATCH.AsInteger():
         code = MTRErrorCodeGeneralError;
         description = NSLocalizedString(@"CASE session resumption failed: Resume MIC mismatch.", nil);
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
         break;
     default:
         code = MTRErrorCodeGeneralError;
         description = [NSString stringWithFormat:NSLocalizedString(@"General error: %u", nil), errorCode.AsInteger()];
-        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
     }
 
-    NSDictionary * userInfo = @{ NSLocalizedDescriptionKey : description };
-    if (additionalUserInfo) {
-        NSMutableDictionary * combined = [userInfo mutableCopy];
-        [combined addEntriesFromDictionary:additionalUserInfo];
-        userInfo = combined;
-    }
+    NSMutableDictionary<NSErrorUserInfoKey, id> * userInfo = [NSMutableDictionary dictionaryWithDictionary:additionalUserInfo ?: @{}];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    userInfo[MTRUnderlyingErrorCodeKey] = @(errorCode.AsInteger());
 
     auto * error = [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
     void * key = (__bridge void *) [MTRErrorHolder class];
@@ -187,6 +200,11 @@ NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
 + (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode
 {
     return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode)];
+}
+
++ (NSError *)errorForCHIPIntegerCode:(uint32_t)errorCode additionalUserInfo:(NSDictionary<NSErrorUserInfoKey, id> *)additionalUserInfo
+{
+    return [MTRError errorForCHIPErrorCode:chip::ChipError(errorCode) logContext:nil additionalUserInfo:additionalUserInfo];
 }
 
 + (NSError *)errorForIMStatus:(const chip::app::StatusIB &)status
@@ -413,7 +431,7 @@ NSString * const MTRBDXErrorDomain = @"MTRBDXErrorDomain";
         code = CHIP_ERROR_NOT_FOUND.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
-        id userInfoErrorCode = error.userInfo[@"errorCode"];
+        id userInfoErrorCode = error.userInfo[MTRUnderlyingErrorCodeKey];
         if ([userInfoErrorCode isKindOfClass:NSNumber.class]) {
             code = static_cast<decltype(code)>([userInfoErrorCode unsignedLongValue]);
             break;
