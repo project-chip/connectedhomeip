@@ -1509,6 +1509,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     _unitTestConnectivityMonitorWaitSeconds = seconds;
 }
 
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID
+{
+    __block BOOL resolving = NO;
+    [self syncRunOnWorkQueue:^{
+        auto peerId = self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue);
+        resolving = self->_cppCommissioner->CASESessionMgr()->IsResolvingAddress(peerId);
+    } error:nil];
+    return resolving;
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
