@@ -5520,7 +5520,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
         return;
     }
 
-    MTREventPath * eventPath = [[MTREventPath alloc] initWithPath:aEventHeader.mPath];
+    MTREventPath * eventPath = [MTRClusterPath _sharedPathForPath:[[MTREventPath alloc] initWithPath:aEventHeader.mPath]];
     if (apStatus != nullptr) {
         [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForIMStatus:*apStatus] }];
     } else if (apData == nullptr) {
@@ -5558,7 +5558,7 @@ void SubscriptionCallback::OnAttributeData(
         return;
     }
 
-    MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
+    MTRAttributePath * attributePath = [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:aPath]];
     if (aStatus.mStatus != Status::Success) {
         [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
     } else if (apData == nullptr) {
