@@ -146,8 +146,14 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+    // Fail the session requests still waiting on a connectivity monitor; run on the Matter queue at shutdown.
+    NSMutableSet<dispatch_block_t> * _connectivityCheckShutdownHandlers;
 #ifdef DEBUG
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
+    os_unfair_lock _unitTestHookLock;
+    // Queued on the Matter queue when a Thread node's session request is handed an existing
+    // session, so tests can check what has already happened by the time other Matter-queue work runs.
+    dispatch_block_t _unitTestExistingSessionFoundHook;
 #endif
 }
 
@@ -208,6 +214,9 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         _currentCommissioning = nil;
         _commissioningQueue = dispatch_queue_create("org.csa-iot.matter.framework.commissioning.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _deviceConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
+#ifdef DEBUG
+        _unitTestHookLock = OS_UNFAIR_LOCK_INIT;
+#endif
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -517,6 +526,23 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         // _cppCommissioner, so we're not in a state where we claim to be
         // running but are actually partially shut down.
         _cppCommissioner = nullptr;
+
+        // Fail the session requests still waiting on a connectivity monitor: shutdown has stopped
+        // their monitors, and their timeouts hold them only weakly, so nothing else will. This has
+        // to happen in the same Matter-queue step that stops the controller running: a request
+        // registers here on the Matter queue only while the controller is running, so every request
+        // is either registered before this point and failed here, or never registered at all. The
+        // handlers take _deviceConnectivityMonitorLock themselves, so run them outside it.
+        NSSet<dispatch_block_t> * shutdownHandlers;
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            shutdownHandlers = [_connectivityCheckShutdownHandlers copy];
+            [_connectivityCheckShutdownHandlers removeAllObjects];
+        }
+        for (dispatch_block_t shutdownHandler in shutdownHandlers) {
+            shutdownHandler();
+        }
+
         commissionerToShutDown->Shutdown();
         // Don't clear out our fabric index association until controller
         // shutdown completes, in case it wants to write to storage as it
@@ -786,6 +812,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         }
 
         _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
+        _connectivityCheckShutdownHandlers = [NSMutableSet set];
 
         commissionerInitialized = YES;
 
@@ -1509,6 +1536,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     _unitTestConnectivityMonitorWaitSeconds = seconds;
 }
 
+- (void)unitTestSetExistingSessionFoundHook:(nullable dispatch_block_t)hook
+{
+    std::lock_guard lock(_unitTestHookLock);
+    _unitTestExistingSessionFoundHook = hook;
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -1761,67 +1794,105 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // In the case that this device is known to use thread, queue this with subscription attempts as well, to
     // help with throttling Thread traffic.
     if ([self definitelyUsesThreadForDevice:nodeID]) {
-        __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
-        [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
-            MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
-                completion(exchangeManager, session, error, retryDelay);
-                workItemCompletion(MTRAsyncWorkComplete);
-            };
-            [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
-        }];
-
-        // The monitor would call the handler when resolve returns a usable address. The monitor
-        // handler block retains the monitor object itself, forming a retain cycle. The cycle is
-        // broken when stopMonitoring is called.
-        MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
-        NSTimeInterval monitorWaitSeconds = kSecondsToWaitForConnectivityMonitorBeforeSessionAttempt;
-#ifdef DEBUG
-        if (_unitTestConnectivityMonitorWaitSeconds > 0) {
-            monitorWaitSeconds = _unitTestConnectivityMonitorWaitSeconds;
-        }
-#endif
-        void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
-            // Ensure the work item is queued only once, since this handler could be called multiple times in a row
-            if (workItem) {
-                if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
-                    MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
-                } else {
-                    if (timedOut) {
-                        MTR_LOG_ERROR("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, proceeding with connection attempt", self, nodeID, monitorWaitSeconds);
-                    }
-                    [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+        [self
+            asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
+                // The subscription pool and the connectivity check throttle session establishment. A
+                // node we already have a CASE session with needs neither, so do not make it wait on a
+                // resolve: its subscription may be live while its resolve never answers.
+                if ([self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
+                    return;
                 }
-                workItem = nil;
-                [deviceConnectivityMonitor stopMonitoring];
+                [self _getSessionForThreadNodeAfterConnectivityCheck:nodeID parameters:parameters completion:completion];
             }
-        };
-        BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
-            enqueueWorkItemOnce(NO);
-        } queue:_chipWorkQueue];
-
-        if (monitorStarted) {
-            // Add the monitor object to the weak set, so that the above retain cycle can be broken
-            // when the controller shuts down.
-            {
-                std::lock_guard lock(_deviceConnectivityMonitorLock);
-                [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
-            }
-            __weak void (^weakEnqueueWorkItemOnce)(BOOL) = enqueueWorkItemOnce;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (monitorWaitSeconds * NSEC_PER_SEC)), _chipWorkQueue, ^{
-                void (^strongEnqueueWorkItemOnce)(BOOL) = weakEnqueueWorkItemOnce;
-                if (strongEnqueueWorkItemOnce) {
-                    strongEnqueueWorkItemOnce(YES);
-                }
-            });
-        } else {
-            // DNS-SD monitoring failed to start - proceed with immediate connection attempt
-            // (This is unlikely, but needed so that the workItem block always executes.)
-            MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
-            [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
-        }
+            errorHandler:^(NSError * error) {
+                completion(nullptr, chip::NullOptional, error, nil);
+            }];
     } else {
         [self directlyGetSessionForNode:nodeID parameters:parameters completion:completion];
+    }
+}
+
+// Must be called on the Matter queue.
+- (void)_getSessionForThreadNodeAfterConnectivityCheck:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion
+{
+    assertChipStackLockedByCurrentThread();
+
+    __block MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull workItemCompletion) {
+        MTRInternalDeviceConnectionCallback completionWrapper = ^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
+            completion(exchangeManager, session, error, retryDelay);
+            workItemCompletion(MTRAsyncWorkComplete);
+        };
+        [self directlyGetSessionForNode:nodeID parameters:parameters completion:completionWrapper];
+    }];
+
+    // The monitor would call the handler when resolve returns a usable address. The monitor
+    // handler block retains the monitor object itself, forming a retain cycle. The cycle is
+    // broken when stopMonitoring is called.
+    MTRDeviceConnectivityMonitor * deviceConnectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:self.compressedFabricID nodeID:@(nodeID)];
+    NSTimeInterval monitorWaitSeconds = kSecondsToWaitForConnectivityMonitorBeforeSessionAttempt;
+#ifdef DEBUG
+    if (_unitTestConnectivityMonitorWaitSeconds > 0) {
+        monitorWaitSeconds = _unitTestConnectivityMonitorWaitSeconds;
+    }
+#endif
+    __block dispatch_block_t shutdownHandler;
+    void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
+        // Ensure the work item is queued only once, since this handler could be called multiple times in a row
+        if (workItem) {
+            if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
+                MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
+            } else {
+                if (timedOut) {
+                    MTR_LOG_ERROR("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, proceeding with connection attempt", self, nodeID, monitorWaitSeconds);
+                }
+                [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX", nodeID];
+            }
+            workItem = nil;
+            [deviceConnectivityMonitor stopMonitoring];
+            {
+                std::lock_guard lock(self->_deviceConnectivityMonitorLock);
+                [self->_connectivityCheckShutdownHandlers removeObject:shutdownHandler];
+            }
+            shutdownHandler = nil;
+        }
+    };
+    BOOL monitorStarted = [deviceConnectivityMonitor startMonitoringWithHandler:^{
+        enqueueWorkItemOnce(NO);
+    } queue:_chipWorkQueue];
+
+    if (monitorStarted) {
+        // Add the monitor object to the weak set, so that the above retain cycle can be broken
+        // when the controller shuts down.
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+        }
+        shutdownHandler = ^{
+            if (workItem) {
+                MTR_LOG("%@ shutting down, failing session request for node 0x%016llX waiting on its connectivity monitor", self, nodeID);
+                workItem = nil;
+                [deviceConnectivityMonitor stopMonitoring];
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+            }
+        };
+        {
+            std::lock_guard lock(_deviceConnectivityMonitorLock);
+            [_connectivityCheckShutdownHandlers addObject:shutdownHandler];
+        }
+        __weak void (^weakEnqueueWorkItemOnce)(BOOL) = enqueueWorkItemOnce;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (monitorWaitSeconds * NSEC_PER_SEC)), _chipWorkQueue, ^{
+            void (^strongEnqueueWorkItemOnce)(BOOL) = weakEnqueueWorkItemOnce;
+            if (strongEnqueueWorkItemOnce) {
+                strongEnqueueWorkItemOnce(YES);
+            }
+        });
+    } else {
+        // DNS-SD monitoring failed to start - proceed with immediate connection attempt
+        // (This is unlikely, but needed so that the workItem block always executes.)
+        MTR_LOG("%@ DNS-SD monitoring unavailable for node 0x%016llX, proceeding with connection attempt", self, nodeID);
+        [self->_concurrentSubscriptionPool enqueueWorkItem:workItem descriptionWithFormat:@"device controller getSessionForNode nodeID: 0x%016llX (no DNS-SD)", nodeID];
     }
 }
 
@@ -1833,6 +1904,16 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     auto transportPayloadCapability = (parameters & MTRSessionParametersSupportsLargePayloads) ? chip::TransportPayloadCapability::kLargePayload : chip::TransportPayloadCapability::kMRPPayload;
     auto session = _cppCommissioner->SessionMgr()->FindSecureSessionForNode(_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE), transportPayloadCapability);
     VerifyOrReturnValue(session.HasValue(), NO);
+#ifdef DEBUG
+    dispatch_block_t existingSessionFoundHook;
+    {
+        std::lock_guard lock(_unitTestHookLock);
+        existingSessionFoundHook = _unitTestExistingSessionFoundHook;
+    }
+    if (existingSessionFoundHook) {
+        dispatch_async(_chipWorkQueue, existingSessionFoundHook);
+    }
+#endif
     completion(_cppCommissioner->ExchangeMgr(), session, nil, nil);
     return YES;
 }
