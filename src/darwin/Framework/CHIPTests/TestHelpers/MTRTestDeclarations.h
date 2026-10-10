@@ -100,6 +100,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 // Syncs onto the Matter queue: call off that queue, while the controller is running.
 - (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
+// Must be called on the Matter queue.
+- (void)unitTestInjectBrowseResultWithFlags:(uint32_t)flags interfaceIndex:(uint32_t)interfaceIndex instanceName:(NSString *)instanceName domain:(NSString *)domain;
 @end
 
 @interface MTRBaseDevice (TestDebug)

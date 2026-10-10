@@ -86,6 +86,7 @@ void MTROperationalBrowser::EnsureBrowse()
     }
 
     mAddedInstanceNames = [[NSMutableSet alloc] init];
+    mPresentInstances = [[NSMutableDictionary alloc] init];
 
     mInitialized = true;
 
@@ -103,6 +104,7 @@ void MTROperationalBrowser::StopBrowse()
     ChipLogProgress(Controller, "%p stopping persistent operational browse", this);
     if (mInitialized) {
         mAddedInstanceNames = nil;
+        mPresentInstances = nil;
         DNSServiceRefDeallocate(mBrowseRef);
         mInitialized = false;
     }
@@ -130,14 +132,40 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     }
 
     auto * newInstanceName = [NSString stringWithUTF8String:aName];
-    if (!(aFlags & kDNSServiceFlagsAdd)) {
-        MTR_LOG("Matter operational instance advertisement removed: '%@'\n", newInstanceName);
-        // Make sure that we don't notify about things that appear and then disappear.
-        [self->mAddedInstanceNames removeObject:newInstanceName];
-        return;
+    auto * domain = @(StringOrNullMarker(aDomain));
+    NSArray * location = @[ @(aInterfaceId), domain ];
+    NSMutableSet<NSArray *> * locations = self->mPresentInstances[newInstanceName];
+    if (aFlags & kDNSServiceFlagsAdd) {
+        // Notify only when the instance goes from browsed nowhere to browsed
+        // somewhere.  Known trade-off: if a device re-advertises on interface B
+        // while a stale record is still cached on interface A, we do not notify
+        // until mDNSResponder removes the stale record from A and the instance
+        // disappears everywhere.  This relies on mDNSResponder delivering a
+        // Remove when a record expires or its interface goes away.
+        MTR_LOG("Matter operational instance advertisement added: '%@' on interface %" PRIu32 " in %@", newInstanceName, aInterfaceId, domain);
+        if (locations == nil) {
+            locations = [[NSMutableSet alloc] init];
+            self->mPresentInstances[newInstanceName] = locations;
+            [self->mAddedInstanceNames addObject:newInstanceName];
+        }
+        [locations addObject:location];
+    } else {
+        // Note that a removal does not return early: a batch can end with a
+        // removal (e.g. an Add with MoreComing followed by a Remove of a
+        // different instance), and the pending Adds still have to be delivered
+        // at the end of that batch.  Before, they waited for the next Add.
+        //
+        // A removal for an instance or location we do not know about is
+        // harmless: nil `locations` gives count == 0, and removing a missing
+        // key or name is a no-op.
+        MTR_LOG("Matter operational instance advertisement removed: '%@' on interface %" PRIu32 " in %@", newInstanceName, aInterfaceId, domain);
+        [locations removeObject:location];
+        if (locations.count == 0) {
+            [self->mPresentInstances removeObjectForKey:newInstanceName];
+            // Make sure that we don't notify about things that appear and then disappear.
+            [self->mAddedInstanceNames removeObject:newInstanceName];
+        }
     }
-
-    [self->mAddedInstanceNames addObject:newInstanceName];
 
     if (aFlags & kDNSServiceFlagsMoreComing) {
         // Just wait for those other notifications, so we coalesce everything.
@@ -157,6 +185,17 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     }
     [self->mAddedInstanceNames removeAllObjects];
 }
+
+#ifdef DEBUG
+void MTROperationalBrowser::UnitTestInjectBrowseResult(DNSServiceFlags aFlags, uint32_t aInterfaceId, const char * aName, const char * aDomain)
+{
+    assertChipStackLockedByCurrentThread();
+    // Without a running browse there is no tracking state, so results would be
+    // notified without being tracked.
+    VerifyOrDie(mInitialized);
+    OnBrowse(nullptr, aFlags, aInterfaceId, kDNSServiceErr_NoError, aName, kOperationalType, aDomain, this);
+}
+#endif
 
 MTROperationalBrowser::~MTROperationalBrowser()
 {
