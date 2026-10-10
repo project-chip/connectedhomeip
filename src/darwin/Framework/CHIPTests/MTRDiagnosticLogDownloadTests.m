@@ -415,7 +415,7 @@ static NSString * crashLogContent = nil;
         });
     });
     IMP recordingRetry = imp_implementationWithBlock(^BOOL(id download) {
-        BOOL retried = ((BOOL (*)(id, SEL)) originalRetry)(download, retry);
+        BOOL retried = ((BOOL(*)(id, SEL)) originalRetry)(download, retry);
         [retries addObject:@(retried)];
         return retried;
     });
