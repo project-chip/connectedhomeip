@@ -54,9 +54,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
+- (void)operationalInstanceAdded:(NSNumber *)nodeID;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+@end
+
+@interface MTRBaseDevice (Test)
+- (void)invalidateCASESession;
 @end
 
 MTR_TESTABLE_DIRECT_MEMBERS
@@ -85,6 +90,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+- (BOOL)unitTestIsResolvingAddressForNodeID:(NSNumber *)nodeID;
 @end
 
 @interface MTRBaseDevice (TestDebug)
