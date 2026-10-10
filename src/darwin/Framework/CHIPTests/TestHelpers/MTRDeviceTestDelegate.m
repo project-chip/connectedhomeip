@@ -144,6 +144,13 @@
     }
 }
 
+- (void)unitTestOperationalAdvertisementSeenForDevice:(MTRDevice *)device
+{
+    if (self.onOperationalAdvertisementSeen != nil) {
+        self.onOperationalAdvertisementSeen();
+    }
+}
+
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
 {
     if (self.onUTCTimeSet != nil) {
