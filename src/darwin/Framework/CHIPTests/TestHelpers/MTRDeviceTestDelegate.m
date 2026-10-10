@@ -144,6 +144,20 @@
     }
 }
 
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device
+{
+    if (self.onReadClientCreated != nil) {
+        self.onReadClientCreated();
+    }
+}
+
+- (void)unitTestInternalStateChangedForDevice:(MTRDevice *)device state:(NSUInteger)state
+{
+    if (self.onInternalStateTransition != nil) {
+        self.onInternalStateTransition(state);
+    }
+}
+
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
 {
     if (self.onUTCTimeSet != nil) {
