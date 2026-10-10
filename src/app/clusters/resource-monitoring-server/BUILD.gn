@@ -33,5 +33,6 @@ source_set("resource-monitoring-server") {
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/ActivatedCarbonFilterMonitoring",
     "${chip_root}/zzz_generated/app-common/clusters/HepaFilterMonitoring",
+    "${chip_root}/zzz_generated/app-common/clusters/WaterTankLevelMonitoring",
   ]
 }
