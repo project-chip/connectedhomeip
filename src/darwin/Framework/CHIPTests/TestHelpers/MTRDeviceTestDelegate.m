@@ -144,6 +144,13 @@
     }
 }
 
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device
+{
+    if (self.onReadClientCreated != nil) {
+        self.onReadClientCreated();
+    }
+}
+
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
 {
     if (self.onUTCTimeSet != nil) {
