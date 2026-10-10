@@ -69,6 +69,20 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
 #endif // HAVE_NSTASK
 }
 
+- (void)suspend
+{
+#if HAVE_NSTASK
+    [self.task suspend];
+#endif // HAVE_NSTASK
+}
+
+- (void)resume
+{
+#if HAVE_NSTASK
+    [self.task resume];
+#endif // HAVE_NSTASK
+}
+
 @end
 
 @implementation MTRTestCase (ServerAppRunner)
