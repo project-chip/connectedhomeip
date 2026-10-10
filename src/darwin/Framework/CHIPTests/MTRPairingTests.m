@@ -111,6 +111,55 @@ static MTRTestKeys * sTestKeys = nil;
 
 @end
 
+@interface FailedAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
+@property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic, strong, nullable) NSError * attestationError;
+@end
+
+@implementation FailedAttestationDelegate
+- (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
+                             opaqueDeviceHandle:(void *)opaqueDeviceHandle
+                          attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                                          error:(NSError * _Nullable)error
+{
+    self.attestationError = error;
+    [self.expectation fulfill];
+    [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+}
+@end
+
+@interface FailedOnlyAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
+@property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic, strong, nullable) NSError * attestationError;
+@end
+
+@implementation FailedOnlyAttestationDelegate
+- (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
+                          opaqueDeviceHandle:(void *)opaqueDeviceHandle
+                                       error:(NSError *)error
+{
+    self.attestationError = error;
+    [self.expectation fulfill];
+    [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+}
+@end
+
+@interface MTRPairingTestMetricsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, strong) XCTestExpectation * expectation;
+@property (nonatomic, strong, nullable) NSError * commissioningCompleteError;
+@end
+
+@implementation MTRPairingTestMetricsControllerDelegate
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics
+{
+    self.commissioningCompleteError = error;
+    [self.expectation fulfill];
+}
+@end
+
 typedef void (^AttestationHandler)(dispatch_block_t);
 
 @interface MTRPairingTestsCommissioningDelegate : NSObject <MTRCommissioningDelegate>
@@ -1094,6 +1143,124 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
     [self waitForExpectations:@[ expectation3 ] timeout:kPairingTimeoutInSeconds];
     XCTAssertNil(controllerDelegate3.commissioningCompleteError);
+}
+
+- (void)test019_CommissioningFailureReportsNetworkCommissioningInfo
+{
+    __auto_type * expectation = [self expectationWithDescription:@"Commissioning complete"];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation attestationDelegate:nil failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate queue:dispatch_get_main_queue()];
+
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId)
+                                  networkCommissioningStatus:@(MTRNetworkCommissioningStatusAuthFailure)
+                                                  errorValue:@(-5)
+                                                   debugText:@"Wrong password"];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    NSError * error = controllerDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningStatusKey], @(MTRNetworkCommissioningStatusAuthFailure));
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningConnectErrorValueKey], @(-5));
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningDebugTextKey], @"Wrong password");
+
+    expectation = [self expectationWithDescription:@"Commissioning complete without network commissioning info"];
+    controllerDelegate.expectation = expectation;
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId) networkCommissioningStatus:nil errorValue:nil debugText:nil];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    error = controllerDelegate.commissioningCompleteError;
+    XCTAssertNotNil(error);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningStatusKey]);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningConnectErrorValueKey]);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningDebugTextKey]);
+
+    __auto_type * metricsDelegate = [[MTRPairingTestMetricsControllerDelegate alloc] init];
+    metricsDelegate.expectation = [self expectationWithDescription:@"Commissioning complete with metrics"];
+    [sController setDeviceControllerDelegate:metricsDelegate queue:dispatch_get_main_queue()];
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId)
+                                  networkCommissioningStatus:@(MTRNetworkCommissioningStatusNetworkNotFound)
+                                                  errorValue:nil
+                                                   debugText:@"No such network"];
+    [self waitForExpectations:@[ metricsDelegate.expectation ] timeout:kTimeoutInSeconds];
+
+    error = metricsDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningStatusKey], @(MTRNetworkCommissioningStatusNetworkNotFound));
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningConnectErrorValueKey]);
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningDebugTextKey], @"No such network");
+}
+
+- (void)test020_PairDeviceWithBadChecksumReportsIntegrityCheckFailed
+{
+    NSError * error;
+    XCTAssertFalse([sController pairDevice:sDeviceId onboardingPayload:@"641286075300001000017" error:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+
+    error = nil;
+    XCTAssertFalse([sController pairDevice:sDeviceId onboardingPayload:@"MT:M5L90MP500K64J0000?" error:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidIntegerValue);
+}
+
+- (void)doAttestationFailureTestWithDelegate:(id<MTRDeviceAttestationDelegate>)attestationDelegate
+                                 expectation:(XCTestExpectation *)attestationExpectation
+                            attestationError:(NSError * (^)(void) )attestationError
+{
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[
+                                    @"--dac_provider",
+                                    [self absolutePathFor:@"credentials/development/commissioner_dut/invalid_paa/test_case_vector.json"],
+                                ]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning complete"];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                 attestationDelegate:attestationDelegate
+                                                                                   failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate queue:dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL)];
+    self.controllerDelegate = controllerDelegate;
+
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ attestationExpectation, expectation ] timeout:kPairingTimeoutInSeconds];
+
+    // 101 is AttestationVerificationResult::kPaaNotFound.
+    NSError * attestationFailure = attestationError();
+    XCTAssertEqualObjects(attestationFailure.domain, MTRErrorDomain);
+    XCTAssertEqual(attestationFailure.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertEqualObjects(attestationFailure.userInfo[MTRAttestationVerificationResultKey], @(101));
+    XCTAssertEqualObjects(attestationFailure.userInfo[MTRDeviceBasicInformationVendorIDKey], @(0xFFF1));
+    XCTAssertEqualObjects(attestationFailure.userInfo[MTRDeviceBasicInformationProductIDKey], @(0x8000));
+
+    NSError * commissioningError = controllerDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(commissioningError.domain, MTRErrorDomain);
+    XCTAssertEqualObjects(commissioningError.userInfo[MTRAttestationVerificationResultKey], @(101));
+}
+
+- (void)test021_AttestationFailureReportsVerificationResult
+{
+    __auto_type * attestationDelegate = [[FailedAttestationDelegate alloc] init];
+    attestationDelegate.expectation = [self expectationWithDescription:@"Attestation delegate called"];
+    [self doAttestationFailureTestWithDelegate:attestationDelegate
+                                   expectation:attestationDelegate.expectation
+                              attestationError:^{
+                                  return attestationDelegate.attestationError;
+                              }];
+}
+
+- (void)test022_AttestationFailedCallbackReportsVerificationResult
+{
+    __auto_type * attestationDelegate = [[FailedOnlyAttestationDelegate alloc] init];
+    attestationDelegate.expectation = [self expectationWithDescription:@"Attestation failed delegate called"];
+    [self doAttestationFailureTestWithDelegate:attestationDelegate
+                                   expectation:attestationDelegate.expectation
+                              attestationError:^{
+                                  return attestationDelegate.attestationError;
+                              }];
 }
 
 @end
