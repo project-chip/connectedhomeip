@@ -121,7 +121,8 @@ endif()
 
 set(BOARD_REQUIRES)
 if (CONFIG_DEVICE_TYPE_ESP_MOSAICO)
-    list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/MosaicoUsbConsole.cpp")
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/board")
+    list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/board/MosaicoUsbConsole.cpp")
     if (NOT EXISTS "$ENV{ESP_MOSAICO_BSP_PATH}/components/esp-mosaico-bsp/CMakeLists.txt")
         message(FATAL_ERROR "The ESP-Mosaico BSP is missing. Set ESP_MOSAICO_BSP_PATH to a checkout of "
                             "https://github.com/esp-mosaico/esp-mosaico-bsp, see the README.")
