@@ -235,15 +235,15 @@ directory is scanned at configure time, so an existing build directory needs
 ### Look and Feel
 
 `Theme.cpp` extends the default LVGL dark theme with an apply callback, so every
-widget gets the same finish at creation: gradient screen background,
-rounded translucent cards with a soft shadow, accent buttons that shrink
-slightly while pressed, thick gradient sliders with a glowing knob, dimmed
-dialog backdrops. Screens compose from the builders in `Ui.h` (`CreateTile`,
-`CreateIconBadge`, `CreatePill`, `CreateHeading`) and take sizes from
-`Ui::Px(large, small)`, which picks the first value on 480-class panels and the
-second on 320x240, so the CoreS3 keeps its compact layout. Fonts follow the same
-rule: Montserrat 32/24/18/14 for title, heading, body and caption on the large
-panel, the default font everywhere on the small one.
+widget gets the same finish at creation: gradient screen background, rounded
+translucent cards with a soft shadow, accent buttons that shrink slightly while
+pressed, thick gradient sliders with a glowing knob, dimmed dialog backdrops.
+Screens compose from the builders in `Ui.h` (`CreateTile`, `CreateIconBadge`,
+`CreatePill`, `CreateHeading`) and take sizes from `Ui::Px(large, small)`, which
+picks the first value on 480-class panels and the second on 320x240, so the
+CoreS3 keeps its compact layout. Fonts follow the same rule: Montserrat
+32/24/18/14 for title, heading, body and caption on the large panel, the default
+font everywhere on the small one.
 
 Motion is deliberate and short: content slides in from the side the navigation
 came from (`Ui::AnimateEntrance`), the QR card and verdict badges scale in with
@@ -523,9 +523,9 @@ If the board has a touch panel and an ESP-IDF BSP with an LVGL port, reuse the
 3. Select the backend in the `BOARD_SRCS` block of `main/CMakeLists.txt` and add
    the BSP to `main/idf_component.yml` under a `target ==` rule, or through
    `EXTRA_COMPONENT_DIRS` if it is not on the registry.
-4. Add an `sdkconfig_<board>.defaults` with the LVGL requirements of the BSP (color
-   depth, `LV_CONF_SKIP`, allocator) plus `LV_USE_QRCODE`, `LV_USE_TABVIEW` and
-   `LV_USE_MSGBOX` for the screens here.
+4. Add an `sdkconfig_<board>.defaults` with the LVGL requirements of the BSP
+   (color depth, `LV_CONF_SKIP`, allocator) plus `LV_USE_QRCODE`,
+   `LV_USE_TABVIEW` and `LV_USE_MSGBOX` for the screens here.
 
 For anything else, add a renderer:
 
