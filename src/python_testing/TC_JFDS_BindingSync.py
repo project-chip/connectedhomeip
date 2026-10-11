@@ -55,6 +55,9 @@ log = logging.getLogger(__name__)
 
 JFDS = Clusters.JointFabricDatastore
 
+# The JF Administrator writes each datastore binding to the Binding cluster on the entry's EndpointID.
+TARGET_BINDING_ENDPOINT = 1
+
 
 class TC_JFDS_BindingSync(MatterBaseTest):
     @async_test_body
@@ -182,7 +185,7 @@ class TC_JFDS_BindingSync(MatterBaseTest):
         for _ in range(int(timeout_s * 2)):
             self._assert_admin_running()
             bindings = await self.read_single_attribute(
-                dev_ctrl=self.devCtrlEcoA, node_id=self.target_node_id, endpoint=0,
+                dev_ctrl=self.devCtrlEcoA, node_id=self.target_node_id, endpoint=TARGET_BINDING_ENDPOINT,
                 attribute=Clusters.Binding.Attributes.Binding)
             if len(bindings) == count:
                 return
@@ -191,7 +194,8 @@ class TC_JFDS_BindingSync(MatterBaseTest):
 
     async def _add_binding(self, binding: JFDS.Structs.DatastoreBindingTargetStruct):
         await self.send_single_cmd(
-            cmd=JFDS.Commands.AddBindingToEndpointForNode(nodeID=self.target_node_id, endpointID=1, binding=binding),
+            cmd=JFDS.Commands.AddBindingToEndpointForNode(
+                nodeID=self.target_node_id, endpointID=TARGET_BINDING_ENDPOINT, binding=binding),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
 
     @async_test_body
@@ -234,8 +238,8 @@ class TC_JFDS_BindingSync(MatterBaseTest):
         await self.send_single_cmd(
             cmd=JFDS.Commands.AddPendingNode(nodeID=self.target_node_id, friendlyName="binding-sync-target"),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
-        # RefreshNode writes the node's ACL back from the datastore and currently keeps only part of the node's existing
-        # entries, so the access for the JF Administrator and this controller is registered in the datastore too.
+        # RefreshNode writes the node's ACL back from the datastore. The access for the JF Administrator and this
+        # controller is registered in the datastore before that write.
         await self.send_single_cmd(
             cmd=JFDS.Commands.AddACLToNode(
                 nodeID=self.target_node_id,
