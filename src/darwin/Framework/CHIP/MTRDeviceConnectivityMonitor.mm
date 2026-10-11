@@ -495,6 +495,12 @@ static void ResolveCallback(
     return sConnectivityMonitorCount;
 }
 
++ (NSUInteger)unitTestLiveMonitorCount
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    return sMonitorMap.count;
+}
+
 + (NSUInteger)unitTestSharedConnectionGeneration
 {
     std::lock_guard lock(sConnectivityMonitorLock);

@@ -37,6 +37,7 @@
 #ifdef DEBUG
 + (BOOL)unitTestHasActiveSharedConnection;
 + (NSUInteger)unitTestActiveMonitorCount;
++ (NSUInteger)unitTestLiveMonitorCount;
 + (NSUInteger)unitTestSharedConnectionGeneration;
 + (int)unitTestSharedConnectionSocket;
 + (void)unitTestDisconnectSharedConnectionFromDaemon;
@@ -1001,6 +1002,42 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     XCTAssertTrue([self waitUntil:^{ return checked; } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
     XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
     XCTAssertTrue([self waitUntil:^{ return sessionDelivered; } timeout:kPromptSeconds description:@"session delivered"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test022_MonitorFreedWhenItsSessionRequestTimesOut
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-022" port:15041]);
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x100B);
+    NSUInteger liveBefore = [MTRDeviceConnectivityMonitor unitTestLiveMonitorCount];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:nodeID invokeCompletions:invokeCompletions];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestLiveMonitorCount], liveBefore + 1, @"monitor alive while its request waits");
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); } timeout:kMonitorWaitSeconds + kPromptSeconds description:@"session request proceeded after the wait"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestLiveMonitorCount] == liveBefore); } timeout:kPromptSeconds description:@"monitor freed after its request timed out"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test023_MonitorFreedWhenControllerShutsDownWhileItsSessionRequestWaits
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-023" port:15042]);
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x100C);
+    NSUInteger liveBefore = [MTRDeviceConnectivityMonitor unitTestLiveMonitorCount];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:nodeID invokeCompletions:invokeCompletions];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestLiveMonitorCount], liveBefore + 1, @"monitor alive while its request waits");
+    @autoreleasepool {
+        [controller shutdown];
+    }
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestLiveMonitorCount] == liveBefore); } timeout:kPromptSeconds description:@"monitor freed by controller shutdown, before the wait ends"]);
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
