@@ -23,6 +23,9 @@
 #if CONFIG_DEVICE_TYPE_M5STACK_CORES3
 #include "CoreS3Chime.h"
 using BoardChime = chip::app::CoreS3Chime;
+#elif CONFIG_DEVICE_TYPE_ESP_MOSAICO
+#include "MosaicoChime.h"
+using BoardChime = chip::app::MosaicoChime;
 #endif
 #endif
 
