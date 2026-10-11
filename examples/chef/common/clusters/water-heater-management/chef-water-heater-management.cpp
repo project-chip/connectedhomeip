@@ -137,7 +137,7 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
 #if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (auto * thermostat = Thermostat::Chef::FindClusterOnEndpoint(mEndpointId); thermostat != nullptr)
     {
-        occupiedHeatingSetpoint = thermostat->GetSetpoints().occupiedRange.heating.Temperature();
+        occupiedHeatingSetpoint           = thermostat->GetSetpoints().occupiedRange.heating.Temperature();
         DataModel::Nullable<int16_t> temp = thermostat->GetLocalTemperature();
         if (!temp.IsNull())
         {
