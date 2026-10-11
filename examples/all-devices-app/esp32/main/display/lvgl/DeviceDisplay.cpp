@@ -18,13 +18,13 @@
 
 #include "DeviceDisplay.h"
 #include "CommissioningCodesScreen.h"
+#include "DisplayBoard.h"
 #include "DisplayNotificationHub.h"
 #include "HomeScreen.h"
 #include "NavigationStack.h"
 #include "SystemMenuScreen.h"
 
 #include <app/server/Server.h>
-#include <bsp/esp-bsp.h>
 #include <cinttypes>
 #include <esp_log.h>
 #include <lvgl.h>
@@ -33,11 +33,10 @@ namespace {
 
 const char TAG[] = "Display";
 
-// bsp_display_lock() treats 0 as "wait indefinitely".
-constexpr uint32_t kWaitForever = 0;
-
 // 30 seconds of inactivity before blanking the LCD backlight.
 constexpr uint32_t kInactivityTimeoutMs = 30000;
+
+constexpr int kBrightnessOn = 100;
 
 // Non-null once the panel is up; both entry points are no-ops before that and
 // after a failed bring-up.
@@ -49,7 +48,7 @@ lv_obj_t * sWakeOverlay = nullptr;
 void OnWakeOverlayTouch(lv_event_t * event)
 {
     ESP_LOGI(TAG, "Touch detected while sleeping; waking display");
-    bsp_display_backlight_on();
+    DisplayBoard::SetBrightness(kBrightnessOn);
     sBacklightOn = true;
 
     if (sWakeOverlay != nullptr)
@@ -73,7 +72,7 @@ void CheckInactivityTimer(lv_timer_t * timer)
         if (inactiveMs >= kInactivityTimeoutMs)
         {
             ESP_LOGI(TAG, "Display inactive for %" PRIu32 " ms; turning off backlight", inactiveMs);
-            bsp_display_backlight_off();
+            DisplayBoard::SetBrightness(0);
             sBacklightOn = false;
 
             // Place an invisible overlay on the top layer to intercept the wake touch
@@ -96,14 +95,14 @@ void CheckInactivityTimer(lv_timer_t * timer)
 void InitDeviceDisplay()
 {
     // Powers the panel rails, starts the SPI panel and the LVGL port task.
-    gDisplay = bsp_display_start();
+    gDisplay = DisplayBoard::Start();
     if (gDisplay == nullptr)
     {
-        ESP_LOGE(TAG, "bsp_display_start() failed");
+        ESP_LOGE(TAG, "DisplayBoard::Start() failed");
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
         ESP_LOGE(TAG, "Could not take the LVGL lock");
         return;
@@ -127,11 +126,11 @@ void InitDeviceDisplay()
     // Register inactivity timer to blank display after 30s
     lv_timer_create(CheckInactivityTimer, 1000, nullptr);
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 
     // Only turn the backlight on once there is something to look at, to avoid
     // showing the uninitialized panel contents.
-    ESP_ERROR_CHECK_WITHOUT_ABORT(bsp_display_backlight_on());
+    DisplayBoard::SetBrightness(kBrightnessOn);
     sBacklightOn = true;
 }
 
@@ -142,14 +141,14 @@ void ShowRestartingMessage()
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
         return;
     }
 
     if (!sBacklightOn)
     {
-        bsp_display_backlight_on();
+        DisplayBoard::SetBrightness(kBrightnessOn);
         sBacklightOn = true;
     }
 
@@ -170,7 +169,7 @@ void ShowRestartingMessage()
     lv_display_trigger_activity(gDisplay);
     lv_refr_now(gDisplay);
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }
 
 void InitDisplayDataModelListener()
@@ -192,7 +191,7 @@ void InitDisplayDataModelListener()
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
         return;
     }
@@ -201,5 +200,5 @@ void InitDisplayDataModelListener()
     NavigationStack::Push("System", ShowSystemMenu);
     NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }

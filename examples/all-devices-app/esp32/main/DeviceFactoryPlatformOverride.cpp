@@ -20,7 +20,10 @@
 #include <app_config/enabled_devices.h>
 
 #if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
+#if CONFIG_DEVICE_TYPE_M5STACK_CORES3
 #include "CoreS3Chime.h"
+using BoardChime = chip::app::CoreS3Chime;
+#endif
 #endif
 
 namespace chip {
@@ -30,7 +33,7 @@ void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentSto
 {
 #if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
     AppDeviceFactory::GetInstance().RegisterCreator(
-        "chime", [&timerDelegate]() { return AppDeviceFactory::MakeDevice<CoreS3Chime>(timerDelegate); });
+        "chime", [&timerDelegate]() { return AppDeviceFactory::MakeDevice<BoardChime>(timerDelegate); });
 #endif
 }
 

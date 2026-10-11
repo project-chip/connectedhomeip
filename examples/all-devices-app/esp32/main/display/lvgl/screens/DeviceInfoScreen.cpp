@@ -18,9 +18,9 @@
 
 #include "DeviceInfoScreen.h"
 #include "DeviceTypeSelection.h"
+#include "DisplayBoard.h"
 
 #include <app/server/Server.h>
-#include <bsp/esp-bsp.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_netif.h>
@@ -31,8 +31,7 @@
 
 namespace {
 
-constexpr char TAG[]            = "DeviceInfoScreen";
-constexpr uint32_t kWaitForever = 0;
+constexpr char TAG[] = "DeviceInfoScreen";
 
 // The commissioning label waiting for a fabric count, or null when no such label exists. The
 // screen is rebuilt on every refresh, so a reply can outlive the label it was asked for; the
@@ -56,7 +55,7 @@ void RequestCommissioningStatus()
     chip::DeviceLayer::SystemLayer().ScheduleLambda([] {
         const uint8_t fabricCount = chip::Server::GetInstance().GetFabricTable().FabricCount();
 
-        if (!bsp_display_lock(kWaitForever))
+        if (!DisplayBoard::Lock())
         {
             ESP_LOGE(TAG, "Could not acquire display lock for the commissioning status");
             return;
@@ -74,7 +73,7 @@ void RequestCommissioningStatus()
             }
         }
 
-        bsp_display_unlock();
+        DisplayBoard::Unlock();
     });
 }
 

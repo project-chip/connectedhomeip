@@ -81,4 +81,9 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 # -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
 
+# Designated initializers that leave trailing members to their defaults are used
+# throughout the code-driven data model. GCC 16 (ESP-IDF 6.2) warns on them under
+# -Wextra; the GN build of the CHIP library already passes this flag.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-missing-field-initializers" APPEND)
+
 flashing_script()
