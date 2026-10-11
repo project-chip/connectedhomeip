@@ -22,16 +22,23 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/silabs/SilabsConfig.h>
-#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <provision/ProvisionCrypto.h>
 #include <provision/ProvisionStorageReader.h>
 #include <silabs_creds.h>
 
+#if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION && SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+#if !SL_MATTER_GN_BUILD
+#include <sl_matter_provision_config.h>
+
 #ifndef NDEBUG
-#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED) && (SL_MATTER_GN_BUILD == 0)
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED)
 #include <sl_matter_test_event_trigger_config.h>
-#endif
-#endif
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED)
+#endif // NDEBUG
+#endif // !SL_MATTER_GN_BUILD
 
 #include <cstring>
 
