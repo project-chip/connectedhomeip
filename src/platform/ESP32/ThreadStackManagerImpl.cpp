@@ -65,7 +65,14 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     // sending DNS Announcement message.
     RunOnTCPIP([this]() {
         esp_netif_t * openthread_netif = esp_openthread_get_netif();
-        chip::Inet::InterfaceId interface(netif_get_by_index(esp_netif_get_netif_impl_index(openthread_netif)));
+        VerifyOrReturn(openthread_netif != nullptr, ChipLogError(DeviceLayer, "OpenThread network interface is unavailable"));
+        const int netifIndex = esp_netif_get_netif_impl_index(openthread_netif);
+        VerifyOrReturn(netifIndex >= 0 && netifIndex <= UINT8_MAX,
+                       ChipLogError(DeviceLayer, "Invalid OpenThread network interface index: %d", netifIndex));
+        struct netif * lwipNetif = netif_get_by_index(static_cast<uint8_t>(netifIndex));
+        VerifyOrReturn(lwipNetif != nullptr,
+                       ChipLogError(DeviceLayer, "No OpenThread network interface found for index %d", netifIndex));
+        chip::Inet::InterfaceId interface(lwipNetif);
         GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
     });
 #endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)

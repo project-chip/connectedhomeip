@@ -460,8 +460,22 @@ class ToolChipDN : public chip::Credentials::ChipDN
 {
 public:
     bool SetCertName(X509_NAME * name) const;
-    bool SetCertSubjectDN(X509 * cert) const { return SetCertName(X509_get_subject_name(cert)); };
-    bool SetCertIssuerDN(X509 * cert) const { return SetCertName(X509_get_issuer_name(cert)); };
+    bool SetCertSubjectDN(X509 * cert) const
+    {
+        // X509_get_subject_name() returns a name owned by, and embedded in, cert itself. On
+        // OpenSSL 4.0 that embedded name is const-qualified (callers are expected to install a
+        // whole new name via X509_set_subject_name() rather than mutate the one living inside
+        // the cert); OpenSSL <=3.x and BoringSSL still return it non-const and allow in-place
+        // mutation. Duplicate into an owned copy, mutate the copy, then install it back - this
+        // requires no const_cast and compiles identically on every backend.
+        std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> nameCopy(X509_NAME_dup(X509_get_subject_name(cert)), &X509_NAME_free);
+        return nameCopy && SetCertName(nameCopy.get()) && X509_set_subject_name(cert, nameCopy.get()) != 0;
+    };
+    bool SetCertIssuerDN(X509 * cert) const
+    {
+        std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> nameCopy(X509_NAME_dup(X509_get_issuer_name(cert)), &X509_NAME_free);
+        return nameCopy && SetCertName(nameCopy.get()) && X509_set_issuer_name(cert, nameCopy.get()) != 0;
+    };
     bool HasAttr(chip::ASN1::OID oid) const;
     void PrintDN(FILE * file, const char * name) const;
 };

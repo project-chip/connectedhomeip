@@ -20,13 +20,20 @@
 namespace chip {
 namespace app {
 
-LoggingFan::LoggingFan(const Context & context) :
-    LoggingFanLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFan, 1), context)
-{}
+LoggingFan::LoggingFan(const Context & context, Clusters::FanControl::Delegate * customFan, Clusters::OnOffDelegate * customOnOff) :
+    Fan(customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
+        context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr, context)
+{
+    SetFanLoad(this);
+}
 
-LoggingFan::LoggingFan(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context) :
-    LoggingFanLoad(deviceTypes, context)
-{}
+LoggingFan::LoggingFan(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                       Clusters::FanControl::Delegate * customFan, Clusters::OnOffDelegate * customOnOff) :
+    Fan(deviceTypes, customFan ? *customFan : static_cast<Clusters::FanControl::Delegate &>(*this),
+        context.includeOnOffCluster ? (customOnOff ? customOnOff : static_cast<Clusters::OnOffDelegate *>(this)) : nullptr, context)
+{
+    SetFanLoad(this);
+}
 
 } // namespace app
 } // namespace chip

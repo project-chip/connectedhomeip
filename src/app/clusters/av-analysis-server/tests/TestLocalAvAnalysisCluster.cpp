@@ -256,9 +256,9 @@ TEST_F(TestLocalAvAnalysisCluster, ReadAllAttributesWithClusterTesterTest)
 
     // On startup there should be no active triggers
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
-    size_t triggersSize;
+    size_t triggersSize = 0;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
-    TEMPORARY_RETURN_IGNORED aActiveContextTriggers.ComputeSize(&triggersSize);
+    ASSERT_EQ(aActiveContextTriggers.ComputeSize(&triggersSize), CHIP_NO_ERROR);
     ASSERT_EQ(triggersSize, static_cast<size_t>(0));
 
     bool trackingEnabled = false;
@@ -511,6 +511,11 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEnableContextTriggersCommandTestContex
     // Read our set of active triggers, make sure valid
     Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType aActiveContextTriggers;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, aActiveContextTriggers), CHIP_NO_ERROR);
+
+    // The one enabled trigger, so the assertions in the loop below are reached
+    size_t triggerCount = 0;
+    ASSERT_EQ(aActiveContextTriggers.ComputeSize(&triggerCount), CHIP_NO_ERROR);
+    ASSERT_EQ(triggerCount, static_cast<size_t>(1));
 
     auto aActiveContextIterator = aActiveContextTriggers.begin();
     while (aActiveContextIterator.Next())
@@ -856,6 +861,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::AnalysisSessionStart::DecodableType startData;
     ASSERT_EQ(analysisStartEvent->GetEventData(startData), CHIP_NO_ERROR);
     ASSERT_EQ(startData.sessionID, mSessionId);
+    // The source fields are REMCONDETECT-only; a local node's events must not carry them
+    ASSERT_FALSE(startData.sourceNodeId.HasValue());
     if (!startData.triggeredZones.IsNull())
     {
         FAIL() << "Expected Zones to be Null";
@@ -882,6 +889,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType perceivedContextData;
     ASSERT_EQ(perceivedContextEvent->GetEventData(perceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(perceivedContextData.sessionID, mSessionId);
+    ASSERT_FALSE(perceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(perceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains only a new identified context, and that it has one value.
     ASSERT_TRUE(perceivedContextData.newIdentifiedContexts.HasValue());
@@ -930,6 +939,9 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType secondPerceivedContextData;
     ASSERT_EQ(secondPerceivedContextEvent->GetEventData(secondPerceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(secondPerceivedContextData.sessionID, mSessionId);
+    // Without RemoteContextDetection the source fields are absent on every PerceivedContext path
+    ASSERT_FALSE(secondPerceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(secondPerceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains a new and current identified context only
     ASSERT_TRUE(secondPerceivedContextData.newIdentifiedContexts.HasValue());
@@ -984,6 +996,8 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::PerceivedContext::DecodableType thirdPerceivedContextData;
     ASSERT_EQ(thirdPerceivedContextEvent->GetEventData(thirdPerceivedContextData), CHIP_NO_ERROR);
     ASSERT_EQ(thirdPerceivedContextData.sessionID, mSessionId);
+    ASSERT_FALSE(thirdPerceivedContextData.sourceNodeId.HasValue());
+    ASSERT_FALSE(thirdPerceivedContextData.sourceStartTimestamp.HasValue());
 
     // Verify that the event contains a current and expired identified context only
     ASSERT_FALSE(thirdPerceivedContextData.newIdentifiedContexts.HasValue());
@@ -1037,11 +1051,389 @@ TEST_F(TestLocalAvAnalysisCluster, ExecuteEventGenerationSequence)
     Events::AnalysisSessionEnd::DecodableType endSessionData;
     ASSERT_EQ(endSessionEvent->GetEventData(endSessionData), CHIP_NO_ERROR);
     ASSERT_EQ(endSessionData.sessionID, mSessionId);
+    ASSERT_FALSE(endSessionData.sourceNodeId.HasValue());
 
     // 6. Verify that the session is no longer available, a new context should fail with the no longer valid session id
     ASSERT_EQ(
         mServer.GetLogic().NewContextDetected(mSessionId, testAdditionalTrackedContext, &mClusterTester.GetServerClusterContext()),
         CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestLocalAvAnalysisCluster, TriggersPersistedWithoutZoneIDsLoadAsTheEntireFrame)
+{
+    // A stored entry carrying no ZoneIDs, as one persisted before this endpoint had
+    // PerZoneContextDetection would: the field is optional, so loading must not read it blindly
+    uint8_t buffer[128];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+
+    Structs::ContextTriggerStruct::Type stored;
+    stored.context.namespaceID = static_cast<uint8_t>(0x49);
+    stored.context.tag         = static_cast<uint8_t>(0x0B);
+    ASSERT_EQ(stored.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    ConcreteAttributePath path(kTestEndpointId, Clusters::AvAnalysis::Id, Attributes::ActiveAmbientContextTriggers::Id);
+    ASSERT_EQ(
+        mClusterTester.GetServerClusterContext().attributeStorage.WriteValue(path, ByteSpan(buffer, writer.GetLengthWritten())),
+        CHIP_NO_ERROR);
+
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType triggers;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, triggers), CHIP_NO_ERROR);
+    auto iter = triggers.begin();
+    ASSERT_TRUE(iter.Next());
+    ASSERT_EQ(iter.GetValue().context.namespaceID, 0x49);
+    ASSERT_EQ(iter.GetValue().context.tag, 0x0B);
+    // Restored as the entire frame, the meaning a null ZoneIDs list carries
+    ASSERT_TRUE(iter.GetValue().zoneIDs.HasValue());
+    ASSERT_TRUE(iter.GetValue().zoneIDs.Value().IsNull());
+    ASSERT_FALSE(iter.Next());
+}
+
+TEST_F(TestLocalAvAnalysisCluster, DisableComposesRepeatedContextsInOrder)
+{
+    // Disable has no duplicate-entry rule, so naming a context twice has to compose: working on a
+    // copy must give what processing each in turn would, not let one decision win
+    ASSERT_TRUE(EnableSpecificTestContexts(testAmbientContexts[0], DataModel::MakeNullable(testZoneIDList)));
+
+    // testZoneIDList is {1,2,3,4}; remove {1} then {2}, expecting {3,4}
+    const std::vector<uint16_t> firstRemoval{ static_cast<uint16_t>(0x01) };
+    const std::vector<uint16_t> secondRemoval{ static_cast<uint16_t>(0x02) };
+
+    uint8_t buffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    for (const auto & zones : { firstRemoval, secondRemoval })
+    {
+        Structs::ContextTriggerStruct::Type trigger;
+        trigger.context.namespaceID = testAmbientContexts[0].namespaceID;
+        trigger.context.tag         = testAmbientContexts[0].tag;
+        trigger.zoneIDs = MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.data(), zones.size())));
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    Commands::DisableContextTriggers::DecodableType commandData;
+    ASSERT_EQ(commandData.contextTriggers.SetNonNull().Decode(reader), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
+    auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, path, commandData);
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
+
+    // Both removals landed on the same entry, in order
+    const auto & stored = mServer.GetLogic().mActiveAmbientContextTriggers;
+    ASSERT_EQ(stored.size(), 1u);
+    ASSERT_TRUE(stored[0].GetZoneIDs().HasValue());
+    ASSERT_FALSE(stored[0].GetZoneIDs().Value().IsNull());
+    const std::vector<uint16_t> remaining = stored[0].GetZoneIDs().Value().Value();
+    const std::vector<uint16_t> expected{ static_cast<uint16_t>(0x03), static_cast<uint16_t>(0x04) };
+    EXPECT_EQ(remaining, expected);
+}
+
+TEST_F(TestLocalAvAnalysisCluster, DisableAppliesNothingWhenAnyTriggerIsInvalid)
+{
+    // Each failure ends processing with no other side-effects, so a later trigger failing has to
+    // leave the removals the earlier ones would have made unmade
+    ASSERT_TRUE(EnableAllTestContexts());
+    const size_t activeBefore = mServer.GetLogic().mActiveAmbientContextTriggers.size();
+    ASSERT_GE(activeBefore, 2u);
+
+    // [an active context, then one that never was]: the first is removed, the second is rejected
+    uint8_t buffer[512];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    for (const auto & context : { testAmbientContexts[0], testErrorAmbientContext[0] })
+    {
+        Structs::ContextTriggerStruct::Type trigger;
+        trigger.context.namespaceID = context.namespaceID;
+        trigger.context.tag         = context.tag;
+        // PerZoneContextDetection is set here, so the field is required; null means the whole entry
+        trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    Commands::DisableContextTriggers::DecodableType commandData;
+    ASSERT_EQ(commandData.contextTriggers.SetNonNull().Decode(reader), CHIP_NO_ERROR);
+
+    const size_t dirtyBefore = mClusterTester.GetDirtyList().size();
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
+    auto response = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, path, commandData);
+
+    if (response.has_value())
+    {
+        EXPECT_EQ(response.value().GetStatusCode().GetStatus(), Status::DynamicConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
+
+    // The first context is untouched, and nothing was reported
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
+    EXPECT_EQ(mClusterTester.GetDirtyList().size(), dirtyBefore);
+
+    // Nor persisted: a restart finds the set as it was
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
+}
+
+TEST_F(TestLocalAvAnalysisCluster, WithoutPerZoneDetectionZoneIDsStayAbsentAcrossARestart)
+{
+    // ZoneIDs conforms to PerZoneContextDetection, so a node without the feature must not encode
+    // the field at all - and must not start encoding it once the entries come back from storage
+    MockAvAnalysisDelegate delegate;
+    AvAnalysisCluster noZones(kTestEndpointId, chip::BitFlags<Feature>(Feature::kLocalContextDetection), testAmbientContexts,
+                              DataModel::NullNullable);
+    noZones.SetDelegate(&delegate);
+    ClusterTester tester(noZones);
+    ASSERT_EQ(noZones.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    commandData.contextTriggers.SetNull();
+    auto response = noZones.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
+
+    auto zoneIDsAbsent = [&tester]() -> bool {
+        Attributes::ActiveAmbientContextTriggers::TypeInfo::DecodableType triggers;
+        if (tester.ReadAttribute(Attributes::ActiveAmbientContextTriggers::Id, triggers) != CHIP_NO_ERROR)
+        {
+            return false;
+        }
+        auto iter    = triggers.begin();
+        bool anyRead = false;
+        while (iter.Next())
+        {
+            anyRead = true;
+            if (iter.GetValue().zoneIDs.HasValue())
+            {
+                return false;
+            }
+        }
+        return anyRead && iter.GetStatus() == CHIP_NO_ERROR;
+    };
+
+    EXPECT_TRUE(zoneIDsAbsent()) << "ZoneIDs encoded on a node without PerZoneContextDetection";
+
+    noZones.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(noZones.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(zoneIDsAbsent()) << "ZoneIDs appeared once the entries came back from storage";
+    noZones.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestLocalAvAnalysisCluster, MoreThanFiftyContextTriggersIsAConstraintError)
+{
+    // ContextTriggers is constrained to 50 entries on both commands, so exceeding it violates the
+    // field constraint rather than making the command malformed
+    constexpr size_t kBufferSize = 4096;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    ASSERT_TRUE(buffer.Alloc(kBufferSize));
+
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), static_cast<uint32_t>(kBufferSize));
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    for (size_t entry = 0; entry <= AvAnalysis::kMaxContextTriggers; entry++)
+    {
+        Structs::ContextTriggerStruct::Type trigger;
+        trigger.context.namespaceID = static_cast<uint8_t>(0x49);
+        trigger.context.tag         = static_cast<uint8_t>(0x0B);
+        // PerZoneContextDetection is set on this fixture, so the field has to be present
+        trigger.zoneIDs = MakeOptional(DataModel::NullNullable);
+        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), trigger), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    const uint32_t encodedLength = writer.GetLengthWritten();
+
+    // A fresh list per command, since each holds a reader positioned in the buffer. Reports success
+    // rather than asserting: an ASSERT inside a lambda returns from the lambda, not from the test.
+    auto decodeList = [&](DataModel::DecodableList<Structs::ContextTriggerStruct::DecodableType> & aList) -> bool {
+        TLV::TLVReader reader;
+        reader.Init(buffer.Get(), encodedLength);
+        return reader.Next() == CHIP_NO_ERROR && aList.Decode(reader) == CHIP_NO_ERROR;
+    };
+
+    // An active set to be left alone: the rejection ends processing with no other side-effects
+    ASSERT_TRUE(EnableAllTestContexts());
+    const size_t activeBefore = mServer.GetLogic().mActiveAmbientContextTriggers.size();
+    ASSERT_GT(activeBefore, 0u);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    Commands::EnableContextTriggers::DecodableType enableData;
+    ASSERT_TRUE(decodeList(enableData.contextTriggers.SetNonNull()));
+    ConcreteCommandPath enablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    auto enableResponse = mServer.GetLogic().HandleEnableContextTriggers(commandHandler, enablePath, enableData);
+    if (enableResponse.has_value())
+    {
+        EXPECT_EQ(enableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
+
+    Commands::DisableContextTriggers::DecodableType disableData;
+    ASSERT_TRUE(decodeList(disableData.contextTriggers.SetNonNull()));
+    ConcreteCommandPath disablePath{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::DisableContextTriggers::Id };
+    auto disableResponse = mServer.GetLogic().HandleDisableContextTriggers(commandHandler, disablePath, disableData);
+    if (disableResponse.has_value())
+    {
+        EXPECT_EQ(disableResponse.value().GetStatusCode().GetStatus(), Status::ConstraintError);
+    }
+    else
+    {
+        FAIL();
+    }
+    EXPECT_EQ(mServer.GetLogic().mActiveAmbientContextTriggers.size(), activeBefore);
+}
+
+// TLV length of the widest ContextTriggerStruct holding aZoneCount zones: a non-null MfgCode, the
+// longest label the estimate budgets for and zone ids above 255, which take two bytes each.
+// Measured in a buffer far larger than any claim, so the result is the encoder's and not the
+// buffer's. Returns 0 if it could not be encoded at all.
+size_t WorstCaseTriggerLength(uint16_t aZoneCount)
+{
+    std::vector<uint16_t> zones;
+    for (uint16_t zone = 0; zone < aZoneCount; zone++)
+    {
+        zones.push_back(static_cast<uint16_t>(0xFF00 + zone));
+    }
+    const std::string label(64, 'x');
+
+    Structs::ContextTriggerStruct::Type trigger;
+    trigger.context.mfgCode     = DataModel::MakeNullable(static_cast<chip::VendorId>(0xFFFE));
+    trigger.context.namespaceID = static_cast<uint8_t>(0xFF);
+    trigger.context.tag         = static_cast<uint8_t>(0xFF);
+    trigger.context.label       = MakeOptional(DataModel::MakeNullable(CharSpan(label.data(), label.size())));
+    // With no zones the field is still encoded, as null: that is how a restored entry carries it
+    trigger.zoneIDs = zones.empty()
+        ? MakeOptional(DataModel::NullNullable)
+        : MakeOptional(DataModel::MakeNullable(DataModel::List<const uint16_t>(zones.data(), zones.size())));
+
+    constexpr size_t kGenerousSize = 4096;
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    if (!buffer.Alloc(kGenerousSize))
+    {
+        return 0;
+    }
+    TLV::TLVWriter writer;
+    writer.Init(buffer.Get(), static_cast<uint32_t>(kGenerousSize));
+    if (DataModel::Encode(writer, TLV::AnonymousTag(), trigger) != CHIP_NO_ERROR)
+    {
+        return 0;
+    }
+    return writer.GetLengthWritten();
+}
+
+TEST_F(TestLocalAvAnalysisCluster, TheSerializedSizeEstimateHoldsForAWorstCaseTrigger)
+{
+    for (uint16_t zoneCount : { static_cast<uint16_t>(0), static_cast<uint16_t>(kTestMaxZones), static_cast<uint16_t>(255) })
+    {
+        const size_t actual = WorstCaseTriggerLength(zoneCount);
+        ASSERT_GT(actual, 0u) << "could not encode a worst-case trigger for " << zoneCount << " zones";
+        EXPECT_LE(actual, ContextTriggerSerializedSize(static_cast<uint8_t>(zoneCount)))
+            << "the estimate is short for " << zoneCount << " zones";
+    }
+}
+
+using DetectedZones = Optional<DataModel::Nullable<std::vector<uint16_t>>>;
+
+DetectedZones ZonesOf(std::vector<uint16_t> aZoneIDs)
+{
+    return MakeOptional(DataModel::MakeNullable(std::move(aZoneIDs)));
+}
+
+const DetectedZones kNoZones;
+const DetectedZones kNullZones = MakeOptional(DataModel::Nullable<std::vector<uint16_t>>());
+
+TEST_F(TestLocalAvAnalysisCluster, ATriggeringContextIsActiveWhenItsZonesCoverTheDetection)
+{
+    // With PerZoneContextDetection a detection is only active if every zone it names is one the
+    // context was enabled for; a context enabled with Null zones covers every zone
+    ASSERT_TRUE(EnableSpecificTestContexts(testAmbientContexts[0], DataModel::MakeNullable(testZoneIDList)));
+    ASSERT_TRUE(EnableSpecificTestContexts(testAmbientContexts[1], DataModel::NullNullable));
+
+    auto & logic = mServer.GetLogic();
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1, 2 })));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf(testZoneIDList)));
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1, 5 }))) << "zone 5 was not enabled";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNullZones)) << "the context is zone-specific";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNoZones)) << "per-zone detection needs zones";
+
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[1], ZonesOf({ 5 })));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[1], kNullZones));
+
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[2], ZonesOf({ 1 }))) << "not enabled";
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testErrorAmbientContext[0], ZonesOf({ 1 }))) << "not supported";
+}
+
+TEST_F(TestLocalAvAnalysisCluster, WithoutPerZoneDetectionAnEnabledContextIsActiveWhateverTheZones)
+{
+    MockAvAnalysisDelegate delegate;
+    AvAnalysisCluster noZones(kTestEndpointId, chip::BitFlags<Feature>(Feature::kLocalContextDetection), testAmbientContexts,
+                              DataModel::NullNullable);
+    noZones.SetDelegate(&delegate);
+    ClusterTester tester(noZones);
+    ASSERT_EQ(noZones.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath path{ kTestEndpointId, Clusters::AvAnalysis::Id, Commands::EnableContextTriggers::Id };
+    Commands::EnableContextTriggers::DecodableType commandData;
+    uint8_t tlvBuffer[512];
+    commandData.contextTriggers = CreateCommandData(testAmbientContexts[0], DataModel::NullNullable, tlvBuffer, sizeof(tlvBuffer),
+                                                    /* noZones = */ true);
+    auto response               = noZones.GetLogic().HandleEnableContextTriggers(commandHandler, path, commandData);
+    ASSERT_TRUE(response.has_value() && response.value().IsSuccess());
+
+    auto & logic = noZones.GetLogic();
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNoZones));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], kNullZones));
+    EXPECT_TRUE(logic.IsTriggeringContextActive(testAmbientContexts[0], ZonesOf({ 1 })));
+    EXPECT_FALSE(logic.IsTriggeringContextActive(testAmbientContexts[1], kNoZones)) << "not enabled";
+
+    noZones.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

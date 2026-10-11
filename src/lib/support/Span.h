@@ -402,8 +402,12 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 {
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
-    memmove(out_buf.data(), span_to_copy.data(), span_to_copy.size());
+    // No guarantee that span_to_copy and out_buf don't overlap, so memmove() not memcpy().
+    // An empty span may have a null data(), it is undefined behaviour to pass it to memmove() even at zero length.
+    if (!span_to_copy.empty())
+    {
+        memmove(out_buf.data(), span_to_copy.data(), span_to_copy.size());
+    }
     out_buf.reduce_size(span_to_copy.size());
 
     return CHIP_NO_ERROR;
@@ -413,8 +417,12 @@ inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableC
 {
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // There is no guarantee that cspan_to_copy and out_buf don't overlap, so use memmove()
-    memmove(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    // No guarantee that cspan_to_copy and out_buf don't overlap, so memmove() not memcpy().
+    // An empty span may have a null data(), it is undefined behaviour to pass it to memmove() even at zero length.
+    if (!cspan_to_copy.empty())
+    {
+        memmove(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());
+    }
     out_buf.reduce_size(cspan_to_copy.size());
 
     return CHIP_NO_ERROR;
@@ -430,8 +438,13 @@ inline void CopyCharSpanToMutableCharSpanWithTruncation(CharSpan span_to_copy, M
 {
     size_t size_to_copy = std::min(span_to_copy.size(), out_span.size());
 
-    // There is no guarantee that span_to_copy and out_buf don't overlap, so use memmove()
-    memmove(out_span.data(), span_to_copy.data(), size_to_copy);
+    // No guarantee that span_to_copy and out_span don't overlap, so memmove() not memcpy().
+    // Either span may have a null data() when empty, which is undefined to pass to memmove() even at zero length.
+    // Check size_to_copy: it is zero when out_span is empty, even if span_to_copy is not.
+    if (size_to_copy != 0)
+    {
+        memmove(out_span.data(), span_to_copy.data(), size_to_copy);
+    }
     out_span.reduce_size(size_to_copy);
 }
 

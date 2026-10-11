@@ -14,22 +14,15 @@
 #   limitations under the License.
 #
 
-include(${CHIP_ROOT}/config/zephyr/ota-image.cmake)
-
 # ==============================================================================
-# Create the Matter OTA image for Silabs Zephyr targets.
+# Matter OTA image post-build for Silabs Zephyr targets.
+#
+# Dispatches to the MCUboot or SiWx917 RPS implementation.
 # ==============================================================================
 if(CONFIG_CHIP_OTA_REQUESTOR)
-    if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
-        set(ZEPHYR_OUTPUT_NAME "zephyr")
+    if(CONFIG_SOC_SERIES_SIWG917)
+        include(${CMAKE_CURRENT_LIST_DIR}/zephyr-post-build-siwx917.cmake)
     else()
-        set(ZEPHYR_OUTPUT_NAME "zephyr.signed")
-    endif()
-
-    if(CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
-            INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ZEPHYR_OUTPUT_NAME}.bin
-            OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
-        )
+        include(${CMAKE_CURRENT_LIST_DIR}/zephyr-post-build-mcuboot.cmake)
     endif()
 endif()

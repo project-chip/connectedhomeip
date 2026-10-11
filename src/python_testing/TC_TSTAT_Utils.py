@@ -15,10 +15,127 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter import ChipDeviceCtrl
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest
 
 cluster = Clusters.Thermostat
+
+
+class ThermostatBaseTest(MatterBaseTest):
+    """Base class for Thermostat tests."""
+
+    def check_atomic_response(self,
+                              response: object,
+                              expected_attribute_statuses: dict[int, Status] | None = None,
+                              expected_atomic_status: Status = Status.Success,
+                              expected_timeout: int | None = None) -> None:
+        """Validates the structure and status fields of an AtomicResponse."""
+        asserts.assert_equal(response.statusCode, expected_atomic_status, "Response should have the right atomic status")
+
+        if expected_attribute_statuses is not None:
+            actual_statuses = {attrStatus.attributeID: attrStatus.statusCode for attrStatus in response.attributeStatus}
+            for attr_id, expected_attr_status in expected_attribute_statuses.items():
+                if expected_attr_status is not None:
+                    asserts.assert_in(attr_id, actual_statuses, f"Attribute {attr_id} should have a status in AtomicResponse")
+                    asserts.assert_equal(
+                        actual_statuses[attr_id], expected_attr_status,
+                        f"Attribute {attr_id} status mismatch: expected {expected_attr_status}, "
+                        f"got {actual_statuses[attr_id]}")
+
+        if expected_timeout is not None:
+            asserts.assert_equal(response.timeout, expected_timeout, "Timeout should have the right value")
+
+    async def send_atomic_request(self,
+                                  request_type: Globals.Enums.AtomicRequestTypeEnum,
+                                  expected_attribute_statuses: dict[int, Status] | None = None,
+                                  dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                  endpoint: int | None = None,
+                                  timeout: int | None = None,
+                                  expected_status: Status = Status.Success,
+                                  expected_atomic_status: Status = Status.Success,
+                                  expected_timeout: int | None = None) -> object:
+        """Sends an AtomicRequest command and validates the response."""
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if endpoint is None:
+            endpoint = self.get_endpoint()
+
+        attribute_ids = list(expected_attribute_statuses.keys()) if expected_attribute_statuses is not None else []
+
+        cmd = cluster.Commands.AtomicRequest(
+            requestType=request_type,
+            attributeRequests=attribute_ids,
+            timeout=timeout if timeout is not None else (
+                1800 if request_type == Globals.Enums.AtomicRequestTypeEnum.kBeginWrite else None)
+        )
+        try:
+            response = await self.send_single_cmd(cmd=cmd, dev_ctrl=dev_ctrl, endpoint=endpoint)
+            asserts.assert_equal(expected_status, Status.Success, "Expected InteractionModelError but command succeeded")
+            self.check_atomic_response(response,
+                                       expected_attribute_statuses=expected_attribute_statuses,
+                                       expected_atomic_status=expected_atomic_status,
+                                       expected_timeout=expected_timeout)
+            return response
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned from AtomicRequest")
+            return None
+
+    async def send_atomic_request_begin(self,
+                                        expected_attribute_statuses: dict[int, Status] | None = None,
+                                        dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                        endpoint: int | None = None,
+                                        timeout: int = 1800,
+                                        expected_status: Status = Status.Success,
+                                        expected_atomic_status: Status = Status.Success,
+                                        expected_timeout: int | None = None) -> object:
+        """Sends an AtomicRequest BeginWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            timeout=timeout,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status,
+            expected_timeout=expected_timeout
+        )
+
+    async def send_atomic_request_commit(self,
+                                         expected_attribute_statuses: dict[int, Status] | None = None,
+                                         dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                         endpoint: int | None = None,
+                                         expected_status: Status = Status.Success,
+                                         expected_atomic_status: Status = Status.Success) -> object:
+        """Sends an AtomicRequest CommitWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status
+        )
+
+    async def send_atomic_request_rollback(self,
+                                           expected_attribute_statuses: dict[int, Status] | None = None,
+                                           dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                           endpoint: int | None = None,
+                                           expected_status: Status = Status.Success,
+                                           expected_atomic_status: Status = Status.Success) -> object:
+        """Sends an AtomicRequest RollbackWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status
+        )
 
 
 class ThermostatState:

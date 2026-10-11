@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ cluster = Clusters.ElectricalProtectionAlarm
 AlarmBitmap = cluster.Bitmaps.AlarmBitmap
 
 
-class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
+class ElectricalProtectionAlarmTestBaseHelper(MatterTestCommissionedDevice):
     """Shared TestEventTrigger handling for the TC-EPALM cases.
 
     The trigger codes are namespaced by cluster id in the top two bytes. In the low byte, 0x00

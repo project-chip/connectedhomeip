@@ -777,7 +777,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         {
             std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessagesOnBootUp =
                 std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
-            mICDManager.TriggerCheckInMessages(sendCheckInMessagesOnBootUp);
+            mICDManager.TriggerCheckInMessages(sendCheckInMessagesOnBootUp, app::ICDManager::CheckInTriggerReason::kColdBoot);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

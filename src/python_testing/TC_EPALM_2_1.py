@@ -48,7 +48,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -190,18 +190,14 @@ def _check_residual_current_fault_ratings_struct(s) -> None:
 def _check_short_circuit_ratings_struct(s) -> None:
     _check_choice_group(s, ('tripCurrent', 'tripMechanism', 'tripCurve', 'ultimateMaxCurrent',
                             'serviceMaxCurrent', 'maxCurrent'), 'ShortCircuitRatingsStruct')
-    # These amperage-mA fields carry constraint "all" in the spec, unlike every other amperage-mA
-    # field in this cluster, which is "min 1". Raised with the test team as a possible spec defect;
-    # validated as int64 only until that is settled.
     for name, value in (('TripCurrent', s.tripCurrent),
                         ('UltimateMaxCurrent', s.ultimateMaxCurrent),
                         ('ServiceMaxCurrent', s.serviceMaxCurrent),
                         ('MaxCurrent', s.maxCurrent)):
         if value is not None:
-            matter_asserts.assert_valid_int64(value, f'{name} must be an int64')
-            matter_asserts.assert_int_in_range(value, -MEASUREMENT_MAX - 1, MEASUREMENT_MAX, name)
+            _check_measurement(value, name)
     if s.tripMechanism is not None:
-        _check_current_trip_mechanism(s.tripMechanism)
+        _check_bitmap(s.tripMechanism, 'TripMechanism', cluster.Bitmaps.CurrentTripMechanismBitmap)
     if s.tripCurve is not None:
         _check_trip_curve(s.tripCurve)
 
@@ -234,7 +230,7 @@ def _check_surge_protection_ratings_struct(s) -> None:
         _check_uint_min_one(s.responseTime, 'ResponseTime')
 
 
-class TC_EPALM_2_1(MatterBaseTest):
+class TC_EPALM_2_1(MatterTestCommissionedDevice):
 
     @pics('EPALM.S')
     @async_test_body

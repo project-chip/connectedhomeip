@@ -53,6 +53,8 @@ constexpr uint16_t kPowerSourceId               = 0x0F;
 constexpr uint16_t kCommonAreaId                = 0x10; // Clusters::Globals::AreaTypeTag
 constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::LandmarkTag
 constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
+constexpr uint16_t kClosureId                   = 0x44; // Clusters::Globals::ClosureTag
+constexpr uint16_t kClosurePanelId              = 0x45; // Clusters::Globals::ClosurePanelTag
 
 } // namespace CommonNamespace
 

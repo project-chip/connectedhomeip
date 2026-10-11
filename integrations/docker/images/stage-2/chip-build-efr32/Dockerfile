@@ -9,7 +9,7 @@ COPY files-slt/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
 # Setup SLT CLI (kept in the final image on PATH as /opt/silabs/slt/slt)
 RUN set -x \
     && mkdir -p /tmp/slt_install /tmp/slt_cli_bin \
-    && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.1.4-linux-x64.zip -O /tmp/slt.zip \
+    && curl -fsSL https://www.silabs.com/documents/public/software/slt-cli-1.2.2-linux-x64.zip -o /tmp/slt.zip \
     && unzip -q /tmp/slt.zip -d /tmp/slt_install \
     && rm /tmp/slt.zip \
     && chmod +x /tmp/slt_install/slt \

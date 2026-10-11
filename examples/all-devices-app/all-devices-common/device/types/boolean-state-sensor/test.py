@@ -30,13 +30,15 @@ scripts/run_in_python_env.sh out/python_env \
     --app out/linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test/all-devices-app \
     --app-args "\
         --device contact-sensor:1 \
-        --device water-leak-detector:2" \
+        --device water-leak-detector:2 \
+        --rpc-server-port 33000" \
     --factory-reset \
     --script examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor/test.py \
     --script-args "\
         --commissioning-method on-network \
         --discriminator 3840 \
-        --passcode 20202021\
+        --passcode 20202021 \
+        --int-arg rpc_server_port:33000\
         " \
     --app-stdin-pipe /tmp/app_stdin.txt'
 
@@ -103,12 +105,15 @@ class BooleanStateSensorCommissioningTest(MatterBaseTest):
         self.step(3, "Toggle and assert state values on Endpoint 1 and Endpoint 2 independently via PwRPC")
 
         # Establish PwRPC connection
-        logger.info("Establishing Pigweed RPC connection...")
+        # Defaults to the app's own default port; override with
+        # "--int-arg rpc_server_port:<port>" when the app is started with --rpc-server-port.
+        rpc_server_port = self.user_params.get("rpc_server_port", 33000)
+        logger.info("Establishing Pigweed RPC connection on port %d...", rpc_server_port)
         device_connection = create_device_serial_or_socket_connection(
             device="",
             baudrate=115200,
             token_databases=[],
-            socket_addr="127.0.0.1:33000",
+            socket_addr=f"127.0.0.1:{rpc_server_port}",
             compiled_protos=[attributes_service_pb2],
             rpc_logging=True,
             channel_id=rpc.DEFAULT_CHANNEL_ID,

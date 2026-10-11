@@ -128,6 +128,7 @@ private:
     std::promise<Dnssd::DiscoveredNodeData> mDiscoveredNodePromise;
 
     std::shared_ptr<ot::commissioner::Commissioner> mCommissioner;
+    std::atomic<bool> mStopProxyThread{ false };
     std::thread mProxyThread;
     DiscoveryDiagnostic mLastDiscoveryDiagnostic;
 };

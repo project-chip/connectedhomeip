@@ -82,6 +82,12 @@ class MatterTestConfig:
     # Fabric ID which to use
     fabric_id: int = 1
 
+    # When False, the controller stack is initialized without server-side
+    # interactions, so the TH publishes no DNS-SD records at all (neither its
+    # '_matterd._udp' commissioner service nor its operational identities).
+    # Set by the runner from the test class attribute enable_server_interactions.
+    enable_server_interactions: bool = True
+
     # "Alpha" by default
     root_of_trust_index: int = TestingDefaults.TRUST_ROOT_INDEX
 

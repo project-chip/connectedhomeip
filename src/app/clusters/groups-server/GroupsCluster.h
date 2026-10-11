@@ -16,51 +16,26 @@
  */
 #pragma once
 
-#include <access/AccessControl.h>
-#include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
-#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/Groups/Commands.h>
-#include <clusters/Groups/Ids.h>
-#include <credentials/GroupDataProvider.h>
+#include <app/AppConfig.h>
 
-#include <optional>
+#if CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
+#include <app/clusters/groups-server/StubbedGroupsCluster.h> // nogncheck
+#else
+#include <app/clusters/groups-server/GroupsClusterImpl.h> // nogncheck
+#endif
 
 namespace chip::app::Clusters {
 
-class GroupsCluster : public DefaultServerCluster
-{
-public:
-    struct Context
-    {
-        Credentials::GroupDataProvider & groupDataProvider;
-        scenes::ScenesIntegrationDelegate * scenesIntegration = nullptr; // if null, no scenes support
-        IdentifyIntegrationDelegate * identifyIntegration     = nullptr; // if null, no identify support
-    };
-
-    GroupsCluster(EndpointId endpointId, const Context & context) :
-        DefaultServerCluster({ endpointId, Groups::Id }), mGroupDataProvider(context.groupDataProvider),
-        mScenesIntegration(context.scenesIntegration), mIdentifyIntegration(context.identifyIntegration)
-    {}
-
-    // ServerClusterInterface
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
-
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-
-private:
-    Credentials::GroupDataProvider & mGroupDataProvider;
-    scenes::ScenesIntegrationDelegate * mScenesIntegration;
-    IdentifyIntegrationDelegate * mIdentifyIntegration;
-
-    Protocols::InteractionModel::Status AddGroup(GroupId groupID, CharSpan groupName,
-                                                 const chip::Access::SubjectDescriptor & subjectDescriptor);
-};
+/// The Groups cluster implementation selected by the build configuration.
+///
+/// Groupcast supersedes the Groups cluster commands, so a build with groupcast enabled gets the
+/// compatibility-only StubbedGroupsCluster and one without it gets the full implementation. Both
+/// are constructed from a `GroupsCluster::Context`, so callers do not need to know which one is
+/// in use.
+#if CHIP_CONFIG_USE_STUBBED_GROUPS_CLUSTER
+using GroupsCluster = StubbedGroupsCluster;
+#else
+using GroupsCluster = GroupsClusterImpl;
+#endif
 
 } // namespace chip::app::Clusters

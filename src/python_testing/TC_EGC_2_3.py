@@ -43,13 +43,13 @@ from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.ElectricalGridConditions
 
 
-class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
+class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterTestCommissionedDevice):
     """Implementation of test case TC_EGC_2_3."""
 
     def desc_TC_EGC_2_3(self) -> str:
