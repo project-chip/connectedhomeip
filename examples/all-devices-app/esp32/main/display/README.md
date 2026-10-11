@@ -149,7 +149,7 @@ and `main/CMakeLists.txt` compiles exactly one backend from
 `display/lvgl/board/` for the selected `CONFIG_DEVICE_TYPE_*`. The two backends
 differ in more than naming: the CoreS3 BSP wraps `esp_lvgl_port`, where a lock
 timeout of 0 waits forever, while the Mosaico BSP wraps `esp_lvgl_adapter`,
-where -1 does. The CoreS3 has an LCD backlight; the Mosaico's CO5300 is an
+where -1 does. The CoreS3 has an LCD backlight; the CO5300 on the Mosaico is an
 AMOLED, so "backlight off" is brightness 0 while LVGL and the touch controller
 keep running for the wake-on-touch overlay.
 
@@ -234,8 +234,8 @@ directory is scanned at configure time, so an existing build directory needs
 
 ### Look and Feel
 
-`Theme.cpp` extends LVGL's default dark theme with an apply callback, so every
-widget gets the renderer's finish at creation: gradient screen background,
+`Theme.cpp` extends the default LVGL dark theme with an apply callback, so every
+widget gets the same finish at creation: gradient screen background,
 rounded translucent cards with a soft shadow, accent buttons that shrink
 slightly while pressed, thick gradient sliders with a glowing knob, dimmed
 dialog backdrops. Screens compose from the builders in `Ui.h` (`CreateTile`,
@@ -523,7 +523,7 @@ If the board has a touch panel and an ESP-IDF BSP with an LVGL port, reuse the
 3. Select the backend in the `BOARD_SRCS` block of `main/CMakeLists.txt` and add
    the BSP to `main/idf_component.yml` under a `target ==` rule, or through
    `EXTRA_COMPONENT_DIRS` if it is not on the registry.
-4. Add an `sdkconfig_<board>.defaults` with the BSP's LVGL requirements (colour
+4. Add an `sdkconfig_<board>.defaults` with the LVGL requirements of the BSP (color
    depth, `LV_CONF_SKIP`, allocator) plus `LV_USE_QRCODE`, `LV_USE_TABVIEW` and
    `LV_USE_MSGBOX` for the screens here.
 

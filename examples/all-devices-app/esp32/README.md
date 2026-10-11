@@ -70,7 +70,7 @@ idf.py build
 The board's USB-C port is the ESP32-S31's USB OTG controller and there is no
 USB-to-UART bridge, so the application runs a USB CDC console on that port
 (`main/MosaicoUsbConsole.cpp`). `idf.py monitor` shows the logs there, and the
-device answers esptool's USB Serial/JTAG reset sequence, so once this firmware
+device answers the USB Serial/JTAG reset sequence esptool uses, so once this firmware
 is on the board `idf.py flash` resets it into the bootloader by itself:
 
 ```
