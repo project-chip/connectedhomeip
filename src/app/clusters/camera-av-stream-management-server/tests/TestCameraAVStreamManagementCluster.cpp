@@ -247,6 +247,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
+    /** @brief Priority changes require no simulated hardware action in this delegate. */
     void OnStreamUsagePrioritiesChanged() override {}
 
     /** @brief Records delegate notifications so tests can detect side effects of rejected writes. */
@@ -255,6 +256,7 @@ public:
     /** @brief Returns the cumulative notification count since this mock was constructed. */
     uint32_t GetAttributeChangedCount() const { return mAttributeChangedCount; }
 
+    /** @brief Supplies deterministic JPEG fixture data at the requested resolution for snapshot command tests. */
     Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override
@@ -949,6 +951,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightEnabled)
     EXPECT_TRUE(statusLightEnabled);
 }
 
+/** @brief Known brightness values must round-trip through attribute writes and reads. */
 TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
 {
     Attributes::StatusLightBrightness::TypeInfo::Type statusLightBrightness = Globals::ThreeLevelAutoEnum::kAuto;
@@ -1092,6 +1095,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestInvalidStoredStatusLightBrightne
     EXPECT_EQ(server.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kHigh);
 }
 
+/**
+ * @brief Valid audio allocation must succeed; invalid parameters, unsupported usages, and excess allocations must fail.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
 {
     using Request  = Commands::AudioStreamAllocate::Type;

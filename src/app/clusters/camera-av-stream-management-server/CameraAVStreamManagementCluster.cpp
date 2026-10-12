@@ -1278,6 +1278,10 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetLocalSnapshotRecordingEnabled(boo
                                    Attributes::LocalSnapshotRecordingEnabled::Id);
 }
 
+/**
+ * @brief Updates status-light enablement, persisting and reporting changes while leaving unchanged values alone.
+ * @return CHIP_NO_ERROR for a no-op or successful update, or the storage error if persistence fails.
+ */
 CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightEnabled(bool aStatusLightEnabled)
 {
     return SetAttributeIfDifferent(mStatusLightEnabled, aStatusLightEnabled, Attributes::StatusLightEnabled::Id);
