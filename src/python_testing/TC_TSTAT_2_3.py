@@ -94,7 +94,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.has_events = False
 
         self.step("1b", "TH reads FeatureMap from DUT")
-        
+
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap
         )
