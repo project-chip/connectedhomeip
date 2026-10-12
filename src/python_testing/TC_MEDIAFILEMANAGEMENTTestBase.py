@@ -195,21 +195,17 @@ class MEDIAFILEMANAGEMENTTestBase:
     async def send_delete_file_expect_failure(self, endpoint, file_id: int) -> InteractionModelError:
         """Send DeleteFile for a FileID that does not exist and return the resulting error.
 
-        The specification's Effect on Receipt requires NOT_FOUND, and the reference
-        implementation returns that, while the test plan text names the cluster-specific
-        InvalidFileID (2). Either is accepted here and the observed one is logged, so the
-        test does not pick a side in that discrepancy.
+        The specification's Effect on Receipt is explicit: "If the specified FileID does not
+        exist, the server SHALL respond with a status of NOT_FOUND." DeleteFile carries no
+        response payload, so the status arrives on the invoke itself.
         """
         try:
             await self.send_single_cmd(cmd=_CLUSTER.Commands.DeleteFile(fileID=file_id), endpoint=endpoint)
             asserts.fail(f"DeleteFile with the non-existent FileID {file_id} should not have succeeded")
         except InteractionModelError as e:
-            accepted = (e.status == Status.NotFound
-                        or (e.hasClusterStatus and e.clusterStatus == _CLUSTER.Enums.FileStatusEnum.kInvalidFileID))
-            asserts.assert_true(
-                accepted,
-                f"DeleteFile for a non-existent FileID returned {e}; expected NOT_FOUND (per the specification's "
-                f"Effect on Receipt) or cluster status InvalidFileID (2) (per the test plan)")
+            asserts.assert_equal(
+                e.status, Status.NotFound,
+                f"DeleteFile for a non-existent FileID must be rejected with NOT_FOUND (0x8b), got {e}")
             log.info("DeleteFile for a non-existent FileID was rejected with %s", e)
             return e
 
