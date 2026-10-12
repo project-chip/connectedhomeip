@@ -544,6 +544,12 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_NoProvider)
     ASSERT_TRUE(result.status.has_value());
     ASSERT_EQ(result.status->GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
 }
+
+TEST_F(TestAccessControlCluster, AccessRestrictionProviderDefaultsToNull)
+{
+    Access::AccessControl accessControl;
+    EXPECT_EQ(accessControl.GetAccessRestrictionProvider(), nullptr);
+}
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 } // namespace
