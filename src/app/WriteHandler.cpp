@@ -51,6 +51,13 @@ namespace app {
 using namespace Protocols::InteractionModel;
 using Status = Protocols::InteractionModel::Status;
 
+/**
+ * @brief Prepare the provider, delegate, and list path before receiving a write transaction.
+ * @param apProvider The non-null data model provider for this transaction.
+ * @param apWriteHandlerDelegate The non-null delegate managing handler lifetime and write conflicts.
+ * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE while an exchange is held, or CHIP_ERROR_INVALID_ARGUMENT.
+ * The previous transaction must be closed before reuse; Close() clears its captured fabric identity.
+ */
 CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
@@ -107,6 +114,13 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
     return info->HasFlags(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
+/**
+ * @brief Process a write message and send its response when the exchange and request require one.
+ * @param apExchangeContext The retained exchange used for an individual request or the next chunk.
+ * @param aPayload The encoded request, consumed by parsing.
+ * @param aIsTimedWrite Whether the request follows an accepted timed interaction.
+ * @return The parsing/processing status, or Failure if allocating, encoding, or sending the response fails.
+ */
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
                                                System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {

@@ -131,6 +131,10 @@ const MockNodeConfig & TestMockNodeConfig()
 class TestWriteInteraction : public chip::Testing::AppContext
 {
 public:
+    /**
+     * @brief Start the loopback context and install the group provider, mock model, and list metadata used by the regressions.
+     * Retain the prior model so fixture teardown restores its ownership.
+     */
     void SetUp() override
     {
         AppContext::SetUp();
@@ -149,6 +153,10 @@ public:
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
+    /**
+     * @brief Restore mock metadata and provider ownership, finish group storage, and shut down the loopback context.
+     * This prevents handler reuse and session-release cases from leaving state in the next test.
+     */
     void TearDown() override
     {
         chip::Testing::ResetMockNodeConfig();
