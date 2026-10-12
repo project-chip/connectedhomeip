@@ -29,6 +29,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+
+class MediaFileManagementCluster;
+
 namespace MediaFileManagement {
 
 /**
@@ -40,6 +43,14 @@ namespace MediaFileManagement {
  * coordinator to drive the transfers. It is optional: when no coordinator is
  * set (e.g. in unit tests) the manager keeps metadata-only behavior.
  */
+/// Outcome of resolving a ResponseID handed out by ShareFileWithClient.
+enum class SharedFileLookupResult
+{
+    kAvailable, ///< Shared with this peer and not yet retrieved.
+    kRetrieved, ///< Shared with this peer, but the client has already pulled the bytes.
+    kUnknown,   ///< Never handed out, or handed out to a different peer.
+};
+
 class BdxCoordinator
 {
 public:
@@ -64,9 +75,13 @@ public:
     /**
      * Resolve a ResponseID previously handed out by ShareFileWithClient to the
      * shared FileID, verifying it was shared with `peer`. Invoked for
-     * GetSharedFile. Returns false if unknown or not shared with this peer.
+     * GetSharedFile. `fileID` is only written when the result is kAvailable.
+     *
+     * A ResponseID is retired once the client has pulled the file over BDX, not
+     * when it is looked up here, so a client may resolve the same ResponseID more
+     * than once while it is still fetching.
      */
-    virtual bool LookupSharedFile(ScopedNodeId peer, uint16_t responseID, uint64_t & fileID) = 0;
+    virtual SharedFileLookupResult LookupSharedFile(ScopedNodeId peer, uint16_t responseID, uint64_t & fileID) = 0;
 
     /**
      * Build a `bdx://<own-node-id>/<designator>` URI (into `out`) that a client
@@ -98,6 +113,11 @@ public:
 
     /// Attach the BDX coordinator used to move file bytes out-of-band. Optional.
     void SetBdxCoordinator(BdxCoordinator * coordinator) { mBdxCoordinator = coordinator; }
+
+    /// Attach the cluster so that changes to the stored files can be reported to
+    /// subscribers. Optional; without it the attributes still read correctly but no
+    /// subscription reports are generated.
+    void SetCluster(MediaFileManagementCluster * cluster) { mCluster = cluster; }
 
     /// Resolve the on-disk data-blob path for a file id (used by the BDX layer).
     std::string DataFilePathForFile(uint64_t fileID) const { return DataFilePath(fileID); }
@@ -151,6 +171,11 @@ private:
     void LoadIndex();
     void SaveIndex();
 
+    // Report that the stored files changed. AvailableFiles and AvailableStorage both
+    // derive from the file list, so adding or removing a file changes both.
+    void NotifyStoredFilesChanged();
+
+    MediaFileManagementCluster * mCluster = nullptr;
     std::string mStorageDir;
     std::vector<FileEntry> mFiles;
     uint64_t mNextFileID = 1;
@@ -168,6 +193,9 @@ private:
 
     // Supported MIME types advertised via the SupportedMimeTypes attribute.
     static const std::vector<std::string> kSupportedMimeTypes;
+
+    // True when the MIME type is one of the entries reported by SupportedMimeTypes.
+    static bool IsSupportedMimeType(const CharSpan & mimeType);
 };
 
 } // namespace MediaFileManagement

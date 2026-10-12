@@ -111,6 +111,13 @@ CHIP_ERROR ClosurePanel::Register(EndpointId endpoint, CodeDrivenDataModelProvid
                                 CHIP_ERROR_INVALID_ARGUMENT);
             dimensionConfig.WithModulation(modulation->type);
         }
+        if (positioning.unit.has_value())
+        {
+            // Unit is a mandatory attribute once UN is enabled, same as the motion parameters above.
+            VerifyOrReturnError(positioning.unit->unit != Clusters::ClosureDimension::ClosureUnitEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            dimensionConfig.WithUnit(positioning.unit->unit, positioning.unit->range);
+        }
     }
 
     mClosureDimensionCluster.Create(dimensionConfig);
