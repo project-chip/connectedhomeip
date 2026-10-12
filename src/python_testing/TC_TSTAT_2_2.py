@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import queue
+import logging
 
 from mobly import asserts
 from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
@@ -46,6 +47,8 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
 
@@ -417,6 +420,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("2d")
         # Verified in 2c
+        log.info("Test step verified in 2c.")
 
         self.step("3a")
         if self.pics_guard(hasHeatingFeature):
@@ -440,6 +444,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("3d")
         # Verified in 3c
+        log.info("Test step verified in 3c.")
 
         self.step("4a")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
@@ -463,6 +468,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("4d")
         # Verified in 4c
+        log.info("Test step verified in 4c.")
 
         self.step("5a")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
@@ -486,6 +492,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("5d")
         # Verified in 5c
+        log.info("Test step verified in 5c.")
 
         self.step("6a")
         if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
@@ -664,14 +671,14 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating)
 
         self.step("13a")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
         if self.pics_guard(hasHeatingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30)
 
         self.step("13b")
-        if not self.pics_guard(hasHeatingFeature):
+        if self.pics_guard(not hasHeatingFeature):
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
                 asserts.fail("Expected InvalidCommand")
@@ -681,6 +688,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("13c")
         # Verified in 13a
+        log.info("Test step verified in 13a.")
 
         self.step("14a")
         if self.pics_guard(hasHeatingFeature):
@@ -689,13 +697,15 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("14b")
         # Verified in 14a
+        log.info("Test step verified in 14a.")
 
         self.step("15a")
         if self.pics_guard(hasCoolingFeature):
+            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30)
 
         self.step("15b")
-        if not self.pics_guard(hasCoolingFeature):
+        if self.pics_guard(not hasCoolingFeature):
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
                 asserts.fail("Expected InvalidCommand")
@@ -705,6 +715,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("15c")
         # Verified in 15a
+        log.info("Test step verified in 15a.")
 
         self.step("16a")
         if self.pics_guard(hasCoolingFeature):
@@ -713,28 +724,31 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("16b")
         # Verified in 16a
+        log.info("Test step verified in 16a.")
 
         self.step("17a")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-        if self.pics_guard(hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-        if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
+            if hasHeatingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30)
 
         self.step("17b")
         # Verified in 17a
+        log.info("Test step verified in 17a.")
 
         self.step("18a")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-        if self.pics_guard(hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-        if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
+            if hasHeatingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
 
         self.step("18b")
         # Verified in 18a
+        log.info("Test step verified in 18a.")
 
 
 if __name__ == "__main__":
