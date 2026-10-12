@@ -139,10 +139,12 @@ class EventSubscribePath:
     """One EventRequests shape used by the TC-IDM-6.2 subscribe steps.
 
     `events` is passed straight to ChipDeviceController.ReadEvent.
+    `specific_cluster` is true when the path names one cluster.
     `specific_event` is true when the path names one event id.
     `endpoint` is set when the path names one endpoint; None is an endpoint wildcard.
     """
     events: list
+    specific_cluster: bool
     specific_event: bool
     endpoint: int | None
 
@@ -2177,12 +2179,12 @@ class IDMBaseTest(BasicCompositionTests):
     def wildcard_event_paths(self, endpoint: int, cluster, event) -> list[EventSubscribePath]:
         """Return the six EventRequests shapes from TC-IDM-6.2 steps 1-6, in order."""
         return [
-            EventSubscribePath(events=[(endpoint, event, False)], specific_event=True, endpoint=endpoint),
-            EventSubscribePath(events=[(endpoint, cluster, False)], specific_event=False, endpoint=endpoint),
-            EventSubscribePath(events=[endpoint], specific_event=False, endpoint=endpoint),
-            EventSubscribePath(events=[event], specific_event=True, endpoint=None),
-            EventSubscribePath(events=[cluster], specific_event=False, endpoint=None),
-            EventSubscribePath(events=['*'], specific_event=False, endpoint=None),
+            EventSubscribePath(events=[(endpoint, event, False)], specific_cluster=True, specific_event=True, endpoint=endpoint),
+            EventSubscribePath(events=[(endpoint, cluster, False)], specific_cluster=True, specific_event=False, endpoint=endpoint),
+            EventSubscribePath(events=[endpoint], specific_cluster=False, specific_event=False, endpoint=endpoint),
+            EventSubscribePath(events=[event], specific_cluster=True, specific_event=True, endpoint=None),
+            EventSubscribePath(events=[cluster], specific_cluster=True, specific_event=False, endpoint=None),
+            EventSubscribePath(events=['*'], specific_cluster=False, specific_event=False, endpoint=None),
         ]
 
     def negotiated_max_interval_sec(self, sub: SubscriptionTransaction) -> int:
@@ -2228,7 +2230,8 @@ class IDMBaseTest(BasicCompositionTests):
         """Check the priming report for a TC-IDM-6.2 EventRequests shape.
 
         SubscriptionId must be a uint32 and the report must include `event`.
-        A specific-event path must not include any other event. An endpoint-specific
+        A specific-event path must not include any other event. A cluster-specific
+        path must not include events from any other cluster. An endpoint-specific
         path must not include events from any other endpoint.
         """
         asserts.assert_true(self.is_valid_uint32_value(sub.subscriptionId),
@@ -2246,6 +2249,9 @@ class IDMBaseTest(BasicCompositionTests):
                 if report.Header.ClusterId != cluster.id or report.Header.EventId != event.event_id
             ]
             asserts.assert_equal(others, [], "Specific event path returned a different event")
+        if path.specific_cluster:
+            off_cluster = [report for report in reports if report.Header.ClusterId != cluster.id]
+            asserts.assert_equal(off_cluster, [], f"Priming report included events outside cluster {cluster.__name__}")
         if path.endpoint is not None:
             off_endpoint = [report for report in reports if report.Header.EndpointId != path.endpoint]
             asserts.assert_equal(off_endpoint, [], f"Priming report included events outside endpoint {path.endpoint}")
