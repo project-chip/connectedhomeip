@@ -20,6 +20,11 @@
 #include "silabs_utils.h"
 #include <app/server/Server.h>
 
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#include <provision/ProvisionCrypto.h>
+#include <provision/ProvisionStorageWriter.h>
+#endif // SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 #include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h> // nogncheck
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>            // nogncheck
@@ -141,7 +146,14 @@ void OTAConfig::Init()
 
     gRequestorUser.Init(&gRequestorCore, &imageProcessor);
 
-    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    // The factory data OTA processor persists attestation credentials through the
+    // same storage writer and crypto backends used by provisioning.
+    CHIP_ERROR err = imageProcessor.Init(&gDownloader, chip::DeviceLayer::Silabs::Provision::ProvisionStorageWriter::GetInstance(),
+                                         chip::DeviceLayer::Silabs::Provision::ProvisionCrypto::GetInstance());
+#else
+    CHIP_ERROR err        = imageProcessor.Init(&gDownloader);
+#endif
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("Image processor init failed");

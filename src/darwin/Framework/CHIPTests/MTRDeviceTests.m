@@ -6689,22 +6689,16 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     // We relaunch the app multiple times, to try to trigger time
     // synchronization loss detection. These are the different cases:
     //
-    //   1) Relaunch with a bad clock, this should just trigger an update,
-    //      because it's the first time that we detect a bad time.
-    //   2) Relaunch with a bad clock again, this should not trigger an update,
-    //      because we avoid doing it too soon after a previous update (see
-    //      MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE).
-    //   3) Set the cadence to zero and relaunch with a bad clock again. This
-    //      should trigger an update, because with cadence being zero we won't
-    //      block an update.
-    //   4) Relaunch with a slightly bad clock (and cadence still set to zero).
-    //      This should not trigger an update, because the time is not out of
-    //      sync enough.
+    //   1) Relaunch with a bad clock, this should trigger an update.
+    //   2) Relaunch with a bad clock again, this should trigger an update too:
+    //      a device with no battery-backed RTC loses its clock on every power
+    //      cycle, and the budget gives us room to repair several in a row.
+    //   3) Same again, still within the budget, so still an update.
+    //   4) Relaunch with a slightly bad clock. This should not trigger an
+    //      update, because the time is not out of sync enough.
+    //
+    // test049a covers exhausting the budget, without relaunching the app.
     for (int i = 0; i < 4; ++i) {
-        if (i == 2) {
-            delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
-        }
-
         __weak __auto_type weakDelegate = delegate;
 
         XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
@@ -6729,7 +6723,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
                 XCTAssertNil(error);
                 [correctedTime fulfill];
             };
-            if (i == 1 || i == 3) {
+            if (i == 3) {
                 correctedTime.inverted = YES;
             }
             [resubscriptionReachableExpectation fulfill];
@@ -6757,6 +6751,101 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     }
 }
 
+// Tests that we only repair a device's clock BUDGET times per window, so a device that
+// cannot keep its clock does not have us updating it forever.
+- (void)test049a_TimeSynchronizationRepairIsRateLimited
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    // The mock clock is required, not just convenient: without it the app has to set the
+    // real system clock, which it cannot do, so every SetUTCTime fails with
+    // TimeNotAccepted. Starting at the Matter epoch also means the app's own priming report
+    // shows a lost clock, which costs no budget because no update is scheduled yet.
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    // Repairs are scheduled rather than performed inline, so without this every iteration
+    // would wait out MTR_DEVICE_TIME_UPDATE_SHORT_WAIT_TIME_SEC.
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    // Let the update that subscription establishment schedules finish first. It costs no
+    // budget (nothing is spent unless a long-delay update was already pending), and it
+    // leaves exactly that long-delay update pending, which is what a repair needs.
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegateForBaseline = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegateForBaseline;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    // UTCTime = null means the device has no time, which is a time synchronization loss.
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    // Injecting the report is enough to hit the repair path; no need to restart the app
+    // with a bad clock the way test049 does.
+    __weak __auto_type weakDelegate = delegate;
+    __auto_type injectLoss = ^(BOOL expectRepair, NSString * label) {
+        XCTestExpectation * repaired = [self expectationWithDescription:[NSString stringWithFormat:@"SetUTCTime for %@", label]];
+        repaired.inverted = !expectRepair;
+        XCTestExpectation * reportEnded = [self expectationWithDescription:[NSString stringWithFormat:@"Report end for %@", label]];
+        // Clear the handlers as they fire, so a later report cannot reach an expectation
+        // an earlier iteration is done with.
+        delegate.onUTCTimeSet = ^(NSError * error) {
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onUTCTimeSet = nil;
+            XCTAssertNil(error);
+            [repaired fulfill];
+        };
+        delegate.onReportEnd = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+            [reportEnded fulfill];
+        };
+
+        [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+        [self waitForExpectations:@[ reportEnded ] timeout:kTimeoutInSeconds];
+        // Short timeout for the inverted ones, so a passing test does not sit there
+        // proving a negative.
+        [self waitForExpectations:@[ repaired ] timeout:expectRepair ? 60 : 1];
+    };
+
+    // The whole loop runs well inside the window, so losses past the budget must not be
+    // repaired.
+    const int budget = 5; // MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_BUDGET
+    for (int i = 0; i < budget; ++i) {
+        injectLoss(YES, [NSString stringWithFormat:@"loss %d", i]);
+    }
+    injectLoss(NO, @"loss past budget");
+    injectLoss(NO, @"another loss past budget");
+
+    // Forcing the window to zero stands in for waiting it out; test049c covers it sliding
+    // entry by entry.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
+    injectLoss(YES, @"loss after window");
+}
+
 // Tests that time synchronization loss is detected even when the cached CurrentTime
 // value has not changed (i.e. when the device power-cycles repeatedly and always
 // reports null, matching what we already have in cache from the previous cycle).
@@ -6767,7 +6856,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
     __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
     delegate.skipSetupSubscription = YES;
-    delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(0);
 
     [device setDelegate:delegate queue:queue];
 
@@ -6821,6 +6910,104 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:NO];
     [self waitForExpectations:@[ nonSubscriptionReportEnd ] timeout:kTimeoutInSeconds];
     [self waitForExpectations:@[ noLossFromRead ] timeout:2];
+}
+
+// Tests that the window slides: budget frees up as individual repairs age out, rather
+// than the whole window being discarded at once.
+- (void)test049c_TimeSynchronizationRepairBudgetWindowSlides
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We never subscribe, so the node does not have to exist, and tearDown removes this
+    // device so we start with the whole budget unspent.
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    // Spend the whole budget (5): 3 repairs 50 minutes ago and 2 repairs 10 minutes ago.
+    NSDate * fiftyMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-50 * 60];
+    NSDate * tenMinutesAgo = [NSDate dateWithTimeIntervalSinceNow:-10 * 60];
+    for (int i = 0; i < 3; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:fiftyMinutesAgo];
+    }
+    for (int i = 0; i < 2; ++i) {
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:tenMinutesAgo];
+    }
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
+
+    // With a 30 minute window only the older 3 age out, so exactly 3 slots come back.
+    // Expiring the window all at once would give us 5, and dropping one entry per check
+    // would give us fewer.
+    delegate.timeSynchronizationLossDetectionCadenceOverride = @(30 * 60);
+    for (int i = 0; i < 3; ++i) {
+        XCTAssertTrue([device unitTestShouldDetectTimeSynchronizationLoss]);
+        [device unitTestNoteTimeSynchronizationRepairScheduledAt:[NSDate now]];
+    }
+    XCTAssertFalse([device unitTestShouldDetectTimeSynchronizationLoss]);
+}
+
+- (void)test049d_TimeSynchronizationLossSurvivesOverlappingReport
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[ @"--use_mock_clock", @"0" ]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    XCTestExpectation * baselineTimeSet = [self expectationWithDescription:@"Baseline SetUTCTime"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [baselineTimeSet fulfill];
+    };
+
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+
+    [self waitForExpectations:@[ baselineTimeSet ] timeout:60];
+
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    XCTestExpectation * repaired = [self expectationWithDescription:@"SetUTCTime for the loss"];
+    delegate.onUTCTimeSet = ^(NSError * error) {
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onUTCTimeSet = nil;
+        XCTAssertNil(error);
+        [repaired fulfill];
+    };
+
+    [controller syncRunOnWorkQueue:^{
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleAttributeReport:nullTimeSyncReport fromSubscription:YES];
+        }];
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleReportEnd];
+            [device _handleReportEnd];
+        }];
+    } error:nil];
+
+    [self waitForExpectations:@[ repaired ] timeout:60];
 }
 
 - (void)test050_readAttributePaths_withWildCardPath
@@ -7000,6 +7187,558 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
     XCTAssertTrue([output isEqual:inputValue]);
+}
+
+@end
+
+@interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
+@property (nonatomic, readonly) NSXPCInterface * exportedInterface;
+@property (atomic, copy, nullable) void (^onControllerConfiguration)(NSDictionary * controllerState);
+@end
+
+@implementation MTRInterestedPathsTestXPCServer
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+        SEL readAttributePaths = @selector(deviceController:nodeID:readAttributePaths:withReply:);
+        NSSet * readClasses = [[_exportedInterface classesForSelector:readAttributePaths argumentIndex:2 ofReply:NO] setByAddingObject:[MTRAttributeRequestPath class]];
+        [_exportedInterface setClasses:readClasses forSelector:readAttributePaths argumentIndex:2 ofReply:NO];
+    }
+    return self;
+}
+
+- (BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
+{
+    newConnection.exportedInterface = self.exportedInterface;
+    newConnection.exportedObject = self;
+    [newConnection activate];
+    return YES;
+}
+
+- (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState
+{
+    __auto_type onControllerConfiguration = self.onControllerConfiguration;
+    if (onControllerConfiguration) {
+        onControllerConfiguration(controllerState);
+    }
+}
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths withReply:(void (^)(NSArray<NSDictionary<NSString *, id> *> *))reply
+{
+    reply(@[]);
+}
+
+@end
+
+@interface MTRDeviceInterestedPathsTests : MTRTestCase
+@end
+
+@implementation MTRDeviceInterestedPathsTests {
+    BOOL _localTestStorageEnabledBeforeTest;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    _localTestStorageEnabledBeforeTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
+}
+
+- (void)tearDown
+{
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeTest;
+    [super tearDown];
+}
+
+- (MTRDeviceController *)createControllerWithPlainServer:(MTRInterestedPathsTestXPCServer *)server
+{
+    NSXPCListener * listener = [NSXPCListener anonymousListener];
+    listener.delegate = server;
+    [listener resume];
+
+    __auto_type * parameters = [[MTRXPCDeviceControllerParameters alloc] initWithXPCConnectionBlock:^NSXPCConnection * {
+        return [[NSXPCConnection alloc] initWithListenerEndpoint:listener.endpoint];
+    } uniqueIdentifier:[NSUUID UUID]];
+    NSError * error;
+    __auto_type * controller = [[MTRDeviceController alloc] initWithParameters:parameters error:&error];
+    XCTAssertNotNil(controller, @"%@", error);
+    return controller;
+}
+
+// Tests that the union covers every delegate, dedupes, and is nil while any delegate wants every path.
+- (void)test001_UnionAcrossDelegates
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], @[]);
+
+    __auto_type * attributePath1 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * attributePath2 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(112)];
+    __auto_type * eventPath1 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(11) eventID:@(111)];
+
+    __auto_type * delegate1 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate1.skipSetupSubscription = YES;
+    [device addDelegate:delegate1 queue:queue interestedPathsForAttributes:@[ attributePath1 ] interestedPathsForEvents:@[ eventPath1 ]];
+
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[ attributePath1 ]);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], @[ eventPath1 ]);
+
+    __auto_type * delegate2 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate2.skipSetupSubscription = YES;
+    [device addDelegate:delegate2 queue:queue interestedPathsForAttributes:@[ attributePath1, attributePath2 ] interestedPathsForEvents:nil];
+
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    __auto_type * attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+    XCTAssertTrue([attributeUnion containsObject:attributePath1]);
+    XCTAssertTrue([attributeUnion containsObject:attributePath2]);
+
+    __auto_type * delegate3 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate3.skipSetupSubscription = YES;
+    [device addDelegate:delegate3 queue:queue interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+
+    __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate4.skipSetupSubscription = YES;
+    [device addDelegate:delegate4 queue:queue];
+
+    XCTAssertNil([device unionOfInterestedPathsForAttributes]);
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    [device removeDelegate:delegate4];
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertEqual(attributeUnion.count, 2);
+    XCTAssertTrue([attributeUnion containsObject:attributePath1]);
+    XCTAssertTrue([attributeUnion containsObject:attributePath2]);
+    XCTAssertNil([device unionOfInterestedPathsForEvents]);
+
+    [device removeDelegate:delegate1];
+    [device removeDelegate:delegate2];
+    [device removeDelegate:delegate3];
+}
+
+// Tests that the union keeps endpoint IDs and paths of its own kind, narrows other paths to cluster paths, and drops anything else.
+- (void)test002_UnionElementTypes
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)];
+    __auto_type * attributePath = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)];
+    __auto_type * eventPath = [MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)];
+    NSNumber * endpointID = @(3);
+    NSObject * unknownObject = [[NSObject alloc] init];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate
+                               queue:queue
+        interestedPathsForAttributes:@[ clusterPath, attributePath, endpointID, eventPath, unknownObject ]
+            interestedPathsForEvents:@[ clusterPath, eventPath, endpointID, attributePath, unknownObject ]];
+
+    NSArray * expectedAttributes = @[
+        endpointID,
+        clusterPath,
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(44)],
+        attributePath,
+    ];
+    NSArray * expectedEvents = @[
+        endpointID,
+        clusterPath,
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(22)],
+        eventPath,
+    ];
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedAttributes);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], expectedEvents);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that a pending attribute-value waiter's paths are in the union, and leave it on satisfaction or release.
+- (void)test003_UnionIncludesAttributeValueWaiters
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegatePath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * waitedPath = [MTRAttributePath attributePathWithEndpointID:@(7) clusterID:@(77) attributeID:@(777)];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:queue interestedPathsForAttributes:@[ delegatePath ] interestedPathsForEvents:@[]];
+
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:waitedPath]);
+
+    XCTestExpectation * waiterCompleted = [self expectationWithDescription:@"attribute value waiter completed"];
+    __auto_type * waiter = [device waitForAttributeValues:@{ waitedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                  timeout:60
+                                                    queue:queue
+                                               completion:^(NSError * _Nullable waitError) {
+                                                   XCTAssertNil(waitError);
+                                                   [waiterCompleted fulfill];
+                                               }];
+    XCTAssertNotNil(waiter);
+
+    NSArray * attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertTrue([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    NSUInteger changesBeforeSatisfaction = [device unitTestInterestedPathsChangedCount];
+
+    [device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : waitedPath,
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ]
+                         fromSubscription:YES];
+
+    [self waitForExpectations:@[ waiterCompleted ] timeout:kTimeoutInSeconds];
+
+    XCTAssertGreaterThan([device unitTestInterestedPathsChangedCount], changesBeforeSatisfaction);
+
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertFalse([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    [waiter cancel];
+    [waiter cancel];
+    attributeUnion = [device unionOfInterestedPathsForAttributes];
+    XCTAssertFalse([attributeUnion containsObject:waitedPath]);
+    XCTAssertTrue([attributeUnion containsObject:delegatePath]);
+
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(8) clusterID:@(88) attributeID:@(888)];
+    NSUInteger changesBeforeRelease;
+    @autoreleasepool {
+        __auto_type * releasedWaiter = [device waitForAttributeValues:@{ releasedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                              timeout:60
+                                                                queue:queue
+                                                           completion:^(NSError * _Nullable waitError) {}];
+        XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+        changesBeforeRelease = [device unitTestInterestedPathsChangedCount];
+        releasedWaiter = nil;
+    }
+    XCTAssertGreaterThan([device unitTestInterestedPathsChangedCount], changesBeforeRelease);
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that the union's order depends only on its contents, not on the order delegates added them.
+- (void)test004_UnionOrderIsIndependentOfInsertionOrder
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+
+    __auto_type * cluster = [MTRClusterPath clusterPathWithEndpointID:@(10) clusterID:@(6)];
+    NSArray * expectedAttributes = @[
+        @(2),
+        cluster,
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(2)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(10)],
+        [MTRAttributePath attributePathWithEndpointID:@(10) clusterID:@(6) attributeID:@(0)],
+    ];
+    NSArray * expectedEvents = @[
+        @(2),
+        cluster,
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(6) eventID:@(2)],
+        [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(6) eventID:@(10)],
+    ];
+
+    NSMutableArray * delegates = [NSMutableArray array];
+    for (NSNumber * nodeID in @[ @(kDeviceId1), @(kDeviceId2) ]) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+        BOOL reversed = [nodeID isEqual:@(kDeviceId2)];
+        NSArray * attributes = reversed ? expectedAttributes.reverseObjectEnumerator.allObjects : expectedAttributes;
+        NSArray * events = reversed ? expectedEvents.reverseObjectEnumerator.allObjects : expectedEvents;
+        for (NSUInteger i = 0; i < attributes.count; i++) {
+            __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+            delegate.skipSetupSubscription = YES;
+            [device addDelegate:delegate
+                                       queue:queue
+                interestedPathsForAttributes:@[ attributes[i] ]
+                    interestedPathsForEvents:i < events.count ? @[ events[i] ] : @[]];
+            [delegates addObject:delegate];
+        }
+
+        XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedAttributes);
+        XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], expectedEvents);
+
+        for (id delegate in delegates) {
+            [device removeDelegate:delegate];
+        }
+        [delegates removeAllObjects];
+    }
+}
+
+// Tests that the change count moves once per waiter addition and removal, and not for a waiter that was already removed.
+- (void)test005_WaiterChangesInterestedPathsOnce
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:queue interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    NSDictionary * expectedValue = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) };
+
+    __auto_type * cancelledPath = [MTRAttributePath attributePathWithEndpointID:@(9) clusterID:@(99) attributeID:@(999)];
+    XCTestExpectation * cancelledCompleted = [self expectationWithDescription:@"cancelled waiter completed"];
+    NSUInteger changes = [device unitTestInterestedPathsChangedCount];
+    __auto_type * cancelledWaiter = [device waitForAttributeValues:@{ cancelledPath : expectedValue }
+                                                           timeout:60
+                                                             queue:queue
+                                                        completion:^(NSError * _Nullable waitError) {
+                                                            XCTAssertEqual(waitError.code, MTRErrorCodeCancelled);
+                                                            [cancelledCompleted fulfill];
+                                                        }];
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:cancelledPath]);
+
+    changes = [device unitTestInterestedPathsChangedCount];
+    [cancelledWaiter cancel];
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertFalse([[device unionOfInterestedPathsForAttributes] containsObject:cancelledPath]);
+    [cancelledWaiter cancel];
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    [self waitForExpectations:@[ cancelledCompleted ] timeout:kTimeoutInSeconds];
+
+    __auto_type * satisfiedPath = [MTRAttributePath attributePathWithEndpointID:@(5) clusterID:@(55) attributeID:@(555)];
+    XCTestExpectation * satisfiedCompleted = [self expectationWithDescription:@"satisfied waiter completed"];
+    @autoreleasepool {
+        __auto_type * satisfiedWaiter = [device waitForAttributeValues:@{ satisfiedPath : expectedValue }
+                                                               timeout:60
+                                                                 queue:queue
+                                                            completion:^(NSError * _Nullable waitError) {
+                                                                XCTAssertNil(waitError);
+                                                                [satisfiedCompleted fulfill];
+                                                            }];
+        changes = [device unitTestInterestedPathsChangedCount];
+        [device unitTestInjectAttributeReport:@[ @{ MTRAttributePathKey : satisfiedPath, MTRDataKey : expectedValue } ] fromSubscription:YES];
+        [self waitForExpectations:@[ satisfiedCompleted ] timeout:kTimeoutInSeconds];
+        [device unitTestSyncRunOnDeviceQueue:^ {}];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+
+        [satisfiedWaiter cancel];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+        satisfiedWaiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that a delegate released without removeDelegate: changes the interested paths once the device next calls its delegates.
+- (void)test006_ReleasedDelegateChangesInterestedPaths
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * keptPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(11) attributeID:@(111)];
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)];
+
+    __auto_type * keptDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    keptDelegate.skipSetupSubscription = YES;
+    [device addDelegate:keptDelegate queue:queue interestedPathsForAttributes:@[ keptPath ] interestedPathsForEvents:@[]];
+
+    NSUInteger changes = [device unitTestInterestedPathsChangedCount];
+    __weak id weakReleasedDelegate;
+    @autoreleasepool {
+        __auto_type * releasedDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+        releasedDelegate.skipSetupSubscription = YES;
+        [device addDelegate:releasedDelegate queue:queue interestedPathsForAttributes:@[ releasedPath ] interestedPathsForEvents:@[]];
+        weakReleasedDelegate = releasedDelegate;
+    }
+    [self waitForExpectations:@[ [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        return weakReleasedDelegate == nil;
+    }]
+                                           evaluatedWithObject:self
+                                                       handler:nil] ]
+                      timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * reportReceived = [self expectationWithDescription:@"kept delegate received report"];
+    keptDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [reportReceived fulfill];
+    };
+    [device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : keptPath,
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ]
+                         fromSubscription:YES];
+    [self waitForExpectations:@[ reportReceived ] timeout:kTimeoutInSeconds];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[ keptPath ]);
+
+    [device removeDelegate:keptDelegate];
+}
+
+// Tests that a server exporting the plain MTRXPCServerProtocol interface receives the interested paths, and their updates for a waiter.
+- (void)test007_RegistrationDecodesWithPlainServerInterface
+{
+    __auto_type * server = [[MTRInterestedPathsTestXPCServer alloc] init];
+    NSSet * allowedClasses = [server.exportedInterface classesForSelector:@selector(deviceController:updateControllerConfiguration:) argumentIndex:1 ofReply:NO];
+    XCTAssertFalse([allowedClasses containsObject:[MTRClusterPath class]]);
+
+    NSDictionary * expectedNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId1),
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[
+            @(3),
+            @{
+                MTRDeviceControllerRegistrationInterestedPathEndpointIDKey : @(1),
+                MTRDeviceControllerRegistrationInterestedPathClusterIDKey : @(11),
+            },
+            @{
+                MTRDeviceControllerRegistrationInterestedPathEndpointIDKey : @(2),
+                MTRDeviceControllerRegistrationInterestedPathClusterIDKey : @(22),
+                MTRDeviceControllerRegistrationInterestedPathAttributeIDKey : @(222),
+            },
+        ],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[ @{
+            MTRDeviceControllerRegistrationInterestedPathEndpointIDKey : @(4),
+            MTRDeviceControllerRegistrationInterestedPathClusterIDKey : @(44),
+            MTRDeviceControllerRegistrationInterestedPathEventIDKey : @(444),
+        } ],
+    };
+    XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with interested paths received"];
+    registrationReceived.assertForOverFulfill = NO;
+    server.onControllerConfiguration = ^(NSDictionary * controllerState) {
+        if ([controllerState[MTRDeviceControllerRegistrationNodeIDsKey] containsObject:expectedNode]) {
+            [registrationReceived fulfill];
+        }
+    };
+
+    __auto_type * controller = [self createControllerWithPlainServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[ [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)], [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)], @(3) ]
+            interestedPathsForEvents:@[ [MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)] ]];
+
+    [self waitForExpectations:@[ registrationReceived ] timeout:kTimeoutInSeconds];
+
+    NSDictionary * expectedWaiterNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId2),
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @{
+            MTRDeviceControllerRegistrationInterestedPathEndpointIDKey : @(7),
+            MTRDeviceControllerRegistrationInterestedPathClusterIDKey : @(77),
+            MTRDeviceControllerRegistrationInterestedPathAttributeIDKey : @(777),
+        } ],
+        MTRDeviceControllerRegistrationInterestedPathsForEventsKey : @[],
+    };
+    XCTestExpectation * waiterRegistered = [self expectationWithDescription:@"registration with waiter-only node received"];
+    waiterRegistered.assertForOverFulfill = NO;
+    server.onControllerConfiguration = ^(NSDictionary * controllerState) {
+        if ([controllerState[MTRDeviceControllerRegistrationNodeIDsKey] containsObject:expectedWaiterNode]) {
+            [waiterRegistered fulfill];
+        }
+    };
+
+    __auto_type * waiterDevice = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * waitedPath = [MTRAttributePath attributePathWithEndpointID:@(7) clusterID:@(77) attributeID:@(777)];
+    __auto_type * waiter = [waiterDevice waitForAttributeValues:@{ waitedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                        timeout:60
+                                                          queue:dispatch_get_main_queue()
+                                                     completion:^(NSError * _Nullable waitError) {}];
+    [self waitForExpectations:@[ waiterRegistered ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * waiterUnregistered = [self expectationWithDescription:@"registration without waiter-only node received"];
+    waiterUnregistered.assertForOverFulfill = NO;
+    server.onControllerConfiguration = ^(NSDictionary * controllerState) {
+        NSArray * nodes = controllerState[MTRDeviceControllerRegistrationNodeIDsKey];
+        if (nodes.count == 1 && [nodes containsObject:expectedNode]) {
+            [waiterUnregistered fulfill];
+        }
+    };
+    [waiter cancel];
+    [self waitForExpectations:@[ waiterUnregistered ] timeout:kTimeoutInSeconds];
+
+    server.onControllerConfiguration = nil;
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+// Tests that invalidating a device with a pending waiter changes the interested paths once, and without one does not.
+- (void)test008_InvalidateWithWaiterChangesInterestedPaths
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * idleDevice = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+
+    __auto_type * waitedPath = [MTRAttributePath attributePathWithEndpointID:@(6) clusterID:@(66) attributeID:@(666)];
+    XCTestExpectation * waiterCancelled = [self expectationWithDescription:@"waiter cancelled"];
+    __auto_type * waiter = [device waitForAttributeValues:@{ waitedPath : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }
+                                                  timeout:60
+                                                    queue:dispatch_get_main_queue()
+                                               completion:^(NSError * _Nullable waitError) {
+                                                   XCTAssertEqual(waitError.code, MTRErrorCodeCancelled);
+                                                   [waiterCancelled fulfill];
+                                               }];
+    XCTAssertNotNil(waiter);
+
+    NSUInteger changes = [device unitTestInterestedPathsChangedCount];
+    NSUInteger idleChanges = [idleDevice unitTestInterestedPathsChangedCount];
+    [controller removeDevice:device];
+    [controller removeDevice:idleDevice];
+    [self waitForExpectations:@[ waiterCancelled ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqual([idleDevice unitTestInterestedPathsChangedCount], idleChanges);
+}
+
+// Tests that a registration leaves out the interested-paths key of any kind some delegate wants every path of.
+- (void)test009_RegistrationOmitsKeyForEveryPath
+{
+    __auto_type * server = [[MTRInterestedPathsTestXPCServer alloc] init];
+    NSDictionary * expectedAttributesOnlyNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId1),
+        MTRDeviceControllerRegistrationInterestedPathsForAttributesKey : @[ @(1) ],
+    };
+    NSDictionary * expectedEveryPathNode = @{
+        MTRDeviceControllerRegistrationNodeIDKey : @(kDeviceId2),
+    };
+    XCTestExpectation * registrationReceived = [self expectationWithDescription:@"registration with both nodes received"];
+    registrationReceived.assertForOverFulfill = NO;
+    server.onControllerConfiguration = ^(NSDictionary * controllerState) {
+        NSArray * nodes = controllerState[MTRDeviceControllerRegistrationNodeIDsKey];
+        if ([nodes containsObject:expectedAttributesOnlyNode] && [nodes containsObject:expectedEveryPathNode]) {
+            [registrationReceived fulfill];
+        }
+    };
+
+    __auto_type * controller = [self createControllerWithPlainServer:server];
+    __auto_type * attributesOnlyDevice = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * everyPathDevice = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * attributesOnlyDelegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * everyPathDelegate = [[MTRDeviceTestDelegate alloc] init];
+    [attributesOnlyDevice addDelegate:attributesOnlyDelegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[ @(1) ] interestedPathsForEvents:nil];
+    [everyPathDevice addDelegate:everyPathDelegate queue:dispatch_get_main_queue()];
+
+    [self waitForExpectations:@[ registrationReceived ] timeout:kTimeoutInSeconds];
+
+    server.onControllerConfiguration = nil;
+    [attributesOnlyDevice removeDelegate:attributesOnlyDelegate];
+    [everyPathDevice removeDelegate:everyPathDelegate];
+    [controller shutdown];
 }
 
 @end
