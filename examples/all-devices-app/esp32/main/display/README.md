@@ -363,16 +363,16 @@ freed widget. Because both unregistration and event dispatch execute under
 `InitDisplayDataModelListener()` and turns the commissioning session into a
 status line under the manual pairing code:
 
-| Event                                       | Status line                                   |
-| :------------------------------------------ | :-------------------------------------------- |
-| `kCHIPoBLEConnectionEstablished`            | Controller connected over BLE                 |
-| `kSecureSessionEstablished` (PASE)          | Passcode verified, secure session open        |
-| `kOperationalNetworkEnabled`                | Credentials received, joining Wi-Fi           |
-| `kWiFiConnectivityChange` (established)     | Joined Wi-Fi, waiting for the controller      |
-| `kSecureSessionEstablished` (CASE)          | Operational session established               |
-| `kCommissioningComplete`                    | Commissioning successful (green)              |
-| `kFailSafeTimerExpired`                     | Commissioning failed: timed out (red)         |
-| `kCHIPoBLEConnectionClosed` before complete | Commissioning failed: controller disconnected |
+| Event                                          | Status line                                   |
+| :--------------------------------------------- | :-------------------------------------------- |
+| `kCHIPoBLEConnectionEstablished`               | Controller connected over BLE                 |
+| `kSecureSessionEstablished` (PASE)             | Passcode verified, secure session open        |
+| `kOperationalNetworkEnabled`                   | Credentials received, joining Wi-Fi           |
+| `kWiFiConnectivityChange` (established)        | Joined Wi-Fi, waiting for the controller      |
+| `kSecureSessionEstablished` (CASE)             | Operational session established               |
+| `kCommissioningComplete`                       | Commissioning successful (green)              |
+| `kFailSafeTimerExpired`                        | Commissioning failed: timed out (red)         |
+| `kCHIPoBLEConnectionClosed` before credentials | Commissioning failed: controller disconnected |
 
 Before any of these the line reads "Waiting for a controller", or "Commissioned"
 when the node already has a fabric. A commissioned node shows a notice in place

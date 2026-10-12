@@ -15,11 +15,11 @@ Boards with a display get the UI described in
 [main/display/README.md](main/display/README.md): a button-driven menu on the
 M5Stack Basic/Gray and a touch-driven LVGL UI on the others.
 
-| Board                   | SoC       | Defaults file                       |
-| :---------------------- | :-------- | :---------------------------------- |
-| M5Stack Basic/Gray      | ESP32     | `sdkconfig_m5stack.defaults`        |
-| M5Stack CoreS3          | ESP32-S3  | `sdkconfig_m5stack_cores3.defaults` |
-| ESP-Mosaico v1.0 / v1.2 | ESP32-S31 | `sdkconfig_mosaico.defaults`        |
+| Board              | SoC       | Defaults file                       |
+| :----------------- | :-------- | :---------------------------------- |
+| M5Stack Basic/Gray | ESP32     | `sdkconfig_m5stack.defaults`        |
+| M5Stack CoreS3     | ESP32-S3  | `sdkconfig_m5stack_cores3.defaults` |
+| ESP-Mosaico        | ESP32-S31 | `sdkconfig_mosaico.defaults`        |
 
 ### ESP-Mosaico (ESP32-S31)
 
