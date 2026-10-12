@@ -1179,7 +1179,7 @@ class TC_JFDS_2_5(MatterTestCommissioner):
         # Note: epoch key bytes (epochKey0-2) are always returned as Null by KeySetRead per spec
         # (they are write-only). th_keyset_epoch was stored at setup time.
 
-        # Step 33: TH reads NodeKeySetList and verifies Status Pending
+        # Step 33: TH reads NodeKeySetList and verifies Status Committed
         self.step(33, "TH reads NodeKeySetList attribute from DUT for NodeId=th_node_id and KeySetID=th_keyset_id")
 
         response = await self.devCtrlEcoA.ReadAttribute(
@@ -1197,8 +1197,8 @@ class TC_JFDS_2_5(MatterTestCommissioner):
         asserts.assert_is_not_none(th2_keyset_entry, "NodeKeySetList should contain entry for th_node_id")
         self._assert_enum_equal(
             th2_keyset_entry.statusEntry.state,
-            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kPending,
-            "StatusEntry should be Pending")
+            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kCommitted,
+            "StatusEntry should be Committed")
 
         # Step 34: TH reads KeySetList from TH2 and verifies new EpochKey2
         self.step(34, "TH reads KeySetList from the given endpoint on TH2")
