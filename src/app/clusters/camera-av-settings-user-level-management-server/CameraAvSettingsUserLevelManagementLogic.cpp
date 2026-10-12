@@ -136,6 +136,11 @@ void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeI
     }
 }
 
+/**
+ * @brief Persist the supplied mechanical position without changing the active position or notifying subscribers.
+ * @param mptzPosition The position to encode in the attribute's persistent record.
+ * @return CHIP_NO_ERROR on success, or a missing-provider, encoding, or storage error.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
     const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
@@ -152,6 +157,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
     return mAttributePersistenceProvider->WriteValue(path, bufferSpan);
 }
 
+/**
+ * @brief Decode the stored mechanical position without applying it to the active position.
+ * @param mptzPosition Receives the decoded position on success.
+ * @return CHIP_NO_ERROR on success, or a missing-provider, storage, or decoding error.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
@@ -729,6 +739,13 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
+/**
+ * @brief Validate supported axes and ask the delegate to move to an absolute mechanical position.
+ * @param commandData The requested optional pan, tilt, and zoom values; at least one must be supplied.
+ * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range value,
+ *         Busy when movement is unavailable, or the delegate's status.
+ * Success records the target and starts movement; the completion callback applies the position.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData)
@@ -824,6 +841,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Validate relative mechanical movements, clamp their targets to axis limits, and call the delegate.
+ * @param commandData The optional axis deltas; at least one supported axis must be supplied.
+ * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range delta,
+ *         Busy when movement is unavailable, or the delegate's status.
+ * Success records the clamped targets; the completion callback applies the position.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRelativeMove(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData)

@@ -72,6 +72,10 @@ public:
         return Status::Success;
     }
 
+    /**
+     * @brief Accept relative mechanical movement without invoking completion or changing the test's stored position.
+     * @return Success; the test drives the completion callback explicitly.
+     */
     Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback)
     {
@@ -114,6 +118,11 @@ public:
      */
     Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) { return Status::Success; }
 
+    /**
+     * @brief Accept relative digital movement while leaving the supplied viewport unchanged.
+     * @param aViewport The output viewport, left unchanged because this mock has no camera-stream geometry.
+     * @return Success so the test can inspect the cluster's range and stream-ID handling.
+     */
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
                             Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport)
     {
@@ -289,6 +298,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
+/**
+ * @brief Verify relative mechanical movement enters the moving state and updates the position on completion.
+ * Check the resulting axis values against the initial values plus the requested deltas, and verify the return to idle.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -1242,6 +1255,10 @@ struct TestMigrateCameraAvSettingsUserLevelManagementMigration : public ::testin
     bool mServerStarted                                         = false;
 };
 
+/**
+ * @brief Verify a valid mechanical position migrates from legacy storage and is restored during startup.
+ * Read back all three axes to check that the migrated values reach the active position.
+ */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPositionTlv)
 {
     Structs::MPTZStruct::Type position;
