@@ -50,12 +50,12 @@ public:
      * called by the interaction model at the appropriate times.
      *
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
+     * @param aCluster                          The ID and revision of the ResourceMonitoring aliased cluster to be instantiated.
      * @param aFeatureMap                       The feature map of the cluster.
      * @param aDegradationDirection             The degradation direction of the cluster.
      * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
      */
-    ResourceMonitoringCluster(EndpointId aEndpointId, ClusterId aClusterId,
+    ResourceMonitoringCluster(EndpointId aEndpointId, ResourceMonitoring::ClusterEntry aCluster,
                               const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
                               OptionalAttributeSet optionalAttributeSet,
                               ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
@@ -149,6 +149,7 @@ private:
 
     bool mResetConditionCommandSupported{ false };
 
+    const uint32_t mClusterRevision;
     const BitFlags<ResourceMonitoring::Feature> mEnabledFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
 };

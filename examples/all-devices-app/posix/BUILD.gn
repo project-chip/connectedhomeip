@@ -24,23 +24,25 @@ if (chip_enable_pw_rpc) {
   import("$dir_pw_build/target_types.gni")
 }
 
-executable("all-devices-app") {
-  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+config("posix-includes") {
+  include_dirs = [
+    ".",
+    "include",
+    "${chip_root}/examples/common",
+  ]
+}
 
+source_set("device-instances") {
   sources = [
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/OOBAccessorHook.h",
     "${chip_root}/examples/all-devices-app/posix/named_pipe/Hook.h",
-    "PosixAudioManager.cpp",
-    "PosixChime.cpp",
-    "PosixSpeaker.cpp",
-    "include/CHIPProjectAppConfig.h",
-    "include/DeviceFactoryPlatformOverride.h",
-    "main.cpp",
+    "DeviceInstances.cpp",
+    "DeviceInstances.h",
+    "PosixDeviceFactory.h",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/identify:LoggingIdentifyDelegate",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor",
@@ -59,6 +61,8 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dimmable-plug-in-unit:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light",
@@ -103,23 +107,52 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-dac-provider",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
-    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
-    "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    "${chip_root}/examples/all-devices-app/posix/app_options:device-type-parser",
     "${chip_root}/examples/all-devices-app/posix/named_pipe",
-    "${chip_root}/examples/common/tracing:commandline",
-    "${chip_root}/examples/platform/linux:app-main-loop",
-    "${chip_root}/examples/platform/linux:commissionable-init",
-    "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
-    "${chip_root}/examples/platform/linux:named-pipes",
     "${chip_root}/src/app/persistence",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+
+  if (chip_device_platform == "darwin") {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
+  } else {
+    public_deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
+  }
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
+  }
+
+  public_configs = [ ":posix-includes" ]
+}
+
+executable("all-devices-app") {
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+
+  sources = [
+    "PosixAudioManager.cpp",
+    "PosixChime.cpp",
+    "PosixSpeaker.cpp",
+    "include/CHIPProjectAppConfig.h",
+    "include/DeviceFactoryPlatformOverride.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    ":device-instances",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/identify:LoggingIdentifyDelegate",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-dac-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-info-provider",
+    "${chip_root}/examples/all-devices-app/all-devices-common/providers:all-devices-example-device-instance-info-provider",
+    "${chip_root}/examples/all-devices-app/posix/app_options:app-options",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/examples/platform/linux:app-main-loop",
+    "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
     "${chip_root}/third_party/jsoncpp",
     "${chip_root}/third_party/miniaudio:miniaudio",
-    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
   if (chip_enable_transport_trace) {
@@ -135,10 +168,7 @@ executable("all-devices-app") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
   }
 
-  include_dirs = [
-    "include",
-    "${chip_root}/examples/common",
-  ]
+  configs += [ ":posix-includes" ]
 
   if (chip_enable_pw_rpc) {
     defines += [
