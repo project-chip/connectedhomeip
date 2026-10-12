@@ -152,6 +152,7 @@ void PowerTopologyCluster::Shutdown(ClusterShutdownType shutdownType)
 CHIP_ERROR PowerTopologyCluster::SnapshotNodesForFabric(FabricIndex fabricIndex)
 {
     ReleaseNodeSnapshot();
+    mNodeSnapshotFabric = fabricIndex;
 
     const size_t count = mCircuitNodeStorage->CountForFabric(fabricIndex);
     if (count == 0)
@@ -182,8 +183,9 @@ CHIP_ERROR PowerTopologyCluster::SnapshotNodesForFabric(FabricIndex fabricIndex)
 void PowerTopologyCluster::ReleaseNodeSnapshot()
 {
     mNodeSnapshot.Free();
-    mNodeSnapshotCount = 0;
-    mNodeSnapshotValid = false;
+    mNodeSnapshotCount  = 0;
+    mNodeSnapshotValid  = false;
+    mNodeSnapshotFabric = kUndefinedFabricIndex;
 }
 
 void PowerTopologyCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
@@ -239,6 +241,15 @@ void PowerTopologyCluster::ListAttributeWriteNotification(const ConcreteAttribut
 void PowerTopologyCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     VerifyOrReturn(mCircuitNodeStorage != nullptr);
+
+    // A list write still in progress for this fabric must not restore its entries after they are
+    // removed here. A snapshot held for another fabric stays, so that fabric's write can still be
+    // rolled back.
+    if (mNodeSnapshotFabric == fabricIndex)
+    {
+        ReleaseNodeSnapshot();
+    }
+
     if (mCircuitNodeStorage->CountForFabric(fabricIndex) == 0)
     {
         return;
