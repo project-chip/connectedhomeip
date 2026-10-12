@@ -59,6 +59,8 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDataModelProvider = apProvider;
 
     mDelegate = apWriteHandlerDelegate;
+    // A new transaction must not inherit flags from a previous chunked write.
+    mStateFlags.ClearAll();
     MoveToState(State::Initialized);
 
     mProcessingAttributePath.ClearValue();
