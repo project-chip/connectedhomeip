@@ -29,6 +29,7 @@
 #include <clusters/CameraAvStreamManagement/ClusterId.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
 #include <clusters/CameraAvStreamManagement/Metadata.h>
+#include <clusters/shared/EnumsCheck.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -1284,6 +1285,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightEnabled(bool aStatusLi
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness)
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(aStatusLightBrightness) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mStatusLightBrightness != aStatusLightBrightness)
     {
         mStatusLightBrightness = aStatusLightBrightness;
@@ -1619,9 +1622,12 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
     {
         uint8_t statusLightBrightness = to_underlying(mStatusLightBrightness);
         const uint8_t defaultValue    = statusLightBrightness;
+        // Ignore invalid values left by older firmware and retain the initialized default.
         if (attrPersistence.LoadNativeEndianValue<uint8_t>(
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id),
-                statusLightBrightness, defaultValue))
+                statusLightBrightness, defaultValue) &&
+            EnsureKnownEnumValue(static_cast<Globals::ThreeLevelAutoEnum>(statusLightBrightness)) !=
+                Globals::ThreeLevelAutoEnum::kUnknownEnumValue)
         {
             mStatusLightBrightness = static_cast<Globals::ThreeLevelAutoEnum>(statusLightBrightness);
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded StatusLightBrightness as %d", mPath.mEndpointId,
@@ -1629,7 +1635,7 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
         }
         else
         {
-            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StatusLightBrightness from the KVS. Defaulting to %d",
+            ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: No valid StatusLightBrightness in the KVS. Defaulting to %d",
                           mPath.mEndpointId, to_underlying(mStatusLightBrightness));
         }
     }
