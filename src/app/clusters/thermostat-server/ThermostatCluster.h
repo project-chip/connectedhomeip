@@ -355,7 +355,7 @@ public:
             {
                 if constexpr (kHasSuggestions)
                 {
-                    // Per spec § 4.3.11.50, removing a preset that is referenced by a ThermostatSuggestions entry
+                    // Per spec, removing a preset that is referenced by a ThermostatSuggestions entry
                     // or by CurrentThermostatSuggestion must cascade. This is best-effort since the Presets commit
                     // above has already taken effect.
                     if (*status == Protocols::InteractionModel::Status::Success && attributeId == Attributes::Presets::Id)
