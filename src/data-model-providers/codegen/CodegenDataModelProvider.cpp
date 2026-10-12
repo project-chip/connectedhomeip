@@ -276,8 +276,6 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
     VerifyOrReturnValue(endpoint != nullptr, CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
     // We build the cluster list by merging two lists:
     //   - mRegistry items from ServerClusterInterfaces
@@ -320,6 +318,9 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     }
 
     ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+
+    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 

@@ -15,9 +15,16 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 assert(chip_build_controller_dynamic_server)
+
+source_set("dynamic-model") {
+  sources = codegen_data_model_SOURCES
+  public_deps = codegen_data_model_PUBLIC_DEPS
+  defines = [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
+}
 
 chip_test_suite("tests") {
   output_name = "libDynamicDispatcherTests"
@@ -25,8 +32,11 @@ chip_test_suite("tests") {
   test_sources = [ "TestDynamicDispatcher.cpp" ]
 
   public_deps = [
+    ":dynamic-model",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/protocols",
   ]
 

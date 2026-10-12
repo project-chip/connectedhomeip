@@ -790,7 +790,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointHidesRegisteredCluster)
     EXPECT_EQ(value, 1234u);
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, EndsListWriteAfterEndpointRemoved)
+TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointDoesNotReceiveListWriteEnd)
 {
     MockServerCluster cluster({ { 1, 10 }, { 2, 10 } }, 1, {});
     ServerClusterRegistration registration(cluster);
@@ -817,11 +817,14 @@ TEST_F(TestCodeDrivenDataModelProvider, EndsListWriteAfterEndpointRemoved)
         mProvider.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
         EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
 
-        // The cluster is still active on endpoint 2 and must finish its pending write on endpoint 1.
+        // Endpoint 2 keeps the cluster active, but notifications for the removed endpoint must still be suppressed.
         mProvider.ListAttributeWriteNotification(attributePath, endOperation, kTestFabricIndex);
-        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount + 1u);
-        EXPECT_EQ(*cluster.mLastListWriteOpType, endOperation);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
+        ASSERT_TRUE(cluster.mLastListWriteOpType.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpType, ListWriteOperation::kListWriteBegin);
+        ASSERT_TRUE(cluster.mLastListWriteOpPath.has_value());
         EXPECT_EQ(*cluster.mLastListWriteOpPath, attributePath);
+        ASSERT_TRUE(cluster.mLastListWriteOpAccessingFabric.has_value());
         EXPECT_EQ(*cluster.mLastListWriteOpAccessingFabric, kTestFabricIndex);
 
         ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations[0]), CHIP_NO_ERROR);
@@ -1214,4 +1217,67 @@ TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredE
     EXPECT_EQ(clusterWithoutRegisteredEndpoint.startupCallCount, 0);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, UnstartedClusterDoesNotReceiveListWriteNotifications)
+{
+    MockServerCluster cluster(ConcreteClusterPath(1, 10), 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    ASSERT_EQ(cluster.startupCallCount, 0);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
+    for (auto operation : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        mProvider.ListAttributeWriteNotification(path, operation, kTestFabricIndex);
+    }
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, ShutDownClusterDoesNotReceiveListWriteEnd)
+{
+    MockServerCluster cluster(ConcreteClusterPath(1, 10), 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.startupCallCount, 1);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    ASSERT_EQ(cluster.mListWriteNotificationCount, 1u);
+    ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.shutdownCallCount, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteFailure, kTestFabricIndex);
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 1u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointDoesNotReceiveUnpairedListWriteEnd)
+{
+    MockServerCluster cluster({ { 1, 10 }, { 2, 10 } }, 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    for (const auto & entry : { endpointEntry1, endpointEntry2 })
+    {
+        mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+        mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), entry));
+        ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.shutdownCallCount, 0);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    ASSERT_EQ(cluster.mListWriteNotificationCount, 0u);
+    for (auto operation : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        mProvider.ListAttributeWriteNotification(path, operation, kTestFabricIndex);
+    }
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
 }

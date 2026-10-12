@@ -27,11 +27,6 @@
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-static_assert(kWebRTCRequesterDynamicEndpointId == chip::app::dynamic_server::kWebRTCRequestorDynamicEndpointId,
-              "WebRTC requestor endpoint must match dynamic server metadata");
-#endif
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -55,26 +50,25 @@ void WebRTCTransportRequestorManager::Init()
     Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
 
     mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, *this);
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    CHIP_ERROR err = app::dynamic_server::RegisterServerCluster(mWebRTCRegisteredServerCluster.Registration());
+#else
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+#endif
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
                      kWebRTCRequesterDynamicEndpointId, err.Format());
     }
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    else
-    {
-        app::dynamic_server::SetWebRTCRequestorEndpointEnabled(true);
-    }
-#endif
 }
 
 void WebRTCTransportRequestorManager::Shutdown()
 {
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-    app::dynamic_server::SetWebRTCRequestorEndpointEnabled(false);
-#endif
+    CHIP_ERROR err = app::dynamic_server::UnregisterServerCluster(mWebRTCRegisteredServerCluster.Cluster());
+#else
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRegisteredServerCluster.Cluster());
+#endif
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());

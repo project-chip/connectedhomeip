@@ -2901,7 +2901,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRequireVisibleEndpoint)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, EndsListWriteAfterEndpointHidden)
+TEST_F(TestCodegenModelViaMocks, HiddenEndpointDoesNotReceiveListWriteEnd)
 {
     auto & model = CodegenDataModelProvider::Instance();
     const ConcreteClusterPath clusterPath(kMockEndpoint1, MockClusterId(10));
@@ -2927,10 +2927,11 @@ TEST_F(TestCodegenModelViaMocks, EndsListWriteAfterEndpointHidden)
         model.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
         EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
 
-        // End notifications must still reach the receiver of Begin for rollback and cleanup.
+        // A retained registration must not bypass endpoint visibility for completion notifications.
         model.ListAttributeWriteNotification(attributePath, endOperation, kTestFabricIndex);
-        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount + 1u);
-        EXPECT_EQ(*cluster.mLastListWriteOpType, endOperation);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
+        ASSERT_TRUE(cluster.mLastListWriteOpType.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpType, ListWriteOperation::kListWriteBegin);
     }
 }
 
@@ -3149,3 +3150,25 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     EXPECT_TRUE(span2.data_equal("shortUniqueId"_span));
 }
 #endif
+
+TEST_F(TestCodegenModelViaMocks, HiddenEndpointDoesNotReceiveUnpairedListWriteEnd)
+{
+    auto & model = CodegenDataModelProvider::Instance();
+    const ConcreteClusterPath clusterPath(kMockEndpoint1, MockClusterId(10));
+    const ConcreteAttributePath path(clusterPath.mEndpointId, clusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+    FakeDefaultServerCluster cluster(clusterPath);
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+    auto unregister = ScopeExit([&] { EXPECT_SUCCESS(model.Registry().Unregister(&cluster)); });
+    const MockNodeConfig noEndpoints({});
+    auto restoreConfig = ScopeExit([&] { SetMockNodeConfig(gTestNodeConfig); });
+    SetMockNodeConfig(noEndpoints);
+
+    model.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    ASSERT_EQ(cluster.mListWriteNotificationCount, 0u);
+    for (auto operation : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        model.ListAttributeWriteNotification(path, operation, kTestFabricIndex);
+    }
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
+}

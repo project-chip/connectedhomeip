@@ -157,9 +157,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
                                                               DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
-    // A pending list write still needs its End notification for rollback and cleanup after its endpoint is disabled.
-    VerifyOrReturn(opType != DataModel::ListWriteOperation::kListWriteBegin ||
-                   emberAfFindEndpointType(aPath.mEndpointId) != nullptr);
+    VerifyOrReturn(emberAfFindEndpointType(aPath.mEndpointId) != nullptr);
 
     // NOTE: for backwards compatibility, we process AAI logic BEFORE Server Cluster Interface
     //       so that AttributeAccessInterface logic works if one was installed before Server Cluster Interface

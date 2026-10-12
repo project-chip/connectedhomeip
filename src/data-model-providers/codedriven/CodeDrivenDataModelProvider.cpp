@@ -125,10 +125,7 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
                                                                  DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
-    // End notifications must reach a retained cluster even after its endpoint is removed.
-    ServerClusterInterface * serverCluster = opType == DataModel::ListWriteOperation::kListWriteBegin
-        ? GetServerClusterInterface(path)
-        : mServerClusterRegistry.Get(path);
+    ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturn(serverCluster != nullptr);
     serverCluster->ListAttributeWriteNotification(path, opType, accessingFabric);
 }

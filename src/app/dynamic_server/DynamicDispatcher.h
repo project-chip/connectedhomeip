@@ -17,16 +17,19 @@
 
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
 namespace app {
 namespace dynamic_server {
 
-constexpr EndpointId kWebRTCRequestorDynamicEndpointId = 1;
+/// Register a cluster and notify subscribers if this creates a dynamic endpoint.
+/// The caller must hold the CHIP stack lock.
+CHIP_ERROR RegisterServerCluster(ServerClusterRegistration & registration);
 
-// Make the endpoint visible only while its server cluster is registered.
-void SetWebRTCRequestorEndpointEnabled(bool enabled);
+/// Unregister a cluster and notify subscribers if this removes a dynamic endpoint.
+/// The caller must hold the CHIP stack lock.
+CHIP_ERROR UnregisterServerCluster(ServerClusterInterface & cluster);
 
 } // namespace dynamic_server
 } // namespace app
