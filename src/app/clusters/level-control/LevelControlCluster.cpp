@@ -84,6 +84,7 @@ LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & con
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTransitionHandler.StopTransition();
+    OnOffDelegate::Unlink();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -134,6 +135,11 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
     if (!mCurrentLevel.value().IsNull())
     {
         mDelegate.OnLevelChanged(mCurrentLevel.value().Value());
+    }
+
+    if (mOnOffCluster != nullptr && mFeatureMap.Has(Feature::kOnOff))
+    {
+        mOnOffCluster->AddDelegate(this);
     }
 
     return CHIP_NO_ERROR;
@@ -417,6 +423,9 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     {
         ReturnErrorOnFailure(SetOnOff(true));
     }
+    // Spec 1.6.6.9 gates only the 'without On/Off' commands: Move, Move to Level, Step, Stop.
+    // MoveWithOnOff is exempt in both directions, so the gate must not be reached just because
+    // the MoveMode is Down.
     else if (!IsWithOnOffCommand(commandId) && !ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
@@ -638,7 +647,9 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
 
 CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), CHIP_NO_ERROR);
+    // Spec "'With On/Off' Commands" conditions the OnOff side effects on whether the On/Off cluster is
+    // implemented on the same endpoint, not on the OO feature bit.
+    VerifyOrReturnError(mOnOffCluster != nullptr, CHIP_NO_ERROR);
     VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
 
     // Prevent potential callback loops
@@ -650,7 +661,7 @@ CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 
 bool LevelControlCluster::GetOnOff()
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), false);
+    VerifyOrReturnError(mOnOffCluster != nullptr, false);
     return mOnOffCluster->GetOnOff();
 }
 
@@ -880,20 +891,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
 
 bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec: "Command execution SHALL NOT continue beyond the Options processing if all of these criteria are true:
-    // ...
-    // * The On/Off cluster exists on the same endpoint as this cluster.
-    // * The OnOff attribute of the On/Off cluster, on this endpoint, is FALSE.
-    // * The value of the ExecuteIfOff bit is 0."
-
-    // 1. If On/Off feature is not supported, there is no dependency, so we execute.
-    // 2. If the OnOff state is On, we execute.
-    if (!mFeatureMap.Has(Feature::kOnOff) || GetOnOff())
+    // Spec "Options Attribute" and "Effect of Level Control Commands Depends on OnOff":
+    // command suppression while OnOff is FALSE depends on On/Off cluster presence on the endpoint,
+    // even when Feature::kOnOff is 0.
+    if (mOnOffCluster == nullptr || GetOnOff())
     {
         return true;
     }
 
-    // 3. The device is Off. We check the ExecuteIfOff bit.
     if (optionsMask.Has(OptionsBitmap::kExecuteIfOff))
     {
         return optionsOverride.Has(OptionsBitmap::kExecuteIfOff);

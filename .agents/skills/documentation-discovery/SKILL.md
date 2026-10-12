@@ -61,7 +61,7 @@ reference suite:
    methodologies demonstrating interactive commissioning via `chip-tool`,
    automated Python CI harnesses (`local.py`), and standalone test runners
    (`run_python_test.py`).
-5. **`examples/all-devices-app/docs/custom_product_baseline.md`**: Transitioning
+5. **`examples/all-devices-app/docs/writing_code_driven_app.md`**: Transitioning
    from the dynamic runtime simulator to a fixed, static production firmware
    blueprint, optimizing RAM/Flash usage, and direct C++ member object
    instantiation.

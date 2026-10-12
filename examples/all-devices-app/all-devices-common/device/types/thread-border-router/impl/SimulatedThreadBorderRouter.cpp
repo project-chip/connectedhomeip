@@ -36,7 +36,7 @@ SimulatedThreadBorderRouter::SimulatedThreadBorderRouter(const Context & context
         .delegate            = *this,
         .failSafeContext     = context.failSafeContext,
         .platformManager     = context.platformManager,
-        .breadcrumbTracker   = *this,
+        .breadcrumbTracker   = context.breadcrumbTracker,
         .diagnosticsProvider = *this,
     }),
     mTimerDelegate(context.timerDelegate), mThreadNetworkDirectoryStorage(context.storage), mBorderRouterName(context.nodeLabel)

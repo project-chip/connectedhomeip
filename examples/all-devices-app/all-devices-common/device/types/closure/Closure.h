@@ -40,6 +40,7 @@ public:
         bool withManuallyOperable = false;
         bool withProtection       = false;
         bool withAccess           = false;
+        bool withCountdownTime    = false;
         DataModel::Nullable<Clusters::ClosureControl::GenericOverallCurrentState> initialOverallCurrentState;
     };
 

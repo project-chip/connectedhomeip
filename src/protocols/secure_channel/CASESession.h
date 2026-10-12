@@ -53,10 +53,7 @@ namespace chip {
 
 // TODO: temporary derive from Messaging::UnsolicitedMessageHandler, actually the CASEServer should be the umh, it will be fixed
 // when implementing concurrent CASE session.
-class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
-                               public Messaging::ExchangeDelegate,
-                               public FabricTable::Delegate,
-                               public PairingSession
+class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler, public FabricTable::Delegate, public PairingSession
 {
 public:
     ~CASESession() override;

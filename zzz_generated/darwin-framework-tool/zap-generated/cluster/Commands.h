@@ -174265,7 +174265,7 @@ public:
         AddArgument("MimeType", &mRequest.mimeType);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
 #endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
@@ -174291,7 +174291,7 @@ public:
         params.mimeType = [[NSString alloc] initWithBytes:mRequest.mimeType.data() length:mRequest.mimeType.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.imageUri = [[NSString alloc] initWithBytes:mRequest.imageUri.data() length:mRequest.imageUri.size() encoding:NSUTF8StringEncoding];
+        params.imageURI = [[NSString alloc] initWithBytes:mRequest.imageURI.data() length:mRequest.imageURI.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -174417,18 +174417,14 @@ public:
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.supportedMimeTypes.HasValue()) {
-            if (mRequest.supportedMimeTypes.Value().IsNull()) {
-                params.supportedMimeTypes = nil;
-            } else {
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    for (auto & entry_2 : mRequest.supportedMimeTypes.Value().Value()) {
-                        NSString * newElement_2;
-                        newElement_2 = [[NSString alloc] initWithBytes:entry_2.data() length:entry_2.size() encoding:NSUTF8StringEncoding];
-                        [array_2 addObject:newElement_2];
-                    }
-                    params.supportedMimeTypes = array_2;
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.supportedMimeTypes.Value()) {
+                    NSString * newElement_1;
+                    newElement_1 = [[NSString alloc] initWithBytes:entry_1.data() length:entry_1.size() encoding:NSUTF8StringEncoding];
+                    [array_1 addObject:newElement_1];
                 }
+                params.supportedMimeTypes = array_1;
             }
         } else {
             params.supportedMimeTypes = nil;
@@ -174455,7 +174451,7 @@ public:
 
 private:
     chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>> mComplex_SupportedMimeTypes;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::CharSpan>>> mComplex_SupportedMimeTypes;
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
@@ -174540,7 +174536,7 @@ public:
         AddArgument("MimeType", &mRequest.mimeType);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
 #endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
@@ -174569,7 +174565,7 @@ public:
         params.mimeType = [[NSString alloc] initWithBytes:mRequest.mimeType.data() length:mRequest.mimeType.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.imageUri = [[NSString alloc] initWithBytes:mRequest.imageUri.data() length:mRequest.imageUri.size() encoding:NSUTF8StringEncoding];
+        params.imageURI = [[NSString alloc] initWithBytes:mRequest.imageURI.data() length:mRequest.imageURI.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;

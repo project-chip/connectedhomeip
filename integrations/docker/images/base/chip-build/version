@@ -1,1 +1,1 @@
-215 : [Telink] Update Docker image (Zephyr update)
+216 : [Silabs] Use curl to install SLT-CLI and update the sisdk folder to support wake-on-matter
