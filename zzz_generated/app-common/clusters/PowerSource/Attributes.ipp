@@ -33,79 +33,79 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Status::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, status);
+        return DataModel::Decode(reader, status, DataModel::DecodeContext::kRead);
     case Attributes::Order::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, order);
+        return DataModel::Decode(reader, order, DataModel::DecodeContext::kRead);
     case Attributes::Description::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, description);
+        return DataModel::Decode(reader, description, DataModel::DecodeContext::kRead);
     case Attributes::WiredAssessedInputVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredAssessedInputVoltage);
+        return DataModel::Decode(reader, wiredAssessedInputVoltage, DataModel::DecodeContext::kRead);
     case Attributes::WiredAssessedInputFrequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredAssessedInputFrequency);
+        return DataModel::Decode(reader, wiredAssessedInputFrequency, DataModel::DecodeContext::kRead);
     case Attributes::WiredCurrentType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredCurrentType);
+        return DataModel::Decode(reader, wiredCurrentType, DataModel::DecodeContext::kRead);
     case Attributes::WiredAssessedCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredAssessedCurrent);
+        return DataModel::Decode(reader, wiredAssessedCurrent, DataModel::DecodeContext::kRead);
     case Attributes::WiredNominalVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredNominalVoltage);
+        return DataModel::Decode(reader, wiredNominalVoltage, DataModel::DecodeContext::kRead);
     case Attributes::WiredMaximumCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredMaximumCurrent);
+        return DataModel::Decode(reader, wiredMaximumCurrent, DataModel::DecodeContext::kRead);
     case Attributes::WiredPresent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, wiredPresent);
+        return DataModel::Decode(reader, wiredPresent, DataModel::DecodeContext::kRead);
     case Attributes::ActiveWiredFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeWiredFaults);
+        return DataModel::Decode(reader, activeWiredFaults, DataModel::DecodeContext::kRead);
     case Attributes::BatVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batVoltage);
+        return DataModel::Decode(reader, batVoltage, DataModel::DecodeContext::kRead);
     case Attributes::BatPercentRemaining::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batPercentRemaining);
+        return DataModel::Decode(reader, batPercentRemaining, DataModel::DecodeContext::kRead);
     case Attributes::BatTimeRemaining::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batTimeRemaining);
+        return DataModel::Decode(reader, batTimeRemaining, DataModel::DecodeContext::kRead);
     case Attributes::BatChargeLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batChargeLevel);
+        return DataModel::Decode(reader, batChargeLevel, DataModel::DecodeContext::kRead);
     case Attributes::BatReplacementNeeded::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batReplacementNeeded);
+        return DataModel::Decode(reader, batReplacementNeeded, DataModel::DecodeContext::kRead);
     case Attributes::BatReplaceability::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batReplaceability);
+        return DataModel::Decode(reader, batReplaceability, DataModel::DecodeContext::kRead);
     case Attributes::BatPresent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batPresent);
+        return DataModel::Decode(reader, batPresent, DataModel::DecodeContext::kRead);
     case Attributes::ActiveBatFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeBatFaults);
+        return DataModel::Decode(reader, activeBatFaults, DataModel::DecodeContext::kRead);
     case Attributes::BatReplacementDescription::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batReplacementDescription);
+        return DataModel::Decode(reader, batReplacementDescription, DataModel::DecodeContext::kRead);
     case Attributes::BatCommonDesignation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batCommonDesignation);
+        return DataModel::Decode(reader, batCommonDesignation, DataModel::DecodeContext::kRead);
     case Attributes::BatANSIDesignation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batANSIDesignation);
+        return DataModel::Decode(reader, batANSIDesignation, DataModel::DecodeContext::kRead);
     case Attributes::BatIECDesignation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batIECDesignation);
+        return DataModel::Decode(reader, batIECDesignation, DataModel::DecodeContext::kRead);
     case Attributes::BatApprovedChemistry::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batApprovedChemistry);
+        return DataModel::Decode(reader, batApprovedChemistry, DataModel::DecodeContext::kRead);
     case Attributes::BatCapacity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batCapacity);
+        return DataModel::Decode(reader, batCapacity, DataModel::DecodeContext::kRead);
     case Attributes::BatQuantity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batQuantity);
+        return DataModel::Decode(reader, batQuantity, DataModel::DecodeContext::kRead);
     case Attributes::BatChargeState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batChargeState);
+        return DataModel::Decode(reader, batChargeState, DataModel::DecodeContext::kRead);
     case Attributes::BatTimeToFullCharge::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batTimeToFullCharge);
+        return DataModel::Decode(reader, batTimeToFullCharge, DataModel::DecodeContext::kRead);
     case Attributes::BatFunctionalWhileCharging::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batFunctionalWhileCharging);
+        return DataModel::Decode(reader, batFunctionalWhileCharging, DataModel::DecodeContext::kRead);
     case Attributes::BatChargingCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, batChargingCurrent);
+        return DataModel::Decode(reader, batChargingCurrent, DataModel::DecodeContext::kRead);
     case Attributes::ActiveBatChargeFaults::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeBatChargeFaults);
+        return DataModel::Decode(reader, activeBatChargeFaults, DataModel::DecodeContext::kRead);
     case Attributes::EndpointList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, endpointList);
+        return DataModel::Decode(reader, endpointList, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

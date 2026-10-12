@@ -33,37 +33,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxNetworks::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxNetworks);
+        return DataModel::Decode(reader, maxNetworks, DataModel::DecodeContext::kRead);
     case Attributes::Networks::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, networks);
+        return DataModel::Decode(reader, networks, DataModel::DecodeContext::kRead);
     case Attributes::ScanMaxTimeSeconds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, scanMaxTimeSeconds);
+        return DataModel::Decode(reader, scanMaxTimeSeconds, DataModel::DecodeContext::kRead);
     case Attributes::ConnectMaxTimeSeconds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, connectMaxTimeSeconds);
+        return DataModel::Decode(reader, connectMaxTimeSeconds, DataModel::DecodeContext::kRead);
     case Attributes::InterfaceEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, interfaceEnabled);
+        return DataModel::Decode(reader, interfaceEnabled, DataModel::DecodeContext::kRead);
     case Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lastNetworkingStatus);
+        return DataModel::Decode(reader, lastNetworkingStatus, DataModel::DecodeContext::kRead);
     case Attributes::LastNetworkID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lastNetworkID);
+        return DataModel::Decode(reader, lastNetworkID, DataModel::DecodeContext::kRead);
     case Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lastConnectErrorValue);
+        return DataModel::Decode(reader, lastConnectErrorValue, DataModel::DecodeContext::kRead);
     case Attributes::SupportedWiFiBands::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedWiFiBands);
+        return DataModel::Decode(reader, supportedWiFiBands, DataModel::DecodeContext::kRead);
     case Attributes::SupportedThreadFeatures::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedThreadFeatures);
+        return DataModel::Decode(reader, supportedThreadFeatures, DataModel::DecodeContext::kRead);
     case Attributes::ThreadVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, threadVersion);
+        return DataModel::Decode(reader, threadVersion, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

@@ -33,39 +33,39 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentState);
+        return DataModel::Decode(reader, currentState, DataModel::DecodeContext::kRead);
     case Attributes::TargetState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetState);
+        return DataModel::Decode(reader, targetState, DataModel::DecodeContext::kRead);
     case Attributes::Resolution::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, resolution);
+        return DataModel::Decode(reader, resolution, DataModel::DecodeContext::kRead);
     case Attributes::StepValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, stepValue);
+        return DataModel::Decode(reader, stepValue, DataModel::DecodeContext::kRead);
     case Attributes::Unit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unit);
+        return DataModel::Decode(reader, unit, DataModel::DecodeContext::kRead);
     case Attributes::UnitRange::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unitRange);
+        return DataModel::Decode(reader, unitRange, DataModel::DecodeContext::kRead);
     case Attributes::LimitRange::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, limitRange);
+        return DataModel::Decode(reader, limitRange, DataModel::DecodeContext::kRead);
     case Attributes::TranslationDirection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, translationDirection);
+        return DataModel::Decode(reader, translationDirection, DataModel::DecodeContext::kRead);
     case Attributes::RotationAxis::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rotationAxis);
+        return DataModel::Decode(reader, rotationAxis, DataModel::DecodeContext::kRead);
     case Attributes::Overflow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overflow);
+        return DataModel::Decode(reader, overflow, DataModel::DecodeContext::kRead);
     case Attributes::ModulationType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, modulationType);
+        return DataModel::Decode(reader, modulationType, DataModel::DecodeContext::kRead);
     case Attributes::LatchControlModes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, latchControlModes);
+        return DataModel::Decode(reader, latchControlModes, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

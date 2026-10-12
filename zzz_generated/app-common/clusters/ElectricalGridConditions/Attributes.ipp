@@ -33,21 +33,21 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LocalGenerationAvailable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localGenerationAvailable);
+        return DataModel::Decode(reader, localGenerationAvailable, DataModel::DecodeContext::kRead);
     case Attributes::CurrentConditions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentConditions);
+        return DataModel::Decode(reader, currentConditions, DataModel::DecodeContext::kRead);
     case Attributes::ForecastConditions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, forecastConditions);
+        return DataModel::Decode(reader, forecastConditions, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

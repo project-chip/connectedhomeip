@@ -33,43 +33,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Mask::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mask);
+        return DataModel::Decode(reader, mask, DataModel::DecodeContext::kRead);
     case Attributes::Latch::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, latch);
+        return DataModel::Decode(reader, latch, DataModel::DecodeContext::kRead);
     case Attributes::State::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, state);
+        return DataModel::Decode(reader, state, DataModel::DecodeContext::kRead);
     case Attributes::Supported::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supported);
+        return DataModel::Decode(reader, supported, DataModel::DecodeContext::kRead);
     case Attributes::OverVoltageThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overVoltageThreshold);
+        return DataModel::Decode(reader, overVoltageThreshold, DataModel::DecodeContext::kRead);
     case Attributes::UnderVoltageThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, underVoltageThreshold);
+        return DataModel::Decode(reader, underVoltageThreshold, DataModel::DecodeContext::kRead);
     case Attributes::OverFrequencyThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overFrequencyThreshold);
+        return DataModel::Decode(reader, overFrequencyThreshold, DataModel::DecodeContext::kRead);
     case Attributes::UnderFrequencyThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, underFrequencyThreshold);
+        return DataModel::Decode(reader, underFrequencyThreshold, DataModel::DecodeContext::kRead);
     case Attributes::OverPowerThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overPowerThreshold);
+        return DataModel::Decode(reader, overPowerThreshold, DataModel::DecodeContext::kRead);
     case Attributes::UnderPowerThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, underPowerThreshold);
+        return DataModel::Decode(reader, underPowerThreshold, DataModel::DecodeContext::kRead);
     case Attributes::OverCurrentThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overCurrentThreshold);
+        return DataModel::Decode(reader, overCurrentThreshold, DataModel::DecodeContext::kRead);
     case Attributes::UnderCurrentThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, underCurrentThreshold);
+        return DataModel::Decode(reader, underCurrentThreshold, DataModel::DecodeContext::kRead);
     case Attributes::PowerImportThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerImportThreshold);
+        return DataModel::Decode(reader, powerImportThreshold, DataModel::DecodeContext::kRead);
     case Attributes::PowerExportThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerExportThreshold);
+        return DataModel::Decode(reader, powerExportThreshold, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

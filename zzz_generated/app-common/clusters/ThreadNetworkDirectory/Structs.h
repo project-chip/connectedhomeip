@@ -55,6 +55,7 @@ public:
     uint64_t activeTimestamp = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 

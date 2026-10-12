@@ -72,6 +72,10 @@ chip_test_suite("tests") {
 
   test_sources += [ "TestCommissioningDelegate.cpp" ]
 
+  if (chip_enable_read_client) {
+    test_sources += [ "TestTypedReadCallback.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   sources = [

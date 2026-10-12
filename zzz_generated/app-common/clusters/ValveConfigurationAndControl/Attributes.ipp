@@ -33,37 +33,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::OpenDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, openDuration);
+        return DataModel::Decode(reader, openDuration, DataModel::DecodeContext::kRead);
     case Attributes::DefaultOpenDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultOpenDuration);
+        return DataModel::Decode(reader, defaultOpenDuration, DataModel::DecodeContext::kRead);
     case Attributes::AutoCloseTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, autoCloseTime);
+        return DataModel::Decode(reader, autoCloseTime, DataModel::DecodeContext::kRead);
     case Attributes::RemainingDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, remainingDuration);
+        return DataModel::Decode(reader, remainingDuration, DataModel::DecodeContext::kRead);
     case Attributes::CurrentState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentState);
+        return DataModel::Decode(reader, currentState, DataModel::DecodeContext::kRead);
     case Attributes::TargetState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetState);
+        return DataModel::Decode(reader, targetState, DataModel::DecodeContext::kRead);
     case Attributes::CurrentLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentLevel);
+        return DataModel::Decode(reader, currentLevel, DataModel::DecodeContext::kRead);
     case Attributes::TargetLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetLevel);
+        return DataModel::Decode(reader, targetLevel, DataModel::DecodeContext::kRead);
     case Attributes::DefaultOpenLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultOpenLevel);
+        return DataModel::Decode(reader, defaultOpenLevel, DataModel::DecodeContext::kRead);
     case Attributes::ValveFault::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, valveFault);
+        return DataModel::Decode(reader, valveFault, DataModel::DecodeContext::kRead);
     case Attributes::LevelStep::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, levelStep);
+        return DataModel::Decode(reader, levelStep, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

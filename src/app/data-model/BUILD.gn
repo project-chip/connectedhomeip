@@ -40,6 +40,7 @@ source_set("data-model") {
     "List.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
+    "RequiredFieldSet.h",
   ]
 
   deps = [

@@ -225,6 +225,14 @@ protected:
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                                             Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
                                         static_cast<FabricId>(0x1122334455667788ULL)));
+        // NodeID and Label are required even though commissioner info does not use them.
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(static_cast<uint8_t>(
+                                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kNodeID)),
+                                        NodeId{ 1 }));
+        ReturnErrorOnFailure(
+            writer.PutString(TLV::ContextTag(static_cast<uint8_t>(
+                                 Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kLabel)),
+                             ""_span));
         ReturnErrorOnFailure(
             writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),

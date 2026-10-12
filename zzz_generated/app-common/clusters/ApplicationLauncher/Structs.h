@@ -51,6 +51,7 @@ public:
     chip::CharSpan applicationID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -74,6 +75,7 @@ public:
     Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 

@@ -32,8 +32,10 @@
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/WrappedStructEncoder.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <clusters/UnitTesting/Commands.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -630,6 +632,196 @@ public:
 protected:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
+
+namespace {
+
+class RequiredFieldCommandProvider : public TestImCustomDataModel
+{
+public:
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & inputArguments, CommandHandler * handler) override
+    {
+        using namespace Clusters::UnitTesting::Commands;
+        switch (request.path.mCommandId)
+        {
+        case TestAddArguments::Id: {
+            TestAddArguments::DecodableType payload;
+            ReturnErrorOnFailure(payload.Decode(inputArguments));
+            break;
+        }
+        case TestStructArgumentRequest::Id: {
+            TestStructArgumentRequest::DecodableType payload;
+            ReturnErrorOnFailure(payload.Decode(inputArguments));
+            break;
+        }
+        default:
+            return Protocols::InteractionModel::Status::UnsupportedCommand;
+        }
+
+        // Count business handling only after the generated decoder accepts the payload.
+        mHandledCommands++;
+        return mResult;
+    }
+
+    size_t mHandledCommands               = 0;
+    DataModel::ActionReturnStatus mResult = Protocols::InteractionModel::Status::Success;
+};
+
+class TestRequiredFieldCommandDispatch : public TestCommandInteraction
+{
+public:
+    void SetUp() override
+    {
+        TestCommandInteraction::SetUp();
+        ASSERT_FALSE(HasFailure());
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(&mProvider);
+    }
+
+protected:
+    template <typename EncodePayload>
+    void Dispatch(CommandId commandId, EncodePayload encodePayload, const StatusIB & expectedStatus)
+    {
+        uint8_t buffer[256];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_SUCCESS(encodePayload(writer));
+        ASSERT_SUCCESS(writer.Finalize());
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_SUCCESS(reader.Next());
+
+        // Exercise the real IM dispatch boundary locally, without sending an InvokeRequest.
+        const ConcreteCommandPath path(kTestEndpointId, Clusters::UnitTesting::Id, commandId);
+        CommandHandlerWithUnrespondedCommand handler(&mockCommandHandlerDelegate, path, NullOptional);
+        {
+            CommandHandler::Handle handle(&handler);
+            CommandHandlerImpl::Callback * callback = InteractionModelEngine::GetInstance();
+            callback->DispatchCommand(handler, path, reader);
+        }
+
+        ASSERT_FALSE(handler.mMockCommandResponder.mChunks.IsNull());
+        System::PacketBufferTLVReader responseReader;
+        responseReader.Init(handler.mMockCommandResponder.mChunks.Retain());
+        InvokeResponseMessage::Parser response;
+        ASSERT_SUCCESS(response.Init(responseReader));
+        InvokeResponseIBs::Parser responses;
+        ASSERT_SUCCESS(response.GetInvokeResponses(&responses));
+        TLV::TLVReader entries;
+        responses.GetReader(&entries);
+        ASSERT_SUCCESS(entries.Next());
+        InvokeResponseIB::Parser entry;
+        ASSERT_SUCCESS(entry.Init(entries));
+        CommandStatusIB::Parser commandStatus;
+        ASSERT_SUCCESS(entry.GetStatus(&commandStatus));
+        CommandPathIB::Parser responsePath;
+        ASSERT_SUCCESS(commandStatus.GetPath(&responsePath));
+        ConcreteCommandPath decodedPath;
+        ASSERT_SUCCESS(responsePath.GetConcreteCommandPath(decodedPath));
+        EXPECT_EQ(decodedPath, path);
+        StatusIB::Parser statusParser;
+        ASSERT_SUCCESS(commandStatus.GetErrorStatus(&statusParser));
+        StatusIB decodedStatus;
+        ASSERT_SUCCESS(statusParser.DecodeStatusIB(decodedStatus));
+        EXPECT_EQ(decodedStatus, expectedStatus);
+        EXPECT_EQ(entries.Next(), CHIP_END_OF_TLV);
+        EXPECT_SUCCESS(response.ExitContainer());
+    }
+
+    RequiredFieldCommandProvider mProvider;
+};
+
+TEST_F(TestRequiredFieldCommandDispatch, CompleteCommandsReachHandler)
+{
+    using namespace Clusters::UnitTesting::Commands;
+    Dispatch(
+        TestAddArguments::Id,
+        [](TLV::TLVWriter & writer) {
+            TestAddArguments::Type payload;
+            payload.arg1 = 7;
+            payload.arg2 = 8;
+            return DataModel::Encode(writer, TLV::AnonymousTag(), payload);
+        },
+        StatusIB(Protocols::InteractionModel::Status::Success));
+    ASSERT_FALSE(HasFailure());
+    EXPECT_EQ(mProvider.mHandledCommands, 1u);
+
+    Dispatch(
+        TestStructArgumentRequest::Id,
+        [](TLV::TLVWriter & writer) { return DataModel::Encode(writer, TLV::AnonymousTag(), TestStructArgumentRequest::Type{}); },
+        StatusIB(Protocols::InteractionModel::Status::Success));
+    ASSERT_FALSE(HasFailure());
+    EXPECT_EQ(mProvider.mHandledCommands, 2u);
+}
+
+TEST_F(TestRequiredFieldCommandDispatch, MissingRequiredFieldsReturnInvalidCommand)
+{
+    using namespace Clusters::UnitTesting::Commands;
+    for (const auto omitted : { TestAddArguments::Fields::kArg1, TestAddArguments::Fields::kArg2 })
+    {
+        Dispatch(
+            TestAddArguments::Id,
+            [omitted](TLV::TLVWriter & writer) {
+                DataModel::WrappedStructEncoder encoder(writer, TLV::AnonymousTag());
+                if (omitted != TestAddArguments::Fields::kArg1)
+                {
+                    encoder.Encode(to_underlying(TestAddArguments::Fields::kArg1), uint8_t{ 7 });
+                }
+                if (omitted != TestAddArguments::Fields::kArg2)
+                {
+                    encoder.Encode(to_underlying(TestAddArguments::Fields::kArg2), uint8_t{ 8 });
+                }
+                return encoder.Finalize();
+            },
+            StatusIB(Protocols::InteractionModel::Status::InvalidCommand));
+        EXPECT_EQ(mProvider.mHandledCommands, 0u);
+    }
+}
+
+TEST_F(TestRequiredFieldCommandDispatch, MissingNestedFieldsReturnInvalidCommand)
+{
+    using namespace Clusters::UnitTesting::Commands;
+    Dispatch(
+        TestStructArgumentRequest::Id,
+        [](TLV::TLVWriter & writer) {
+            TLV::TLVType outer;
+            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+            // The argument is present, but its nested struct has no required fields.
+            ReturnErrorOnFailure(
+                DataModel::WrappedStructEncoder(writer, TLV::ContextTag(TestStructArgumentRequest::Fields::kArg1)).Finalize());
+            return writer.EndContainer(outer);
+        },
+        StatusIB(Protocols::InteractionModel::Status::InvalidCommand));
+    EXPECT_EQ(mProvider.mHandledCommands, 0u);
+}
+
+TEST_F(TestRequiredFieldCommandDispatch, OtherProviderStatusesArePreserved)
+{
+    using namespace Clusters::UnitTesting::Commands;
+    using Protocols::InteractionModel::ClusterStatusCode;
+    using Protocols::InteractionModel::Status;
+    const struct
+    {
+        DataModel::ActionReturnStatus result;
+        StatusIB expected;
+    } cases[] = {
+        { CHIP_ERROR_INTERNAL, StatusIB(Status::Failure) },
+        { CHIP_IM_GLOBAL_STATUS(ConstraintError), StatusIB(Status::ConstraintError) },
+        { ClusterStatusCode::ClusterSpecificFailure(17), StatusIB(Status::Failure, 17) },
+        { ClusterStatusCode::ClusterSpecificSuccess(17), StatusIB(Status::Success, 17) },
+    };
+    for (const auto & testCase : cases)
+    {
+        mProvider.mResult = testCase.result;
+        Dispatch(
+            TestAddArguments::Id,
+            [](TLV::TLVWriter & writer) { return DataModel::Encode(writer, TLV::AnonymousTag(), TestAddArguments::Type{}); },
+            testCase.expected);
+        ASSERT_FALSE(HasFailure());
+    }
+    EXPECT_EQ(mProvider.mHandledCommands, 4u);
+}
+
+} // namespace
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {

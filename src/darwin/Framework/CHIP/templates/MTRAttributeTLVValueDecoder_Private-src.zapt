@@ -28,7 +28,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
             TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
+            *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
             if (*aError != CHIP_NO_ERROR)
             {
                 return nil;
@@ -63,7 +63,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
             TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
+            *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
             if (*aError != CHIP_NO_ERROR)
             {
                 return nil;
@@ -104,7 +104,7 @@ static id _Nullable DecodePrivateAttributeValueFor{{asUpperCamelCase name preser
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
             TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
+            *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
             if (*aError != CHIP_NO_ERROR)
             {
                 return nil;

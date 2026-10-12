@@ -33,21 +33,21 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::ActiveNetworkIdentities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeNetworkIdentities);
+        return DataModel::Decode(reader, activeNetworkIdentities, DataModel::DecodeContext::kRead);
     case Attributes::Clients::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clients);
+        return DataModel::Decode(reader, clients, DataModel::DecodeContext::kRead);
     case Attributes::ClientTableSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clientTableSize);
+        return DataModel::Decode(reader, clientTableSize, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

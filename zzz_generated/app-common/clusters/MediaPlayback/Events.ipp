@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -49,49 +50,73 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldCurrentState,
+        kFieldStartTime,
+        kFieldDuration,
+        kFieldSampledPosition,
+        kFieldPlaybackSpeed,
+        kFieldSeekRangeEnd,
+        kFieldSeekRangeStart,
+        kFieldAudioAdvanceUnmuted,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kCurrentState))
         {
-            err = DataModel::Decode(reader, currentState);
+            err = DataModel::Decode(reader, currentState, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCurrentState));
         }
         else if (__context_tag == to_underlying(Fields::kStartTime))
         {
-            err = DataModel::Decode(reader, startTime);
+            err = DataModel::Decode(reader, startTime, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldStartTime));
         }
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
-            err = DataModel::Decode(reader, duration);
+            err = DataModel::Decode(reader, duration, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDuration));
         }
         else if (__context_tag == to_underlying(Fields::kSampledPosition))
         {
-            err = DataModel::Decode(reader, sampledPosition);
+            err = DataModel::Decode(reader, sampledPosition, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSampledPosition));
         }
         else if (__context_tag == to_underlying(Fields::kPlaybackSpeed))
         {
-            err = DataModel::Decode(reader, playbackSpeed);
+            err = DataModel::Decode(reader, playbackSpeed, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPlaybackSpeed));
         }
         else if (__context_tag == to_underlying(Fields::kSeekRangeEnd))
         {
-            err = DataModel::Decode(reader, seekRangeEnd);
+            err = DataModel::Decode(reader, seekRangeEnd, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSeekRangeEnd));
         }
         else if (__context_tag == to_underlying(Fields::kSeekRangeStart))
         {
-            err = DataModel::Decode(reader, seekRangeStart);
+            err = DataModel::Decode(reader, seekRangeStart, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSeekRangeStart));
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            err = DataModel::Decode(reader, data);
+            err = DataModel::Decode(reader, data, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kAudioAdvanceUnmuted))
         {
-            err = DataModel::Decode(reader, audioAdvanceUnmuted);
+            err = DataModel::Decode(reader, audioAdvanceUnmuted, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAudioAdvanceUnmuted));
         }
         else
         {

@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -44,29 +45,45 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldActive,
+        kFieldInactive,
+        kFieldState,
+        kFieldMask,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kActive))
         {
-            err = DataModel::Decode(reader, active);
+            err = DataModel::Decode(reader, active, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldActive));
         }
         else if (__context_tag == to_underlying(Fields::kInactive))
         {
-            err = DataModel::Decode(reader, inactive);
+            err = DataModel::Decode(reader, inactive, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldInactive));
         }
         else if (__context_tag == to_underlying(Fields::kState))
         {
-            err = DataModel::Decode(reader, state);
+            err = DataModel::Decode(reader, state, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldState));
         }
         else if (__context_tag == to_underlying(Fields::kMask))
         {
-            err = DataModel::Decode(reader, mask);
+            err = DataModel::Decode(reader, mask, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMask));
         }
         else
         {

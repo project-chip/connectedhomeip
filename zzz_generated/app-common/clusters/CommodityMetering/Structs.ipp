@@ -20,6 +20,7 @@
 
 #include <clusters/CommodityMetering/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -40,21 +41,38 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldTariffComponentIDs,
+        kFieldQuantity,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kTariffComponentIDs))
         {
-            err = DataModel::Decode(reader, tariffComponentIDs);
+            err = DataModel::Decode(reader, tariffComponentIDs, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTariffComponentIDs));
         }
         else if (__context_tag == to_underlying(Fields::kQuantity))
         {
-            err = DataModel::Decode(reader, quantity);
+            err = DataModel::Decode(reader, quantity, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldQuantity));
         }
 
         ReturnErrorOnFailure(err);

@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -45,33 +46,45 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldConnectionID,
+        kFieldTriggerType,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kConnectionID))
         {
-            err = DataModel::Decode(reader, connectionID);
+            err = DataModel::Decode(reader, connectionID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldConnectionID));
         }
         else if (__context_tag == to_underlying(Fields::kTriggerType))
         {
-            err = DataModel::Decode(reader, triggerType);
+            err = DataModel::Decode(reader, triggerType, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTriggerType));
         }
         else if (__context_tag == to_underlying(Fields::kActivationReason))
         {
-            err = DataModel::Decode(reader, activationReason);
+            err = DataModel::Decode(reader, activationReason, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kContainerType))
         {
-            err = DataModel::Decode(reader, containerType);
+            err = DataModel::Decode(reader, containerType, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kCMAFSessionNumber))
         {
-            err = DataModel::Decode(reader, CMAFSessionNumber);
+            err = DataModel::Decode(reader, CMAFSessionNumber, DataModel::DecodeContext::kRead);
         }
         else
         {
@@ -94,25 +107,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldConnectionID,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kConnectionID))
         {
-            err = DataModel::Decode(reader, connectionID);
+            err = DataModel::Decode(reader, connectionID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldConnectionID));
         }
         else if (__context_tag == to_underlying(Fields::kContainerType))
         {
-            err = DataModel::Decode(reader, containerType);
+            err = DataModel::Decode(reader, containerType, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kCMAFSessionNumber))
         {
-            err = DataModel::Decode(reader, CMAFSessionNumber);
+            err = DataModel::Decode(reader, CMAFSessionNumber, DataModel::DecodeContext::kRead);
         }
         else
         {

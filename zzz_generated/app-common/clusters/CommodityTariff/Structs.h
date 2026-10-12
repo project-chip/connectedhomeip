@@ -51,6 +51,7 @@ public:
     uint16_t peakPeriod             = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -74,6 +75,7 @@ public:
     AuxiliaryLoadSettingEnum requiredState = static_cast<AuxiliaryLoadSettingEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -99,6 +101,7 @@ public:
     Optional<int16_t> priceLevel;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -138,6 +141,7 @@ public:
     Optional<chip::CharSpan> externalID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -172,6 +176,7 @@ public:
     DataModel::DecodableList<uint32_t> dayPatternIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -197,6 +202,7 @@ public:
     Optional<DayEntryRandomizationTypeEnum> randomizationType;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -234,6 +240,7 @@ public:
     DataModel::DecodableList<uint32_t> dayEntryIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -267,6 +274,7 @@ public:
     DataModel::DecodableList<uint32_t> dayEntryIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -290,6 +298,7 @@ public:
     DataModel::Nullable<BlockModeEnum> blockMode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -327,6 +336,7 @@ public:
     DataModel::DecodableList<uint32_t> tariffComponentIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };

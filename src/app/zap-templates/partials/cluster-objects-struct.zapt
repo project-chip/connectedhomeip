@@ -14,6 +14,7 @@ namespace {{asUpperCamelCase name}} {
 
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
+        CHIP_ERROR DecodeWithContext(TLV::TLVReader &reader, DataModel::DecodeContext aContext);
         {{/unless}}
 
         static constexpr bool kIsFabricScoped = {{isFabricScoped}};
@@ -45,6 +46,7 @@ namespace {{asUpperCamelCase name}} {
         {{/zcl_struct_items}}
 
         CHIP_ERROR Decode(TLV::TLVReader &reader);
+        CHIP_ERROR DecodeWithContext(TLV::TLVReader &reader, DataModel::DecodeContext aContext);
 
         static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
@@ -113,11 +115,53 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {{/if}}
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader &reader, DataModel::DecodeContext aContext) {
+    enum class RequiredFields : uint16_t {
+        {{#zcl_struct_items}}
+        {{#unless isOptional}}
+        kField{{asUpperCamelCase label}},
+        {{/unless}}
+        {{/zcl_struct_items}}
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
+    {{#if isFabricScoped}}
+    {{#if struct_has_fabric_sensitive_fields}}
+    bool __saw_sensitive_field = false;
+    {{/if}}
+    {{/if}}
     detail::StructDecodeIterator __iterator(reader);
     while (true) {
         uint8_t __context_tag  = 0;
         CHIP_ERROR err = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            {{#if isFabricScoped}}
+            {{#if struct_has_fabric_sensitive_fields}}
+            const bool hasFabricIndex = __required_fields.IsPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            // A read may redact the entire set of fabric-sensitive fields. Writes must include them.
+            if (aContext != DataModel::DecodeContext::kWrite && hasFabricIndex && !__saw_sensitive_field)
+            {
+                {{#zcl_struct_items}}
+                {{#unless isOptional}}
+                {{#if isFabricSensitive}}
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kField{{asUpperCamelCase label}}));
+                {{/if}}
+                {{/unless}}
+                {{/zcl_struct_items}}
+            }
+            {{/if}}
+            // FabricIndex is supplied by the interaction for writes and is encoded for reads.
+            if (aContext != DataModel::DecodeContext::kRead)
+            {
+                __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
+            }
+            {{/if}}
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         {{#zcl_struct_items}}
@@ -127,7 +171,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
-          err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+          err = DataModel::Decode(reader, {{asLowerCamelCase label}}, aContext);
+          {{#unless isOptional}}
+          __required_fields.MarkPresent(to_underlying(RequiredFields::kField{{asUpperCamelCase label}}));
+          {{/unless}}
+          {{#if ../isFabricScoped}}
+          {{#if isFabricSensitive}}
+          __saw_sensitive_field = true;
+          {{/if}}
+          {{/if}}
         }
         {{/zcl_struct_items}}
 

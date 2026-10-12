@@ -1803,7 +1803,15 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
     // includes CHIP_NO_ERROR: in this case CHIP_NO_ERROR would mean set a `status success on the command`
     if (status.has_value())
     {
-        apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
+        if (status->GetUnderlyingError() == CHIP_ERROR_MISSING_TLV_ELEMENT)
+        {
+            // Missing required command fields are invalid input, including errors returned by code-driven clusters.
+            apCommandObj.AddStatus(aCommandPath, Status::InvalidCommand);
+        }
+        else
+        {
+            apCommandObj.AddStatus(aCommandPath, status->GetStatusCode());
+        }
     }
 }
 

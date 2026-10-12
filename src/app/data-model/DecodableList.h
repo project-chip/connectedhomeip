@@ -45,14 +45,22 @@ public:
      * Specifically, the passed-in reader should be pointing into the list just after
      * having called `OpenContainer` on the list element.
      */
-    void SetReader(const TLV::TLVReader & reader) { mReader = reader; }
+    void SetReader(const TLV::TLVReader & reader)
+    {
+        mReader        = reader;
+        mDecodeContext = DecodeContext::kUnspecified;
+    }
 
     /*
      * @brief
      *
      * This call clears the TLV reader managed by this class, so it can be reused.
      */
-    void ClearReader() { mReader.Init(nullptr, 0); }
+    void ClearReader()
+    {
+        mReader.Init(nullptr, 0);
+        mDecodeContext = DecodeContext::kUnspecified;
+    }
 
     /*
      * Compute the size of the list. This can fail if the TLV is malformed. If
@@ -72,13 +80,18 @@ public:
         return mReader.CountRemainingInContainer(size);
     }
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    // Decoding validates the list container. Required fields in its elements are checked by Iterator::Next();
+    // consumers must check Iterator::GetStatus() for errors, potentially after processing earlier entries.
+    CHIP_ERROR Decode(TLV::TLVReader & reader) { return DecodeWithContext(reader, DecodeContext::kUnspecified); }
+
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DecodeContext context)
     {
         VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
         TLV::TLVType type;
         ReturnErrorOnFailure(reader.EnterContainer(type));
         SetReader(reader);
         ReturnErrorOnFailure(reader.ExitContainer(type));
+        mDecodeContext = context;
         return CHIP_NO_ERROR;
     }
 
@@ -86,7 +99,7 @@ protected:
     class Iterator
     {
     public:
-        Iterator(const TLV::TLVReader & reader)
+        Iterator(const TLV::TLVReader & reader, DecodeContext context = DecodeContext::kUnspecified) : mDecodeContext(context)
         {
             mStatus = CHIP_NO_ERROR;
             mReader.Init(reader);
@@ -126,9 +139,11 @@ protected:
     protected:
         CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
+        DecodeContext mDecodeContext;
     };
 
     TLV::TLVReader mReader;
+    DecodeContext mDecodeContext = DecodeContext::kUnspecified;
 };
 
 template <bool IsFabricScoped>
@@ -172,12 +187,15 @@ protected:
     {
     public:
         template <bool IsActuallyFabricScoped = IsFabricScoped, std::enable_if_t<IsActuallyFabricScoped, bool> = true>
-        Iterator(const TLV::TLVReader & reader, const Optional<FabricIndex> & fabricIndex) :
-            DecodableListBase::Iterator(reader), FabricIndexIteratorMemberMixin<IsFabricScoped>(fabricIndex)
+        Iterator(const TLV::TLVReader & reader, const Optional<FabricIndex> & fabricIndex,
+                 DecodeContext context = DecodeContext::kUnspecified) :
+            DecodableListBase::Iterator(reader, context),
+            FabricIndexIteratorMemberMixin<IsFabricScoped>(fabricIndex)
         {}
 
         template <bool IsActuallyFabricScoped = IsFabricScoped, std::enable_if_t<!IsActuallyFabricScoped, bool> = true>
-        Iterator(const TLV::TLVReader & reader) : DecodableListBase::Iterator(reader)
+        Iterator(const TLV::TLVReader & reader, DecodeContext context = DecodeContext::kUnspecified) :
+            DecodableListBase::Iterator(reader, context)
         {}
     };
 };
@@ -223,11 +241,13 @@ public:
          * no list.
          */
         template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex) : IteratorBase(reader, fabricIndex)
+        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex,
+                 DecodeContext context = DecodeContext::kUnspecified) :
+            IteratorBase(reader, fabricIndex, context)
         {}
 
         template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
-        Iterator(const TLV::TLVReader & reader) : IteratorBase(reader)
+        Iterator(const TLV::TLVReader & reader, DecodeContext context = DecodeContext::kUnspecified) : IteratorBase(reader, context)
         {}
 
         /*
@@ -284,7 +304,7 @@ public:
                 // an incorrect view of the state as seen from a client.
                 //
                 mValue        = T();
-                this->mStatus = DataModel::Decode(this->mReader, mValue);
+                this->mStatus = DataModel::Decode(this->mReader, mValue, this->mDecodeContext);
             }
 
             return (this->mStatus == CHIP_NO_ERROR);
@@ -298,13 +318,13 @@ public:
     template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
     Iterator begin() const
     {
-        return Iterator(this->mReader, this->mFabricIndex);
+        return Iterator(this->mReader, this->mFabricIndex, this->mDecodeContext);
     }
 
     template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
     Iterator begin() const
     {
-        return Iterator(this->mReader);
+        return Iterator(this->mReader, this->mDecodeContext);
     }
 };
 

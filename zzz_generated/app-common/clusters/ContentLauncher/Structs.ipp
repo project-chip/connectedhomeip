@@ -20,6 +20,7 @@
 
 #include <clusters/ContentLauncher/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -41,25 +42,44 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldWidth,
+        kFieldHeight,
+        kFieldMetric,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kWidth))
         {
-            err = DataModel::Decode(reader, width);
+            err = DataModel::Decode(reader, width, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldWidth));
         }
         else if (__context_tag == to_underlying(Fields::kHeight))
         {
-            err = DataModel::Decode(reader, height);
+            err = DataModel::Decode(reader, height, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHeight));
         }
         else if (__context_tag == to_underlying(Fields::kMetric))
         {
-            err = DataModel::Decode(reader, metric);
+            err = DataModel::Decode(reader, metric, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMetric));
         }
 
         ReturnErrorOnFailure(err);
@@ -80,25 +100,44 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldContentAppVendorID,
+        kFieldContentAppProductID,
+        kFieldData,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kContentAppVendorID))
         {
-            err = DataModel::Decode(reader, contentAppVendorID);
+            err = DataModel::Decode(reader, contentAppVendorID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldContentAppVendorID));
         }
         else if (__context_tag == to_underlying(Fields::kContentAppProductID))
         {
-            err = DataModel::Decode(reader, contentAppProductID);
+            err = DataModel::Decode(reader, contentAppProductID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldContentAppProductID));
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            err = DataModel::Decode(reader, data);
+            err = DataModel::Decode(reader, data, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldData));
         }
 
         ReturnErrorOnFailure(err);
@@ -123,41 +162,56 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldUrl,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kUrl))
         {
-            err = DataModel::Decode(reader, url);
+            err = DataModel::Decode(reader, url, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldUrl));
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            err = DataModel::Decode(reader, data);
+            err = DataModel::Decode(reader, data, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kContentType))
         {
-            err = DataModel::Decode(reader, contentType);
+            err = DataModel::Decode(reader, contentType, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kContentHeaders))
         {
-            err = DataModel::Decode(reader, contentHeaders);
+            err = DataModel::Decode(reader, contentHeaders, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kOffsetMillisecs))
         {
-            err = DataModel::Decode(reader, offsetMillisecs);
+            err = DataModel::Decode(reader, offsetMillisecs, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kQueueType))
         {
-            err = DataModel::Decode(reader, queueType);
+            err = DataModel::Decode(reader, queueType, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kNextUrl))
         {
-            err = DataModel::Decode(reader, nextUrl);
+            err = DataModel::Decode(reader, nextUrl, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -177,21 +231,34 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kLaunchUrlInfo))
         {
-            err = DataModel::Decode(reader, launchUrlInfo);
+            err = DataModel::Decode(reader, launchUrlInfo, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kContentAppInfo))
         {
-            err = DataModel::Decode(reader, contentAppInfo);
+            err = DataModel::Decode(reader, contentAppInfo, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -212,25 +279,42 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldLanguageCode,
+        kFieldAudioOutputIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kLanguageCode))
         {
-            err = DataModel::Decode(reader, languageCode);
+            err = DataModel::Decode(reader, languageCode, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldLanguageCode));
         }
         else if (__context_tag == to_underlying(Fields::kCharacteristics))
         {
-            err = DataModel::Decode(reader, characteristics);
+            err = DataModel::Decode(reader, characteristics, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kAudioOutputIndex))
         {
-            err = DataModel::Decode(reader, audioOutputIndex);
+            err = DataModel::Decode(reader, audioOutputIndex, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAudioOutputIndex));
         }
 
         ReturnErrorOnFailure(err);
@@ -251,25 +335,42 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldPlaybackPosition,
+        kFieldTextTrack,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kPlaybackPosition))
         {
-            err = DataModel::Decode(reader, playbackPosition);
+            err = DataModel::Decode(reader, playbackPosition, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPlaybackPosition));
         }
         else if (__context_tag == to_underlying(Fields::kTextTrack))
         {
-            err = DataModel::Decode(reader, textTrack);
+            err = DataModel::Decode(reader, textTrack, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTextTrack));
         }
         else if (__context_tag == to_underlying(Fields::kAudioTracks))
         {
-            err = DataModel::Decode(reader, audioTracks);
+            err = DataModel::Decode(reader, audioTracks, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -289,21 +390,38 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldName,
+        kFieldValue,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kName))
         {
-            err = DataModel::Decode(reader, name);
+            err = DataModel::Decode(reader, name, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldName));
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            err = DataModel::Decode(reader, value);
+            err = DataModel::Decode(reader, value, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldValue));
         }
 
         ReturnErrorOnFailure(err);
@@ -324,25 +442,42 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldType,
+        kFieldValue,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kType))
         {
-            err = DataModel::Decode(reader, type);
+            err = DataModel::Decode(reader, type, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldType));
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            err = DataModel::Decode(reader, value);
+            err = DataModel::Decode(reader, value, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldValue));
         }
         else if (__context_tag == to_underlying(Fields::kExternalIDList))
         {
-            err = DataModel::Decode(reader, externalIDList);
+            err = DataModel::Decode(reader, externalIDList, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -361,17 +496,32 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldParameterList,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kParameterList))
         {
-            err = DataModel::Decode(reader, parameterList);
+            err = DataModel::Decode(reader, parameterList, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldParameterList));
         }
 
         ReturnErrorOnFailure(err);
@@ -392,25 +542,38 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kImageURL))
         {
-            err = DataModel::Decode(reader, imageURL);
+            err = DataModel::Decode(reader, imageURL, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kColor))
         {
-            err = DataModel::Decode(reader, color);
+            err = DataModel::Decode(reader, color, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kSize))
         {
-            err = DataModel::Decode(reader, size);
+            err = DataModel::Decode(reader, size, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -434,37 +597,52 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldProviderName,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kProviderName))
         {
-            err = DataModel::Decode(reader, providerName);
+            err = DataModel::Decode(reader, providerName, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldProviderName));
         }
         else if (__context_tag == to_underlying(Fields::kBackground))
         {
-            err = DataModel::Decode(reader, background);
+            err = DataModel::Decode(reader, background, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kLogo))
         {
-            err = DataModel::Decode(reader, logo);
+            err = DataModel::Decode(reader, logo, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kProgressBar))
         {
-            err = DataModel::Decode(reader, progressBar);
+            err = DataModel::Decode(reader, progressBar, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kSplash))
         {
-            err = DataModel::Decode(reader, splash);
+            err = DataModel::Decode(reader, splash, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kWaterMark))
         {
-            err = DataModel::Decode(reader, waterMark);
+            err = DataModel::Decode(reader, waterMark, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -484,21 +662,38 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldPresetID,
+        kFieldPresetName,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kPresetID))
         {
-            err = DataModel::Decode(reader, presetID);
+            err = DataModel::Decode(reader, presetID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPresetID));
         }
         else if (__context_tag == to_underlying(Fields::kPresetName))
         {
-            err = DataModel::Decode(reader, presetName);
+            err = DataModel::Decode(reader, presetName, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPresetName));
         }
 
         ReturnErrorOnFailure(err);

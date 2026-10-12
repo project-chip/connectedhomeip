@@ -33,157 +33,157 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::LocalTemperature::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localTemperature);
+        return DataModel::Decode(reader, localTemperature, DataModel::DecodeContext::kRead);
     case Attributes::OutdoorTemperature::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, outdoorTemperature);
+        return DataModel::Decode(reader, outdoorTemperature, DataModel::DecodeContext::kRead);
     case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupancy);
+        return DataModel::Decode(reader, occupancy, DataModel::DecodeContext::kRead);
     case Attributes::AbsMinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, absMinHeatSetpointLimit);
+        return DataModel::Decode(reader, absMinHeatSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::AbsMaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, absMaxHeatSetpointLimit);
+        return DataModel::Decode(reader, absMaxHeatSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::AbsMinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, absMinCoolSetpointLimit);
+        return DataModel::Decode(reader, absMinCoolSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::AbsMaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, absMaxCoolSetpointLimit);
+        return DataModel::Decode(reader, absMaxCoolSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::PICoolingDemand::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, PICoolingDemand);
+        return DataModel::Decode(reader, PICoolingDemand, DataModel::DecodeContext::kRead);
     case Attributes::PIHeatingDemand::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, PIHeatingDemand);
+        return DataModel::Decode(reader, PIHeatingDemand, DataModel::DecodeContext::kRead);
     case Attributes::HVACSystemTypeConfiguration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, HVACSystemTypeConfiguration);
+        return DataModel::Decode(reader, HVACSystemTypeConfiguration, DataModel::DecodeContext::kRead);
     case Attributes::LocalTemperatureCalibration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localTemperatureCalibration);
+        return DataModel::Decode(reader, localTemperatureCalibration, DataModel::DecodeContext::kRead);
     case Attributes::OccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupiedCoolingSetpoint);
+        return DataModel::Decode(reader, occupiedCoolingSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::OccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupiedHeatingSetpoint);
+        return DataModel::Decode(reader, occupiedHeatingSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::UnoccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unoccupiedCoolingSetpoint);
+        return DataModel::Decode(reader, unoccupiedCoolingSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::UnoccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unoccupiedHeatingSetpoint);
+        return DataModel::Decode(reader, unoccupiedHeatingSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::MinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minHeatSetpointLimit);
+        return DataModel::Decode(reader, minHeatSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::MaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxHeatSetpointLimit);
+        return DataModel::Decode(reader, maxHeatSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::MinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minCoolSetpointLimit);
+        return DataModel::Decode(reader, minCoolSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::MaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxCoolSetpointLimit);
+        return DataModel::Decode(reader, maxCoolSetpointLimit, DataModel::DecodeContext::kRead);
     case Attributes::MinSetpointDeadBand::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minSetpointDeadBand);
+        return DataModel::Decode(reader, minSetpointDeadBand, DataModel::DecodeContext::kRead);
     case Attributes::RemoteSensing::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, remoteSensing);
+        return DataModel::Decode(reader, remoteSensing, DataModel::DecodeContext::kRead);
     case Attributes::ControlSequenceOfOperation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, controlSequenceOfOperation);
+        return DataModel::Decode(reader, controlSequenceOfOperation, DataModel::DecodeContext::kRead);
     case Attributes::SystemMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, systemMode);
+        return DataModel::Decode(reader, systemMode, DataModel::DecodeContext::kRead);
     case Attributes::ThermostatRunningMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, thermostatRunningMode);
+        return DataModel::Decode(reader, thermostatRunningMode, DataModel::DecodeContext::kRead);
     case Attributes::StartOfWeek::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startOfWeek);
+        return DataModel::Decode(reader, startOfWeek, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfWeeklyTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfWeeklyTransitions);
+        return DataModel::Decode(reader, numberOfWeeklyTransitions, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfDailyTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfDailyTransitions);
+        return DataModel::Decode(reader, numberOfDailyTransitions, DataModel::DecodeContext::kRead);
     case Attributes::TemperatureSetpointHold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, temperatureSetpointHold);
+        return DataModel::Decode(reader, temperatureSetpointHold, DataModel::DecodeContext::kRead);
     case Attributes::TemperatureSetpointHoldDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, temperatureSetpointHoldDuration);
+        return DataModel::Decode(reader, temperatureSetpointHoldDuration, DataModel::DecodeContext::kRead);
     case Attributes::ThermostatProgrammingOperationMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, thermostatProgrammingOperationMode);
+        return DataModel::Decode(reader, thermostatProgrammingOperationMode, DataModel::DecodeContext::kRead);
     case Attributes::ThermostatRunningState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, thermostatRunningState);
+        return DataModel::Decode(reader, thermostatRunningState, DataModel::DecodeContext::kRead);
     case Attributes::SetpointChangeSource::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, setpointChangeSource);
+        return DataModel::Decode(reader, setpointChangeSource, DataModel::DecodeContext::kRead);
     case Attributes::SetpointChangeAmount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, setpointChangeAmount);
+        return DataModel::Decode(reader, setpointChangeAmount, DataModel::DecodeContext::kRead);
     case Attributes::SetpointChangeSourceTimestamp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, setpointChangeSourceTimestamp);
+        return DataModel::Decode(reader, setpointChangeSourceTimestamp, DataModel::DecodeContext::kRead);
     case Attributes::OccupiedSetback::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupiedSetback);
+        return DataModel::Decode(reader, occupiedSetback, DataModel::DecodeContext::kRead);
     case Attributes::OccupiedSetbackMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupiedSetbackMin);
+        return DataModel::Decode(reader, occupiedSetbackMin, DataModel::DecodeContext::kRead);
     case Attributes::OccupiedSetbackMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupiedSetbackMax);
+        return DataModel::Decode(reader, occupiedSetbackMax, DataModel::DecodeContext::kRead);
     case Attributes::UnoccupiedSetback::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unoccupiedSetback);
+        return DataModel::Decode(reader, unoccupiedSetback, DataModel::DecodeContext::kRead);
     case Attributes::UnoccupiedSetbackMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unoccupiedSetbackMin);
+        return DataModel::Decode(reader, unoccupiedSetbackMin, DataModel::DecodeContext::kRead);
     case Attributes::UnoccupiedSetbackMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, unoccupiedSetbackMax);
+        return DataModel::Decode(reader, unoccupiedSetbackMax, DataModel::DecodeContext::kRead);
     case Attributes::EmergencyHeatDelta::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, emergencyHeatDelta);
+        return DataModel::Decode(reader, emergencyHeatDelta, DataModel::DecodeContext::kRead);
     case Attributes::ACType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACType);
+        return DataModel::Decode(reader, ACType, DataModel::DecodeContext::kRead);
     case Attributes::ACCapacity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCapacity);
+        return DataModel::Decode(reader, ACCapacity, DataModel::DecodeContext::kRead);
     case Attributes::ACRefrigerantType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACRefrigerantType);
+        return DataModel::Decode(reader, ACRefrigerantType, DataModel::DecodeContext::kRead);
     case Attributes::ACCompressorType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCompressorType);
+        return DataModel::Decode(reader, ACCompressorType, DataModel::DecodeContext::kRead);
     case Attributes::ACErrorCode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACErrorCode);
+        return DataModel::Decode(reader, ACErrorCode, DataModel::DecodeContext::kRead);
     case Attributes::ACLouverPosition::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACLouverPosition);
+        return DataModel::Decode(reader, ACLouverPosition, DataModel::DecodeContext::kRead);
     case Attributes::ACCoilTemperature::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCoilTemperature);
+        return DataModel::Decode(reader, ACCoilTemperature, DataModel::DecodeContext::kRead);
     case Attributes::ACCapacityformat::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCapacityformat);
+        return DataModel::Decode(reader, ACCapacityformat, DataModel::DecodeContext::kRead);
     case Attributes::PresetTypes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, presetTypes);
+        return DataModel::Decode(reader, presetTypes, DataModel::DecodeContext::kRead);
     case Attributes::ScheduleTypes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, scheduleTypes);
+        return DataModel::Decode(reader, scheduleTypes, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfPresets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfPresets);
+        return DataModel::Decode(reader, numberOfPresets, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfSchedules::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfSchedules);
+        return DataModel::Decode(reader, numberOfSchedules, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfScheduleTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfScheduleTransitions);
+        return DataModel::Decode(reader, numberOfScheduleTransitions, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfScheduleTransitionPerDay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfScheduleTransitionPerDay);
+        return DataModel::Decode(reader, numberOfScheduleTransitionPerDay, DataModel::DecodeContext::kRead);
     case Attributes::ActivePresetHandle::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePresetHandle);
+        return DataModel::Decode(reader, activePresetHandle, DataModel::DecodeContext::kRead);
     case Attributes::ActiveScheduleHandle::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeScheduleHandle);
+        return DataModel::Decode(reader, activeScheduleHandle, DataModel::DecodeContext::kRead);
     case Attributes::Presets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, presets);
+        return DataModel::Decode(reader, presets, DataModel::DecodeContext::kRead);
     case Attributes::Schedules::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, schedules);
+        return DataModel::Decode(reader, schedules, DataModel::DecodeContext::kRead);
     case Attributes::SetpointHoldExpiryTimestamp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, setpointHoldExpiryTimestamp);
+        return DataModel::Decode(reader, setpointHoldExpiryTimestamp, DataModel::DecodeContext::kRead);
     case Attributes::MaxThermostatSuggestions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxThermostatSuggestions);
+        return DataModel::Decode(reader, maxThermostatSuggestions, DataModel::DecodeContext::kRead);
     case Attributes::ThermostatSuggestions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, thermostatSuggestions);
+        return DataModel::Decode(reader, thermostatSuggestions, DataModel::DecodeContext::kRead);
     case Attributes::CurrentThermostatSuggestion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentThermostatSuggestion);
+        return DataModel::Decode(reader, currentThermostatSuggestion, DataModel::DecodeContext::kRead);
     case Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, thermostatSuggestionNotFollowingReason);
+        return DataModel::Decode(reader, thermostatSuggestionNotFollowingReason, DataModel::DecodeContext::kRead);
     case Attributes::CriticalFreezeProtection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, criticalFreezeProtection);
+        return DataModel::Decode(reader, criticalFreezeProtection, DataModel::DecodeContext::kRead);
     case Attributes::CriticalOverheatProtection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, criticalOverheatProtection);
+        return DataModel::Decode(reader, criticalOverheatProtection, DataModel::DecodeContext::kRead);
     case Attributes::Sensors::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sensors);
+        return DataModel::Decode(reader, sensors, DataModel::DecodeContext::kRead);
     case Attributes::AvailableSensorHandles::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, availableSensorHandles);
+        return DataModel::Decode(reader, availableSensorHandles, DataModel::DecodeContext::kRead);
     case Attributes::EnabledSensorHandles::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enabledSensorHandles);
+        return DataModel::Decode(reader, enabledSensorHandles, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfSensorScheduleTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfSensorScheduleTransitions);
+        return DataModel::Decode(reader, numberOfSensorScheduleTransitions, DataModel::DecodeContext::kRead);
     case Attributes::SensorSchedule::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sensorSchedule);
+        return DataModel::Decode(reader, sensorSchedule, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

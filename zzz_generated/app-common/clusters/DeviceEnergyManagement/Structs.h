@@ -55,6 +55,7 @@ public:
     Optional<uint16_t> currency;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -82,6 +83,7 @@ public:
     uint32_t maxDuration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -116,6 +118,7 @@ public:
     PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -194,6 +197,7 @@ public:
     Optional<uint32_t> maxDurationAdjustment;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -245,6 +249,7 @@ public:
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 };
@@ -270,6 +275,7 @@ public:
     Optional<int8_t> loadControl;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -297,6 +303,7 @@ public:
     uint32_t endTime            = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -322,6 +329,7 @@ public:
     uint32_t duration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 

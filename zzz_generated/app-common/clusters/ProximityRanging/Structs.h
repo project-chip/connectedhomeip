@@ -57,6 +57,7 @@ public:
     RDRReferenceEnum reference = static_cast<RDRReferenceEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -98,6 +99,7 @@ public:
     Optional<DataModel::Nullable<int8_t>> txPower;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -125,6 +127,7 @@ public:
     Optional<chip::ByteSpan> sessionKey;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -154,6 +157,7 @@ public:
     chip::ByteSpan ltk;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -187,6 +191,7 @@ public:
     Optional<uint8_t> maxConcurrentSessions;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -218,6 +223,7 @@ public:
     Optional<uint16_t> maxRangingInstances;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -243,6 +249,7 @@ public:
     Optional<uint32_t> rangingInstanceInterval;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -268,6 +275,7 @@ public:
     Optional<uint16_t> errorMarginCondition;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -293,6 +301,7 @@ public:
     chip::ByteSpan pmk;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    CHIP_ERROR DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext);
 
     static constexpr bool kIsFabricScoped = false;
 
