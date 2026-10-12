@@ -93,6 +93,11 @@ void WriteHandler::Close()
     MoveToState(State::Uninitialized);
 }
 
+/**
+ * @brief Classify a write path from provider metadata for list-write processing and notifications.
+ * @param path The endpoint, cluster, and attribute to query.
+ * @return The list quality flag, or std::nullopt when the provider or attribute metadata is unavailable.
+ */
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
     if (mDataModelProvider == nullptr)

@@ -306,6 +306,12 @@ public:
 
 } // namespace
 
+/**
+ * @brief Append a valid boolean write, including the scalar control used after list-write teardown.
+ * @param aWriteClient The client receiving the encoded attribute.
+ * @param encoding Select normal encoding or preencoded TLV.
+ * Encoding failures are reported as test assertions.
+ */
 void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
     AttributePathParams attributePathParams;
