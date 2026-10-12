@@ -23,6 +23,7 @@
 #include <posix/named_pipe/translators/AmbientContextTranslator.h>
 #include <posix/named_pipe/translators/BasicInformationTranslator.h>
 #include <posix/named_pipe/translators/BooleanStateTranslator.h>
+#include <posix/named_pipe/translators/DoorbellTranslator.h>
 #include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 #include <posix/named_pipe/translators/ModeSelectTranslator.h>
 #include <posix/named_pipe/translators/OccupancyTranslator.h>
@@ -377,10 +378,32 @@ TEST_F(TestNamedPipeTranslators, RvcTranslator)
     EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
 }
 
+TEST_F(TestNamedPipeTranslators, DoorbellTranslator)
+{
+    DoorbellTranslator translator;
+    auto names = translator.GetActionNames();
+    EXPECT_EQ(names.size(), 2U);
+
+    // ShortPress
+    Json::Value json1 = ParseJson(R"({"Name": "ShortPress"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json1, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
+
+    // Press (alias)
+    Json::Value json2 = ParseJson(R"({"Name": "Press"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, json2, mRegistry), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
+
+    // Unknown action
+    Json::Value unknown = ParseJson(R"({"Name": "UnknownAction"})");
+    EXPECT_EQ(translator.TranslateAndExecute(1, unknown, mRegistry), CHIP_ERROR_NOT_FOUND);
+}
+
 TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
 {
     Dispatcher dispatcher(mRegistry);
     EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<OnOffTranslator>(), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatcher.EnsureTranslatorRegistered<DoorbellTranslator>(), CHIP_NO_ERROR);
 
     // Valid action on explicit endpoint
     Json::Value valid = ParseJson(R"({"Name": "SetOnOff", "EndpointId": 1, "OnOff": true})");
@@ -390,6 +413,11 @@ TEST_F(TestNamedPipeTranslators, Dispatcher_DispatchJson)
     // Valid action with default endpoint (0)
     Json::Value defEp = ParseJson(R"({"Name": "SetOnOff", "OnOff": false})");
     EXPECT_EQ(dispatcher.DispatchJson(defEp), CHIP_NO_ERROR);
+
+    // Valid DoorbellTranslator action (ShortPress)
+    Json::Value doorbellCmd = ParseJson(R"({"Name": "ShortPress", "EndpointId": 1})");
+    EXPECT_EQ(dispatcher.DispatchJson(doorbellCmd), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockAccessor->mLastAction, "ShortPress");
 
     // Invalid JSON structure (not object)
     Json::Value arrayVal(Json::arrayValue);

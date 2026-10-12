@@ -33,7 +33,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DiagnosticDataProvider.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -46,6 +48,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/features/WifiFeature.h>
+#if CONFIG_CHIP_LIB_SHELL
+#include <lib/shell/commands/WiFi.h>
+#endif // CONFIG_CHIP_LIB_SHELL
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -119,7 +124,13 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitWifiNetworking()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // TODO WiFi
+    // InitChipStack() initializes the Zephyr connectivity layer.  The same
+    // singleton is then used by WifiFeature for Matter Network Commissioning.
+    // The shell registration below is only a development/debug interface.
+#if CONFIG_CHIP_LIB_SHELL
+    Shell::SetWiFiDriver(&mWifiDriver);
+#endif // CONFIG_CHIP_LIB_SHELL
+    ChipLogProgress(AppServer, "Matter Wi-Fi station commissioning is enabled");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     return CHIP_NO_ERROR;
 }
@@ -238,6 +249,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = mRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,

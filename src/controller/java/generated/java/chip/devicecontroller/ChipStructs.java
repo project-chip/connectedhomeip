@@ -18272,7 +18272,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
   public String name;
   public Long size;
   public String mimeType;
-  public String imageUri;
+  public String imageURI;
   private static final long FILE_ID_ID = 0L;
   private static final long NAME_ID = 1L;
   private static final long SIZE_ID = 2L;
@@ -18284,13 +18284,13 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     String name,
     Long size,
     String mimeType,
-    String imageUri
+    String imageURI
   ) {
     this.fileID = fileID;
     this.name = name;
     this.size = size;
     this.mimeType = mimeType;
-    this.imageUri = imageUri;
+    this.imageURI = imageURI;
   }
 
   public StructType encodeTlv() {
@@ -18299,7 +18299,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     values.add(new StructElement(NAME_ID, new StringType(name)));
     values.add(new StructElement(SIZE_ID, new UIntType(size)));
     values.add(new StructElement(MIME_TYPE_ID, new StringType(mimeType)));
-    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageUri)));
+    values.add(new StructElement(IMAGE_URI_ID, new StringType(imageURI)));
 
     return new StructType(values);
   }
@@ -18312,7 +18312,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     String name = null;
     Long size = null;
     String mimeType = null;
-    String imageUri = null;
+    String imageURI = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == FILE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -18337,7 +18337,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
       } else if (element.contextTagNum() == IMAGE_URI_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          imageUri = castingValue.value(String.class);
+          imageURI = castingValue.value(String.class);
         }
       }
     }
@@ -18346,7 +18346,7 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
       name,
       size,
       mimeType,
-      imageUri
+      imageURI
     );
   }
 
@@ -18366,8 +18366,8 @@ public static class MediaFileManagementClusterFileDescriptionStruct {
     output.append("\tmimeType: ");
     output.append(mimeType);
     output.append("\n");
-    output.append("\timageUri: ");
-    output.append(imageUri);
+    output.append("\timageURI: ");
+    output.append(imageURI);
     output.append("\n");
     output.append("}\n");
     return output.toString();

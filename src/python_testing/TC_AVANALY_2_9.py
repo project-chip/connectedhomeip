@@ -112,28 +112,30 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
         log.info("Using Zone 1 ID: %d, Zone 2 ID: %d", zone_1_id, zone_2_id)
 
         # Enable TrackingEnabled and enable context triggers for all zones
-        await self.write_single_attribute(
-            attributes.TrackingEnabled(True), endpoint_id=endpoint
-        )
-        tracking_enabled = await self.read_avanaly_attribute_expect_success(
-            endpoint, attributes.TrackingEnabled
-        )
-        asserts.assert_true(
-            tracking_enabled, "TrackingEnabled must be True after write"
-        )
-        await self.send_enable_context_triggers_cmd(
-            endpoint, context_triggers=NullValue
-        )
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+        try:
+            await self.write_single_attribute(
+                attributes.TrackingEnabled(True), endpoint_id=endpoint
+            )
+            tracking_enabled = await self.read_avanaly_attribute_expect_success(
+                endpoint, attributes.TrackingEnabled
+            )
+            asserts.assert_true(
+                tracking_enabled, "TrackingEnabled must be True after write"
+            )
+            await self.send_enable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
 
-        # Set up event subscription handler
-        event_callback = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
+            # Set up event subscription handler
+            event_callback = EventSubscriptionHandler(expected_cluster=cluster)
+            await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(2)
-        context_to_detect = supported_contexts[0]
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
+            self.step(2)
+            context_to_detect = supported_contexts[0]
+            if self.matter_test_config.pipe_name:
+                pipe_payload_1 = {
                     "Name": "AvAnalysisPerceivedContext",
                     "NewContexts": [
                         {
@@ -145,40 +147,41 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
                         }
                     ],
                 }
-            )
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg=f"Simulate entity detection in Zone 1 (zoneID={zone_1_id}) on the DUT. Press Enter once initiated."
-            )
+                if self.has_feature_remcondetect:
+                    pipe_payload_1["SourceNodeId"] = camera_node_id
+                self.write_to_app_pipe(pipe_payload_1)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg=f"Simulate entity detection in Zone 1 (zoneID={zone_1_id}) on the DUT. Press Enter once initiated."
+                )
 
-        self.step(3)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event1 = event_callback.wait_for_event_report(
-                cluster.Events.PerceivedContext, timeout_sec=30
-            )
-            log.info("PerceivedContext event 1: %s", event1)
-            asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
-            asserts.assert_is_not_none(
-                event1.newIdentifiedContexts,
-                "newIdentifiedContexts must be present in event 1",
-            )
-            tc1 = event1.newIdentifiedContexts[0]
-            asserts.assert_equal(
-                tc1.currentZone,
-                zone_1_id,
-                f"Expected currentZone {zone_1_id}, got {tc1.currentZone}",
-            )
-            asserts.assert_true(
-                tc1.previousZone is None or tc1.previousZone is NullValue,
-                f"Expected previousZone to be Null, got {tc1.previousZone}",
-            )
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 3")
+            self.step(3)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event1 = event_callback.wait_for_event_report(
+                    cluster.Events.PerceivedContext, timeout_sec=30
+                )
+                log.info("PerceivedContext event 1: %s", event1)
+                asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
+                asserts.assert_is_not_none(
+                    event1.newIdentifiedContexts,
+                    "newIdentifiedContexts must be present in event 1",
+                )
+                tc1 = event1.newIdentifiedContexts[0]
+                asserts.assert_equal(
+                    tc1.currentZone,
+                    zone_1_id,
+                    f"Expected currentZone {zone_1_id}, got {tc1.currentZone}",
+                )
+                asserts.assert_true(
+                    tc1.previousZone is None or tc1.previousZone is NullValue,
+                    f"Expected previousZone to be Null, got {tc1.previousZone}",
+                )
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 3")
 
-        self.step(4)
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
+            self.step(4)
+            if self.matter_test_config.pipe_name:
+                pipe_payload_2 = {
                     "Name": "AvAnalysisPerceivedContext",
                     "NewContexts": [
                         {
@@ -190,48 +193,52 @@ class TC_AVANALY_2_9(MatterTestCommissionedDevice, AVANALYTestBase):
                         }
                     ],
                 }
-            )
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg=f"Simulate entity moving from Zone 1 (zoneID={zone_1_id}) to Zone 2 (zoneID={zone_2_id}) on the DUT. Press Enter once initiated."
-            )
+                if self.has_feature_remcondetect:
+                    pipe_payload_2["SourceNodeId"] = camera_node_id
+                self.write_to_app_pipe(pipe_payload_2)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg=f"Simulate entity moving from Zone 1 (zoneID={zone_1_id}) to Zone 2 (zoneID={zone_2_id}) on the DUT. Press Enter once initiated."
+                )
 
-        self.step(5)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event2 = event_callback.wait_for_event_report(
-                cluster.Events.PerceivedContext, timeout_sec=30
-            )
-            log.info("PerceivedContext event 2: %s", event2)
-            asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
-            tracked_list = (
-                event2.newIdentifiedContexts or event2.currentIdentifiedContexts
-            )
-            asserts.assert_is_not_none(
-                tracked_list, "TrackedContexts must be present in event 2"
-            )
-            tc2 = tracked_list[0]
-            asserts.assert_equal(
-                tc2.currentZone,
-                zone_2_id,
-                f"Expected currentZone {zone_2_id}, got {tc2.currentZone}",
-            )
-            asserts.assert_equal(
-                tc2.previousZone,
-                zone_1_id,
-                f"Expected previousZone {zone_1_id}, got {tc2.previousZone}",
-            )
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 5")
+            self.step(5)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event2 = event_callback.wait_for_event_report(
+                    cluster.Events.PerceivedContext, timeout_sec=30
+                )
+                log.info("PerceivedContext event 2: %s", event2)
+                asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
+                tracked_list = (
+                    event2.newIdentifiedContexts or event2.currentIdentifiedContexts
+                )
+                asserts.assert_is_not_none(
+                    tracked_list, "TrackedContexts must be present in event 2"
+                )
+                tc2 = tracked_list[0]
+                asserts.assert_equal(
+                    tc2.currentZone,
+                    zone_2_id,
+                    f"Expected currentZone {zone_2_id}, got {tc2.currentZone}",
+                )
+                asserts.assert_equal(
+                    tc2.previousZone,
+                    zone_1_id,
+                    f"Expected previousZone {zone_1_id}, got {tc2.previousZone}",
+                )
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 5")
 
-        # Cleanup
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
-        await self.write_single_attribute(
-            attributes.TrackingEnabled(False), endpoint_id=endpoint
-        )
-        await self.send_disable_context_triggers_cmd(
-            endpoint, context_triggers=NullValue
-        )
+            # Cleanup
+            if self.matter_test_config.pipe_name:
+                self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
+            await self.write_single_attribute(
+                attributes.TrackingEnabled(False), endpoint_id=endpoint
+            )
+            await self.send_disable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
+        finally:
+            await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

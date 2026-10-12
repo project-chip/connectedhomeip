@@ -16,8 +16,23 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
 
 import("crypto.gni")
+
+# The single-part PSA AEAD path encrypts through a stack buffer sized for one
+# UDP MTU, so it cannot handle the large payloads a TCP session negotiates. Test
+# builds are exempt so the single-part path stays covered on Linux; tests that
+# send large payloads skip themselves under CHIP_CRYPTO_PSA_AEAD_SINGLE_PART.
+# If this limitation is removed, drop this assert and re-enable
+# TestReportingEngine.TestBuildAndSendSingleReportDataLargePayload in
+# src/app/tests/TestReportingEngine.cpp.
+# See https://github.com/project-chip/connectedhomeip/issues/74514.
+assert(
+    chip_crypto != "psa" || !chip_crypto_psa_aead_single_part ||
+        !chip_inet_config_enable_tcp_endpoint || chip_build_tests,
+    "chip_crypto_psa_aead_single_part cannot be combined with chip_inet_config_enable_tcp_endpoint")
 
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
@@ -104,7 +119,8 @@ if (chip_crypto == "openssl") {
   import("${chip_root}/build_overrides/boringssl.gni")
 
   source_set("cryptopal_boringssl") {
-    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
+    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor
+    # #ifdef differences
     sources = [
       "CHIPCryptoPALOpenSSL.cpp",
       "CHIPCryptoPALOpenSSL.h",

@@ -18,6 +18,7 @@
 #include <transport/SecureSession.h>
 #include <transport/Session.h>
 #include <transport/UnauthenticatedSessionTable.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Transport {
@@ -76,6 +77,18 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
     // indicate we are processing non-initial message since the other side would be responding to our message.
     return GetAckTimeout(isFirstMessageOnExchange) + upperlayerProcessingTimeout +
         GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp(), false /*isFirstMessageOnExchange*/);
+}
+
+size_t Session::GetMaxAppMessageLen() const
+{
+    if (!AllowsLargePayload())
+    {
+        return kMaxAppMessageLen;
+    }
+
+    uint32_t maxPayload = GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+    size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+    return std::min<size_t>(remoteLimit, kMaxLargeAppMessageLen);
 }
 
 uint16_t Session::SessionIdForLogging() const

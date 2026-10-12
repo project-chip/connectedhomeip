@@ -293,7 +293,7 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4342A" "BRD2708A" "BRD2911A")
+    WIFI_SOC_BOARDS=("BRD4338A" "BRD2605A" "BRD4343A" "BRD4343C" "BRD4342A" "BRD2708A" "BRD2911A")
     if [[ " ${WIFI_SOC_BOARDS[@]} " =~ " ${SILABS_BOARD} " ]]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
