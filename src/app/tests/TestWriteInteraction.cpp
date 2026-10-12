@@ -81,7 +81,6 @@ const MockNodeConfig & TestMockNodeConfig()
                 Clusters::UnitTesting::Attributes::Int16u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
                 MockAttributeConfig(Clusters::UnitTesting::Attributes::ListStructOctetString::Id, ZCL_ARRAY_ATTRIBUTE_TYPE),
-                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
             }),
         }),
         MockEndpointConfig(kMockEndpoint1, {
