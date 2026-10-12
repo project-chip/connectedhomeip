@@ -21,6 +21,7 @@
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -64,6 +65,9 @@ public:
 
 struct TestContentLaunchServer : public ::testing::Test
 {
+    // Encoding command responses into MockCommandHandler allocates through chip::Platform.
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestContentLaunchServer, TestDelegateDefaultHandleGetMovable)
@@ -122,10 +126,8 @@ TEST_F(TestContentLaunchServer, TestDelegateDefaultHandlePlayPreset)
 
     // The default Presets list is empty, so no PresetID can match.
     ASSERT_TRUE(mockHandler.HasStatus());
-    const auto & status = mockHandler.GetLastStatus().status;
-    EXPECT_EQ(status.GetStatus(), Protocols::InteractionModel::Status::Failure);
-    ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
-    EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusEnum::kPresetNotFound));
+    EXPECT_EQ(mockHandler.GetLastStatus().status,
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusEnum::kPresetNotFound));
 }
 
 TEST_F(TestContentLaunchServer, TestDelegateGetSupportedStreamingProtocols)
