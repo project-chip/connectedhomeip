@@ -597,29 +597,19 @@ bool CameraAvSettingsUserLevelMgmtServerLogic::KnownVideoStreamID(uint16_t aVide
 }
 
 /**
- * Helper function for setting the next preset ID to use in advance of reception of an MPTZSavePreset.
- * The method loops over the range of possible IDs, starting with the current ID, if the preset ID is in use,
- * it continues to the next possible value, looping back to 1. The checking is needed as the preset IDs aren't
- * solely server generated, they can also be provided by a client.
- * If there are no free presets (which will happen if all slots are taken), the value is not updated.
+ * @brief Retain a free allocation cursor or select the next unused ID, wrapping within 1 through MaxPresets.
+ * Check the current ID first so reload and removal do not skip an available slot.
+ * Zero capacity and a full list leave the cursor unchanged; insertion into a full list is rejected by the save handler.
  */
 void CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID()
 {
+    VerifyOrReturn(mMaxPresets != 0);
     uint8_t nextIDToCheck = mCurrentPresetID;
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.", mEndpointId,
                   mCurrentPresetID);
 
     do
     {
-        nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) + 1);
-
-        // Have we lapped back round to where we started?  If so, break
-        //
-        if (nextIDToCheck == mCurrentPresetID)
-        {
-            break;
-        }
-
         auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
                                [=](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) {
                                    return mptzph.GetPresetID() == nextIDToCheck;
@@ -629,7 +619,8 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID()
             mCurrentPresetID = nextIDToCheck;
             break;
         }
-    } while (true);
+        nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) + 1);
+    } while (nextIDToCheck != mCurrentPresetID);
 
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
 }
@@ -659,6 +650,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeMPTZPresets(At
     });
 }
 
+/**
+ * @brief Encode the current digital-stream list without changing its entries or persistent records.
+ * @param aEncoder The attribute encoder receiving the stream list.
+ * @return CHIP_NO_ERROR on success, or an encoding error.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -671,6 +667,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(At
     });
 }
 
+/**
+ * @brief Restore position, presets, and digital streams, then notify the delegate that loading has completed.
+ * Rebuild the allocation cursor from the loaded presets before notifying the delegate.
+ * Position-load errors select default axis values; preset or stream errors clear the corresponding active list.
+ * Invalid preset records remain in storage, and delegate notification errors are ignored by the existing startup policy.
+ */
 void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -706,6 +708,10 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Loaded MPTZPresets", mEndpointId);
     }
 
+    // The allocation cursor is not persisted. Rebuild it from the loaded list before notifying the delegate.
+    mCurrentPresetID = 1;
+    UpdatePresetID();
+
     // Load DPTZRelativeMove
     err = LoadDPTZStreams();
     if (err != CHIP_NO_ERROR)
@@ -724,6 +730,13 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
+/**
+ * @brief Validate supported axes and ask the delegate to move to an absolute mechanical position.
+ * @param commandData The requested optional pan, tilt, and zoom values; at least one must be supplied.
+ * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range value,
+ *         Busy when movement is unavailable, or the delegate's status.
+ * Success records the target and starts movement; the completion callback applies the position.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData)
@@ -970,6 +983,12 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Ask the delegate to move to a known preset; commit position values after its completion callback.
+ * @param commandData The preset ID to look up.
+ * @return ConstraintError for an out-of-range ID, NotFound for a missing preset, Busy when movement is unavailable,
+ *         or the delegate's status. Success starts movement and marks MovementState as moving.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData)
@@ -1033,6 +1052,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Save the current mechanical position under an explicit preset ID or the cached available ID.
+ * @param commandData The preset name and optional ID; an existing explicit ID selects an update.
+ * @return ConstraintError for an out-of-range explicit ID, ResourceExhausted for an insertion into a full list,
+ *         the delegate's rejection status, Failure on persistence error, or Success after notifying subscribers.
+ * Persistence failure rolls back the active list and retains the allocation cursor.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData)
@@ -1146,6 +1172,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return Status::Success;
 }
 
+/**
+ * @brief Remove a known preset after delegate acceptance and a successful persistence write.
+ * @param commandData The preset ID to remove.
+ * @return ConstraintError for an out-of-range ID, NotFound for an absent ID, the delegate's rejection status,
+ *         Failure on persistence error, or Success after refreshing the allocation cursor and notifying subscribers.
+ * Persistence failure retains the active list and allocation cursor and emits no attribute notification.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRemovePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData)
@@ -1204,11 +1237,17 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Remove the identified item from the known set of presets
     //
     mMptzPresetHelpers.erase(it);
+    UpdatePresetID();
     MarkDirty(Attributes::MPTZPresets::Id);
 
     return Status::Success;
 }
 
+/**
+ * @brief Ask the delegate to apply a viewport to a known digital stream.
+ * @param commandData The stream ID and requested viewport.
+ * @return NotFound for an unknown stream, or the delegate's status; Success commits the requested viewport.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZSetViewport(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData)
@@ -1236,6 +1275,12 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Ask the delegate to compute a relative viewport change for a known digital stream.
+ * @param commandData The stream ID and optional movement deltas.
+ * @return ConstraintError for an out-of-range zoom delta, NotFound for an unknown stream, or the delegate's status.
+ * Success commits the viewport supplied by the delegate.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZRelativeMove(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData)
