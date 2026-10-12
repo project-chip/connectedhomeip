@@ -233,10 +233,10 @@ directory is scanned at configure time, so an existing build directory needs
 
 `Theme.cpp` extends the default LVGL dark theme with an apply callback, so every
 widget is styled at creation: plain containers become cards, and buttons,
-sliders, switches and dialogs get matching styles. Screens compose from the
-builders in `Ui.h` and take sizes from `Ui::Px(large, small)`, which picks the
-first value on 480-class panels and the second on 320x240, so the CoreS3 keeps
-its compact layout. Fonts follow the same rule.
+sliders, switches and message boxes get matching styles. Screens compose from
+the builders in `Ui.h` and take sizes from `Ui::Px(large, small)`, which picks
+the first value on 480-class panels and the second on 320x240, so the CoreS3
+keeps its compact layout. Fonts follow the same rule.
 
 ### Thread Safety
 
