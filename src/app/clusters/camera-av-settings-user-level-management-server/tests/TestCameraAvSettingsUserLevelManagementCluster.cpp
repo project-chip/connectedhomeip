@@ -34,7 +34,10 @@
 #include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Defer.h>
 #include <lib/support/ReadOnlyBuffer.h>
+
+#include <string>
 
 namespace {
 
@@ -81,7 +84,14 @@ public:
         return Status::Success;
     }
 
-    Status MPTZSavePreset(uint8_t aPreset) { return Status::Success; }
+    /** @brief Record successful preset saves so rejected commands can be checked for delegate side effects. */
+    Status MPTZSavePreset(uint8_t aPreset)
+    {
+        ++mSavePresetCalls;
+        return Status::Success;
+    }
+
+    size_t mSavePresetCalls = 0;
 
     Status MPTZRemovePreset(uint8_t aPreset) { return Status::Success; }
 
@@ -364,6 +374,265 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
 
     // As we provided a Preset ID of 2, the next Preset to use should still be 1
     ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 1);
+}
+
+/** @brief Bound names passed directly to the public helper without changing its void setter or constructor API. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetHelperRejectsOverlengthNames)
+{
+    MPTZPresetHelper preset;
+    preset.SetName("01234567890123456789012345678901"_span);
+    const std::string originalName = preset.GetName();
+    ASSERT_EQ(originalName.size(), 32u);
+
+    const std::string reportName(132, 'a');
+    const std::string boundaryName(33, 'b');
+    const std::string multibyteName = std::string(30, 'c') + "\xE7\x95\x8C";
+    const CharSpan invalidNames[]   = { CharSpan(reportName.data(), reportName.size()),
+                                        CharSpan(boundaryName.data(), boundaryName.size()),
+                                        CharSpan(multibyteName.data(), multibyteName.size()) };
+    for (CharSpan name : invalidNames)
+    {
+        preset.SetName(name);
+        EXPECT_EQ(preset.GetName(), originalName);
+        MPTZPresetHelper constructed(1, name, mServer.GetLogic().GetMptzPosition());
+        EXPECT_TRUE(constructed.GetName().empty());
+    }
+
+    preset.SetName(""_span);
+    EXPECT_TRUE(preset.GetName().empty());
+    const std::string validMultibyteName = std::string(29, 'c') + "\xE7\x95\x8C";
+    MPTZPresetHelper constructed(1, CharSpan(validMultibyteName.data(), validMultibyteName.size()),
+                                 mServer.GetLogic().GetMptzPosition());
+    EXPECT_EQ(constructed.GetName(), validMultibyteName);
+}
+
+/** @brief Reject names above 32 bytes before allocating an ID, saving a preset, or notifying subscribers. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOverlengthNewNames)
+{
+    const std::string reportName(132, 'a');
+    const std::string boundaryName(33, 'b');
+    const std::string multibyteName = std::string(30, 'c') + "\xE7\x95\x8C";
+    const CharSpan invalidNames[]   = { CharSpan(reportName.data(), reportName.size()),
+                                        CharSpan(boundaryName.data(), boundaryName.size()),
+                                        CharSpan(multibyteName.data(), multibyteName.size()) };
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence      = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    const size_t storedKeys = mClusterTester.GetTestContext().StorageDelegate().GetNumKeys();
+    mClusterTester.GetDirtyList().clear();
+
+    for (bool providePresetID : { false, true })
+    {
+        for (CharSpan name : invalidNames)
+        {
+            Commands::MPTZSavePreset::Type request;
+            request.name = name;
+            if (providePresetID)
+            {
+                request.presetID.SetValue(2);
+            }
+            auto result = mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request);
+            EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+            EXPECT_EQ(mMockDelegate.mSavePresetCalls, 0u);
+            EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 1);
+            EXPECT_TRUE(mServer.GetLogic().mMptzPresetHelpers.empty());
+            EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+            EXPECT_EQ(mClusterTester.GetTestContext().StorageDelegate().GetNumKeys(), storedKeys);
+
+            Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+            ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+            size_t count = 0;
+            ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+            EXPECT_EQ(count, 0u);
+
+            uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+            MutableByteSpan stored(buffer);
+            EXPECT_EQ(persistence.ReadValue(presetsPath, stored), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        }
+    }
+
+    // A valid request must still use the first ID after all rejected requests.
+    Commands::MPTZSavePreset::Type request;
+    request.name = "01234567890123456789012345678901"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, 1u);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+}
+
+/** @brief Reject overlength updates while preserving the saved name, position, KVS bytes, ID, and notifications. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOverlengthUpdates)
+{
+    Commands::MPTZSavePreset::Type request;
+    request.presetID.SetValue(1);
+    request.name = "SavedPreset"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan before(beforeBuffer);
+    ASSERT_EQ(persistence.ReadValue(presetsPath, before), CHIP_NO_ERROR);
+
+    // An accepted update would capture this new position; rejection must retain the saved position.
+    mServer.GetLogic().SetPan(MakeOptional(static_cast<int16_t>(7)));
+    mClusterTester.GetDirtyList().clear();
+    const std::string reportName(132, 'a');
+    const std::string boundaryName(33, 'b');
+    const std::string multibyteName = std::string(30, 'c') + "\xE7\x95\x8C";
+    const CharSpan invalidNames[]   = { CharSpan(reportName.data(), reportName.size()),
+                                        CharSpan(boundaryName.data(), boundaryName.size()),
+                                        CharSpan(multibyteName.data(), multibyteName.size()) };
+
+    for (CharSpan name : invalidNames)
+    {
+        request.name = name;
+        auto result  = mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+        EXPECT_EQ(mMockDelegate.mSavePresetCalls, 1u);
+        EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+        EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+
+        Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+        ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+        auto it = presets.begin();
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, 1);
+        EXPECT_TRUE(it.GetValue().name.data_equal("SavedPreset"_span));
+        ASSERT_TRUE(it.GetValue().settings.pan.HasValue());
+        EXPECT_EQ(it.GetValue().settings.pan.Value(), kDefaultPan);
+        EXPECT_FALSE(it.Next());
+        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+        uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+        MutableByteSpan after(afterBuffer);
+        ASSERT_EQ(persistence.ReadValue(presetsPath, after), CHIP_NO_ERROR);
+        EXPECT_TRUE(before.data_equal(after));
+    }
+
+    request.name = "01234567890123456789012345678901"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, 2u);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetMptzPosition().pan.Value(), 7);
+}
+
+/** @brief Preserve empty, short, and 32-byte names through creation, updates, and a fresh server's persistence load. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetAcceptsNameLengthBoundaries)
+{
+    const std::string multibyteName = std::string(29, 'c') + "\xE7\x95\x8C";
+    const CharSpan names[]          = { ""_span, "A"_span, "01234567890123456789012345678901"_span,
+                                        CharSpan(multibyteName.data(), multibyteName.size()) };
+    uint8_t presetID                = 1;
+    for (CharSpan name : names)
+    {
+        Commands::MPTZSavePreset::Type request;
+        request.name = name;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+        Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+        ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+        auto it = presets.begin();
+        for (uint8_t id = 1; id <= presetID; ++id)
+        {
+            ASSERT_TRUE(it.Next());
+            EXPECT_EQ(it.GetValue().presetID, id);
+            EXPECT_TRUE(it.GetValue().name.data_equal(names[id - 1]));
+        }
+        EXPECT_FALSE(it.Next());
+        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+        ++presetID;
+    }
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 5);
+
+    for (CharSpan name : names)
+    {
+        Commands::MPTZSavePreset::Type request;
+        request.presetID.SetValue(1);
+        request.name = name;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+        EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 5);
+        EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 4u);
+        EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetName(), std::string(name.data(), name.size()));
+    }
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, 8u);
+
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester restoredTester(restored);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    auto it = presets.begin();
+    for (uint8_t id = 1; id <= 4; ++id)
+    {
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, id);
+        EXPECT_TRUE(it.GetValue().name.data_equal(id == 1 ? names[3] : names[id - 1]));
+    }
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
+}
+
+/** @brief Reject stored overlength names without exposing a partially loaded list or rewriting the invalid record. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetsRejectOverlengthStoredNames)
+{
+    const std::string reportName(132, 'a');
+    const std::string boundaryName(33, 'b');
+    const std::string multibyteName = std::string(30, 'c') + "\xE7\x95\x8C";
+    const CharSpan invalidNames[]   = { CharSpan(reportName.data(), reportName.size()),
+                                        CharSpan(boundaryName.data(), boundaryName.size()),
+                                        CharSpan(multibyteName.data(), multibyteName.size()) };
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+
+    for (CharSpan name : invalidNames)
+    {
+        uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType arrayType;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+        Structs::MPTZPresetStruct::Type preset;
+        preset.presetID = 1;
+        preset.name     = "01234567890123456789012345678901"_span;
+        preset.settings = mServer.GetLogic().GetMptzPosition();
+        ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        preset.presetID = 2;
+        preset.name     = name;
+        ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        const ByteSpan encoded(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(persistence.WriteValue(presetsPath, encoded), CHIP_NO_ERROR);
+
+        MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+        CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+        restored.SetDelegate(&restoredDelegate);
+        ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester restoredTester(restored);
+        Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+        ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+        size_t count = 0;
+        ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, 0u);
+        EXPECT_TRUE(restored.GetLogic().mMptzPresetHelpers.empty());
+        EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 1);
+        EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
+
+        uint8_t storedBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+        MutableByteSpan stored(storedBuffer);
+        ASSERT_EQ(persistence.ReadValue(presetsPath, stored), CHIP_NO_ERROR);
+        EXPECT_TRUE(encoded.data_equal(stored));
+
+        Commands::MPTZSavePreset::Type request;
+        request.name = "ValidAfterReload"_span;
+        ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+        ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 1u);
+        EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    }
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
@@ -984,6 +1253,41 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPres
     EXPECT_TRUE(it.GetValue().name.data_equal("TestPreset"_span));
     EXPECT_EQ(it.GetValue().settings.pan.Value(), 5);
     EXPECT_FALSE(it.Next());
+}
+
+/** @brief Prevent a legacy preset containing an overlength name from becoming active after storage migration. */
+TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, RejectsMigratedOverlengthPresetName)
+{
+    const std::string name(132, 'a');
+    Structs::MPTZPresetStruct::Type preset;
+    preset.presetID = 1;
+    preset.name     = "ValidPreset"_span;
+    preset.settings.pan.SetValue(kDefaultPan);
+    preset.settings.tilt.SetValue(kDefaultTilt);
+    preset.settings.zoom.SetValue(kDefaultZoom);
+    uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    TLV::TLVType arrayType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    preset.presetID = 2;
+    preset.name     = CharSpan(name.data(), name.size());
+    ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+    WriteSafeTlv(Attributes::MPTZPresets::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    ASSERT_FALSE(HasFailure());
+    StartServer();
+    ASSERT_FALSE(HasFailure());
+
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+    EXPECT_TRUE(mServer.GetLogic().mMptzPresetHelpers.empty());
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, 0u);
 }
 
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)

@@ -213,6 +213,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Load persisted presets, rejecting overlength names before copying them into owned storage.
+ * @return CHIP_NO_ERROR for a complete list or an absent record, ConstraintError for an overlength name,
+ *         or the storage, allocation, or decoding error.
+ * LoadPersistentAttributes clears any partially loaded list on error; the persisted record is left unchanged.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -250,6 +256,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     {
         MPTZPresetStruct::Type preset;
         ReturnErrorOnFailure(DataModel::Decode(reader, preset));
+        VerifyOrReturnError(preset.name.size() <= kMaxMPTZPresetNameLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         MPTZPresetHelper aMptzPresetHelper;
 
         aMptzPresetHelper.SetPresetID(preset.presetID);
@@ -1027,6 +1034,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Save or update a preset using the current mechanical position and a name of at most 32 bytes.
+ * @param commandData The optional preset ID and name. Invalid IDs or overlength names are rejected before delegate or state
+ * effects.
+ * @return Success after persistence, ConstraintError for invalid input, ResourceExhausted when no slot is available,
+ *         the delegate's error status, or Failure when persistence fails and the list update is rolled back.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData)
@@ -1036,6 +1050,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     Optional<uint8_t> preset  = commandData.presetID;
     chip::CharSpan presetName = commandData.name;
     uint8_t presetToUse       = mCurrentPresetID;
+
+    VerifyOrReturnError(
+        presetName.size() <= kMaxMPTZPresetNameLength, Status::ConstraintError,
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset name exceeds the maximum byte length", mEndpointId));
 
     // Do we have a user provided preset ID? If yes, is it in range?
     //
