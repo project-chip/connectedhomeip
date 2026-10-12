@@ -59,7 +59,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -79,7 +79,7 @@ MAX_SAT_VALUE = 65535
 MAX_T_VALUE = 6
 
 
-class TC_SC_4_3(MatterBaseTest):
+class TC_SC_4_3(MatterTestCommissionedDevice):
 
     def steps_TC_SC_4_3(self):
         return [TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),

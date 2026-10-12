@@ -45,14 +45,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_33(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_33(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     async def _get_stream_ref_count(self, stream_id: int, attribute, endpoint: int) -> int:
         streams = await self.read_single_attribute_check_success(

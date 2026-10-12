@@ -20,6 +20,7 @@ from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.esp32_zephyr import Esp32ZephyrApp, Esp32ZephyrBoard, Esp32ZephyrBuilder
 from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
@@ -56,12 +57,14 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-light',
     'dimmable-plug-in-unit',
     'dishwasher',
+    'doorbell',
     'electrical-sensor',
     'extended-color-light',
     'extractor-hood',
     'fan',
     'flow-sensor',
     'generic-switch',
+    'humidity-conditioner',
     'humidity-sensor',
     'laundry-dryer',
     'laundry-washer',
@@ -81,12 +84,15 @@ _ALL_DEVICES_APP_DEVICES = [
     'rain-sensor',
     'refrigerator',
     'robotic-vacuum-cleaner',
+    'room-air-conditioner',
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'thread-border-router',
     'water-freeze-detector',
     'water-leak-detector',
     'water-valve',
+    'window-covering',
     # keep-sorted: end
 ]
 
@@ -343,6 +349,27 @@ def BuildEsp32Target():
     return target
 
 
+def BuildEsp32ZephyrTarget() -> BuildTarget:
+    """Create the ESP32 Zephyr build target."""
+    target = BuildTarget('esp32', Esp32ZephyrBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('zephyr'),
+    ])
+
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('c6devkitc', board=Esp32ZephyrBoard.C6_DEVKITC),
+    ])
+
+    # applications
+    target.AppendFixedTargets([
+        TargetPart('light', app=Esp32ZephyrApp.LIGHT),
+    ])
+
+    return target
+
+
 def BuildEfr32Target():
     target = BuildTarget('efr32', Efr32Builder)
 
@@ -359,6 +386,7 @@ def BuildEfr32Target():
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343c', board=Efr32Board.BRD4343C, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2708a', board=Efr32Board.BRD2708A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2911a', board=Efr32Board.BRD2911A, enable_wifi=True, enable_917_soc=True),
@@ -367,7 +395,7 @@ def BuildEfr32Target():
     # apps
     app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
-        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4343c|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -384,7 +412,7 @@ def BuildEfr32Target():
     # Single-device subset builds for all-devices-app.
     for _device in _ALL_DEVICES_APP_DEVICES:
         app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
-                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4343c|brd4342a|brd2708a|brd2911a)'))
 
     target.AppendFixedTargets(app_parts)
 
@@ -851,6 +879,8 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
+        TargetPart('tl3228x', board=TelinkBoard.TL3228X),
+        TargetPart('tl3228x_retention', board=TelinkBoard.TL3228X_RETENTION),
         TargetPart('tl3238x', board=TelinkBoard.TL3238X),
         TargetPart('tl3238x_retention', board=TelinkBoard.TL3238X_RETENTION),
         TargetPart('tl5218x', board=TelinkBoard.TL5218X),
@@ -947,6 +977,7 @@ BUILD_TARGETS = [
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
+    BuildEsp32ZephyrTarget(),
     BuildGenioTarget(),
     BuildHostFakeTarget(),
     BuildHostTarget(),
