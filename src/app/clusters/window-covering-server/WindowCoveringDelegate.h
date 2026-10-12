@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandResponseHelper.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -61,6 +62,16 @@ public:
      * occurring..
      */
     virtual CHIP_ERROR HandleStopMotion() = 0;
+
+    // These methods are called when the corresponding attributes are updated by the server, whether
+    // via InvokeCommand, or direct server APIs. Default implementations do nothing;
+    // override only the callbacks you need.
+
+    virtual void OnTargetPositionLiftChanged(DataModel::Nullable<Percent100ths> newTargetLift) {}
+    virtual void OnTargetPositionTiltChanged(DataModel::Nullable<Percent100ths> newTargetTilt) {}
+    virtual void OnModeChanged(chip::BitMask<Mode> newMode) {}
+    virtual void OnSafetyStatusChanged(chip::BitMask<SafetyStatus> newSafetyStatus) {}
+    virtual void OnConfigStatusChanged(chip::BitMask<ConfigStatus> newConfigStatus) {}
 
     virtual ~WindowCoveringDelegate() = default;
 

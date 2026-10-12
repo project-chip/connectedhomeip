@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
-#include <headers/ProvisionedDataProvider.h>
+#include <headers/ProvisionStorageInterfaces.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -34,12 +34,12 @@ public:
     /**
      * @brief Configures the Silabs Test Event trigger
      *
-     * @param provider pointer to the silabs provisionned data provider
+     * @param reader pointer to the Silicon Labs provisioning storage reader
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR, if the init was succesful
-     *                    CHIP_ERROR_INVALID_ARGUMENT, if the manager input is equal to nullptr
+     * @return CHIP_ERROR CHIP_NO_ERROR, if initialization succeeds
+     *                    CHIP_ERROR_INVALID_ARGUMENT, if reader is nullptr
      */
-    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::ProvisionedDataProvider * provider);
+    CHIP_ERROR Init(DeviceLayer::Silabs::Provision::IProvisionStorageReader * reader);
 
     /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
@@ -49,7 +49,7 @@ public:
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
 
 private:
-    DeviceLayer::Silabs::Provision::ProvisionedDataProvider * mProvider = nullptr;
+    DeviceLayer::Silabs::Provision::IProvisionStorageReader * mReader = nullptr;
 };
 
 } // namespace chip

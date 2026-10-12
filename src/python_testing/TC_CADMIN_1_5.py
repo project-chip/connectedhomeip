@@ -42,12 +42,13 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError as IME
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_5(CADMINBaseTest):
+class TC_CADMIN_1_5(MatterTestCommissionedDevice, CADMINBaseTest):
 
     async def commission_on_network_expect_error(self, setup_code: int, discriminator: int):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already

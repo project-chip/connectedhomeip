@@ -171,6 +171,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kPAASupportedProfiles), PAASupportedProfiles);
     encoder.Encode(to_underlying(Fields::kPAISupportedProfiles), PAISupportedProfiles);
     encoder.Encode(to_underlying(Fields::kDACSupportedProfiles), DACSupportedProfiles);
+    encoder.Encode(to_underlying(Fields::kCDSupportedProfiles), CDSupportedProfiles);
     return encoder.Finalize();
 }
 
@@ -195,6 +196,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDACSupportedProfiles))
         {
             err = DataModel::Decode(reader, DACSupportedProfiles);
+        }
+        else if (__context_tag == to_underlying(Fields::kCDSupportedProfiles))
+        {
+            err = DataModel::Decode(reader, CDSupportedProfiles);
         }
 
         ReturnErrorOnFailure(err);

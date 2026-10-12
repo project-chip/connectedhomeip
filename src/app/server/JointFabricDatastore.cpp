@@ -436,11 +436,26 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     const NodeId nodeId   = entryToSync.nodeID;
                     const EndpointId epId = entryToSync.endpointID;
                     const GroupId groupId = entryToSync.groupID;
-                    ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, entryToSync, [this, nodeId, epId, groupId]() {
-                        detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
-                            return e.nodeID == nodeId && e.endpointID == epId && e.groupID == groupId;
+                    CHIP_ERROR syncErr =
+                        mDelegate->SyncNode(mRefreshingNodeId, entryToSync, [this, nodeId, epId, groupId](CHIP_ERROR innerErr) {
+                            if (innerErr != CHIP_NO_ERROR)
+                            {
+                                return;
+                            }
+                            detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
+                                return e.nodeID == nodeId && e.endpointID == epId && e.groupID == groupId;
+                            });
                         });
-                    }));
+                    if (syncErr != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(AppServer,
+                                     "Failed syncing group entry during refresh for node 0x" ChipLogFormatX64
+                                     ": %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                        mRefreshingNodeId = kUndefinedNodeId;
+                        mRefreshState     = kIdle;
+                        return syncErr;
+                    }
                 }
                 else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
                 {
@@ -449,15 +464,31 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     };
 
                     auto entryToErase = *it;
-                    ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, endpointGroupIdNullEntry, [this, entryToErase]() {
-                        mEndpointGroupIDEntries.erase(std::remove_if(mEndpointGroupIDEntries.begin(), mEndpointGroupIDEntries.end(),
-                                                                     [&](const auto & entry) {
-                                                                         return entry.nodeID == entryToErase.nodeID &&
-                                                                             entry.endpointID == entryToErase.endpointID &&
-                                                                             entry.groupID == entryToErase.groupID;
-                                                                     }),
-                                                      mEndpointGroupIDEntries.end());
-                    }));
+                    CHIP_ERROR syncErr =
+                        mDelegate->SyncNode(mRefreshingNodeId, endpointGroupIdNullEntry, [this, entryToErase](CHIP_ERROR innerErr) {
+                            if (innerErr != CHIP_NO_ERROR)
+                            {
+                                return;
+                            }
+                            mEndpointGroupIDEntries.erase(std::remove_if(mEndpointGroupIDEntries.begin(),
+                                                                         mEndpointGroupIDEntries.end(),
+                                                                         [&](const auto & entry) {
+                                                                             return entry.nodeID == entryToErase.nodeID &&
+                                                                                 entry.endpointID == entryToErase.endpointID &&
+                                                                                 entry.groupID == entryToErase.groupID;
+                                                                         }),
+                                                          mEndpointGroupIDEntries.end());
+                        });
+                    if (syncErr != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(AppServer,
+                                     "Failed deleting group entry during refresh for node 0x" ChipLogFormatX64
+                                     ": %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                        mRefreshingNodeId = kUndefinedNodeId;
+                        mRefreshState     = kIdle;
+                        return syncErr;
+                    }
                 }
                 else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
@@ -489,6 +520,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
     break;
 
     case kRefreshingBindings: {
+        mRefreshingBindingEntries.clear();
+
         // Check if we still have endpoints to process for group fetching
         if (mRefreshingEndpointIndex < mRefreshingEndpointsList.size())
         {
@@ -594,7 +627,18 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             ++it;
         }
 
-        ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, mRefreshingBindingEntries, [this]() {
+        ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, mRefreshingBindingEntries, [this](CHIP_ERROR syncErr) {
+            if (syncErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Failed syncing bindings during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+
+                // Keep entries pending/failed for retry, but always close out refresh state.
+                mRefreshingNodeId = kUndefinedNodeId;
+                mRefreshState     = kIdle;
+                return;
+            }
             for (auto & entry : mEndpointBindingEntries)
             {
                 if (entry.nodeID == mRefreshingNodeId &&
@@ -605,7 +649,16 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     {
                         if (entry.endpointID == bindingEntry.endpointID && BindingMatches(entry.binding, bindingEntry.binding))
                         {
-                            entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                            if (bindingEntry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
+                            {
+                                entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed;
+                                entry.statusEntry.failureCode = bindingEntry.statusEntry.failureCode;
+                            }
+                            else
+                            {
+                                entry.statusEntry.state       = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+                                entry.statusEntry.failureCode = 0;
+                            }
                             break;
                         }
                     }
@@ -715,6 +768,61 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
     break;
     case kRefreshingGroupKeySets: {
         // 4. Ensure per-node key-set entries for each GroupKeySet are synced to devices.
+        if (mRefreshingNodeKeySetDeletions.empty())
+        {
+            for (const auto & groupKeySet : mGroupKeySetList)
+            {
+                for (const auto & nodeKeySetEntry : mNodeKeySetEntries)
+                {
+                    if (nodeKeySetEntry.groupKeySetID == groupKeySet.groupKeySetID &&
+                        nodeKeySetEntry.statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+                    {
+                        mRefreshingNodeKeySetDeletions.emplace_back(nodeKeySetEntry.nodeID, nodeKeySetEntry.groupKeySetID);
+                    }
+                }
+            }
+        }
+
+        if (mRefreshingNodeKeySetDeletionIndex < mRefreshingNodeKeySetDeletions.size())
+        {
+            // Structured bindings cannot be captured by lambdas prior to C++20.
+            const auto & nodeKeySetDeletion = mRefreshingNodeKeySetDeletions[mRefreshingNodeKeySetDeletionIndex];
+            NodeId nodeIdToErase            = nodeKeySetDeletion.first;
+            uint16_t groupKeySetIdToErase   = nodeKeySetDeletion.second;
+            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nullEntry{ 0 };
+            CHIP_ERROR syncErr =
+                mDelegate->SyncNode(nodeIdToErase, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR innerErr) {
+                    if (innerErr == CHIP_NO_ERROR)
+                    {
+                        mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
+                                                                [nodeIdToErase, groupKeySetIdToErase](const auto & entry) {
+                                                                    return entry.nodeID == nodeIdToErase &&
+                                                                        entry.groupKeySetID == groupKeySetIdToErase;
+                                                                }),
+                                                 mNodeKeySetEntries.end());
+                    }
+
+                    ++mRefreshingNodeKeySetDeletionIndex;
+                    if (ContinueRefresh() != CHIP_NO_ERROR)
+                    {
+                        // Ignore errors in continuation from within the callback.
+                    }
+                });
+            if (syncErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Failed deleting group key set during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                mRefreshingNodeKeySetDeletions.clear();
+                mRefreshingNodeKeySetDeletionIndex = 0;
+                mRefreshingNodeId                  = kUndefinedNodeId;
+                mRefreshState                      = kIdle;
+                return syncErr;
+            }
+
+            return CHIP_NO_ERROR;
+        }
+
         for (auto gksIt = mGroupKeySetList.begin(); gksIt != mGroupKeySetList.end(); ++gksIt)
         {
             const uint16_t groupKeySetId = gksIt->groupKeySetID;
@@ -733,29 +841,29 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                     // Make a copy of the group key set to send to the node.
                     const NodeId entryNodeId = nkIt->nodeID;
                     auto groupKeySet         = *gksIt;
-                    ReturnErrorOnFailure(mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId]() {
-                        detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
-                            return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
+                    CHIP_ERROR syncErr =
+                        mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId](CHIP_ERROR innerErr) {
+                            if (innerErr != CHIP_NO_ERROR)
+                            {
+                                return;
+                            }
+                            detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                                return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
+                            });
                         });
-                    }));
+                    if (syncErr != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(AppServer,
+                                     "Failed syncing group key set during refresh for node 0x" ChipLogFormatX64
+                                     ": %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                        mRefreshingNodeKeySetDeletions.clear();
+                        mRefreshingNodeKeySetDeletionIndex = 0;
+                        mRefreshingNodeId                  = kUndefinedNodeId;
+                        mRefreshState                      = kIdle;
+                        return syncErr;
+                    }
                     ++nkIt;
-                }
-                else if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
-                {
-                    // zero-initialized struct to indicate deletion for the SyncNode call
-                    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nullEntry{ 0 };
-
-                    auto nodeIdToErase        = nkIt->nodeID;
-                    auto groupKeySetIdToErase = nkIt->groupKeySetID;
-                    ReturnErrorOnFailure(
-                        mDelegate->SyncNode(nkIt->nodeID, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase]() {
-                            mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
-                                                                    [&](const auto & entry) {
-                                                                        return entry.nodeID == nodeIdToErase &&
-                                                                            entry.groupKeySetID == groupKeySetIdToErase;
-                                                                    }),
-                                                     mNodeKeySetEntries.end());
-                        }));
                 }
                 else if (nkIt->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
                 {
@@ -772,11 +880,28 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                         // Retry the failed commit by attempting to SyncNode again.
                         const NodeId entryNodeId = nkIt->nodeID;
                         auto groupKeySet         = *gksIt;
-                        ReturnErrorOnFailure(mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId]() {
-                            detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
-                                return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
+                        CHIP_ERROR syncErr =
+                            mDelegate->SyncNode(nkIt->nodeID, groupKeySet, [this, entryNodeId, groupKeySetId](CHIP_ERROR innerErr) {
+                                if (innerErr != CHIP_NO_ERROR)
+                                {
+                                    return;
+                                }
+                                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                                    return e.nodeID == entryNodeId && e.groupKeySetID == groupKeySetId;
+                                });
                             });
-                        }));
+                        if (syncErr != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(AppServer,
+                                         "Failed retrying group key set during refresh for node 0x" ChipLogFormatX64
+                                         ": %" CHIP_ERROR_FORMAT,
+                                         ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+                            mRefreshingNodeKeySetDeletions.clear();
+                            mRefreshingNodeKeySetDeletionIndex = 0;
+                            mRefreshingNodeId                  = kUndefinedNodeId;
+                            mRefreshState                      = kIdle;
+                            return syncErr;
+                        }
                         ++nkIt;
                     }
                 }
@@ -786,6 +911,9 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                 }
             }
         }
+
+        mRefreshingNodeKeySetDeletions.clear();
+        mRefreshingNodeKeySetDeletionIndex = 0;
 
         // Request ACL List from the device and transition to kRefreshingACLs.
         ReturnErrorOnFailure(mDelegate->FetchACLList(
@@ -872,6 +1000,8 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
     }
     break;
     case kRefreshingACLs: {
+        mRefreshingACLEntries.clear();
+
         // 5.
         for (auto it = mACLEntries.begin(); it != mACLEntries.end();)
         {
@@ -929,7 +1059,17 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
             ++it;
         }
 
-        ReturnErrorOnFailure(mDelegate->SyncNode(mRefreshingNodeId, mRefreshingACLEntries, [this]() {
+        CHIP_ERROR syncErr = mDelegate->SyncNode(mRefreshingNodeId, mRefreshingACLEntries, [this](CHIP_ERROR innerErr) {
+            if (innerErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed syncing ACLs during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                             ChipLogValueX64(mRefreshingNodeId), innerErr.Format());
+
+                // Keep entries pending/failed for retry, but always close out refresh state.
+                mRefreshingNodeId = kUndefinedNodeId;
+                mRefreshState     = kIdle;
+                return;
+            }
             for (auto & entry : mACLEntries)
             {
                 if (entry.nodeID == mRefreshingNodeId &&
@@ -955,21 +1095,33 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
                                                      Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
                                              }),
                               mACLEntries.end());
-        }));
+            // 6.
+            if (SetNode(mRefreshingNodeId, Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted) != CHIP_NO_ERROR)
+            {
+                mRefreshingNodeId = kUndefinedNodeId;
+                mRefreshState     = kIdle;
+                return;
+            }
 
-        // 6.
-        ReturnErrorOnFailure(SetNode(mRefreshingNodeId, Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted));
+            ChipLogDetail(AppServer, "Finished refreshing node (ID: 0x" ChipLogFormatX64 "). Node is now marked as Committed.",
+                          ChipLogValueX64(mRefreshingNodeId));
 
-        ChipLogDetail(AppServer, "Finished refreshing node (ID: 0x" ChipLogFormatX64 "). Node is now marked as Committed.",
-                      ChipLogValueX64(mRefreshingNodeId));
+            for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+            {
+                listener->MarkNodeListChanged();
+            }
 
-        for (Listener * listener = mListeners; listener != nullptr; listener = listener->mNext)
+            mRefreshingNodeId = kUndefinedNodeId;
+            mRefreshState     = kIdle;
+        });
+        if (syncErr != CHIP_NO_ERROR)
         {
-            listener->MarkNodeListChanged();
+            ChipLogError(AppServer, "Failed syncing ACLs during refresh for node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                         ChipLogValueX64(mRefreshingNodeId), syncErr.Format());
+            mRefreshingNodeId = kUndefinedNodeId;
+            mRefreshState     = kIdle;
+            return syncErr;
         }
-
-        mRefreshingNodeId = kUndefinedNodeId;
-        mRefreshState     = kIdle;
     }
     break;
     }
@@ -1143,6 +1295,8 @@ CHIP_ERROR JointFabricDatastore::RemoveAdmin(NodeId nodeId)
 CHIP_ERROR
 JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     bool entryUpdated = false;
 
     for (size_t i = 0; i < mNodeKeySetEntries.size(); ++i)
@@ -1156,11 +1310,16 @@ JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Struc
 
                 const NodeId entryNodeId          = entry.nodeID;
                 const uint16_t entryGroupKeySetID = groupKeySet.groupKeySetID;
-                LogErrorOnFailure(mDelegate->SyncNode(entry.nodeID, groupKeySet, [this, entryNodeId, entryGroupKeySetID]() {
-                    detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
-                        return e.nodeID == entryNodeId && e.groupKeySetID == entryGroupKeySetID;
-                    });
-                }));
+                LogErrorOnFailure(
+                    mDelegate->SyncNode(entry.nodeID, groupKeySet, [this, entryNodeId, entryGroupKeySetID](CHIP_ERROR syncErr) {
+                        if (syncErr != CHIP_NO_ERROR)
+                        {
+                            return;
+                        }
+                        detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & e) {
+                            return e.nodeID == entryNodeId && e.groupKeySetID == entryGroupKeySetID;
+                        });
+                    }));
 
                 if (entryUpdated == false)
                 {
@@ -1286,7 +1445,12 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
                     const NodeId entryNodeId         = epGroupEntry.nodeID;
                     const EndpointId entryEndpointId = epGroupEntry.endpointID;
                     CHIP_ERROR syncErr               = mDelegate->SyncNode(
-                        epGroupEntry.nodeID, entryToSync, [this, entryNodeId, entryEndpointId, updatedGroupId]() {
+                        epGroupEntry.nodeID, entryToSync,
+                        [this, entryNodeId, entryEndpointId, updatedGroupId](CHIP_ERROR callbackErr) {
+                            if (callbackErr != CHIP_NO_ERROR)
+                            {
+                                return;
+                            }
                             detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & e) {
                                 return e.nodeID == entryNodeId && e.endpointID == entryEndpointId && e.groupID == updatedGroupId;
                             });
@@ -1403,10 +1567,15 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
             // index would mark the wrong/invalid slot if an interleaved Invoke mutated the vector.
             const NodeId entryNodeId   = acl.nodeID;
             const uint16_t entryListId = acl.listID;
-            ReturnErrorOnFailure(mDelegate->SyncNode(acl.nodeID, entryToEncode, [this, entryNodeId, entryListId]() {
-                detail::MarkEntryCommittedIfFound(
-                    mACLEntries, [&](const auto & e) { return e.nodeID == entryNodeId && e.listID == entryListId; });
-            }));
+            ReturnErrorOnFailure(
+                mDelegate->SyncNode(acl.nodeID, entryToEncode, [this, entryNodeId, entryListId](CHIP_ERROR syncErr) {
+                    if (syncErr != CHIP_NO_ERROR)
+                    {
+                        return;
+                    }
+                    detail::MarkEntryCommittedIfFound(
+                        mACLEntries, [&](const auto & e) { return e.nodeID == entryNodeId && e.listID == entryListId; });
+                }));
         }
     }
 
@@ -1503,39 +1672,6 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
 
     VerifyOrReturnError(IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    if (mGroupInformationEntries[index].groupKeySetID.IsNull() == false)
-    {
-        uint16_t groupKeySetID = mGroupInformationEntries[index].groupKeySetID.Value();
-
-        // make sure mNodeKeySetEntries contains an entry for this keyset and node, else add one and update device
-        bool nodeKeySetExists = false;
-        for (auto & entry : mNodeKeySetEntries)
-        {
-            if (entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID)
-            {
-                nodeKeySetExists = true;
-                break; // Found the group key set, no need to add it again
-            }
-        }
-
-        if (!nodeKeySetExists)
-        {
-            // Create a new group key set entry if it doesn't exist
-            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newNodeKeySet;
-            newNodeKeySet.nodeID            = nodeId;
-            newNodeKeySet.groupKeySetID     = groupKeySetID;
-            newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
-
-            mNodeKeySetEntries.push_back(newNodeKeySet);
-
-            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newNodeKeySet, [this, nodeId, groupKeySetID]() {
-                detail::MarkEntryCommittedIfFound(mNodeKeySetEntries, [&](const auto & entry) {
-                    return entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID;
-                });
-            }));
-        }
-    }
-
     // Check if the group ID already exists for the endpoint
     for (auto & entry : mEndpointGroupIDEntries)
     {
@@ -1554,10 +1690,66 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
     newGroupEntry.groupID           = groupId;
     newGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-    // Add the new ACL entry to the datastore
+    // Add the new endpoint-group entry to the datastore.
     mEndpointGroupIDEntries.push_back(newGroupEntry);
 
-    return mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId]() {
+    // Ensure the node has the required keyset before issuing AddGroup on the target endpoint.
+    if (mGroupInformationEntries[index].groupKeySetID.IsNull() == false)
+    {
+        uint16_t groupKeySetID = mGroupInformationEntries[index].groupKeySetID.Value();
+
+        bool nodeKeySetExists = false;
+        for (const auto & entry : mNodeKeySetEntries)
+        {
+            if (entry.nodeID == nodeId && entry.groupKeySetID == groupKeySetID)
+            {
+                nodeKeySetExists = true;
+                break;
+            }
+        }
+
+        if (!nodeKeySetExists)
+        {
+            Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newNodeKeySet;
+            newNodeKeySet.nodeID            = nodeId;
+            newNodeKeySet.groupKeySetID     = groupKeySetID;
+            newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+            mNodeKeySetEntries.push_back(newNodeKeySet);
+
+            return mDelegate->SyncNode(
+                nodeId, newNodeKeySet, [this, nodeId, newGroupEntry, endpointId, groupId](CHIP_ERROR syncErr) {
+                    if (syncErr != CHIP_NO_ERROR)
+                    {
+                        return;
+                    }
+                    // Keep the NodeKeySet entry pending here. It is intended to be finalized by the
+                    // refresh flow after mirrored state is observed, not immediately on this write.
+
+                    CHIP_ERROR err =
+                        mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId](CHIP_ERROR groupSyncErr) {
+                            if (groupSyncErr != CHIP_NO_ERROR)
+                            {
+                                return;
+                            }
+                            detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
+                                return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.groupID == groupId;
+                            });
+                        });
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(DataManagement, "Failed to sync endpoint group after keyset sync: %" CHIP_ERROR_FORMAT,
+                                     err.Format());
+                    }
+                });
+        }
+    }
+
+    return mDelegate->SyncNode(nodeId, newGroupEntry, [this, nodeId, endpointId, groupId](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            return;
+        }
         detail::MarkEntryCommittedIfFound(mEndpointGroupIDEntries, [&](const auto & entry) {
             return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.groupID == groupId;
         });
@@ -1579,17 +1771,22 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
             const auto erasedNodeId     = it->nodeID;
             const auto erasedEndpointId = it->endpointID;
             const auto erasedGroupId    = it->groupID;
-            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, *it, [this, erasedNodeId, erasedEndpointId, erasedGroupId]() {
-                for (auto eraseIt = mEndpointGroupIDEntries.begin(); eraseIt != mEndpointGroupIDEntries.end(); ++eraseIt)
-                {
-                    if (eraseIt->nodeID == erasedNodeId && eraseIt->endpointID == erasedEndpointId &&
-                        eraseIt->groupID == erasedGroupId)
+            ReturnErrorOnFailure(
+                mDelegate->SyncNode(nodeId, *it, [this, erasedNodeId, erasedEndpointId, erasedGroupId](CHIP_ERROR syncErr) {
+                    if (syncErr != CHIP_NO_ERROR)
                     {
-                        mEndpointGroupIDEntries.erase(eraseIt);
-                        break;
+                        return;
                     }
-                }
-            }));
+                    for (auto eraseIt = mEndpointGroupIDEntries.begin(); eraseIt != mEndpointGroupIDEntries.end(); ++eraseIt)
+                    {
+                        if (eraseIt->nodeID == erasedNodeId && eraseIt->endpointID == erasedEndpointId &&
+                            eraseIt->groupID == erasedGroupId)
+                        {
+                            mEndpointGroupIDEntries.erase(eraseIt);
+                            break;
+                        }
+                    }
+                }));
 
             if (IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR)
             {
@@ -1601,16 +1798,21 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                         it2->statusEntry.state         = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
                         const auto erasedKeySetNodeId  = it2->nodeID;
                         const auto erasedKeySetGroupId = it2->groupKeySetID;
-                        ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, *it2, [this, erasedKeySetNodeId, erasedKeySetGroupId]() {
-                            for (auto eraseIt = mNodeKeySetEntries.begin(); eraseIt != mNodeKeySetEntries.end(); ++eraseIt)
-                            {
-                                if (eraseIt->nodeID == erasedKeySetNodeId && eraseIt->groupKeySetID == erasedKeySetGroupId)
+                        ReturnErrorOnFailure(
+                            mDelegate->SyncNode(nodeId, *it2, [this, erasedKeySetNodeId, erasedKeySetGroupId](CHIP_ERROR syncErr) {
+                                if (syncErr != CHIP_NO_ERROR)
                                 {
-                                    mNodeKeySetEntries.erase(eraseIt);
-                                    break;
+                                    return;
                                 }
-                            }
-                        }));
+                                for (auto eraseIt = mNodeKeySetEntries.begin(); eraseIt != mNodeKeySetEntries.end(); ++eraseIt)
+                                {
+                                    if (eraseIt->nodeID == erasedKeySetNodeId && eraseIt->groupKeySetID == erasedKeySetGroupId)
+                                    {
+                                        mNodeKeySetEntries.erase(eraseIt);
+                                        break;
+                                    }
+                                }
+                            }));
 
                         break;
                     }
@@ -1738,10 +1940,14 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     // Add the new binding entry to the datastore
     mEndpointBindingEntries.push_back(newBindingEntry);
 
-    const uint16_t listID = newBindingEntry.listID;
-    return mDelegate->SyncNode(nodeId, newBindingEntry, [this, nodeId, endpointId, listID]() {
+    const uint16_t syncedListId = newBindingEntry.listID;
+    return mDelegate->SyncNode(nodeId, newBindingEntry, [this, nodeId, endpointId, syncedListId](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            return;
+        }
         detail::MarkEntryCommittedIfFound(mEndpointBindingEntries, [&](const auto & entry) {
-            return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == listID;
+            return entry.nodeID == nodeId && entry.endpointID == endpointId && entry.listID == syncedListId;
         });
     });
 }
@@ -1761,7 +1967,11 @@ JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId n
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             // Re-resolve by stable key inside the async completion instead of capturing the raw
             // iterator (which dangles if an interleaved Add*/Remove* reallocates the vector).
-            return mDelegate->SyncNode(nodeId, *it, [this, listId, nodeId, endpointId]() {
+            return mDelegate->SyncNode(nodeId, *it, [this, listId, nodeId, endpointId](CHIP_ERROR syncErr) {
+                if (syncErr != CHIP_NO_ERROR)
+                {
+                    return;
+                }
                 mEndpointBindingEntries.erase(std::remove_if(mEndpointBindingEntries.begin(), mEndpointBindingEntries.end(),
                                                              [&](const auto & entry) {
                                                                  return entry.nodeID == nodeId && entry.listID == listId &&
@@ -1959,7 +2169,11 @@ JointFabricDatastore::AddACLToNode(
     const auto committedNodeId = storedEntry.nodeID;
     const auto committedListId = storedEntry.listID;
 
-    return mDelegate->SyncNode(nodeId, entryToEncode, [this, committedNodeId, committedListId]() {
+    return mDelegate->SyncNode(nodeId, entryToEncode, [this, committedNodeId, committedListId](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            return;
+        }
         for (auto & entry : mACLEntries)
         {
             if (entry.nodeID == committedNodeId && entry.listID == committedListId)
@@ -1992,7 +2206,11 @@ CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeI
             entryToDelete.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
             // Re-resolve by stable key inside the async completion instead of capturing the raw
             // iterator (which dangles if an interleaved Add*/Remove* reallocates the vector).
-            return mDelegate->SyncNode(nodeId, entryToDelete, [this, listId, nodeId]() {
+            return mDelegate->SyncNode(nodeId, entryToDelete, [this, listId, nodeId](CHIP_ERROR syncErr) {
+                if (syncErr != CHIP_NO_ERROR)
+                {
+                    return;
+                }
                 mACLEntries.erase(
                     std::remove_if(mACLEntries.begin(), mACLEntries.end(),
                                    [&](const auto & entry) { return entry.nodeID == nodeId && entry.listID == listId; }),
@@ -2047,7 +2265,11 @@ CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t gr
             // Sync to the node and mark committed on success. Re-resolve by stable key inside the
             // completion; capturing the index would mark the wrong/invalid slot if an interleaved
             // Invoke mutated the vector before the async completion fires.
-            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId]() {
+            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId](CHIP_ERROR syncErr) {
+                if (syncErr != CHIP_NO_ERROR)
+                {
+                    return;
+                }
                 detail::MarkEntryCommittedIfFound(
                     mNodeKeySetEntries, [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetId; });
             }));
@@ -2082,14 +2304,19 @@ CHIP_ERROR JointFabricDatastore::RemoveNodeKeySetEntry(GroupId groupId, uint16_t
 
                 auto nodeIdToErase        = it->nodeID;
                 auto groupKeySetIdToErase = it->groupKeySetID;
-                ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase]() {
-                    mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
-                                                            [&](const auto & entry) {
-                                                                return entry.nodeID == nodeIdToErase &&
-                                                                    entry.groupKeySetID == groupKeySetIdToErase;
-                                                            }),
-                                             mNodeKeySetEntries.end());
-                }));
+                ReturnErrorOnFailure(
+                    mDelegate->SyncNode(nodeId, nullEntry, [this, nodeIdToErase, groupKeySetIdToErase](CHIP_ERROR syncErr) {
+                        if (syncErr != CHIP_NO_ERROR)
+                        {
+                            return;
+                        }
+                        mNodeKeySetEntries.erase(std::remove_if(mNodeKeySetEntries.begin(), mNodeKeySetEntries.end(),
+                                                                [&](const auto & entry) {
+                                                                    return entry.nodeID == nodeIdToErase &&
+                                                                        entry.groupKeySetID == groupKeySetIdToErase;
+                                                                }),
+                                                 mNodeKeySetEntries.end());
+                    }));
 
                 return CHIP_NO_ERROR;
             }
@@ -2112,7 +2339,11 @@ CHIP_ERROR JointFabricDatastore::TestAddNodeKeySetEntry(GroupId groupId, uint16_
 
     // Sync to the node and mark committed on success. Re-resolve by stable key inside the completion
     // rather than capturing the index, which an interleaved Invoke could invalidate.
-    return mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId]() {
+    return mDelegate->SyncNode(nodeId, newEntry, [this, nodeId, groupKeySetId](CHIP_ERROR syncErr) {
+        if (syncErr != CHIP_NO_ERROR)
+        {
+            return;
+        }
         detail::MarkEntryCommittedIfFound(mNodeKeySetEntries,
                                           [&](const auto & e) { return e.nodeID == nodeId && e.groupKeySetID == groupKeySetId; });
     });

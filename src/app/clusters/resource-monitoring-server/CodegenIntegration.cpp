@@ -81,6 +81,22 @@ ResourceMonitoringCluster::OptionalAttributeSet ConstructOptionalAttributeSet(En
     return optionalAttributeSet;
 }
 
+// Maps a cluster ID to its ID/revision entry; dies on non-ResourceMonitoring clusters.
+ClusterEntry GetClusterEntry(ClusterId clusterId)
+{
+    switch (clusterId)
+    {
+    case ActivatedCarbonFilterMonitoring::Id:
+        return kActivatedCarbonFilterMonitoring;
+    case HepaFilterMonitoring::Id:
+        return kHepaFilterMonitoring;
+    case WaterTankLevelMonitoring::Id:
+        return kWaterTankLevelMonitoring;
+    default:
+        chipDie();
+    }
+}
+
 } // namespace
 
 namespace chip {
@@ -90,7 +106,7 @@ namespace ResourceMonitoring {
 
 Instance::Instance(Delegate * delegate, EndpointId endpointId, ClusterId clusterId, uint32_t featureMap,
                    DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported) :
-    mCluster(endpointId, clusterId, BitFlags<ResourceMonitoring::Feature>{ featureMap },
+    mCluster(endpointId, GetClusterEntry(clusterId), BitFlags<ResourceMonitoring::Feature>{ featureMap },
              ConstructOptionalAttributeSet(endpointId, clusterId), degradationDirection, resetConditionCommandSupported)
 {
     TEMPORARY_RETURN_IGNORED mCluster.Cluster().SetDelegate(delegate);

@@ -21,11 +21,15 @@
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <app/tests/CommissioningWindowManagerTestAccess.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/dnssd/Advertiser.h>
+#include <lib/shell/Commands.h>
+#include <lib/shell/Engine.h>
+#include <lib/shell/streamer.h>
 #include <lib/support/Span.h>
 #include <messaging/tests/echo/common.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -54,6 +58,8 @@ using namespace System::Clock::Literals;
 using chip::CommissioningWindowAdvertisement;
 using chip::CommissioningWindowManager;
 using chip::Server;
+using chip::Shell::Engine;
+using chip::Shell::RegisterDeviceCommands;
 
 namespace {
 
@@ -188,6 +194,9 @@ public:
         ASSERT_EQ(chip::Server::GetInstance().Init(initParams), CHIP_NO_ERROR);
 
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+
+        ASSERT_EQ(chip::Shell::streamer_init(chip::Shell::streamer_get()), 0);
+        RegisterDeviceCommands();
     }
 
     static void TearDownTestSuite()
@@ -604,6 +613,40 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     ResetDirtyFlags();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+TEST_F(TestCommissioningWindowManager, TestEnhancedWindowDoesNotAdvertiseOverWiFiPAF)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    chip::Testing::CommissioningWindowManagerTestAccess access(&commissionMgr);
+    uint16_t originDiscriminator;
+    EXPECT_EQ(chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
+    uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
+    Spake2pVerifier verifier;
+    constexpr uint32_t kIterations               = kSpake2p_Min_PBKDF_Iterations;
+    uint8_t salt[kSpake2p_Min_PBKDF_Salt_Length] = {};
+    chip::ByteSpan saltData(salt);
+
+    // A basic window opened on all transports before the device was commissioned leaves
+    // Wi-Fi PAF selected after it closes.
+    ASSERT_EQ(commissionMgr.OpenBasicCommissioningWindow(), CHIP_NO_ERROR);
+    commissionMgr.CloseCommissioningWindow();
+    ASSERT_TRUE(access.IsWiFiPAF());
+
+    constexpr auto fabricIndex = static_cast<chip::FabricIndex>(1);
+    constexpr auto vendorId    = static_cast<chip::VendorId>(0xFFF3);
+    EXPECT_EQ(commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), newDiscriminator, verifier,
+                                                            kIterations, saltData, fabricIndex, vendorId),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    EXPECT_FALSE(access.IsWiFiPAF());
+
+    commissionMgr.CloseCommissioningWindow();
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    ResetDirtyFlags();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)
 {
     TemporarySessionManager sessionManager(*this);
@@ -742,6 +785,73 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     // Asserting that PASESession is still present on the Commissioner side
     commissionerSession = pairingCommissioner.CopySecureSession();
     EXPECT_TRUE(commissionerSession.HasValue());
+}
+
+CHIP_ERROR RunDeviceShellSubcommand(const char * subcommand)
+{
+    char deviceArg[] = "device";
+    char subcommandArg[64];
+    Platform::CopyString(subcommandArg, subcommand);
+
+    char * argv[] = { deviceArg, subcommandArg };
+    return Engine::Root().ExecCommand(2, argv);
+}
+
+TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindow)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    EXPECT_EQ(RunDeviceShellSubcommand("opencommissioningwindow"), CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
+}
+
+TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowAlreadyOpen)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    ASSERT_EQ(commissionMgr.OpenBasicCommissioningWindow(), CHIP_NO_ERROR);
+    ASSERT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    EXPECT_EQ(RunDeviceShellSubcommand("opencommissioningwindow"), CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
+}
+
+TEST_F(TestCommissioningWindowManager, TestShellOpenCommissioningWindowFailsWhenFailSafeArmed)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto & failSafeContext                     = Server::GetInstance().GetFailSafeContext();
+
+    ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    ASSERT_EQ(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)), CHIP_NO_ERROR);
+
+    EXPECT_NE(RunDeviceShellSubcommand("opencommissioningwindow"), CHIP_NO_ERROR);
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    failSafeContext.DisarmFailSafe();
+    commissionMgr.CloseCommissioningWindow();
+}
+
+TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindow)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    ASSERT_EQ(commissionMgr.OpenBasicCommissioningWindow(), CHIP_NO_ERROR);
+    ASSERT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    EXPECT_EQ(RunDeviceShellSubcommand("closecommissioningwindow"), CHIP_NO_ERROR);
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
+}
+
+TEST_F(TestCommissioningWindowManager, TestShellCloseCommissioningWindowNotOpen)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+
+    EXPECT_EQ(RunDeviceShellSubcommand("closecommissioningwindow"), CHIP_NO_ERROR);
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    commissionMgr.CloseCommissioningWindow();
 }
 
 } // namespace

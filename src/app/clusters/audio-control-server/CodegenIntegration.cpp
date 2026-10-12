@@ -24,6 +24,10 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenIntegration.h> // nogncheck
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -91,6 +95,14 @@ public:
         }
 
         gServers[clusterInstanceIndex].Create(endpointId, *delegate, config);
+
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+        // Register the cluster as a scene handler. The scene table is shared across endpoints; scene
+        // save/recall calls SupportsCluster() first, so registering on an endpoint that has no
+        // Scenes Management cluster is harmless - the handler is simply never invoked there.
+        ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpointId, &gServers[clusterInstanceIndex].Cluster());
+#endif
+
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -100,7 +112,17 @@ public:
         return &gServers[clusterInstanceIndex].Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override
+    {
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+        if (gServers[clusterInstanceIndex].IsConstructed())
+        {
+            AudioControlCluster & cluster = gServers[clusterInstanceIndex].Cluster();
+            ScenesManagement::ScenesServer::Instance().UnregisterSceneHandler(cluster.GetPaths()[0].mEndpointId, &cluster);
+        }
+#endif
+        gServers[clusterInstanceIndex].Destroy();
+    }
 };
 
 } // namespace

@@ -34,6 +34,7 @@ source_set("commands") {
       "Device.cpp",
       "OnboardingCodes.cpp",
     ]
+    deps += [ "${chip_root}/src/app/server:server" ]
   }
 
   if (chip_enable_wifi) {

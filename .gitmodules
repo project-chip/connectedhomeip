@@ -22,7 +22,7 @@
 	platforms = esp32
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
-	url = https://github.com/google/pigweed.git
+	url = https://pigweed.googlesource.com/pigweed/pigweed.git
 	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
@@ -300,7 +300,7 @@
 	url = https://github.com/abseil/abseil-cpp.git
 	platforms = linux,darwin
 [submodule "third_party/fuzztest"]
-	path = third_party/fuzztest
+	path = third_party/fuzztest/repo
 	url = https://github.com/google/fuzztest.git
 	platforms = linux,darwin
 [submodule "third_party/googletest"]

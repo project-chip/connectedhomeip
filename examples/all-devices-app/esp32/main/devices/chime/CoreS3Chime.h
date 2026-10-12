@@ -1,0 +1,38 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <device/types/chime/Chime.h>
+
+namespace chip::app {
+
+/**
+ * Hardware-backed Chime implementation for M5Stack CoreS3.
+ * Synthesizes multi-harmonic chime tones through the onboard AW88298 I2S speaker amplifier.
+ */
+class CoreS3Chime : public Chime
+{
+public:
+    explicit CoreS3Chime(TimerDelegate & timerDelegate);
+    ~CoreS3Chime() override = default;
+
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
+};
+
+} // namespace chip::app

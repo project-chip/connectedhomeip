@@ -45,7 +45,7 @@ from mobly import asserts
 from matter.exceptions import ChipStackError
 from matter.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 CHIP_ERROR_CODES = {
@@ -54,7 +54,7 @@ CHIP_ERROR_CODES = {
 }
 
 
-class TC_SC_3_4(MatterBaseTest):
+class TC_SC_3_4(MatterTestCommissionedDevice):
     disable_wildcard_subscription = True
 
     def desc_TC_SC_3_4(self) -> str:

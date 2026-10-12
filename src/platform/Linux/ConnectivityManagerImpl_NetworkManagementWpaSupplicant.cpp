@@ -24,6 +24,7 @@
 #include <glib.h>
 
 #include <lib/core/Optional.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>

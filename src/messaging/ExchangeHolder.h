@@ -189,6 +189,18 @@ private:
 
     ExchangeMessageDispatch & GetMessageDispatch() override { return mpExchangeDelegate.GetMessageDispatch(); }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
+    {
+        mpExchangeDelegate.HandleConnectionAttemptComplete(conn, conErr);
+    }
+
+    void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override
+    {
+        mpExchangeDelegate.HandleConnectionClosed(conn, conErr);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     ExchangeDelegate & mpExchangeDelegate;
     ExchangeContext * mpExchangeCtx = nullptr;
 };

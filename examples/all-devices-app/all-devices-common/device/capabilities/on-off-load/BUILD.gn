@@ -38,8 +38,8 @@ source_set("on-off-load") {
 
 source_set("logging") {
   sources = [
-    "impl/LoggingOnOffLoad.cpp",
-    "impl/LoggingOnOffLoad.h",
+    "impl/LoggingOnOffDelegate.cpp",
+    "impl/LoggingOnOffDelegate.h",
   ]
 
   public_deps = [
