@@ -377,6 +377,9 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.
     SetBLE(false);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    SetWiFiPAF(false);
+#endif
 
     VerifyOrReturnError(salt.size() <= sizeof(mECMSalt), CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -21,6 +21,8 @@
 #import <Network/Network.h>
 #import <dns_sd.h>
 #import <os/lock.h>
+#import <sys/socket.h>
+#import <sys/stat.h>
 
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
@@ -29,6 +31,7 @@
 @implementation MTRDeviceConnectivityMonitor {
     NSString * _instanceName;
     std::vector<DNSServiceRef> _resolvers;
+    NSUInteger _resolversConnectionGeneration;
     NSMutableDictionary<NSString *, nw_connection_t> * _connectionsByHostname;
     uintptr_t _monitorID; // Unique ID for safe DNS-SD callback lookup
 
@@ -55,6 +58,8 @@ static NSUInteger sConnectivityMonitorCount;
 // connection while newer child resolvers are still pending cleanup.
 static NSUInteger sSharedResolverLingerGeneration;
 static DNSServiceRef sSharedResolverConnection;
+static NSUInteger sSharedResolverConnectionGeneration;
+static ino_t sSharedResolverConnectionSocketInode;
 static dispatch_queue_t sSharedResolverQueue;
 
 // Map table solution for DNS-SD callback safety:
@@ -154,9 +159,58 @@ static uintptr_t sNextMonitorID = 1;
             sSharedResolverConnection = NULL;
             return NULL;
         }
+        sSharedResolverConnectionGeneration++;
+        struct stat socketStat = {};
+        fstat(DNSServiceRefSockFD(sSharedResolverConnection), &socketStat);
+        sSharedResolverConnectionSocketInode = socketStat.st_ino;
     }
 
     return sSharedResolverConnection;
+}
+
+// dns_sd closes the connection's socket when the daemon goes away, and the descriptor number can then be reused.
++ (BOOL)_sharedResolverConnectionSocketClosed
+{
+    os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
+    struct stat socketStat = {};
+    return sSharedResolverConnection && (fstat(DNSServiceRefSockFD(sSharedResolverConnection), &socketStat) != 0 || socketStat.st_ino != sSharedResolverConnectionSocketInode);
+}
+
++ (NSArray<MTRDeviceConnectivityMonitor *> *)_discardSharedResolverConnection
+{
+    os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
+
+    DNSServiceRef oldConnection = sSharedResolverConnection;
+    sSharedResolverConnection = NULL;
+    sConnectivityMonitorCount = 0;
+    if (oldConnection) {
+        dispatch_async(sSharedResolverQueue, ^{
+            DNSServiceRefDeallocate(oldConnection);
+        });
+    }
+
+    NSArray<MTRDeviceConnectivityMonitor *> * monitors = sMonitorMap.objectEnumerator.allObjects;
+    for (MTRDeviceConnectivityMonitor * monitor in monitors) {
+        if (monitor->_resolvers.size() == 0) {
+            continue;
+        }
+        monitor->_resolvers.clear();
+        [monitor _callHandler];
+        [monitor _stopMonitoring];
+    }
+    return monitors;
+}
+
+// dns_sd reports a lost daemon connection with either error.
+static bool IsDaemonConnectionLost(DNSServiceErrorType error)
+{
+    return error == kDNSServiceErr_ServiceNotRunning || error == kDNSServiceErr_DefunctConnection;
+}
+
+- (BOOL)_isOnCurrentSharedConnection
+{
+    os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
+    return _resolvers.size() != 0 && sSharedResolverConnection && _resolversConnectionGeneration == sSharedResolverConnectionGeneration;
 }
 
 - (void)_callHandler
@@ -179,15 +233,6 @@ static uintptr_t sNextMonitorID = 1;
 
     if (hostName == NULL) {
         MTR_LOG_ERROR("%@ NULL host resolved, ignoring", self);
-        return;
-    }
-    // dns_sd.h: must check and call deallocate if error is kDNSServiceErr_ServiceNotRunning
-    if (error == kDNSServiceErr_ServiceNotRunning) {
-        MTR_LOG_ERROR("%@ disconnected from dns-sd subsystem", self);
-        // Notify caller to proceed with connection attempt despite DNS-SD failure.
-        // Waiting indefinitely would cause hangs, so we trigger the handler to unblock.
-        [self _callHandler];
-        [self _stopMonitoring];
         return;
     }
 
@@ -255,15 +300,73 @@ static void ResolveCallback(
     // Context contains monitor ID, to look up the monitor object
     uintptr_t monitorID = reinterpret_cast<uintptr_t>(context);
 
+    MTRDeviceConnectivityMonitor * monitor;
+    // Declared before the lock so the discarded monitors are released after it is unlocked.
+    NSArray<MTRDeviceConnectivityMonitor *> * monitorsToRelease;
     std::lock_guard lock(sConnectivityMonitorLock);
-    MTRDeviceConnectivityMonitor * monitor = [sMonitorMap objectForKey:@(monitorID)];
+    monitor = [sMonitorMap objectForKey:@(monitorID)];
 
     // If monitor is nil, object was deallocated - callback safely ignored
     if (!monitor) {
         return;
     }
 
+    // dns_sd.h: must check and call deallocate if error is kDNSServiceErr_ServiceNotRunning
+    if (IsDaemonConnectionLost(errorCode)) {
+        if ([monitor _isOnCurrentSharedConnection]) {
+            MTR_LOG_ERROR("%@ disconnected from dns-sd subsystem: %" PRId32 ", discarding shared resolver connection", monitor, errorCode);
+            monitorsToRelease = [MTRDeviceConnectivityMonitor _discardSharedResolverConnection];
+        }
+        return;
+    }
+
     [monitor handleResolvedHostname:hostName port:port error:errorCode];
+}
+
+- (DNSServiceErrorType)_createResolvers
+{
+    os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
+
+    auto sharedConnection = [MTRDeviceConnectivityMonitor _sharedResolverConnection];
+    if (!sharedConnection) {
+        MTR_LOG_ERROR("%@ failed to get shared resolver connection", self);
+        return kDNSServiceErr_Unknown;
+    }
+
+    DNSServiceErrorType result = kDNSServiceErr_NoError;
+    // We're already on the connection's dispatch queue, so call DNSServiceResolve directly
+    for (auto domain : kResolveDomains) {
+        DNSServiceRef resolver = sharedConnection;
+        DNSServiceErrorType dnsError = DNSServiceResolve(&resolver,
+            kDNSServiceFlagsShareConnection,
+            kDNSServiceInterfaceIndexAny,
+            _instanceName.UTF8String,
+            kOperationalType,
+            domain,
+            ResolveCallback,
+            reinterpret_cast<void *>(_monitorID)); // Pass ID as context, not object pointer
+        if (dnsError == kDNSServiceErr_NoError) {
+            _resolvers.emplace_back(std::move(resolver));
+        } else {
+            MTR_LOG_ERROR("%@ failed to create resolver for \"%s\" domain: %" PRId32, self, StringOrNullMarker(domain), dnsError);
+            if (!IsDaemonConnectionLost(result)) {
+                result = dnsError;
+            }
+        }
+    }
+
+    if (IsDaemonConnectionLost(result)) {
+        for (auto & resolver : _resolvers) {
+            DNSServiceRefDeallocate(resolver);
+        }
+        _resolvers.clear();
+    }
+    if (_resolvers.size() != 0) {
+        _resolversConnectionGeneration = sSharedResolverConnectionGeneration;
+        sConnectivityMonitorCount++;
+        sSharedResolverLingerGeneration++;
+    }
+    return result;
 }
 
 - (BOOL)startMonitoringWithHandler:(MTRDeviceConnectivityMonitorHandler)handler queue:(dispatch_queue_t)queue
@@ -279,6 +382,8 @@ static void ResolveCallback(
     // Run entire function on sSharedResolverQueue to maintain lock ordering (queue → lock)
     // and avoid deadlocks with callbacks that also use this pattern.
     dispatch_sync(sSharedResolverQueue, ^{
+        // Declared before the lock so the discarded monitors are released after it is unlocked.
+        NSArray<MTRDeviceConnectivityMonitor *> * monitorsToRelease;
         std::lock_guard lock(sConnectivityMonitorLock);
 
         _monitorHandler = handler;
@@ -293,36 +398,13 @@ static void ResolveCallback(
             return;
         }
 
-        auto sharedConnection = [MTRDeviceConnectivityMonitor _sharedResolverConnection];
-        if (!sharedConnection) {
-            MTR_LOG_ERROR("%@ failed to get shared resolver connection", self);
-            _monitorHandler = nil;
-            _handlerQueue = nil;
-            result = NO;
-            return;
-        }
-
-        // We're already on the connection's dispatch queue, so call DNSServiceResolve directly
-        for (auto domain : kResolveDomains) {
-            DNSServiceRef resolver = sharedConnection;
-            DNSServiceErrorType dnsError = DNSServiceResolve(&resolver,
-                kDNSServiceFlagsShareConnection,
-                kDNSServiceInterfaceIndexAny,
-                _instanceName.UTF8String,
-                kOperationalType,
-                domain,
-                ResolveCallback,
-                reinterpret_cast<void *>(_monitorID)); // Pass ID as context, not object pointer
-            if (dnsError == kDNSServiceErr_NoError) {
-                _resolvers.emplace_back(std::move(resolver));
-            } else {
-                MTR_LOG_ERROR("%@ failed to create resolver for \"%s\" domain: %" PRId32, self, StringOrNullMarker(domain), dnsError);
-            }
+        if ([MTRDeviceConnectivityMonitor _sharedResolverConnectionSocketClosed] || IsDaemonConnectionLost([self _createResolvers])) {
+            MTR_LOG_ERROR("%@ shared resolver connection lost its dns-sd daemon, discarding it", self);
+            monitorsToRelease = [MTRDeviceConnectivityMonitor _discardSharedResolverConnection];
+            [self _createResolvers];
         }
 
         if (_resolvers.size() != 0) {
-            sConnectivityMonitorCount++;
-            sSharedResolverLingerGeneration++;
             result = YES;
             return;
         }
@@ -377,11 +459,13 @@ static void ResolveCallback(
     _monitorHandler = nil;
     _handlerQueue = nil;
 
-    if (_resolvers.size() != 0) {
+    if ([self _isOnCurrentSharedConnection]) {
         sConnectivityMonitorCount--;
         auto resolversToCleanUp = std::move(_resolvers);
         [self _clearResolvers:resolversToCleanUp]; // Async DNS cleanup
     }
+    // Resolvers on a discarded connection are freed along with it.
+    _resolvers.clear();
 }
 
 - (void)stopMonitoring
@@ -403,6 +487,46 @@ static void ResolveCallback(
 {
     std::lock_guard lock(sConnectivityMonitorLock);
     return sSharedResolverConnection != NULL;
+}
+
++ (NSUInteger)unitTestActiveMonitorCount
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    return sConnectivityMonitorCount;
+}
+
++ (NSUInteger)unitTestSharedConnectionGeneration
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    return sSharedResolverConnection ? sSharedResolverConnectionGeneration : 0;
+}
+
++ (int)unitTestSharedConnectionSocket
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    return sSharedResolverConnection ? DNSServiceRefSockFD(sSharedResolverConnection) : -1;
+}
+
++ (void)unitTestDisconnectSharedConnectionFromDaemon
+{
+    std::lock_guard lock(sConnectivityMonitorLock);
+    if (sSharedResolverConnection) {
+        shutdown(DNSServiceRefSockFD(sSharedResolverConnection), SHUT_RDWR);
+    }
+}
+
++ (void)unitTestCloseIdleSharedConnection
+{
+    if (!sSharedResolverQueue) {
+        return;
+    }
+    dispatch_sync(sSharedResolverQueue, ^{
+        std::lock_guard lock(sConnectivityMonitorLock);
+        if (sSharedResolverConnection && !sConnectivityMonitorCount) {
+            DNSServiceRefDeallocate(sSharedResolverConnection);
+            sSharedResolverConnection = NULL;
+        }
+    });
 }
 #endif
 

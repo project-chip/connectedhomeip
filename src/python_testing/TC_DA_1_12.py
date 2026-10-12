@@ -37,7 +37,7 @@
 # All certificate and signature validation runs in Python (see support_modules/pqc_support.py)
 # rather than through the SDK's C++ crypto, so the harness is an independent check on the stack.
 # Verifying ML-DSA signatures therefore needs a cryptography build providing
-# hazmat.primitives.asymmetric.mldsa (46.0.0 or newer, linked against OpenSSL 3.5 or newer).
+# hazmat.primitives.asymmetric.mldsa (48.0.0 or newer, linked against OpenSSL 3.5 or newer).
 #
 #   python3 src/python_testing/TC_DA_1_12.py --commissioning-method on-network \
 #       --discriminator 1234 --passcode 20202021 \
@@ -76,7 +76,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         return "[TC-DA-1.12] ML-DSA Device Attestation Request Validation Scenario [DUT-Commissionee]"
 
     def pics_TC_DA_1_12(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
+        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
                 "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_DA_1_12(self) -> list[TestStep]:

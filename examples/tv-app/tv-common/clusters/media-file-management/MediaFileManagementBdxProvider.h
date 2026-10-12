@@ -49,6 +49,19 @@ public:
     MediaFileManagementBdxProvider() = default;
 
     /**
+     * Notified once a client has finished pulling a shared file, so the
+     * coordinator can retire the ResponseID that authorized the pull.
+     */
+    class RetrievalObserver
+    {
+    public:
+        virtual ~RetrievalObserver()                                                   = default;
+        virtual void OnSharedFileRetrieved(ScopedNodeId peer, const char * designator) = 0;
+    };
+
+    void SetRetrievalObserver(RetrievalObserver * observer) { mRetrievalObserver = observer; }
+
+    /**
      * Authorize `designator` to be served to `peer` from the file at `path`.
      * Called by the coordinator when a file is shared (RequestSharedFiles) so a
      * later GetSharedFile pull for the same designator can be satisfied.
@@ -92,6 +105,8 @@ private:
     // Path of the blob being served for the active transfer.
     std::string mActivePath;
     uint64_t mNumBytesSent = 0;
+
+    RetrievalObserver * mRetrievalObserver = nullptr;
 };
 
 } // namespace MediaFileManagement

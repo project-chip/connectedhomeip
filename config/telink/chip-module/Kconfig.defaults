@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2025 Project CHIP Authors
+#   Copyright (c) 2023-2026 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -77,15 +77,15 @@ config ISR_STACK_SIZE
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 1024 if PM && !SOC_RISCV_TELINK_W91
-    default 2048 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 2048
 
 config HEAP_MEM_POOL_SIZE
-    default 1796 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 1796 if SOC_FAMILY_TELINK_TLX
     default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 30720 if (SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X) && CHIP_CONCURRENT_MODE
-    default 26584 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 26584 if SOC_FAMILY_TELINK_TLX
     default 29448 if SOC_RISCV_TELINK_W91
     default 20716
 
@@ -97,7 +97,7 @@ config NET_IF_UNICAST_IPV6_ADDR_COUNT
     default 6
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
-    default 47 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 47 if SOC_FAMILY_TELINK_TLX
     default 8 if PM
     default 15
 
@@ -107,20 +107,20 @@ config NET_IF_IPV6_PREFIX_COUNT
 # Network buffers
 config NET_PKT_RX_COUNT
     default 16 if SOC_RISCV_TELINK_W91
-    default 4 if PM || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 4 if PM || SOC_FAMILY_TELINK_TLX
     default 8
 
 config NET_PKT_TX_COUNT
     default 16 if SOC_RISCV_TELINK_W91
-    default 4 if PM || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 4 if PM || SOC_FAMILY_TELINK_TLX
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_FAMILY_TELINK_TLX
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_FAMILY_TELINK_TLX
     default 32
 
 config GPIO
@@ -168,15 +168,15 @@ config BT_MAX_CONN
     default 1
 
 config BT_L2CAP_TX_MTU
-    default 103 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 103 if SOC_FAMILY_TELINK_TLX
     default 247
 
 config BT_BUF_ACL_RX_SIZE
-    default 107 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 107 if SOC_FAMILY_TELINK_TLX
     default 251
 
 config BT_BUF_ACL_TX_SIZE
-    default 107 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 107 if SOC_FAMILY_TELINK_TLX
     default 251
 
 config BT_BUF_EVT_RX_COUNT
@@ -202,7 +202,7 @@ config BT_HOST_CRYPTO
 if SOC_RISCV_TELINK_B9X || SOC_FAMILY_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
-    default 1536 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 1536 if SOC_FAMILY_TELINK_TLX
     default 712
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
@@ -236,7 +236,7 @@ config PWM
 
 endif
 
-if BOARD_TL7218X_RETENTION || BOARD_TL3238X_RETENTION || BOARD_TL3238X || BOARD_TL5218X_RETENTION || BOARD_TL5218X
+if BOARD_TL3228X_RETENTION || BOARD_TL3238X_RETENTION || BOARD_TL3238X || BOARD_TL5218X_RETENTION || BOARD_TL5218X || BOARD_TL7218X_RETENTION
 config SOC_SERIES_RISCV_TELINK_TLX_NON_RETENTION_RAM_CODE
     default n if PM
 
@@ -250,7 +250,7 @@ endif
 
 # Board non-retention config
 if  BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1 || \
-    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3238X || BOARD_TL5218X || BOARD_TL7218X
+    BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TL3228X || BOARD_TL3238X || BOARD_TL5218X || BOARD_TL7218X
 config PWM
     default y
 endif
@@ -277,18 +277,6 @@ config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
 
-# In current config/zephyr/Kconfig
-# next deprecated values are selected
-# warning: Deprecated symbol CPLUSPLUS is enabled.
-# warning: Deprecated symbol LIB_CPLUSPLUS is enabled.
-# new one are:
-# CONFIG_CPP
-# CONFIG_LIBCPP_IMPLEMENTATION
-# See https://docs.zephyrproject.org/latest/releases/release-notes-3.3.html
-# Since not only Telink is using Zephyr just suppress warnings
-config WARN_DEPRECATED
-    default n
-
 # Reboot system when fault happened
 config TELINK_SOC_REBOOT_ON_FAULT
     default y
@@ -297,7 +285,7 @@ config NVS_LOOKUP_CACHE
     default y
 
 config NVS_LOOKUP_CACHE_SIZE
-    default 400 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 400 if SOC_FAMILY_TELINK_TLX
     default 2048 if !PM || SOC_RISCV_TELINK_W91
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
@@ -357,18 +345,18 @@ config OPENTHREAD_SED_RAM_CODE
 
 config IEEE802154_TLX_OPTIMIZATION
     bool "Optimize 802.15.4 RF performance for TLX SoCs"
-    default y if PM && (SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X)
+    default y if PM && SOC_FAMILY_TELINK_TLX
     default n
     help
       Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
 
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM
-    default 4096 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 4096 if SOC_FAMILY_TELINK_TLX
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 2048 if PM && (SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X)
-    default 608 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 2048 if PM && SOC_FAMILY_TELINK_TLX
+    default 608 if SOC_FAMILY_TELINK_TLX
     default 640
 
 config OPENTHREAD_SLAAC
@@ -379,12 +367,12 @@ config OPENTHREAD_MANUAL_START
 
 # 6 is the max rf level by Vant
 config OPENTHREAD_DEFAULT_TX_POWER
-    default 3 if PM && (SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X)
-    default 11 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL521X
+    default 3 if PM && SOC_FAMILY_TELINK_TLX
+    default 11 if SOC_FAMILY_TELINK_TLX
     default 9
 
 config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
-    default 40 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X
+    default 40 if SOC_FAMILY_TELINK_TLX
     default 2 if PM
     default 8
 
@@ -401,9 +389,8 @@ config NET_TX_STACK_SIZE
     default 600
 
 config NET_RX_STACK_SIZE
-    default 2048 if SOC_RISCV_TELINK_W91
-    default 664 if PM
-    default 2048 if SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X
+    default 664 if PM && !SOC_RISCV_TELINK_W91
+    default 2048
 
 # Disable certain parts of Zephyr IPv6 stack
 config NET_IPV6_NBR_CACHE
@@ -527,7 +514,7 @@ config MBEDTLS_PSA_CRYPTO_C
 
 config TELINK_TLX_SHA_HW_SLOTS
     int
-    default 8 if SOC_RISCV_TELINK_TLX
+    default 8 if SOC_FAMILY_TELINK_TLX
 
 config NET_CONTEXT_RECV_PKTINFO
     bool
