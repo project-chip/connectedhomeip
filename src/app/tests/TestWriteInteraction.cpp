@@ -59,6 +59,10 @@ namespace app {
 
 using namespace chip::Testing;
 
+/**
+ * @brief Provide stable mock metadata for scalar writes and list-write notification regressions.
+ * @return The fixture's static endpoint and attribute configuration.
+ */
 const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace Clusters::Globals::Attributes;
@@ -171,11 +175,13 @@ public:
         kFinalChunk,
     };
 
+    /** @brief Exercise terminal exchange events and verify fabric identity, notifications, and handler reuse. */
     void TestListWriteTermination(ListWriteTermination termination);
 
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
+    /** @brief Verify pending failure notifications survive release of the exchange holder on both fabrics. */
     void TestWriteHandlerListWriteEndAfterExchangeRelease();
     void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
@@ -259,6 +265,12 @@ namespace {
 class ListWriteNotificationProvider : public TestImCustomDataModel
 {
 public:
+    /**
+     * @brief Record list operations and the fabric plus exchange/session state observed during completion.
+     * @param path The list attribute receiving the notification.
+     * @param operation The begin, success, or failure event emitted by the handler.
+     * @param accessingFabric The transaction fabric supplied by the handler.
+     */
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation operation,
                                         FabricIndex accessingFabric) override
     {
@@ -599,6 +611,9 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
     }
 }
 
+/**
+ * @brief Retain the original fabric in a pending failure notification after explicitly releasing the exchange holder.
+ */
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExchangeRelease)
 {
     using namespace Protocols::InteractionModel;
@@ -661,6 +676,11 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExcha
     }
 }
 
+/**
+ * @brief Exercise list-write termination on both fabrics and verify identity, lifecycle, and retransmission cleanup.
+ * @param termination The session release, invalid message, malformed chunk, or successful final chunk to exercise.
+ * Reuse controls encode both optional flags explicitly, keeping omitted-field defaults in their separate regression.
+ */
 void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termination)
 {
     using namespace Protocols::InteractionModel;
@@ -800,19 +820,21 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
             ASSERT_SUCCESS(toBob ? CreateSessionAliceToBob() : CreateSessionBobToAlice());
         }
     }
-    // A request without MoreChunkedMessages must finish identically on fresh and reused handlers, including after failure.
+    // Use WriteClient's explicit false flags so fabric teardown and handler reuse are independent of omitted-field defaults.
     WriteHandler freshHandler;
     for (auto * handler : { &freshHandler, &writeHandler })
     {
         ASSERT_SUCCESS(handler->Init(&provider, InteractionModelEngine::GetInstance()));
-        provider.mExchangeHolder           = &handler->mExchangeCtx;
-        System::PacketBufferHandle payload = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-        ASSERT_FALSE(payload.IsNull());
-        GenerateWriteRequest(false /* aIsTimedWrite */, payload);
+        provider.mExchangeHolder = &handler->mExchangeCtx;
+        TestWriteClientCallback writeCallback;
+        WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
+        AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+        ASSERT_SUCCESS(writeClient.FinalizeMessage(false /* aHasMoreChunks */));
+        ASSERT_FALSE(writeClient.mChunks.IsNull());
         TestExchangeDelegate delegate;
         auto * exchange = NewExchangeToBob(&delegate);
         ASSERT_NE(exchange, nullptr);
-        ASSERT_EQ(handler->OnWriteRequest(exchange, std::move(payload), false /* aIsTimedWrite */), Status::Success);
+        ASSERT_EQ(handler->OnWriteRequest(exchange, writeClient.mChunks.PopHead(), false /* aIsTimedWrite */), Status::Success);
         EXPECT_TRUE(handler->IsFree());
         EXPECT_EQ(handler->GetAccessingFabricIndex(), kUndefinedFabricIndex);
         handler->Close();
@@ -821,21 +843,33 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
     provider.mExchangeHolder = &writeHandler.mExchangeCtx;
 }
 
+/**
+ * @brief Preserve the fabric when the exchange remains present but its session is released while awaiting another chunk.
+ */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterSessionRelease)
 {
     TestListWriteTermination(ListWriteTermination::kSessionReleased);
 }
 
+/**
+ * @brief Fail a pending list write with its original fabric when the exchange receives an unexpected StatusResponse.
+ */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterUnexpectedStatusResponse)
 {
     TestListWriteTermination(ListWriteTermination::kUnexpectedStatusResponse);
 }
 
+/**
+ * @brief Fail a pending list write with its original fabric when the next WriteRequest cannot be decoded.
+ */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterMalformedNextChunk)
 {
     TestListWriteTermination(ListWriteTermination::kMalformedNextChunk);
 }
 
+/**
+ * @brief Complete a valid final chunk with a success notification and clear the transaction identity on closure.
+ */
 TEST_F(TestWriteInteraction, ListWriteSuccessAfterFinalChunk)
 {
     TestListWriteTermination(ListWriteTermination::kFinalChunk);

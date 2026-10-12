@@ -59,8 +59,6 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     mDataModelProvider = apProvider;
 
     mDelegate = apWriteHandlerDelegate;
-    // A new transaction must not inherit flags from a previous chunked write.
-    mStateFlags.ClearAll();
     MoveToState(State::Initialized);
 
     mProcessingAttributePath.ClearValue();
@@ -68,6 +66,10 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Fail any pending list write, release the exchange, and clear the cached transaction fabric.
+ * Repeated calls after closure have no effect. The list notification runs before clearing its fabric identity.
+ */
 void WriteHandler::Close()
 {
     VerifyOrReturn(mState != State::Uninitialized);
@@ -133,6 +135,14 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
     return status;
 }
 
+/**
+ * @brief Capture the requesting fabric and process the first message of a write transaction.
+ * @param apExchangeContext The request exchange with a live session; retained while more chunks are expected.
+ * @param aPayload The encoded write request, consumed by the handler.
+ * @param aIsTimedWrite Whether the request follows an accepted timed interaction.
+ * @return Success for an accepted or suppressed request, or the write-request error status.
+ * Nonchunked and rejected requests close the handler; chunked requests retain the captured fabric until closure.
+ */
 Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
                                     bool aIsTimedWrite)
 {
@@ -736,6 +746,10 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Return the transaction fabric without depending on the exchange or session still being present.
+ * @return The captured fabric until Close(), or kUndefinedFabricIndex before a request and after closure.
+ */
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
     // Close() can deliver a final list-write notification after the exchange or its session is gone.
