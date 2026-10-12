@@ -59,7 +59,10 @@ public:
 
     std::vector<MockRootCert> rootCerts;
     std::vector<MockClientCert> clientCerts;
+    uint32_t rootLookupCount   = 0;
+    uint32_t clientLookupCount = 0;
 
+    /** @brief Leave certificate state in memory; this mock does not load or persist certificates. */
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
 
     void Finish() override {}
@@ -70,13 +73,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /** @brief Stub unused certificate retrieval; command tests consult HasRootCertificateEntry instead. */
     CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry) override
     {
         return CHIP_NO_ERROR;
     }
 
+    /** @brief Look up a root certificate and count accesses to verify request validation precedes lookup. */
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id) override
     {
+        ++rootLookupCount;
         for (const auto & cert : rootCerts)
         {
             if (cert.fabric == fabric_index && cert.caid == id)
@@ -92,13 +98,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /** @brief Stub unused certificate retrieval; command tests consult HasClientCertificateEntry instead. */
     CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) override
     {
         return CHIP_NO_ERROR;
     }
 
+    /** @brief Look up a client certificate and count accesses to verify request validation precedes lookup. */
     CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id) override
     {
+        ++clientLookupCount;
         for (const auto & cert : clientCerts)
         {
             if (cert.fabric == fabric_index && cert.ccdid == id)
@@ -156,10 +165,12 @@ public:
         std::string hostname;
         TLSCAID caid;
         DataModel::Nullable<TLSCCDID> ccdid;
+        uint16_t port;
     };
 
     std::vector<MockEndpoint> endpoints;
     uint16_t nextEndpointID = 1;
+    uint32_t provisionCount = 0;
 
     CHIP_ERROR provisionError = CHIP_NO_ERROR;
     Protocols::InteractionModel::ClusterStatusCode provisionStatus =
@@ -167,8 +178,10 @@ public:
     Protocols::InteractionModel::Status removeStatus = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mutateReferenceCountError             = CHIP_NO_ERROR;
 
+    /** @brief Keep mock endpoints in memory without loading or writing persistent storage. */
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
 
+    /** @brief Encode the retained endpoint fields, including their port, for attribute-read controls. */
     CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
     {
         for (auto & endpoint : endpoints)
@@ -181,12 +194,14 @@ public:
                     ByteSpan(reinterpret_cast<const uint8_t *>(endpoint.hostname.c_str()), endpoint.hostname.size());
                 decodable.caid  = endpoint.caid;
                 decodable.ccdid = endpoint.ccdid;
+                decodable.port  = endpoint.port;
                 ReturnErrorOnFailure(callback(decodable));
             }
         }
         return CHIP_NO_ERROR;
     }
 
+    /** @brief Return a matching endpoint with its original hostname, certificate references, and port. */
     CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                            LoadedEndpointCallback callback) override
     {
@@ -200,16 +215,19 @@ public:
                     ByteSpan(reinterpret_cast<const uint8_t *>(endpoint.hostname.c_str()), endpoint.hostname.size());
                 decodable.caid  = endpoint.caid;
                 decodable.ccdid = endpoint.ccdid;
+                decodable.port  = endpoint.port;
                 return callback(decodable);
             }
         }
         return CHIP_ERROR_NOT_FOUND;
     }
 
+    /** @brief Count provision calls and retain endpoint fields to expose allocation before invalid-port rejection. */
     Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                       const Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID) override
     {
+        ++provisionCount;
         if (provisionError != CHIP_NO_ERROR)
         {
             return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound);
@@ -224,7 +242,8 @@ public:
         std::string hostname(reinterpret_cast<const char *>(provisionReq.hostname.data()), provisionReq.hostname.size());
 
         endpointID = nextEndpointID++;
-        endpoints.push_back({ matterEndpoint, fabric, endpointID, hostname, provisionReq.caid, provisionReq.ccdid });
+        endpoints.push_back(
+            { matterEndpoint, fabric, endpointID, hostname, provisionReq.caid, provisionReq.ccdid, provisionReq.port });
 
         return Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Success);
     }
@@ -364,6 +383,7 @@ TEST_F(TestTLSClientManagementCluster, TestReadFeatureMap)
     EXPECT_EQ(featureMap, 0u);
 }
 
+/** @brief Decode an empty endpoint list as the attribute-read control for rejected provisioning. */
 TEST_F(TestTLSClientManagementCluster, TestReadProvisionedEndpointsEmpty)
 {
     Attributes::ProvisionedEndpoints::TypeInfo::DecodableType list;
@@ -373,11 +393,13 @@ TEST_F(TestTLSClientManagementCluster, TestReadProvisionedEndpointsEmpty)
     EXPECT_FALSE(it.Next());
 }
 
+/** @brief Retain successful provisioning with a valid port and root certificate as a command-response control. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
 {
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -393,12 +415,217 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints[0].endpointID, 1);
 }
 
+/**
+ * @brief Reject port zero with valid certificates before allocating an endpoint or notifying attributes.
+ * Exercise both a null and a present client certificate through command TLV encoding and decoding.
+ */
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
+{
+    mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
+    auto & listener = mClusterTester.GetTestContext().ChangeListener();
+
+    for (bool withClientCertificate : { false, true })
+    {
+        Commands::ProvisionEndpoint::Type request;
+        request.hostname = ByteSpan::fromCharSpan("example.com"_span);
+        request.port     = 0;
+        request.caid     = 1;
+        request.endpointID.SetNull();
+        if (withClientCertificate)
+        {
+            request.ccdid.SetNonNull(1);
+        }
+        else
+        {
+            request.ccdid.SetNull();
+        }
+
+        auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+        EXPECT_FALSE(result.IsSuccess());
+        ASSERT_TRUE(result.status.has_value());
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+        }
+        EXPECT_FALSE(result.response.has_value());
+        EXPECT_EQ(mMockDelegate.provisionCount, 0u);
+        EXPECT_EQ(mMockDelegate.nextEndpointID, 1u);
+        EXPECT_TRUE(mMockDelegate.endpoints.empty());
+        EXPECT_EQ(mMockCertTable.rootLookupCount, 0u);
+        EXPECT_EQ(mMockCertTable.clientLookupCount, 0u);
+        EXPECT_TRUE(listener.DirtyList().empty());
+        EXPECT_TRUE(listener.ChangedList().empty());
+
+        Attributes::ProvisionedEndpoints::TypeInfo::DecodableType list;
+        ASSERT_TRUE(mClusterTester.ReadAttribute(Attributes::ProvisionedEndpoints::Id, list).IsSuccess());
+        auto iterator = list.begin();
+        EXPECT_FALSE(iterator.Next());
+        EXPECT_EQ(iterator.GetStatus(), CHIP_NO_ERROR);
+    }
+}
+
+/** @brief Return the port constraint error before consulting absent root or client certificate entries. */
+TEST_F(TestTLSClientManagementCluster, TestZeroPortValidationPrecedesCertificateLookup)
+{
+    for (bool missingRoot : { true, false })
+    {
+        Commands::ProvisionEndpoint::Type request;
+        request.hostname = ByteSpan::fromCharSpan("example.com"_span);
+        request.port     = 0;
+        request.caid     = missingRoot ? 99 : 1;
+        request.endpointID.SetNull();
+        if (missingRoot)
+        {
+            request.ccdid.SetNull();
+        }
+        else
+        {
+            request.ccdid.SetNonNull(99);
+        }
+
+        auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+        EXPECT_FALSE(result.IsSuccess());
+        ASSERT_TRUE(result.status.has_value());
+        if (result.status.has_value())
+        {
+            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+            EXPECT_FALSE(result.status->GetStatusCode().GetClusterSpecificCode().has_value());
+        }
+        EXPECT_FALSE(result.response.has_value());
+        EXPECT_EQ(mMockCertTable.rootLookupCount, 0u);
+        EXPECT_EQ(mMockCertTable.clientLookupCount, 0u);
+        EXPECT_EQ(mMockDelegate.provisionCount, 0u);
+        EXPECT_EQ(mMockDelegate.nextEndpointID, 1u);
+        EXPECT_TRUE(mMockDelegate.endpoints.empty());
+        EXPECT_TRUE(mClusterTester.GetTestContext().ChangeListener().DirtyList().empty());
+    }
+}
+
+/** @brief Accept ports 1, 443, and 65535 without narrowing the valid range or changing certificate-reference handling. */
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointValidPortBoundaries)
+{
+    mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
+    constexpr uint16_t ports[] = { 1, 443, 65535 };
+    auto & listener            = mClusterTester.GetTestContext().ChangeListener();
+
+    for (uint16_t port : ports)
+    {
+        for (bool withClientCertificate : { false, true })
+        {
+            Commands::ProvisionEndpoint::Type request;
+            request.hostname = ByteSpan::fromCharSpan("example.com"_span);
+            request.port     = port;
+            request.caid     = 1;
+            request.endpointID.SetNull();
+            if (withClientCertificate)
+            {
+                request.ccdid.SetNonNull(1);
+            }
+            else
+            {
+                request.ccdid.SetNull();
+            }
+            const uint16_t nextID = mMockDelegate.nextEndpointID;
+            const size_t dirty    = listener.DirtyList().size();
+
+            auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+            ASSERT_TRUE(result.IsSuccess());
+            ASSERT_TRUE(result.response.has_value());
+            if (result.response.has_value())
+            {
+                EXPECT_EQ(result.response->endpointID, nextID);
+            }
+            ASSERT_FALSE(mMockDelegate.endpoints.empty());
+            EXPECT_EQ(mMockDelegate.endpoints.back().port, port);
+            EXPECT_EQ(mMockDelegate.nextEndpointID, nextID + 1u);
+            EXPECT_EQ(listener.DirtyList().size(), dirty + 1u);
+
+            Commands::FindEndpoint::Type find;
+            find.endpointID = nextID;
+            auto found      = mClusterTester.Invoke<Commands::FindEndpoint::Type>(find);
+            ASSERT_TRUE(found.IsSuccess());
+            ASSERT_TRUE(found.response.has_value());
+            if (found.response.has_value())
+            {
+                EXPECT_EQ(found.response->endpoint.port, port);
+                EXPECT_TRUE(found.response->endpoint.hostname.data_equal(request.hostname));
+                EXPECT_EQ(found.response->endpoint.caid, request.caid);
+                EXPECT_EQ(found.response->endpoint.ccdid, request.ccdid);
+            }
+        }
+    }
+    EXPECT_EQ(mMockDelegate.provisionCount, 6u);
+    EXPECT_EQ(mMockDelegate.endpoints.size(), 6u);
+    EXPECT_EQ(mMockCertTable.rootLookupCount, 6u);
+    EXPECT_EQ(mMockCertTable.clientLookupCount, 3u);
+}
+
+/** @brief Reject a port-zero update without consuming an ID or changing a previously provisioned endpoint. */
+TEST_F(TestTLSClientManagementCluster, TestZeroPortPreservesProvisionedEndpoint)
+{
+    Commands::ProvisionEndpoint::Type request;
+    request.hostname = ByteSpan::fromCharSpan("example.com"_span);
+    request.port     = 443;
+    request.caid     = 1;
+    request.endpointID.SetNull();
+    request.ccdid.SetNull();
+    auto first = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+    ASSERT_TRUE(first.IsSuccess());
+    ASSERT_TRUE(first.response.has_value());
+    if (!first.response.has_value())
+    {
+        return;
+    }
+    const uint16_t id     = first.response->endpointID;
+    const uint16_t nextID = mMockDelegate.nextEndpointID;
+    const auto calls      = mMockDelegate.provisionCount;
+    auto & listener       = mClusterTester.GetTestContext().ChangeListener();
+    const auto dirty      = listener.DirtyList().size();
+    const auto changed    = listener.ChangedList().size();
+    const auto lookups    = mMockCertTable.rootLookupCount;
+
+    request.hostname = ByteSpan::fromCharSpan("other.example"_span);
+    request.port     = 0;
+    request.caid     = 2;
+    request.endpointID.SetNonNull(id);
+    auto rejected = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+    EXPECT_FALSE(rejected.IsSuccess());
+    ASSERT_TRUE(rejected.status.has_value());
+    if (rejected.status.has_value())
+    {
+        EXPECT_EQ(rejected.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    }
+    EXPECT_FALSE(rejected.response.has_value());
+    EXPECT_EQ(mMockDelegate.provisionCount, calls);
+    EXPECT_EQ(mMockDelegate.nextEndpointID, nextID);
+    ASSERT_EQ(mMockDelegate.endpoints.size(), 1u);
+    EXPECT_EQ(mMockDelegate.endpoints[0].hostname, "example.com");
+    EXPECT_EQ(mMockDelegate.endpoints[0].port, 443u);
+    EXPECT_EQ(mMockDelegate.endpoints[0].caid, 1u);
+    EXPECT_EQ(mMockCertTable.rootLookupCount, lookups);
+    EXPECT_EQ(listener.DirtyList().size(), dirty);
+    EXPECT_EQ(listener.ChangedList().size(), changed);
+
+    Commands::FindEndpoint::Type find;
+    find.endpointID = id;
+    auto found      = mClusterTester.Invoke<Commands::FindEndpoint::Type>(find);
+    ASSERT_TRUE(found.IsSuccess());
+    ASSERT_TRUE(found.response.has_value());
+    if (found.response.has_value())
+    {
+        EXPECT_EQ(found.response->endpoint.port, 443u);
+        EXPECT_TRUE(found.response->endpoint.hostname.data_equal(ByteSpan::fromCharSpan("example.com"_span)));
+    }
+}
+
+/** @brief Keep hostname and CA-ID constraint checks isolated from port validation by supplying a valid port. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 {
     // Test hostname too short
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("abc"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -410,16 +637,18 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 
     // Test invalid CAID
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-    request.caid     = 256; // exceeds kMaxRootCertId
+    request.caid     = 65535; // exceeds kMaxRootCertId
     result           = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
     EXPECT_FALSE(result.IsSuccess());
 }
 
+/** @brief Preserve the missing-root-certificate response for an otherwise valid endpoint request. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 99; // Not in mock cert table
+    request.port     = 443;
     request.ccdid.SetNull();
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
@@ -431,23 +660,27 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
     }
 }
 
+/** @brief Preserve the missing-client-certificate response for an otherwise valid endpoint request. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointClientCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
     request.caid     = 1;
+    request.port     = 443;
     request.ccdid.SetNonNull(99); // Not in mock cert table
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
     EXPECT_FALSE(result.IsSuccess());
 }
 
+/** @brief Provision with a valid port and retain successful lookup of the resulting endpoint and hostname. */
 TEST_F(TestTLSClientManagementCluster, TestFindEndpointSuccess)
 {
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
     provisionReq.hostname = ByteSpan::fromCharSpan("example.com"_span);
     provisionReq.caid     = 1;
+    provisionReq.port     = 443;
     provisionReq.ccdid.SetNull();
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
@@ -487,6 +720,7 @@ TEST_F(TestTLSClientManagementCluster, TestFindEndpointNotFound)
     }
 }
 
+/** @brief Reject endpoint IDs outside the declared range before invoking the lookup delegate. */
 TEST_F(TestTLSClientManagementCluster, TestFindEndpointConstraintError)
 {
     Commands::FindEndpoint::Type request;
@@ -500,12 +734,14 @@ TEST_F(TestTLSClientManagementCluster, TestFindEndpointConstraintError)
     }
 }
 
+/** @brief Provision with a valid port and retain removal of the resulting endpoint. */
 TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointSuccess)
 {
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
     provisionReq.hostname = ByteSpan::fromCharSpan("example.com"_span);
     provisionReq.caid     = 1;
+    provisionReq.port     = 443;
     provisionReq.ccdid.SetNull();
 
     auto provisionResult = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(provisionReq);
