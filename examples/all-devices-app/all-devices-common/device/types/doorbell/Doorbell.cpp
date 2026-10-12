@@ -14,9 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <binding-handler/BindingHandler.h>
+#include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Ids.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <devices/Types.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -111,6 +114,22 @@ Clusters::BindingCluster & Doorbell::BindingCluster()
     return mBindingCluster.Cluster();
 }
 
+CHIP_ERROR Doorbell::TriggerChime(std::optional<uint8_t> chimeId)
+{
+    VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+
+    Clusters::Chime::Commands::PlayChimeSound::Type playChimeCommand;
+    if (chimeId.has_value())
+    {
+        playChimeCommand.chimeID.SetValue(chimeId.value());
+    }
+
+    auto command = Platform::MakeUnique<SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type>>(playChimeCommand);
+    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    return ScheduleBindingCommand(mConfig.platformManager, mConfig.bindingManager, mEndpointId, std::move(command));
+}
+
 CHIP_ERROR Doorbell::HandleShortPress()
 {
     VerifyOrReturnError(mSwitchCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
@@ -122,7 +141,7 @@ CHIP_ERROR Doorbell::HandleShortPress()
     {
         ChipLogError(AppServer, "Doorbell: Unable to send OnInitialPress event");
     }
-    // Chime should be triggered here.
+    ReturnErrorOnFailure(TriggerChime());
     return mSwitchCluster.Cluster().SetCurrentPosition(0);
 }
 

@@ -50,6 +50,8 @@ public:
 
     CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override;
 
+    CHIP_ERROR TriggerChime(std::optional<uint8_t> chimeId = std::nullopt);
+
     // Doorbell actions (can be invoked via OOB accessors, named pipes, or physical button drivers)
     CHIP_ERROR HandleShortPress();
 
