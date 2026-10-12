@@ -85,7 +85,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         # Does the device implement the MinHeatSetpointLimit attribute?
         self.has_min_heat_limit = self.check_pics("TSTAT.S.A0015")
 
-        self.step("1", "Commission DUT to TH", is_commissioning=True)
+        self.step("1a", "Commission DUT to TH", is_commissioning=True)
 
         UnoccupiedHeatingSetpointValue = None
         UnoccupiedCoolingSetpointValue = None
@@ -93,9 +93,14 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.events_callback = None
         self.has_events = False
 
+        self.step("1b", "TH reads FeatureMap from DUT")
+        
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap
         )
+
+        self.step("1c", "If TEVT feature is supported, set up a subscription to all events of the Thermostat Cluster on the DUT")
+
         if feature_map & cluster.Bitmaps.Feature.kEvents:
             self.has_events = True
             self.events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Thermostat)
@@ -223,7 +228,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
                 "OccupiedCoolingSetpoint attribute should increase in value by 0.01C",
             )
 
-        self.step("4b", "Test Harness Client reads SetpointChange event from Server DUT")
+        self.step("4b", "If TEVT feature is supported, Test Harness verifies SetpointChange event from Server DUT")
         # Verified in 4a
 
         self.step(
@@ -243,7 +248,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
                 "OccupiedHeatingSetpoint attribute should decrease in value by 0.01C",
             )
 
-        self.step("5b", "Test Harness Client reads SetpointChange event from Server DUT")
+        self.step("5b", "If TEVT feature is supported, Test Harness verifies SetpointChange event from Server DUT")
         # Verified in 5a
 
         self.step(
@@ -264,7 +269,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
                     "UnoccupiedCoolingSetpoint attribute should increase in value by 0.01C",
                 )
 
-        self.step("6b", "Test Harness Client reads SetpointChange event from Server DUT")
+        self.step("6b", "If TEVT feature is supported, Test Harness verifies SetpointChange event from Server DUT")
         # Verified in 6a
 
         self.step(
@@ -285,7 +290,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
                     "UnoccupiedHeatingSetpoint attribute should decrease in value by 0.01C",
                 )
 
-        self.step("7b", "Test Harness Client reads SetpointChange event from Server DUT")
+        self.step("7b", "If TEVT feature is supported, Test Harness verifies SetpointChange event from Server DUT")
         # Verified in 7a
 
 
