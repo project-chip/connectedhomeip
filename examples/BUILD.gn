@@ -35,6 +35,7 @@ if (chip_build_tests) {
       "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
     ]
 

@@ -18,10 +18,7 @@
 
 #pragma once
 
-#include <app/CommandSender.h>
-#include <app/OperationalSessionSetup.h>
 #include <app/clusters/bindings/BindingManager.h>
-#include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -31,12 +28,17 @@
 #include <platform/PlatformManager.h>
 
 #include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace chip {
-class OperationalDeviceProxy;
-
 namespace app {
+
+/**
+ * Returns the default ExchangeManager used for group binding commands when no
+ * custom ExchangeManager is injected.
+ */
+Messaging::ExchangeManager & GetDefaultExchangeManager();
 
 /**
  * Abstract base class for binding command contexts.
@@ -79,8 +81,12 @@ template <typename CommandType>
 class SimpleBindingCommand : public BindingContext
 {
 public:
-    explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
-    explicit SimpleBindingCommand(CommandType && command) : mCommand(std::move(command)) {}
+    explicit SimpleBindingCommand(const CommandType & command, Messaging::ExchangeManager * exchangeMgr = nullptr) :
+        mCommand(command), mExchangeManager(exchangeMgr)
+    {}
+    explicit SimpleBindingCommand(CommandType && command, Messaging::ExchangeManager * exchangeMgr = nullptr) :
+        mCommand(std::move(command)), mExchangeManager(exchangeMgr)
+    {}
 
     ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
 
@@ -101,6 +107,8 @@ public:
                            ChipLogError(AppServer, "SimpleBindingCommand: Peer device connection not ready"));
 
             auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
+                (void) status;
+                (void) dataResponse;
                 ChipLogProgress(AppServer, "Binding command (0x%" PRIx32 ", 0x%" PRIx32 ") succeeded on endpoint %u",
                                 CommandType::GetClusterId(), CommandType::GetCommandId(), commandPath.mEndpointId);
             };
@@ -120,8 +128,9 @@ public:
         }
         else if (binding.type == Clusters::Binding::MATTER_MULTICAST_BINDING)
         {
-            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-            CHIP_ERROR err = Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, mCommand);
+            Messaging::ExchangeManager * exchangeMgr =
+                mExchangeManager != nullptr ? mExchangeManager : &GetDefaultExchangeManager();
+            CHIP_ERROR err = Controller::InvokeGroupCommandRequest(exchangeMgr, binding.fabricIndex, binding.groupId, mCommand);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
@@ -139,6 +148,7 @@ public:
 
 private:
     CommandType mCommand;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
 };
 
 /**
@@ -151,61 +161,80 @@ private:
 CHIP_ERROR InitBindingHandler();
 
 /**
- * Dispatches a binding command synchronously.
- * Ownership of command is transferred to BindingManager on success.
+ * Dispatches a binding command synchronously using a Platform::UniquePtr.
+ * Ownership is transferred to BindingManager on success, or deleted on failure.
  */
 CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
                                   EndpointId localEndpointId,
-                                  BindingContext * command);
-
-/**
- * Schedules a binding command onto the PlatformManager event loop.
- * Ownership of command is transferred on success.
- */
-CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                  Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId,
-                                  BindingContext * command);
-
-/**
- * Dispatches a binding command synchronously using a Platform::UniquePtr.
- * Ownership is released on success, or deleted on failure.
- */
-template <typename ContextType>
-inline CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
-                                         EndpointId localEndpointId,
-                                         Platform::UniquePtr<ContextType> command)
-{
-    static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ERROR err = DispatchBindingCommand(bindingManager, localEndpointId, command.get());
-    if (err == CHIP_NO_ERROR)
-    {
-        command.release();
-    }
-    return err;
-}
+                                  Platform::UniquePtr<BindingContext> command);
 
 /**
  * Schedules a binding command onto the PlatformManager event loop using a Platform::UniquePtr.
  * Ownership is transferred on success, or deleted on failure.
  */
-template <typename ContextType>
+CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
+                                  Clusters::Binding::Manager & bindingManager,
+                                  EndpointId localEndpointId,
+                                  Platform::UniquePtr<BindingContext> command);
+
+/**
+ * Dispatches a derived BindingContext synchronously using a Platform::UniquePtr.
+ * Ownership is transferred to BindingManager on success, or deleted on failure.
+ */
+template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
+inline CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
+                                         EndpointId localEndpointId,
+                                         Platform::UniquePtr<ContextType> command)
+{
+    static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
+    return DispatchBindingCommand(bindingManager, localEndpointId,
+                                  Platform::UniquePtr<BindingContext>(command.release()));
+}
+
+/**
+ * Schedules a derived BindingContext onto the PlatformManager event loop using a Platform::UniquePtr.
+ * Ownership is transferred on success, or deleted on failure.
+ */
+template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
 inline CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
                                          Clusters::Binding::Manager & bindingManager,
                                          EndpointId localEndpointId,
                                          Platform::UniquePtr<ContextType> command)
 {
     static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return ScheduleBindingCommand(platformManager, bindingManager, localEndpointId,
+                                  Platform::UniquePtr<BindingContext>(command.release()));
+}
 
-    CHIP_ERROR err = ScheduleBindingCommand(platformManager, bindingManager, localEndpointId, command.get());
-    if (err == CHIP_NO_ERROR)
-    {
-        command.release();
-    }
-    return err;
+/**
+ * Allocates a SimpleBindingCommand for a standard cluster command struct and dispatches it synchronously.
+ */
+template <typename CommandType>
+inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager,
+                                               EndpointId localEndpointId,
+                                               CommandType && commandPayload,
+                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
+{
+    using DecayedCommand = std::decay_t<CommandType>;
+    auto command = Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
+    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
+    return DispatchBindingCommand(bindingManager, localEndpointId, std::move(command));
+}
+
+/**
+ * Allocates a SimpleBindingCommand for a standard cluster command struct and schedules it on the PlatformManager event loop.
+ */
+template <typename CommandType>
+inline CHIP_ERROR ScheduleSimpleBindingCommand(DeviceLayer::PlatformManager & platformManager,
+                                               Clusters::Binding::Manager & bindingManager,
+                                               EndpointId localEndpointId,
+                                               CommandType && commandPayload,
+                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
+{
+    using DecayedCommand = std::decay_t<CommandType>;
+    auto command = Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
+    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
+    return ScheduleBindingCommand(platformManager, bindingManager, localEndpointId, std::move(command));
 }
 
 /**

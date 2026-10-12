@@ -57,6 +57,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
 #include <delegates/SilabsBatteryPowerSource.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
@@ -167,6 +168,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 CHIP_ERROR AppTask::AppInit()
 {
+    LogErrorOnFailure(InitBindingHandler());
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&AppTask::ButtonEventHandler);
 #ifdef ENABLE_CHIP_SHELL
     chip::Shell::DeviceCommands::GetInstance().Register();

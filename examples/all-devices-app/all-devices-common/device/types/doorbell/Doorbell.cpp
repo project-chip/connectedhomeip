@@ -124,10 +124,7 @@ CHIP_ERROR Doorbell::TriggerChime(std::optional<uint8_t> chimeId)
         playChimeCommand.chimeID.SetValue(chimeId.value());
     }
 
-    auto command = Platform::MakeUnique<SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type>>(playChimeCommand);
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    return ScheduleBindingCommand(mConfig.platformManager, mConfig.bindingManager, mEndpointId, std::move(command));
+    return DispatchSimpleBindingCommand(mConfig.bindingManager, mEndpointId, playChimeCommand);
 }
 
 CHIP_ERROR Doorbell::HandleShortPress()
@@ -141,8 +138,9 @@ CHIP_ERROR Doorbell::HandleShortPress()
     {
         ChipLogError(AppServer, "Doorbell: Unable to send OnInitialPress event");
     }
-    ReturnErrorOnFailure(TriggerChime());
-    return mSwitchCluster.Cluster().SetCurrentPosition(0);
+    CHIP_ERROR chimeErr = TriggerChime();
+    ReturnErrorOnFailure(mSwitchCluster.Cluster().SetCurrentPosition(0));
+    return chimeErr;
 }
 
 } // namespace app

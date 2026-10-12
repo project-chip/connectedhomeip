@@ -22,6 +22,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
@@ -327,6 +328,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
+    LogErrorOnFailure(InitBindingHandler());
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;

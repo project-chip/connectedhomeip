@@ -23,9 +23,7 @@
 #include <clusters/Identify/Ids.h>
 #include <clusters/OnOff/Commands.h>
 #include <clusters/OnOff/Ids.h>
-#include <device/types/doorbell/Doorbell.h>
 #include <lib/support/CHIPMem.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -43,14 +41,38 @@ protected:
 class TestCustomContext : public BindingContext
 {
 public:
-    explicit TestCustomContext(int & destructorCount) : mDestructorCount(destructorCount) {}
+    explicit TestCustomContext(int & destructorCount, int * dispatchCount = nullptr,
+                               Clusters::Binding::TableEntry * lastEntry = nullptr,
+                               OperationalDeviceProxy ** lastPeer        = nullptr) :
+        mDestructorCount(destructorCount),
+        mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer)
+    {}
+
     ~TestCustomContext() override { mDestructorCount++; }
 
     ClusterId GetClusterId() const override { return 0xFFFF; }
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) override {}
+
+    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) override
+    {
+        if (mDispatchCount != nullptr)
+        {
+            (*mDispatchCount)++;
+        }
+        if (mLastEntry != nullptr)
+        {
+            *mLastEntry = binding;
+        }
+        if (mLastPeer != nullptr)
+        {
+            *mLastPeer = peer_device;
+        }
+    }
 
 private:
     int & mDestructorCount;
+    int * mDispatchCount                         = nullptr;
+    Clusters::Binding::TableEntry * mLastEntry   = nullptr;
+    OperationalDeviceProxy ** mLastPeer          = nullptr;
 };
 
 TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
@@ -59,7 +81,7 @@ TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
     AllDevicesBoundDeviceContextReleaseHandler(nullptr);
 
     // Test polymorphic context destruction and memory cleanup
-    int destructorCount = 0;
+    int destructorCount  = 0;
     auto * customContext = Platform::New<TestCustomContext>(destructorCount);
     VerifyOrDie(customContext != nullptr);
 
@@ -72,6 +94,24 @@ TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
     VerifyOrDie(chimeCmd != nullptr);
 
     AllDevicesBoundDeviceContextReleaseHandler(chimeCmd);
+}
+
+TEST_F(TestBindingHandler, ChangedHandlerForwardsEntryAndPeerToContext)
+{
+    int destructorCount = 0;
+    int dispatchCount   = 0;
+    Clusters::Binding::TableEntry recordedEntry;
+    OperationalDeviceProxy * recordedPeer = reinterpret_cast<OperationalDeviceProxy *>(0x1);
+
+    TestCustomContext customContext(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer);
+
+    Clusters::Binding::TableEntry entry =
+        Clusters::Binding::TableEntry::ForNode(1 /* fabric */, 0x1234 /* node */, 2 /* local */, 3 /* remote */, 0xFFFF);
+
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &customContext);
+    EXPECT_EQ(dispatchCount, 1);
+    EXPECT_EQ(recordedEntry, entry);
+    EXPECT_EQ(recordedPeer, nullptr);
 }
 
 TEST_F(TestBindingHandler, ChangedHandlerHandlesNullContextGracefully)
@@ -116,7 +156,7 @@ TEST_F(TestBindingHandler, ChangedHandlerSupportsMultipleClusters)
     EXPECT_EQ(onOffCmd.GetClusterId(), Clusters::OnOff::Id);
     AllDevicesBoundDeviceChangedHandler(onOffEntry, nullptr, &onOffCmd);
 
-    // 2. Identify Cluster
+    // 2. Identify Cluster (using move constructor)
     Clusters::Binding::TableEntry identifyEntry;
     identifyEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
     identifyEntry.local     = 1;
@@ -125,7 +165,7 @@ TEST_F(TestBindingHandler, ChangedHandlerSupportsMultipleClusters)
 
     Clusters::Identify::Commands::Identify::Type identifyCmd;
     identifyCmd.identifyTime = 5;
-    SimpleBindingCommand<Clusters::Identify::Commands::Identify::Type> identifyBindingCmd(identifyCmd);
+    SimpleBindingCommand<Clusters::Identify::Commands::Identify::Type> identifyBindingCmd(std::move(identifyCmd));
     EXPECT_EQ(identifyBindingCmd.GetClusterId(), Clusters::Identify::Id);
     AllDevicesBoundDeviceChangedHandler(identifyEntry, nullptr, &identifyBindingCmd);
 
@@ -186,37 +226,28 @@ TEST_F(TestBindingHandler, ChangedHandlerHandlesUnsupportedBindingType)
     AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
 }
 
-TEST_F(TestBindingHandler, DispatchAndScheduleBindingCommandNullValidation)
+TEST_F(TestBindingHandler, DispatchAndScheduleBindingCommandValidationAndCleanup)
 {
-    EXPECT_EQ(DispatchBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ScheduleBindingCommand(DeviceLayer::PlatformMgr(), Clusters::Binding::Manager::GetInstance(), 1, nullptr),
+    EXPECT_EQ(DispatchBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, Platform::UniquePtr<BindingContext>(nullptr)),
               CHIP_ERROR_INVALID_ARGUMENT);
-}
+    EXPECT_EQ(ScheduleBindingCommand(DeviceLayer::PlatformMgr(), Clusters::Binding::Manager::GetInstance(), 1,
+                                     Platform::UniquePtr<BindingContext>(nullptr)),
+              CHIP_ERROR_INVALID_ARGUMENT);
 
-TEST_F(TestBindingHandler, TriggerChimeUnregisteredFails)
-{
-    class DummyIdentifyDelegate : public Clusters::IdentifyDelegate
-    {
-    public:
-        void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override {}
-        void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override {}
-        void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override {}
-        bool IsTriggerEffectEnabled() const override { return false; }
-    } dummyIdentify;
+    // When Binding::Manager is not initialized, DispatchBindingCommand fails with CHIP_ERROR_INCORRECT_STATE
+    // and must destroy the passed UniquePtr<TestCustomContext> exactly once.
+    int destructorCount = 0;
+    auto customContext  = Platform::MakeUnique<TestCustomContext>(destructorCount);
+    ASSERT_NE(customContext, nullptr);
 
-    DefaultTimerDelegate timerDelegate;
-    Doorbell::Config config{
-        .timerDelegate    = timerDelegate,
-        .platformManager  = DeviceLayer::PlatformMgr(),
-        .bindingTable     = Clusters::Binding::Table::GetInstance(),
-        .bindingManager   = Clusters::Binding::Manager::GetInstance(),
-        .identifyDelegate = dummyIdentify,
-    };
-    Doorbell doorbell(config);
+    EXPECT_EQ(DispatchBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, std::move(customContext)),
+              CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(destructorCount, 1);
 
-    // Prior to registration, TriggerChime must return CHIP_ERROR_INCORRECT_STATE
-    EXPECT_EQ(doorbell.TriggerChime(), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_EQ(doorbell.HandleShortPress(), CHIP_ERROR_INCORRECT_STATE);
+    // Verify DispatchSimpleBindingCommand also cleans up and returns CHIP_ERROR_INCORRECT_STATE when uninitialized
+    Clusters::OnOff::Commands::Toggle::Type toggleCmd;
+    EXPECT_EQ(DispatchSimpleBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, toggleCmd),
+              CHIP_ERROR_INCORRECT_STATE);
 }
 
 } // namespace

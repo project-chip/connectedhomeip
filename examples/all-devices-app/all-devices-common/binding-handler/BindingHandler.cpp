@@ -18,12 +18,15 @@
 
 #include "BindingHandler.h"
 
+#include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace app {
 
 namespace {
+
+const void * sLastReleasedContext = nullptr;
 
 void InitBindingHandlerInternal(intptr_t /* arg */)
 {
@@ -45,40 +48,50 @@ struct AsyncBindingWorkData
 {
     EndpointId localEndpointId;
     Clusters::Binding::Manager * bindingManager;
-    BindingContext * command;
+    Platform::UniquePtr<BindingContext> command;
 };
 
 void AsyncBindingWorkerFunction(intptr_t context)
 {
     VerifyOrReturn(context != 0, ChipLogError(AppServer, "AsyncBindingWorkerFunction - Invalid context"));
     auto * workData = reinterpret_cast<AsyncBindingWorkData *>(context);
-    std::unique_ptr<AsyncBindingWorkData> cleanup(workData);
+    Platform::UniquePtr<AsyncBindingWorkData> cleanup(workData);
 
     Clusters::Binding::Manager * manager =
         workData->bindingManager != nullptr ? workData->bindingManager : &Clusters::Binding::Manager::GetInstance();
 
-    CHIP_ERROR err = DispatchBindingCommand(*manager, workData->localEndpointId, workData->command);
+    CHIP_ERROR err = DispatchBindingCommand(*manager, workData->localEndpointId, std::move(workData->command));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "AsyncBindingWorkerFunction: DispatchBindingCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
-        Platform::Delete(workData->command);
     }
 }
 
 } // namespace
 
+Messaging::ExchangeManager & GetDefaultExchangeManager()
+{
+    return Server::GetInstance().GetExchangeManager();
+}
+
 CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
                                   EndpointId localEndpointId,
-                                  BindingContext * command)
+                                  Platform::UniquePtr<BindingContext> command)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ClusterId clusterId = command->GetClusterId();
+    ClusterId clusterId         = command->GetClusterId();
+    BindingContext * rawCommand = command.release();
+    sLastReleasedContext        = nullptr;
 
-    CHIP_ERROR err = bindingManager.NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(command));
+    CHIP_ERROR err = bindingManager.NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(rawCommand));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
+        if (sLastReleasedContext != rawCommand)
+        {
+            Platform::Delete(rawCommand);
+        }
     }
     return err;
 }
@@ -86,7 +99,7 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
 CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
                                   Clusters::Binding::Manager & bindingManager,
                                   EndpointId localEndpointId,
-                                  BindingContext * command)
+                                  Platform::UniquePtr<BindingContext> command)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -95,7 +108,7 @@ CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager
 
     workData->localEndpointId = localEndpointId;
     workData->bindingManager  = &bindingManager;
-    workData->command         = command;
+    workData->command         = std::move(command);
 
     CHIP_ERROR err = platformManager.ScheduleWork(AsyncBindingWorkerFunction, reinterpret_cast<intptr_t>(workData.get()));
     if (err == CHIP_NO_ERROR)
@@ -121,6 +134,7 @@ void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & b
 void AllDevicesBoundDeviceContextReleaseHandler(void * context)
 {
     VerifyOrReturn(context != nullptr);
+    sLastReleasedContext = context;
     Platform::Delete(static_cast<BindingContext *>(context));
 }
 
