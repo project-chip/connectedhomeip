@@ -86,7 +86,6 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
         """Returns the PICS requirements for TC-AVANALY-2.7."""
         return [
             "AVANALY.S",
-            "AVANALY.S.E02",
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis))
@@ -109,169 +108,174 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
                 self.skip_step(s)
             return
 
-        self.step(2)
-        context_a = supported_contexts[0]
-        context_b = supported_contexts[1]
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+        try:
+            self.step(2)
+            context_a = supported_contexts[0]
+            context_b = supported_contexts[1]
 
-        if self.has_feature_perzonedetect:
-            triggers = [
-                cluster.Structs.ContextTriggerStruct(context=context_a, zoneIDs=NullValue),
-                cluster.Structs.ContextTriggerStruct(context=context_b, zoneIDs=NullValue)
-            ]
-        else:
-            triggers = [
-                cluster.Structs.ContextTriggerStruct(context=context_a),
-                cluster.Structs.ContextTriggerStruct(context=context_b)
-            ]
+            if self.has_feature_perzonedetect:
+                triggers = [
+                    cluster.Structs.ContextTriggerStruct(context=context_a, zoneIDs=NullValue),
+                    cluster.Structs.ContextTriggerStruct(context=context_b, zoneIDs=NullValue)
+                ]
+            else:
+                triggers = [
+                    cluster.Structs.ContextTriggerStruct(context=context_a),
+                    cluster.Structs.ContextTriggerStruct(context=context_b)
+                ]
 
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=triggers)
+            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=triggers)
 
-        # Set up event subscription handler
-        event_callback = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
+            # Set up event subscription handler
+            event_callback = EventSubscriptionHandler(expected_cluster=cluster)
+            await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(3)
-        pipe_payload_1 = {
-            "Name": "AvAnalysisPerceivedContext",
-            "NewContexts": [
-                {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
-            ]
-        }
-        if self.has_feature_remcondetect:
-            pipe_payload_1["SourceNodeId"] = self.dut_node_id
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(pipe_payload_1)
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg=f"Simulate detection of Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) on the DUT. Press Enter once detected."
-            )
-
-        self.step(4)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
-            log.info("PerceivedContext event 1: %s", event1)
-            asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
-            active_session_id = event1.sessionID
-            asserts.assert_is_not_none(active_session_id, "sessionID must be present in event 1")
-            asserts.assert_greater_equal(active_session_id, 0, "sessionID must be a valid uint16")
-            asserts.assert_less_equal(active_session_id, 0xFFFF, "sessionID must be a valid uint16")
+            self.step(3)
+            pipe_payload_1 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "NewContexts": [
+                    {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
+                ]
+            }
             if self.has_feature_remcondetect:
-                asserts.assert_is_not_none(event1.sourceNodeId,
-                                           "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event1.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event1.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                asserts.assert_is_not_none(
-                    event1.sourceStartTimestamp,
-                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                pipe_payload_1["SourceNodeId"] = camera_node_id
+            if self.matter_test_config.pipe_name:
+                self.write_to_app_pipe(pipe_payload_1)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg=f"Simulate detection of Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) on the DUT. Press Enter once detected."
                 )
-            asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
-            new_tags_1 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event1.newIdentifiedContexts]
-            asserts.assert_in((context_a.namespaceID, context_a.tag), new_tags_1,
-                              "Context A not found in newIdentifiedContexts of event 1")
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 4")
-            active_session_id = 0
 
-        self.step(5)
-        pipe_payload_2 = {
-            "Name": "AvAnalysisPerceivedContext",
-            "SessionId": active_session_id,
-            "NewContexts": [
-                {"NamespaceId": context_b.namespaceID, "Tag": context_b.tag, "IdentifiedContextId": 2}
-            ]
-        }
-        if self.has_feature_remcondetect:
-            pipe_payload_2["SourceNodeId"] = self.dut_node_id
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(pipe_payload_2)
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg=f"Simulate detection of Context B (namespace=0x{context_b.namespaceID:02X}, tag=0x{context_b.tag:04X}) on the DUT while Context A remains present. Press Enter once detected."
-            )
+            self.step(4)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event1 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+                log.info("PerceivedContext event 1: %s", event1)
+                asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
+                active_session_id = event1.sessionID
+                asserts.assert_is_not_none(active_session_id, "sessionID must be present in event 1")
+                asserts.assert_greater_equal(active_session_id, 0, "sessionID must be a valid uint16")
+                asserts.assert_less_equal(active_session_id, 0xFFFF, "sessionID must be a valid uint16")
+                if self.has_feature_remcondetect:
+                    asserts.assert_is_not_none(event1.sourceNodeId,
+                                               "SourceNodeId must be present when REMCONDETECT is supported")
+                    asserts.assert_equal(event1.sourceNodeId, camera_node_id,
+                                         f"SourceNodeId ({event1.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
+                    asserts.assert_is_not_none(
+                        event1.sourceStartTimestamp,
+                        "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                    )
+                asserts.assert_is_not_none(event1.newIdentifiedContexts, "newIdentifiedContexts must be present in event 1")
+                new_tags_1 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event1.newIdentifiedContexts]
+                asserts.assert_in((context_a.namespaceID, context_a.tag), new_tags_1,
+                                  "Context A not found in newIdentifiedContexts of event 1")
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 4")
+                active_session_id = 0
 
-        self.step(6)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
-            log.info("PerceivedContext event 2: %s", event2)
-            asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
-            asserts.assert_equal(event2.sessionID, active_session_id,
-                                 f"SessionID in event 2 ({event2.sessionID}) does not match active session ({active_session_id})")
+            self.step(5)
+            pipe_payload_2 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "SessionId": active_session_id,
+                "NewContexts": [
+                    {"NamespaceId": context_b.namespaceID, "Tag": context_b.tag, "IdentifiedContextId": 2}
+                ]
+            }
             if self.has_feature_remcondetect:
-                asserts.assert_is_not_none(event2.sourceNodeId,
-                                           "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event2.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event2.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                asserts.assert_is_not_none(
-                    event2.sourceStartTimestamp,
-                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                pipe_payload_2["SourceNodeId"] = camera_node_id
+            if self.matter_test_config.pipe_name:
+                self.write_to_app_pipe(pipe_payload_2)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg=f"Simulate detection of Context B (namespace=0x{context_b.namespaceID:02X}, tag=0x{context_b.tag:04X}) on the DUT while Context A remains present. Press Enter once detected."
                 )
-            asserts.assert_is_not_none(event2.newIdentifiedContexts, "newIdentifiedContexts must be present in event 2")
-            new_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event2.newIdentifiedContexts]
-            asserts.assert_in((context_b.namespaceID, context_b.tag), new_tags_2,
-                              "Context B not found in newIdentifiedContexts of event 2")
-            asserts.assert_is_not_none(event2.currentIdentifiedContexts,
-                                       "currentIdentifiedContexts must be present in event 2")
-            current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
-                              for tc in event2.currentIdentifiedContexts]
-            asserts.assert_in((context_a.namespaceID, context_a.tag), current_tags_2,
-                              "Context A not found in currentIdentifiedContexts of event 2")
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 6")
 
-        self.step(7)
-        pipe_payload_3 = {
-            "Name": "AvAnalysisPerceivedContext",
-            "SessionId": active_session_id,
-            "ExpiredContexts": [
-                {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
-            ]
-        }
-        if self.has_feature_remcondetect:
-            pipe_payload_3["SourceNodeId"] = self.dut_node_id
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(pipe_payload_3)
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg=f"Simulate Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) leaving/expiring while Context B remains. Press Enter once expired."
-            )
+            self.step(6)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event2 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+                log.info("PerceivedContext event 2: %s", event2)
+                asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
+                asserts.assert_equal(event2.sessionID, active_session_id,
+                                     f"SessionID in event 2 ({event2.sessionID}) does not match active session ({active_session_id})")
+                if self.has_feature_remcondetect:
+                    asserts.assert_is_not_none(event2.sourceNodeId,
+                                               "SourceNodeId must be present when REMCONDETECT is supported")
+                    asserts.assert_equal(event2.sourceNodeId, camera_node_id,
+                                         f"SourceNodeId ({event2.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
+                    asserts.assert_is_not_none(
+                        event2.sourceStartTimestamp,
+                        "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                    )
+                asserts.assert_is_not_none(event2.newIdentifiedContexts, "newIdentifiedContexts must be present in event 2")
+                new_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event2.newIdentifiedContexts]
+                asserts.assert_in((context_b.namespaceID, context_b.tag), new_tags_2,
+                                  "Context B not found in newIdentifiedContexts of event 2")
+                asserts.assert_is_not_none(event2.currentIdentifiedContexts,
+                                           "currentIdentifiedContexts must be present in event 2")
+                current_tags_2 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                                  for tc in event2.currentIdentifiedContexts]
+                asserts.assert_in((context_a.namespaceID, context_a.tag), current_tags_2,
+                                  "Context A not found in currentIdentifiedContexts of event 2")
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 6")
 
-        self.step(8)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event3 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
-            log.info("PerceivedContext event 3: %s", event3)
-            asserts.assert_is_not_none(event3, "Expected PerceivedContext event")
-            asserts.assert_equal(event3.sessionID, active_session_id,
-                                 f"SessionID in event 3 ({event3.sessionID}) does not match active session ({active_session_id})")
+            self.step(7)
+            pipe_payload_3 = {
+                "Name": "AvAnalysisPerceivedContext",
+                "SessionId": active_session_id,
+                "ExpiredContexts": [
+                    {"NamespaceId": context_a.namespaceID, "Tag": context_a.tag, "IdentifiedContextId": 1}
+                ]
+            }
             if self.has_feature_remcondetect:
-                asserts.assert_is_not_none(event3.sourceNodeId,
-                                           "SourceNodeId must be present when REMCONDETECT is supported")
-                asserts.assert_equal(event3.sourceNodeId, self.dut_node_id,
-                                     f"SourceNodeId ({event3.sourceNodeId}) must match source camera NodeID ({self.dut_node_id})")
-                asserts.assert_is_not_none(
-                    event3.sourceStartTimestamp,
-                    "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                pipe_payload_3["SourceNodeId"] = camera_node_id
+            if self.matter_test_config.pipe_name:
+                self.write_to_app_pipe(pipe_payload_3)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg=f"Simulate Context A (namespace=0x{context_a.namespaceID:02X}, tag=0x{context_a.tag:04X}) leaving/expiring while Context B remains. Press Enter once expired."
                 )
-            asserts.assert_is_not_none(event3.expiredContexts, "expiredContexts must be present in event 3")
-            expired_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event3.expiredContexts]
-            asserts.assert_in((context_a.namespaceID, context_a.tag), expired_tags_3,
-                              "Context A not found in expiredContexts of event 3")
-            asserts.assert_is_not_none(event3.currentIdentifiedContexts,
-                                       "currentIdentifiedContexts must be present in event 3")
-            current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
-                              for tc in event3.currentIdentifiedContexts]
-            asserts.assert_in((context_b.namespaceID, context_b.tag), current_tags_3,
-                              "Context B not found in currentIdentifiedContexts of event 3")
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 8")
 
-        self.step(9)
-        # Cleanup: end analysis session and disable all context triggers
-        if self.matter_test_config.pipe_name:
-            cleanup_payload = {"Name": "AvAnalysisSessionEnd", "SessionId": active_session_id}
-            if self.has_feature_remcondetect:
-                cleanup_payload["SourceNodeId"] = self.dut_node_id
-            self.write_to_app_pipe(cleanup_payload)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+            self.step(8)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event3 = event_callback.wait_for_event_report(cluster.Events.PerceivedContext, timeout_sec=30)
+                log.info("PerceivedContext event 3: %s", event3)
+                asserts.assert_is_not_none(event3, "Expected PerceivedContext event")
+                asserts.assert_equal(event3.sessionID, active_session_id,
+                                     f"SessionID in event 3 ({event3.sessionID}) does not match active session ({active_session_id})")
+                if self.has_feature_remcondetect:
+                    asserts.assert_is_not_none(event3.sourceNodeId,
+                                               "SourceNodeId must be present when REMCONDETECT is supported")
+                    asserts.assert_equal(event3.sourceNodeId, camera_node_id,
+                                         f"SourceNodeId ({event3.sourceNodeId}) must match source camera NodeID ({camera_node_id})")
+                    asserts.assert_is_not_none(
+                        event3.sourceStartTimestamp,
+                        "SourceStartTimestamp must be present when REMCONDETECT is supported",
+                    )
+                asserts.assert_is_not_none(event3.expiredContexts, "expiredContexts must be present in event 3")
+                expired_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag) for tc in event3.expiredContexts]
+                asserts.assert_in((context_a.namespaceID, context_a.tag), expired_tags_3,
+                                  "Context A not found in expiredContexts of event 3")
+                asserts.assert_is_not_none(event3.currentIdentifiedContexts,
+                                           "currentIdentifiedContexts must be present in event 3")
+                current_tags_3 = [(tc.identifiedContext.namespaceID, tc.identifiedContext.tag)
+                                  for tc in event3.currentIdentifiedContexts]
+                asserts.assert_in((context_b.namespaceID, context_b.tag), current_tags_3,
+                                  "Context B not found in currentIdentifiedContexts of event 3")
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 8")
+
+            self.step(9)
+            # Cleanup: end analysis session, disable all context triggers, and remove stream if created
+            if self.matter_test_config.pipe_name:
+                cleanup_payload = {"Name": "AvAnalysisSessionEnd", "SessionId": active_session_id}
+                if self.has_feature_remcondetect:
+                    cleanup_payload["SourceNodeId"] = camera_node_id
+                self.write_to_app_pipe(cleanup_payload)
+            await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        finally:
+            await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

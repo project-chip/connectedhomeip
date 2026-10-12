@@ -129,8 +129,8 @@ class TC_AVANALY_2_4(MatterTestCommissionedDevice, AVANALYTestBase):
         )
 
         self.step(3)
-        # Establish analysis stream with TH node id or valid NodeID
-        node_id = self.dut_node_id
+        # Establish analysis stream with camera node id
+        node_id = self.get_camera_node_id()
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStream response: %s", resp)
         asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")

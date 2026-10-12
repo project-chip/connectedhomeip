@@ -18,6 +18,7 @@
 
 #include <app_options/AppOptions.h>
 #include <device-factory/DeviceFactory.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
@@ -282,7 +283,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
     case kOptionEnableKey: {
-        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+        constexpr size_t kEnableKeyLength = sizeof(mConfig.testEventTriggerEnableKey);
 
         if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
         {

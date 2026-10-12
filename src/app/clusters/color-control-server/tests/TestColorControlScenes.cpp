@@ -441,11 +441,10 @@ CHIP_ERROR MakeDecodableEfs(chip::Span<const AttributeValuePair> pairs, MutableB
     return out.Decode(reader);
 }
 
-// §3.2.7.1.1: at AddScene, an EFS whose declared EnhancedColorMode carries NONE of that mode's companion
-// attributes is rejected (a presence check across the whole EFS, done before delegating to the base
-// handler). A caller is free to write only some of a mode's companions — see
-// SerializeAddAcceptsModeWithPartialAttributes — CT is the one mode without a partial case: it has exactly
-// one companion, so omitting it means omitting all of them.
+// §3.2.7.1.1: "if data for EnhancedColorMode equals CurrentHueAndCurrentSaturation, then data for attributes
+// CurrentHue and CurrentSaturation SHALL be present in the ExtensionFieldSetStructs", and the same for
+// CurrentX/CurrentY and EnhancedCurrentHue/CurrentSaturation. An EFS missing all of its mode's attributes is
+// rejected; one missing only some of them is covered by SerializeAddRejectsModeWithPartialAttributes.
 TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingAllRequiredAttributes)
 {
     ColorControlCluster::Config config(delegate, mockTimer);
@@ -478,11 +477,9 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingAllRequiredAttribut
     }
 }
 
-// §3.2.7.1.1: a caller that only wants to override, say, Saturation need not also supply Hue — an EFS
-// declaring a multi-attribute mode is accepted as long as AT LEAST ONE of that mode's companions is
-// present; the one left out is simply absent from the stored scene. (CT has no partial case: its one
-// companion is unconditionally required, covered above.)
-TEST_F(TestColorControlScenes, SerializeAddAcceptsModeWithPartialAttributes)
+// §3.2.7.1.1: an EFS declaring a multi-attribute mode must carry ALL of that mode's companions; one
+// without the other (e.g. hue without saturation) is rejected, since recall would apply an undefined value.
+TEST_F(TestColorControlScenes, SerializeAddRejectsModeWithPartialAttributes)
 {
     ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
@@ -529,7 +526,7 @@ TEST_F(TestColorControlScenes, SerializeAddAcceptsModeWithPartialAttributes)
 
         uint8_t out[128];
         MutableByteSpan outSpan(out);
-        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_NO_ERROR) << c.name;
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT) << c.name;
     }
 }
 

@@ -94,22 +94,34 @@ class TC_PAVST_2_15(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
         """Test steps definition."""
         return [
             TestStep("precondition", "Commissioning and Zone Setup", is_commissioning=True),
-            TestStep(1, "TH1 allocates a PushAV transport with TriggerType = Motion.",
-                     "Verify successful allocation. Store ConnectionID as aConnectionID."),
-            TestStep(2, "TH1 Reads MaxZones attribute from Zone Management cluster", "Store value as aMaxZones."),
-            TestStep(3, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID != aConnectionID.", "DUT responds with NOT_FOUND."),
-            TestStep(4, "TH2 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID.",
+            TestStep(
+                1,
+                "TH1 executes steps 1-6 of TC-PAVST-2.11, overriding step 6 to set TriggerType = Motion in TransportTriggerOptions, to allocate a PushAV transport.",
+                "Verify successful completion of all steps. Store the ConnectionID as aConnectionID-1.",
+            ),
+            TestStep(
+                2,
+                "TH1 Reads Zones and MaxZones attributes from the Zone Management cluster on DUT.",
+                "Store values as aZones and aMaxZones.",
+            ),
+            TestStep(3, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID != aConnectionID-1.",
+                     "DUT responds with NOT_FOUND."),
+            TestStep(4, "TH2 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID-1.",
                      "DUT responds with NOT_FOUND (cross-fabric)."),
-            TestStep(5, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID and duplicate zones.",
+            TestStep(5, "TH1 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID-1 and duplicate zones.",
                      "DUT responds with ALREADY_EXISTS."),
             TestStep(6, "TH1 sends the UpdateMotionZoneOptions command with aMaxZones + 1 valid Zone IDs.",
                      "DUT responds with DYNAMIC_CONSTRAINT_ERROR."),
-            TestStep(7, "TH1 sends the UpdateMotionZoneOptions command with invalid ZoneID.", "DUT responds with InvalidZone."),
+            TestStep(
+                7,
+                "TH1 sends the UpdateMotionZoneOptions command with ConnectionID = aConnectionID-1 and MotionZones containing an invalid ZoneID that is not present in aZones.",
+                "DUT responds with InvalidZone.",
+            ),
             TestStep(8, "TH1 sends the UpdateMotionZoneOptions command with empty list [].", "DUT responds with SUCCESS."),
-            TestStep(9, "TH1 sends FindTransport command for aConnectionID.", "Verify MotionZones is empty."),
+            TestStep(9, "TH1 sends FindTransport command for aConnectionID-1.", "Verify MotionZones is empty."),
             TestStep(
                 10, "TH1 sends the UpdateMotionZoneOptions command with MotionZones = [aZoneID1, aZoneID2].", "DUT responds with SUCCESS."),
-            TestStep(11, "TH1 sends FindTransport command for aConnectionID.", "Verify MotionZones matches updated zones."),
+            TestStep(11, "TH1 sends FindTransport command for aConnectionID-1.", "Verify MotionZones matches updated zones."),
             TestStep(12, "If PERZONESENS is False, TH1 sends command with invalid MotionSensitivity (11).",
                      "DUT responds with CONSTRAINT_ERROR."),
             TestStep(13, "If PERZONESENS is False, TH1 sends command with valid MotionSensitivity (5).", "DUT responds with SUCCESS."),
@@ -229,12 +241,12 @@ class TC_PAVST_2_15(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
             aZoneID1 = motion_zones[0].zoneID
             aZoneID2 = motion_zones[1].zoneID
 
+        # Step 1: Allocate transport with Motion trigger
+        self.step(1)
         # Clean up existing transports
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(status, Status.Success, "Cleanup of transports failed")
 
-        # Step 1: Allocate transport with Motion trigger
-        self.step(1)
         # Allocate streams first
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
         video_stream_id = aAllocatedVideoStreams[0] if isinstance(aAllocatedVideoStreams, list) else aAllocatedVideoStreams
@@ -286,11 +298,13 @@ class TC_PAVST_2_15(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_is_not_none(aConnectionID, "AllocatePushTransportResponse does not contain connectionID")
         asserts.assert_true(aConnectionID != 0, "ConnectionID should not be 0")
 
-        # Step 2: Read MaxZones
+        # Step 2: Read Zones and MaxZones
         self.step(2)
+        aZones = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=zmcluster, attribute=zmattr.Zones)
         aMaxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmattr.MaxZones)
-        log.info("aMaxZones: %s", aMaxZones)
+        log.info("aZones count: %d, aMaxZones: %s", len(aZones), aMaxZones)
 
         # Step 3: Update with wrong ConnectionID
         self.step(3)

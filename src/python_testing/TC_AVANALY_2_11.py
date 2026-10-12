@@ -85,41 +85,45 @@ class TC_AVANALY_2_11(MatterTestCommissionedDevice, AVANALYTestBase):
         supported_contexts = await self.read_avanaly_attribute_expect_success(endpoint, attributes.SupportedAmbientContexts)
         asserts.assert_greater_equal(len(supported_contexts), 1, "SupportedAmbientContexts must not be empty")
 
-        self.step(2)
-        subset_context = supported_contexts[0]
-        if self.has_feature_perzonedetect:
-            trigger = cluster.Structs.ContextTriggerStruct(context=subset_context, zoneIDs=NullValue)
-        else:
-            trigger = cluster.Structs.ContextTriggerStruct(context=subset_context)
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+        try:
+            self.step(2)
+            subset_context = supported_contexts[0]
+            if self.has_feature_perzonedetect:
+                trigger = cluster.Structs.ContextTriggerStruct(context=subset_context, zoneIDs=NullValue)
+            else:
+                trigger = cluster.Structs.ContextTriggerStruct(context=subset_context)
 
-        await self.send_enable_context_triggers_cmd(endpoint, context_triggers=[trigger])
-        active_before = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
-        asserts.assert_greater_equal(len(active_before), 1, "ActiveAmbientContextTriggers should not be empty")
+            await self.send_enable_context_triggers_cmd(endpoint, context_triggers=[trigger])
+            active_before = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
+            asserts.assert_greater_equal(len(active_before), 1, "ActiveAmbientContextTriggers should not be empty")
 
-        self.step(3)
-        res = await self.write_single_attribute(attributes.TrackingEnabled(True), endpoint_id=endpoint)
-        asserts.assert_equal(res, Status.Success, "Writing TrackingEnabled failed")
+            self.step(3)
+            res = await self.write_single_attribute(attributes.TrackingEnabled(True), endpoint_id=endpoint)
+            asserts.assert_equal(res, Status.Success, "Writing TrackingEnabled failed")
 
-        self.step(4)
-        await self.request_device_reboot()
+            self.step(4)
+            await self.request_device_reboot()
 
-        self.step(5)  # Reconnection handled by request_device_reboot
+            self.step(5)  # Reconnection handled by request_device_reboot
 
-        self.step(6)
-        active_after = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
-        log.info("ActiveAmbientContextTriggers after reboot: %s", active_after)
-        active_tags_after = {(t.context.namespaceID, t.context.tag) for t in active_after}
-        asserts.assert_in((subset_context.namespaceID, subset_context.tag), active_tags_after,
-                          "Enabled context trigger was not persisted across reboot")
+            self.step(6)
+            active_after = await self.read_avanaly_attribute_expect_success(endpoint, attributes.ActiveAmbientContextTriggers)
+            log.info("ActiveAmbientContextTriggers after reboot: %s", active_after)
+            active_tags_after = {(t.context.namespaceID, t.context.tag) for t in active_after}
+            asserts.assert_in((subset_context.namespaceID, subset_context.tag), active_tags_after,
+                              "Enabled context trigger was not persisted across reboot")
 
-        self.step(7)
-        tracking_after = await self.read_avanaly_attribute_expect_success(endpoint, attributes.TrackingEnabled)
-        log.info("TrackingEnabled after reboot: %s", tracking_after)
-        asserts.assert_true(tracking_after, "TrackingEnabled was not persisted as True across reboot")
+            self.step(7)
+            tracking_after = await self.read_avanaly_attribute_expect_success(endpoint, attributes.TrackingEnabled)
+            log.info("TrackingEnabled after reboot: %s", tracking_after)
+            asserts.assert_true(tracking_after, "TrackingEnabled was not persisted as True across reboot")
 
-        # Cleanup
-        await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
-        await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+            # Cleanup
+            await self.write_single_attribute(attributes.TrackingEnabled(False), endpoint_id=endpoint)
+            await self.send_disable_context_triggers_cmd(endpoint, context_triggers=NullValue)
+        finally:
+            await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":
