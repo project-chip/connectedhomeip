@@ -650,8 +650,11 @@ std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewF
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
-    CHIP_ERROR err = mClusterContext.accessControl.GetAccessRestrictionProvider()->RequestFabricRestrictionReview(
-        commandObj->GetAccessingFabricIndex(), entries, token);
+    auto * accessRestrictionProvider = mClusterContext.accessControl.GetAccessRestrictionProvider();
+    VerifyOrReturnValue(accessRestrictionProvider != nullptr, Protocols::InteractionModel::Status::UnsupportedCommand);
+
+    CHIP_ERROR err =
+        accessRestrictionProvider->RequestFabricRestrictionReview(commandObj->GetAccessingFabricIndex(), entries, token);
 
     if (err != CHIP_NO_ERROR)
     {
