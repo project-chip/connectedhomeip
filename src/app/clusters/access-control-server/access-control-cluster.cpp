@@ -608,6 +608,9 @@ std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewF
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
 
+    auto * accessRestrictionProvider = mClusterContext.accessControl.GetAccessRestrictionProvider();
+    VerifyOrReturnValue(accessRestrictionProvider != nullptr, Protocols::InteractionModel::Status::UnsupportedCommand);
+
     uint64_t token;
     std::vector<AccessRestrictionProvider::Entry> entries;
     auto entryIter = commandData.arl.begin();
@@ -649,9 +652,6 @@ std::optional<DataModel::ActionReturnStatus> AccessControlCluster::HandleReviewF
         ChipLogError(DataManagement, "AccessControlCluster: invalid ARL data");
         return Protocols::InteractionModel::Status::InvalidCommand;
     }
-
-    auto * accessRestrictionProvider = mClusterContext.accessControl.GetAccessRestrictionProvider();
-    VerifyOrReturnValue(accessRestrictionProvider != nullptr, Protocols::InteractionModel::Status::UnsupportedCommand);
 
     CHIP_ERROR err =
         accessRestrictionProvider->RequestFabricRestrictionReview(commandObj->GetAccessingFabricIndex(), entries, token);
