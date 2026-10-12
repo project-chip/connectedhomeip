@@ -111,6 +111,10 @@ _available_devices = [
     "DISHWASHER",
   ],
   [
+    "doorbell",
+    "DOORBELL",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],
@@ -253,6 +257,11 @@ _available_devices = [
   [
     "water-valve",
     "WATER_VALVE",
+  ],
+
+  [
+    "window-covering",
+    "WINDOW_COVERING",
   ],
 ]
 
