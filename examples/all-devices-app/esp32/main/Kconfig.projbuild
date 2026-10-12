@@ -71,12 +71,6 @@ menu "Demo"
         config DEVICE_TYPE_ESP_MOSAICO
             bool "ESP-Mosaico"
             depends on IDF_TARGET_ESP32S31
-            help
-                ESP-Mosaico development board (ESP32-S31, 16MB flash, octal PSRAM).
-
-                The 480x480 CO5300 AMOLED and CST9217 touch panel are driven by the
-                LVGL renderer through the esp-mosaico-bsp component, taken from the
-                checkout ESP_MOSAICO_BSP_PATH points at, see the README.
         config DEVICE_TYPE_ESP32_H2_DEVKITM
             bool "ESP32H2-DevKitM"
             depends on IDF_TARGET_ESP32H2

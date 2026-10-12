@@ -146,12 +146,9 @@ The LVGL renderer never includes a BSP header directly. Everything it needs from
 the board (start the panel and LVGL task, take and release the LVGL lock, blank
 and restore the light output) goes through `display/lvgl/board/DisplayBoard.h`,
 and `main/CMakeLists.txt` compiles exactly one backend from
-`display/lvgl/board/` for the selected `CONFIG_DEVICE_TYPE_*`. The two backends
-differ in more than naming: the CoreS3 BSP wraps `esp_lvgl_port`, where a lock
-timeout of 0 waits forever, while the Mosaico BSP wraps `esp_lvgl_adapter`,
-where -1 does. The CoreS3 has an LCD backlight; the CO5300 on the Mosaico is an
-AMOLED, so "backlight off" is brightness 0 while LVGL and the touch controller
-keep running for the wake-on-touch overlay.
+`display/lvgl/board/` for the selected `CONFIG_DEVICE_TYPE_*`. Each backend
+wraps the LVGL port of its BSP: `esp_lvgl_port` on the CoreS3,
+`esp_lvgl_adapter` on the Mosaico.
 
 The legacy `tft/` driver accesses ESP32 hardware registers directly and does not
 compile for ESP32-S3. Targets using other chips must use `lvgl/` or add a
@@ -235,22 +232,11 @@ directory is scanned at configure time, so an existing build directory needs
 ### Look and Feel
 
 `Theme.cpp` extends the default LVGL dark theme with an apply callback, so every
-widget gets the same finish at creation: gradient screen background, rounded
-translucent cards with a soft shadow, accent buttons that shrink slightly while
-pressed, thick gradient sliders with a glowing knob, dimmed dialog backdrops.
-Screens compose from the builders in `Ui.h` (`CreateTile`, `CreateIconBadge`,
-`CreatePill`, `CreateHeading`) and take sizes from `Ui::Px(large, small)`, which
-picks the first value on 480-class panels and the second on 320x240, so the
-CoreS3 keeps its compact layout. Fonts follow the same rule: Montserrat
-32/24/18/14 for title, heading, body and caption on the large panel, the default
-font everywhere on the small one.
-
-Motion is deliberate and short: content slides in from the side the navigation
-came from (`Ui::AnimateEntrance`), the QR card and verdict badges scale in with
-an overshoot (`Ui::PopIn`), the idle "Waiting for a controller" line breathes
-(`Ui::StartPulse`), and the panel fades to black over 0.7 s before it sleeps
-instead of cutting out. The bar shows live Wi-Fi, BLE and fabric indicators fed
-by `CommissioningMonitor`.
+widget is styled at creation: plain containers become cards, and buttons,
+sliders, switches and dialogs get matching styles. Screens compose from the
+builders in `Ui.h` and take sizes from `Ui::Px(large, small)`, which picks the
+first value on 480-class panels and the second on 320x240, so the CoreS3 keeps
+its compact layout. Fonts follow the same rule.
 
 ### Thread Safety
 
@@ -382,11 +368,7 @@ fabric count behind this comes from a `FabricTable::Delegate`, so a fabric
 removed by a controller brings the codes back. Every update wakes a blanked
 panel. On success, and only while the QR screen is the one showing, an LVGL
 one-shot timer pops the stack back to Home after the verdict has been on screen
-for a moment, and the line returns to "Commissioned". The handler runs on the
-CHIP thread and takes the display lock, the permitted order; the QR screen
-builds its status row with `CreateStatusView()` from the LVGL task, and the
-binding is dropped on the row's `LV_EVENT_DELETE`, so a stage arriving after the
-screen was left is only logged.
+for a moment, and the line returns to "Commissioned".
 
 ### Auto-Sleep and Wake-on-Touch
 

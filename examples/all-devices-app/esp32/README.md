@@ -23,17 +23,10 @@ M5Stack Basic/Gray and a touch-driven LVGL UI on the others.
 
 ### ESP-Mosaico (ESP32-S31)
 
-#### Required repositories
-
-| Repository                                                        | Revision                                                  | Provides                                           |
-| :---------------------------------------------------------------- | :-------------------------------------------------------- | :------------------------------------------------- |
-| [esp-idf](https://github.com/espressif/esp-idf)                   | `master` at `4d59230ddff` (`v6.2-dev-3087`) or newer      | ESP32-S31 support (preview target), LVGL 9.5       |
-| [esp-mosaico-bsp](https://github.com/esp-mosaico/esp-mosaico-bsp) | `6edd088e` or newer, pointed to by `ESP_MOSAICO_BSP_PATH` | CO5300 AMOLED, CST9217 touch, ES8311 codec drivers |
-
 #### ESP-IDF
 
-The Mosaico needs ESP-IDF 6.2, which at the time of writing is only on master.
-This port was built with:
+The Mosaico needs [ESP-IDF](https://github.com/espressif/esp-idf) 6.2, which at
+the time of writing is only on master. This port was built with:
 
 ```
 git clone https://github.com/espressif/esp-idf.git
@@ -46,8 +39,9 @@ git submodule update --init --recursive
 
 #### Mosaico BSP
 
-Clone the BSP anywhere and point `ESP_MOSAICO_BSP_PATH` at the checkout before
-building; the port was tested at commit `6edd088e`:
+Clone the [esp-mosaico-bsp](https://github.com/esp-mosaico/esp-mosaico-bsp)
+anywhere and point `ESP_MOSAICO_BSP_PATH` at the checkout before building; the
+port was tested at commit `6edd088e`:
 
 ```
 git clone https://github.com/esp-mosaico/esp-mosaico-bsp.git /path/to/esp-mosaico-bsp
@@ -77,19 +71,12 @@ firmware is on the board `idf.py flash` resets it into the bootloader by itself:
 idf.py -p /dev/ttyACM0 flash monitor
 ```
 
-If esptool reports that it lost the port right after resetting the board, the
-ROM loader came up under another device name; run the command again with
-`--before no-reset` on that port.
-
 For the first flash, or whenever the board runs firmware without that console,
 put it into ROM download mode by hand first:
 
 1. Press and hold the Boot button (left of the USB-C port).
 2. Press and release the Reset button while still holding Boot.
 3. Release Boot. The ROM enumerates as an Espressif USB device.
-
-The Matter shell is disabled on this board: the device type, commissioning QR
-code, status, reboot and factory reset are all on the touch UI.
 
 ### Boards with a dedicated build target
 
