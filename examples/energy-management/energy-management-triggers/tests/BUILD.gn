@@ -16,12 +16,20 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
+  import(
+      "${chip_root}/src/app/clusters/device-energy-management-server/app_config_dependent_sources.gni")
+
   output_name = "TestDEMTestEventTriggers"
 
   test_sources = [ "TestDEMTestEventTriggers.cpp" ]
 
-  sources = [
-    "${chip_root}/src/app/clusters/device-energy-management-server/CodegenIntegration.cpp",
+  sources = []
+  foreach(file, app_config_dependent_sources) {
+    sources += [
+      "${chip_root}/src/app/clusters/device-energy-management-server/${file}",
+    ]
+  }
+  sources += [
     "../DEMTestEventTriggers.cpp",
     "../FakeReadings.h",
   ]
