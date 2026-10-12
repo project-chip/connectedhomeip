@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import queue
 import logging
+import queue
 
 from mobly import asserts
 from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
