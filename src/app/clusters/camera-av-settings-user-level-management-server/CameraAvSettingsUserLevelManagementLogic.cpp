@@ -128,6 +128,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBu
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
+/**
+ * @brief Notify the registered callback that an attribute changed; do nothing when no callback is installed.
+ * @param aAttributeId The changed attribute on this cluster's endpoint.
+ */
 void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeId)
 {
     if (mMarkDirtyCallback)
@@ -674,6 +678,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeMPTZPresets(At
     });
 }
 
+/**
+ * @brief Encode the current digital-stream list without changing its entries or persistent records.
+ * @param aEncoder The attribute encoder receiving the stream list.
+ * @return CHIP_NO_ERROR on success, or an encoding error.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -686,6 +695,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(At
     });
 }
 
+/**
+ * @brief Restore position, presets, and digital streams, then notify the delegate that loading has completed.
+ * Position-load errors select default axis values; preset or stream errors clear the corresponding active list.
+ * Invalid preset records remain in storage, and delegate notification errors are ignored by the existing startup policy.
+ */
 void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

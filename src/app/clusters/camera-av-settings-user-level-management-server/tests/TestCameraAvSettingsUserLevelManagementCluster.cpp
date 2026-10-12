@@ -59,14 +59,34 @@ static constexpr uint8_t testMaxPresets           = 5;
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
+    /**
+     * @brief Leave fixture-owned delegate state unchanged during cluster shutdown.
+     */
     void ShutdownApp() {}
 
+    /**
+     * @brief Allow mechanical movement without introducing hardware-state dependencies into the tests.
+     * @return True so the cluster can exercise its movement handling.
+     */
     bool CanChangeMPTZ() { return true; }
 
+    /**
+     * @brief Ignore allocation events; stream tests populate the cluster's stream list directly.
+     */
     void VideoStreamAllocated(uint16_t aStreamID) {}
+    /**
+     * @brief Ignore deallocation events; stream tests control the cluster's stream list directly.
+     */
     void VideoStreamDeallocated(uint16_t aStreamID) {}
+    /**
+     * @brief Ignore camera-stream defaults; individual tests provide explicit viewport values.
+     */
     void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) {}
 
+    /**
+     * @brief Accept absolute movement without invoking completion or changing the test's stored position.
+     * @return Success; the test drives the completion callback explicitly.
+     */
     Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
     {
         return Status::Success;
@@ -189,6 +209,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
                                               }));
 }
 
+/**
+ * @brief Check configured limits, initial mechanical position, idle movement state, and empty presets.
+ * Read attributes through ClusterTester to exercise the cluster's metadata and attribute encoders.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClusterTesterTest)
 {
     uint8_t maxPresets = 0;
@@ -248,6 +272,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClus
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 }
 
+/**
+ * @brief Verify absolute mechanical movement enters the moving state and applies requested axes on completion.
+ * Drive the mock completion callback and check the resulting position and return to idle.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
