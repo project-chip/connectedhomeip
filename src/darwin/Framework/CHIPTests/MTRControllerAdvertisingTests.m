@@ -34,7 +34,25 @@ static NSString * NodeIDAsString(NSNumber * nodeID) { return [NSString stringWit
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation nodeIDToExpect:(NSNumber *)nodeIDToExpect;
 - (void)discoveredNodeID:(NSString *)nodeID onCompressedFabricID:(NSString *)compressedFabricID;
+- (void)stop;
 @end
+
+// An operational instance name is <compressed fabric ID>-<node ID>, each 16
+// uppercase hex digits; lowercase hex is not valid there.
+static bool IsUppercaseHexDigit(char aChar) { return (aChar >= '0' && aChar <= '9') || (aChar >= 'A' && aChar <= 'F'); }
+
+static bool IsOperationalInstanceName(const char * aName)
+{
+    if (strlen(aName) != 33 || aName[16] != '-') {
+        return false;
+    }
+    for (size_t i = 0; i < 33; ++i) {
+        if (i != 16 && !IsUppercaseHexDigit(aName[i])) {
+            return false;
+        }
+    }
+    return true;
+}
 
 static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t aInterfaceId, DNSServiceErrorType aError,
     const char * aName, const char * aType, const char * aDomain, void * aContext)
@@ -46,7 +64,9 @@ static void OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, uint32_t
     }
 
     // 16 chars for compressed fabric id, 16 chars for node id, and the dash.
-    XCTAssertTrue(strlen(aName) == 33);
+    if (!IsOperationalInstanceName(aName)) {
+        return;
+    }
 
     NSString * compressedFabricID = [[NSString alloc] initWithBytes:aName length:16 encoding:NSUTF8StringEncoding];
     NSString * nodeID = [[NSString alloc] initWithBytes:aName + 17 length:16 encoding:NSUTF8StringEncoding];
@@ -98,17 +118,22 @@ static const DNSServiceFlags kBrowseFlags = 0;
     if ([nodeID isEqualToString:_nodeIDToExpect]) {
         _discoveredNodes = [NSSet setWithSet:_allDiscoveredNodes[compressedFabricID]];
         // Stop our browse so we get no more notifications.
+        [self stop];
+        [_expectation fulfill];
+    }
+}
+
+- (void)stop
+{
+    if (_browseRef) {
         DNSServiceRefDeallocate(_browseRef);
         _browseRef = NULL;
-        [_expectation fulfill];
     }
 }
 
 - (void)dealloc
 {
-    if (_browseRef) {
-        DNSServiceRefDeallocate(_browseRef);
-    }
+    [self stop];
 }
 
 @end
@@ -116,8 +141,18 @@ static const DNSServiceFlags kBrowseFlags = 0;
 @interface MTRControllerAdvertisingTests : XCTestCase
 @end
 
+static void OnRegister(DNSServiceRef aServiceRef, DNSServiceFlags aFlags, DNSServiceErrorType aError, const char * aName,
+    const char * aType, const char * aDomain, void * aContext)
+{
+    XCTAssertTrue(aError == kDNSServiceErr_NoError);
+    if (aFlags & kDNSServiceFlagsAdd) {
+        [(__bridge XCTestExpectation *) aContext fulfill];
+    }
+}
+
 @implementation MTRControllerAdvertisingTests {
     dispatch_queue_t _storageQueue;
+    MTRControllerAdvertisingTestsOperationalBrowser * _operationalBrowser;
 }
 
 + (void)tearDown
@@ -136,6 +171,8 @@ static const DNSServiceFlags kBrowseFlags = 0;
 - (void)tearDown
 {
     // Per-test teardown, runs after each test.
+    [_operationalBrowser stop];
+    _operationalBrowser = nil;
     [self stopFactory];
     _storageQueue = nil;
     [super tearDown];
@@ -215,9 +252,9 @@ static const DNSServiceFlags kBrowseFlags = 0;
     // Assume that since we start the controller with nodeID3 last, by the
     // time we see its advertisements we will have seen the ones for the one
     // with nodeID1 too, if it had any.
-    __auto_type * operationalBrowser =
+    _operationalBrowser =
         [[MTRControllerAdvertisingTestsOperationalBrowser alloc] initWithExpectation:browseExpectation nodeIDToExpect:nodeID3];
-    XCTAssertNotNil(operationalBrowser);
+    XCTAssertNotNil(_operationalBrowser);
 
     __auto_type * storageDelegate1 = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
@@ -265,7 +302,7 @@ static const DNSServiceFlags kBrowseFlags = 0;
     [self waitForExpectations:@[ browseExpectation ] timeout:kTimeoutInSeconds];
 
     __auto_type * expectedDiscoveredNodes = [NSSet setWithArray:@[ NodeIDAsString(nodeID2), NodeIDAsString(nodeID3) ]];
-    XCTAssertEqualObjects(operationalBrowser.discoveredNodes, expectedDiscoveredNodes);
+    XCTAssertEqualObjects(_operationalBrowser.discoveredNodes, expectedDiscoveredNodes);
 
     [controller1 shutdown];
     XCTAssertFalse([controller1 isRunning]);
@@ -273,6 +310,41 @@ static const DNSServiceFlags kBrowseFlags = 0;
     XCTAssertFalse([controller2 isRunning]);
     [controller3 shutdown];
     XCTAssertFalse([controller3 isRunning]);
+}
+
+- (void)registerInstance:(const char *)instanceName port:(uint16_t)port
+{
+    __auto_type * registered = [self expectationWithDescription:[NSString stringWithFormat:@"Registered %s", instanceName]];
+    DNSServiceRef registerRef;
+    __auto_type err = DNSServiceRegister(&registerRef, kDNSServiceFlagsNoAutoRename, 0, instanceName, kOperationalType, kLocalDot,
+        "localhost", htons(port), 0, NULL, OnRegister, (__bridge void *) registered);
+    XCTAssertTrue(err == kDNSServiceErr_NoError);
+    [self addTeardownBlock:^{
+        DNSServiceRefDeallocate(registerRef);
+    }];
+    err = DNSServiceSetDispatchQueue(registerRef, dispatch_get_main_queue());
+    XCTAssertTrue(err == kDNSServiceErr_NoError);
+    [self waitForExpectations:@[ registered ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test002_ForeignInstanceNamesAreIgnored
+{
+    NSNumber * nodeID = @(0x2718281828459045);
+
+    [self registerInstance:"foreign-instance" port:15002];
+    [self registerInstance:"3141592653589793X0000000000000001" port:15004];
+    [self registerInstance:"3141592653589793-000000000000000G" port:15005];
+    [self registerInstance:"3141592653589793-00000000000000ab" port:15006];
+
+    __auto_type * browseExpectation = [self expectationWithDescription:@"Discovered the operational instance"];
+    _operationalBrowser =
+        [[MTRControllerAdvertisingTestsOperationalBrowser alloc] initWithExpectation:browseExpectation nodeIDToExpect:nodeID];
+
+    __auto_type * operationalName = [NSString stringWithFormat:@"%016llX-%@", 0x3141592653589793ULL, NodeIDAsString(nodeID)];
+    [self registerInstance:operationalName.UTF8String port:15003];
+
+    [self waitForExpectations:@[ browseExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqualObjects(_operationalBrowser.discoveredNodes, [NSSet setWithObject:NodeIDAsString(nodeID)]);
 }
 
 @end
