@@ -49024,8 +49024,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_size);
                 jobject newElement_0_mimeType;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.mimeType, newElement_0_mimeType));
-                jobject newElement_0_imageUri;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.imageUri, newElement_0_imageUri));
+                jobject newElement_0_imageURI;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.imageURI, newElement_0_imageURI));
 
                 {
                     jclass fileDescriptionStructStructClass_1;
@@ -49051,7 +49051,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(fileDescriptionStructStructClass_1, fileDescriptionStructStructCtor_1, newElement_0_fileID,
-                                       newElement_0_name, newElement_0_size, newElement_0_mimeType, newElement_0_imageUri);
+                                       newElement_0_name, newElement_0_size, newElement_0_mimeType, newElement_0_imageURI);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

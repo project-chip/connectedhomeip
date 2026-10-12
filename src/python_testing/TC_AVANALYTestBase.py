@@ -33,6 +33,17 @@ class AVANALYTestBase:
     has_feature_remcondetect = False
     has_feature_perzonedetect = False
 
+    def get_camera_node_id(self) -> int:
+        """Return the Node ID of the camera device to use for remote analysis streams and zones.
+
+        Checks user_params for 'camera_node_id' (or 'remote_node_id' alias), falling back to
+        self.dut_node_id when the DUT itself hosts the camera clusters (e.g. in single-node CI).
+        """
+        camera_node_id = self.user_params.get("camera_node_id", self.user_params.get("remote_node_id"))
+        if camera_node_id is not None:
+            return int(camera_node_id, 0) if isinstance(camera_node_id, str) else int(camera_node_id)
+        return self.dut_node_id
+
     async def read_avanaly_attribute_expect_success(self, endpoint, attribute):
         """Read the provided attribute from the cluster instance on the provided endpoint.
 
@@ -269,3 +280,30 @@ class AVANALYTestBase:
                 f"Unexpected error returned on removing analysis stream: expected {expected_status}, got {e.status}",
             )
             return None
+
+    async def ensure_analysis_stream_established(self, endpoint: int):
+        """Ensure at least one analysis stream is established for the camera node when REMCONDETECT is supported.
+
+        Returns the newly established analysisStreamID if one was created, or None if not needed.
+        """
+        if not self.has_feature_remcondetect:
+            return None
+        attributes = Clusters.Objects.AvAnalysis.Attributes
+        camera_node_id = self.get_camera_node_id()
+        streams = await self.read_avanaly_attribute_expect_success(
+            endpoint, attributes.AnalysisStreams
+        )
+        if not any(s.nodeID == camera_node_id for s in (streams or [])):
+            resp = await self.send_establish_analysis_stream_cmd(
+                endpoint, node_id=camera_node_id
+            )
+            asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
+            return resp.analysisStreamID
+        return None
+
+    async def cleanup_analysis_stream(self, endpoint: int, analysis_stream_id) -> None:
+        """Remove an analysis stream established by ensure_analysis_stream_established."""
+        if analysis_stream_id is not None:
+            await self.send_remove_analysis_stream_cmd(
+                endpoint, analysis_stream_id=analysis_stream_id
+            )
