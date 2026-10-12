@@ -589,6 +589,13 @@ exit:
     return err;
 }
 
+/**
+ * @brief Decode one write message and process its attribute values using message-local optional flag defaults.
+ * @param aPayload The encoded request, consumed by the parser.
+ * @param aIsTimedWrite Whether the request follows an accepted timed interaction.
+ * @return Success after processing the request, TimedRequestMismatch for inconsistent timed state, or InvalidAction on error.
+ * Omitted SuppressResponse and MoreChunkedMessages fields default to false for every message, including later chunks.
+ */
 Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -618,7 +625,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+    boolValue = false;
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
     {
@@ -632,7 +639,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
