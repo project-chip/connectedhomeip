@@ -650,11 +650,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeMPTZPresets(At
     });
 }
 
-/**
- * @brief Encode the current digital-stream list without changing its entries or persistent records.
- * @param aEncoder The attribute encoder receiving the stream list.
- * @return CHIP_NO_ERROR on success, or an encoding error.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -730,13 +725,6 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
-/**
- * @brief Validate supported axes and ask the delegate to move to an absolute mechanical position.
- * @param commandData The requested optional pan, tilt, and zoom values; at least one must be supplied.
- * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range value,
- *         Busy when movement is unavailable, or the delegate's status.
- * Success records the target and starts movement; the completion callback applies the position.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData)
@@ -983,12 +971,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-/**
- * @brief Ask the delegate to move to a known preset; commit position values after its completion callback.
- * @param commandData The preset ID to look up.
- * @return ConstraintError for an out-of-range ID, NotFound for a missing preset, Busy when movement is unavailable,
- *         or the delegate's status. Success starts movement and marks MovementState as moving.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData)
@@ -1243,11 +1225,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return Status::Success;
 }
 
-/**
- * @brief Ask the delegate to apply a viewport to a known digital stream.
- * @param commandData The stream ID and requested viewport.
- * @return NotFound for an unknown stream, or the delegate's status; Success commits the requested viewport.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZSetViewport(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::DecodableType & commandData)
@@ -1275,12 +1252,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-/**
- * @brief Ask the delegate to compute a relative viewport change for a known digital stream.
- * @param commandData The stream ID and optional movement deltas.
- * @return ConstraintError for an out-of-range zoom delta, NotFound for an unknown stream, or the delegate's status.
- * Success commits the viewport supplied by the delegate.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleDPTZRelativeMove(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData)
