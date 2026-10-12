@@ -1283,6 +1283,16 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightEnabled(bool aStatusLi
     return SetAttributeIfDifferent(mStatusLightEnabled, aStatusLightEnabled, Attributes::StatusLightEnabled::Id);
 }
 
+/**
+ * @brief Updates and persists a known status-light brightness value.
+ *
+ * Undefined enum values return ConstraintError before any state or notification changes.
+ * A valid unchanged value is a no-op; a successful change notifies the delegate and marks the attribute for reporting.
+ *
+ * @param aStatusLightBrightness One of Auto, Low, Medium, or High.
+ * @return CHIP_NO_ERROR for a valid no-op or successful update, ConstraintError for an undefined value,
+ *         or the storage error if persistence fails.
+ */
 CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::ThreeLevelAutoEnum aStatusLightBrightness)
 {
     VerifyOrReturnError(EnsureKnownEnumValue(aStatusLightBrightness) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
@@ -1300,6 +1310,12 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Restores persistent configuration using the context established by Startup().
+ *
+ * Invalid stored StatusLightBrightness values retain the initialized brightness without rewriting storage.
+ * The delegate receives PersistentAttributesLoadedCallback() after all persistent attributes are loaded.
+ */
 void CameraAVStreamManagementCluster::LoadPersistentAttributes()
 {
     AttributePersistence attrPersistence{ mContext->attributeStorage };

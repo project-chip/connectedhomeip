@@ -249,8 +249,10 @@ public:
 
     void OnStreamUsagePrioritiesChanged() override {}
 
+    /** @brief Records delegate notifications so tests can detect side effects of rejected writes. */
     void OnAttributeChanged(AttributeId) override { mAttributeChangedCount++; }
 
+    /** @brief Returns the cumulative notification count since this mock was constructed. */
     uint32_t GetAttributeChangedCount() const { return mAttributeChangedCount; }
 
     Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
@@ -972,6 +974,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
               CHIP_NO_ERROR); // Restore default
 }
 
+/**
+ * @brief Undefined raw TLV writes must be rejected after enum decoding without changing state or notifying consumers.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightnessWrite)
 {
     ASSERT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kHigh),
@@ -999,6 +1004,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightne
     }
 }
 
+/**
+ * @brief The application setter must reject both the unknown sentinel and undefined enum casts without side effects.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightnessSetter)
 {
     ASSERT_EQ(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kHigh), CHIP_NO_ERROR);
@@ -1022,6 +1030,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightne
     }
 }
 
+/**
+ * @brief Fresh cluster instances must load valid stored brightness values and retain Medium for invalid records.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestStatusLightBrightnessPersistenceValidation)
 {
     const struct
@@ -1057,6 +1068,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestStatusLightBrightnessPersistence
     }
 }
 
+/**
+ * @brief The first Init() must preserve an application's non-default initial brightness when the stored value is invalid.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestInvalidStoredStatusLightBrightnessPreservesInitialValue)
 {
     mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
