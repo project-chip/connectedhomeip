@@ -276,6 +276,12 @@ public:
 
 } // namespace
 
+/**
+ * @brief Append a valid boolean write for scalar request and response controls.
+ * @param aWriteClient The client receiving the encoded attribute.
+ * @param encoding Select normal encoding or preencoded TLV.
+ * Encoding failures are reported as test assertions.
+ */
 void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
     AttributePathParams attributePathParams;
@@ -411,9 +417,12 @@ void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::Pack
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
-// Builds a single WriteRequest that combines SuppressResponse=true with MoreChunkedMessages=true on one valid
-// AttributeDataIB. A conformant WriteClient never emits this combination; it is constructed directly here to
-// exercise the first-chunk handler lifecycle on the receive path.
+/**
+ * @brief Encode explicit true response-suppression and chunking flags for receive-side rejection controls.
+ * @param aPayload Supplies the buffer and receives the encoded single-attribute request.
+ * WriteClient does not emit this combination; the raw request exercises receive-side validation and handler cleanup.
+ * Encoding failures are reported as test assertions.
+ */
 void TestWriteInteraction::GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
@@ -519,6 +528,11 @@ CHIP_ERROR TestWriteInteraction::GenerateOptionalFlagWriteRequest(System::Packet
     return writer.Finalize(&payload);
 }
 
+/**
+ * @brief Encode an attribute-status response for the client response and cleanup controls.
+ * @param aPayload Supplies the buffer and receives a WriteResponse with InvalidSubscription for endpoint 2, cluster 3, attribute 4.
+ * Encoding failures are reported as test assertions.
+ */
 void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
