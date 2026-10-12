@@ -252,6 +252,11 @@ void ResetToRoot()
     }
 }
 
+void RefreshCurrent()
+{
+    RefreshView(false);
+}
+
 size_t GetDepth()
 {
     return sStack.size();

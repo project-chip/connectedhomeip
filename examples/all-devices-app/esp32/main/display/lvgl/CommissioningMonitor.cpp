@@ -59,6 +59,9 @@ lv_timer_t * sReturnHomeTimer = nullptr;
 // CHIP thread only.
 bool sWifiConnected = false;
 bool sBleConnected  = false;
+// Once credentials are in, a commissioner may drop BLE and finish over the operational
+// network, so a BLE close is only a failure before that point.
+bool sNetworkEnabled = false;
 
 // Set from the first sign of a controller until the verdict, so the BLE link closing
 // after a successful run is not reported as a failure.
@@ -201,6 +204,14 @@ void RefreshFabricCount(const chip::FabricTable & table)
     if (sPhase == Phase::kIdle)
     {
         sStatusText = sFabricCount != 0 ? kIdleCommissioned : kIdleUncommissioned;
+    }
+    // The codes screen picks the QR code or the commissioned notice when it is built.
+    if (sStatusView != nullptr)
+    {
+        NavigationStack::RefreshCurrent();
+    }
+    else
+    {
         RenderStatus();
     }
     RenderIndicators();
@@ -251,8 +262,9 @@ void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
-        sInProgress   = true;
-        sBleConnected = true;
+        sInProgress     = true;
+        sNetworkEnabled = false;
+        sBleConnected   = true;
         SetStatus("Controller connected over BLE", Phase::kInProgress);
         break;
 
@@ -263,6 +275,7 @@ void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
     case DeviceEventType::kOperationalNetworkEnabled:
         if (sInProgress)
         {
+            sNetworkEnabled = true;
             SetStatus("Credentials received, joining Wi-Fi", Phase::kInProgress);
         }
         break;
@@ -294,7 +307,7 @@ void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t)
 
     case DeviceEventType::kCHIPoBLEConnectionClosed:
         sBleConnected = false;
-        if (sInProgress)
+        if (sInProgress && !sNetworkEnabled)
         {
             sInProgress = false;
             SetStatus("Commissioning failed: controller disconnected", Phase::kFailure);

@@ -93,7 +93,7 @@ void CreateHero(lv_obj_t * parent, const std::string & deviceType, bool isAllBri
     lv_obj_clear_flag(text, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t * caption = lv_label_create(text);
-    lv_label_set_text_fmt(caption, "%s  ·  Matter", DisplayBoard::BoardName());
+    lv_label_set_text_fmt(caption, "%s  •  Matter", DisplayBoard::BoardName());
     lv_obj_set_style_text_font(caption, Ui::CaptionFont(), LV_PART_MAIN);
     lv_obj_set_style_text_color(caption, lv_color_hex(0xDDE4FF), LV_PART_MAIN);
 

@@ -93,9 +93,8 @@ void CheckInactivityTimer(lv_timer_t * timer)
             if (sWakeOverlay == nullptr)
             {
                 sWakeOverlay = lv_obj_create(lv_layer_top());
+                lv_obj_remove_style_all(sWakeOverlay);
                 lv_obj_set_size(sWakeOverlay, LV_PCT(100), LV_PCT(100));
-                lv_obj_set_style_bg_opa(sWakeOverlay, LV_OPA_TRANSP, LV_PART_MAIN);
-                lv_obj_set_style_border_width(sWakeOverlay, 0, LV_PART_MAIN);
                 lv_obj_clear_flag(sWakeOverlay, LV_OBJ_FLAG_SCROLLABLE);
                 lv_obj_add_event_cb(sWakeOverlay, OnWakeOverlayTouch, LV_EVENT_PRESSED, nullptr);
             }

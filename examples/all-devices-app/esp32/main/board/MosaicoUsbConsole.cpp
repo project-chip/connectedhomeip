@@ -140,6 +140,14 @@ esp_err_t InitResetEmulation()
     return err;
 }
 
+void DeinitResetEmulation()
+{
+    esp_unregister_shutdown_handler(BeforeRestart);
+    esp_timer_stop(sRestartTimer);
+    esp_timer_delete(sRestartTimer);
+    sRestartTimer = nullptr;
+}
+
 } // namespace
 
 esp_err_t InitMosaicoUsbConsole()
@@ -162,6 +170,7 @@ esp_err_t InitMosaicoUsbConsole()
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "tinyusb_driver_install failed: %s", esp_err_to_name(err));
+        DeinitResetEmulation();
         return err;
     }
 
@@ -174,6 +183,7 @@ esp_err_t InitMosaicoUsbConsole()
     {
         ESP_LOGE(TAG, "tinyusb_cdcacm_init failed: %s", esp_err_to_name(err));
         tinyusb_driver_uninstall();
+        DeinitResetEmulation();
         return err;
     }
 
@@ -183,6 +193,7 @@ esp_err_t InitMosaicoUsbConsole()
         ESP_LOGE(TAG, "tinyusb_console_init failed: %s", esp_err_to_name(err));
         tinyusb_cdcacm_deinit(TINYUSB_CDC_ACM_0);
         tinyusb_driver_uninstall();
+        DeinitResetEmulation();
         return err;
     }
 

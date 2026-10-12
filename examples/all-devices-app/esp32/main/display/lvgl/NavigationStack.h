@@ -37,6 +37,9 @@ void Push(const std::string & title, RenderScreenFn renderFn);
 void Pop();
 void PopTo(size_t level);
 void ResetToRoot();
+
+/// Rebuilds the current screen in place, for content that changed underneath it.
+void RefreshCurrent();
 size_t GetDepth();
 
 /// Connectivity shown at the right end of the bar.
