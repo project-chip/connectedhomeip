@@ -165,7 +165,7 @@ public:
      *        entries whose preset no longer exists (see RemoveThermostatSuggestionsForRemovedPresets()) and, if
      *        that cascade completed, re-evaluates the current suggestion.
      *
-     * Per spec § 4.3.11.50, this must run after a Presets atomic write commits a preset removal.
+     * Per spec, this must run after a Presets atomic write commits a preset removal.
      */
     void OnPresetsCommitted();
 
