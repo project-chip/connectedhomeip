@@ -2384,7 +2384,7 @@ class IDMBaseTest(BasicCompositionTests):
                                      f"Expected at least {minimum} event report(s), got {len(reports)}")
         return reports, first_at
 
-    async def assert_reports_held_for_min_interval(
+    def assert_reports_held_for_min_interval(
         self,
         handler: EventSubscriptionHandler,
         sub_time: float,
@@ -2399,9 +2399,10 @@ class IDMBaseTest(BasicCompositionTests):
         is before ReadEvent returns. slack_sec covers that gap.
         """
         hold_until = sub_time + min_interval_sec - slack_sec
-        while time.time() < hold_until:
-            asserts.assert_equal(handler.get_size(), 0, "Event report arrived before MinInterval expired")
-            await asyncio.sleep(0.05)
+        asserts.assert_less(
+            time.time(), hold_until,
+            "Event was triggered too late to verify the report is held until MinInterval")
+        handler.wait_for_event_expect_no_report(timeout_sec=max(0.0, hold_until - time.time()))
         remaining = timeout_sec - (time.time() - sub_time)
         return self.take_event_reports(handler, timeout_sec=max(0.1, remaining), minimum=minimum_events)
 
@@ -2433,13 +2434,10 @@ class IDMBaseTest(BasicCompositionTests):
         arrival_limit_sec defaults to the DUT's MaxInterval plus one MRP timeout.
         Pass a lower limit when the report has to beat MaxInterval, as with IsUrgent.
         """
-        asserts.assert_less(
-            time.time() - started_at, min_interval_sec,
-            "Event was not triggered before MinInterval")
         max_interval = self.negotiated_max_interval_sec(sub)
         if arrival_limit_sec is None:
             arrival_limit_sec = max_interval + mrp_timeout_sec
-        reports, first_at = await self.assert_reports_held_for_min_interval(
+        reports, first_at = self.assert_reports_held_for_min_interval(
             handler,
             started_at,
             min_interval_sec,
