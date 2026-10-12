@@ -17,8 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
+#     app: ${COMPRO_RUNNER}
+#     app-args: >
+#       --proxy-app ${ALL_DEVICES_BLE_WIFI_APP}
+#       --proxy-args "--trace-to json:${TRACE_APP}.json"
+#       --discriminator 1234
+#       --endpoint 5
+#       --proxy-transport auto
+#     app-ready-pattern: "COMPRO topology ready"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -28,7 +34,9 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --fail-on-skipped
 #     factory-reset: true
+#     timeout: 100
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -61,12 +69,13 @@ from mobly import asserts
 from support_modules.compro_support import COMPROBaseTest, commission_if_needed
 
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_COMPRO_2_5(COMPROBaseTest):
+class TC_COMPRO_2_5(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def desc_TC_COMPRO_2_5(self) -> str:
         return "[TC-COMPRO-2.5] Writable Attributes with DUT as Server"

@@ -97,7 +97,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             err = sl_wfx_host_pre_bootloader_spi_transfer();
             if (err != SL_STATUS_OK)
             {
-                ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+                ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %" PRIu32, err);
                 return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
@@ -106,13 +106,13 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             err = sl_wfx_host_post_bootloader_spi_transfer();
             if (err != SL_STATUS_OK)
             {
-                ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+                ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %" PRIu32, err);
                 return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
             if (err)
             {
-                ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
+                ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %" PRIu32, err);
                 return CHIP_ERROR_CANCELLED;
             }
             mWriteOffset += kAlignmentBytes;
@@ -141,21 +141,21 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     err = sl_wfx_host_pre_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
     {
-        ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+        ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %" PRIu32, err);
         return SL_GENERIC_OTA_ERROR;
     }
 #endif // SL_BTLCTRL_MUX
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
+        ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %" PRIu32, err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if SL_BTLCTRL_MUX
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
-            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %" PRIu32, err);
             return SL_GENERIC_OTA_ERROR;
         }
 #endif // SL_BTLCTRL_MUX
@@ -165,14 +165,14 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %ld", err);
+        ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %" PRIu32, err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if SL_BTLCTRL_MUX
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
-            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %" PRIu32, err);
             return SL_GENERIC_OTA_ERROR;
         }
 #endif // SL_BTLCTRL_MUX
@@ -183,7 +183,7 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     err = sl_wfx_host_post_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
     {
-        ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+        ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %" PRIu32, err);
         return SL_GENERIC_OTA_ERROR;
     }
 #endif // SL_BTLCTRL_MUX
@@ -210,7 +210,7 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
         err = sl_wfx_host_pre_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
-            ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %" PRIu32, err);
             return SL_GENERIC_OTA_ERROR;
         }
 #endif // SL_BTLCTRL_MUX
@@ -219,7 +219,7 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
         err = sl_wfx_host_post_bootloader_spi_transfer();
         if (err != SL_STATUS_OK)
         {
-            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %" PRIu32, err);
             return SL_GENERIC_OTA_ERROR;
         }
 #endif // SL_BTLCTRL_MUX

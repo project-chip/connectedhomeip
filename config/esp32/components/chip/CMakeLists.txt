@@ -31,7 +31,11 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns)
+# wpa_supplicant is here for esp_eap_client.h, which the Wi-Fi PDC support in
+# src/platform/ESP32 needs. It is listed unconditionally because the requirements have to be
+# identical during CMake's early expansion pass, where CONFIG_* is not yet available.
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash mdns
+                            wpa_supplicant)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
@@ -84,7 +88,6 @@ if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
     chip_gn_arg_append("chip_crypto"                    "\"psa\"")
     # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
     chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
-    chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
 endif()
 
 # If ccache was enabled by IDF and the ccache executable was found,

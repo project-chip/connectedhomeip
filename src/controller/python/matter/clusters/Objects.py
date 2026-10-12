@@ -320,6 +320,31 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class ClosurePanelTag(MatterIntEnum):
+            kLift = 0x00
+            kTilt = 0x01
+            kSliding = 0x02
+            kRotate = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class ClosureTag(MatterIntEnum):
+            kCovering = 0x00
+            kWindow = 0x01
+            kBarrier = 0x02
+            kCabinet = 0x03
+            kGate = 0x04
+            kGarageDoor = 0x05
+            kDoor = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
             kAirPurifier = 0x01
@@ -53141,14 +53166,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             fileID: 'uint' = 0
             name: 'str' = ""
             size: 'uint' = 0
             mimeType: 'str' = ""
-            imageUri: 'str' = ""
+            imageURI: 'str' = ""
 
     class Commands:
         @dataclass
@@ -53165,13 +53190,13 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=3, Type=str),
                     ])
 
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
         @dataclass
         class AddFileResponse(ClusterCommand):
@@ -53220,12 +53245,12 @@ class MediaFileManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="requestID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Optional[typing.List[str]]),
                     ])
 
             clientName: str = ""
             requestID: uint = 0
-            supportedMimeTypes: typing.Union[None, Nullable, typing.List[str]] = None
+            supportedMimeTypes: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GetSharedFile(ClusterCommand):
@@ -53255,11 +53280,11 @@ class MediaFileManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
+                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
                     ])
 
             status: MediaFileManagement.Enums.FileStatusEnum = 0
-            fileDescription: typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = None
+            fileDescription: typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = NullValue
 
         @dataclass
         class OfferFile(ClusterCommand):
@@ -53276,14 +53301,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             clientName: str = ""
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
     class Attributes:
         @dataclass

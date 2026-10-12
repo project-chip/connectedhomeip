@@ -319,4 +319,31 @@ TEST(TestStringBuilder, TestOverflowMarker)
     TestStringBuilder<14>(arr, sizeof(arr)).Check(check2);
 }
 
+void ENFORCE_FORMAT(2, 3) FormatVHelper(StringBuilderBase & builder, const char * format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    builder.AddFormatV(format, args);
+    va_end(args);
+}
+
+TEST(TestStringBuilder, TestFormatV)
+{
+    TestStringBuilder<32>().Check([](StringBuilderBase & builder) {
+        FormatVHelper(builder, "Value: %d (%s)", 42, "ok");
+        EXPECT_TRUE(builder.Fit());
+        builder.AddMarkerIfOverflow();
+        EXPECT_STREQ(builder.c_str(), "Value: 42 (ok)");
+    });
+
+    TestStringBuilder<11>().Check([](StringBuilderBase & builder) {
+        FormatVHelper(builder, "%d %d %d %d %d", 1, 2, 3, 4, 1234);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1 2 3 4 12");
+
+        builder.AddMarkerIfOverflow();
+        EXPECT_STREQ(builder.c_str(), "1 2 3 4...");
+    });
+}
+
 } // namespace
