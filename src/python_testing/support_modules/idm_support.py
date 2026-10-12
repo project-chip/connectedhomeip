@@ -2294,10 +2294,12 @@ class IDMBaseTest(BasicCompositionTests):
     async def verify_node_event_numbers(self, ctrl: ChipDeviceCtrl, subscribed: list[EventReadResult]) -> list[EventReadResult]:
         """Check event numbers increase by 1 across every cluster.
 
+        The subscribed records must arrive in increasing order with valid timestamps.
         A subscription filtered to one event hides numbers used by other clusters,
         so a gap there is not a DUT failure. Re-read from the smallest subscribed
         number with a wildcard path and check that sequence.
         """
+        self.verify_monotonic_event_records(subscribed, contiguous=False)
         numbers = [report.Header.EventNumber for report in subscribed]
         logged = await self.read_events_since(ctrl, min(numbers))
         self.verify_monotonic_event_records(logged)
@@ -2456,25 +2458,38 @@ class IDMBaseTest(BasicCompositionTests):
             f"First event report took {elapsed:.2f}s, past the {arrival_limit_sec:.2f}s limit")
         return reports
 
-    def verify_monotonic_event_records(self, events: list[EventReadResult]) -> None:
-        """Event numbers increase by 1. Each record carries a System or Epoch timestamp.
+    def verify_monotonic_event_records(self, events: list[EventReadResult], contiguous: bool = True) -> None:
+        """Event numbers increase in received order. Each record carries a System or Epoch timestamp.
+
+        Events are checked as received, not sorted, since the publisher must report
+        them from lowest to highest event number. With `contiguous`, each number must
+        be exactly one greater than the last. Without it, numbers only have to
+        increase, as in a subscription filtered to one event where other clusters
+        use the numbers in between.
 
         ReadClient adds a delta timestamp onto the previous absolute timestamp
         before the report reaches this test, so every record observed here is
-        System or Epoch, including records after the first in a report.
+        System or Epoch, including records after the first in a report. ReadClient
+        also rejects a record without exactly one timestamp.
         """
         asserts.assert_greater(len(events), 1, "Need more than one event to check EventNumber monotonicity")
-        ordered = sorted(events, key=lambda report: report.Header.EventNumber)
-        for report in ordered:
+        for report in events:
             asserts.assert_is_not_none(report.Header.Timestamp, "Event record has no timestamp")
             asserts.assert_in(
                 report.Header.TimestampType,
                 (EventTimestampType.SYSTEM, EventTimestampType.EPOCH),
                 f"Event {report.Header.EventNumber} timestamp is not System or Epoch",
             )
-        for prev, curr in zip(ordered, ordered[1:]):
-            asserts.assert_equal(
-                curr.Header.EventNumber,
-                prev.Header.EventNumber + 1,
-                f"EventNumber {curr.Header.EventNumber} is not one greater than {prev.Header.EventNumber}",
-            )
+        for prev, curr in zip(events, events[1:]):
+            if contiguous:
+                asserts.assert_equal(
+                    curr.Header.EventNumber,
+                    prev.Header.EventNumber + 1,
+                    f"EventNumber {curr.Header.EventNumber} is not one greater than {prev.Header.EventNumber}",
+                )
+            else:
+                asserts.assert_greater(
+                    curr.Header.EventNumber,
+                    prev.Header.EventNumber,
+                    f"EventNumber {curr.Header.EventNumber} was reported after {prev.Header.EventNumber}",
+                )
