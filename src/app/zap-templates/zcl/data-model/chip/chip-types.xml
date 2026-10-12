@@ -107,11 +107,11 @@ limitations under the License.
     <type id="0xC7" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
     <type id="0xC8" description="Event Number"             name="event_no"          size="8"  discrete="true" />
 
-    <type id="0xF2" description="IP Address"               name="ipadr"                       composite="true"/>
-    <type id="0xF3" description="IPv4 Address"             name="ipv4adr"           size="4"  composite="true"/>
-    <type id="0xF4" description="IPv6 Address"             name="ipv6adr"           size="16" composite="true"/>
-    <type id="0xF5" description="IPv6 Prefix"              name="ipv6pre"                     composite="true"/>
-    <type id="0xF6" description="Hardware Address"         name="hwadr"                       composite="true"/>
+    <type id="0xF2" description="IP Address"               name="ipadr"                       composite="true" baseType="octet_string" />
+    <type id="0xF3" description="IPv4 Address"             name="ipv4adr"           size="4"  composite="true" baseType="octet_string" />
+    <type id="0xF4" description="IPv6 Address"             name="ipv6adr"           size="16" composite="true" baseType="octet_string" />
+    <type id="0xF5" description="IPv6 Prefix"              name="ipv6pre"                     composite="true" baseType="octet_string" />
+    <type id="0xF6" description="Hardware Address"         name="hwadr"                       composite="true" baseType="octet_string" />
 
     <!-- TODO: Spec marks these as "compositte" yet they are set "discrete" here -->
     <type id="0xC9" description="Semantic Tag"             name="semtag"            size="4"  discrete="true" />
