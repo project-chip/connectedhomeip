@@ -5792,7 +5792,91 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
 } // namespace ActivatedCarbonFilterMonitoring
 
 namespace WaterTankLevelMonitoring {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Condition {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);
+inline void GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Percent fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace Condition
+
+namespace DegradationDirection {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum & value);
+inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum & value,
+                         chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum & value);
+inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum & value,
+                         chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value);
+inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
+inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & value,
+                         const chip::app::DataModel::Nullable<uint32_t> & fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace LastChangedTime
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value);
+inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value);
+inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallback)
+{
+    if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
+    {
+        value = fallback;
+    }
+}
+} // namespace ClusterRevision
+
+} // namespace Attributes
 } // namespace WaterTankLevelMonitoring
 
 namespace BooleanStateConfiguration {

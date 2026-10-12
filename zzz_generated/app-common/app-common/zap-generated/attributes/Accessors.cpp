@@ -10120,7 +10120,109 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & v
 } // namespace ActivatedCarbonFilterMonitoring
 
 namespace WaterTankLevelMonitoring {
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+namespace Condition {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<chip::Percent>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace Condition
+
+namespace DegradationDirection {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<bool>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace InPlaceIndicator
+
+namespace LastChangedTime {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.AsNullable<uint32_t>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace LastChangedTime
+
+namespace FeatureMap {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<uint32_t>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & value)
+{
+    AttributeDefaultValue defaultVal;
+    Protocols::InteractionModel::Status status =
+        emberAfGetAttributeDefaultValue(endpoint, Clusters::WaterTankLevelMonitoring::Id, Id, defaultVal);
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    value = defaultVal.As<uint16_t>();
+    return Protocols::InteractionModel::Status::Success;
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
 } // namespace WaterTankLevelMonitoring
 
 namespace BooleanStateConfiguration {
