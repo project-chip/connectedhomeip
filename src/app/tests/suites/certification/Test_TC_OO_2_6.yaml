@@ -15,13 +15,14 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.
 CI:
-    - name: "Test against all clusters app"
-      app: all-clusters
-    - name: "Test against all-devices/on-off-light"
+    - name: "Test against all-devices/cooktop"
       app: all-devices
       args:
           - --device
-          - on-off-light
+          - cooktop
+      test_args:
+          - --endpoint
+          - "2"
 
 name: 4.1.6. [TC-OO-2.6] OffOnly Feature with DUT as Server
 

@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/thread-network-diagnostics-server/DirectThreadNetworkDiagnosticsProvider.h>
 #include <app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.h>
 #include <app/clusters/thread-network-directory-server/ThreadNetworkDirectoryCluster.h>
-#include <device/capabilities/breadcrumb/SimpleBreadCrumbTracker.h>
 #include <device/types/thread-border-router/ThreadBorderRouter.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
@@ -34,17 +34,11 @@ namespace app {
 /**
  * Concrete simulated implementation of ThreadBorderRouter.
  *
- * Inherits from ThreadBorderRouterManagementDelegate, SimpleBreadCrumbTracker, and
- * DirectThreadNetworkDiagnosticsProvider before ThreadBorderRouter so that these base
- * subobjects are fully constructed before ThreadBorderRouter's constructor receives
- * references to them.
- *
- * Note on BreadCrumbTracker:
- * See SimpleBreadCrumbTracker.h for details on Matter Core Spec 14.3.6.4.2. A future refactor
- * should route breadcrumb updates to the root node's GeneralCommissioningCluster.
+ * Inherits from ThreadBorderRouterManagementDelegate and DirectThreadNetworkDiagnosticsProvider
+ * before ThreadBorderRouter so that these base subobjects are fully constructed before
+ * ThreadBorderRouter's constructor receives references to them.
  */
 class SimulatedThreadBorderRouter : public Clusters::ThreadBorderRouterManagementDelegate,
-                                    public SimpleBreadCrumbTracker,
                                     public Clusters::ThreadNetworkDiagnostics::DirectThreadNetworkDiagnosticsProvider,
                                     public ThreadBorderRouter
 {
@@ -55,6 +49,7 @@ public:
         PersistentStorageDelegate & storage;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         std::string nodeLabel;
     };
 

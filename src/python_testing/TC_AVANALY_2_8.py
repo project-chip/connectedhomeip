@@ -117,27 +117,29 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
         )
 
         # Also ensure at least one context trigger is enabled
-        if self.has_feature_perzonedetect:
-            trigger = cluster.Structs.ContextTriggerStruct(
-                context=supported_contexts[0], zoneIDs=NullValue
+        camera_node_id = self.get_camera_node_id()
+        established_stream_id = await self.ensure_analysis_stream_established(endpoint)
+        try:
+            if self.has_feature_perzonedetect:
+                trigger = cluster.Structs.ContextTriggerStruct(
+                    context=supported_contexts[0], zoneIDs=NullValue
+                )
+            else:
+                trigger = cluster.Structs.ContextTriggerStruct(
+                    context=supported_contexts[0]
+                )
+            await self.send_enable_context_triggers_cmd(
+                endpoint, context_triggers=[trigger]
             )
-        else:
-            trigger = cluster.Structs.ContextTriggerStruct(
-                context=supported_contexts[0]
-            )
-        await self.send_enable_context_triggers_cmd(
-            endpoint, context_triggers=[trigger]
-        )
 
-        # Set up event subscription handler
-        event_callback = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
+            # Set up event subscription handler
+            event_callback = EventSubscriptionHandler(expected_cluster=cluster)
+            await event_callback.start(self.default_controller, self.dut_node_id, endpoint)
 
-        self.step(3)
-        context_to_detect = supported_contexts[0]
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
+            self.step(3)
+            context_to_detect = supported_contexts[0]
+            if self.matter_test_config.pipe_name:
+                pipe_payload_1 = {
                     "Name": "AvAnalysisPerceivedContext",
                     "NewContexts": [
                         {
@@ -147,40 +149,41 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
                         }
                     ],
                 }
-            )
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg="Simulate detection of a tracked entity (e.g., Person) on the DUT. Press Enter once detected."
-            )
+                if self.has_feature_remcondetect:
+                    pipe_payload_1["SourceNodeId"] = camera_node_id
+                self.write_to_app_pipe(pipe_payload_1)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg="Simulate detection of a tracked entity (e.g., Person) on the DUT. Press Enter once detected."
+                )
 
-        self.step(4)
-        id1 = None
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event1 = event_callback.wait_for_event_report(
-                cluster.Events.PerceivedContext, timeout_sec=30
-            )
-            log.info("PerceivedContext event 1: %s", event1)
-            asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
-            asserts.assert_is_not_none(
-                event1.newIdentifiedContexts,
-                "newIdentifiedContexts must be present in event 1",
-            )
-            asserts.assert_greater_equal(
-                len(event1.newIdentifiedContexts),
-                1,
-                "Expected at least 1 TrackedContext entry",
-            )
-            id1 = event1.newIdentifiedContexts[0].identifiedContextID
-            log.info("Saved IdentifiedContextID id1: %s", id1)
-            asserts.assert_is_not_none(id1, "IdentifiedContextID must not be None")
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 4")
-            id1 = 42
+            self.step(4)
+            id1 = None
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event1 = event_callback.wait_for_event_report(
+                    cluster.Events.PerceivedContext, timeout_sec=30
+                )
+                log.info("PerceivedContext event 1: %s", event1)
+                asserts.assert_is_not_none(event1, "Expected PerceivedContext event")
+                asserts.assert_is_not_none(
+                    event1.newIdentifiedContexts,
+                    "newIdentifiedContexts must be present in event 1",
+                )
+                asserts.assert_greater_equal(
+                    len(event1.newIdentifiedContexts),
+                    1,
+                    "Expected at least 1 TrackedContext entry",
+                )
+                id1 = event1.newIdentifiedContexts[0].identifiedContextID
+                log.info("Saved IdentifiedContextID id1: %s", id1)
+                asserts.assert_is_not_none(id1, "IdentifiedContextID must not be None")
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 4")
+                id1 = 42
 
-        self.step(5)
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe(
-                {
+            self.step(5)
+            if self.matter_test_config.pipe_name:
+                pipe_payload_2 = {
                     "Name": "AvAnalysisPerceivedContext",
                     "NewContexts": [
                         {
@@ -190,47 +193,51 @@ class TC_AVANALY_2_8(MatterTestCommissionedDevice, AVANALYTestBase):
                         }
                     ],
                 }
-            )
-        elif not self.is_ci:
-            self.wait_for_user_input(
-                prompt_msg="Simulate the entity moving and being detected again (e.g., across zones). Press Enter once detected."
-            )
+                if self.has_feature_remcondetect:
+                    pipe_payload_2["SourceNodeId"] = camera_node_id
+                self.write_to_app_pipe(pipe_payload_2)
+            elif not self.is_ci:
+                self.wait_for_user_input(
+                    prompt_msg="Simulate the entity moving and being detected again (e.g., across zones). Press Enter once detected."
+                )
 
-        self.step(6)
-        if self.matter_test_config.pipe_name or not self.is_ci:
-            event2 = event_callback.wait_for_event_report(
-                cluster.Events.PerceivedContext, timeout_sec=30
-            )
-            log.info("PerceivedContext event 2: %s", event2)
-            asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
-            tracked_list = (
-                event2.newIdentifiedContexts or event2.currentIdentifiedContexts
-            )
-            asserts.assert_is_not_none(
-                tracked_list, "Tracked contexts list must not be None"
-            )
-            matching_ids = [
-                tc.identifiedContextID
-                for tc in tracked_list
-                if tc.identifiedContextID == id1
-            ]
-            asserts.assert_greater_equal(
-                len(matching_ids),
-                1,
-                f"IdentifiedContextID {id1} not found in second PerceivedContext event: {tracked_list}",
-            )
-        else:
-            log.info("CI mode: skipping blocking event wait in Step 6")
+            self.step(6)
+            if self.matter_test_config.pipe_name or not self.is_ci:
+                event2 = event_callback.wait_for_event_report(
+                    cluster.Events.PerceivedContext, timeout_sec=30
+                )
+                log.info("PerceivedContext event 2: %s", event2)
+                asserts.assert_is_not_none(event2, "Expected PerceivedContext event")
+                tracked_list = (
+                    event2.newIdentifiedContexts or event2.currentIdentifiedContexts
+                )
+                asserts.assert_is_not_none(
+                    tracked_list, "Tracked contexts list must not be None"
+                )
+                matching_ids = [
+                    tc.identifiedContextID
+                    for tc in tracked_list
+                    if tc.identifiedContextID == id1
+                ]
+                asserts.assert_greater_equal(
+                    len(matching_ids),
+                    1,
+                    f"IdentifiedContextID {id1} not found in second PerceivedContext event: {tracked_list}",
+                )
+            else:
+                log.info("CI mode: skipping blocking event wait in Step 6")
 
-        # Cleanup: reset TrackingEnabled, end session, and disable context triggers
-        if self.matter_test_config.pipe_name:
-            self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
-        await self.write_single_attribute(
-            attributes.TrackingEnabled(False), endpoint_id=endpoint
-        )
-        await self.send_disable_context_triggers_cmd(
-            endpoint, context_triggers=NullValue
-        )
+            # Cleanup: reset TrackingEnabled, end session, and disable context triggers
+            if self.matter_test_config.pipe_name:
+                self.write_to_app_pipe({"Name": "AvAnalysisSessionEnd"})
+            await self.write_single_attribute(
+                attributes.TrackingEnabled(False), endpoint_id=endpoint
+            )
+            await self.send_disable_context_triggers_cmd(
+                endpoint, context_triggers=NullValue
+            )
+        finally:
+            await self.cleanup_analysis_stream(endpoint, established_stream_id)
 
 
 if __name__ == "__main__":

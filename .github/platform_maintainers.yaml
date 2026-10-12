@@ -29,7 +29,8 @@ silabs:
   maintainers:
     - jmartinez-silabs
     - jepenven-silabs
-    - lpbeliveau-silabs
+    - rcasallas-silabs
+
     # Proposed maintainers (uncomment to activate):
     # - chirag-silabs
     # - arun-silabs
@@ -42,6 +43,10 @@ silabs:
     - "third_party/silabs/**"
     - "config/silabs/**"
     - "config/efr32/**"
+    - "src/test_driver/efr32/**"
+    - "scripts/examples/gn_silabs_example.sh"
+    - "scripts/tools/silabs/**"
+    - "scripts/setup/silabs/**"
 
 esp32:
   maintainers:
