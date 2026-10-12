@@ -78,6 +78,7 @@ public:
         return Status::Success;
     }
 
+    /** @brief Accept a preset move without calling completion; tests drive the completion callback explicitly. */
     Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback)
     {
@@ -93,8 +94,10 @@ public:
 
     size_t mSavePresetCalls = 0;
 
+    /** @brief Accept a removal so tests can inspect the cluster's resulting preset state. */
     Status MPTZRemovePreset(uint8_t aPreset) { return Status::Success; }
 
+    /** @brief Accept a viewport request without applying it to a physical stream. */
     Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) { return Status::Success; }
 
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
@@ -324,6 +327,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
+/** @brief Verify saving an explicit ID exposes the preset and preserves the next available ID. */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -635,6 +639,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetsRejectOverleng
     }
 }
 
+/** @brief Verify a saved position is restored after completing the preset movement. */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -1223,6 +1228,7 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPosi
     EXPECT_EQ(readPosition.zoom.Value(), 30);
 }
 
+/** @brief Verify a valid legacy preset migrates with its ID, complete name, and saved pan value. */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPresetsTlv)
 {
     Structs::MPTZStruct::Type settings;
@@ -1290,6 +1296,7 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, RejectsMigratedO
     EXPECT_EQ(mMockDelegate.mSavePresetCalls, 0u);
 }
 
+/** @brief Verify a legacy digital stream migrates with its stream ID and viewport start coordinate. */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)
 {
     Globals::Structs::ViewportStruct::Type viewPort{ 1, 2, 100, 200 };

@@ -171,6 +171,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     return CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Persist the complete active preset list without changing it or notifying subscribers.
+ * @return CHIP_NO_ERROR on success, or a missing-provider, allocation, encoding, or storage error.
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -971,6 +975,12 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Ask the delegate to move to a known preset; commit position values after its completion callback.
+ * @param commandData The preset ID to look up.
+ * @return ConstraintError for an out-of-range ID, NotFound for a missing preset, Busy when movement is unavailable,
+ *         or the delegate's status. Success starts movement and marks MovementState as moving.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData)
