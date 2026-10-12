@@ -88,9 +88,13 @@ private:
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
 
 public:
-    /** @brief Destroy the owned preset data; allow destruction through a base helper pointer. */
+    /**
+     * @brief Destroy the owned preset data; allow destruction through a base helper pointer.
+     */
     virtual ~MPTZPresetHelper() = default;
-    /** @brief Create a preset with an empty name; the caller must assign its ID before use. */
+    /**
+     * @brief Create a preset with an empty name; the caller must assign its ID before use.
+     */
     MPTZPresetHelper() {}
     /**
      * @brief Construct a preset with an owned name; an overlength name leaves the name empty.
@@ -126,14 +130,26 @@ public:
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
     }
 
-    /** @brief Return the ID assigned by the parameterized constructor or SetPresetID; it must be initialized before reading. */
+    /**
+     * @brief Return the ID assigned by the parameterized constructor or SetPresetID.
+     * @return The assigned preset ID. The caller must initialize the ID before reading it.
+     */
     uint8_t GetPresetID() const { return mPresetID; }
-    /** @brief Assign an ID without range validation; the caller enforces the cluster's valid ID range. */
+    /**
+     * @brief Assign an ID without range validation.
+     * @param aPreset The ID, whose cluster-specific range must be validated by the caller.
+     */
     void SetPresetID(uint8_t aPreset) { mPresetID = aPreset; }
 
-    /** @brief Return the saved position, preserving absent optional pan, tilt, and zoom fields. */
+    /**
+     * @brief Return the saved position, preserving absent optional pan, tilt, and zoom fields.
+     * @return A copy of the saved position.
+     */
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type GetMptzPosition() const { return mMptzPosition; }
-    /** @brief Copy a saved position without validating axis ranges; the caller validates supported axes and their values. */
+    /**
+     * @brief Copy a saved position without validating axis ranges.
+     * @param aPosition The saved position; the caller validates supported axes and their values.
+     */
     void SetMptzPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type aPosition) { mMptzPosition = aPosition; }
 };
 

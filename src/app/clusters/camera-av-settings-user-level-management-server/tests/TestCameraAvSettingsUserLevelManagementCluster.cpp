@@ -78,14 +78,21 @@ public:
         return Status::Success;
     }
 
-    /** @brief Accept a preset move without calling completion; tests drive the completion callback explicitly. */
+    /**
+     * @brief Accept a preset move without calling completion; tests drive the completion callback explicitly.
+     * @return Success to let the cluster enter the moving state.
+     */
     Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback)
     {
         return Status::Success;
     }
 
-    /** @brief Record successful preset saves so rejected commands can be checked for delegate side effects. */
+    /**
+     * @brief Record successful preset saves so rejected commands can be checked for delegate side effects.
+     * @param aPreset The preset ID proposed by the cluster.
+     * @return Success after incrementing the save-call count.
+     */
     Status MPTZSavePreset(uint8_t aPreset)
     {
         ++mSavePresetCalls;
@@ -94,10 +101,17 @@ public:
 
     size_t mSavePresetCalls = 0;
 
-    /** @brief Accept a removal so tests can inspect the cluster's resulting preset state. */
+    /**
+     * @brief Accept a removal so tests can inspect the cluster's resulting preset state.
+     * @param aPreset The existing preset ID selected by the cluster.
+     * @return Success without additional delegate state changes.
+     */
     Status MPTZRemovePreset(uint8_t aPreset) { return Status::Success; }
 
-    /** @brief Accept a viewport request without applying it to a physical stream. */
+    /**
+     * @brief Accept a viewport request without applying it to a physical stream.
+     * @return Success so tests can inspect the cluster's viewport update.
+     */
     Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) { return Status::Success; }
 
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
@@ -327,7 +341,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
-/** @brief Verify saving an explicit ID exposes the preset and preserves the next available ID. */
+/**
+ * @brief Verify saving an explicit ID exposes the preset and preserves the next available ID.
+ * Saving ID 2 must leave ID 1 available for the next implicit-ID request.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -380,7 +397,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 1);
 }
 
-/** @brief Bound names passed directly to the public helper without changing its void setter or constructor API. */
+/**
+ * @brief Bound names passed directly to the public helper without changing its void setter or constructor API.
+ * Rejected setter calls retain the previous name; rejected constructor names remain empty.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetHelperRejectsOverlengthNames)
 {
     MPTZPresetHelper preset;
@@ -410,7 +430,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetHelperRejectsOv
     EXPECT_EQ(constructed.GetName(), validMultibyteName);
 }
 
-/** @brief Reject names above 32 bytes before allocating an ID, saving a preset, or notifying subscribers. */
+/**
+ * @brief Reject names above 32 bytes before allocating an ID, saving a preset, or notifying subscribers.
+ * Exercise both implicit and explicit new IDs, and verify that a later valid request still uses the first ID.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOverlengthNewNames)
 {
     const std::string reportName(132, 'a');
@@ -464,7 +487,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOver
     EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
 }
 
-/** @brief Reject overlength updates while preserving the saved name, position, KVS bytes, ID, and notifications. */
+/**
+ * @brief Reject overlength updates while preserving the saved name, position, KVS bytes, ID, and notifications.
+ * Changing the current pan value makes an unintended preset-position update observable.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOverlengthUpdates)
 {
     Commands::MPTZSavePreset::Type request;
@@ -520,7 +546,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOver
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetMptzPosition().pan.Value(), 7);
 }
 
-/** @brief Preserve empty, short, and 32-byte names through creation, updates, and a fresh server's persistence load. */
+/**
+ * @brief Preserve empty, short, and 32-byte names through creation, updates, and a fresh server's persistence load.
+ * Include a multibyte UTF-8 name whose complete encoding is exactly 32 bytes.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetAcceptsNameLengthBoundaries)
 {
     const std::string multibyteName = std::string(29, 'c') + "\xE7\x95\x8C";
@@ -579,7 +608,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetAcceptsName
     EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
 }
 
-/** @brief Reject stored overlength names without exposing a partially loaded list or rewriting the invalid record. */
+/**
+ * @brief Reject stored overlength names without exposing a partially loaded list or rewriting the invalid record.
+ * Place a valid entry before the invalid entry to exercise partial-load cleanup, then verify that saving remains possible.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetsRejectOverlengthStoredNames)
 {
     const std::string reportName(132, 'a');
@@ -639,7 +671,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetsRejectOverleng
     }
 }
 
-/** @brief Verify a saved position is restored after completing the preset movement. */
+/**
+ * @brief Verify a saved position is restored after completing the preset movement.
+ * Drive the mock completion callback and check both position and movement-state readback.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -1228,7 +1263,10 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPosi
     EXPECT_EQ(readPosition.zoom.Value(), 30);
 }
 
-/** @brief Verify a valid legacy preset migrates with its ID, complete name, and saved pan value. */
+/**
+ * @brief Verify a valid legacy preset migrates with its ID, complete name, and saved pan value.
+ * This valid record is a control for rejection of invalid legacy preset names.
+ */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPresetsTlv)
 {
     Structs::MPTZStruct::Type settings;
@@ -1261,7 +1299,10 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPres
     EXPECT_FALSE(it.Next());
 }
 
-/** @brief Prevent a legacy preset containing an overlength name from becoming active after storage migration. */
+/**
+ * @brief Prevent a legacy preset containing an overlength name from becoming active after storage migration.
+ * Verify that the valid prefix is also discarded under the existing load-error policy.
+ */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, RejectsMigratedOverlengthPresetName)
 {
     const std::string name(132, 'a');
@@ -1296,7 +1337,10 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, RejectsMigratedO
     EXPECT_EQ(mMockDelegate.mSavePresetCalls, 0u);
 }
 
-/** @brief Verify a legacy digital stream migrates with its stream ID and viewport start coordinate. */
+/**
+ * @brief Verify a legacy digital stream migrates with its stream ID and viewport start coordinate.
+ * Use a valid DPTZ record as a control for the shared cluster migration startup.
+ */
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesDPTZStreamsTlv)
 {
     Globals::Structs::ViewportStruct::Type viewPort{ 1, 2, 100, 200 };
