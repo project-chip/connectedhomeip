@@ -66,7 +66,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ INLINE_BDX_FALLBACK_STATUSES = (StatusEnum.kExhausted, StatusEnum.kNoLogs)
 RESPONSE_PAYLOAD_STATUSES = (StatusEnum.kSuccess, StatusEnum.kNoLogs)
 
 
-class TC_DLOG_2_1(MatterBaseTest):
+class TC_DLOG_2_1(MatterTestCommissionedDevice):
 
     def desc_TC_DLOG_2_1(self) -> str:
         return "[TC-DLOG-2.1] Diagnostic Logs Cluster Commands Checks with BDX [DUT as Server]"
