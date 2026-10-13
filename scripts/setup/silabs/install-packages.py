@@ -15,15 +15,10 @@ import shutil
 import stat
 import subprocess
 import sys
+from platform import machine
 from zipfile import ZipFile
 
 logger = logging.getLogger(__name__)
-
-try:
-    import dload
-except ImportError:
-    logger.error("dload package is required. Install it with: pip install dload")
-    sys.exit(1)
 
 
 def setup_logging(verbose=False):
@@ -37,13 +32,15 @@ def get_platform_vars():
     platform = sys.platform
     if platform == "darwin":
         platform_name = "mac"
+        host_arch = "arm64" if machine() == "arm64" else "x64"
     elif platform == "linux":
         platform_name = "linux"
+        host_arch = "x64"
     else:
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.1.1-{platform_name}-x64.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.2.2-{platform_name}-{host_arch}.zip"
     return platform_name, slt_cli_url
 
 
@@ -196,7 +193,7 @@ def download_slt_cli():
     logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
-        dload.save(slt_cli_url, slt_zip_path)
+        subprocess.run(["curl", "-fsSL", "--max-time", "120", slt_cli_url, "-o", slt_zip_path], check=True)
         with ZipFile(slt_zip_path, 'r') as zObject:
             # Check for path traversal vulnerabilities before extracting
             for member in zObject.infolist():

@@ -173,6 +173,7 @@ public:
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
+    CHIP_ERROR StartWiFiManagementSync();
     // Release GLib objects before the GLib main loop is quit.
     // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
     void StopWiFiManagement();
@@ -318,7 +319,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     WiFiPAFAdvertiseParam mPafAdvParam;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;

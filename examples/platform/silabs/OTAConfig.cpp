@@ -20,6 +20,17 @@
 #include "silabs_utils.h"
 #include <app/server/Server.h>
 
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#include <provision/ProvisionCrypto.h>
+#include <provision/ProvisionStorageWriter.h>
+#endif // SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h> // nogncheck
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>            // nogncheck
+#include <lib/core/CHIPError.h>
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
 #ifndef SLI_SI91X_MCU_INTERFACE
 
 #include "api/application_properties.h"
@@ -77,6 +88,38 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 #endif // SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT
 #endif // SLI_SI91X_MCU_INTERFACE
 
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+// In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
+// which is where these singletons normally live. Provide local instances instead so that the
+// requestor init below can hand them to DefaultOTARequestor::Init. Events are dropped until
+// a code-driven OTARequestorCluster is composed on the root endpoint.
+namespace chip {
+namespace {
+
+class NoOpOtaRequestorEventGenerator : public DefaultOTARequestorEventGenerator
+{
+public:
+    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent &) override { return CHIP_NO_ERROR; }
+};
+
+} // namespace
+
+OTARequestorAttributes & GetOTARequestorAttributes()
+{
+    static OTARequestorAttributes gOtaRequestorAttributes;
+    return gOtaRequestorAttributes;
+}
+
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
+{
+    static NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
+    return gOtaRequestorEventGenerator;
+}
+
+} // namespace chip
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
@@ -103,7 +146,14 @@ void OTAConfig::Init()
 
     gRequestorUser.Init(&gRequestorCore, &imageProcessor);
 
-    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    // The factory data OTA processor persists attestation credentials through the
+    // same storage writer and crypto backends used by provisioning.
+    CHIP_ERROR err = imageProcessor.Init(&gDownloader, chip::DeviceLayer::Silabs::Provision::ProvisionStorageWriter::GetInstance(),
+                                         chip::DeviceLayer::Silabs::Provision::ProvisionCrypto::GetInstance());
+#else
+    CHIP_ERROR err        = imageProcessor.Init(&gDownloader);
+#endif
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("Image processor init failed");

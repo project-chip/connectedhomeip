@@ -60,7 +60,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -74,9 +74,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
-
-class TC_SC_4_3(DiscoverySupport, MatterBaseTest):
-
+class TC_SC_4_3(DiscoverySupport, MatterTestCommissionedDevice):
     def steps_TC_SC_4_3(self):
         return [TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
                 TestStep(1, "TH reads ServerList attribute from the Descriptor cluster on EP0.",

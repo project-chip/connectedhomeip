@@ -15,10 +15,224 @@
 #    limitations under the License.
 #
 
+import queue
+
+from mobly import asserts
+
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter import ChipDeviceCtrl
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest
 
 cluster = Clusters.Thermostat
+
+
+class ThermostatBaseTest(MatterBaseTest):
+    """Base class for Thermostat tests."""
+
+    async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
+        received_events = []
+        while len(received_events) < len(expected_events):
+            try:
+                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
+                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
+                    received_events.append(event_result.Data)
+            except queue.Empty:
+                break
+
+        # Read any extra unexpected events non-blockingly
+        while True:
+            try:
+                event_result = events_callback.get_event_from_queue(block=False, timeout=0)
+                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
+                    received_events.append(event_result.Data)
+            except queue.Empty:
+                break
+
+        # Verify that the number of received events matches the expected number
+        asserts.assert_equal(len(received_events), len(expected_events),
+                             f"Expected {len(expected_events)} events, but received {len(received_events)}: {received_events}")
+
+        # Verify each expected event matches one received event
+        for expected in expected_events:
+            matched = False
+            for idx, received in enumerate(received_events):
+                if (received.systemMode == expected['systemMode'] and
+                    received.occupancy == expected['occupancy'] and
+                        received.currentSetpoint == expected['currentSetpoint']):
+                    matched = True
+                    received_events.pop(idx)
+                    break
+            asserts.assert_true(matched, f"Could not find expected event: {expected} in received events: {received_events}")
+
+    async def read_and_verify_all_attributes(self, endpoint: int, cluster: Clusters.ClusterObjects.ClusterObjectDescriptor) -> None:
+        for attr_class, current_val in [
+            (cluster.Attributes.OccupiedHeatingSetpoint, self.state.occupiedHeatingSetpoint),
+            (cluster.Attributes.OccupiedCoolingSetpoint, self.state.occupiedCoolingSetpoint),
+            (cluster.Attributes.UnoccupiedHeatingSetpoint, self.state.unoccupiedHeatingSetpoint),
+            (cluster.Attributes.UnoccupiedCoolingSetpoint, self.state.unoccupiedCoolingSetpoint),
+            (cluster.Attributes.MinHeatSetpointLimit, self.state.minHeatSetpointLimit),
+            (cluster.Attributes.MaxHeatSetpointLimit, self.state.maxHeatSetpointLimit),
+            (cluster.Attributes.MinCoolSetpointLimit, self.state.minCoolSetpointLimit),
+            (cluster.Attributes.MaxCoolSetpointLimit, self.state.maxCoolSetpointLimit)
+        ]:
+            has_attr = False
+            match attr_class:
+                case cluster.Attributes.OccupiedHeatingSetpoint:
+                    has_attr = self.has_heating
+                case cluster.Attributes.OccupiedCoolingSetpoint:
+                    has_attr = self.has_cooling
+                case cluster.Attributes.UnoccupiedHeatingSetpoint:
+                    has_attr = self.has_heating and self.hasOccupancy
+                case cluster.Attributes.UnoccupiedCoolingSetpoint:
+                    has_attr = self.has_cooling and self.hasOccupancy
+                case cluster.Attributes.MinHeatSetpointLimit:
+                    has_attr = self.has_heating and self.has_min_heat_limit
+                case cluster.Attributes.MaxHeatSetpointLimit:
+                    has_attr = self.has_heating and self.has_max_heat_limit
+                case cluster.Attributes.MinCoolSetpointLimit:
+                    has_attr = self.has_cooling and self.has_min_cool_limit
+                case cluster.Attributes.MaxCoolSetpointLimit:
+                    has_attr = self.has_cooling and self.has_max_cool_limit
+
+            if has_attr:
+                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr_class)
+                asserts.assert_equal(val, current_val, f"Mismatch for {attr_class}")
+
+    async def write_setpoint(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, value: int) -> None:
+        endpoint = self.get_endpoint()
+        attr_id = attribute.attribute_id
+
+        old_state = self.state.copy()
+        expected_status, new_state, changed_ids = self.simulator.write(self.state, attr_id, value)
+
+        if expected_status != Status.Success:
+            status = await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint, expect_success=False)
+            asserts.assert_equal(status, expected_status)
+            return
+
+        if self.has_events:
+            self.events_callback.flush_events()
+
+        await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint)
+
+        self.state = new_state
+
+        if self.has_events:
+            expected_events = self.simulator.get_expected_events(old_state, self.state, changed_ids, attr_id)
+            await self.verify_events(expected_events, self.events_callback)
+
+        await self.read_and_verify_all_attributes(endpoint, cluster)
+
+    def check_atomic_response(self,
+                              response: object,
+                              expected_attribute_statuses: dict[int, Status] | None = None,
+                              expected_atomic_status: Status = Status.Success,
+                              expected_timeout: int | None = None) -> None:
+        """Validates the structure and status fields of an AtomicResponse."""
+        asserts.assert_equal(response.statusCode, expected_atomic_status, "Response should have the right atomic status")
+
+        if expected_attribute_statuses is not None:
+            actual_statuses = {attrStatus.attributeID: attrStatus.statusCode for attrStatus in response.attributeStatus}
+            for attr_id, expected_attr_status in expected_attribute_statuses.items():
+                if expected_attr_status is not None:
+                    asserts.assert_in(attr_id, actual_statuses, f"Attribute {attr_id} should have a status in AtomicResponse")
+                    asserts.assert_equal(
+                        actual_statuses[attr_id], expected_attr_status,
+                        f"Attribute {attr_id} status mismatch: expected {expected_attr_status}, "
+                        f"got {actual_statuses[attr_id]}")
+
+        if expected_timeout is not None:
+            asserts.assert_equal(response.timeout, expected_timeout, "Timeout should have the right value")
+
+    async def send_atomic_request(self,
+                                  request_type: Globals.Enums.AtomicRequestTypeEnum,
+                                  expected_attribute_statuses: dict[int, Status] | None = None,
+                                  dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                  endpoint: int | None = None,
+                                  timeout: int | None = None,
+                                  expected_status: Status = Status.Success,
+                                  expected_atomic_status: Status = Status.Success,
+                                  expected_timeout: int | None = None) -> object:
+        """Sends an AtomicRequest command and validates the response."""
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if endpoint is None:
+            endpoint = self.get_endpoint()
+
+        attribute_ids = list(expected_attribute_statuses.keys()) if expected_attribute_statuses is not None else []
+
+        cmd = cluster.Commands.AtomicRequest(
+            requestType=request_type,
+            attributeRequests=attribute_ids,
+            timeout=timeout if timeout is not None else (
+                1800 if request_type == Globals.Enums.AtomicRequestTypeEnum.kBeginWrite else None)
+        )
+        try:
+            response = await self.send_single_cmd(cmd=cmd, dev_ctrl=dev_ctrl, endpoint=endpoint)
+            asserts.assert_equal(expected_status, Status.Success, "Expected InteractionModelError but command succeeded")
+            self.check_atomic_response(response,
+                                       expected_attribute_statuses=expected_attribute_statuses,
+                                       expected_atomic_status=expected_atomic_status,
+                                       expected_timeout=expected_timeout)
+            return response
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned from AtomicRequest")
+            return None
+
+    async def send_atomic_request_begin(self,
+                                        expected_attribute_statuses: dict[int, Status] | None = None,
+                                        dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                        endpoint: int | None = None,
+                                        timeout: int = 1800,
+                                        expected_status: Status = Status.Success,
+                                        expected_atomic_status: Status = Status.Success,
+                                        expected_timeout: int | None = None) -> object:
+        """Sends an AtomicRequest BeginWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kBeginWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            timeout=timeout,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status,
+            expected_timeout=expected_timeout
+        )
+
+    async def send_atomic_request_commit(self,
+                                         expected_attribute_statuses: dict[int, Status] | None = None,
+                                         dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                         endpoint: int | None = None,
+                                         expected_status: Status = Status.Success,
+                                         expected_atomic_status: Status = Status.Success) -> object:
+        """Sends an AtomicRequest CommitWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kCommitWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status
+        )
+
+    async def send_atomic_request_rollback(self,
+                                           expected_attribute_statuses: dict[int, Status] | None = None,
+                                           dev_ctrl: ChipDeviceCtrl.ChipDeviceController | None = None,
+                                           endpoint: int | None = None,
+                                           expected_status: Status = Status.Success,
+                                           expected_atomic_status: Status = Status.Success) -> object:
+        """Sends an AtomicRequest RollbackWrite command for the given expected attribute statuses."""
+        return await self.send_atomic_request(
+            request_type=Globals.Enums.AtomicRequestTypeEnum.kRollbackWrite,
+            expected_attribute_statuses=expected_attribute_statuses,
+            dev_ctrl=dev_ctrl,
+            endpoint=endpoint,
+            expected_status=expected_status,
+            expected_atomic_status=expected_atomic_status
+        )
 
 
 class ThermostatState:

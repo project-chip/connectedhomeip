@@ -47,7 +47,8 @@ public:
 
     /**
      * @brief Dispatches an action to registered accessors in order.
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if unhandled, or specific error on execution failure.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_FOUND if no handler is found that can handle the action,
+     *         or a specific error on execution failure.
      */
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 

@@ -19,6 +19,7 @@ import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/system/system.gni")
 
@@ -76,6 +77,7 @@ if (chip_build_tests) {
     ]
     test_sources = [
       "TestBasicPacketFilters.cpp",
+      "TestIPv6Datagram.cpp",
       "TestInetAddress.cpp",
       "TestInetErrorStr.cpp",
     ]
@@ -85,6 +87,9 @@ if (chip_build_tests) {
 
     if (chip_system_config_use_sockets && current_os != "zephyr") {
       test_sources += [ "TestInetEndPoint.cpp" ]
+      if (chip_inet_config_enable_tcp_endpoint) {
+        test_sources += [ "TestTCPEndPointSendFailure.cpp" ]
+      }
     }
 
     # ESP32 (FreeRTOS+LwIP) regression test for the TCPEndPointImplLwIP
@@ -95,6 +100,22 @@ if (chip_build_tests) {
     }
 
     cflags = [ "-Wconversion" ]
+  }
+}
+
+if (chip_build_tests && chip_system_config_use_openthread_inet_endpoints &&
+    current_os == "linux") {
+  chip_test_suite("openthread_tests") {
+    output_name = "libInetLayerOpenThreadTests"
+
+    test_sources = [ "TestUDPEndPointOpenThread.cpp" ]
+
+    public_deps = [
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/platform",
+      "${chip_root}/third_party/openthread/platforms/simulation",
+    ]
   }
 }
 

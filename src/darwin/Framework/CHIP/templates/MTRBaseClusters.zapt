@@ -123,6 +123,9 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 {{/zcl_enums}}
 
 {{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
 {{#zcl_enums}}
 {{> enum_decl cluster=../name name=name enumLabel=label}}
 
@@ -175,6 +178,9 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 
 
 {{/zcl_bitmaps}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#endif
+{{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}

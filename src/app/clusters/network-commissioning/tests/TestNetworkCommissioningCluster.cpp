@@ -16,6 +16,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
+#include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -30,9 +31,16 @@
 #include <clusters/NetworkCommissioning/Ids.h>
 #include <clusters/NetworkCommissioning/Metadata.h>
 #include <clusters/NetworkCommissioning/Structs.h>
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Defer.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+#include <system/SystemClock.h>
+
+#include <algorithm>
 #include <vector>
 
 #include "FakeDrivers.h"
@@ -56,8 +64,17 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite()
+    {
+        // InitChipStack() is needed because arming the fail-safe starts a system timer
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::PlatformMgr().Shutdown();
+        Platform::MemoryShutdown();
+    }
 
     inline static NoopBreadcrumbTracker tracker;
     inline static NetworkCommissioningCluster::Context defaultContext{
@@ -195,5 +212,120 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+
+void GenerateIdentity(MutableByteSpan & identity)
+{
+    Crypto::P256Keypair keypair;
+    ASSERT_EQ(keypair.Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    ASSERT_EQ(Credentials::NewChipNetworkIdentity(keypair, identity), CHIP_NO_ERROR);
+}
+
+// Exercises the cluster half of AddOrUpdateWiFiNetwork with PDC: the request reaches the
+// driver intact and the Client Identity it produces comes back in the response. Making
+// sense of the identities themselves is the driver's job, and needs to be covered by cert
+// tests that drive a real WiFi driver.
+TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDC)
+{
+    uint8_t networkIdentityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan networkIdentity(networkIdentityBuffer);
+    GenerateIdentity(networkIdentity);
+
+    uint8_t clientIdentityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan clientIdentity(clientIdentityBuffer);
+    GenerateIdentity(clientIdentity);
+
+    Testing::FakePDCWiFiDriver driver;
+    driver.SetClientIdentity(clientIdentity);
+
+    app::FailSafeContext failSafeContext;
+    // FailSafeContext has no destructor, so an armed context going out of scope would leave
+    // timers behind pointing at it. Disarm on every exit path, including a failed ASSERT_*.
+    auto deferDisarm = MakeDefer([&failSafeContext] { failSafeContext.DisarmFailSafe(); });
+    NetworkCommissioningCluster::Context context{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = failSafeContext,
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
+    NetworkCommissioningCluster cluster(kRootEndpointId, &driver, context);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(
+        failSafeContext.ArmFailSafe(tester.GetCommandHandler().GetSubjectDescriptor().fabricIndex, System::Clock::Seconds16(60)),
+        CHIP_NO_ERROR);
+
+    NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
+    request.ssid = ByteSpan::fromCharSpan("pdc-ssid"_span);
+    request.networkIdentity.SetValue(networkIdentity);
+
+    tester.GetDirtyList().clear();
+    auto result = tester.Invoke(request);
+    ASSERT_TRUE(result.IsSuccess());
+
+    // The driver was asked to configure the network we passed in, without re-using an
+    // existing Client Identity (no clientIdentifier was present in the request).
+    EXPECT_TRUE(driver.GetLastSsid().data_equal(request.ssid));
+    EXPECT_TRUE(driver.GetLastNetworkIdentity().data_equal(networkIdentity));
+    EXPECT_FALSE(driver.GetLastClientIdentityNetworkIndex().HasValue());
+
+    const auto & response = result.response.value();
+    EXPECT_EQ(response.networkingStatus, NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess);
+    ASSERT_TRUE(response.networkIndex.HasValue());
+    EXPECT_EQ(response.networkIndex.Value(), 0u);
+    ASSERT_TRUE(response.clientIdentity.HasValue());
+    EXPECT_TRUE(response.clientIdentity.Value().data_equal(clientIdentity));
+
+    // A successful add/update changes the Networks list.
+    EXPECT_NE(std::find(tester.GetDirtyList().begin(), tester.GetDirtyList().end(),
+                        app::ConcreteAttributePath(kRootEndpointId, NetworkCommissioning::Id, Networks::Id)),
+              tester.GetDirtyList().end());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The Credentials field is only present on AddOrUpdateWiFiNetwork to keep the command shape
+// compatible with the non-PDC case; the spec requires it to be empty when a Network Identity
+// is supplied, and a non-empty value to be rejected with INVALID_COMMAND.
+TEST_F(TestNetworkCommissioningCluster, TestAddOrUpdateWiFiNetworkWithPDCRejectsCredentials)
+{
+    uint8_t networkIdentityBuffer[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan networkIdentity(networkIdentityBuffer);
+    GenerateIdentity(networkIdentity);
+
+    Testing::FakePDCWiFiDriver driver;
+
+    app::FailSafeContext failSafeContext;
+    auto deferDisarm = MakeDefer([&failSafeContext] { failSafeContext.DisarmFailSafe(); });
+    NetworkCommissioningCluster::Context context{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = failSafeContext,
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
+    NetworkCommissioningCluster cluster(kRootEndpointId, &driver, context);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(
+        failSafeContext.ArmFailSafe(tester.GetCommandHandler().GetSubjectDescriptor().fabricIndex, System::Clock::Seconds16(60)),
+        CHIP_NO_ERROR);
+
+    NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
+    request.ssid        = ByteSpan::fromCharSpan("pdc-ssid"_span);
+    request.credentials = ByteSpan::fromCharSpan("password"_span);
+    request.networkIdentity.SetValue(networkIdentity);
+
+    auto result = tester.Invoke(request);
+    EXPECT_EQ(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidCommand));
+    EXPECT_TRUE(driver.GetLastSsid().empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 
 } // namespace

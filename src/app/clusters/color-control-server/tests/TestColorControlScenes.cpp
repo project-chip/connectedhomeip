@@ -162,6 +162,114 @@ TEST_F(TestColorControlScenes, ApplySceneDrivesColorToSavedTarget)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A pair referencing an attribute that is not implemented on the endpoint is ignored rather than
+// failing the recall (Scenes Management AttributeValuePairStruct): the remaining pairs still apply.
+TEST_F(TestColorControlScenes, ApplySceneIgnoresUnknownAttributePairs)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kXy);
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // The unknown pair comes first so the test proves skipping does not derail the later pairs.
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = 0x9999;
+    pairs[0].valueUnsigned8.SetValue(1);
+    pairs[1].attributeID = Attributes::CurrentX::Id;
+    pairs[1].valueUnsigned16.SetValue(100);
+    pairs[2].attributeID = Attributes::CurrentY::Id;
+    pairs[2].valueUnsigned16.SetValue(200);
+    pairs[3].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[3].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kCurrentXAndCurrentY));
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    EXPECT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
+    Complete();
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    Complete();
+    EXPECT_EQ(cluster.CurrentX(), 100u);
+    EXPECT_EQ(cluster.CurrentY(), 200u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// The ignore rule also covers known IDs whose attribute the endpoint's feature set does not implement:
+// a hue/saturation scene on an XY-only endpoint is ignored entirely, so the recall succeeds and the
+// color is left untouched (rather than failing SupportsMode on the default hue/saturation mode, or
+// applying a zero-initialized target).
+TEST_F(TestColorControlScenes, ApplySceneIgnoresAllPairsWhenFeatureUnsupported)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kXy); // no HueAndSaturation feature
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AttributeValuePair pairs[2];
+    pairs[0].attributeID = Attributes::CurrentHue::Id;
+    pairs[0].valueUnsigned8.SetValue(200);
+    pairs[1].attributeID = Attributes::CurrentSaturation::Id;
+    pairs[1].valueUnsigned8.SetValue(150);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.MoveToColor(30000, 40000, 0), Status::Success);
+    Complete();
+    ASSERT_EQ(cluster.CurrentX(), 30000u);
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    Complete();
+    EXPECT_EQ(cluster.CurrentX(), 30000u);
+    EXPECT_EQ(cluster.CurrentY(), 40000u);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kCurrentXAndCurrentY);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Mirror configuration: an XY-only scene on a hue/saturation-only endpoint is likewise ignored
+// entirely, leaving the hue/saturation state unchanged.
+TEST_F(TestColorControlScenes, ApplySceneIgnoresAllPairsOnHueSaturationEndpoint)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kHueAndSaturation); // no XY feature
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AttributeValuePair pairs[2];
+    pairs[0].attributeID = Attributes::CurrentX::Id;
+    pairs[0].valueUnsigned16.SetValue(100);
+    pairs[1].attributeID = Attributes::CurrentY::Id;
+    pairs[1].valueUnsigned16.SetValue(200);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.MoveToHueAndSaturation(200, 150, 0, /*isEnhanced=*/false), Status::Success);
+    Complete();
+    ASSERT_EQ(cluster.CurrentHue(), 200u);
+    ASSERT_EQ(cluster.Saturation(), 150u);
+
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    Complete();
+    EXPECT_EQ(cluster.CurrentHue(), 200u);
+    EXPECT_EQ(cluster.Saturation(), 150u);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // A scene's transition time is a uint32 of milliseconds (AddScene constrains it to 60000000), so the
 // RemainingTime it implies does not fit in uint16 deciseconds: it must saturate at the attribute's
 // constraint max (0xFFFE) rather than wrap — 600000 tenths would come back as 10176.
@@ -273,6 +381,44 @@ TEST_F(TestColorControlScenes, ApplySceneStartsColorLoopWhenSupported)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// A scene that starts the loop replaces an XY transition still running, the same way ColorLoopSet does.
+TEST_F(TestColorControlScenes, ApplySceneColorLoopReplacesXYTransition)
+{
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kColorLoop).Set(Feature::kEnhancedHue).Set(Feature::kHueAndSaturation).Set(Feature::kXy);
+    config.mColorValue = XYColor{ 1000, 2000 };
+    ColorControlCluster cluster(kTestEndpointId, config);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.MoveToColor(30000, 30000, 100), Status::Success); // 10 s transition
+    mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+
+    AttributeValuePair pairs[4];
+    pairs[0].attributeID = Attributes::EnhancedCurrentHue::Id;
+    pairs[0].valueUnsigned16.SetValue(0x4000);
+    pairs[1].attributeID = Attributes::CurrentSaturation::Id;
+    pairs[1].valueUnsigned8.SetValue(200);
+    pairs[2].attributeID = Attributes::EnhancedColorMode::Id;
+    pairs[2].valueUnsigned8.SetValue(to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation));
+    pairs[3].attributeID = Attributes::ColorLoopActive::Id;
+    pairs[3].valueUnsigned8.SetValue(1);
+    DataModel::List<AttributeValuePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    ASSERT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.ApplyScene(kTestEndpointId, ColorControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.ColorLoopActive(), 1);
+
+    const uint16_t hueAtStart = cluster.EnhancedHue();
+    mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    EXPECT_NE(cluster.EnhancedHue(), hueAtStart);
+    EXPECT_EQ(cluster.GetEnhancedColorMode(), EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // SerializeAdd only accepts the decodable form of an EFS, so a Type is TLV-encoded into `backing` and
 // decoded back into `out`. `backing` must outlive every use of `out` — the decoded list iterates over
 // those bytes. Builds an EFS scoped to the ColorControl cluster from the given attribute/value pairs.
@@ -295,11 +441,10 @@ CHIP_ERROR MakeDecodableEfs(chip::Span<const AttributeValuePair> pairs, MutableB
     return out.Decode(reader);
 }
 
-// §3.2.7.1.1: at AddScene, an EFS whose declared EnhancedColorMode carries NONE of that mode's companion
-// attributes is rejected (a presence check across the whole EFS, done before delegating to the base
-// handler). A caller is free to write only some of a mode's companions — see
-// SerializeAddAcceptsModeWithPartialAttributes — CT is the one mode without a partial case: it has exactly
-// one companion, so omitting it means omitting all of them.
+// §3.2.7.1.1: "if data for EnhancedColorMode equals CurrentHueAndCurrentSaturation, then data for attributes
+// CurrentHue and CurrentSaturation SHALL be present in the ExtensionFieldSetStructs", and the same for
+// CurrentX/CurrentY and EnhancedCurrentHue/CurrentSaturation. An EFS missing all of its mode's attributes is
+// rejected; one missing only some of them is covered by SerializeAddRejectsModeWithPartialAttributes.
 TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingAllRequiredAttributes)
 {
     ColorControlCluster::Config config(delegate, mockTimer);
@@ -332,11 +477,9 @@ TEST_F(TestColorControlScenes, SerializeAddRejectsModeMissingAllRequiredAttribut
     }
 }
 
-// §3.2.7.1.1: a caller that only wants to override, say, Saturation need not also supply Hue — an EFS
-// declaring a multi-attribute mode is accepted as long as AT LEAST ONE of that mode's companions is
-// present; the one left out is simply absent from the stored scene. (CT has no partial case: its one
-// companion is unconditionally required, covered above.)
-TEST_F(TestColorControlScenes, SerializeAddAcceptsModeWithPartialAttributes)
+// §3.2.7.1.1: an EFS declaring a multi-attribute mode must carry ALL of that mode's companions; one
+// without the other (e.g. hue without saturation) is rejected, since recall would apply an undefined value.
+TEST_F(TestColorControlScenes, SerializeAddRejectsModeWithPartialAttributes)
 {
     ColorControlCluster::Config config(delegate, mockTimer);
     config.mFeatures.Set(Feature::kColorTemperature).Set(Feature::kXy).Set(Feature::kHueAndSaturation).Set(Feature::kEnhancedHue);
@@ -383,7 +526,7 @@ TEST_F(TestColorControlScenes, SerializeAddAcceptsModeWithPartialAttributes)
 
         uint8_t out[128];
         MutableByteSpan outSpan(out);
-        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_NO_ERROR) << c.name;
+        EXPECT_EQ(cluster.SerializeAdd(kTestEndpointId, efs, outSpan), CHIP_ERROR_INVALID_ARGUMENT) << c.name;
     }
 }
 

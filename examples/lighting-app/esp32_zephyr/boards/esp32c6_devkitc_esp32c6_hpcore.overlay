@@ -1,0 +1,25 @@
+/*
+ * Copyright (c) 2026 Project CHIP Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	aliases {
+		led0 = &light_led;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		/* External LED on a non-strapping pin; the on-board LED is a WS2812 on GPIO8. */
+		light_led: led_0 {
+			gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+			label = "Matter light";
+		};
+	};
+};
+
+/* The board declares 8 MB, the DevKitM module has 4 MB. */
+&flash0 {
+	reg = <0x0 DT_SIZE_M(4)>;
+};

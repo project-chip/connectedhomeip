@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/Zephyr/ConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
+#include <platform/nrfconnect/ConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,7 +36,7 @@ public:
 
 inline DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl()
 {
-    static DeviceInstanceInfoProviderImpl sInstance(ConfigurationManagerImpl::GetDefaultInstance());
+    static DeviceInstanceInfoProviderImpl sInstance(ConfigurationManagerImplNrf::GetDefaultInstance());
     return sInstance;
 }
 } // namespace DeviceLayer

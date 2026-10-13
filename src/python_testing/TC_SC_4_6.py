@@ -38,7 +38,7 @@ from mdns_discovery.utils.support import (get_verify_commissioner_service, get_v
                                           verify_commissioner_txt_record_keys, verify_devtype_subtype)
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestUncommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 '''
@@ -53,7 +53,7 @@ commissioner advertising on the test network.
 '''
 
 
-class TC_SC_4_6(MatterBaseTest):
+class TC_SC_4_6(MatterTestUncommissionedDevice):
     # The DUT is never commissioned in this test (it advertises, the TH only
     # scans DNS-SD), so there is no DUT fabric state to capture or clean up.
     requires_dut = False

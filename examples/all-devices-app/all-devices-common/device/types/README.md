@@ -1,27 +1,56 @@
-# Matter Simulated Device Types Catalog
+# Matter Device Types Catalog
 
-This directory contains concrete C++ implementations of spec-defined **Matter
-Device Types** (e.g. _OnOff Light_, _Dimmable Light_, _Robotic Vacuum Cleaner_,
-_Aggregator_).
+This directory contains C++ representations of spec-defined **Matter Device
+Types** (e.g., _OnOff Light_, _Dimmable Light_, _Laundry Washer_, _Aggregator_).
 
-## Overview
+## Directory Structure & Inheritance
 
-Every directory under `device/types/` represents a single Matter Device Type.
-These classes are typically **leaf types** that the application instantiation
-layer (e.g., `DeviceFactory`) constructs.
+Every directory under `device/types/<foo>/` separates the generic Matter Device
+Type definition from concrete simulation or hardware implementations:
 
--   Subclasses derive from foundational abstractions in `device/api/` (such as
-    `SingleEndpoint` or `DeviceInterface`).
--   They inherit or compose reusable baselines from `device/capabilities/` to
-    reduce duplication.
+```text
+device/types/foo/
+├── Foo.h / Foo.cpp                 # Generic base device class (mandatory spec clusters only)
+├── OOBAccessors.h / .cpp           # Out-of-Band control & inspection accessors
+├── NamedPipeTranslators.h / .cpp   # JSON CLI command translators
+└── impl/
+    └── LoggingFoo.h / .cpp         # Self-contained simulation subclass for DeviceFactory
+```
+
+### Strict Inheritance Direction
+
+```text
+impl/LoggingFoo (Simulation) -> Foo (Base Device Type) -> SingleEndpoint
+```
+
+1. **Base Device Type (`Foo.h`)**:
+    - Inherits directly from `SingleEndpoint` (or a shared capability in special
+      cases).
+    - Defines the Matter `DeviceTypeEntry` (Device Type ID and revision).
+    - Owns **only mandatory clusters** for that device type and accepts abstract
+      `Delegate &` references in its constructor.
+    - Contains zero simulation, logging, or hardware pin logic.
+2. **Concrete Implementation (`impl/LoggingFoo.h` or `EmulatedFoo.h`)**:
+    - **Inherits from `Foo` (`device_type`), never the reverse.**
+    - Implements cluster delegates (inheriting privately from delegate bases
+      _before_ `public Foo` for base-from-member initialization safety).
+    - Instantiated by `DeviceFactory` for simulations; hardware targets subclass
+      `Foo` with hardware drivers.
 
 ## Design Rules
 
-1. **Spec Compliance**: Class names and folder names must correspond directly to
-   standard Matter Device Types defined in the Matter Device Library
-   Specification.
-2. **No Name Stuttering**: Do not include the `Device` suffix in class or file
-   names (e.g., use `Aggregator.h/cpp` and class `Aggregator` instead of
-   `AggregatorDevice`).
-3. **Clean Composition**: Implement command handlers and attribute accessors by
-   delegating logic to the underlying capabilities or platform overrides.
+1. **Spec Compliance & Naming**: Class and folder names correspond directly to
+   Matter Device Library Specification names without the `Device` suffix (e.g.,
+   `LaundryWasher`, not `LaundryWasherDevice`).
+2. **Optional Clusters via Extension Hooks**: Do not place optional clusters in
+   the base `Foo` class. Because `CodeDrivenDataModelProvider` requires all
+   clusters on an endpoint to be added _before_ `provider.AddEndpoint()` is
+   called, base classes expose virtual hooks inside `Register()` and
+   `Unregister()`:
+    - `RegisterAdditionalClusters(EndpointId, CodeDrivenDataModelProvider &)`
+    - `UnregisterAdditionalClusters(CodeDrivenDataModelProvider &)` Subclasses
+      in `impl/` override these hooks to attach optional clusters.
+3. **Prefer Direct `SingleEndpoint` Inheritance**: Avoid creating new shared
+   endpoint base classes in `device/capabilities/`. Prefer flat, self-contained
+   device classes inheriting from `SingleEndpoint`, sharing delegate helper
+   mixins in `impl/` when needed.

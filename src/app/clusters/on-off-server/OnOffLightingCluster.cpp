@@ -221,13 +221,27 @@ std::optional<DataModel::ActionReturnStatus> OnOffLightingCluster::InvokeCommand
 
 void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mOnTime, value, Attributes::OnTime::Id));
+    VerifyOrReturn(mOnTime != value);
+
+    if (abs(mOnTime - value) > kValueDeltaReportTrigger || value == 0)
+    {
+        NotifyAttributeChanged(Attributes::OnTime::Id);
+    }
+
+    mOnTime = value;
     UpdateTimer();
 }
 
 void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mOffWaitTime, value, Attributes::OffWaitTime::Id));
+    VerifyOrReturn(mOffWaitTime != value);
+
+    if (abs(mOffWaitTime - value) > kValueDeltaReportTrigger || value == 0)
+    {
+        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+    }
+
+    mOffWaitTime = value;
     UpdateTimer();
 }
 
@@ -286,10 +300,12 @@ void OnOffLightingCluster::TimerFired()
 
         // TIMED_ON state: we decrement OnTime  to see if we need to turn off
         mOnTime--;
-        NotifyAttributeChanged(Attributes::OnTime::Id);
 
         // If timer is not yet 0, update the timer and keep going. Otherwise move to off state.
         VerifyOrReturn(mOnTime == 0, UpdateTimer());
+
+        // Only notify is OnTime reaches 0
+        NotifyAttributeChanged(Attributes::OnTime::Id);
 
         // transition TIMED_ON to OFF - clear off wait time and turn off
         SetOffWaitTime(0);
@@ -300,7 +316,13 @@ void OnOffLightingCluster::TimerFired()
         VerifyOrReturn(mOffWaitTime > 0);
 
         mOffWaitTime--;
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+
+        // Only notify is OffWaitTime reaches 0
+        if (mOffWaitTime == 0)
+        {
+            NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+        }
+
         UpdateTimer();
     }
 }

@@ -41,11 +41,11 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_6(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def desc_TC_WebRTCP_2_6(self) -> str:
         """Returns a description of this test"""

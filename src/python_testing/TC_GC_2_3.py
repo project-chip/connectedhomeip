@@ -45,13 +45,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_3(MatterBaseTest):
+class TC_GC_2_3(MatterTestCommissionedDevice):
     def desc_TC_GC_2_3(self):
         return "[TC-GC-2.3] UpdateGroupKey KeySetID assignment and key creation with DUT as Server - PROVISIONAL"
 
@@ -176,13 +176,13 @@ class TC_GC_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(5)
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID2,
             keySetID=keySetID1)
         )
 
         self.step(6)
-        sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID2, key_set_id=keySetID1)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
@@ -225,13 +225,13 @@ class TC_GC_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(10)
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
             keySetID=keySetID1)
         )
 
         self.step(11)
-        sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID1, key_set_id=keySetID1)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 

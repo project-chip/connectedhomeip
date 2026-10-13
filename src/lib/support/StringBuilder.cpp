@@ -23,7 +23,13 @@ StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
 {
     va_list args;
     va_start(args, format);
+    AddFormatV(format, args);
+    va_end(args);
+    return *this;
+}
 
+StringBuilderBase & StringBuilderBase::AddFormatV(const char * format, va_list args)
+{
     char * output = nullptr;
     if (mWriter.Available() > 0)
     {
@@ -43,7 +49,6 @@ StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
         mWriter.Skip(static_cast<size_t>(needed));
     }
 
-    va_end(args);
     NullTerminate();
     return *this;
 }

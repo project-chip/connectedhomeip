@@ -194,9 +194,9 @@ using DecodableType = Type;
 namespace SensorScheduleTransitionStruct {
 enum class Fields : uint8_t
 {
-    kDayOfWeek      = 0,
-    kTransitionTime = 1,
-    kEnabledSensors = 2,
+    kDayOfWeek            = 0,
+    kTransitionTime       = 1,
+    kEnabledSensorHandles = 2,
 };
 
 struct Type
@@ -204,7 +204,7 @@ struct Type
 public:
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     uint16_t transitionTime                          = static_cast<uint16_t>(0);
-    DataModel::List<const chip::ByteSpan> enabledSensors;
+    DataModel::List<const chip::ByteSpan> enabledSensorHandles;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -216,7 +216,7 @@ struct DecodableType
 public:
     chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     uint16_t transitionTime                          = static_cast<uint16_t>(0);
-    DataModel::DecodableList<chip::ByteSpan> enabledSensors;
+    DataModel::DecodableList<chip::ByteSpan> enabledSensorHandles;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
