@@ -30,6 +30,11 @@ class TestIniKeyEscaping(unittest.TestCase):
         self.assertEqual(_escapeIniKey('a\tb\nc'), 'a\\x09b\\x0ac')
         self.assertEqual(_escapeIniKey('a\x7fb'), 'a\\x7fb')
 
+    def test_escape_non_ascii(self):
+        # Non-ASCII characters are escaped per UTF-8 byte, matching chip-tool.
+        self.assertEqual(_escapeIniKey('café'), 'caf\\xc3\\xa9')
+        self.assertEqual(_unescapeIniKey('caf\\xc3\\xa9'), 'café')
+
     def test_no_escape_needed(self):
         for key in ['f/1/n', 'g/fidx', 'ExampleOpCredsCAKey0', 'g/s/XAZyZmxGULaZfTMiAvOFbA+/']:
             self.assertEqual(_escapeIniKey(key), key)
@@ -40,7 +45,7 @@ class TestIniKeyEscaping(unittest.TestCase):
         self.assertEqual(_unescapeIniKey('g/s/XAZyZmxGULaZfTMiAvOFbA\\x3d\\x3d'), 'g/s/XAZyZmxGULaZfTMiAvOFbA==')
 
     def test_round_trip(self):
-        for key in ['g/s/abc==', 'a b\\c', 'a\tb\nc', '\\x3d', 'f/1/n', '']:
+        for key in ['g/s/abc==', 'a b\\c', 'a\tb\nc', '\\x3d', 'f/1/n', '', 'café', '日本', '\U0001f600']:
             self.assertEqual(_unescapeIniKey(_escapeIniKey(key)), key)
 
 

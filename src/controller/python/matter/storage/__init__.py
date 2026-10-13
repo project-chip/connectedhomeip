@@ -248,18 +248,18 @@ class VolatileTemporaryPersistentStorage(PersistentStorageBase):
 # Regular expression to match CA keys.
 _caKeyMatch = re.compile(r'(ExampleCAIntermediateCert|ExampleCARootCert|ExampleOpCredsCAKey|ExampleOpCredsICAKey)(\d+)')
 
-# Matches a hex-escaped character in an INI key (see src/lib/support/IniEscaping.cpp).
-_iniKeyEscapeMatch = re.compile(r'\\x([0-9a-f]{2})')
+# Matches a hex-escaped byte in an INI key (see src/lib/support/IniEscaping.cpp).
+_iniKeyEscapeMatch = re.compile(rb'\\x([0-9a-f]{2})')
 
 
 def _escapeIniKey(key: str) -> str:
-    """Escapes an INI key the same way as chip-tool's EscapeKey()."""
-    return ''.join(f'\\x{ord(c):02x}' if (c <= ' ' or c in '=\\' or c >= '\x7f') else c for c in key)
+    """Escapes the UTF-8 bytes of an INI key the same way as chip-tool's EscapeKey()."""
+    return ''.join(f'\\x{b:02x}' if (b <= 0x20 or b in b'=\\' or b >= 0x7f) else chr(b) for b in key.encode('utf-8'))
 
 
 def _unescapeIniKey(key: str) -> str:
-    """Reverses _escapeIniKey()."""
-    return _iniKeyEscapeMatch.sub(lambda m: chr(int(m.group(1), 16)), key)
+    """Reverses _escapeIniKey(), decoding the unescaped bytes as UTF-8."""
+    return _iniKeyEscapeMatch.sub(lambda m: bytes([int(m.group(1), 16)]), key.encode('utf-8')).decode('utf-8')
 
 
 class PersistentStorageJSON(PersistentStorageBase):
