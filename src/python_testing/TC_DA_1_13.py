@@ -24,7 +24,7 @@
 # commissioning success over the legacy fallback is the row result. Run the true column
 # with a controller built with chip_crypto="openssl" against OpenSSL 3.5+.
 
-from TC_DA_PQC_common import PQCDACommissionerTestBase
+from support_modules.da_pqc_common import PQCDACommissionerTestBase
 
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.runner import default_matter_test_main
