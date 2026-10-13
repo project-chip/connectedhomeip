@@ -1149,6 +1149,7 @@ WebRTCTransportProviderCluster::HandleProvideAnswer(CommandHandler & commandHand
     return mDelegate.HandleProvideAnswer(sessionId, sdpAnswer);
 }
 
+/** Validate a nonempty candidate list and session ownership before invoking the application delegate. */
 std::optional<DataModel::ActionReturnStatus>
 WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & commandHandler,
                                                            const Commands::ProvideICECandidates::DecodableType & req)
@@ -1180,6 +1181,8 @@ WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & comm
         ChipLogError(Zcl, "HandleProvideICECandidates: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
         return Status::InvalidCommand;
     }
+
+    VerifyOrReturnError(!candidates.empty(), Status::ConstraintError);
 
     WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
