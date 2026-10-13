@@ -25,8 +25,11 @@ namespace chip::app {
 
 /**
  * Creates an interactive LevelControl cluster widget displaying level slider and percentage.
+ * `levelName` prefixes the value text (e.g. "Volume: 40% (101)"). It is not copied, so it must
+ * outlive the widget (use a string literal).
  * Must be called while holding the LVGL lock.
  */
-lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster);
+lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster,
+                                           const char * levelName = "Brightness");
 
 } // namespace chip::app

@@ -28,7 +28,7 @@ namespace chip::app {
 
 namespace {
 
-void UpdateLevelLabel(lv_obj_t * valueLabel, uint8_t level, uint8_t minLevel, uint8_t maxLevel)
+void UpdateLevelLabel(lv_obj_t * valueLabel, const char * levelName, uint8_t level, uint8_t minLevel, uint8_t maxLevel)
 {
     unsigned int pct = 0;
     if (maxLevel > minLevel)
@@ -40,13 +40,13 @@ void UpdateLevelLabel(lv_obj_t * valueLabel, uint8_t level, uint8_t minLevel, ui
         pct = static_cast<unsigned int>((static_cast<uint32_t>(clamped - minLevel) * 100) / (maxLevel - minLevel));
     }
     char buf[32];
-    snprintf(buf, sizeof(buf), "Brightness: %u%% (%u)", pct, static_cast<unsigned int>(level));
+    snprintf(buf, sizeof(buf), "%s: %u%% (%u)", levelName, pct, static_cast<unsigned int>(level));
     lv_label_set_text(valueLabel, buf);
 }
 
 } // namespace
 
-lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster)
+lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelControlCluster & cluster, const char * levelName)
 {
     uint8_t minLevel = cluster.GetMinLevel();
     uint8_t maxLevel = cluster.GetMaxLevel();
@@ -70,21 +70,23 @@ lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelCon
     lv_slider_set_value(slider, curLevel, LV_ANIM_OFF);
 
     // Initial label render
-    UpdateLevelLabel(valueLabel, curLevel, minLevel, maxLevel);
+    UpdateLevelLabel(valueLabel, levelName, curLevel, minLevel, maxLevel);
 
     // Local touch: the label follows the knob, while the command is sent once the finger lifts.
     // Commanding on every value change turns a single drag into a burst of MoveToLevel commands.
+    // LVGL user data is non-const; the callback only reads the level name.
     lv_obj_add_event_cb(
         slider,
         [](lv_event_t * event) {
+            auto * name      = static_cast<const char *>(lv_event_get_user_data(event));
             auto * sliderObj = static_cast<lv_obj_t *>(lv_event_get_target(event));
             auto * labelObj  = lv_obj_get_child(lv_obj_get_parent(sliderObj), 0);
 
-            UpdateLevelLabel(labelObj, static_cast<uint8_t>(lv_slider_get_value(sliderObj)),
+            UpdateLevelLabel(labelObj, name, static_cast<uint8_t>(lv_slider_get_value(sliderObj)),
                              static_cast<uint8_t>(lv_slider_get_min_value(sliderObj)),
                              static_cast<uint8_t>(lv_slider_get_max_value(sliderObj)));
         },
-        LV_EVENT_VALUE_CHANGED, nullptr);
+        LV_EVENT_VALUE_CHANGED, const_cast<char *>(levelName));
 
     lv_obj_add_event_cb(
         slider,
@@ -104,14 +106,14 @@ lv_obj_t * CreateLevelControlClusterWidget(lv_obj_t * parent, Clusters::LevelCon
     // Subscribing with 'card' automatically unregisters when 'card' is deleted.
     DisplayNotificationHub::Instance().Subscribe(
         card, cluster.GetPaths()[0].mEndpointId, Clusters::LevelControl::Id,
-        [slider, valueLabel, &cluster, minLevel, maxLevel](const ConcreteAttributePath & path) {
+        [slider, valueLabel, &cluster, levelName, minLevel, maxLevel](const ConcreteAttributePath & path) {
             if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id)
             {
                 uint8_t level = cluster.GetCurrentLevel().ValueOr(maxLevel);
                 if (!lv_slider_is_dragged(slider))
                 {
                     lv_slider_set_value(slider, level, LV_ANIM_OFF);
-                    UpdateLevelLabel(valueLabel, level, minLevel, maxLevel);
+                    UpdateLevelLabel(valueLabel, levelName, level, minLevel, maxLevel);
                 }
             }
         });

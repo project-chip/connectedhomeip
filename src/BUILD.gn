@@ -199,6 +199,11 @@ if (chip_build_tests) {
       ]
     }
 
+    if (chip_system_config_use_openthread_inet_endpoints &&
+        current_os == "linux") {
+      tests += [ "${chip_root}/src/inet/tests:openthread_tests" ]
+    }
+
     # These suites link ember mocks (codegen data-model provider), so they cannot
     # run in a "unified" single-binary test build. Restrict them to specific
     # platforms only.
