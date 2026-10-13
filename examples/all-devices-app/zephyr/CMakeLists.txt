@@ -170,7 +170,11 @@ if(CONFIG_OPENTHREAD)
         )
 endif()
 
-# TODO: Wi-Fi
+if(CONFIG_CHIP_WIFI)
+    target_sources(app PRIVATE
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/WifiFeature.cpp
+    )
+endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE

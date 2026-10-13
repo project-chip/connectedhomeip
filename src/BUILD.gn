@@ -199,6 +199,11 @@ if (chip_build_tests) {
       ]
     }
 
+    if (chip_system_config_use_openthread_inet_endpoints &&
+        current_os == "linux") {
+      tests += [ "${chip_root}/src/inet/tests:openthread_tests" ]
+    }
+
     # These suites link ember mocks (codegen data-model provider), so they cannot
     # run in a "unified" single-binary test build. Restrict them to specific
     # platforms only.
@@ -210,6 +215,7 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/concentration-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/door-lock-server/tests",
         "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",

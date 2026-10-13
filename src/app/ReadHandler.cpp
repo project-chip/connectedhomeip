@@ -935,14 +935,11 @@ size_t ReadHandler::GetReportBufferMaxSize()
     Transport::SecureSession * session = GetSession();
     if (session && session->AllowsLargePayload())
     {
-        // Clamp to the session negotiated MaxTCPPayloadSize (or legacy default)
+        // Clamp to the session's maximum permitted application message length
         // to ensure the encoded report chunk does not exceed the limit enforced by SessionManager::PrepareMessage,
         // which would otherwise reject the message with CHIP_ERROR_MESSAGE_TOO_LONG and tear down the subscription.
         // Also clamp to PacketBuffer::kMaxAllocSize in case large packet buffers are not supported.
-        uint32_t maxPayload = session->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
-        size_t limit        = std::min<size_t>(remoteLimit, kMaxLargeAppMessageLen);
-        return std::min<size_t>(limit + kMaxTagLen, System::PacketBuffer::kMaxAllocSize);
+        return std::min<size_t>(session->GetMaxAppMessageLen() + kMaxTagLen, System::PacketBuffer::kMaxAllocSize);
     }
     return kMaxSecureSduLengthBytes;
 }
