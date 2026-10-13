@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+rsource "../../../config/zephyr/chip-module/Kconfig.defaults"
 DT_CHOSEN_IEEE802154 := zephyr,ieee802154
 
 if CHIP
@@ -88,16 +89,7 @@ config MAIN_STACK_SIZE
 config CHIP_TASK_STACK_SIZE
 	default 10240
 
-config HW_STACK_PROTECTION
-	default y
-
-config ASSERT
-	default y
-
 if NET_L2_OPENTHREAD
-
-config NET_IF_MCAST_IPV6_ADDR_COUNT
-	default 14
 
 config OPENTHREAD_THREAD_STACK_SIZE
 	default 6144
@@ -130,14 +122,10 @@ config CHIP_FACTORY_DATA
 	bool "Use provisioned factory data for credentials and commissionable data"
 	default n
 
-config SHELL
-	default y
-
 config CHIP_LIB_SHELL
 	default y
 
 config CHIP_WIFI
-	default y if WIFI
 	imply NET_STATISTICS
 	imply NET_IPV6_ND
 	imply NET_IPV6_NBR_CACHE
@@ -168,25 +156,7 @@ config KERNEL_SHELL
 config SHELL_WILDCARD
 	default n
 
-config SENSOR_SHELL
-    default n
-
-config DEVICE_SHELL
-    default n
-
-config DATE_SHELL
-    default n
-
-config DEVMEM_SHELL
-    default n
-
-config MCUBOOT_SHELL
-    default n
-
 config CLOCK_CONTROL_NRF_SHELL
-    default n
-
-config FLASH_SHELL
     default n
 
 config HWINFO_SHELL
