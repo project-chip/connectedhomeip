@@ -16,6 +16,7 @@
 #
 
 import asyncio
+import contextlib
 import logging
 import os
 import platform
@@ -357,7 +358,7 @@ async def detect_wifi_interface():
         physical_interfaces = [c for c in candidates if not c.startswith('p2p-dev-')]
         if physical_interfaces:
             return physical_interfaces[0]
-        # The ctrl_interface directory is not visible inside the TH SDK container, fall back to sysfs,
+        # The ctrl_interface directory is not visible inside the TH SDK container; fall back to sysfs,
         # which shows the host's interfaces because the container uses the host network namespace.
         sys_net = "/sys/class/net"
         if os.path.isdir(sys_net):
@@ -497,10 +498,9 @@ async def connect_wifi_linux_dbus(interface, ssid, password) -> ConnectionResult
     state = ""
     try:
         for attempt in range(1, ASSOCIATION_ATTEMPTS + 1):
-            try:
+            # Fails with NotConnected when there is no current association
+            with contextlib.suppress(Exception):
                 await iface_call("Disconnect")
-            except Exception:
-                pass  # Fails with NotConnected when there is no current association
             await iface_call("RemoveAllNetworks")
             network_path = await iface_call("AddNetwork", "a{sv}", network_props)
             await iface_call("SelectNetwork", "o", network_path)
