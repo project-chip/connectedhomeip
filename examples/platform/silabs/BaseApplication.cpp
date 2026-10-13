@@ -488,7 +488,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
         isPatternSet = true;
     }
 
-#if !(CHIP_CONFIG_ENABLE_ICD_SERVER) 
+#if !(CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
     if (!isPatternSet)
     {
