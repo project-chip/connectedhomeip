@@ -357,6 +357,7 @@ TEST_F(TestMicrowaveOvenControlCluster, SetCookTimeSecTest)
     }
 }
 
+/** Advertise AddMoreTime only when it is enabled in the cluster configuration. */
 TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
 {
     {
@@ -385,3 +386,195 @@ TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
+
+namespace {
+
+/** Select an operational state without invoking a real Operational State server. */
+class AddTimeOperationalState : public TestIntegrationDelegate
+{
+public:
+    /** Return the state selected by the test. */
+    uint8_t GetCurrentOperationalState() const override { return state; }
+    uint8_t state = to_underlying(OperationalState::OperationalStateEnum::kStopped);
+};
+
+/** Record application callback effects and expose a configurable maximum cooking time. */
+class RecordingCookTimeDelegate : public TestDelegate
+{
+public:
+    /** Capture the requested final time; apply mock countdown effects only on success. */
+    Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) override
+    {
+        ++calls;
+        lastCookTimeSec = finalCookTimeSec;
+        if (status == Status::Success)
+        {
+            countdownSec = finalCookTimeSec;
+        }
+        return status;
+    }
+
+    /** Return the maximum used for boundary and uint32 overflow controls. */
+    uint32_t GetMaxCookTimeSec() const override { return maxCookTimeSec; }
+
+    uint32_t maxCookTimeSec  = 86400;
+    uint32_t calls           = 0;
+    uint32_t lastCookTimeSec = 0;
+    uint32_t countdownSec    = kDefaultCookTimeSec;
+    Status status            = Status::Success;
+};
+
+/** Command-path fixture with AddMoreTime enabled and observable application callback effects. */
+struct TestAddMoreTime : public TestMicrowaveOvenControlCluster
+{
+    /** Start the cluster with a valid cooking time and clean observation counters. */
+    void SetUp() override
+    {
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+        ResetCookTime(kDefaultCookTimeSec);
+    }
+
+    /** Shut down before the context and delegates are destroyed. */
+    void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
+
+    /** Select a valid initial cooking time and clear previous callback/reporting effects. */
+    void ResetCookTime(uint32_t currentTime)
+    {
+        ASSERT_EQ(cluster.SetCookTimeSec(currentTime), CHIP_NO_ERROR);
+        delegate.countdownSec    = currentTime;
+        delegate.calls           = 0;
+        delegate.lastCookTimeSec = 0;
+        testContext.ChangeListener().DirtyList().clear();
+    }
+
+    /** Check status and preserve the cook time, mock countdown, callbacks, and dirty reports on rejection. */
+    void ExpectRejectedTime(uint32_t timeToAdd, Status expected)
+    {
+        const auto currentTime = cluster.GetCookTimeSec();
+        const auto countdown   = delegate.countdownSec;
+        const auto calls       = delegate.calls;
+        const auto dirtyCount  = testContext.ChangeListener().DirtyList().size();
+        Commands::AddMoreTime::Type request;
+        request.timeToAdd = timeToAdd;
+        auto response = tester.Invoke<Commands::AddMoreTime::Type, DataModel::NullObjectType>(Commands::AddMoreTime::Id, request);
+        EXPECT_EQ(response.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(expected));
+        EXPECT_EQ(delegate.calls, calls);
+        EXPECT_EQ(delegate.countdownSec, countdown);
+        EXPECT_EQ(cluster.GetCookTimeSec(), currentTime);
+        uint32_t readTime = 0;
+        ASSERT_EQ(tester.ReadAttribute(CookTime::Id, readTime), CHIP_NO_ERROR);
+        EXPECT_EQ(readTime, currentTime);
+        EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), dirtyCount);
+    }
+
+    /** Check successful time extension at both the delegate and attribute TLV boundary. */
+    void ExpectAddedTime(uint32_t timeToAdd, uint32_t finalTime)
+    {
+        Commands::AddMoreTime::Type request;
+        request.timeToAdd = timeToAdd;
+        auto response = tester.Invoke<Commands::AddMoreTime::Type, DataModel::NullObjectType>(Commands::AddMoreTime::Id, request);
+        ASSERT_TRUE(response.IsSuccess());
+        EXPECT_EQ(delegate.calls, 1u);
+        EXPECT_EQ(delegate.lastCookTimeSec, finalTime);
+        EXPECT_EQ(delegate.countdownSec, finalTime);
+        EXPECT_EQ(cluster.GetCookTimeSec(), finalTime);
+        uint32_t readTime = 0;
+        ASSERT_EQ(tester.ReadAttribute(CookTime::Id, readTime), CHIP_NO_ERROR);
+        EXPECT_EQ(readTime, finalTime);
+        ASSERT_EQ(testContext.ChangeListener().DirtyList().size(), 1u);
+        EXPECT_EQ(testContext.ChangeListener().DirtyList()[0].mAttributeId, CookTime::Id);
+    }
+
+    AddTimeOperationalState operationalState;
+    RecordingCookTimeDelegate delegate;
+    MicrowaveOvenControlCluster::Config config{
+        .feature              = BitFlags<Feature>{},
+        .optionalAttributeSet = {},
+        .supportsAddMoreTime  = true,
+        .integrationDelegate  = operationalState,
+        .appDelegate          = delegate,
+    };
+    MicrowaveOvenControlCluster cluster{ kRootEndpointId, config };
+    ClusterTester tester{ cluster };
+};
+
+/** TimeToAdd has minimum 1; reject zero in supported states before any application effect. */
+TEST_F(TestAddMoreTime, RejectsZeroInSupportedStates)
+{
+    const auto states = { OperationalState::OperationalStateEnum::kStopped, OperationalState::OperationalStateEnum::kRunning,
+                          OperationalState::OperationalStateEnum::kPaused };
+    for (auto state : states)
+    {
+        operationalState.state = to_underlying(state);
+        for (uint32_t current : { 30u, 1u, 86400u })
+        {
+            ResetCookTime(current);
+            VerifyOrReturn(!HasFailure());
+            ExpectRejectedTime(0, Status::ConstraintError);
+            VerifyOrReturn(!HasFailure());
+        }
+        ResetCookTime(30);
+        VerifyOrReturn(!HasFailure());
+        ExpectAddedTime(1, 31);
+        VerifyOrReturn(!HasFailure());
+    }
+}
+
+/** One second and an exact MaxCookTime total remain valid; excess and wrapped totals remain rejected. */
+TEST_F(TestAddMoreTime, PreservesTimeBoundariesAndOverflowProtection)
+{
+    ResetCookTime(30);
+    VerifyOrReturn(!HasFailure());
+    ExpectAddedTime(1, 31);
+    ResetCookTime(1);
+    VerifyOrReturn(!HasFailure());
+    ExpectAddedTime(86399, 86400);
+    ResetCookTime(86399);
+    VerifyOrReturn(!HasFailure());
+    ExpectAddedTime(1, 86400);
+    ResetCookTime(30);
+    VerifyOrReturn(!HasFailure());
+    ExpectRejectedTime(86401, Status::ConstraintError);
+    ResetCookTime(86400);
+    VerifyOrReturn(!HasFailure());
+    ExpectRejectedTime(1, Status::ConstraintError);
+
+    delegate.maxCookTimeSec = 0xFFFFFFFF;
+    ResetCookTime(0xFFFFFFFE);
+    VerifyOrReturn(!HasFailure());
+    ExpectRejectedTime(2, Status::ConstraintError);
+    ExpectAddedTime(1, 0xFFFFFFFF);
+    ResetCookTime(0xFFFFFFFF);
+    VerifyOrReturn(!HasFailure());
+    ExpectRejectedTime(1, Status::ConstraintError);
+}
+
+/** Preserve the existing InvalidInState precedence for the Error state, including a zero request. */
+TEST_F(TestAddMoreTime, PreservesErrorStateRejection)
+{
+    operationalState.state = to_underlying(OperationalState::OperationalStateEnum::kError);
+    for (uint32_t time : { 0u, 1u })
+    {
+        ExpectRejectedTime(time, Status::InvalidInState);
+    }
+}
+
+/** A failed application callback retains its status and does not commit cook-time changes. */
+TEST_F(TestAddMoreTime, PreservesDelegateFailure)
+{
+    delegate.status = Status::Busy;
+    Commands::AddMoreTime::Type request;
+    request.timeToAdd = 1;
+    auto response     = tester.Invoke<Commands::AddMoreTime::Type, DataModel::NullObjectType>(Commands::AddMoreTime::Id, request);
+    EXPECT_EQ(response.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::Busy));
+    EXPECT_EQ(delegate.calls, 1u);
+    EXPECT_EQ(delegate.lastCookTimeSec, 31u);
+    EXPECT_EQ(delegate.countdownSec, 30u);
+    EXPECT_EQ(cluster.GetCookTimeSec(), 30u);
+    uint32_t readTime = 0;
+    ASSERT_EQ(tester.ReadAttribute(CookTime::Id, readTime), CHIP_NO_ERROR);
+    EXPECT_EQ(readTime, 30u);
+    EXPECT_TRUE(testContext.ChangeListener().DirtyList().empty());
+}
+
+} // namespace

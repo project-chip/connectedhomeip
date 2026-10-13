@@ -317,6 +317,7 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(const ConcreteCommandPat
     return status;
 }
 
+/** Validate positive added time and the overflow-safe total before notifying the application. */
 std::optional<DataModel::ActionReturnStatus>
 MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::DecodableType & commandData)
 {
@@ -324,7 +325,7 @@ MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::Deco
     VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);
 
     // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
-    VerifyOrReturnError(commandData.timeToAdd <= mAppDelegate.GetMaxCookTimeSec() &&
+    VerifyOrReturnError(commandData.timeToAdd >= 1 && commandData.timeToAdd <= mAppDelegate.GetMaxCookTimeSec() &&
                             GetCookTimeSec() <= mAppDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
                         Status::ConstraintError,
                         ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
