@@ -18,11 +18,13 @@
 
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/clusters/thermostat-server/ThermostatCluster.h>
+#include <app/clusters/thermostat-server/ThermostatClusterHeatingSetpoints.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
-#include <devices/Types.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
@@ -40,7 +42,7 @@ public:
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
         Clusters::WaterHeaterManagement::Delegate & waterHeaterManagementDelegate;
         // Thermostat cluster
-        BitMask<Clusters::Thermostat::Feature> thermostatFeatures;
+        BitFlags<Clusters::Thermostat::Feature> thermostatFeatures;
         Clusters::Thermostat::OptionalAttributes thermostatOptionalAttributes;
         Clusters::Thermostat::Delegate & thermostatDelegate;
         Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate;
@@ -49,7 +51,7 @@ public:
     };
 
     explicit WaterHeater(const Config & config);
-    ~WaterHeater();
+    ~WaterHeater() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
@@ -57,10 +59,13 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster();
+    const Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster() const;
 
     HeatingThermostat & ThermostatCluster();
+    const HeatingThermostat & ThermostatCluster() const;
 
     Clusters::ModeBaseCluster & WaterHeaterModeCluster();
+    const Clusters::ModeBaseCluster & WaterHeaterModeCluster() const;
 
 protected:
     virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
@@ -72,10 +77,12 @@ protected:
 
     TimerDelegate & GetTimerDelegate() const { return mConfig.timerDelegate; }
 
-    CodeDrivenDataModelProvider * mProvider = nullptr;
+    /// Reports a change of an attribute on this device's endpoint. No-op while the device is not registered.
+    void NotifyAttributeChanged(ClusterId clusterId, AttributeId attributeId);
 
 private:
     const Config mConfig;
+    CodeDrivenDataModelProvider * mProvider = nullptr;
 
     // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;

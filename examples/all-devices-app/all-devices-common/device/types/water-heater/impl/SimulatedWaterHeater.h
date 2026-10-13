@@ -36,6 +36,9 @@ namespace chip::app {
  * The delegate bases are listed before `WaterHeater` on purpose: base classes are constructed in declaration order
  * and destroyed in reverse order, so the delegate subobjects outlive the clusters owned by `WaterHeater` that hold
  * references to them.
+ *
+ * Note: both `SingleEndpoint` and `WaterHeaterManagement::Delegate` declare a protected `mEndpointId`, so an
+ * unqualified `mEndpointId` is ambiguous in this class. Use `GetEndpointId()` (from `SingleEndpoint`) instead.
  */
 class SimulatedWaterHeater : private Clusters::WaterHeaterManagement::Delegate,
                              private Clusters::Thermostat::Delegate,
@@ -45,13 +48,14 @@ class SimulatedWaterHeater : private Clusters::WaterHeaterManagement::Delegate,
                              public WaterHeater
 {
 public:
-    static constexpr Clusters::Thermostat::temperature kMinTemperature     = 0;
-    static constexpr Clusters::Thermostat::temperature kInitialTemperature = 2000;
-    static constexpr Clusters::Thermostat::temperature kFinalTemperature   = 3000;
-    static constexpr Clusters::Thermostat::temperature kMaxTemperature     = 10000;
+    // Temperatures are in units of 0.01 °C.
+    static constexpr Clusters::Thermostat::temperature kMinTemperature         = 0;
+    static constexpr Clusters::Thermostat::temperature kAmbientTemperature     = 2000;
+    static constexpr Clusters::Thermostat::temperature kDefaultHeatingSetpoint = 3000;
+    static constexpr Clusters::Thermostat::temperature kMaxTemperature         = 10000;
 
-    explicit SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
-                                  DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
+    SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
+                         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider);
     ~SimulatedWaterHeater() override;
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
@@ -121,8 +125,8 @@ private:
     void EndBoost();
     void SetHeatingEnabled(bool enabled);
     void EvaluateHeatingDemand(std::optional<uint8_t> pendingMode = std::nullopt);
-    bool IsModeOff(std::optional<uint8_t> mode = std::nullopt);
-    bool IsNormalHeatingPermitted(std::optional<uint8_t> mode = std::nullopt);
+    bool IsModeOff(std::optional<uint8_t> mode = std::nullopt) const;
+    bool IsNormalHeatingPermitted(std::optional<uint8_t> mode = std::nullopt) const;
     Clusters::Thermostat::temperature GetHeatingTargetTemperature() const;
     void NotifyHeatDemandChanged();
     void NotifyBoostStateChanged();
@@ -130,9 +134,6 @@ private:
     FabricTable & mFabricTable;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
 
-    BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
-        Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap::kImmersionElement1
-    };
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeatDemand;
     Clusters::WaterHeaterManagement::BoostStateEnum mBoostState = Clusters::WaterHeaterManagement::BoostStateEnum::kInactive;
     uint32_t mBoostRemainingTime                                = 0;
@@ -144,8 +145,8 @@ private:
 
     // Thermostat attributes
     Clusters::Thermostat::SystemModeEnum mSystemMode                         = Clusters::Thermostat::SystemModeEnum::kOff;
-    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::MakeNullable(kInitialTemperature);
-    Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = kFinalTemperature;
+    DataModel::Nullable<Clusters::Thermostat::temperature> mLocalTemperature = DataModel::MakeNullable(kAmbientTemperature);
+    Clusters::Thermostat::temperature mOccupiedHeatingSetpoint               = kDefaultHeatingSetpoint;
 };
 
 } // namespace chip::app

@@ -30,8 +30,15 @@ namespace chip::app {
 
 namespace {
 
+using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
+
+// Simulation tuning. Temperatures are in units of 0.01 °C.
 constexpr uint32_t kStepDurationSeconds = 3;
-using ModeTagStructType                 = Clusters::detail::Structs::ModeTagStruct::Type;
+constexpr temperature kHeatingStep      = 100; // per step, normal heating
+constexpr temperature kBoostHeatingStep = 200; // per step, while boosting
+constexpr temperature kCoolingStep      = 100; // per step, while not heating
+constexpr temperature kReheatHysteresis = 200; // re-heat once this far below the target
+constexpr BitMask<WaterHeaterHeatSourceBitmap> kHeaterTypes(WaterHeaterHeatSourceBitmap::kImmersionElement1);
 
 constexpr uint8_t kWaterHeaterModeOff    = 0;
 constexpr uint8_t kWaterHeaterModeManual = 1;
@@ -53,7 +60,7 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 // This cluster implementation does not support any Optional features for the WaterHeaterManagement cluster.
 constexpr BitMask<Clusters::WaterHeaterManagement::Feature> kWhmFeatures = {};
 // Only the Heating feature is supported for the Thermostat cluster.
-constexpr BitMask<Clusters::Thermostat::Feature> kThermostatFeatures(Clusters::Thermostat::Feature::kHeating);
+constexpr BitFlags<Clusters::Thermostat::Feature> kThermostatFeatures(Clusters::Thermostat::Feature::kHeating);
 constexpr Clusters::Thermostat::OptionalAttributes GetThermostatOptionalAttributes()
 {
     Clusters::Thermostat::OptionalAttributes attrs;
@@ -62,6 +69,11 @@ constexpr Clusters::Thermostat::OptionalAttributes GetThermostatOptionalAttribut
     return attrs;
 }
 constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes = GetThermostatOptionalAttributes();
+
+bool IsWithinAbsoluteHeatSetpointLimits(temperature value)
+{
+    return value >= SimulatedWaterHeater::kMinTemperature && value <= SimulatedWaterHeater::kMaxTemperature;
+}
 } // namespace
 
 SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
@@ -102,10 +114,10 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     }
     persistence.LoadNativeEndianValue(
         { GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::OccupiedHeatingSetpoint::Id },
-        mOccupiedHeatingSetpoint, kFinalTemperature);
-    if (mOccupiedHeatingSetpoint < kMinTemperature || mOccupiedHeatingSetpoint > kMaxTemperature)
+        mOccupiedHeatingSetpoint, kDefaultHeatingSetpoint);
+    if (!IsWithinAbsoluteHeatSetpointLimits(mOccupiedHeatingSetpoint))
     {
-        mOccupiedHeatingSetpoint = kFinalTemperature;
+        mOccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
     }
     // SystemMode is loaded from storage in Startup(), however we also have CurrentMode attribute stored (handled in the cluster
     // code) so we need to find a way to reconcile the two. Defer mode reconciliation until all clusters on the endpoint
@@ -165,19 +177,25 @@ void SimulatedWaterHeater::TimerFired()
         }
     }
 
-    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+    const temperature currentTemp = mLocalTemperature.ValueOr(kAmbientTemperature);
     const temperature target      = GetHeatingTargetTemperature();
+
+    // Only report (and log) actual changes, so an idle heater at ambient temperature stays quiet.
+    auto updateTemperature = [&](const char * phase, temperature newTemp) {
+        VerifyOrReturn(newTemp != currentTemp);
+        ChipLogProgress(AppServer, "WaterHeater: %s temperature=%" PRId16 "°C", phase, static_cast<int16_t>(newTemp / 100));
+        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
+    };
 
     // Handle heating
     if (mHeatingEnabled)
     {
-        const int32_t temperatureStep = mBoostState == BoostStateEnum::kActive ? 200 : 100;
+        const int32_t temperatureStep = (mBoostState == BoostStateEnum::kActive) ? kBoostHeatingStep : kHeatingStep;
         const int32_t ceiling         = std::max(currentTemp, target);
         const int32_t nextTemp        = std::min(static_cast<int32_t>(currentTemp) + temperatureStep, ceiling);
         const temperature newTemp     = static_cast<temperature>(nextTemp);
 
-        ChipLogProgress(AppServer, "WaterHeater: Heating temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
-        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
+        updateTemperature("Heating", newTemp);
         if (newTemp >= target)
         {
             if (mBoostState == BoostStateEnum::kActive && mBoostOneShot)
@@ -192,12 +210,15 @@ void SimulatedWaterHeater::TimerFired()
     }
     else
     {
-        const int32_t nextTemp    = std::max(static_cast<int32_t>(currentTemp) - 100, static_cast<int32_t>(kInitialTemperature));
+        const int32_t nextTemp =
+            std::max(static_cast<int32_t>(currentTemp) - kCoolingStep, static_cast<int32_t>(kAmbientTemperature));
         const temperature newTemp = static_cast<temperature>(nextTemp);
 
-        ChipLogProgress(AppServer, "WaterHeater: Cooling temperature=%" PRId16 "°C", static_cast<int16_t>(newTemp / 100));
-        ThermostatCluster().SetLocalTemperature(DataModel::MakeNullable(newTemp));
-        if (newTemp <= kInitialTemperature && newTemp < target &&
+        updateTemperature("Cooling", newTemp);
+        // Water never cools below ambient, so clamp the re-heat threshold to it.
+        const int32_t reheatThreshold =
+            std::max(static_cast<int32_t>(target) - kReheatHysteresis, static_cast<int32_t>(kAmbientTemperature));
+        if (newTemp < target && newTemp <= reheatThreshold &&
             (mBoostState == BoostStateEnum::kActive || IsNormalHeatingPermitted()))
         {
             SetHeatingEnabled(true);
@@ -211,13 +232,11 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
                                          Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
                                          Optional<Percent> targetReheat)
 {
-    if (temporarySetpoint.HasValue())
+    // Use the same absolute limits as OccupiedHeatingSetpoint (advertised via AbsMin/AbsMaxHeatSetpointLimit).
+    if (temporarySetpoint.HasValue() && !IsWithinAbsoluteHeatSetpointLimits(temporarySetpoint.Value()))
     {
-        if (temporarySetpoint.Value() < kInitialTemperature || temporarySetpoint.Value() > kMaxTemperature)
-        {
-            ChipLogError(AppServer, "WaterHeater: Boost temporarySetpoint out of range: %" PRId16, temporarySetpoint.Value());
-            return Status::ConstraintError;
-        }
+        ChipLogError(AppServer, "WaterHeater: Boost temporarySetpoint out of range: %" PRId16, temporarySetpoint.Value());
+        return Status::ConstraintError;
     }
 
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
@@ -225,7 +244,7 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
     mBoostState             = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
     mBoostRemainingTime     = duration;
     mBoostOneShot           = oneShot.ValueOr(false);
-    mBoostTemporarySetpoint = temporarySetpoint.HasValue() ? std::make_optional(temporarySetpoint.Value()) : std::nullopt;
+    mBoostTemporarySetpoint = temporarySetpoint.std_optional();
     SetHeatingEnabled(true);
 
     LogErrorOnFailure(
@@ -249,7 +268,7 @@ Status SimulatedWaterHeater::HandleCancelBoost()
 
 BitMask<WaterHeaterHeatSourceBitmap> SimulatedWaterHeater::GetHeaterTypes()
 {
-    return mHeaterTypes;
+    return kHeaterTypes;
 }
 
 BitMask<WaterHeaterHeatSourceBitmap> SimulatedWaterHeater::GetHeatDemand()
@@ -298,30 +317,26 @@ void SimulatedWaterHeater::SetHeatingEnabled(bool enabled)
         return;
     }
     mHeatingEnabled = enabled;
-    mHeatDemand     = enabled ? mHeaterTypes : BitMask<WaterHeaterHeatSourceBitmap>();
+    mHeatDemand     = enabled ? kHeaterTypes : BitMask<WaterHeaterHeatSourceBitmap>();
     NotifyHeatDemandChanged();
 }
 
 void SimulatedWaterHeater::NotifyHeatDemandChanged()
 {
-    VerifyOrReturn(mProvider != nullptr);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, HeatDemand::Id },
-                                      DataModel::AttributeChangeType::kReportable);
+    NotifyAttributeChanged(WaterHeaterManagement::Id, HeatDemand::Id);
 }
 
 void SimulatedWaterHeater::NotifyBoostStateChanged()
 {
-    VerifyOrReturn(mProvider != nullptr);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), WaterHeaterManagement::Id, BoostState::Id },
-                                      DataModel::AttributeChangeType::kReportable);
+    NotifyAttributeChanged(WaterHeaterManagement::Id, BoostState::Id);
 }
 
-bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode)
+bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode) const
 {
     return mode.value_or(WaterHeaterModeCluster().GetCurrentMode()) == kWaterHeaterModeOff;
 }
 
-bool SimulatedWaterHeater::IsNormalHeatingPermitted(std::optional<uint8_t> mode)
+bool SimulatedWaterHeater::IsNormalHeatingPermitted(std::optional<uint8_t> mode) const
 {
     return (mSystemMode == SystemModeEnum::kHeat) && !IsModeOff(mode);
 }
@@ -342,7 +357,7 @@ void SimulatedWaterHeater::EvaluateHeatingDemand(std::optional<uint8_t> pendingM
         return;
     }
 
-    const temperature currentTemp = mLocalTemperature.ValueOr(kInitialTemperature);
+    const temperature currentTemp = mLocalTemperature.ValueOr(kAmbientTemperature);
     const bool shouldHeat         = IsNormalHeatingPermitted(pendingMode) && (currentTemp < mOccupiedHeatingSetpoint);
     SetHeatingEnabled(shouldHeat);
 }
@@ -451,8 +466,7 @@ Protocols::InteractionModel::Status SimulatedWaterHeater::SetOccupiedHeatingSetp
                                                                                      bool & changed)
 {
     changed = false;
-    VerifyOrReturnError(occupiedHeatingSetpoint >= kMinTemperature && occupiedHeatingSetpoint <= kMaxTemperature,
-                        Status::ConstraintError);
+    VerifyOrReturnError(IsWithinAbsoluteHeatSetpointLimits(occupiedHeatingSetpoint), Status::ConstraintError);
     VerifyOrReturnError(mOccupiedHeatingSetpoint != occupiedHeatingSetpoint, Status::Success);
     VerifyOrReturnError(mAttributeStorage != nullptr, Status::Failure);
 
@@ -504,7 +518,7 @@ CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex,
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kWaterHeaterModeOptions), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     const auto & tags = kWaterHeaterModeOptions[modeIndex].tags;
-    VerifyOrReturnError(modeTags.size() >= tags.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(modeTags.size() >= tags.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     std::copy(tags.begin(), tags.end(), modeTags.begin());
     modeTags.reduce_size(tags.size());
     return CHIP_NO_ERROR;
@@ -512,21 +526,7 @@ CHIP_ERROR SimulatedWaterHeater::GetModeTagsByIndex(uint8_t modeIndex,
 
 void SimulatedWaterHeater::HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    bool modeFound = false;
-    for (const auto & option : kWaterHeaterModeOptions)
-    {
-        if (option.value == newMode)
-        {
-            modeFound = true;
-            break;
-        }
-    }
-    if (!modeFound)
-    {
-        response.status = to_underlying(ModeBase::StatusCode::kUnsupportedMode);
-        return;
-    }
-
+    // ModeBaseCluster only calls this for supported modes that differ from CurrentMode.
     if (!mIsSyncingMode)
     {
         mIsSyncingMode              = true;

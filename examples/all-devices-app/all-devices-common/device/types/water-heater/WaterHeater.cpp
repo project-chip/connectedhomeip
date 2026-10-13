@@ -17,11 +17,12 @@
 
 #include <device/types/water-heater/WaterHeater.h>
 
+#include <devices/Types.h>
+
 namespace chip::app {
 WaterHeater::WaterHeater(const Config & config) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mConfig(config)
 {}
-WaterHeater::~WaterHeater() = default;
 
 CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -33,7 +34,7 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mEndpointId = endpoint;
 
     mWaterHeaterManagementCluster.Create(endpoint, mConfig.waterHeaterManagementDelegate, mConfig.whmFeatures);
-    mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
+    mThermostatCluster.Create(endpoint, mConfig.thermostatFeatures,
                               HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mConfig.timerDelegate),
                               mConfig.thermostatDelegate, mConfig.heatingDelegate);
     mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
@@ -61,24 +62,37 @@ void WaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
     mProvider = nullptr;
     UnregisterDescriptor(provider);
     UnregisterOptionalClusters(provider);
-    if (mWaterHeaterManagementCluster.IsConstructed())
+    // Tear down in reverse creation order.
+    if (mWaterHeaterModeCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterManagementCluster.Cluster()));
-        mWaterHeaterManagementCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterModeCluster.Cluster()));
+        mWaterHeaterModeCluster.Destroy();
     }
     if (mThermostatCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mThermostatCluster.Cluster()));
         mThermostatCluster.Destroy();
     }
-    if (mWaterHeaterModeCluster.IsConstructed())
+    if (mWaterHeaterManagementCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterModeCluster.Cluster()));
-        mWaterHeaterModeCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterManagementCluster.Cluster()));
+        mWaterHeaterManagementCluster.Destroy();
     }
 }
 
+void WaterHeater::NotifyAttributeChanged(ClusterId clusterId, AttributeId attributeId)
+{
+    VerifyOrReturn(mProvider != nullptr);
+    mProvider->NotifyAttributeChanged({ mEndpointId, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
+}
+
 Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster()
+{
+    VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
+    return mWaterHeaterManagementCluster.Cluster();
+}
+
+const Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster() const
 {
     VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
     return mWaterHeaterManagementCluster.Cluster();
@@ -90,7 +104,19 @@ WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster()
     return mThermostatCluster.Cluster();
 }
 
+const WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster() const
+{
+    VerifyOrDie(mThermostatCluster.IsConstructed());
+    return mThermostatCluster.Cluster();
+}
+
 Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster()
+{
+    VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
+    return mWaterHeaterModeCluster.Cluster();
+}
+
+const Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster() const
 {
     VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
     return mWaterHeaterModeCluster.Cluster();
