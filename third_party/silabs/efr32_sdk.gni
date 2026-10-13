@@ -1037,11 +1037,10 @@ template("efr32_sdk") {
         sources += [ "${silabs_gen_folder}/autogen/sl_simple_led_instances.c" ]
       }
     }
-    
+
     if (sl_enable_battery_monitoring) {
-      sources += [
-        "${efr32_sdk_root}/platform_core/platform/emlib/src/em_iadc.c",
-      ]
+      sources +=
+          [ "${efr32_sdk_root}/platform_core/platform/emlib/src/em_iadc.c" ]
     }
 
     # SPI is only used for Wifi
