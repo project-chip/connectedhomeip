@@ -863,6 +863,15 @@ format, use the `--load-from-env` flag with the `run_python_tests.py` runner.
 Ex:
 `scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDM_2_1.py'`
 
+## Pull requests that only change Python tests
+
+A pull request whose changed files all sit under `src/python_testing`, outside
+`matter_testing_infrastructure` and the `requirements*.txt` files, skips the
+workflows that only build or test code elsewhere, such as the example builds and
+the YAML test suites; their jobs show as skipped. The REPL test jobs, lint and
+the other checks still run, and the merge queue runs everything. The rule is in
+`scripts/tests/python_test_scope.py`.
+
 ## Running ALL or a subset of tests when changing application code
 
 `scripts/tests/local.py` is a wrapper that is able to build and run tests in a

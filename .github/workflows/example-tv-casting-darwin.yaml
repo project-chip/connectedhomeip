@@ -34,9 +34,14 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     tv-casting-bridge:
         name: Build TV Casting Bridge example
-        if: github.actor != 'restyled-io[bot]'
+        needs: pr_scope
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: macos-26
         steps:
             - name: Checkout

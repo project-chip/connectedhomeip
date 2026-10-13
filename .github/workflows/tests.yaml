@@ -43,8 +43,13 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     test_suites_linux:
         name: Test Suites - Linux
+        needs: pr_scope
 
         strategy:
             matrix:
@@ -57,7 +62,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ubuntu-latest
 
         container:
@@ -572,6 +577,7 @@ jobs:
                 extra-details-file: "test-summaries/compact-failures.txt"
     test_suites_darwin:
         name: Test Suites - Darwin
+        needs: pr_scope
 
         strategy:
             matrix:
@@ -590,7 +596,7 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ${{ matrix.os }}
 
         steps:
@@ -1249,6 +1255,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestTestMetadata.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestFactoryResetRequests.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
+                  scripts/run_in_python_env.sh out/venv 'python3 -m unittest scripts/tests/test_python_test_scope.py'
 
             - name: Run Tests (individual)
               if: ${{matrix.filter == ''}}
@@ -1434,6 +1441,7 @@ jobs:
               job-name: "Deploy to GitHub Pages"
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
+        needs: pr_scope
         strategy:
             matrix:
                 include:
@@ -1450,7 +1458,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         runs-on: ${{ matrix.os }}
 
         steps:

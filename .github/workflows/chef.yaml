@@ -30,11 +30,16 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     chef_linux_reduced:
         name: Chef - Linux CI Examples (Reduced chef devices)
+        needs: pr_scope
         timeout-minutes: 120
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && github.event_name != 'push'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && github.event_name != 'push' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build:215
@@ -61,7 +66,8 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_device_functional_test:
         name: Chef - Device functional tests (Linux)
-        if: github.actor != 'restyled-io[bot]'
+        needs: pr_scope
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
@@ -104,8 +110,9 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_esp32:
         name: Chef - ESP32 CI Examples
+        needs: pr_scope
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:215
@@ -133,8 +140,9 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
+        needs: pr_scope
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-nrf-platform:215
@@ -161,8 +169,9 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     chef_telink:
         name: Chef - Telink CI Examples
+        needs: pr_scope
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-telink:215

@@ -27,9 +27,14 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     unit_tests:
         name: Unit / Integration Tests
-        if: github.actor != 'restyled-io[bot]'
+        needs: pr_scope
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         strategy:
             matrix:
@@ -94,7 +99,8 @@ jobs:
     # Builds and runs the host unit-test suite with the PSA crypto backend.
     psa_crypto_unit_tests:
         name: PSA Crypto Unit Tests
-        if: github.actor != 'restyled-io[bot]'
+        needs: pr_scope
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         runs-on: ubuntu-latest
 
