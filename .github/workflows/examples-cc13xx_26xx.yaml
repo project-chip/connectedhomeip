@@ -32,14 +32,19 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     cc13xx_26xx:
         name: cc13xx_26xx
+        needs: pr_scope
 
         env:
             BUILD_TYPE: gn_cc13xx_26xx
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-ti:215
