@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <Options.h>
 #include <app_options/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceConfig.h>
 
 #include <optional>

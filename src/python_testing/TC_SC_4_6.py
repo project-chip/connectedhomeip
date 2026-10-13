@@ -44,7 +44,7 @@ from mdns_discovery.utils.asserts import (assert_is_commissioner_type, assert_va
 from mobly import asserts
 
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestUncommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ SUBTYPE_BROWSE_TIMEOUT_SEC = 5
 COMMISSIONER_BROWSE_DEADLINE_SEC = 30
 
 
-class TC_SC_4_6(MatterBaseTest):
+class TC_SC_4_6(MatterTestUncommissionedDevice):
     # The DUT is never commissioned in this test (it advertises, the TH only
     # scans DNS-SD), so there is no DUT fabric state to capture or clean up.
     requires_dut = False

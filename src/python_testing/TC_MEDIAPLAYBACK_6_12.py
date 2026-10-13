@@ -41,7 +41,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ _CONTENT_INFO_FIELDS = (
 )
 
 
-class TC_MEDIAPLAYBACK_6_12(MatterBaseTest, MEDIAPLAYBACKTestBase):
+class TC_MEDIAPLAYBACK_6_12(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase):
 
     def desc_TC_MEDIAPLAYBACK_6_12(self) -> str:
         return "[TC-MEDIAPLAYBACK-6.12] Content Info Verification"
