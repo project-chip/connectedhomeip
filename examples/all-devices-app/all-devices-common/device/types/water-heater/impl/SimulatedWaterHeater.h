@@ -26,11 +26,22 @@
 
 namespace chip::app {
 
-class SimulatedWaterHeater : public Clusters::WaterHeaterManagement::Delegate,
-                             public Clusters::Thermostat::Delegate,
-                             public Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
-                             public Clusters::ModeBase::AppDelegate,
-                             public TimerContext,
+/**
+ * Self-contained simulated Water Heater using the self-delegate pattern.
+ *
+ * The delegate interfaces are inherited privately so that external code interacts with the device through the
+ * clusters (e.g. `ThermostatCluster().SetSystemMode(...)`) instead of calling delegate callbacks directly, which
+ * would bypass cluster-side validation and attribute reporting.
+ *
+ * The delegate bases are listed before `WaterHeater` on purpose: base classes are constructed in declaration order
+ * and destroyed in reverse order, so the delegate subobjects outlive the clusters owned by `WaterHeater` that hold
+ * references to them.
+ */
+class SimulatedWaterHeater : private Clusters::WaterHeaterManagement::Delegate,
+                             private Clusters::Thermostat::Delegate,
+                             private Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
+                             private Clusters::ModeBase::AppDelegate,
+                             private TimerContext,
                              public WaterHeater
 {
 public:
@@ -45,6 +56,7 @@ public:
 
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
+private:
     // TimerContext
     void TimerFired() override;
 
@@ -91,6 +103,10 @@ public:
     Protocols::InteractionModel::Status
     GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & absMaxHeatSetpointLimit) const override;
 
+    // Shared override of Clusters::Thermostat::Delegate and Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate.
+    // Both base classes declare the same virtual signature, so a single override implements both. ThermostatCluster
+    // calls Startup() once per delegate interface (i.e. twice on this object); the implementation is idempotent and
+    // only the first call after a Shutdown() performs initialization.
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
 
@@ -102,7 +118,6 @@ public:
                                   DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & modeTags) override;
     void HandleChangeToMode(uint8_t newMode, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-private:
     void EndBoost();
     void SetHeatingEnabled(bool enabled);
     void EvaluateHeatingDemand(std::optional<uint8_t> pendingMode = std::nullopt);

@@ -85,7 +85,13 @@ SimulatedWaterHeater::~SimulatedWaterHeater()
 
 CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
 {
-    VerifyOrReturnError(mAttributeStorage == nullptr, CHIP_NO_ERROR);
+    // ThermostatCluster starts both delegate interfaces implemented by this object (Thermostat::Delegate and
+    // ThermostatHeatingSetpoints::Delegate), so this is invoked twice per cluster startup. Only the first call
+    // initializes; mAttributeStorage is cleared again in Shutdown().
+    if (mAttributeStorage != nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
     mAttributeStorage = &context.attributeStorage;
     AttributePersistence persistence(*mAttributeStorage);
     persistence.LoadNativeEndianValue({ GetEndpointId(), Clusters::Thermostat::Id, Thermostat::Attributes::SystemMode::Id },
