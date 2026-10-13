@@ -33,8 +33,11 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR SetBatPercentRemaining(uint8_t batteryLevel) {return BatteryPowerSourceCluster().SetBatPercentRemaining(batteryLevel);}
-    void SetBatVoltage(uint32_t batteryVoltage) {BatteryPowerSourceCluster().SetBatVoltage(batteryVoltage);}
+    CHIP_ERROR SetBatPercentRemaining(uint8_t batteryLevel)
+    {
+        return BatteryPowerSourceCluster().SetBatPercentRemaining(batteryLevel);
+    }
+    void SetBatVoltage(uint32_t batteryVoltage) { BatteryPowerSourceCluster().SetBatVoltage(batteryVoltage); }
 
     // TimerContext
     void TimerFired() override;
@@ -44,7 +47,6 @@ private:
 };
 
 } // namespace chip::app
-
 
 #if defined(SL_MATTER_BATTERY_MONITOR) && SL_MATTER_BATTERY_MONITOR
 #include <cstddef>
@@ -87,8 +89,8 @@ private:
     static constexpr uint32_t kAdcReferenceMv     = 1210;
 
     // Adjust these values for the actual battery chemistry.
-    static constexpr uint16_t kBatteryFullMv  = 3000; //TODO Adjust this value
-    static constexpr uint16_t kBatteryEmptyMv = 2000; //TODO Adjust this value
+    static constexpr uint16_t kBatteryFullMv  = 3000; // TODO Adjust this value
+    static constexpr uint16_t kBatteryEmptyMv = 2000; // TODO Adjust this value
 
     // Matter BatPercentRemaining uses half-percent units.
     // A delta of 2 therefore represents 1%.
@@ -96,21 +98,21 @@ private:
     static constexpr uint8_t kPercentReportThreshold    = 2;
 
     // Measure at most once every 30 minutes.
-    static constexpr uint32_t kMeasurementIntervalMs = 30UL * 60UL * 1000UL; //TODO Adjust this value
+    static constexpr uint32_t kMeasurementIntervalMs = 30UL * 60UL * 1000UL; // TODO Adjust this value
 
     chip::app::SilabsBatteryPowerSource * mClusterInstance = nullptr;
 
-    uint16_t mVoltageMv = 0;
+    uint16_t mVoltageMv     = 0;
     uint8_t mBatteryPercent = 0;
 
     uint16_t mSamples[kFilterSize] = {};
-    size_t mSampleIndex = 0;
+    size_t mSampleIndex            = 0;
 
     uint32_t mLastMeasurementMs = 0;
 
-    bool mFilterInitialized = false;
-    bool mAdcEnabled = false;
-    bool mHasMeasurement = false;
+    bool mFilterInitialized  = false;
+    bool mAdcEnabled         = false;
+    bool mHasMeasurement     = false;
     bool mObserverRegistered = false;
 };
 #endif // SL_MATTER_BATTERY_MONITOR

@@ -17,7 +17,6 @@
 #include "SilabsBatteryPowerSource.h"
 #include "sensors/Si70xxSensor.h" //nogncheck
 
-
 namespace chip::app {
 
 constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(30);
@@ -40,7 +39,7 @@ CHIP_ERROR SilabsBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDat
     return BatteryMonitor::Instance().Init(this);
 #else
     // Kick off the timer loop to decrease battery level every few seconds
-    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);    
+    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
 #endif
 }
 
@@ -100,8 +99,8 @@ void SilabsBatteryPowerSource::TimerFired()
 #include "em_iadc.h"
 #include "sl_sleeptimer.h"
 
-#include <app/server/Server.h>
 #include <app/icd/server/ICDManager.h>
+#include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip;
@@ -124,7 +123,7 @@ CHIP_ERROR BatteryMonitor::Init(chip::app::SilabsBatteryPowerSource * instance)
     InitAdc();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    auto *observer = Server::GetInstance().GetICDManager().RegisterObserver(this);
+    auto * observer     = Server::GetInstance().GetICDManager().RegisterObserver(this);
     mObserverRegistered = (observer != nullptr);
 #else
     mObserverRegistered = false;
@@ -134,8 +133,8 @@ CHIP_ERROR BatteryMonitor::Init(chip::app::SilabsBatteryPowerSource * instance)
 
 void BatteryMonitor::InitAdc()
 {
-    IADC_Init_t init = IADC_INIT_DEFAULT;
-    IADC_AllConfigs_t configs = IADC_ALLCONFIGS_DEFAULT;
+    IADC_Init_t init             = IADC_INIT_DEFAULT;
+    IADC_AllConfigs_t configs    = IADC_ALLCONFIGS_DEFAULT;
     IADC_InitSingle_t singleInit = IADC_INITSINGLE_DEFAULT;
 
     IADC_SingleInput_t input = {
@@ -151,16 +150,12 @@ void BatteryMonitor::InitAdc()
 
     init.srcClkPrescale = IADC_calcSrcClkPrescale(IADC0, kAdcSourceFrequency, 0);
 
-    configs.configs[0].reference = iadcCfgReferenceInt1V2;
-    configs.configs[0].adcClkPrescale = IADC_calcAdcClkPrescale(IADC0,
-                                                               kAdcFrequency,
-                                                               0,
-                                                               iadcCfgModeNormal,
-                                                               init.srcClkPrescale);
+    configs.configs[0].reference      = iadcCfgReferenceInt1V2;
+    configs.configs[0].adcClkPrescale = IADC_calcAdcClkPrescale(IADC0, kAdcFrequency, 0, iadcCfgModeNormal, init.srcClkPrescale);
 
     IADC_init(IADC0, &init, &configs);
 
-    singleInit.dataValidLevel = (IADC_FifoCfgDvl_t)IADC_SCANFIFOCFG_DVL_VALID4;
+    singleInit.dataValidLevel = (IADC_FifoCfgDvl_t) IADC_SCANFIFOCFG_DVL_VALID4;
     IADC_initSingle(IADC0, &singleInit, &input);
 
     mAdcEnabled = true;
@@ -171,7 +166,7 @@ void BatteryMonitor::EnableAdc()
     if (!mAdcEnabled)
     {
         IADC0->EN_SET = IADC_EN_EN;
-        mAdcEnabled = true;
+        mAdcEnabled   = true;
     }
 }
 
@@ -180,7 +175,7 @@ void BatteryMonitor::DisableAdc()
     if (mAdcEnabled)
     {
         IADC0->EN_CLR = IADC_EN_EN;
-        mAdcEnabled = false;
+        mAdcEnabled   = false;
     }
 }
 
@@ -189,20 +184,19 @@ uint16_t BatteryMonitor::ReadVoltageMv()
     EnableAdc();
 
     IADC_InitSingle_t singleInit = IADC_INITSINGLE_DEFAULT;
-    IADC_SingleInput_t input = {
+    IADC_SingleInput_t input     = {
         iadcNegInputGnd,
         iadcPosInputAvdd,
         0,
         false,
     };
 
-    singleInit.dataValidLevel = (IADC_FifoCfgDvl_t)IADC_SCANFIFOCFG_DVL_VALID4;
+    singleInit.dataValidLevel = (IADC_FifoCfgDvl_t) IADC_SCANFIFOCFG_DVL_VALID4;
     IADC_initSingle(IADC0, &singleInit, &input);
 
     IADC_command(IADC0, iadcCmdStartSingle);
 
-    while ((IADC0->STATUS & (_IADC_STATUS_CONVERTING_MASK | _IADC_STATUS_SINGLEFIFODV_MASK)) !=
-           IADC_STATUS_SINGLEFIFODV)
+    while ((IADC0->STATUS & (_IADC_STATUS_CONVERTING_MASK | _IADC_STATUS_SINGLEFIFODV_MASK)) != IADC_STATUS_SINGLEFIFODV)
     {
     }
 
@@ -212,8 +206,7 @@ uint16_t BatteryMonitor::ReadVoltageMv()
 
     // Same AVDD conversion used by the original Silicon Labs battery monitor.
     // The factor of 4 comes from the internal IADC scaling used for AVDD.
-    const uint32_t voltageMv =
-        (static_cast<uint32_t>(sample.data) * kAdcReferenceMv * 4U) / kAdcMax;
+    const uint32_t voltageMv = (static_cast<uint32_t>(sample.data) * kAdcReferenceMv * 4U) / kAdcMax;
 
     return static_cast<uint16_t>(voltageMv);
 }
@@ -259,9 +252,7 @@ uint8_t BatteryMonitor::VoltageToMatterPercent(uint16_t voltageMv) const
         return 200;
     }
 
-    const uint32_t value =
-        (static_cast<uint32_t>(voltageMv - kBatteryEmptyMv) * 200U) /
-        (kBatteryFullMv - kBatteryEmptyMv);
+    const uint32_t value = (static_cast<uint32_t>(voltageMv - kBatteryEmptyMv) * 200U) / (kBatteryFullMv - kBatteryEmptyMv);
 
     return static_cast<uint8_t>(value);
 }
@@ -285,30 +276,27 @@ void BatteryMonitor::Update()
         return;
     }
 
-    const uint16_t sample = ReadVoltageMv();
+    const uint16_t sample       = ReadVoltageMv();
     const uint16_t newVoltageMv = FilterVoltage(sample);
-    const uint8_t newPercent = VoltageToMatterPercent(newVoltageMv);
+    const uint8_t newPercent    = VoltageToMatterPercent(newVoltageMv);
 
     bool report = !mHasMeasurement;
 
     if (mHasMeasurement)
     {
-        const uint16_t voltageDelta = (newVoltageMv > mVoltageMv)
-            ? static_cast<uint16_t>(newVoltageMv - mVoltageMv)
-            : static_cast<uint16_t>(mVoltageMv - newVoltageMv);
+        const uint16_t voltageDelta = (newVoltageMv > mVoltageMv) ? static_cast<uint16_t>(newVoltageMv - mVoltageMv)
+                                                                  : static_cast<uint16_t>(mVoltageMv - newVoltageMv);
 
-        const uint8_t percentDelta = (newPercent > mBatteryPercent)
-            ? static_cast<uint8_t>(newPercent - mBatteryPercent)
-            : static_cast<uint8_t>(mBatteryPercent - newPercent);
+        const uint8_t percentDelta = (newPercent > mBatteryPercent) ? static_cast<uint8_t>(newPercent - mBatteryPercent)
+                                                                    : static_cast<uint8_t>(mBatteryPercent - newPercent);
 
-        report = (voltageDelta >= kVoltageReportThresholdMv) ||
-                 (percentDelta >= kPercentReportThreshold);
+        report = (voltageDelta >= kVoltageReportThresholdMv) || (percentDelta >= kPercentReportThreshold);
     }
 
-    mVoltageMv = newVoltageMv;
-    mBatteryPercent = newPercent;
+    mVoltageMv         = newVoltageMv;
+    mBatteryPercent    = newPercent;
     mLastMeasurementMs = nowMs;
-    mHasMeasurement = true;
+    mHasMeasurement    = true;
 
     if (report)
     {
