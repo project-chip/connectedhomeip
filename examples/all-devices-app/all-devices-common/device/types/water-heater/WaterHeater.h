@@ -59,13 +59,10 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster();
-    const Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeaterManagementCluster() const;
 
     HeatingThermostat & ThermostatCluster();
-    const HeatingThermostat & ThermostatCluster() const;
 
     Clusters::ModeBaseCluster & WaterHeaterModeCluster();
-    const Clusters::ModeBaseCluster & WaterHeaterModeCluster() const;
 
 protected:
     virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)

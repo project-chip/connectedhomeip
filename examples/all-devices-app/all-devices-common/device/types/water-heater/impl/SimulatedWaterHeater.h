@@ -125,8 +125,8 @@ private:
     void EndBoost();
     void SetHeatingEnabled(bool enabled);
     void EvaluateHeatingDemand(std::optional<uint8_t> pendingMode = std::nullopt);
-    bool IsModeOff(std::optional<uint8_t> mode = std::nullopt) const;
-    bool IsNormalHeatingPermitted(std::optional<uint8_t> mode = std::nullopt) const;
+    bool IsModeOff(std::optional<uint8_t> mode = std::nullopt);
+    bool IsNormalHeatingPermitted(std::optional<uint8_t> mode = std::nullopt);
     Clusters::Thermostat::temperature GetHeatingTargetTemperature() const;
     void NotifyHeatDemandChanged();
     void NotifyBoostStateChanged();

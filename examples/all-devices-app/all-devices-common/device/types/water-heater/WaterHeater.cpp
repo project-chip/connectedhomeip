@@ -92,31 +92,13 @@ Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::Wat
     return mWaterHeaterManagementCluster.Cluster();
 }
 
-const Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster() const
-{
-    VerifyOrDie(mWaterHeaterManagementCluster.IsConstructed());
-    return mWaterHeaterManagementCluster.Cluster();
-}
-
 WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster()
 {
     VerifyOrDie(mThermostatCluster.IsConstructed());
     return mThermostatCluster.Cluster();
 }
 
-const WaterHeater::HeatingThermostat & WaterHeater::ThermostatCluster() const
-{
-    VerifyOrDie(mThermostatCluster.IsConstructed());
-    return mThermostatCluster.Cluster();
-}
-
 Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster()
-{
-    VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
-    return mWaterHeaterModeCluster.Cluster();
-}
-
-const Clusters::ModeBaseCluster & WaterHeater::WaterHeaterModeCluster() const
 {
     VerifyOrDie(mWaterHeaterModeCluster.IsConstructed());
     return mWaterHeaterModeCluster.Cluster();

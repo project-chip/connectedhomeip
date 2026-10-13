@@ -331,12 +331,12 @@ void SimulatedWaterHeater::NotifyBoostStateChanged()
     NotifyAttributeChanged(WaterHeaterManagement::Id, BoostState::Id);
 }
 
-bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode) const
+bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode)
 {
     return mode.value_or(WaterHeaterModeCluster().GetCurrentMode()) == kWaterHeaterModeOff;
 }
 
-bool SimulatedWaterHeater::IsNormalHeatingPermitted(std::optional<uint8_t> mode) const
+bool SimulatedWaterHeater::IsNormalHeatingPermitted(std::optional<uint8_t> mode)
 {
     return (mSystemMode == SystemModeEnum::kHeat) && !IsModeOff(mode);
 }
