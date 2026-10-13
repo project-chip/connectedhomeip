@@ -64,6 +64,7 @@ DeviceInfoListModel::DeviceInfoListModel()
         mItems.push_back({ "Commissioned: No", nullptr });
     }
 
+#if CONFIG_LWIP_IPV4
     esp_netif_t * netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
     esp_netif_ip_info_t ipInfo;
     if (netif != nullptr && esp_netif_get_ip_info(netif, &ipInfo) == ESP_OK && ipInfo.ip.addr != 0)
@@ -76,6 +77,7 @@ DeviceInfoListModel::DeviceInfoListModel()
     {
         mItems.push_back({ "IP: Not Connected", nullptr });
     }
+#endif // CONFIG_LWIP_IPV4
 
     mItems.push_back({ "Dev: " + GetActiveDeviceType(), nullptr });
 

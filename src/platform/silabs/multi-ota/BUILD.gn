@@ -49,6 +49,15 @@ source_set("multi-ota-common") {
     "OTATlvProcessor.cpp",
   ]
   deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+
+  # OTAFactoryDataProcessor only uses the IProvisionStorageWriter and
+  # IProvisionCrypto interfaces from ${sl_provision_root}:headers; the concrete
+  # backends are injected by the application through OTAMultiImageProcessorImpl::Init.
+  # Only the encrypted TLV path (OTATlvProcessor.cpp) still reaches into the
+  # concrete provision storage reader.
+  if (chip_enable_multi_ota_encryption) {
+    deps += [ "${chip_root}/examples/platform/silabs/provision:storage" ]
+  }
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

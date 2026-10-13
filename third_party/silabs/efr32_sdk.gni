@@ -89,6 +89,9 @@ declare_args() {
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
+  # Enable the factory provisioning channel (BLE) used to write provision data
+  sl_use_provision_channel = false
+
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
 
@@ -640,6 +643,12 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=1" ]
     } else {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
+    }
+
+    if (sl_use_provision_channel) {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=0" ]
     }
 
     if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {

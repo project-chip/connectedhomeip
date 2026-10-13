@@ -35,6 +35,7 @@
 #include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/support/Span.h>
 #include <system/SystemPacketBuffer.h>
 
 struct otInstance;
@@ -87,6 +88,39 @@ public:
      *  argument provides specific detail about the type of the error.
      */
     using OnReceiveErrorFunct = void (*)(UDPEndPoint * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
+
+    /// Most UDP payload bytes passed to an OnPortUnreachableFunct; enough for a Matter message header.
+    static constexpr size_t kMaxQuotedPayloadLen = 32;
+
+    /**
+     * Type of port-unreachable event handling function.
+     *
+     * @param[in]   endPoint        The endpoint that sent the datagram.
+     * @param[in]   pktInfo         The datagram as sent. DestAddress and DestPort are the unreachable peer and SrcPort
+     *                              is the local port. SrcAddress is set where the platform reports it and
+     *                              is IPAddress::Any otherwise. Interface is set where the platform reports it and is
+     *                              null otherwise.
+     * @param[in]   quotedPayload   The start of the datagram's UDP payload, at most kMaxQuotedPayloadLen bytes.
+     *                              Valid only for the duration of the call.
+     */
+    using OnPortUnreachableFunct = void (*)(UDPEndPoint * endPoint, const IPPacketInfo & pktInfo, ByteSpan quotedPayload);
+
+    /**
+     * Set the handler called when a peer answers a datagram sent from this endpoint with an ICMPv6 Destination
+     * Unreachable, code 4 (port unreachable), error. It is called only where INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE is
+     * set; set it on a listening endpoint, since a platform may deliver events only while listening. Delivery is best
+     * effort. Events are not authenticated: an event is dropped unless the ICMPv6 sender is the unreachable peer, but a
+     * host that can send from that address can forge one.
+     */
+    void SetPortUnreachableHandler(OnPortUnreachableFunct handler)
+    {
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+        OnPortUnreachable = handler;
+        PortUnreachableHandlerChanged();
+#else
+        (void) handler;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    }
 
     /**
      * Set whether IP multicast traffic should be looped back.
@@ -282,6 +316,10 @@ protected:
     /** The endpoint's receive error event handling function delegate. */
     OnReceiveErrorFunct OnReceiveError;
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    OnPortUnreachableFunct OnPortUnreachable = nullptr;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
     /*
      * Implementation helpers for shared methods.
      */
@@ -295,6 +333,9 @@ protected:
     virtual CHIP_ERROR ListenImpl()                                                                                           = 0;
     virtual CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg)                     = 0;
     virtual void CloseImpl()                                                                                                  = 0;
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    virtual void PortUnreachableHandlerChanged() {}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
     /**
      * Close the endpoint and recycle its memory.

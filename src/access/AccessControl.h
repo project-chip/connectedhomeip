@@ -771,7 +771,7 @@ private:
     EntryListener * mEntryListener = nullptr;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    AccessRestrictionProvider * mAccessRestrictionProvider;
+    AccessRestrictionProvider * mAccessRestrictionProvider = nullptr;
 #endif
 };
 

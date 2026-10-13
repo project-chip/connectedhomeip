@@ -63,7 +63,7 @@ class TC_DA_1_10(MatterTestCommissionedDevice):
         return "[TC-DA-1.10] Validate CertificateChainRequest with PQC Profiles [DUT-Commissionee]"
 
     def pics_TC_DA_1_10(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
+        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_DA_1_10(self) -> list[TestStep]:
         return [
