@@ -94,6 +94,8 @@ private:
     // Recomputes mRgb from the tracked state and pushes it to the LED and LCD.
     void UpdateOutput();
 
+    static void RestoreColor(intptr_t context);
+
 #if SL_MATTER_DISPLAY_ENABLED
     static void DrawDevicePage(GLIB_Context_t * context, EndpointId endpointId, void * userContext);
     // Action-button callback: toggles OnOff for this endpoint via the OnOff cluster.
@@ -106,8 +108,6 @@ private:
 #endif
     bool mOn       = false;
     uint8_t mLevel = 0;
-    uint8_t mHue   = 0;
-    uint8_t mSat   = 0;
     // Chromaticity of the current color; every color mode is folded into this. Defaults to the
     // cluster's CurrentX/CurrentY defaults.
     uint16_t mX = 0x616B;

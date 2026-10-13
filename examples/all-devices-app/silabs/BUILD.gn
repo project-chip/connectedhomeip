@@ -113,6 +113,7 @@ silabs_executable("all_devices_app") {
     "include/AppKeys.h",
     "include/AppTask.h",
     "src/AppTask.cpp",
+    "src/delegates/LightBitMap.h",
     "src/delegates/SilabsColorLight.cpp",
     "src/delegates/SilabsColorLight.h",
     "src/delegates/SilabsDimmableLight.cpp",
