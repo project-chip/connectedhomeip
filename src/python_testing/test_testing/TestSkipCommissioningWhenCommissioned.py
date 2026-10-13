@@ -66,11 +66,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TestSkipCommissioningWhenCommissioned(MatterBaseTest):
+class TestSkipCommissioningWhenCommissioned(MatterTestCommissionedDevice):
 
     @async_test_body
     async def test_runner_decision_matches_expectation(self):
