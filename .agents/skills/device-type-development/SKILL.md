@@ -125,10 +125,10 @@ following them removes comment classes that cost days:
     `app/persistence`), never transitive includes (#74284); posix side must
     reference the device's `:logging`/`:simulated` target it instantiates.
 -   GN deps follow the consumer (#74286): when an optional cluster moves from
-    the generic type into `impl/`, its cluster deps move out of the base
-    source set into `:simulated`/`:logging` with it, and the generic header's
-    includes and `Context` members referencing it go too (reviewers will ask
-    "do we still need these here?").
+    the generic type into `impl/`, its cluster deps move out of the base source
+    set into `:simulated`/`:logging` with it, and the generic header's includes
+    and `Context` members referencing it go too (reviewers will ask "do we still
+    need these here?").
 -   No `Device` suffix on classes/filenames; spell device names out (no PICS
     acronyms) (#72918, #72111); constants `k`-prefixed with units, no `g_`
     prefixes; doc comments on public members only in `.h`, never duplicated in
@@ -148,16 +148,16 @@ following them removes comment classes that cost days:
     (`ValueOr` + "not moving" path).
 -   A Logging/Simulated impl that returns Unsupported from most delegate
     callbacks fails its purpose (#74286): every attribute/feature your config
-    *enables* must have a real delegate surface — optional setpoint-limit
+    _enables_ must have a real delegate surface — optional setpoint-limit
     getters returning `UnsupportedAttribute` broke `LoadSetpoints`,
     `SetpointRaiseLower`, and the TC tests in that PR.
--   Filter valid-but-unsupported enum values with the cluster-consistent
-    error — `ConstraintError`, not `InvalidValue` — and don't let a config
-    advertize a feature the filter rejects (#74286: Context advertizes
-    `kAutoMode` while `SetSystemMode(Auto)` returns ConstraintError, and the
-    persisted value resets to Off on startup).
--   **Config defaults must match `ci-pics-values`** (#74286): the yaml tests
-    run against the shared CI PICS, so a device whose `Config{}` omits
+-   Filter valid-but-unsupported enum values with the cluster-consistent error —
+    `ConstraintError`, not `InvalidValue` — and don't let a config advertize a
+    feature the filter rejects (#74286: Context advertizes `kAutoMode` while
+    `SetSystemMode(Auto)` returns ConstraintError, and the persisted value
+    resets to Off on startup).
+-   **Config defaults must match `ci-pics-values`** (#74286): the yaml tests run
+    against the shared CI PICS, so a device whose `Config{}` omits
     features/attributes the PICS enable fails its own CI (TSTAT `AutoMode`/
     `MinSetpointDeadBand`, TSUIC `ScheduleProgrammingVisibility`). Enable what
     the PICS promise, or adjust guards.
@@ -308,8 +308,8 @@ For each device type touch **all** of (missing any one is a review item):
     impl source set carries the flavor name, not plain `simulated`
     (`temperature-sensor:increasing`).
 -   `examples/all-devices-app/zephyr/Kconfig.devices` — a
-    `CONFIG_ALL_DEVICES_DEVICE_<NAME>` symbol, or Zephyr builds can never
-    select the new device (#74286).
+    `CONFIG_ALL_DEVICES_DEVICE_<NAME>` symbol, or Zephyr builds can never select
+    the new device (#74286).
 -   If you add build **targets** (`scripts/build/build/targets.py`), regenerate
     `scripts/build/testdata/all_targets_linux_x64.txt` with the tooling on the
     right platform — hand-edits reintroduced darwin rows into a linux list in
