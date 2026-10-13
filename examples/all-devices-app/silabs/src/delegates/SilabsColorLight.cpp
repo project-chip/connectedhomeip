@@ -313,9 +313,8 @@ void SilabsColorLight::UpdateOutput()
     };
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    mLed.SetColor(mRgb.r, mRgb.g, mRgb.b); 
     mLed.Set(mOn);
-    // RGBLEDWidget::SetColor only writes while the LED is on.
-    mLed.SetColor(mRgb.r, mRgb.g, mRgb.b);
 #endif
 
 #if SL_MATTER_DISPLAY_ENABLED
