@@ -36,22 +36,16 @@ namespace {
 class TestBatteryPowerSourceAccessor : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
 protected:
     void SetUp() override
     {
         EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
         EXPECT_EQ(mDevice.Register(1, mProvider), CHIP_NO_ERROR);
-        EXPECT_EQ(mRegistry.Register(std::make_unique<BatteryPowerSourceAccessor>(mDevice.BatteryPowerSourceCluster(),
-                                                                                 mDevice.GetEndpointId())),
+        EXPECT_EQ(mRegistry.Register(
+                      std::make_unique<BatteryPowerSourceAccessor>(mDevice.BatteryPowerSourceCluster(), mDevice.GetEndpointId())),
                   CHIP_NO_ERROR);
     }
 
@@ -64,7 +58,8 @@ protected:
     DefaultTimerDelegate mTimerDelegate;
     Testing::TestServerClusterContext mClusterContext;
     CodeDrivenDataModelProvider mProvider{ mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider() };
-    BatteryPowerSource mDevice{ "Test Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable, mTimerDelegate };
+    BatteryPowerSource mDevice{ "Test Battery"_span, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
+                                mTimerDelegate };
     InMemoryOOBAccessorRegistry mRegistry;
 };
 
@@ -80,8 +75,7 @@ TEST_F(TestBatteryPowerSourceAccessor, InitialAttributeValues)
 TEST_F(TestBatteryPowerSourceAccessor, SetBatPercentRemaining_ValidValue)
 {
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
-        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id),
-        static_cast<uint8_t>(170));
+        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id), static_cast<uint8_t>(170));
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
     EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
               CHIP_NO_ERROR);
@@ -119,8 +113,7 @@ TEST_F(TestBatteryPowerSourceAccessor, SetBatPercentRemaining_Null)
 TEST_F(TestBatteryPowerSourceAccessor, SetBatPercentRemaining_ConstraintError)
 {
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
-        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id),
-        static_cast<uint8_t>(201));
+        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id), static_cast<uint8_t>(201));
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
     EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -130,8 +123,7 @@ TEST_F(TestBatteryPowerSourceAccessor, SetBatPercentRemaining_ConstraintError)
 TEST_F(TestBatteryPowerSourceAccessor, SetBatVoltage_ValidValue)
 {
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
-        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatVoltage::Id),
-        static_cast<uint32_t>(3300));
+        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::BatVoltage::Id), static_cast<uint32_t>(3300));
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
     EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
               CHIP_NO_ERROR);
@@ -145,8 +137,7 @@ TEST_F(TestBatteryPowerSourceAccessor, SetBatVoltage_ValidValue)
 TEST_F(TestBatteryPowerSourceAccessor, RejectUnsupportedAttribute)
 {
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
-        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::Order::Id),
-        static_cast<uint8_t>(1));
+        ConcreteAttributePath(1, PowerSource::Id, PowerSource::Attributes::Order::Id), static_cast<uint8_t>(1));
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
     EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
               CHIP_ERROR_NOT_FOUND);
@@ -157,8 +148,7 @@ TEST_F(TestBatteryPowerSourceAccessor, UnhandledActionOrEndpoint)
 {
     // Wrong action
     uint8_t dummy[4] = { 0 };
-    EXPECT_EQ(mRegistry.HandleAction("UnknownAction"_span, ByteSpan(dummy, sizeof(dummy))),
-              CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mRegistry.HandleAction("UnknownAction"_span, ByteSpan(dummy, sizeof(dummy))), CHIP_ERROR_NOT_FOUND);
 
     // Wrong cluster (OnOff)
     {
@@ -172,8 +162,7 @@ TEST_F(TestBatteryPowerSourceAccessor, UnhandledActionOrEndpoint)
     // Wrong endpoint (endpoint 99)
     {
         auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
-            ConcreteAttributePath(99, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id),
-            static_cast<uint8_t>(50));
+            ConcreteAttributePath(99, PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id), static_cast<uint8_t>(50));
         ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
         EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
                   CHIP_ERROR_NOT_FOUND);
