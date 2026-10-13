@@ -26,27 +26,28 @@ namespace chip::app {
 
 namespace {
 
-void UpdateOnOffDisplay(lv_obj_t * stateLabel, lv_obj_t * toggleBtn, lv_obj_t * btnLabel, bool isOn)
+void UpdateOnOffDisplay(lv_obj_t * stateLabel, lv_obj_t * toggleBtn, lv_obj_t * btnLabel, bool isOn,
+                        const OnOffWidgetLabels & labels)
 {
     if (isOn)
     {
-        lv_label_set_text_static(stateLabel, "Power: ON");
+        lv_label_set_text_static(stateLabel, labels.onState);
         lv_obj_set_style_text_color(stateLabel, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
-        lv_label_set_text_static(btnLabel, "Turn OFF");
+        lv_label_set_text_static(btnLabel, labels.turnOff);
         lv_obj_set_style_bg_color(toggleBtn, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     }
     else
     {
-        lv_label_set_text_static(stateLabel, "Power: OFF");
+        lv_label_set_text_static(stateLabel, labels.offState);
         lv_obj_set_style_text_color(stateLabel, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-        lv_label_set_text_static(btnLabel, "Turn ON");
+        lv_label_set_text_static(btnLabel, labels.turnOn);
         lv_obj_set_style_bg_color(toggleBtn, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
     }
 }
 
 } // namespace
 
-lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster)
+lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & cluster, const OnOffWidgetLabels & labels)
 {
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
@@ -71,7 +72,7 @@ lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & 
     lv_obj_set_style_text_color(btnLabel, lv_color_white(), LV_PART_MAIN);
 
     // Initial render
-    UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff());
+    UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff(), labels);
 
     // Local touch: schedule cluster toggle on Matter event loop asynchronously
     lv_obj_add_event_cb(
@@ -85,13 +86,14 @@ lv_obj_t * CreateOnOffClusterWidget(lv_obj_t * parent, Clusters::OnOffCluster & 
 
     // Data model notifications (from local touch or network): updates UI when OnOff attribute changes.
     // Subscribing with 'card' automatically unregisters when 'card' is deleted.
-    DisplayNotificationHub::Instance().Subscribe(card, cluster.GetPaths()[0].mEndpointId, Clusters::OnOff::Id,
-                                                 [stateLabel, toggleBtn, btnLabel, &cluster](const ConcreteAttributePath & path) {
-                                                     if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
-                                                     {
-                                                         UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff());
-                                                     }
-                                                 });
+    DisplayNotificationHub::Instance().Subscribe(
+        card, cluster.GetPaths()[0].mEndpointId, Clusters::OnOff::Id,
+        [stateLabel, toggleBtn, btnLabel, &cluster, labels](const ConcreteAttributePath & path) {
+            if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+            {
+                UpdateOnOffDisplay(stateLabel, toggleBtn, btnLabel, cluster.GetOnOff(), labels);
+            }
+        });
 
     return card;
 }
