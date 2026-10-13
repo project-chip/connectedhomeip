@@ -26,21 +26,21 @@ namespace app {
 
 namespace {
 
-const void * sLastReleasedContext = nullptr;
+// Manager successfully initialized through InitBindingManager. Only this manager is guaranteed to have
+// passed the NotifyBoundClusterChanged preconditions (initialized + handlers registered).
+Clusters::Binding::Manager * sInitializedBindingManager = nullptr;
 
 void InitBindingHandlerInternal(intptr_t /* arg */)
 {
-    auto & server  = Server::GetInstance();
-    CHIP_ERROR err = Clusters::Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    auto & server = Server::GetInstance();
+    CHIP_ERROR err =
+        InitBindingManager(Clusters::Binding::Manager::GetInstance(),
+                           { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to initialize Binding Manager: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-
-    Clusters::Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(AllDevicesBoundDeviceChangedHandler);
-    Clusters::Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(AllDevicesBoundDeviceContextReleaseHandler);
     ChipLogProgress(AppServer, "Binding Manager initialized successfully");
 }
 
@@ -74,32 +74,38 @@ Messaging::ExchangeManager & GetDefaultExchangeManager()
     return Server::GetInstance().GetExchangeManager();
 }
 
-CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId,
+CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
                                   Platform::UniquePtr<BindingContext> command)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ClusterId clusterId         = command->GetClusterId();
-    BindingContext * rawCommand = command.release();
-    sLastReleasedContext        = nullptr;
+    // Reject managers that did not go through InitBindingManager while we still own `command`
+    // (it is freed by the UniquePtr). This covers the NotifyBoundClusterChanged early returns
+    // (CHIP_ERROR_INCORRECT_STATE / CHIP_ERROR_HANDLER_NOT_SET) that happen before it adopts the context.
+    VerifyOrReturnError(&bindingManager == sInitializedBindingManager, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(AppServer, "DispatchBindingCommand: Binding manager not initialized"));
 
-    CHIP_ERROR err = bindingManager.NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(rawCommand));
+    ClusterId clusterId = command->GetClusterId();
+
+    // From here on, ownership belongs to the Binding::Manager, which always calls
+    // AllDevicesBoundDeviceContextReleaseHandler once it no longer needs the context.
+    //
+    // NotifyBoundClusterChanged can fail *after* queueing the context for a unicast binding (e.g. when
+    // session establishment fails synchronously). The queued entry keeps a reference and the context is
+    // released later, so it must NOT be deleted here even though an error is returned. The only failure
+    // that does not adopt the context is the PendingNotificationContext allocation failure, which cannot
+    // be told apart from adopted failures by its error code; that case leaks the context rather than
+    // risking a use-after-free.
+    CHIP_ERROR err = bindingManager.NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(command.release()));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
-        if (sLastReleasedContext != rawCommand)
-        {
-            Platform::Delete(rawCommand);
-        }
     }
     return err;
 }
 
-CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                  Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId,
-                                  Platform::UniquePtr<BindingContext> command)
+CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Manager & bindingManager,
+                                  EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -118,8 +124,8 @@ CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager
     return err;
 }
 
-void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding,
-                                         OperationalDeviceProxy * peer_device, void * context)
+void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+                                         void * context)
 {
     if (context == nullptr)
     {
@@ -134,8 +140,22 @@ void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & b
 void AllDevicesBoundDeviceContextReleaseHandler(void * context)
 {
     VerifyOrReturn(context != nullptr);
-    sLastReleasedContext = context;
     Platform::Delete(static_cast<BindingContext *>(context));
+}
+
+CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params)
+{
+    // Register handlers before Init: Init may establish connections for persisted bindings.
+    bindingManager.RegisterBoundDeviceChangedHandler(AllDevicesBoundDeviceChangedHandler);
+    bindingManager.RegisterBoundDeviceContextReleaseHandler(AllDevicesBoundDeviceContextReleaseHandler);
+    ReturnErrorOnFailure(bindingManager.Init(params));
+    sInitializedBindingManager = &bindingManager;
+    return CHIP_NO_ERROR;
+}
+
+void ShutdownBindingHandler()
+{
+    sInitializedBindingManager = nullptr;
 }
 
 CHIP_ERROR InitBindingHandler()

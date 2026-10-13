@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <binding-handler/BindingHandler.h>
 #include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Ids.h>
@@ -23,7 +26,10 @@
 #include <clusters/Identify/Ids.h>
 #include <clusters/OnOff/Commands.h>
 #include <clusters/OnOff/Ids.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -42,10 +48,8 @@ class TestCustomContext : public BindingContext
 {
 public:
     explicit TestCustomContext(int & destructorCount, int * dispatchCount = nullptr,
-                               Clusters::Binding::TableEntry * lastEntry = nullptr,
-                               OperationalDeviceProxy ** lastPeer        = nullptr) :
-        mDestructorCount(destructorCount),
-        mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer)
+                               Clusters::Binding::TableEntry * lastEntry = nullptr, OperationalDeviceProxy ** lastPeer = nullptr) :
+        mDestructorCount(destructorCount), mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer)
     {}
 
     ~TestCustomContext() override { mDestructorCount++; }
@@ -70,9 +74,9 @@ public:
 
 private:
     int & mDestructorCount;
-    int * mDispatchCount                         = nullptr;
-    Clusters::Binding::TableEntry * mLastEntry   = nullptr;
-    OperationalDeviceProxy ** mLastPeer          = nullptr;
+    int * mDispatchCount                       = nullptr;
+    Clusters::Binding::TableEntry * mLastEntry = nullptr;
+    OperationalDeviceProxy ** mLastPeer        = nullptr;
 };
 
 TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
@@ -246,9 +250,134 @@ TEST_F(TestBindingHandler, DispatchAndScheduleBindingCommandValidationAndCleanup
 
     // Verify DispatchSimpleBindingCommand also cleans up and returns CHIP_ERROR_INCORRECT_STATE when uninitialized
     Clusters::OnOff::Commands::Toggle::Type toggleCmd;
-    EXPECT_EQ(DispatchSimpleBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, toggleCmd),
-              CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(DispatchSimpleBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, toggleCmd), CHIP_ERROR_INCORRECT_STATE);
+}
+
+/**
+ * Fixture with a real Binding::Manager initialized through InitBindingManager, backed by a
+ * loopback messaging stack and a real CASESessionManager.
+ */
+class TestBindingHandlerWithManager : public chip::Testing::LoopbackMessagingContext
+{
+public:
+    static constexpr EndpointId kLocalEndpoint = 1;
+    static constexpr ClusterId kTestClusterId  = 0xFFFF; // Matches TestCustomContext::GetClusterId()
+
+    void SetUp() override
+    {
+        LoopbackMessagingContext::SetUp();
+        VerifyOrReturn(!HasFailure());
+
+        CASESessionManagerConfig config;
+        config.sessionInitParams.sessionManager = &GetSecureSessionManager();
+        config.sessionInitParams.exchangeMgr    = &GetExchangeManager();
+        config.sessionInitParams.fabricTable    = &GetFabricTable();
+        // Only validated for non-null: session establishment never gets far enough to use it in these tests.
+        config.sessionInitParams.groupDataProvider = &mGroupDataProvider;
+        config.clientPool                          = &mCASEClientPool;
+        config.sessionSetupPool                    = &mSessionSetupPool;
+        ASSERT_EQ(mCASESessionManager.Init(&GetSystemLayer(), config), CHIP_NO_ERROR);
+
+        ASSERT_EQ(InitBindingManager(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }), CHIP_NO_ERROR);
+    }
+
+    void TearDown() override
+    {
+        ShutdownBindingHandler();
+        GetFabricTable().RemoveFabricDelegate(&mBindingManager);
+        mCASESessionManager.Shutdown();
+        LoopbackMessagingContext::TearDown();
+    }
+
+protected:
+    TestPersistentStorageDelegate mStorage;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+    CASEClientPool<2> mCASEClientPool;
+    OperationalSessionSetupPool<2> mSessionSetupPool;
+    CASESessionManager mCASESessionManager;
+    Clusters::Binding::Manager mBindingManager;
+};
+
+TEST_F(TestBindingHandlerWithManager, DispatchWithoutMatchingBindingReleasesContextOnce)
+{
+    int destructorCount = 0;
+    int dispatchCount   = 0;
+    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount);
+    ASSERT_NE(context, nullptr);
+
+    EXPECT_EQ(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(destructorCount, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, DispatchRejectsManagerAfterShutdown)
+{
+    ShutdownBindingHandler();
+
+    int destructorCount = 0;
+    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount);
+    ASSERT_NE(context, nullptr);
+
+    // The manager is still initialized, but no longer registered with the handler: the context must
+    // be destroyed by DispatchBindingCommand without being handed to the manager.
+    EXPECT_EQ(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(destructorCount, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, DispatchToGroupBindingInvokesContextAndReleasesIt)
+{
+    constexpr GroupId kGroupId = 0x0101;
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), kGroupId, kLocalEndpoint, kTestClusterId)),
+              CHIP_NO_ERROR);
+
+    int destructorCount = 0;
+    int dispatchCount   = 0;
+    Clusters::Binding::TableEntry recordedEntry;
+    OperationalDeviceProxy * recordedPeer = reinterpret_cast<OperationalDeviceProxy *>(0x1);
+    auto context = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer);
+    ASSERT_NE(context, nullptr);
+
+    EXPECT_EQ(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatchCount, 1);
+    EXPECT_EQ(recordedEntry.type, Clusters::Binding::MATTER_MULTICAST_BINDING);
+    EXPECT_EQ(recordedEntry.groupId, kGroupId);
+    EXPECT_EQ(recordedPeer, nullptr);
+    EXPECT_EQ(destructorCount, 1);
+}
+
+// Regression test: NotifyBoundClusterChanged queues the context for the unicast binding *before*
+// establishing the session. When session establishment then fails synchronously (here: the binding
+// refers to a fabric the device does not know, so the address lookup cannot start), the call returns
+// an error while the pending notification still references the context.
+//
+// DispatchBindingCommand used to delete the context in that case, leaving a dangling pointer in the
+// pending notification map (use-after-free on the next connection, double free when the entry is removed).
+TEST_F(TestBindingHandlerWithManager, ContextStaysAliveWhenNotifyFailsAfterQueueing)
+{
+    constexpr FabricIndex kUnknownFabricIndex = 200;
+    constexpr NodeId kPeerNodeId              = 0x1234;
+    ASSERT_EQ(GetFabricTable().FindFabricWithIndex(kUnknownFabricIndex), nullptr);
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(Clusters::Binding::TableEntry::ForNode(
+                  kUnknownFabricIndex, kPeerNodeId, kLocalEndpoint, 2 /* remote */, kTestClusterId)),
+              CHIP_NO_ERROR);
+    const uint8_t bindingIndex = mBindingManager.GetBindingTable().begin().GetIndex();
+
+    int destructorCount = 0;
+    int dispatchCount   = 0;
+    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount);
+    ASSERT_NE(context, nullptr);
+
+    EXPECT_NE(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
+
+    // The pending notification still owns the context: it must not have been destroyed.
+    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(destructorCount, 0);
+
+    // Removing the binding drops the last reference; the release handler destroys the context exactly once.
+    EXPECT_EQ(mBindingManager.UnicastBindingRemoved(bindingIndex), CHIP_NO_ERROR);
+    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(destructorCount, 1);
 }
 
 } // namespace
-

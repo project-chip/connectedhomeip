@@ -62,8 +62,7 @@ public:
      * @param binding Table entry for the binding.
      * @param peer_device Proxy to connected peer (nullptr for multicast group bindings).
      */
-    virtual void DispatchCommand(const Clusters::Binding::TableEntry & binding,
-                                 OperationalDeviceProxy * peer_device) = 0;
+    virtual void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) = 0;
 };
 
 /**
@@ -90,14 +89,13 @@ public:
 
     ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding,
-                         OperationalDeviceProxy * peer_device) override
+    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) override
     {
         ClusterId targetClusterId = binding.clusterId.value_or(CommandType::GetClusterId());
         if (targetClusterId != CommandType::GetClusterId())
         {
-            ChipLogDetail(AppServer, "Binding cluster mismatch (binding: 0x%" PRIx32 ", command: 0x%" PRIx32 ")",
-                          targetClusterId, CommandType::GetClusterId());
+            ChipLogDetail(AppServer, "Binding cluster mismatch (binding: 0x%" PRIx32 ", command: 0x%" PRIx32 ")", targetClusterId,
+                          CommandType::GetClusterId());
             return;
         }
 
@@ -118,9 +116,9 @@ public:
                              CommandType::GetClusterId(), CommandType::GetCommandId(), error.Format());
             };
 
-            CHIP_ERROR err = Controller::InvokeCommandRequest(
-                peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                binding.remote, mCommand, onSuccess, onFailure);
+            CHIP_ERROR err =
+                Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                                 binding.remote, mCommand, onSuccess, onFailure);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding command: %" CHIP_ERROR_FORMAT, err.Format());
@@ -161,44 +159,59 @@ private:
 CHIP_ERROR InitBindingHandler();
 
 /**
- * Dispatches a binding command synchronously using a Platform::UniquePtr.
- * Ownership is transferred to BindingManager on success, or deleted on failure.
+ * Synchronously registers the all-devices-app handlers on @p bindingManager and initializes it.
+ *
+ * Must be called from the Matter event loop. Only the manager initialized through this function
+ * is accepted by DispatchBindingCommand / ScheduleBindingCommand.
  */
-CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId,
+CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params);
+
+/**
+ * Forgets the manager registered by InitBindingManager. Subsequent dispatches fail with
+ * CHIP_ERROR_INCORRECT_STATE until InitBindingManager is called again.
+ */
+void ShutdownBindingHandler();
+
+/**
+ * Dispatches a binding command synchronously. Must be called from the Matter event loop.
+ *
+ * Ownership of @p command:
+ *  - If @p bindingManager was not initialized through InitBindingManager, CHIP_ERROR_INCORRECT_STATE
+ *    is returned and @p command is destroyed before returning.
+ *  - Otherwise ownership is transferred to the Binding::Manager, even if an error is returned
+ *    (the command may have been queued for a unicast peer before the failure). The command is
+ *    destroyed through AllDevicesBoundDeviceContextReleaseHandler once it is no longer needed.
+ */
+CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
                                   Platform::UniquePtr<BindingContext> command);
 
 /**
  * Schedules a binding command onto the PlatformManager event loop using a Platform::UniquePtr.
- * Ownership is transferred on success, or deleted on failure.
+ * If scheduling fails, @p command is destroyed before returning; otherwise it is dispatched later
+ * with the ownership rules of DispatchBindingCommand.
  */
-CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                  Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId,
-                                  Platform::UniquePtr<BindingContext> command);
+CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Manager & bindingManager,
+                                  EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command);
 
 /**
  * Dispatches a derived BindingContext synchronously using a Platform::UniquePtr.
- * Ownership is transferred to BindingManager on success, or deleted on failure.
+ * Same ownership rules as the non-template DispatchBindingCommand.
  */
 template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
-inline CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager,
-                                         EndpointId localEndpointId,
+inline CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
                                          Platform::UniquePtr<ContextType> command)
 {
     static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
-    return DispatchBindingCommand(bindingManager, localEndpointId,
-                                  Platform::UniquePtr<BindingContext>(command.release()));
+    return DispatchBindingCommand(bindingManager, localEndpointId, Platform::UniquePtr<BindingContext>(command.release()));
 }
 
 /**
  * Schedules a derived BindingContext onto the PlatformManager event loop using a Platform::UniquePtr.
- * Ownership is transferred on success, or deleted on failure.
+ * Same ownership rules as the non-template ScheduleBindingCommand.
  */
 template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
 inline CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                         Clusters::Binding::Manager & bindingManager,
-                                         EndpointId localEndpointId,
+                                         Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
                                          Platform::UniquePtr<ContextType> command)
 {
     static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
@@ -210,13 +223,12 @@ inline CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platform
  * Allocates a SimpleBindingCommand for a standard cluster command struct and dispatches it synchronously.
  */
 template <typename CommandType>
-inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager,
-                                               EndpointId localEndpointId,
-                                               CommandType && commandPayload,
-                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
+inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
+                                               CommandType && commandPayload, Messaging::ExchangeManager * exchangeMgr = nullptr)
 {
     using DecayedCommand = std::decay_t<CommandType>;
-    auto command = Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
+    auto command =
+        Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
     return DispatchBindingCommand(bindingManager, localEndpointId, std::move(command));
 }
@@ -226,13 +238,12 @@ inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bind
  */
 template <typename CommandType>
 inline CHIP_ERROR ScheduleSimpleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                               Clusters::Binding::Manager & bindingManager,
-                                               EndpointId localEndpointId,
-                                               CommandType && commandPayload,
-                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
+                                               Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
+                                               CommandType && commandPayload, Messaging::ExchangeManager * exchangeMgr = nullptr)
 {
     using DecayedCommand = std::decay_t<CommandType>;
-    auto command = Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
+    auto command =
+        Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
     return ScheduleBindingCommand(platformManager, bindingManager, localEndpointId, std::move(command));
 }
@@ -241,8 +252,8 @@ inline CHIP_ERROR ScheduleSimpleBindingCommand(DeviceLayer::PlatformManager & pl
  * Handler invoked by the Binding::Manager when a binding needs to be notified.
  * Dispatches commands to bound unicast or multicast endpoints.
  */
-void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding,
-                                         OperationalDeviceProxy * peer_device, void * context);
+void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+                                         void * context);
 
 /**
  * Handler invoked by the Binding::Manager when the command context is no longer needed.
