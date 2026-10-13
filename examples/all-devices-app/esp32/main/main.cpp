@@ -588,9 +588,16 @@ void InitServer(intptr_t context)
         return;
     }
 
-    if (CHIP_ERROR bindingErr = InitBindingHandler(); bindingErr != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "InitBindingHandler() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                InitBindingManager(Clusters::Binding::Manager::GetInstance(),
+                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                   server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
 #if CONFIG_HAVE_DISPLAY

@@ -266,9 +266,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-    if (CHIP_ERROR bindingErr = InitBindingHandler(); bindingErr != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "InitBindingHandler() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                InitBindingManager(Binding::Manager::GetInstance(),
+                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                   server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
     // Now that the server has started and we are done with our startup logging,

@@ -33,12 +33,6 @@ namespace chip {
 namespace app {
 
 /**
- * Returns the default ExchangeManager used for group binding commands when no
- * custom ExchangeManager is injected.
- */
-Messaging::ExchangeManager & GetDefaultExchangeManager();
-
-/**
  * Abstract base class for binding command contexts.
  *
  * Ensures type-safe dispatch and safe deallocation of context data passed to
@@ -59,8 +53,12 @@ public:
      *
      * @param binding Table entry for the binding.
      * @param peer_device Proxy to connected peer (nullptr for multicast group bindings).
+     * @param exchangeManager Exchange manager registered through InitBindingManager. Unicast commands
+     *                        should use peer_device->GetExchangeManager(); this one is meant for
+     *                        multicast (group) commands, which have no peer device.
      */
-    virtual void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) = 0;
+    virtual void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+                                 Messaging::ExchangeManager & exchangeManager) = 0;
 };
 
 /**
@@ -78,16 +76,13 @@ template <typename CommandType>
 class SimpleBindingCommand : public BindingContext
 {
 public:
-    explicit SimpleBindingCommand(const CommandType & command, Messaging::ExchangeManager * exchangeMgr = nullptr) :
-        mCommand(command), mExchangeManager(exchangeMgr)
-    {}
-    explicit SimpleBindingCommand(CommandType && command, Messaging::ExchangeManager * exchangeMgr = nullptr) :
-        mCommand(std::move(command)), mExchangeManager(exchangeMgr)
-    {}
+    explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
+    explicit SimpleBindingCommand(CommandType && command) : mCommand(std::move(command)) {}
 
     ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) override
+    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+                         Messaging::ExchangeManager & exchangeManager) override
     {
         ClusterId targetClusterId = binding.clusterId.value_or(CommandType::GetClusterId());
         if (targetClusterId != CommandType::GetClusterId())
@@ -124,9 +119,8 @@ public:
         }
         else if (binding.type == Clusters::Binding::MATTER_MULTICAST_BINDING)
         {
-            Messaging::ExchangeManager * exchangeMgr =
-                mExchangeManager != nullptr ? mExchangeManager : &GetDefaultExchangeManager();
-            CHIP_ERROR err = Controller::InvokeGroupCommandRequest(exchangeMgr, binding.fabricIndex, binding.groupId, mCommand);
+            CHIP_ERROR err =
+                Controller::InvokeGroupCommandRequest(&exchangeManager, binding.fabricIndex, binding.groupId, mCommand);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
@@ -144,29 +138,25 @@ public:
 
 private:
     CommandType mCommand;
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
 };
 
 /**
- * Initializes the Binding Manager and registers the bound device changed
- * and context release handlers.
+ * Initializes @p bindingManager and registers the all-devices-app handlers on it.
  *
- * This function schedules the actual initialization onto the PlatformManager
- * event loop so that Server dependencies are fully available.
+ * Synchronous: must be called from the Matter event loop or with the Matter stack lock held, after the
+ * objects referenced by @p params (fabric table, CASE session manager, storage) are initialized.
+ * Only the manager initialized through this function is accepted by DispatchBindingCommand.
+ *
+ * @param bindingManager  Manager to initialize (usually Clusters::Binding::Manager::GetInstance()).
+ * @param params          Init parameters forwarded to Clusters::Binding::Manager::Init.
+ * @param exchangeManager Exchange manager handed to BindingContext::DispatchCommand, used for group commands.
  */
-CHIP_ERROR InitBindingHandler();
+CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
+                              Messaging::ExchangeManager & exchangeManager);
 
 /**
- * Synchronously registers the all-devices-app handlers on @p bindingManager and initializes it.
- *
- * Must be called from the Matter event loop. Only the manager initialized through this function
- * is accepted by DispatchBindingCommand.
- */
-CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params);
-
-/**
- * Forgets the manager registered by InitBindingManager. Subsequent dispatches fail with
- * CHIP_ERROR_INCORRECT_STATE until InitBindingManager is called again.
+ * Forgets the manager and exchange manager registered by InitBindingManager. Subsequent dispatches fail with
+ * CHIP_ERROR_INCORRECT_STATE, and pending notifications are skipped, until InitBindingManager is called again.
  */
 void ShutdownBindingHandler();
 
@@ -192,10 +182,9 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, E
  */
 template <typename CommandType>
 inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                               const CommandType & commandPayload,
-                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
+                                               const CommandType & commandPayload)
 {
-    Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload, exchangeMgr));
+    Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
     return DispatchBindingCommand(bindingManager, localEndpointId, std::move(command));
 }

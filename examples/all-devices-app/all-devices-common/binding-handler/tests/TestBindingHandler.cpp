@@ -48,15 +48,18 @@ class TestCustomContext : public BindingContext
 {
 public:
     explicit TestCustomContext(int & destructorCount, int * dispatchCount = nullptr,
-                               Clusters::Binding::TableEntry * lastEntry = nullptr, OperationalDeviceProxy ** lastPeer = nullptr) :
-        mDestructorCount(destructorCount), mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer)
+                               Clusters::Binding::TableEntry * lastEntry = nullptr, OperationalDeviceProxy ** lastPeer = nullptr,
+                               Messaging::ExchangeManager ** lastExchangeManager = nullptr) :
+        mDestructorCount(destructorCount), mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer),
+        mLastExchangeManager(lastExchangeManager)
     {}
 
     ~TestCustomContext() override { mDestructorCount++; }
 
     ClusterId GetClusterId() const override { return 0xFFFF; }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device) override
+    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+                         Messaging::ExchangeManager & exchangeManager) override
     {
         if (mDispatchCount != nullptr)
         {
@@ -70,13 +73,18 @@ public:
         {
             *mLastPeer = peer_device;
         }
+        if (mLastExchangeManager != nullptr)
+        {
+            *mLastExchangeManager = &exchangeManager;
+        }
     }
 
 private:
     int & mDestructorCount;
-    int * mDispatchCount                       = nullptr;
-    Clusters::Binding::TableEntry * mLastEntry = nullptr;
-    OperationalDeviceProxy ** mLastPeer        = nullptr;
+    int * mDispatchCount                               = nullptr;
+    Clusters::Binding::TableEntry * mLastEntry         = nullptr;
+    OperationalDeviceProxy ** mLastPeer                = nullptr;
+    Messaging::ExchangeManager ** mLastExchangeManager = nullptr;
 };
 
 template <typename... Args>
@@ -106,134 +114,18 @@ TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
     AllDevicesBoundDeviceContextReleaseHandler(chimeCmd);
 }
 
-TEST_F(TestBindingHandler, ChangedHandlerForwardsEntryAndPeerToContext)
+TEST_F(TestBindingHandler, ChangedHandlerSkipsDispatchWhenNotInitialized)
 {
     int destructorCount = 0;
     int dispatchCount   = 0;
-    Clusters::Binding::TableEntry recordedEntry;
-    OperationalDeviceProxy * recordedPeer = reinterpret_cast<OperationalDeviceProxy *>(0x1);
-
-    TestCustomContext customContext(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer);
+    TestCustomContext customContext(destructorCount, &dispatchCount);
 
     Clusters::Binding::TableEntry entry =
-        Clusters::Binding::TableEntry::ForNode(1 /* fabric */, 0x1234 /* node */, 2 /* local */, 3 /* remote */, 0xFFFF);
+        Clusters::Binding::TableEntry::ForGroup(1 /* fabric */, 0x0101 /* group */, 1 /* local */, 0xFFFF);
 
+    // Without InitBindingManager there is no exchange manager to hand to the context: dispatch is skipped.
     AllDevicesBoundDeviceChangedHandler(entry, nullptr, &customContext);
-    EXPECT_EQ(dispatchCount, 1);
-    EXPECT_EQ(recordedEntry, entry);
-    EXPECT_EQ(recordedPeer, nullptr);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerHandlesNullContextGracefully)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::Chime::Id;
-
-    // Passing nullptr context should not crash
-    AllDevicesBoundDeviceChangedHandler(entry, nullptr, nullptr);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerHandlesNullPeerGracefully)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::Chime::Id;
-
-    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
-    chimeCmd.chimeID.SetValue(1);
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
-
-    // Passing nullptr peer_device should not crash
-    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerSupportsMultipleClusters)
-{
-    // 1. OnOff Cluster
-    Clusters::Binding::TableEntry onOffEntry;
-    onOffEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    onOffEntry.local     = 1;
-    onOffEntry.remote    = 2;
-    onOffEntry.clusterId = Clusters::OnOff::Id;
-
-    Clusters::OnOff::Commands::Toggle::Type toggleCmd;
-    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> onOffCmd(toggleCmd);
-    EXPECT_EQ(onOffCmd.GetClusterId(), Clusters::OnOff::Id);
-    AllDevicesBoundDeviceChangedHandler(onOffEntry, nullptr, &onOffCmd);
-
-    // 2. Identify Cluster (using move constructor)
-    Clusters::Binding::TableEntry identifyEntry;
-    identifyEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    identifyEntry.local     = 1;
-    identifyEntry.remote    = 2;
-    identifyEntry.clusterId = Clusters::Identify::Id;
-
-    Clusters::Identify::Commands::Identify::Type identifyCmd;
-    identifyCmd.identifyTime = 5;
-    SimpleBindingCommand<Clusters::Identify::Commands::Identify::Type> identifyBindingCmd(std::move(identifyCmd));
-    EXPECT_EQ(identifyBindingCmd.GetClusterId(), Clusters::Identify::Id);
-    AllDevicesBoundDeviceChangedHandler(identifyEntry, nullptr, &identifyBindingCmd);
-
-    // 3. Chime Cluster
-    Clusters::Binding::TableEntry chimeEntry;
-    chimeEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    chimeEntry.local     = 1;
-    chimeEntry.remote    = 2;
-    chimeEntry.clusterId = Clusters::Chime::Id;
-
-    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> chimeBindingCmd(chimeCmd);
-    EXPECT_EQ(chimeBindingCmd.GetClusterId(), Clusters::Chime::Id);
-    AllDevicesBoundDeviceChangedHandler(chimeEntry, nullptr, &chimeBindingCmd);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerHandlesClusterMismatch)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::OnOff::Id;
-
-    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
-
-    // Passing a Chime command to an OnOff binding entry should detect mismatch and not crash
-    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerHandlesWildcardBinding)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = std::nullopt; // Wildcard binding
-
-    Clusters::OnOff::Commands::Toggle::Type toggleCmd;
-    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> cmd(toggleCmd);
-
-    // Wildcard binding should adopt the command's cluster ID and execute without crashing
-    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
-}
-
-TEST_F(TestBindingHandler, ChangedHandlerHandlesUnsupportedBindingType)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNUSED_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::Chime::Id;
-
-    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
-
-    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
+    EXPECT_EQ(dispatchCount, 0);
 }
 
 TEST_F(TestBindingHandler, DispatchBindingCommandValidationAndCleanup)
@@ -281,7 +173,8 @@ public:
         config.sessionSetupPool                    = &mSessionSetupPool;
         ASSERT_EQ(mCASESessionManager.Init(&GetSystemLayer(), config), CHIP_NO_ERROR);
 
-        ASSERT_EQ(InitBindingManager(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }), CHIP_NO_ERROR);
+        ASSERT_EQ(InitBindingManager(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }, GetExchangeManager()),
+                  CHIP_NO_ERROR);
     }
 
     void TearDown() override
@@ -300,6 +193,152 @@ protected:
     CASESessionManager mCASESessionManager;
     Clusters::Binding::Manager mBindingManager;
 };
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerForwardsEntryAndPeerToContext)
+{
+    int destructorCount = 0;
+    int dispatchCount   = 0;
+    Clusters::Binding::TableEntry recordedEntry;
+    OperationalDeviceProxy * recordedPeer            = reinterpret_cast<OperationalDeviceProxy *>(0x1);
+    Messaging::ExchangeManager * recordedExchangeMgr = nullptr;
+
+    TestCustomContext customContext(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer, &recordedExchangeMgr);
+
+    Clusters::Binding::TableEntry entry =
+        Clusters::Binding::TableEntry::ForNode(1 /* fabric */, 0x1234 /* node */, 2 /* local */, 3 /* remote */, 0xFFFF);
+
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &customContext);
+    EXPECT_EQ(dispatchCount, 1);
+    EXPECT_EQ(recordedEntry, entry);
+    EXPECT_EQ(recordedPeer, nullptr);
+    EXPECT_EQ(recordedExchangeMgr, &GetExchangeManager());
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerHandlesNullContextGracefully)
+{
+    Clusters::Binding::TableEntry entry;
+    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    entry.local     = 1;
+    entry.remote    = 2;
+    entry.clusterId = Clusters::Chime::Id;
+
+    // Passing nullptr context should not crash
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, nullptr);
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerHandlesNullPeerGracefully)
+{
+    Clusters::Binding::TableEntry entry;
+    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    entry.local     = 1;
+    entry.remote    = 2;
+    entry.clusterId = Clusters::Chime::Id;
+
+    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
+    chimeCmd.chimeID.SetValue(1);
+    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
+
+    // Passing nullptr peer_device should not crash
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerSupportsMultipleClusters)
+{
+    // 1. OnOff Cluster
+    Clusters::Binding::TableEntry onOffEntry;
+    onOffEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    onOffEntry.local     = 1;
+    onOffEntry.remote    = 2;
+    onOffEntry.clusterId = Clusters::OnOff::Id;
+
+    Clusters::OnOff::Commands::Toggle::Type toggleCmd;
+    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> onOffCmd(toggleCmd);
+    EXPECT_EQ(onOffCmd.GetClusterId(), Clusters::OnOff::Id);
+    AllDevicesBoundDeviceChangedHandler(onOffEntry, nullptr, &onOffCmd);
+
+    // 2. Identify Cluster (using move constructor)
+    Clusters::Binding::TableEntry identifyEntry;
+    identifyEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    identifyEntry.local     = 1;
+    identifyEntry.remote    = 2;
+    identifyEntry.clusterId = Clusters::Identify::Id;
+
+    Clusters::Identify::Commands::Identify::Type identifyCmd;
+    identifyCmd.identifyTime = 5;
+    SimpleBindingCommand<Clusters::Identify::Commands::Identify::Type> identifyBindingCmd(std::move(identifyCmd));
+    EXPECT_EQ(identifyBindingCmd.GetClusterId(), Clusters::Identify::Id);
+    AllDevicesBoundDeviceChangedHandler(identifyEntry, nullptr, &identifyBindingCmd);
+
+    // 3. Chime Cluster
+    Clusters::Binding::TableEntry chimeEntry;
+    chimeEntry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    chimeEntry.local     = 1;
+    chimeEntry.remote    = 2;
+    chimeEntry.clusterId = Clusters::Chime::Id;
+
+    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
+    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> chimeBindingCmd(chimeCmd);
+    EXPECT_EQ(chimeBindingCmd.GetClusterId(), Clusters::Chime::Id);
+    AllDevicesBoundDeviceChangedHandler(chimeEntry, nullptr, &chimeBindingCmd);
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerHandlesClusterMismatch)
+{
+    Clusters::Binding::TableEntry entry;
+    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    entry.local     = 1;
+    entry.remote    = 2;
+    entry.clusterId = Clusters::OnOff::Id;
+
+    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
+    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
+
+    // Passing a Chime command to an OnOff binding entry should detect mismatch and not crash
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerHandlesWildcardBinding)
+{
+    Clusters::Binding::TableEntry entry;
+    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
+    entry.local     = 1;
+    entry.remote    = 2;
+    entry.clusterId = std::nullopt; // Wildcard binding
+
+    Clusters::OnOff::Commands::Toggle::Type toggleCmd;
+    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> cmd(toggleCmd);
+
+    // Wildcard binding should adopt the command's cluster ID and execute without crashing
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
+}
+
+TEST_F(TestBindingHandlerWithManager, ChangedHandlerHandlesUnsupportedBindingType)
+{
+    Clusters::Binding::TableEntry entry;
+    entry.type      = Clusters::Binding::MATTER_UNUSED_BINDING;
+    entry.local     = 1;
+    entry.remote    = 2;
+    entry.clusterId = Clusters::Chime::Id;
+
+    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
+    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
+
+    AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
+}
+
+TEST_F(TestBindingHandlerWithManager, DispatchSimpleCommandToGroupBinding)
+{
+    // Exercises the real SimpleBindingCommand multicast path with the injected (loopback) exchange manager.
+    // No group keys are provisioned, so the send itself fails and is logged; the dispatch must still
+    // complete and release the context without touching any global Server state.
+    constexpr GroupId kGroupId = 0x0102;
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), kGroupId, kLocalEndpoint, Clusters::OnOff::Id)),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(DispatchSimpleBindingCommand(mBindingManager, kLocalEndpoint, Clusters::OnOff::Commands::Toggle::Type{}),
+              CHIP_NO_ERROR);
+}
 
 TEST_F(TestBindingHandlerWithManager, DispatchWithoutMatchingBindingReleasesContextOnce)
 {

@@ -18,9 +18,6 @@
 
 #include "BindingHandler.h"
 
-#include <app/server/Server.h>
-#include <platform/CHIPDeviceLayer.h>
-
 namespace chip {
 namespace app {
 
@@ -30,26 +27,10 @@ namespace {
 // passed the NotifyBoundClusterChanged preconditions (initialized + handlers registered).
 Clusters::Binding::Manager * sInitializedBindingManager = nullptr;
 
-void InitBindingHandlerInternal(intptr_t /* arg */)
-{
-    auto & server = Server::GetInstance();
-    CHIP_ERROR err =
-        InitBindingManager(Clusters::Binding::Manager::GetInstance(),
-                           { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to initialize Binding Manager: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-    ChipLogProgress(AppServer, "Binding Manager initialized successfully");
-}
+// Exchange manager registered through InitBindingManager, handed to BindingContext::DispatchCommand.
+Messaging::ExchangeManager * sExchangeManager = nullptr;
 
 } // namespace
-
-Messaging::ExchangeManager & GetDefaultExchangeManager()
-{
-    return Server::GetInstance().GetExchangeManager();
-}
 
 CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
                                   Platform::UniquePtr<BindingContext> command)
@@ -90,8 +71,14 @@ void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & b
         return;
     }
 
+    // Pending notifications may still complete after ShutdownBindingHandler(); the context is
+    // released normally through the release handler, it is just not dispatched.
+    VerifyOrReturn(
+        sExchangeManager != nullptr,
+        ChipLogError(AppServer, "AllDevicesBoundDeviceChangedHandler: Binding handler not initialized, skipping dispatch"));
+
     auto * bindingContext = static_cast<BindingContext *>(context);
-    bindingContext->DispatchCommand(binding, peer_device);
+    bindingContext->DispatchCommand(binding, peer_device, *sExchangeManager);
 }
 
 void AllDevicesBoundDeviceContextReleaseHandler(void * context)
@@ -100,11 +87,13 @@ void AllDevicesBoundDeviceContextReleaseHandler(void * context)
     Platform::Delete(static_cast<BindingContext *>(context));
 }
 
-CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params)
+CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
+                              Messaging::ExchangeManager & exchangeManager)
 {
     ReturnErrorOnFailure(bindingManager.Init(params));
     bindingManager.RegisterBoundDeviceChangedHandler(AllDevicesBoundDeviceChangedHandler);
     bindingManager.RegisterBoundDeviceContextReleaseHandler(AllDevicesBoundDeviceContextReleaseHandler);
+    sExchangeManager           = &exchangeManager;
     sInitializedBindingManager = &bindingManager;
     return CHIP_NO_ERROR;
 }
@@ -112,12 +101,7 @@ CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const
 void ShutdownBindingHandler()
 {
     sInitializedBindingManager = nullptr;
-}
-
-CHIP_ERROR InitBindingHandler()
-{
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal));
-    return CHIP_NO_ERROR;
+    sExchangeManager           = nullptr;
 }
 
 } // namespace app
