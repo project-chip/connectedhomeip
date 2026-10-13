@@ -52,6 +52,8 @@ class MatterStackState:
                 persistent_storage = PersistentStorageINI(
                     config.chip_tool_common_storage_path, config.chip_tool_fabric_storage_path)
             else:
+                if config.storage_path is None:
+                    raise ValueError("MatterTestConfig must have one of storage_path or chip_tool_common_storage_path and chip_tool_fabric_storage_path.")
                 persistent_storage = PersistentStorageJSON(config.storage_path)
             self._we_initialized_the_stack = True
         else:
