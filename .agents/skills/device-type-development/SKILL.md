@@ -19,11 +19,10 @@ that cluster must land first (see `code-driven-cluster-migration`).
 Measured cost of doing it wrong: PR #73205 (RVC + Service Area) ran **42 days /
 71 commits**, PR #73430 (Window Covering) **57 days / 58 commits** — most of it
 mid-review restructuring after layout and scope questions the steps below
-resolve up-front. A study of ~41 device-type PRs (Nov 2025 → Oct 2026;
-including PRs #41607, #43768, #72733, #43408) shows fast merges (<2d) all
-had pre-agreed scope + layout, while the slow ones (49/71/99d) were
-placement or ambiguity PRs, not big ones (a 13-device, 172-file PR #72645
-merged in 6 days).
+resolve up-front. A study of ~41 device-type PRs (Nov 2025 → Oct 2026; including
+PRs #41607, #43768, #72733, #43408) shows fast merges (<2d) all had pre-agreed
+scope + layout, while the slow ones (49/71/99d) were placement or ambiguity PRs,
+not big ones (a 13-device, 172-file PR #72645 merged in 6 days).
 
 ---
 
