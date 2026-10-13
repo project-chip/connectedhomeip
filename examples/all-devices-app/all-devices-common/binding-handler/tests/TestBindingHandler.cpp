@@ -79,6 +79,12 @@ private:
     OperationalDeviceProxy ** mLastPeer        = nullptr;
 };
 
+template <typename... Args>
+Platform::UniquePtr<BindingContext> MakeTestContext(Args &&... args)
+{
+    return Platform::UniquePtr<BindingContext>(Platform::New<TestCustomContext>(std::forward<Args>(args)...));
+}
+
 TEST_F(TestBindingHandler, ContextReleaseHandlerDeletesContext)
 {
     // Test that passing nullptr does not crash
@@ -230,18 +236,15 @@ TEST_F(TestBindingHandler, ChangedHandlerHandlesUnsupportedBindingType)
     AllDevicesBoundDeviceChangedHandler(entry, nullptr, &cmd);
 }
 
-TEST_F(TestBindingHandler, DispatchAndScheduleBindingCommandValidationAndCleanup)
+TEST_F(TestBindingHandler, DispatchBindingCommandValidationAndCleanup)
 {
     EXPECT_EQ(DispatchBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, Platform::UniquePtr<BindingContext>(nullptr)),
               CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(ScheduleBindingCommand(DeviceLayer::PlatformMgr(), Clusters::Binding::Manager::GetInstance(), 1,
-                                     Platform::UniquePtr<BindingContext>(nullptr)),
-              CHIP_ERROR_INVALID_ARGUMENT);
 
     // When Binding::Manager is not initialized, DispatchBindingCommand fails with CHIP_ERROR_INCORRECT_STATE
-    // and must destroy the passed UniquePtr<TestCustomContext> exactly once.
+    // and must destroy the passed context exactly once.
     int destructorCount = 0;
-    auto customContext  = Platform::MakeUnique<TestCustomContext>(destructorCount);
+    auto customContext  = MakeTestContext(destructorCount);
     ASSERT_NE(customContext, nullptr);
 
     EXPECT_EQ(DispatchBindingCommand(Clusters::Binding::Manager::GetInstance(), 1, std::move(customContext)),
@@ -302,7 +305,7 @@ TEST_F(TestBindingHandlerWithManager, DispatchWithoutMatchingBindingReleasesCont
 {
     int destructorCount = 0;
     int dispatchCount   = 0;
-    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount);
+    auto context        = MakeTestContext(destructorCount, &dispatchCount);
     ASSERT_NE(context, nullptr);
 
     EXPECT_EQ(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
@@ -315,7 +318,7 @@ TEST_F(TestBindingHandlerWithManager, DispatchRejectsManagerAfterShutdown)
     ShutdownBindingHandler();
 
     int destructorCount = 0;
-    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount);
+    auto context        = MakeTestContext(destructorCount);
     ASSERT_NE(context, nullptr);
 
     // The manager is still initialized, but no longer registered with the handler: the context must
@@ -335,7 +338,7 @@ TEST_F(TestBindingHandlerWithManager, DispatchToGroupBindingInvokesContextAndRel
     int dispatchCount   = 0;
     Clusters::Binding::TableEntry recordedEntry;
     OperationalDeviceProxy * recordedPeer = reinterpret_cast<OperationalDeviceProxy *>(0x1);
-    auto context = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer);
+    auto context                          = MakeTestContext(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer);
     ASSERT_NE(context, nullptr);
 
     EXPECT_EQ(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
@@ -365,7 +368,7 @@ TEST_F(TestBindingHandlerWithManager, ContextStaysAliveWhenNotifyFailsAfterQueue
 
     int destructorCount = 0;
     int dispatchCount   = 0;
-    auto context        = Platform::MakeUnique<TestCustomContext>(destructorCount, &dispatchCount);
+    auto context        = MakeTestContext(destructorCount, &dispatchCount);
     ASSERT_NE(context, nullptr);
 
     EXPECT_NE(DispatchBindingCommand(mBindingManager, kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);

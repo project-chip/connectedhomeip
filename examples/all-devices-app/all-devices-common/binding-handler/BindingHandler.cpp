@@ -44,29 +44,6 @@ void InitBindingHandlerInternal(intptr_t /* arg */)
     ChipLogProgress(AppServer, "Binding Manager initialized successfully");
 }
 
-struct AsyncBindingWorkData
-{
-    EndpointId localEndpointId;
-    Clusters::Binding::Manager * bindingManager;
-    Platform::UniquePtr<BindingContext> command;
-};
-
-void AsyncBindingWorkerFunction(intptr_t context)
-{
-    VerifyOrReturn(context != 0, ChipLogError(AppServer, "AsyncBindingWorkerFunction - Invalid context"));
-    auto * workData = reinterpret_cast<AsyncBindingWorkData *>(context);
-    Platform::UniquePtr<AsyncBindingWorkData> cleanup(workData);
-
-    Clusters::Binding::Manager * manager =
-        workData->bindingManager != nullptr ? workData->bindingManager : &Clusters::Binding::Manager::GetInstance();
-
-    CHIP_ERROR err = DispatchBindingCommand(*manager, workData->localEndpointId, std::move(workData->command));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "AsyncBindingWorkerFunction: DispatchBindingCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
-
 } // namespace
 
 Messaging::ExchangeManager & GetDefaultExchangeManager()
@@ -104,26 +81,6 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, E
     return err;
 }
 
-CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command)
-{
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    auto workData = Platform::MakeUnique<AsyncBindingWorkData>();
-    VerifyOrReturnError(workData != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    workData->localEndpointId = localEndpointId;
-    workData->bindingManager  = &bindingManager;
-    workData->command         = std::move(command);
-
-    CHIP_ERROR err = platformManager.ScheduleWork(AsyncBindingWorkerFunction, reinterpret_cast<intptr_t>(workData.get()));
-    if (err == CHIP_NO_ERROR)
-    {
-        workData.release();
-    }
-    return err;
-}
-
 void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
                                          void * context)
 {
@@ -145,10 +102,9 @@ void AllDevicesBoundDeviceContextReleaseHandler(void * context)
 
 CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params)
 {
-    // Register handlers before Init: Init may establish connections for persisted bindings.
+    ReturnErrorOnFailure(bindingManager.Init(params));
     bindingManager.RegisterBoundDeviceChangedHandler(AllDevicesBoundDeviceChangedHandler);
     bindingManager.RegisterBoundDeviceContextReleaseHandler(AllDevicesBoundDeviceContextReleaseHandler);
-    ReturnErrorOnFailure(bindingManager.Init(params));
     sInitializedBindingManager = &bindingManager;
     return CHIP_NO_ERROR;
 }

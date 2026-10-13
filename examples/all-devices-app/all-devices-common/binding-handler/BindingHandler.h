@@ -25,10 +25,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
 
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 namespace chip {
@@ -162,7 +160,7 @@ CHIP_ERROR InitBindingHandler();
  * Synchronously registers the all-devices-app handlers on @p bindingManager and initializes it.
  *
  * Must be called from the Matter event loop. Only the manager initialized through this function
- * is accepted by DispatchBindingCommand / ScheduleBindingCommand.
+ * is accepted by DispatchBindingCommand.
  */
 CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params);
 
@@ -175,6 +173,9 @@ void ShutdownBindingHandler();
 /**
  * Dispatches a binding command synchronously. Must be called from the Matter event loop.
  *
+ * Custom contexts are passed as a base pointer, e.g.
+ * `Platform::UniquePtr<BindingContext>(Platform::New<MyContext>(...))`.
+ *
  * Ownership of @p command:
  *  - If @p bindingManager was not initialized through InitBindingManager, CHIP_ERROR_INCORRECT_STATE
  *    is returned and @p command is destroyed before returning.
@@ -186,66 +187,17 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, E
                                   Platform::UniquePtr<BindingContext> command);
 
 /**
- * Schedules a binding command onto the PlatformManager event loop using a Platform::UniquePtr.
- * If scheduling fails, @p command is destroyed before returning; otherwise it is dispatched later
- * with the ownership rules of DispatchBindingCommand.
- */
-CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager, Clusters::Binding::Manager & bindingManager,
-                                  EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command);
-
-/**
- * Dispatches a derived BindingContext synchronously using a Platform::UniquePtr.
- * Same ownership rules as the non-template DispatchBindingCommand.
- */
-template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
-inline CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                         Platform::UniquePtr<ContextType> command)
-{
-    static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
-    return DispatchBindingCommand(bindingManager, localEndpointId, Platform::UniquePtr<BindingContext>(command.release()));
-}
-
-/**
- * Schedules a derived BindingContext onto the PlatformManager event loop using a Platform::UniquePtr.
- * Same ownership rules as the non-template ScheduleBindingCommand.
- */
-template <typename ContextType, typename = std::enable_if_t<!std::is_same_v<ContextType, BindingContext>>>
-inline CHIP_ERROR ScheduleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                         Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                         Platform::UniquePtr<ContextType> command)
-{
-    static_assert(std::is_base_of_v<BindingContext, ContextType>, "ContextType must derive from BindingContext");
-    return ScheduleBindingCommand(platformManager, bindingManager, localEndpointId,
-                                  Platform::UniquePtr<BindingContext>(command.release()));
-}
-
-/**
- * Allocates a SimpleBindingCommand for a standard cluster command struct and dispatches it synchronously.
+ * Wraps a standard cluster command struct in a SimpleBindingCommand and dispatches it synchronously.
+ * Must be called from the Matter event loop. Same ownership rules as DispatchBindingCommand.
  */
 template <typename CommandType>
 inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                               CommandType && commandPayload, Messaging::ExchangeManager * exchangeMgr = nullptr)
+                                               const CommandType & commandPayload,
+                                               Messaging::ExchangeManager * exchangeMgr = nullptr)
 {
-    using DecayedCommand = std::decay_t<CommandType>;
-    auto command =
-        Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
+    Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload, exchangeMgr));
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
     return DispatchBindingCommand(bindingManager, localEndpointId, std::move(command));
-}
-
-/**
- * Allocates a SimpleBindingCommand for a standard cluster command struct and schedules it on the PlatformManager event loop.
- */
-template <typename CommandType>
-inline CHIP_ERROR ScheduleSimpleBindingCommand(DeviceLayer::PlatformManager & platformManager,
-                                               Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                               CommandType && commandPayload, Messaging::ExchangeManager * exchangeMgr = nullptr)
-{
-    using DecayedCommand = std::decay_t<CommandType>;
-    auto command =
-        Platform::MakeUnique<SimpleBindingCommand<DecayedCommand>>(std::forward<CommandType>(commandPayload), exchangeMgr);
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
-    return ScheduleBindingCommand(platformManager, bindingManager, localEndpointId, std::move(command));
 }
 
 /**
