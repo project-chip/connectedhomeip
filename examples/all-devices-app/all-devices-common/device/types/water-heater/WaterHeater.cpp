@@ -19,10 +19,7 @@
 
 namespace chip::app {
 WaterHeater::WaterHeater(const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mConfig(config),
-    mTimerDelegate(config.timerDelegate), mWhmDelegate(config.waterHeaterManagementDelegate),
-    mWaterHeaterModeDelegate(config.waterHeaterModeDelegate), mThermostatDelegate(config.thermostatDelegate),
-    mHeatingDelegate(config.heatingDelegate)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterHeater, 1)), mConfig(config)
 {}
 WaterHeater::~WaterHeater() = default;
 
@@ -35,15 +32,15 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mProvider   = &provider;
     mEndpointId = endpoint;
 
-    mWaterHeaterManagementCluster.Create(endpoint, mWhmDelegate, mConfig.whmFeatures);
+    mWaterHeaterManagementCluster.Create(endpoint, mConfig.waterHeaterManagementDelegate, mConfig.whmFeatures);
     mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(mConfig.thermostatFeatures),
-                              HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mTimerDelegate), mThermostatDelegate,
-                              mHeatingDelegate);
+                              HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mConfig.timerDelegate),
+                              mConfig.thermostatDelegate, mConfig.heatingDelegate);
     mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
                                    Clusters::ModeBaseCluster::Config{
                                        .feature                = BitMask<Clusters::ModeBase::Feature>(),
                                        .optionalAttributeSet   = {},
-                                       .appDelegate            = mWaterHeaterModeDelegate,
+                                       .appDelegate            = mConfig.waterHeaterModeDelegate,
                                        .onOffValueForStartUp   = false,
                                        .diagnosticDataProvider = mConfig.diagnosticDataProvider,
                                    });

@@ -35,7 +35,6 @@ public:
     struct Config
     {
         TimerDelegate & timerDelegate;
-        FabricTable & fabricTable;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         // WaterHeaterManagement cluster
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
@@ -71,17 +70,13 @@ protected:
 
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
-    Config mConfig;
+    TimerDelegate & GetTimerDelegate() const { return mConfig.timerDelegate; }
+
     CodeDrivenDataModelProvider * mProvider = nullptr;
 
-    // Delegates
-    TimerDelegate & mTimerDelegate;
-    Clusters::WaterHeaterManagement::Delegate & mWhmDelegate;
-    Clusters::ModeBase::AppDelegate & mWaterHeaterModeDelegate;
-    Clusters::Thermostat::Delegate & mThermostatDelegate;
-    Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & mHeatingDelegate;
-
 private:
+    const Config mConfig;
+
     // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;
     LazyRegisteredServerCluster<HeatingThermostat> mThermostatCluster;

@@ -67,7 +67,6 @@ constexpr Clusters::Thermostat::OptionalAttributes kThermostatOptionalAttributes
 SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, FabricTable & fabricTable,
                                            DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
     WaterHeater(WaterHeater::Config{ .timerDelegate                 = timerDelegate,
-                                     .fabricTable                   = fabricTable,
                                      .diagnosticDataProvider        = diagnosticDataProvider,
                                      .whmFeatures                   = kWhmFeatures,
                                      .waterHeaterManagementDelegate = *this,
@@ -75,12 +74,13 @@ SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, Fabric
                                      .thermostatOptionalAttributes  = kThermostatOptionalAttributes,
                                      .thermostatDelegate            = *this,
                                      .heatingDelegate               = *this,
-                                     .waterHeaterModeDelegate       = *this })
+                                     .waterHeaterModeDelegate       = *this }),
+    mFabricTable(fabricTable)
 {}
 
 SimulatedWaterHeater::~SimulatedWaterHeater()
 {
-    mTimerDelegate.CancelTimer(this);
+    GetTimerDelegate().CancelTimer(this);
 }
 
 CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
@@ -111,19 +111,19 @@ CHIP_ERROR SimulatedWaterHeater::Startup(ServerClusterContext & context)
     // code) so we need to find a way to reconcile the two. Defer mode reconciliation until all clusters on the endpoint
     // are constructed and started.
     mStartupReconciliationPending = true;
-    return mConfig.timerDelegate.StartTimer(this, System::Clock::Milliseconds32(0));
+    return GetTimerDelegate().StartTimer(this, System::Clock::Milliseconds32(0));
 }
 
 void SimulatedWaterHeater::Shutdown(ClusterShutdownType type)
 {
-    mTimerDelegate.CancelTimer(this);
+    GetTimerDelegate().CancelTimer(this);
     mStartupReconciliationPending = false;
     mAttributeStorage             = nullptr;
 }
 
 void SimulatedWaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mConfig.timerDelegate.CancelTimer(this);
+    GetTimerDelegate().CancelTimer(this);
     WaterHeater::Unregister(provider);
 }
 
@@ -141,7 +141,7 @@ void SimulatedWaterHeater::TimerFired()
 
         EvaluateHeatingDemand();
 
-        LogErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+        LogErrorOnFailure(GetTimerDelegate().StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
         return;
     }
 
@@ -204,7 +204,7 @@ void SimulatedWaterHeater::TimerFired()
         }
     }
 
-    LogErrorOnFailure(mConfig.timerDelegate.StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
+    LogErrorOnFailure(GetTimerDelegate().StartTimer(this, System::Clock::Seconds32(kStepDurationSeconds)));
 }
 
 Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
@@ -350,7 +350,7 @@ void SimulatedWaterHeater::EvaluateHeatingDemand(std::optional<uint8_t> pendingM
 // Clusters::Thermostat::Delegate
 FabricTable & SimulatedWaterHeater::GetFabricTable() const
 {
-    return mConfig.fabricTable;
+    return mFabricTable;
 }
 
 SystemModeEnum SimulatedWaterHeater::GetSystemMode() const

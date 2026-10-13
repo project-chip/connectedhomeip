@@ -127,6 +127,7 @@ private:
     void NotifyHeatDemandChanged();
     void NotifyBoostStateChanged();
 
+    FabricTable & mFabricTable;
     AttributePersistenceProvider * mAttributeStorage = nullptr;
 
     BitMask<Clusters::WaterHeaterManagement::WaterHeaterHeatSourceBitmap> mHeaterTypes{
