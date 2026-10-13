@@ -54,8 +54,15 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+PIXIT_1ST_AP_SSID = "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
+PIXIT_1ST_AP_CREDENTIALS = "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS"
 PIXIT_2ND_AP_SSID = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
 PIXIT_2ND_AP_CREDENTIALS = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"
+# The runner only keeps --wifi-ssid / --wifi-passphrase for ble-wifi and nfc-wifi commissioning, so a DUT that is
+# already commissioned (no or on-network commissioning method) passes the first access point as PIXITs instead.
+FIRST_AP_USAGE = (f"Only needed when the DUT is already commissioned (otherwise --wifi-ssid / --wifi-passphrase with "
+                  f"--commissioning-method ble-wifi are used): --string-arg {PIXIT_1ST_AP_SSID}:MyFirstSSID "
+                  f"{PIXIT_1ST_AP_CREDENTIALS}:MyFirstPassword")
 PIXIT_USAGE = (f"Pass both PIXITs in a single --string-arg flag, e.g.: "
                f"--string-arg {PIXIT_2ND_AP_SSID}:MySecondSSID {PIXIT_2ND_AP_CREDENTIALS}:MySecondPassword "
                f"(quote the whole NAME:VALUE pair if a value has spaces)")
@@ -1272,7 +1279,11 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     def desc_TC_CNET_4_11(self):
         return "[TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command [DUT-Server]"
 
-    @harness_params("wifi_ssid", "wifi_passphrase")
+    @harness_params(optional=("wifi_ssid", "wifi_passphrase"))
+    @pixit(PIXIT_1ST_AP_SSID, str, f"SSID of the first access point (plain text). {FIRST_AP_USAGE}",
+           required=False, default=None)
+    @pixit(PIXIT_1ST_AP_CREDENTIALS, str, f"Passphrase of the first access point (plain text). {FIRST_AP_USAGE}",
+           required=False, default=None, sensitive=True)
     @pixit(PIXIT_2ND_AP_SSID, str, f"SSID of the second access point (plain text). {PIXIT_USAGE}")
     @pixit(PIXIT_2ND_AP_CREDENTIALS, str, f"Passphrase of the second access point (plain text). {PIXIT_USAGE}",
            sensitive=True)
@@ -1285,13 +1296,16 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
         set_target_device_id(self.dut_node_id)
         logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
-        # Read the values directly so this also works on SDKs without @pixit / @harness_params
-        wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
-        wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
-        asserts.assert_true(wifi_1st_ap_ssid is not None and wifi_1st_ap_credentials is not None,
-                            "The first access point must be passed with --wifi-ssid <SSID> --wifi-passphrase <passphrase>")
-
+        # Read the values directly so this also works on SDKs without @pixit / @harness_params.
+        # First AP: --wifi-ssid / --wifi-passphrase when the test commissions over ble-wifi / nfc-wifi (the runner
+        # drops them for other methods), otherwise the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_* PIXITs.
         test_params = self.matter_test_config.global_test_params
+        wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid or test_params.get(PIXIT_1ST_AP_SSID)
+        wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase or test_params.get(PIXIT_1ST_AP_CREDENTIALS)
+        asserts.assert_true(wifi_1st_ap_ssid is not None and wifi_1st_ap_credentials is not None,
+                            "The first access point is missing. Pass --wifi-ssid <SSID> --wifi-passphrase <passphrase> "
+                            f"with --commissioning-method ble-wifi, or for an already-commissioned DUT: {FIRST_AP_USAGE}")
+
         missing_pixits = [name for name in (PIXIT_2ND_AP_SSID, PIXIT_2ND_AP_CREDENTIALS) if test_params.get(name) is None]
         asserts.assert_false(missing_pixits, f"Missing PIXIT(s): {', '.join(missing_pixits)}. {PIXIT_USAGE}")
         wifi_2nd_ap_ssid = test_params[PIXIT_2ND_AP_SSID]
