@@ -33,7 +33,11 @@ CHIP_ERROR CookSurfacePart::Register(EndpointId endpoint, CodeDrivenDataModelPro
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
-    mOnOffCluster.Create(endpoint, Clusters::OnOffCluster::Context{ .timerDelegate = mTimerDelegate });
+    mOnOffCluster.Create(endpoint,
+                         Clusters::OnOffCluster::Context{
+                             .timerDelegate = mTimerDelegate,
+                             .featureMap    = BitMask<Clusters::OnOff::Feature>(Clusters::OnOff::Feature::kOffOnly),
+                         });
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
 
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));

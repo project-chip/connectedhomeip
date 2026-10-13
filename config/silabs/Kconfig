@@ -20,15 +20,26 @@ if CHIP
 
 menu "Silabs Matter Config"
 
-# See config/zephyr/Kconfig for full definition
+# See config/common/cmake/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	string "Vendor Name"
 	default "Silicon Laboratories"
 
-# See config/zephyr/Kconfig for full definition
+# See config/common/cmake/Kconfig for the base CHIP_OTA_REQUESTOR definition.
+# Silabs selects the DFU backend below from SoC series.
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA Requestor"
 	default n
+
+# SiWx917: NWP / Security Bootloader RPS path (SIWX91X_FIRMWARE_UPGRADE).
+config CHIP_OTA_BACKEND_SIWX91X
+	def_bool CHIP_OTA_REQUESTOR && SOC_SERIES_SIWG917
+	select SIWX91X_FIRMWARE_UPGRADE
+	imply REBOOT
+
+# EFR32 (and other non-SiWx): MCUboot slot-based DFU.
+config CHIP_OTA_BACKEND_MCUBOOT
+	def_bool CHIP_OTA_REQUESTOR && !CHIP_OTA_BACKEND_SIWX91X
 	imply BOOTLOADER_MCUBOOT
 	imply IMG_MANAGER
 	imply STREAM_FLASH
@@ -37,7 +48,8 @@ config CHIP_OTA_REQUESTOR
 config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
-	depends on SIGN_IMAGES
+	# EFR32 OTA images wrap the MCUboot-signed app; SiWx917 wraps zephyr.rps.
+	depends on SIGN_IMAGES || SOC_SERIES_SIWG917
 
 # Sign the application with the MCUboot ECDSA-P256 development key. Only relevant
 # for MCUboot/OTA builds; replace with a private key for production.

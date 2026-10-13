@@ -125,6 +125,7 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -437,6 +438,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+devicetree
 Devkit
 DevKitC
 DevKitM
@@ -838,6 +840,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -885,6 +888,7 @@ libTransportLayer
 libudev
 libwebkitgtk
 lifecycle
+lifecycles
 lightbulb
 lightin
 LightingApp
@@ -1307,6 +1311,7 @@ registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1378,6 +1383,7 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
@@ -1407,6 +1413,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1487,6 +1494,7 @@ subfolders
 submodule
 submodules
 subnet
+subobject
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1573,6 +1581,7 @@ TKIP
 TLS
 tlsr
 TLV
+TLX
 tmp
 tngvndl
 TODO
@@ -1644,6 +1653,7 @@ unpair
 unprovisioned
 unreferenced
 unregister
+unregisters
 unregistration
 Unsecure
 Unselect

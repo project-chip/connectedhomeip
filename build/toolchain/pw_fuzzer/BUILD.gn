@@ -119,8 +119,8 @@ gcc_toolchain("chip_pw_fuzztest") {
       ]
     }
 
-    pw_unit_test_MAIN = "$dir_pw_fuzzer:fuzztest_main"
-    pw_unit_test_BACKEND = "$dir_pw_fuzzer:gtest"
+    pw_unit_test_MAIN = "//third_party/fuzztest:fuzztest_main"
+    pw_unit_test_BACKEND = "//third_party/fuzztest:gtest"
 
     # The next three lines are needed by the gcc_toolchain template
     current_os = host_os
@@ -185,8 +185,8 @@ gcc_toolchain("chip_pw_fuzztest") {
     # the third_party abseil-cpp triggers warnings related to [-Wformat-nonliteral]
     treat_warnings_as_errors = false
 
-    dir_pw_third_party_abseil_cpp = "//third_party/abseil-cpp/src"
-    dir_pw_third_party_fuzztest = "//third_party/fuzztest"
+    chip_abseil_cpp_dir = "//third_party/abseil-cpp/src"
+    chip_fuzztest_dir = "//third_party/fuzztest/repo"
     dir_pw_third_party_googletest = "$dir_googletest"
 
     # Since pw_fuzzer uses GoogleTest, activating this allows us to benefit from supporting functions

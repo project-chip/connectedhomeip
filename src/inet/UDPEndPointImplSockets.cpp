@@ -167,6 +167,41 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
+void SetAddressReuse(int socket, bool enable)
+{
+    const int value = enable ? 1 : 0;
+    int res         = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value));
+    static_cast<void>(res);
+
+#ifdef SO_REUSEPORT
+    res = setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &value, sizeof(value));
+    if (res != 0)
+    {
+        ChipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
+    }
+#endif // defined(SO_REUSEPORT)
+}
+
+uint16_t GetSocketBoundPort(int socket)
+{
+    SockAddr boundAddr;
+    socklen_t boundAddrLen = sizeof(boundAddr);
+
+    if (getsockname(socket, &boundAddr.any, &boundAddrLen) == 0)
+    {
+        if (boundAddr.any.sa_family == AF_INET)
+        {
+            return ntohs(boundAddr.in.sin_port);
+        }
+        if (boundAddr.any.sa_family == AF_INET6)
+        {
+            return ntohs(boundAddr.in6.sin6_port);
+        }
+    }
+
+    return 0;
+}
+
 } // anonymous namespace
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
@@ -178,42 +213,37 @@ CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPA
     // Make sure we have the appropriate type of socket.
     ReturnErrorOnFailure(GetSocket(addressType));
 
+    // Linux may give a reusable port-0 bind a port another reusable socket holds, so only explicit ports get reuse.
+    // Bind is allowed in kBound and a send binds implicitly; a rejected rebind must not change the live binding.
+    const bool reuse = (port != 0) && (GetSocketBoundPort(mSocket) == 0);
+    if (reuse)
+    {
+        SetAddressReuse(mSocket, true);
+    }
+
+    CHIP_ERROR err = INET_ERROR_WRONG_ADDRESS_TYPE;
     if (addressType == IPAddressType::kIPv6)
     {
-        ReturnErrorOnFailure(IPv6Bind(mSocket, addr, port, interface));
+        err = IPv6Bind(mSocket, addr, port, interface);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (addressType == IPAddressType::kIPv4)
     {
-        ReturnErrorOnFailure(IPv4Bind(mSocket, addr, port));
+        err = IPv4Bind(mSocket, addr, port);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
-    else
+
+    if (err != CHIP_NO_ERROR)
     {
-        return INET_ERROR_WRONG_ADDRESS_TYPE;
-    }
-
-    mBoundPort   = port;
-    mBoundIntfId = interface;
-
-    // If an ephemeral port was requested, retrieve the actual bound port.
-    if (port == 0)
-    {
-        SockAddr boundAddr;
-        socklen_t boundAddrLen = sizeof(boundAddr);
-
-        if (getsockname(mSocket, &boundAddr.any, &boundAddrLen) == 0)
+        if (reuse)
         {
-            if (boundAddr.any.sa_family == AF_INET)
-            {
-                mBoundPort = ntohs(boundAddr.in.sin_port);
-            }
-            else if (boundAddr.any.sa_family == AF_INET6)
-            {
-                mBoundPort = ntohs(boundAddr.in6.sin6_port);
-            }
+            SetAddressReuse(mSocket, false);
         }
+        return err;
     }
+
+    mBoundPort   = (port != 0) ? port : GetSocketBoundPort(mSocket);
+    mBoundIntfId = interface;
 
     return CHIP_NO_ERROR;
 }
@@ -486,17 +516,8 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         // logic up to check for implementations of these options and
         // to provide appropriate HAVE_xxxxx definitions accordingly.
 
-        constexpr int one = 1;
-        int res           = setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-        static_cast<void>(res);
-
-#ifdef SO_REUSEPORT
-        res = setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
-        if (res != 0)
-        {
-            ChipLogError(Inet, "SO_REUSEPORT failed: %d", errno);
-        }
-#endif // defined(SO_REUSEPORT)
+        [[maybe_unused]] constexpr int one = 1;
+        [[maybe_unused]] int res;
 
         // If creating an IPv6 socket, tell the kernel that it will be
         // IPv6 only.  This makes it posible to bind two sockets to

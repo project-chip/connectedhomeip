@@ -42,11 +42,11 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_7(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def desc_TC_AVSUM_2_7(self) -> str:
         return "[TC-AVSUM-2.7] DPTZSetViewport command validation"

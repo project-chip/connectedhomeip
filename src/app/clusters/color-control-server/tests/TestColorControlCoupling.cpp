@@ -16,7 +16,7 @@
 
 // ColorControl coupling tests: to On/Off, and to Level Control.
 //
-// On/Off coupling is via DIRECT INJECTION (Config.onOff), the same pattern LevelControl uses (WithOnOff) -
+// On/Off coupling is via DIRECT INJECTION (Config.onOff), the same pattern LevelControl uses (WithOnOffCluster) -
 // no registry, no CodegenDataModelProvider::Instance(), no mock_model. We construct both clusters, inject
 // the On/Off cluster, and drive the public command handlers to check the ExecuteIfOff gate honors the live
 // On/Off state. Level coupling is driven by calling CoupleColorTempToLevel directly, as the application does.

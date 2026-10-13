@@ -41,13 +41,13 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_8(MatterBaseTest):
+class TC_ACL_2_8(MatterTestCommissionedDevice):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)

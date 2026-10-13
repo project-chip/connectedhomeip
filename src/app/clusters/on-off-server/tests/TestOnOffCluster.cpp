@@ -342,11 +342,13 @@ TEST_F(TestOnOffCluster, TestSceneSupport)
     EXPECT_TRUE(mMockDelegate.mOnOff);
 }
 
-TEST_F(TestOnOffCluster, TestSceneInvalidAttribute)
+TEST_F(TestOnOffCluster, TestSceneUnknownAttributeIgnored)
 {
     using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
-    // Construct invalid scene data with a wrong Attribute ID.
+    // A pair referencing an attribute that is not implemented on the endpoint is ignored
+    // (Scenes Management AttributeValuePairStruct), so the recall succeeds and leaves the
+    // state untouched.
     AttributeValuePair pairs[1];
     pairs[0].attributeID = Attributes::OnOff::Id + 1;
     pairs[0].valueUnsigned8.SetValue(1);
@@ -357,7 +359,29 @@ TEST_F(TestOnOffCluster, TestSceneInvalidAttribute)
 
     EXPECT_EQ(mCluster.EncodeAttributeValueList(attributeValueList, serializedBytes), CHIP_NO_ERROR);
 
-    EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 0), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    EXPECT_FALSE(mMockDelegate.mOnOff);
+}
+
+TEST_F(TestOnOffCluster, TestSceneUnknownAttributeIgnoredAlongsideOnOffPair)
+{
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+
+    // An unknown pair before the OnOff pair is skipped and the OnOff pair still applies.
+    AttributeValuePair pairs[2];
+    pairs[0].attributeID = Attributes::OnOff::Id + 1;
+    pairs[0].valueUnsigned8.SetValue(0);
+    pairs[1].attributeID = Attributes::OnOff::Id;
+    pairs[1].valueUnsigned8.SetValue(1);
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
+
+    EXPECT_EQ(mCluster.EncodeAttributeValueList(attributeValueList, serializedBytes), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mCluster.ApplyScene(kTestEndpointId, Clusters::OnOff::Id, serializedBytes, 0), CHIP_NO_ERROR);
+    EXPECT_TRUE(mMockDelegate.mOnOff);
 }
 
 TEST_F(TestOnOffCluster, TestSceneTransition)

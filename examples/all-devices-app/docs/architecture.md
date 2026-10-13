@@ -78,52 +78,134 @@ These directories contain hardware-specific or OS-specific drivers, entrypoint
 
 ## 3. Key Core Classes
 
-### The Device Interface
+### Device Inheritance & Extension Model
 
-All devices in the application implement `DeviceInterface` and its core base
-class, `SingleEndpoint`.
+All single-endpoint devices inherit from `DeviceInterface` and `SingleEndpoint`.
+Device types follow a strict inheritance direction separating generic spec
+definitions from concrete simulations or hardware drivers.
+
+#### 1. Default 2-Tier Hierarchy (`SingleEndpoint <- Foo <- LoggingFoo`)
 
 ```mermaid
 classDiagram
     class DeviceInterface {
         <<interface>>
-        #mDeviceTypes: Span~const DeviceTypeEntry~
-        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
-        +Unregister(CodeDrivenDataModelProvider & provider)*
+        +Register(EndpointIdAllocator &, CodeDrivenDataModelProvider &, EndpointComposition)* CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider &)*
     }
 
     class SingleEndpoint {
         <<abstract>>
         #mEndpointId: EndpointId
-        +Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)* CHIP_ERROR
-        +Unregister(CodeDrivenDataModelProvider & provider)*
+        +Register(EndpointId, CodeDrivenDataModelProvider &, EndpointComposition)* CHIP_ERROR
+        +Unregister(CodeDrivenDataModelProvider &)*
         +GetEndpointId() EndpointId
     }
 
-    class OccupancySensor {
-        #mOccupancySensingCluster: LazyRegisteredServerCluster~OccupancySensingCluster~
-        #mIdentifyCluster: LazyRegisteredServerCluster~IdentifyCluster~
-        +Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition) CHIP_ERROR
-        +Unregister(CodeDrivenDataModelProvider & provider)
+    class Foo {
+        <<device/types/foo/Foo.h>>
+        #MandatoryClusters
+        +Foo(Delegates &)
+        #RegisterAdditionalClusters(EndpointId, CodeDrivenDataModelProvider &) CHIP_ERROR
+        #UnregisterAdditionalClusters(CodeDrivenDataModelProvider &) void
+    }
+
+    class LoggingFoo {
+        <<device/types/foo/impl/LoggingFoo.h>>
+        #OptionalClusters
+        +LoggingFoo(Context)
+        #RegisterAdditionalClusters(...) override
+        #UnregisterAdditionalClusters(...) override
     }
 
     DeviceInterface <|-- SingleEndpoint
-    SingleEndpoint <|-- OccupancySensor
+    SingleEndpoint <|-- Foo
+    Foo <|-- LoggingFoo
 ```
 
--   **`DeviceInterface`** (`all-devices-common/device/api/Interface.h`): Defines
-    the pure virtual lifecycle contracts (`Register`, `Unregister`, etc.)
-    required for registering a block of data model elements into the active
-    server.
 -   **`SingleEndpoint`** (`all-devices-common/device/api/SingleEndpoint.h`):
-    Encapsulates endpoint state, managing its assigned `EndpointId`, its parent
-    endpoint relationship (for bridges or composite devices), and a list of
-    `DeviceTypeEntry` structures.
--   **Concrete Devices** (e.g., `OccupancySensor`): Inherit from
-    `SingleEndpoint`, own one or more concrete strongly-typed cluster instances
-    (`LazyRegisteredServerCluster`), and bind them to the endpoint during
-    registration.
+    Encapsulates endpoint state, `EndpointId` assignment, parent composition,
+    and `DeviceTypeEntry` descriptors.
+-   **Base Device Type (`device/types/foo/Foo.h`, e.g. `LaundryWasher`)**:
+    Represents the spec-defined Matter Device Type. It inherits directly from
+    `SingleEndpoint`, defines the `DeviceTypeEntry` (ID and revision), owns
+    **only mandatory clusters**, and accepts abstract `Delegate &` references
+    via constructor injection. It contains zero simulation, logging, or hardware
+    pin logic.
+-   **Concrete Implementation / Simulation
+    (`device/types/foo/impl/LoggingFoo.h`)**: Inherits from `Foo` (**never the
+    reverse**). `LoggingFoo` (or `EmulatedFoo`) provides a self-contained
+    simulation for `DeviceFactory` by implementing the required cluster
+    delegates (inheriting privately from delegate bases _before_ `public Foo`
+    for base-from-member initialization safety). Hardware targets subclass or
+    instantiate `Foo` with real hardware drivers.
+
+Because `impl/LoggingFoo` and platform subclasses derive from `Foo`, UI screens,
+Out-of-Band (OOB) CLI controls, and generic application logic bind to the base
+device type interface (`Foo`) without coupling to simulation or hardware
+details.
+
+#### 2. Optional Clusters & Registration Hooks
+
+Optional clusters must **not** reside in the base `Foo` class. Keeping `Foo`
+restricted to mandatory clusters avoids RAM/Flash overhead for minimal products.
+
+Because `CodeDrivenDataModelProvider` requires all clusters on an endpoint to be
+registered via `provider.AddCluster()` **before** `provider.AddEndpoint()`
+commits the endpoint (and removed **after** `UnregisterDescriptor()` unregisters
+the endpoint), base device classes expose virtual extension hooks inside their
+`Register()` and `Unregister()` methods:
+
+-   `RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)`:
+    Invoked inside `Foo::Register()` after mandatory clusters are added,
+    immediately before `provider.AddEndpoint(mEndpointRegistration)`.
+-   `UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)`:
+    Invoked inside `Foo::Unregister()` immediately after
+    `UnregisterDescriptor(provider)`.
+
+Subclasses in `impl/` or platform targets override these hooks to attach
+optional clusters cleanly.
+
+#### 3. Special Case: Shared Capabilities (`device/capabilities/`)
+
+```mermaid
+classDiagram
+    class SingleEndpoint {
+        <<abstract>>
+    }
+
+    class OnOffLoad {
+        <<device/capabilities/on-off-load/OnOffLoad.h>>
+    }
+
+    class OnOffLight {
+        <<device/types/on-off-light/OnOffLight.h>>
+    }
+
+    class LoggingOnOffLight {
+        <<device/types/on-off-light/impl/LoggingOnOffLight.h>>
+    }
+
+    SingleEndpoint <|-- OnOffLoad
+    OnOffLoad <|-- OnOffLight
+    OnOffLight <|-- LoggingOnOffLight
+```
+
+A small set of closely related device families (`OnOffLoad`, `DimmableLoad`,
+`FanLoad`) use a 3-tier hierarchy:
+`impl -> device_type -> capability -> SingleEndpoint`.
+
+-   **Capabilities are an exception, not the default**: Deep endpoint
+    inheritance increases coupling, complicates constructor/context plumbing,
+    and obscures cluster lifecycles.
+-   **Prefer duplication over new capabilities**: When creating new device
+    types, inherit directly from `SingleEndpoint` even if cluster declarations
+    repeat across similar devices.
+-   **Share delegates, not endpoint bases**: To share cluster behavior or
+    logging stubs across device types, implement reusable delegate classes in
+    `capabilities/impl/` (e.g. `LoggingOnOffDelegate`) and compose or inherit
+    those in `impl/LoggingFoo` while keeping `Foo` derived directly from
+    `SingleEndpoint`.
 
 ### The Device Factory
 

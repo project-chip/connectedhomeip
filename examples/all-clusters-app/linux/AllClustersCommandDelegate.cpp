@@ -18,6 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 
+#include "PQCDeviceAttestationProfileReadOverride.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
 #include <app/clusters/basic-information/CodegenIntegration.h>
@@ -402,6 +403,20 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     if (name == "SoftwareFault")
     {
         self->OnSoftwareFaultEventHandler(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
+    }
+    else if (name == "SetPQCDeviceAttestationProfileReadMode")
+    {
+        const auto & mode = self->mJsonValue["Mode"];
+        VerifyOrExit(mode.isString(), ChipLogError(NotSpecified, "Profile read Mode must be a string"));
+        // The codegen provider only consults attribute-access overrides when Ember metadata exists.
+        VerifyOrExit(emberAfLocateAttributeMetadata(kRootEndpointId, OperationalCredentials::Id,
+                                                    OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id) != nullptr,
+                     ChipLogError(NotSpecified, "PQCDeviceAttestationProfile is missing from the ZAP configuration"));
+        const std::string value = mode.asString();
+        CHIP_ERROR err          = GetPQCDeviceAttestationProfileReadOverride().SetReadMode(CharSpan(value.data(), value.size()));
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(NotSpecified, "Profile read Mode must be Normal, UnsupportedAttribute, or Failure"));
+        ChipLogProgress(NotSpecified, "PQCDeviceAttestationProfile read mode set to %s", value.c_str());
     }
     else if (name == "HardwareFaultChange")
     {

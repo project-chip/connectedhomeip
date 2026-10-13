@@ -125,7 +125,7 @@ template("chip_pw_fuzz_target") {
       sources = invoker.test_source
       output_dir = _test_output_dir
 
-      deps = [ "$dir_pw_fuzzer:fuzztest" ]
+      deps = [ "${chip_root}/third_party/fuzztest" ]
 
       # this is necessary so FuzzTest is compiled into an executable in third_party/pigweed/repo/pw_unit_test/test.gni
       # otherwise it will be built successfully but with FuzzTarget.DISABLED.ninja and no executable.

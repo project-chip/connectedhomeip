@@ -25,23 +25,27 @@ jobs:
   list_workflows:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
-    permissions: write-all
+    #   actions:read    summarize_fail.py runs `gh run list` / `gh run view --log-failed`
+    #   contents:write  the Update Docs step commits to the daily_pass_percentage branch
+    permissions:
+      actions: read
+      contents: write
     steps:
-      - uses: actions/checkout@v7
-      - run: pip install pandas python-slugify pyyaml tabulate
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - run: pip install -c scripts/setup/constraints.txt pandas pyyaml tabulate python-slugify==9.1.0
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Update Docs
-        uses: test-room-7/action-update-file@v2
+        uses: test-room-7/action-update-file@6b8249d09d5926fbae288c0bb640757f09ec7ce0 # v2
         with:
           file-path: docs/daily_pass_percentage.md
           commit-msg: Update daily pass percentage
           github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: daily_pass_percentage
       - name: Upload Logs
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: workflow-fail-summary
           path: |

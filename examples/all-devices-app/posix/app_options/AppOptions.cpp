@@ -20,6 +20,7 @@
 #include <device-factory/DeviceFactory.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <setup_payload/SetupPayload.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -64,6 +65,7 @@ constexpr uint16_t kOptionEnableKey     = 0xffde;
 constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
+constexpr uint16_t kOptionPasscode      = 0xffe1;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -211,6 +213,19 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.discriminator = static_cast<uint16_t>(val);
         return true;
     }
+    case kOptionPasscode: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        // Rejects zero, anything above 99999998 and the trivial codes such as
+        // 11111111 and 12345678.
+        if (*endptr != '\0' || val > UINT32_MAX || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(val)))
+        {
+            ChipLogError(Support, "Invalid passcode: %s", value);
+            return false;
+        }
+        mConfig.passcode = static_cast<uint32_t>(val);
+        return true;
+    }
     case kOptionVendorId:
         mConfig.vendorId = static_cast<uint16_t>(strtoul(value, nullptr, 0));
         return true;
@@ -304,9 +319,11 @@ OptionSet * AppOptions::GetOptions()
 #endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "passcode", kArgumentRequired, kOptionPasscode },
         { "vendor-id", kArgumentRequired, kOptionVendorId },
         { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
+        { "secured-device-port", kArgumentRequired, kOptionPort },
         { "interface-id", kArgumentRequired, kOptionInterfaceId },
         { "groupcast", kNoArgument, kOptionGroupcast },
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
@@ -358,14 +375,18 @@ OptionSet * AppOptions::GetOptions()
         result += "  --discriminator <number>\n";
         result += "       Discriminator value for commissioning (default: 3840)\n\n";
 
+        result += "  --passcode <number>\n";
+        result += "       Setup passcode for commissioning (default: 20202021)\n\n";
+
         result += "  --vendor-id <number>\n";
         result += "       Vendor ID value for commissioning\n\n";
 
         result += "  --product-id <number>\n";
         result += "       Product ID value for commissioning\n\n";
 
-        result += "  --port <number>\n";
-        result += "       Listen port for secure device messages (default: 5540)\n\n";
+        result += "  --port <number>, --secured-device-port <number>\n";
+        result += "       Listen port for secure device messages (default: 5540). The second\n";
+        result += "       spelling is the one the other example applications use.\n\n";
 
         result += "  --interface-id <number>\n";
         result += "       Interface ID to use for multicast multicast DNS\n\n";

@@ -20,8 +20,13 @@
 
 namespace chip::app {
 
-MountedOnOffControl::MountedOnOffControl(const Context & context) :
-    LoggingOnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1), context)
+MountedOnOffControl::MountedOnOffControl(const Context & context, Clusters::OnOffDelegate * customOnOff,
+                                         Clusters::OnOffEffectDelegate * customEffect,
+                                         Clusters::IdentifyDelegate * customIdentify) :
+    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMountedOnOffControl, 1),
+              customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
+              customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
+              customIdentify ? *customIdentify : context.identifyDelegate, context)
 {}
 
 } // namespace chip::app

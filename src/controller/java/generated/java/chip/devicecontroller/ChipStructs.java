@@ -4040,67 +4040,6 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     return output.toString();
   }
 }
-public static class GroupKeyManagementClusterGroupcastAdoptionStruct {
-  public Boolean groupcastAdopted;
-  public Integer fabricIndex;
-  private static final long GROUPCAST_ADOPTED_ID = 0L;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public GroupKeyManagementClusterGroupcastAdoptionStruct(
-    Boolean groupcastAdopted,
-    Integer fabricIndex
-  ) {
-    this.groupcastAdopted = groupcastAdopted;
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(GROUPCAST_ADOPTED_ID, new BooleanType(groupcastAdopted)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static GroupKeyManagementClusterGroupcastAdoptionStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Boolean groupcastAdopted = null;
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == GROUPCAST_ADOPTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          groupcastAdopted = castingValue.value(Boolean.class);
-        }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new GroupKeyManagementClusterGroupcastAdoptionStruct(
-      groupcastAdopted,
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("GroupKeyManagementClusterGroupcastAdoptionStruct {\n");
-    output.append("\tgroupcastAdopted: ");
-    output.append(groupcastAdopted);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class FixedLabelClusterLabelStruct {
   public String label;
   public String value;

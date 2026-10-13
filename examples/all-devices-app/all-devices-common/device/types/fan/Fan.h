@@ -24,6 +24,8 @@ namespace app {
 class Fan : public FanLoad
 {
 public:
+    using Context = FanLoad::Context;
+
     Fan(Clusters::FanControl::Delegate & fanDelegate, Clusters::OnOffDelegate * onOffDelegate, const Context & context);
     ~Fan() override = default;
 
