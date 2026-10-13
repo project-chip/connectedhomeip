@@ -585,15 +585,22 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         network_id = network_id.strip()
 
-        config_commands = [
-            f'SET_NETWORK {network_id} ssid "{ssid}"',
-            f'SET_NETWORK {network_id} psk "{password}"',
-            f'SET_NETWORK {network_id} key_mgmt {WIFI_KEY_MGMT}',
-            f'SET_NETWORK {network_id} ieee80211w 1',
-            f'SET_NETWORK {network_id} proto RSN WPA',
-            f'SET_NETWORK {network_id} pairwise CCMP TKIP',
-            f'SET_NETWORK {network_id} group CCMP TKIP',
-        ]
+        if password:
+            config_commands = [
+                f'SET_NETWORK {network_id} ssid "{ssid}"',
+                f'SET_NETWORK {network_id} psk "{password}"',
+                f'SET_NETWORK {network_id} key_mgmt {WIFI_KEY_MGMT}',
+                f'SET_NETWORK {network_id} ieee80211w 1',
+                f'SET_NETWORK {network_id} proto RSN WPA',
+                f'SET_NETWORK {network_id} pairwise CCMP TKIP',
+                f'SET_NETWORK {network_id} group CCMP TKIP',
+            ]
+        else:
+            # Open network: no passphrase (wpa_supplicant rejects an empty psk)
+            config_commands = [
+                f'SET_NETWORK {network_id} ssid "{ssid}"',
+                f'SET_NETWORK {network_id} key_mgmt NONE',
+            ]
 
         for cmd in config_commands:
             result = await wpa_command(interface, cmd)
@@ -1300,8 +1307,13 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
         # First AP: --wifi-ssid / --wifi-passphrase when the test commissions over ble-wifi / nfc-wifi (the runner
         # drops them for other methods), otherwise the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_* PIXITs.
         test_params = self.matter_test_config.global_test_params
-        wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid or test_params.get(PIXIT_1ST_AP_SSID)
-        wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase or test_params.get(PIXIT_1ST_AP_CREDENTIALS)
+        # Explicit None checks: an empty passphrase is valid (open network) and must not fall through to the PIXIT.
+        wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
+        if wifi_1st_ap_ssid is None:
+            wifi_1st_ap_ssid = test_params.get(PIXIT_1ST_AP_SSID)
+        wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
+        if wifi_1st_ap_credentials is None:
+            wifi_1st_ap_credentials = test_params.get(PIXIT_1ST_AP_CREDENTIALS)
         asserts.assert_true(wifi_1st_ap_ssid is not None and wifi_1st_ap_credentials is not None,
                             "The first access point is missing. Pass --wifi-ssid <SSID> --wifi-passphrase <passphrase> "
                             f"with --commissioning-method ble-wifi, or for an already-commissioned DUT: {FIRST_AP_USAGE}")
