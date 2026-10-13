@@ -42,8 +42,6 @@ public:
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
-    // Presets and hold delegates are required by this device's expanded cluster composition.
-    // Callers of the previous setpoint-only constructor must now supply both delegates.
     Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                Clusters::Thermostat::Delegate & thermostatDelegate,
                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,

@@ -96,9 +96,6 @@ public:
     // Optional Deadband Override
     Protocols::InteractionModel::Status GetMinDeadband(int16_t & value) const override;
 
-    Protocols::InteractionModel::Status GetCriticalFreezeProtection(bool & value) const override;
-    Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & value) const override;
-
     // ThermostatPresets::Delegate
     CHIP_ERROR GetPresetTypeAtIndex(size_t index, Clusters::Thermostat::Structs::PresetTypeStruct::Type & value) override;
     uint8_t GetNumberOfPresets() override { return kPresetCapacity; }

@@ -37,6 +37,10 @@ bool IsSupportedMode(thermostat::SystemModeEnum mode, const BitFlags<thermostat:
     {
         return true;
     }
+    if (mode == thermostat::SystemModeEnum::kAuto)
+    {
+        return features.Has(thermostat::Feature::kAutoMode);
+    }
     if (mode == thermostat::SystemModeEnum::kHeat)
     {
         return features.Has(thermostat::Feature::kHeating);
@@ -55,6 +59,7 @@ Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & contex
         .features           = context.features,
         .optionalAttributes = context.optionalAttributes,
     };
+    loggingContext.optionalAttributes.ThermostatRunningMode           = context.features.Has(thermostat::Feature::kAutoMode);
     loggingContext.optionalAttributes.ThermostatRunningState          = true;
     loggingContext.optionalAttributes.RemoteSensing                   = true;
     loggingContext.optionalAttributes.LocalTemperatureCalibration     = true;
@@ -68,6 +73,7 @@ Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & contex
     loggingContext.optionalAttributes.MaxCoolSetpointLimit            = true;
     loggingContext.optionalAttributes.TemperatureSetpointHold         = true;
     loggingContext.optionalAttributes.TemperatureSetpointHoldDuration = true;
+    loggingContext.optionalAttributes.SetpointHoldExpiryTimestamp     = true;
     loggingContext.optionalAttributes.CriticalFreezeProtection        = context.features.Has(thermostat::Feature::kHeating);
     loggingContext.optionalAttributes.CriticalOverheatProtection      = context.features.Has(thermostat::Feature::kCooling);
     return loggingContext;
@@ -166,34 +172,16 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
         mSystemMode = thermostat::SystemModeEnum::kOff;
     }
 
-    if (mMinHeatSetpointLimit < thermostat::kDefaultAbsMinHeatSetpointLimit ||
-        mMinHeatSetpointLimit > thermostat::kDefaultAbsMaxHeatSetpointLimit)
+    // The cluster validates the complete setpoint state on every write; on startup the loaded
+    // persisted state is re-checked the same way, and anything inconsistent falls back to defaults.
+    if (!HasThermostatCluster() || !ThermostatCluster().GetSetpoints().Valid())
     {
         mMinHeatSetpointLimit = thermostat::kDefaultAbsMinHeatSetpointLimit;
-    }
-    if (mMaxHeatSetpointLimit < thermostat::kDefaultAbsMinHeatSetpointLimit ||
-        mMaxHeatSetpointLimit > thermostat::kDefaultAbsMaxHeatSetpointLimit)
-    {
         mMaxHeatSetpointLimit = thermostat::kDefaultAbsMaxHeatSetpointLimit;
-    }
-    if (mMinCoolSetpointLimit < thermostat::kDefaultAbsMinCoolSetpointLimit ||
-        mMinCoolSetpointLimit > thermostat::kDefaultAbsMaxCoolSetpointLimit)
-    {
         mMinCoolSetpointLimit = thermostat::kDefaultAbsMinCoolSetpointLimit;
-    }
-    if (mMaxCoolSetpointLimit < thermostat::kDefaultAbsMinCoolSetpointLimit ||
-        mMaxCoolSetpointLimit > thermostat::kDefaultAbsMaxCoolSetpointLimit)
-    {
         mMaxCoolSetpointLimit = thermostat::kDefaultAbsMaxCoolSetpointLimit;
-    }
-
-    if (mHeatingSetpoint < mMinHeatSetpointLimit || mHeatingSetpoint > mMaxHeatSetpointLimit)
-    {
-        mHeatingSetpoint = thermostat::kDefaultHeatingSetpoint;
-    }
-    if (mCoolingSetpoint < mMinCoolSetpointLimit || mCoolingSetpoint > mMaxCoolSetpointLimit)
-    {
-        mCoolingSetpoint = thermostat::kDefaultCoolingSetpoint;
+        mHeatingSetpoint      = thermostat::kDefaultHeatingSetpoint;
+        mCoolingSetpoint      = thermostat::kDefaultCoolingSetpoint;
     }
 
     UpdateSimulatedRunningState();
@@ -203,18 +191,6 @@ CHIP_ERROR LoggingThermostat::Startup(ServerClusterContext & context)
 void LoggingThermostat::Shutdown(ClusterShutdownType type)
 {
     mAttributeStorage = nullptr;
-}
-
-Status LoggingThermostat::GetCriticalFreezeProtection(bool & value) const
-{
-    value = false;
-    return Status::Success;
-}
-
-Status LoggingThermostat::GetCriticalOverheatProtection(bool & value) const
-{
-    value = false;
-    return Status::Success;
 }
 
 CHIP_ERROR LoggingThermostat::GetPresetTypeAtIndex(size_t index, thermostat::Structs::PresetTypeStruct::Type & value)
@@ -734,13 +710,15 @@ void LoggingThermostat::UpdateSimulatedRunningState()
     if (!mLocalTemperature.IsNull())
     {
         int16_t currentTemp = mLocalTemperature.Value();
-        if (Features().Has(thermostat::Feature::kHeating) && mSystemMode == thermostat::SystemModeEnum::kHeat &&
+        if (Features().Has(thermostat::Feature::kHeating) &&
+            (mSystemMode == thermostat::SystemModeEnum::kHeat || mSystemMode == thermostat::SystemModeEnum::kAuto) &&
             currentTemp < mHeatingSetpoint)
         {
             newRunningMode = thermostat::ThermostatRunningModeEnum::kHeat;
             newRunningState.Set(thermostat::RelayStateBitmap::kHeat);
         }
-        else if (Features().Has(thermostat::Feature::kCooling) && mSystemMode == thermostat::SystemModeEnum::kCool &&
+        else if (Features().Has(thermostat::Feature::kCooling) &&
+                 (mSystemMode == thermostat::SystemModeEnum::kCool || mSystemMode == thermostat::SystemModeEnum::kAuto) &&
                  currentTemp > mCoolingSetpoint)
         {
             newRunningMode = thermostat::ThermostatRunningModeEnum::kCool;
