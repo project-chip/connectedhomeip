@@ -25,8 +25,8 @@
 #include "util/RealtekObserver.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
