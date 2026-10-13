@@ -174,14 +174,33 @@ public:
 
     // ---- Application-facing API ------------------------------------------------
 
-    /// Applies a lock-state change originating from a local operation and emits the
-    /// corresponding LockOperation / LockOperationError events.
+    /// Applies a lock-state change and emits the corresponding LockOperation /
+    /// LockOperationError events. With `sendLockOperationEvent == false` only
+    /// the attribute is updated (legacy "initialize-only" updates).
     CHIP_ERROR SetLockState(DlLockState newState, OperationSourceEnum opSource, const DataModel::Nullable<uint16_t> & userIndex,
                             const Span<const CredentialStruct> & credentials, const DataModel::Nullable<FabricIndex> & fabricIdx,
-                            const DataModel::Nullable<NodeId> & nodeId);
+                            const DataModel::Nullable<NodeId> & nodeId, bool sendLockOperationEvent = true);
 
     /// Updates the door position state and emits a DoorStateChange event.
     CHIP_ERROR SetDoorState(DataModel::Nullable<DoorStateEnum> doorState);
+
+    /// Updates the ActuatorEnabled read-only state (application reported).
+    CHIP_ERROR SetActuatorEnabled(bool actuatorEnabled)
+    {
+        SetAttributeValue(mActuatorEnabled, actuatorEnabled, Attributes::ActuatorEnabled::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    /// Updates the AutoRelockTime attribute without changing any pending relock.
+    CHIP_ERROR SetAutoRelockTime(uint32_t autoRelockTime)
+    {
+        SetAttributeValue(mAutoRelockTime, autoRelockTime, Attributes::AutoRelockTime::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    /// Writes the OperatingMode attribute (rejects unknown values and modes
+    /// that are not marked as supported by SupportedOperatingModes).
+    DataModel::ActionReturnStatus SetOperatingMode(OperatingModeEnum value);
 
     /// Sends a DoorLockAlarm event.
     CHIP_ERROR SendLockAlarmEvent(AlarmCodeEnum alarmCode);
@@ -207,7 +226,9 @@ public:
     }
 
     DlLockState GetLockState() const { return mLockState.ValueOr(DlLockState::kNotFullyLocked); }
+    const DataModel::Nullable<DlLockState> & GetLockStateNullable() const { return mLockState; }
     uint32_t GetAutoRelockTime() const { return mAutoRelockTime; }
+    bool GetRequirePINforRemoteOperation() const { return mRequirePINforRemoteOperation; }
 
 private:
     Delegate & mDelegate;

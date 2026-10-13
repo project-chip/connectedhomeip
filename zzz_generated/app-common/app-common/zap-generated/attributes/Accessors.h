@@ -7685,18 +7685,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clu
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockState value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockState value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LockState
 
 namespace LockType {
@@ -7709,10 +7697,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::DoorLock::DlL
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LockType
 
 namespace ActuatorEnabled {
@@ -7724,9 +7708,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace ActuatorEnabled
 
 namespace DoorState {
@@ -7740,18 +7721,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<chip::app::Clu
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace DoorState
 
 namespace DoorOpenEvents {
@@ -7763,9 +7732,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace DoorOpenEvents
 
 namespace DoorClosedEvents {
@@ -7777,9 +7743,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace DoorClosedEvents
 
 namespace OpenPeriod {
@@ -7791,9 +7754,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace OpenPeriod
 
 namespace NumberOfTotalUsersSupported {
@@ -7805,9 +7765,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfTotalUsersSupported
 
 namespace NumberOfPINUsersSupported {
@@ -7819,9 +7776,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfPINUsersSupported
 
 namespace NumberOfRFIDUsersSupported {
@@ -7833,9 +7787,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfRFIDUsersSupported
 
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
@@ -7847,9 +7798,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfWeekDaySchedulesSupportedPerUser
 
 namespace NumberOfYearDaySchedulesSupportedPerUser {
@@ -7861,9 +7809,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfYearDaySchedulesSupportedPerUser
 
 namespace NumberOfHolidaySchedulesSupported {
@@ -7875,9 +7820,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfHolidaySchedulesSupported
 
 namespace MaxPINCodeLength {
@@ -7889,9 +7831,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace MaxPINCodeLength
 
 namespace MinPINCodeLength {
@@ -7903,9 +7842,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace MinPINCodeLength
 
 namespace MaxRFIDCodeLength {
@@ -7917,9 +7853,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace MaxRFIDCodeLength
 
 namespace MinRFIDCodeLength {
@@ -7931,9 +7864,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace MinRFIDCodeLength
 
 namespace CredentialRulesSupport {
@@ -7947,12 +7877,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters:
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value, MarkAttributeDirty markDirty);
 } // namespace CredentialRulesSupport
 
 namespace NumberOfCredentialsSupportedPerUser {
@@ -7964,9 +7888,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace NumberOfCredentialsSupportedPerUser
 
 namespace Language {
@@ -7978,9 +7899,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::CharSpan & value, chip::Char
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace Language
 
 namespace LEDSettings {
@@ -7992,9 +7910,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace LEDSettings
 
 namespace AutoRelockTime {
@@ -8006,9 +7921,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace AutoRelockTime
 
 namespace SoundVolume {
@@ -8020,9 +7932,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace SoundVolume
 
 namespace OperatingMode {
@@ -8035,10 +7944,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::DoorLock::Ope
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace OperatingMode
 
 namespace SupportedOperatingModes {
@@ -8052,13 +7957,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters:
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value,
-                                        MarkAttributeDirty markDirty);
 } // namespace SupportedOperatingModes
 
 namespace DefaultConfigurationRegister {
@@ -8072,13 +7970,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters:
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value,
-                                        MarkAttributeDirty markDirty);
 } // namespace DefaultConfigurationRegister
 
 namespace EnableLocalProgramming {
@@ -8090,9 +7981,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace EnableLocalProgramming
 
 namespace EnableOneTouchLocking {
@@ -8104,9 +7992,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace EnableOneTouchLocking
 
 namespace EnableInsideStatusLED {
@@ -8118,9 +8003,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace EnableInsideStatusLED
 
 namespace EnablePrivacyModeButton {
@@ -8132,9 +8014,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace EnablePrivacyModeButton
 
 namespace LocalProgrammingFeatures {
@@ -8148,13 +8027,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::BitMask<chip::app::Clusters:
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LocalProgrammingFeatures
 
 namespace WrongCodeEntryLimit {
@@ -8166,9 +8038,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace WrongCodeEntryLimit
 
 namespace UserCodeTemporaryDisableTime {
@@ -8180,9 +8049,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint8_t & value, uint8_t fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
 } // namespace UserCodeTemporaryDisableTime
 
 namespace SendPINOverTheAir {
@@ -8194,9 +8060,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace SendPINOverTheAir
 
 namespace RequirePINforRemoteOperation {
@@ -8208,9 +8071,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace RequirePINforRemoteOperation
 
 namespace ExpiringUserTimeout {
@@ -8222,9 +8082,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ExpiringUserTimeout
 
 namespace AliroReaderVerificationKey {
@@ -8316,9 +8173,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -8330,9 +8184,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes

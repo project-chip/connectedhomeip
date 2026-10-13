@@ -26,6 +26,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -276,6 +277,23 @@ CHIP_ERROR AppTask::Init()
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
+
+    // Lock app runtime parity with the legacy implementation: this application
+    // only supports the user, PIN-credential and credentials-over-the-air
+    // access features and no auto-relock. Must run before the server init,
+    // where the Door Lock cluster is created.
+    {
+        chip::app::Clusters::DoorLock::ServerConfigOverrides doorLockConfig;
+        doorLockConfig.features = chip::BitFlags<chip::app::Clusters::DoorLock::Feature>(
+            chip::app::Clusters::DoorLock::Feature::kPinCredential, chip::app::Clusters::DoorLock::Feature::kUser,
+            chip::app::Clusters::DoorLock::Feature::kCredentialsOverTheAirAccess);
+        doorLockConfig.numberOfTotalUsersSupported         = CONFIG_LOCK_NUM_USERS;
+        doorLockConfig.numberOfPINUsersSupported           = CONFIG_LOCK_NUM_USERS;
+        doorLockConfig.numberOfRFIDUsersSupported          = 0;
+        doorLockConfig.numberOfCredentialsSupportedPerUser = CONFIG_LOCK_NUM_CREDENTIALS_PER_USER;
+        doorLockConfig.autoRelockTime                      = 0;
+        chip::app::Clusters::DoorLock::ApplyServerConfigOverrides(kLockEndpointId, doorLockConfig);
+    }
 
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
@@ -715,22 +733,20 @@ void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::
     }
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newLockState, source] {
-        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
-        chip::app::Clusters::DoorLock::Attributes::LockState::Get(kLockEndpointId, currentLockState);
-
-        if (currentLockState.IsNull())
+        auto * cluster = chip::app::Clusters::DoorLock::FindClusterOnEndpoint(kLockEndpointId);
+        if (cluster == nullptr)
         {
-            // Initialize lock state with start value, but not invoke lock/unlock.
-            chip::app::Clusters::DoorLock::Attributes::LockState::Set(kLockEndpointId, newLockState);
+            LOG_ERR("Door lock cluster not found on endpoint %d", kLockEndpointId);
+            return;
         }
-        else
+        LOG_INF("Updating LockState attribute");
+        chip::app::DataModel::Nullable<uint16_t> noUser;
+        CHIP_ERROR err = cluster->SetLockState(newLockState, source, noUser, chip::Span<const CredentialStruct>(),
+                                               chip::app::DataModel::Nullable<chip::FabricIndex>(),
+                                               chip::app::DataModel::Nullable<chip::NodeId>());
+        if (err != CHIP_NO_ERROR)
         {
-            LOG_INF("Updating LockState attribute");
-
-            if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, newLockState, source))
-            {
-                LOG_ERR("Failed to update LockState attribute");
-            }
+            LOG_ERR("Failed to update LockState attribute");
         }
     });
 }

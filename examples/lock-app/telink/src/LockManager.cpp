@@ -23,6 +23,7 @@
 #include <AppTask.h>
 #include <LockSettingsStorage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 

@@ -32,6 +32,7 @@
 #include "qPinCfg.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 

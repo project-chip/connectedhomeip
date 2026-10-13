@@ -39,19 +39,12 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    VerifyOrReturn(attributePath.mClusterId == DoorLock::Id && attributePath.mAttributeId == DoorLock::Attributes::LockState::Id);
-
-    switch (*value)
-    {
-    case to_underlying(DlLockState::kLocked):
-        BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
-        break;
-    case to_underlying(DlLockState::kUnlocked):
-        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
-        break;
-    default:
-        break;
-    }
+    // Door lock state changes are actuated by the lock operation delegate
+    // hooks now; attribute writes no longer drive the hardware.
+    (void) attributePath;
+    (void) type;
+    (void) size;
+    (void) value;
 }
 
 bool emberAfPluginDoorLockGetUser(EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -112,25 +105,10 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nulla
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
+    // Cluster registration is handled by MatterDoorLockClusterInitCallback;
+    // feature/capacity overrides are installed from AppTask::Init.
     DoorLockServer::Instance().InitServer(endpoint);
 
-    const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(Zcl, "Failed to set DoorLock %s: %x", attributeName, to_underlying(status));
-        }
-    };
-
-    logOnFailure(DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt), "type");
-    logOnFailure(DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of users");
-    logOnFailure(DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of PIN users");
-    logOnFailure(DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0), "number of RFID users");
-    logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
-                 "number of credentials per user");
-
-    // Set FeatureMap to (kUser|kPinCredential), default is:
-    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x181), "feature map");
-
+    // Only the initial lock state is synced from the (already running) hardware.
     AppTask::Instance().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

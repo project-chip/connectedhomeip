@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <lib/support/StringBuilder.h>

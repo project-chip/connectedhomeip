@@ -18,6 +18,7 @@
 
 #include "DeviceWithDisplay.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 

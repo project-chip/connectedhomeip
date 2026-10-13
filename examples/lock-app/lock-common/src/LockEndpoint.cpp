@@ -18,6 +18,7 @@
 #include "LockEndpoint.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/door-lock-server/CodegenIntegration.h>
 #include <cstring>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/StringBuilder.h>
@@ -561,8 +562,12 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
                                 OperationSourceEnum opSource)
 {
     // Assume pin is required until told otherwise
-    bool requirePin = true;
-    chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(mEndpointId, &requirePin);
+    bool requirePin  = true;
+    auto lockCluster = chip::app::Clusters::DoorLock::FindClusterOnEndpoint(mEndpointId);
+    if (lockCluster != nullptr)
+    {
+        requirePin = lockCluster->GetRequirePINforRemoteOperation();
+    }
 
     // If a pin code is not given
     if (!pin.HasValue())

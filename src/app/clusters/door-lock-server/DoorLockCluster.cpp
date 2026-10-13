@@ -405,13 +405,7 @@ DataModel::ActionReturnStatus DoorLockCluster::WriteAttribute(const DataModel::W
     case OperatingMode::Id: {
         OperatingModeEnum value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value != OperatingModeEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
-        // The OperatingModesBitmap uses inverted polarity: a `0` bit marks a
-        // supported mode, so the mode is rejected when its bit is set.
-        VerifyOrReturnError(!mSupportedOperatingModes.Has(static_cast<DlSupportedOperatingModes>(1u << to_underlying(value))),
-                            Protocols::InteractionModel::Status::ConstraintError);
-        SetAttributeValue(mOperatingMode, value, OperatingMode::Id);
-        return CHIP_NO_ERROR;
+        return SetOperatingMode(value);
     }
     case EnableLocalProgramming::Id: {
         bool value;
@@ -543,9 +537,20 @@ CHIP_ERROR DoorLockCluster::SetLockState(DlLockState newState, OperationSourceEn
                                          const DataModel::Nullable<uint16_t> & userIndex,
                                          const Span<const CredentialStruct> & credentials,
                                          const DataModel::Nullable<FabricIndex> & fabricIdx,
-                                         const DataModel::Nullable<NodeId> & nodeId)
+                                         const DataModel::Nullable<NodeId> & nodeId, bool sendLockOperationEvent)
 {
-    return ApplyLockStateChange(newState, opSource, userIndex, credentials, fabricIdx, nodeId, /* sendLockOperationEvent */ true);
+    return ApplyLockStateChange(newState, opSource, userIndex, credentials, fabricIdx, nodeId, sendLockOperationEvent);
+}
+
+DataModel::ActionReturnStatus DoorLockCluster::SetOperatingMode(OperatingModeEnum value)
+{
+    VerifyOrReturnError(value != OperatingModeEnum::kUnknownEnumValue, Protocols::InteractionModel::Status::ConstraintError);
+    // The OperatingModesBitmap uses inverted polarity: a `0` bit marks a
+    // supported mode, so the mode is rejected when its bit is set.
+    VerifyOrReturnError(!mSupportedOperatingModes.Has(static_cast<DlSupportedOperatingModes>(1u << to_underlying(value))),
+                        Protocols::InteractionModel::Status::ConstraintError);
+    SetAttributeValue(mOperatingMode, value, OperatingMode::Id);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DoorLockCluster::SetDoorState(DataModel::Nullable<DoorStateEnum> doorState)
@@ -790,7 +795,8 @@ CHIP_ERROR DoorLockCluster::ApplyLockStateChange(DlLockState newState, Operation
     // Spec 5.3.3.25: 0 = disabled; unlock operations from any source are timed.
     // Lock and unlatch operations are not relocked here, and UnlockWithTimeout
     // schedules its own one-shot timer instead of using AutoRelockTime.
-    if (opType == LockOperationTypeEnum::kUnlock && mAutoRelockTime != 0)
+    // Initial (event-less) lock-state updates do not schedule a relock either.
+    if (sendLockOperationEvent && opType == LockOperationTypeEnum::kUnlock && mAutoRelockTime != 0)
     {
         ScheduleAutoRelock(mAutoRelockTime);
     }
