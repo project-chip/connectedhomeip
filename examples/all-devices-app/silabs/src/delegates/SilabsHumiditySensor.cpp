@@ -111,7 +111,7 @@ void SilabsHumiditySensor::DrawDevicePage(GLIB_Context_t * context, EndpointId e
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 namespace {
-constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(5);
+constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(30);
 } // namespace
 
 void SilabsHumiditySensor::TimerFired()
@@ -132,7 +132,7 @@ void SilabsHumiditySensor::TimerFired()
     }
     else
     {
-        ChipLogError(AppServer, "SilabsHumiditySensor: Si70xx read failed: %x", status);
+        ChipLogError(AppServer, "SilabsHumiditySensor: Si70xx read failed: %lx", status);
     }
 
     LogErrorOnFailure(HumiditySensor::mTimerDelegate.StartTimer(this, kSi70xxSampleIntervalSec));

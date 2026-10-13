@@ -33,8 +33,8 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // TODO @jepenven-silabs
-    // Add setBatterySamplingPeriod
+    CHIP_ERROR SetBatPercentRemaining(uint8_t batteryLevel) {return BatteryPowerSourceCluster().SetBatPercentRemaining(batteryLevel);}
+    void SetBatVoltage(uint32_t batteryVoltage) {BatteryPowerSourceCluster().SetBatVoltage(batteryVoltage);}
 
     // TimerContext
     void TimerFired() override;
@@ -57,7 +57,7 @@ class BatteryMonitor : public chip::app::ICDStateObserver
 public:
     static BatteryMonitor & Instance();
 
-    void Init();
+    CHIP_ERROR Init(chip::app::SilabsBatteryPowerSource * instance);
     void Update();
 
     uint16_t GetVoltageMv() const { return mVoltageMv; }
@@ -78,7 +78,6 @@ private:
     uint16_t ReadVoltageMv();
     uint16_t FilterVoltage(uint16_t sample);
     uint8_t VoltageToMatterPercent(uint16_t voltageMv) const;
-    void UpdateMatterAttributes();
     bool ShouldMeasure(uint32_t nowMs) const;
 
     static constexpr size_t kFilterSize = 16;
@@ -98,6 +97,8 @@ private:
 
     // Measure at most once every 30 minutes.
     static constexpr uint32_t kMeasurementIntervalMs = 30UL * 60UL * 1000UL; //TODO Adjust this value
+
+    chip::app::SilabsBatteryPowerSource * mClusterInstance = nullptr;
 
     uint16_t mVoltageMv = 0;
     uint8_t mBatteryPercent = 0;

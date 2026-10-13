@@ -202,7 +202,7 @@ else
                 shift
                 ;;
             --low-power)
-                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
+                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true sl_uart_log_output=false use_external_flash=false "
                 shift
                 ;;
             --chip_enable_wifi_ipv4)

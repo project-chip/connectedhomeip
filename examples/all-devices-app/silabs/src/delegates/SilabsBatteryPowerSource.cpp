@@ -15,13 +15,15 @@
  *    limitations under the License.
  */
 #include "SilabsBatteryPowerSource.h"
+#include "sensors/Si70xxSensor.h" //nogncheck
+
 
 namespace chip::app {
 
 constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(30);
 
 SilabsBatteryPowerSource::SilabsBatteryPowerSource() :
-    BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
+    BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable,
                        mTimerDelegate)
 {}
 
@@ -34,8 +36,12 @@ CHIP_ERROR SilabsBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDat
                                               EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
+#if SL_MATTER_BATTERY_MONITOR
+    return BatteryMonitor::Instance().Init(this);
+#else
     // Kick off the timer loop to decrease battery level every few seconds
-    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);
+    return mTimerDelegate.StartTimer(this, kDecreaseBatteryLevelInterval);    
+#endif
 }
 
 void SilabsBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
@@ -44,11 +50,9 @@ void SilabsBatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider
     mTimerDelegate.CancelTimer(this);
 }
 
+// Simulated Battery drain
 void SilabsBatteryPowerSource::TimerFired()
 {
-
-    // TODO @jepenven-silabs
-    // Add VMCU power sampling
     auto & batteryCluster = BatteryPowerSourceCluster();
     auto batteryLevel     = batteryCluster.GetBatPercentRemaining();
 
@@ -92,16 +96,10 @@ void SilabsBatteryPowerSource::TimerFired()
 } // namespace chip::app
 
 
-
-
-// TODO migrate
-#include "BatteryMonitor.h"
-
 #include "em_cmu.h"
 #include "em_iadc.h"
 #include "sl_sleeptimer.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/icd/server/ICDManager.h>
 #include <lib/core/CHIPError.h>
@@ -110,16 +108,19 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-constexpr EndpointId kPowerSourceEndpoint = 1; //TODO Adjust this value
-
 BatteryMonitor & BatteryMonitor::Instance()
 {
     static BatteryMonitor instance;
     return instance;
 }
 
-void BatteryMonitor::Init()
+CHIP_ERROR BatteryMonitor::Init(chip::app::SilabsBatteryPowerSource * instance)
 {
+    if (instance == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mClusterInstance = instance;
     InitAdc();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -128,6 +129,7 @@ void BatteryMonitor::Init()
 #else
     mObserverRegistered = false;
 #endif
+    return CHIP_NO_ERROR;
 }
 
 void BatteryMonitor::InitAdc()
@@ -311,23 +313,18 @@ void BatteryMonitor::Update()
     if (report)
     {
         chip::DeviceLayer::PlatformMgr().LockChipStack();
-        UpdateMatterAttributes();
+        mClusterInstance->SetBatVoltage(mVoltageMv);
+        TEMPORARY_RETURN_IGNORED mClusterInstance->SetBatPercentRemaining(mBatteryPercent);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
-}
-
-void BatteryMonitor::UpdateMatterAttributes()
-{
-    // BatVoltage is represented in millivolts.
-    (void) PowerSource::Attributes::BatVoltage::Set(kPowerSourceEndpoint, mVoltageMv);
-
-    // BatPercentRemaining is represented in 0.5% units (0..200).
-    (void) PowerSource::Attributes::BatPercentRemaining::Set(kPowerSourceEndpoint, mBatteryPercent);
 }
 
 void BatteryMonitor::OnEnterActiveMode()
 {
     EnableAdc();
+    // Activate Sensor
+    GPIO_PinModeSet(gpioPortC, 9, gpioModePushPull, 1);
+    TEMPORARY_RETURN_IGNORED Si70xxSensor::Init();
 }
 
 void BatteryMonitor::OnTransitionToIdle()
@@ -338,6 +335,8 @@ void BatteryMonitor::OnTransitionToIdle()
 void BatteryMonitor::OnEnterIdleMode()
 {
     DisableAdc();
+    // disativate sensor
+    GPIO_PinModeSet(gpioPortC, 9, gpioModePushPull, 0);
 }
 
 void BatteryMonitor::OnICDModeChange()
