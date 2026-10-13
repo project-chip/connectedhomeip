@@ -780,6 +780,7 @@ ScenesManagementCluster::HandleRemoveAllScenes(FabricIndex fabricIndex,
     return response;
 }
 
+/** Store the current scene state and return the corresponding command response. */
 ScenesManagement::Commands::StoreSceneResponse::Type
 ScenesManagementCluster::HandleStoreScene(FabricIndex fabricIndex,
                                           const ScenesManagement::Commands::StoreScene::DecodableType & req)
@@ -802,6 +803,7 @@ ScenesManagementCluster::HandleStoreScene(FabricIndex fabricIndex,
     return response;
 }
 
+/** Validate RecallScene field constraints before applying the scene or updating FabricSceneInfo. */
 Protocols::InteractionModel::Status
 ScenesManagementCluster::HandleRecallScene(FabricIndex fabricIndex,
                                            const ScenesManagement::Commands::RecallScene::DecodableType & req)
@@ -810,6 +812,10 @@ ScenesManagementCluster::HandleRecallScene(FabricIndex fabricIndex,
 
     // Verify the attributes are respecting constraints
     VerifyOrReturnError(req.sceneID != scenes::kUndefinedSceneId, Status::ConstraintError);
+    if (req.transitionTime.HasValue() && !req.transitionTime.Value().IsNull())
+    {
+        VerifyOrReturnError(req.transitionTime.Value().Value() <= scenes::kScenesMaxTransitionTime, Status::ConstraintError);
+    }
 
     CHIP_ERROR err = RecallSceneParse(fabricIndex, req.groupID, req.sceneID, req.transitionTime);
 

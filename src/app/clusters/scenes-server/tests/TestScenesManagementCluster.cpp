@@ -16,6 +16,7 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/scenes-server/Constants.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -67,6 +68,7 @@ public:
     {
         bool on = false;
 
+        /** Encode the mock on-state in the scene extension field set. */
         CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
         {
             TLV::TLVType outer;
@@ -75,6 +77,7 @@ public:
             return writer.EndContainer(outer);
         }
 
+        /** Decode the stored mock on-state from its TLV structure. */
         CHIP_ERROR Decode(TLV::TLVReader & reader)
         {
             TLV::TLVType outer;
@@ -86,6 +89,8 @@ public:
         }
     };
 
+    uint32_t mApplySceneCalls              = 0;
+    TransitionTimeMs mLastTransitionTimeMs = 0;
     MockClusterEFS mState;
     AttributeValuePairStruct::Type mAttributeRead[1]; // Persistent storage for Deserialize
 
@@ -119,6 +124,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /** Serialize the current mock state for StoreScene. */
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
         VerifyOrReturnError(cluster == kMockClusterId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -130,6 +136,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /** Decode stored mock state into an extension field set for ViewScene. */
     CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                            app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & extensionFieldSet) override
     {
@@ -150,9 +157,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /** Record the applied transition time and restore the serialized mock state. */
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           TransitionTimeMs timeMs) override
     {
+        ++mApplySceneCalls;
+        mLastTransitionTimeMs = timeMs;
         VerifyOrReturnError(cluster == kMockClusterId, CHIP_ERROR_INVALID_ARGUMENT);
         MockClusterEFS deserializedEFS;
         TLV::TLVReader reader;
@@ -882,6 +892,7 @@ TEST_F(TestScenesManagementCluster, StoreSceneResourceExhausted)
     ExpectCommandStatus(store_response_fail, Status::ResourceExhausted);
 }
 
+/** StoreScene followed by RecallScene restores the saved mock on-state. */
 TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
 {
     ClusterTester tester(cluster);
@@ -914,6 +925,155 @@ TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
     EXPECT_TRUE(mMockSceneHandler.mState.on);
 }
 
+/** Fixture with a stored scene that restores an observable state through the scene handler. */
+struct TestRecallSceneTransitionTime : public TestScenesManagementCluster
+{
+    /** Store an on-state scene with a known transition time, then turn the live state off. */
+    void StoreRecallableScene(ClusterTester & tester, GroupId groupID)
+    {
+        AddSceneToTable(tester, groupID, kTestSceneId, "RecallScene", 1234);
+        VerifyOrReturn(!HasFailure());
+        mMockSceneHandler.mState.on = true;
+        StoreScene::Type request;
+        request.groupID = groupID;
+        request.sceneID = kTestSceneId;
+        auto response   = tester.Invoke<StoreScene::Type, StoreSceneResponse::DecodableType>(StoreScene::Id, request);
+        ExpectCommandStatus(response, Status::Success);
+        mMockSceneHandler.mState.on = false;
+    }
+
+    /** Check rejection before handler invocation, reporting, or mutation of the stored scene. */
+    void ExpectRejectedRecall(ClusterTester & tester, const RecallScene::Type & request)
+    {
+        ScenesManagementSceneTable::SceneTableEntry before;
+        ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(
+                      kFabricIndex, ScenesManagementSceneTable::SceneStorageId(request.sceneID, request.groupID), before),
+                  CHIP_NO_ERROR);
+        const auto calls      = mMockSceneHandler.mApplySceneCalls;
+        const auto dirtyCount = testContext.ChangeListener().DirtyList().size();
+        auto response         = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+        EXPECT_EQ(response.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+        EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, calls);
+        EXPECT_FALSE(mMockSceneHandler.mState.on);
+        EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), dirtyCount);
+        ScenesManagementSceneTable::SceneTableEntry after;
+        ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(
+                      kFabricIndex, ScenesManagementSceneTable::SceneStorageId(request.sceneID, request.groupID), after),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(before == after);
+    }
+};
+
+/** RecallScene accepts the inclusive maximum and zero as concrete overrides. */
+TEST_F(TestRecallSceneTransitionTime, AcceptsTransitionTimeBoundaries)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+    StoreRecallableScene(tester, kTestGroupId);
+    VerifyOrReturn(!HasFailure());
+    RecallScene::Type request;
+    request.groupID        = kTestGroupId;
+    request.sceneID        = kTestSceneId;
+    const uint32_t times[] = { 0, 1, 59'999'999, 60'000'000 };
+    for (uint32_t time : times)
+    {
+        mMockSceneHandler.mState.on = false;
+        const auto calls            = mMockSceneHandler.mApplySceneCalls;
+        request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(time));
+        auto response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+        ASSERT_TRUE(response.IsSuccess());
+        EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, calls + 1);
+        EXPECT_EQ(mMockSceneHandler.mLastTransitionTimeMs, time);
+        EXPECT_TRUE(mMockSceneHandler.mState.on);
+        ScenesManagementSceneTable::SceneTableEntry stored;
+        ASSERT_EQ(sceneTableProvider.mSceneTable->GetSceneTableEntry(
+                      kFabricIndex, ScenesManagementSceneTable::SceneStorageId(kTestSceneId, kTestGroupId), stored),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(stored.mStorageData.mSceneTransitionTimeMs, 1234u);
+    }
+}
+
+/** The 60,000,000 ms command constraint applies to both grouped and global scenes. */
+TEST_F(TestRecallSceneTransitionTime, RejectsOversizedTransitionTimes)
+{
+    ScopedAttributeChangeListenerRegistration listener(customDataModel, testContext);
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+    const GroupId groups[] = { kTestGroupId, scenes::kGlobalSceneGroupId };
+    const uint32_t times[] = { 60'000'001, 1'234'567'890, 0xFFFFFFFE };
+    for (GroupId group : groups)
+    {
+        StoreRecallableScene(tester, group);
+        VerifyOrReturn(!HasFailure());
+        RecallScene::Type request;
+        request.groupID = group;
+        request.sceneID = kTestSceneId;
+        for (uint32_t time : times)
+        {
+            request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(time));
+            ExpectRejectedRecall(tester, request);
+            VerifyOrReturn(!HasFailure());
+        }
+        const auto calls = mMockSceneHandler.mApplySceneCalls;
+        request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(60'000'000));
+        auto response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+        ASSERT_TRUE(response.IsSuccess());
+        EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, calls + 1);
+        EXPECT_EQ(mMockSceneHandler.mLastTransitionTimeMs, 60'000'000u);
+        EXPECT_TRUE(mMockSceneHandler.mState.on);
+    }
+}
+
+/** Omitted and null overrides, including the application API, use the stored transition time. */
+TEST_F(TestRecallSceneTransitionTime, UsesStoredTimeWithoutConcreteOverride)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+    StoreRecallableScene(tester, kTestGroupId);
+    VerifyOrReturn(!HasFailure());
+    RecallScene::Type request;
+    request.groupID = kTestGroupId;
+    request.sceneID = kTestSceneId;
+    for (bool useNull : { false, true })
+    {
+        if (useNull)
+        {
+            request.transitionTime.SetValue(DataModel::Nullable<uint32_t>());
+        }
+        mMockSceneHandler.mState.on = false;
+        const auto calls            = mMockSceneHandler.mApplySceneCalls;
+        auto response               = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+        ASSERT_TRUE(response.IsSuccess());
+        EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, calls + 1);
+        EXPECT_EQ(mMockSceneHandler.mLastTransitionTimeMs, 1234u);
+        EXPECT_TRUE(mMockSceneHandler.mState.on);
+    }
+    mMockSceneHandler.mState.on = false;
+    const auto calls            = mMockSceneHandler.mApplySceneCalls;
+    ASSERT_EQ(cluster.RecallScene(kFabricIndex, kTestGroupId, kTestSceneId), CHIP_NO_ERROR);
+    EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, calls + 1);
+    EXPECT_EQ(mMockSceneHandler.mLastTransitionTimeMs, 1234u);
+    EXPECT_TRUE(mMockSceneHandler.mState.on);
+}
+
+/** Reject an invalid override before lookup; a valid override still reports a missing scene. */
+TEST_F(TestRecallSceneTransitionTime, ValidatesBeforeSceneLookup)
+{
+    ClusterTester tester(cluster);
+    tester.SetFabricIndex(kFabricIndex);
+    RecallScene::Type request;
+    request.groupID = kTestGroupId;
+    request.sceneID = kTestSceneId;
+    request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(60'000'001));
+    auto response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+    EXPECT_EQ(response.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+    request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(60'000'000));
+    response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, request);
+    EXPECT_EQ(response.GetStatusCode(), ClusterStatusCode(Status::NotFound));
+    EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, 0u);
+}
+
+/** RecallScene reports NotFound for a scene that has not been stored. */
 TEST_F(TestScenesManagementCluster, RecallSceneNotFound)
 {
     ClusterTester tester(cluster);
