@@ -74,6 +74,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
 
+
 class TC_SC_4_3(DiscoverySupport, MatterTestCommissionedDevice):
     def steps_TC_SC_4_3(self):
         return [TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
