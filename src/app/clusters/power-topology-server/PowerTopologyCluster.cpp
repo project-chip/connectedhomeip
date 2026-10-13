@@ -146,6 +146,8 @@ void PowerTopologyCluster::Shutdown(ClusterShutdownType shutdownType)
     {
         mFabricTable->RemoveFabricDelegate(this);
     }
+    // Without the fabric delegate, a removal would no longer release the snapshot.
+    ReleaseNodeSnapshot();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
