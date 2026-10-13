@@ -458,45 +458,6 @@ async def _is_device_operational_via_dnssd(
         return False
 
 
-async def _is_device_commissionable_via_dnssd(
-    discovery_timeout_sec: float = DNSSD_DISCOVERY_TIMEOUT_SEC
-) -> bool:
-    """
-    Check if any device is advertising as commissionable via DNS-SD on the network.
-
-    This check avoids long CASE timeouts when a device is in pairing mode.
-    Devices advertise commissionable services on _matterc._udp.local.
-
-    Args:
-        discovery_timeout_sec: Timeout for DNS-SD discovery (default 3 seconds)
-
-    Returns:
-        True if any device is advertising as commissionable, False otherwise
-    """
-    from mdns_discovery.mdns_discovery import MdnsDiscovery
-
-    try:
-        LOGGER.info("Checking DNS-SD for commissionable service (_matterc._udp.local.)")
-
-        # Discover commissionable services
-        mdns = MdnsDiscovery()
-        services = await mdns.get_commissionable_services(
-            discovery_timeout_sec=discovery_timeout_sec,
-            log_output=False
-        )
-
-        if services:
-            LOGGER.info("Found %s commissionable device(s) via DNS-SD", len(services))
-            return True
-
-        LOGGER.info("No commissionable devices found via DNS-SD")
-        return False
-
-    except (OSError, ValueError, RuntimeError, TypeError) as e:
-        LOGGER.warning("DNS-SD commissionable check failed: %s", e)
-        return False
-
-
 async def _establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
@@ -595,54 +556,60 @@ async def _establish_pase_or_case_session(
     return _session_kind_from_task_name(completed_name)
 
 
+# Bounds for the commissioned-state check: the resolve timeout is what a fresh or absent device
+# costs; the CASE timeout is the confirmation once an address is known.
+IS_COMMISSIONED_RESOLVE_TIMEOUT_MS = 2000
+IS_COMMISSIONED_CASE_TIMEOUT_MS = 2000
+
+
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
-    node_id: int
+    node_id: int,
+    resolve_timeout_ms: int = IS_COMMISSIONED_RESOLVE_TIMEOUT_MS,
+    case_timeout_ms: int = IS_COMMISSIONED_CASE_TIMEOUT_MS,
 ) -> bool:
     """
-    Check if the device is commissioned on the current fabric (Controller's fabric).
+    Check whether the device is commissioned on this controller's fabric.
 
-    Uses a passive detection strategy:
+    The answer is a live CASE session, not an advertisement:
 
-    1. DNS-SD operational check (_matter._tcp): if the device advertises as operational
-       for this fabric and node, returns True immediately.
-    2. DNS-SD commissionable check (_matterc._udp): if the device advertises a pairing
-       window, returns False immediately (fast-fail — device is not operational).
-    3. If neither mDNS check is conclusive, returns False (device is off, broken,
-       or on another fabric without an open commissioning window).
+    1. Resolve the node's address on this fabric via DNS-SD, first answer wins. No answer within the
+       timeout means the device is off, factory fresh, or not on this fabric: False.
+    2. Resolved: establish or reuse a CASE session with a short timeout. Success is the proof:
+       True. Failure means the address came from a stale DNS-SD cache or the device dropped
+       our fabric: False.
 
-    This function is side-effect free: it does not open PASE or CASE sessions.
+    Never opens PASE, so it cannot take the device's single PASE slot. Controller storage is
+    not consulted: the Python controller re-issues its own NOC on every start, which clears
+    the fabric's CASE resumption records, so they say nothing across processes.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
+        resolve_timeout_ms: Maximum time to wait for the DNS-SD answer
+        case_timeout_ms: Maximum time to wait for the CASE session
 
     Returns:
-        True if the device is confirmed to be commissioned on this fabric, False otherwise.
+        True if a CASE session to the node exists or was established, False otherwise.
+
+    Raises:
+        ChipStackError: On infrastructure failures in the resolve step.
     """
-    try:
-        # Step 1: Fast DNS-SD check — is the device operational on this fabric?
-        is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
-
-        if is_operational:
-            LOGGER.info("Device %s is operational via DNS-SD - confirmed commissioned", node_id)
-            return True
-
-        # Step 2: Fast DNS-SD check — if the device is commissionable (pairing window open)
-        is_commissionable = await _is_device_commissionable_via_dnssd()
-
-        if is_commissionable:
-            LOGGER.info("Device %s is commissionable via DNS-SD (pairing window open) - not commissioned", node_id)
-            return False
-
-        # Step 3: Neither mDNS check was conclusive.
-        # Device is off, broken, or on another fabric without a commissioning window.
-        LOGGER.info("Device %s not found via any DNS-SD check - not commissioned on this fabric", node_id)
+    resolved = await dev_ctrl.ResolveNodeAddress(node_id, resolve_timeout_ms)
+    if resolved is None:
+        LOGGER.info("Node 0x%X: did not resolve on this fabric within %d ms - not commissioned (or unreachable)",
+                    node_id, resolve_timeout_ms)
         return False
 
-    except (ChipStackError, OSError, RuntimeError, ValueError, TypeError) as e:
-        LOGGER.error("Failed to check commissioning status for node %s: %s", node_id, e)
-        raise
+    try:
+        await dev_ctrl.GetConnectedDevice(node_id, allowPASE=False, timeoutMs=case_timeout_ms)
+    except (TimeoutError, ChipStackError) as e:
+        LOGGER.info("Node 0x%X: resolved to %s but CASE failed within %d ms (%s) - not commissioned",
+                    node_id, resolved, case_timeout_ms, f"{type(e).__name__}: {e}".rstrip(": "))
+        return False
+
+    LOGGER.info("Node 0x%X: CASE session established - commissioned on this fabric", node_id)
+    return True
 
 
 async def get_commissioned_fabric_count(
