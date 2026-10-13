@@ -28,10 +28,14 @@ class BatteryPowerSource : public SingleEndpoint
 {
     using Feature                               = Clusters::PowerSource::Feature;
     constexpr static auto BatPercentRemainingId = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
+    constexpr static auto BatVoltageId          = Clusters::PowerSource::Attributes::BatVoltage::Id;
 
 public:
-    using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
-                                                                         OptionalAttributeSet<BatPercentRemainingId>::All()>;
+    // Simple battery-backed Power Source Cluster that exposes both BatPercentRemaining and BatVoltage
+    // so commissioners (e.g. Home Assistant) can display a battery level and a battery voltage reading.
+    using SimpleBatteryPowerSourceCluster =
+        Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
+                                     OptionalAttributeSet<BatPercentRemainingId, BatVoltageId>::All()>;
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                        TimerDelegate & timerDelegate);
