@@ -378,6 +378,18 @@ async def detect_wifi_interface():
         return None
 
 
+# wpa_supplicant SET_NETWORK fields that carry secrets; their values never go to logs or error messages
+WPA_SECRET_FIELDS = ("psk", "password", "sae_password", "wep_key0", "wep_key1", "wep_key2", "wep_key3")
+
+
+def redact_wpa_command(cmd: str) -> str:
+    """Returns a wpa_supplicant control command safe to log: the value of a secret field is replaced."""
+    parts = cmd.split(" ", 3)
+    if len(parts) == 4 and parts[0].upper() == "SET_NETWORK" and parts[2] in WPA_SECRET_FIELDS:
+        return f"{parts[0]} {parts[1]} {parts[2]} ***"
+    return cmd
+
+
 async def wpa_command(iface, cmd):
     """Send command to wpa_supplicant via Unix socket"""
 
@@ -396,10 +408,10 @@ async def wpa_command(iface, cmd):
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
     except TimeoutError:
-        logger.error("wpa_command: Timed out waiting for reply to '%s' on %s", cmd, iface)
+        logger.error("wpa_command: Timed out waiting for reply to '%s' on %s", redact_wpa_command(cmd), iface)
         raise
     except Exception as e:
-        logger.error("wpa_command: Error sending '%s' to %s: %s", cmd, iface, e)
+        logger.error("wpa_command: Error sending '%s' to %s: %s", redact_wpa_command(cmd), iface, e)
         raise
     finally:
         sock.close()
@@ -605,8 +617,9 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         for cmd in config_commands:
             result = await wpa_command(interface, cmd)
             if result.startswith("FAIL"):
-                logger.error("connect_wifi_linux: Failed to configure network: %s -> %s", cmd, result)
-                return ConnectionResult(1, f"Failed to configure network: {cmd}")
+                safe_cmd = redact_wpa_command(cmd)
+                logger.error("connect_wifi_linux: Failed to configure network: %s -> %s", safe_cmd, result)
+                return ConnectionResult(1, f"Failed to configure network: {safe_cmd}")
 
         await wpa_command(interface, f"ENABLE_NETWORK {network_id}")
         await wpa_command(interface, f"SELECT_NETWORK {network_id}")
