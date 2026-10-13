@@ -98,6 +98,43 @@ west build ... -- -DFILE_SUFFIX=debug
 west build ... -- -DFILE_SUFFIX=release
 ```
 
+## Network Transport Selection
+
+The application builds a Matter root node with exactly one operational network
+transport: Wi-Fi or Thread. BLE is used for commissioning in both cases
+(`CONFIG_BT=y` by default).
+
+Matter's Wi-Fi support does not follow Zephyr's `CONFIG_WIFI` automatically.
+Select the transport explicitly, and set both options so the result does not
+depend on platform or vendor defaults:
+
+| Transport | Matter / Zephyr options                              | Board requirements                                                       |
+| --------- | ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| Wi-Fi     | `CONFIG_CHIP_WIFI=y`<br>`CONFIG_NET_L2_OPENTHREAD=n` | A Zephyr Wi-Fi driver for the board (`CONFIG_WIFI=y` and its driver)     |
+| Thread    | `CONFIG_NET_L2_OPENTHREAD=y`<br>`CONFIG_CHIP_WIFI=n` | An IEEE 802.15.4 radio (`zephyr,ieee802154` chosen node) or a vendor RCP |
+
+`CONFIG_NET_L2_OPENTHREAD` selects `CONFIG_OPENTHREAD`, which enables Matter's
+Thread support. The OpenThread device type defaults to FTD
+(`CONFIG_OPENTHREAD_FTD`).
+
+Supported combinations:
+
+| `CONFIG_CHIP_WIFI` | `CONFIG_NET_L2_OPENTHREAD` | Result                                                     |
+| ------------------ | -------------------------- | ---------------------------------------------------------- |
+| y                  | n                          | Wi-Fi root node                                            |
+| n                  | y                          | Thread root node                                           |
+| y                  | y                          | Not supported (build error: Thread + Wi-Fi root node)      |
+| n                  | n                          | Not supported (build error: no network technology enabled) |
+
+Ethernet-only (`CONFIG_CHIP_ETHERNET`) is not supported by this application.
+
+Put the options in a `.conf` file and pass it with `EXTRA_CONF_FILE`, for
+example:
+
+```sh
+west build ... -- -DEXTRA_CONF_FILE=my_thread.conf
+```
+
 ## Device Selection
 
 Device types are Kconfig options (`CONFIG_ALL_DEVICES_DEVICE_*`, see
