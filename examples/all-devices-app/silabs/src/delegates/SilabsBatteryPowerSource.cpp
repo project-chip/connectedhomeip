@@ -36,7 +36,7 @@ CHIP_ERROR SilabsBatteryPowerSource::Register(EndpointId endpoint, CodeDrivenDat
                                               EndpointComposition composition)
 {
     ReturnErrorOnFailure(BatteryPowerSource::Register(endpoint, provider, composition));
-#if SL_MATTER_BATTERY_MONITOR
+#if defined(SL_MATTER_BATTERY_MONITOR) && SL_MATTER_BATTERY_MONITOR
     return BatteryMonitor::Instance().Init(this);
 #else
     // Kick off the timer loop to decrease battery level every few seconds
@@ -95,7 +95,7 @@ void SilabsBatteryPowerSource::TimerFired()
 
 } // namespace chip::app
 
-
+#if defined(SL_MATTER_BATTERY_MONITOR) && SL_MATTER_BATTERY_MONITOR
 #include "em_cmu.h"
 #include "em_iadc.h"
 #include "sl_sleeptimer.h"
@@ -343,3 +343,4 @@ void BatteryMonitor::OnICDModeChange()
 {
     // No action required for the battery monitor.
 }
+#endif // SL_MATTER_ENABLE_BATTERY_MONITOR

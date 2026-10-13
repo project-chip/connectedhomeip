@@ -46,7 +46,7 @@ private:
 } // namespace chip::app
 
 
-// TODO migrate
+#if defined(SL_MATTER_BATTERY_MONITOR) && SL_MATTER_BATTERY_MONITOR
 #include <cstddef>
 #include <cstdint>
 
@@ -113,3 +113,4 @@ private:
     bool mHasMeasurement = false;
     bool mObserverRegistered = false;
 };
+#endif // SL_MATTER_BATTERY_MONITOR
