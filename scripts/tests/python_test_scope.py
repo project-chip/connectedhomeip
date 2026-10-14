@@ -43,6 +43,24 @@ it was before the change, so that a change to it selects only the tests whose
 exclusion it changes. `--github-env` also writes PYTHON_TEST_APPS, the
 comma-delimited REPL environment variables of the apps those tests and the
 unfiltered REPL job need, for the REPL build job's app build steps.
+
+How to maintain
+---------------
+Only the MAINTAINER SETTINGS block below is expected to change. Edit it when:
+
+-   a build, or the macOS Python environment build, starts reading another file
+    under src/python_testing: add it to PYTHON_ENVIRONMENT_FILES;
+-   execute_python_tests.py changes which test_metadata.yaml sections the
+    regular run leaves out: update EXCLUDED_SECTIONS. If it changes how
+    `--regex` matches, update runner_matches() too;
+-   the unfiltered REPL job (filter "") runs tests on another app: add it to
+    UNFILTERED_JOB_APPS;
+-   tests.yaml renames the REPL run job or the step that writes the REPL
+    environment file: update SHARD_JOB or ENV_FILE_STEP.
+
+Nothing here changes for new tests, helpers, apps or shard filters. Modules the
+test framework imports from the test tree are found automatically.
+test_python_test_scope.py checks these settings against the repository.
 """
 
 import argparse
@@ -56,40 +74,56 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TextIO
 
-CHIP_ROOT = Path(__file__).resolve().parents[2]
+# ==== MAINTAINER SETTINGS: the only part expected to change; see "How to maintain" above ====
 
 TEST_TREE = "src/python_testing/"
 
-# Inside the test tree, but every test depends on it.
+# Every test depends on this package, so a change in it means a full CI run.
 FRAMEWORK_PACKAGE = "src/python_testing/matter_testing_infrastructure/"
 
-# Inside the test tree, but installed by every Python environment build,
-# including the macOS one that a Python test change skips.
+# Update when a build, or the macOS Python environment build, starts reading
+# another file under src/python_testing. A change to one of these means a full CI run.
 PYTHON_ENVIRONMENT_FILES = frozenset({
     "src/python_testing/requirements.nfc.txt",
     "src/python_testing/requirements.txt",
 })
 
+# A build file under src/python_testing means a full CI run.
 BUILD_FILE_SUFFIXES = (".gn", ".gni")
 
-# Inside the test tree, and they decide which tests the REPL shards run.
+# These decide which tests the REPL shards run, so a change to them runs every shard.
 METADATA_FILE = "src/python_testing/test_metadata.yaml"
 REPL_SELECTION_FILES = frozenset({"src/python_testing/execute_python_tests.py", METADATA_FILE})
 
-# Modules here are not selected through their importers: the unfiltered REPL job
-# runs them, or CI does not run them at all.
+# Update when execute_python_tests.py (cmd_run) changes which test_metadata.yaml
+# sections the regular REPL run leaves out. Each maps to where its tests run instead.
+EXCLUDED_SECTIONS = {
+    "not_automated": "is listed under not_automated in test_metadata.yaml",
+    "nightly": "runs only in the nightly workflow",
+}
+
+# Modules in these folders are not selected through their importers: the
+# unfiltered REPL job runs them, or CI does not run them at all.
 UNSHARDED_DIRECTORIES = ("test_testing/", "post_certification_tests/")
 
+# Update when the unfiltered REPL job (filter "") runs tests on another app.
+# These apps are built on every pull request.
+UNFILTERED_JOB_APPS = ("ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2")
+
+# Update when tests.yaml renames the REPL run job or the step that writes the
+# REPL environment file: the shard filters and the app paths are read from them.
 WORKFLOW = ".github/workflows/tests.yaml"
 SHARD_JOB = "repl_tests_linux_run"
 ENV_FILE_STEP = "Generate an argument environment file"
+
+# ==== END OF MAINTAINER SETTINGS ====
+
+CHIP_ROOT = Path(__file__).resolve().parents[2]
 NO_TESTS = "none"
-
-# Built for every pull request: the unfiltered REPL job runs its tests on them.
-UNFILTERED_JOB_APPS = ("ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2")
-
 CI_ARGUMENTS = re.compile(r"=== BEGIN CI TEST ARGUMENTS ===(.*?)=== END CI TEST ARGUMENTS ===", re.S)
 
+
+# ---- Which changes are Python-test-only: decides whether the unrelated workflows skip ----
 
 def full_run_reason(path: str) -> str | None:
     """Return why a changed path needs the full CI run, or None for a Python test change."""
@@ -120,12 +154,62 @@ def classify(paths: Iterable[str]) -> tuple[bool, str]:
     return True, f"{len(changed)} changed {noun}, all Python tests or test helpers"
 
 
-def runner_matches(pattern: str, path: str) -> bool:
-    """Match a shard filter the way `execute_python_tests.py run --regex` does."""
-    if pattern.startswith("!"):
-        return re.search(pattern[1:], path) is None
-    return re.search(pattern, path) is not None
+# ---- Reading the repository: tests.yaml, test_metadata.yaml and the tests' CI arguments ----
 
+def shard_job(chip_root: Path) -> dict:
+    """Return the REPL run job from tests.yaml."""
+    import yaml
+    workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
+    job = (workflow.get("jobs") or {}).get(SHARD_JOB)
+    if job is None:
+        raise LookupError(f"{WORKFLOW} has no job {SHARD_JOB}. Fix: update SHARD_JOB in {Path(__file__).name}.")
+    return job
+
+
+def shard_filters(chip_root: Path) -> list[str]:
+    """Return the REPL shard filters, as the split estimator reads them."""
+    try:
+        filters = shard_job(chip_root)["strategy"]["matrix"]["filter"]
+    except KeyError:
+        raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no strategy.matrix.filter list. "
+                          f"Fix: update shard_filters() in {Path(__file__).name}.") from None
+    return [f for f in filters if f]
+
+
+def environment_file(chip_root: Path) -> dict[str, str]:
+    """Return the variables the REPL environment file defines, with their paths."""
+    for step in shard_job(chip_root).get("steps") or []:
+        if step.get("name") == ENV_FILE_STEP:
+            return dict(re.findall(r'echo "([A-Z_0-9]+): ([^"]+)" >> /tmp/test_env.yaml', step["run"]))
+    raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no step named {ENV_FILE_STEP!r}. "
+                      f"Fix: update ENV_FILE_STEP in {Path(__file__).name}.")
+
+
+def built_apps(variables: dict[str, str]) -> set[str]:
+    """Return the variables whose path is an artifact of the REPL build job."""
+    return {name for name, path in variables.items() if path.startswith("objdir-clone/")}
+
+
+def load_metadata(path: Path) -> dict:
+    import yaml
+    return yaml.safe_load(path.read_text()) or {}
+
+
+def excluded_tests(metadata: dict) -> dict[str, str]:
+    """Return the tests the regular REPL run leaves out, with where they run instead."""
+    excluded = {}
+    for section, where in EXCLUDED_SECTIONS.items():
+        excluded.update({item["name"]: where for item in metadata.get(section) or []})
+    return excluded
+
+
+def ci_variables(source: str) -> set[str]:
+    """Return the ${VARIABLE} placeholders in a test's CI arguments block, across all its runs."""
+    block = CI_ARGUMENTS.search(source)
+    return set(re.findall(r"\$\{([A-Z_0-9]+)\}", block.group(1))) if block else set()
+
+
+# ---- Following imports through the test tree ----
 
 def module_name(rel: str) -> str:
     """Return the import name of a file given relative to the test tree."""
@@ -209,46 +293,13 @@ def framework_imports(tree: Path, files: dict[str, TreeFile]) -> set[str]:
     return imported & {rel.split("/")[0].removesuffix(".py") for rel in files}
 
 
-def shard_filters(chip_root: Path) -> list[str]:
-    """Return the REPL shard filters, as the split estimator reads them."""
-    import yaml
-    workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
-    return [f for f in workflow["jobs"][SHARD_JOB]["strategy"]["matrix"]["filter"] if f]
+# ---- Selection: which REPL tests a change needs, per shard, and which apps they use ----
 
-
-def load_metadata(path: Path) -> dict:
-    import yaml
-    return yaml.safe_load(path.read_text()) or {}
-
-
-def excluded_tests(metadata: dict) -> dict[str, str]:
-    """Return the tests the regular REPL run leaves out, with where they run instead."""
-    excluded = {item["name"]: "is listed under not_automated in test_metadata.yaml"
-                for item in metadata.get("not_automated") or []}
-    excluded.update({item["name"]: "runs only in the nightly workflow"
-                     for item in metadata.get("nightly") or []})
-    return excluded
-
-
-def ci_variables(source: str) -> set[str]:
-    """Return the ${VARIABLE} placeholders in a test's CI arguments block, across all its runs."""
-    block = CI_ARGUMENTS.search(source)
-    return set(re.findall(r"\$\{([A-Z_0-9]+)\}", block.group(1))) if block else set()
-
-
-def environment_file(chip_root: Path) -> dict[str, str]:
-    """Return the variables the REPL environment file defines, with their paths."""
-    import yaml
-    workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
-    for step in workflow["jobs"][SHARD_JOB]["steps"]:
-        if step.get("name") == ENV_FILE_STEP:
-            return dict(re.findall(r'echo "([A-Z_0-9]+): ([^"]+)" >> /tmp/test_env.yaml', step["run"]))
-    return {}
-
-
-def built_apps(variables: dict[str, str]) -> set[str]:
-    """Return the variables whose path is an artifact of the REPL build job."""
-    return {name for name, path in variables.items() if path.startswith("objdir-clone/")}
+def runner_matches(pattern: str, path: str) -> bool:
+    """Match a shard filter the way `execute_python_tests.py run --regex` does; keep the two in step."""
+    if pattern.startswith("!"):
+        return re.search(pattern[1:], path) is None
+    return re.search(pattern, path) is not None
 
 
 @dataclass
@@ -287,6 +338,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
     def runnable(rel: str) -> bool:
         return "/" not in rel and rel.endswith(".py") and rel not in excluded and rel in files
 
+    # The changed files themselves.
     queue = deque()  # (module, its file, the changed file that led to it)
     seen = set()
     for path in changed:
@@ -315,6 +367,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
         seen.add(module)
         queue.append((module, rel, rel))
 
+    # Their importers, followed through helpers.
     while queue:
         module, rel, origin = queue.popleft()
         filename = rel.rsplit("/", 1)[-1]
@@ -335,6 +388,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
         elif rel in files and "/" in rel and not rel.startswith(UNSHARDED_DIRECTORIES) and "/tests/" not in f"/{rel}":
             return Selection(full_reason=f"{TEST_TREE}{rel} is imported by no test, so which tests use it is unknown")
 
+    # Each shard's share of the selected tests.
     filters = shard_filters(chip_root)
     for rel in selection.tests:
         if not any(runner_matches(f, TEST_TREE + rel) for f in filters):
@@ -343,6 +397,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
         share = sorted(rel[:-len(".py")] for rel in selection.tests if runner_matches(f, TEST_TREE + rel))
         selection.slices[f] = "/(" + "|".join(map(re.escape, share)) + r")\.py$" if share else NO_TESTS
 
+    # The apps those tests and the unfiltered REPL job run on.
     variables = environment_file(chip_root)
     apps = set(UNFILTERED_JOB_APPS)
     for rel in selection.tests:
@@ -353,6 +408,8 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
     selection.apps = sorted(apps & built_apps(variables))
     return selection
 
+
+# ---- Command line ----
 
 def summary_markdown(selection: Selection) -> str:
     """Describe a selection for the job summary."""

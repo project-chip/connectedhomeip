@@ -316,6 +316,16 @@ class TestSelect(unittest.TestCase):
             {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": ["", "TC_[A-M]"]}}}}}))
         self.assertIn("matches no REPL shard filter", self.select("TC_Zeta.py").full_reason)
 
+    def test_a_renamed_job_or_step_says_what_to_update(self):
+        workflow = self.root / ".github/workflows/tests.yaml"
+        workflow.write_text(yaml.safe_dump({"jobs": {"renamed_job": {}}}))
+        with self.assertRaisesRegex(LookupError, "Fix: update SHARD_JOB"):
+            self.select("TC_Alpha.py")
+        workflow.write_text(yaml.safe_dump(
+            {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}}, "steps": []}}}))
+        with self.assertRaisesRegex(LookupError, "Fix: update ENV_FILE_STEP"):
+            self.select("TC_Alpha.py")
+
     def test_select_command_writes_the_output_line_and_summary(self):
         output = self.root / "github_output"
         summary = self.root / "summary.md"
