@@ -231,10 +231,13 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     )
             finally:
                 if range_stream_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint,
-                        cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=range_stream_id),
-                    )
+                    try:
+                        await self.send_single_cmd(
+                            endpoint=endpoint,
+                            cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=range_stream_id),
+                        )
+                    except InteractionModelError as e:
+                        log.error("Failed to deallocate snapshot stream %s: %s", range_stream_id, e)
 
 
 if __name__ == "__main__":
