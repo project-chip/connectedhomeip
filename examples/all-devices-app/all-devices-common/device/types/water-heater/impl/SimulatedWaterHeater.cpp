@@ -53,8 +53,8 @@ struct WaterHeaterModeOption
     Span<const ModeTagStructType> tags;
 };
 const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
-    { "Manual"_span, kWaterHeaterModeManual, Span<const ModeTagStructType>(kWaterHeaterModeManualTags) },
     { "Off"_span, kWaterHeaterModeOff, Span<const ModeTagStructType>(kWaterHeaterModeOffTags) },
+    { "Manual"_span, kWaterHeaterModeManual, Span<const ModeTagStructType>(kWaterHeaterModeManualTags) },
 };
 
 // This cluster implementation does not support any Optional features for the WaterHeaterManagement cluster.
