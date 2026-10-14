@@ -793,6 +793,9 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
 
+        outputs:
+            python_test_slices: ${{ steps.select_python_tests.outputs.python_test_slices }}
+
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             BLE_WIFI_BUILD_VARIANT: asan
@@ -830,6 +833,19 @@ jobs:
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            # On a pull request that only changes Python tests, choose the tests each
+            # REPL shard runs; see scripts/tests/python_test_scope.py. A failure here
+            # leaves the output empty, and every shard then runs as usual.
+            - name: Select Python tests for this pull request
+              id: select_python_tests
+              if: github.event_name == 'pull_request'
+              continue-on-error: true
+              run: |
+                  git fetch --no-tags --quiet --depth=2 origin "$GITHUB_SHA"
+                  git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
+                  git show HEAD^1:src/python_testing/test_metadata.yaml > "$RUNNER_TEMP/previous-test-metadata.yaml"
+                  scripts/run_in_build_env.sh "scripts/tests/python_test_scope.py select --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
 
             - name: Setup and Restore Cache
               id: ccache
@@ -1121,6 +1137,10 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
             CHIP_IP_PACKET_CAPTURE: 1
+            # On a pull request that only changes Python tests: a regex for this shard's
+            # share of the selected tests, or "none" when it has none. Empty otherwise,
+            # and the shard runs its whole filter.
+            PYTHON_TEST_SELECTION: ${{ fromJSON(needs.repl_tests_linux_build.outputs.python_test_slices || '{}')[matrix.filter] }}
 
         # Tests are I/O bound, so run on a smaller machine
         runs-on: namespace-profile-1x2
@@ -1145,21 +1165,26 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: actions/checkout@v7
 
             - name: Checkout submodules & Bootstrap
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}-${{ matrix.filter }}
 
             - name: Set ASAN symbolizer path
+              if: env.PYTHON_TEST_SELECTION != 'none'
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
 
             - name: Set up a IPV6 known environment
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
+              if: env.PYTHON_TEST_SELECTION != 'none'
               uses: namespace-actions/download-artifact@v2
               with:
                 name: repl-build-data
@@ -1168,12 +1193,14 @@ jobs:
             # "Directory renamed before its status could be extracted" during rapid unpack.
             - uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
               name: Unpack artifacts
+              if: env.PYTHON_TEST_SELECTION != 'none'
               with:
                   command: tar xfJ repl-build-data.tar.xz
                   attempt_limit: 3
                   attempt_delay: 2000
 
             - name: Generate an argument environment file
+              if: env.PYTHON_TEST_SELECTION != 'none'
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   # keep-sorted: start
@@ -1271,30 +1298,34 @@ jobs:
                       --script src/python_testing/test_testing/test_manufacturer_specific_cluster.py"
 
             - name: Run Tests ${{matrix.filter}}
-              if: ${{matrix.filter != ''}}
+              if: ${{ matrix.filter != '' && env.PYTHON_TEST_SELECTION != 'none' }}
               env:
                   KEEP_GOING: ${{ github.event_name != 'pull_request' && '--keep-going' || '' }}
               run: |
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  SELECTION=""
+                  if [ -n "$PYTHON_TEST_SELECTION" ]; then
+                      SELECTION="--regex '$PYTHON_TEST_SELECTION'"
+                  fi
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' $SELECTION --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
-              if: ${{ matrix.filter != '' && always() }}
+              if: ${{ matrix.filter != '' && always() && env.PYTHON_TEST_SELECTION != 'none' }}
               run: |
                   [ -f test-summaries/python-tests.json ] && \
                     scripts/run_in_python_env.sh out/venv \
                       'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json --compact-failures-file test-summaries/compact-failures.txt' || true
             - name: Upload python test summary
               uses: actions/upload-artifact@v7
-              if: ${{ matrix.filter != '' && always() }}
+              if: ${{ matrix.filter != '' && always() && env.PYTHON_TEST_SELECTION != 'none' }}
               with:
                   name: test-summaries-python-${{ matrix.filter }}
                   path: test-summaries/python-tests.json
                   retention-days: 30
 
             - name: Upload JUnit XML Results
-              if: always() && matrix.filter != ''
+              if: always() && matrix.filter != '' && env.PYTHON_TEST_SELECTION != 'none'
               uses: actions/upload-artifact@v7
               with:
                   name: junit-results-repl-${{ matrix.filter }}

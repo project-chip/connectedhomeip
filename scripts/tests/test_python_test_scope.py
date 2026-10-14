@@ -19,8 +19,11 @@
 
 import contextlib
 import io
+import json
 import os
 import sys
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -29,7 +32,7 @@ import yaml
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # pylint: disable=wrong-import-position
-from python_test_scope import classify, main  # noqa: E402
+from python_test_scope import NO_TESTS, classify, imported_names, main, runner_matches, select  # noqa: E402
 
 
 class TestClassify(unittest.TestCase):
@@ -121,6 +124,208 @@ class TestMain(unittest.TestCase):
     def test_a_command_is_required(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
             main([], stdin=io.StringIO(""))
+
+
+CI_BLOCK = "# === BEGIN CI TEST ARGUMENTS ===\n# test-runner-runs:\n#   run1:\n#     app: ${ALL_CLUSTERS_APP}\n# === END CI TEST ARGUMENTS ===\n"
+
+
+class TestSelect(unittest.TestCase):
+    """Selection over a small tree shaped like src/python_testing, with two shards."""
+
+    TREE = {
+        "TC_Alpha.py": CI_BLOCK + "from support_modules.alpha_support import go\n",
+        "TC_Beta.py": CI_BLOCK + "from TC_HelperBase import HelperBase\n",
+        "TC_Gamma.py": CI_BLOCK + "import pkg.front\n",
+        "TC_Zeta.py": CI_BLOCK + "LAUNCHER = 'support_modules/launcher.py'\n",
+        "TC_Omega.py": CI_BLOCK + "import support_modules\n",
+        "TC_HelperBase.py": "from support_modules import shared\n",
+        "TC_Manual.py": "",
+        "TC_Slow_1.py": CI_BLOCK,
+        "support_modules/__init__.py": "",
+        "support_modules/alpha_support.py": "",
+        "support_modules/shared.py": "",
+        "support_modules/launcher.py": "",
+        "support_modules/orphan.py": "",
+        "support_modules/old_idm_support.py": "",
+        "pkg/__init__.py": "",
+        "pkg/front.py": "from . import back\n",
+        "pkg/back.py": "",
+        "pkg/tests/test_back.py": "",
+        "test_testing/TestThing.py": "",
+        "post_certification_tests/checks.py": "",
+        "README.md": "",
+    }
+    METADATA = {
+        "not_automated": [{"name": "TC_HelperBase.py", "reason": "helper"}, {"name": "TC_Manual.py", "reason": "manual"}],
+        "nightly": [{"name": "TC_Slow_1.py", "reason": "slow"}],
+    }
+    FILTERS = ["", "TC_[A-M]", "!TC_[A-M]"]
+
+    def setUp(self):
+        self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        tree = self.root / "src/python_testing"
+        for rel, text in self.TREE.items():
+            (tree / rel).parent.mkdir(parents=True, exist_ok=True)
+            (tree / rel).write_text(text)
+        (tree / "test_metadata.yaml").write_text(yaml.safe_dump(self.METADATA))
+        workflow = {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}}}}}
+        (self.root / ".github/workflows").mkdir(parents=True)
+        (self.root / ".github/workflows/tests.yaml").write_text(yaml.safe_dump(workflow))
+
+    def select(self, *rels):
+        return select([f"src/python_testing/{rel}" for rel in rels], self.root)
+
+    def assert_selected(self, selection, *names):
+        self.assertIsNone(selection.full_reason)
+        self.assertEqual(sorted(selection.tests), sorted(names))
+
+    def test_a_changed_test_runs_alone_in_its_shard(self):
+        selection = self.select("TC_Alpha.py")
+        self.assert_selected(selection, "TC_Alpha.py")
+        self.assertEqual(selection.slices, {"TC_[A-M]": r"/(TC_Alpha)\.py$", "!TC_[A-M]": NO_TESTS})
+
+    def test_a_changed_module_selects_its_importers_across_shards(self):
+        selection = self.select("TC_Alpha.py", "support_modules/launcher.py")
+        self.assert_selected(selection, "TC_Alpha.py", "TC_Zeta.py")
+        self.assertEqual(selection.slices, {"TC_[A-M]": r"/(TC_Alpha)\.py$", "!TC_[A-M]": r"/(TC_Zeta)\.py$"})
+        self.assertEqual(selection.tests["TC_Zeta.py"], "uses src/python_testing/support_modules/launcher.py")
+
+    def test_importers_are_followed_through_helpers(self):
+        # shared.py <- TC_HelperBase.py <- TC_Beta.py.
+        self.assert_selected(self.select("support_modules/shared.py"), "TC_Beta.py")
+        # The package init runs for every importer of the package or its modules. TC_Zeta only
+        # launches launcher.py by path, which does not run the package init.
+        self.assert_selected(self.select("support_modules/__init__.py"), "TC_Alpha.py", "TC_Beta.py", "TC_Omega.py")
+
+    def test_relative_imports_are_resolved(self):
+        self.assert_selected(self.select("pkg/back.py"), "TC_Gamma.py")
+
+    def test_a_helper_the_regular_run_leaves_out_is_reported_only_without_importers(self):
+        selection = self.select("TC_HelperBase.py")
+        self.assert_selected(selection, "TC_Beta.py")
+        self.assertEqual(selection.not_run, {})
+        selection = self.select("TC_Manual.py", "TC_Slow_1.py")
+        self.assert_selected(selection)
+        self.assertIn("not_automated", selection.not_run["TC_Manual.py"])
+        self.assertIn("nightly", selection.not_run["TC_Slow_1.py"])
+        self.assertEqual(selection.slices, {"TC_[A-M]": NO_TESTS, "!TC_[A-M]": NO_TESTS})
+
+    def test_changes_the_shards_never_run_select_nothing(self):
+        for rel in ("README.md", "test_testing/TestThing.py", "pkg/tests/test_back.py",
+                    "post_certification_tests/checks.py"):
+            with self.subTest(rel=rel):
+                selection = self.select(rel)
+                self.assert_selected(selection)
+                self.assertEqual(set(selection.slices.values()), {NO_TESTS})
+
+    def test_deleted_files(self):
+        self.assert_selected(self.select("TC_Removed.py"))
+        # Nothing imports the deleted module any more; its importers changed with it.
+        self.assert_selected(self.select("support_modules/deleted_module.py"))
+
+    def test_a_metadata_change_selects_the_tests_whose_exclusion_it_changes(self):
+        tree = self.root / "src/python_testing"
+        (tree / "TC_Manual.py").write_text(CI_BLOCK)
+        now = {"not_automated": [{"name": "TC_HelperBase.py", "reason": "helper"}],
+               "nightly": [{"name": "TC_Slow_1.py", "reason": "slow"}, {"name": "TC_Alpha.py", "reason": "slow"}]}
+        (tree / "test_metadata.yaml").write_text(yaml.safe_dump(now))
+        selection = select(["src/python_testing/test_metadata.yaml", "src/python_testing/TC_Manual.py"],
+                           self.root, previous_metadata=self.METADATA)
+        self.assert_selected(selection, "TC_Manual.py")
+        self.assertEqual(selection.not_run, {"TC_Alpha.py": "runs only in the nightly workflow"})
+        self.assertEqual(selection.slices, {"TC_[A-M]": r"/(TC_Manual)\.py$", "!TC_[A-M]": NO_TESTS})
+
+    def test_a_metadata_change_that_moves_no_test_selects_nothing(self):
+        tree = self.root / "src/python_testing"
+        reworded = {key: [dict(item, reason="reworded") for item in items] for key, items in self.METADATA.items()}
+        (tree / "test_metadata.yaml").write_text(yaml.safe_dump(reworded))
+        self.assert_selected(select(["src/python_testing/test_metadata.yaml"], self.root, previous_metadata=self.METADATA))
+
+    def test_select_command_reads_the_previous_metadata(self):
+        previous = self.root / "previous.yaml"
+        previous.write_text(yaml.safe_dump(self.METADATA))
+        output = self.root / "github_output"
+        with contextlib.redirect_stderr(io.StringIO()):
+            main(["select", "--previous-metadata", str(previous), "--output", str(output), "--chip-root", str(self.root)],
+                 stdin=io.StringIO("src/python_testing/test_metadata.yaml\n"))
+            main(["select", "--previous-metadata", str(self.root / "missing.yaml"), "--output", str(output),
+                  "--chip-root", str(self.root)], stdin=io.StringIO("src/python_testing/test_metadata.yaml\n"))
+        narrowed, full = output.read_text().splitlines()
+        self.assertEqual(set(json.loads(narrowed.split("=", 1)[1]).values()), {NO_TESTS})
+        self.assertEqual(full, "python_test_slices=")
+
+    def test_every_shard_runs_as_usual_when_the_selection_cannot_be_trusted(self):
+        cases = {
+            "test_metadata.yaml": "decides which tests run",
+            "execute_python_tests.py": "decides which tests run",
+            "data/values.json": "not Python",
+            "support_modules/orphan.py": "imported by no test",
+        }
+        for rel, reason in cases.items():
+            with self.subTest(rel=rel):
+                selection = self.select(rel)
+                self.assertIn(reason, selection.full_reason)
+                self.assertEqual(selection.slices, {})
+        self.assertIn("outside the Python test tree",
+                      select(["src/python_testing/TC_Alpha.py", "src/app/server/Server.cpp"], self.root).full_reason)
+
+    def test_a_test_no_shard_filter_matches_runs_every_shard(self):
+        (self.root / ".github/workflows/tests.yaml").write_text(yaml.safe_dump(
+            {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": ["", "TC_[A-M]"]}}}}}))
+        self.assertIn("matches no REPL shard filter", self.select("TC_Zeta.py").full_reason)
+
+    def test_select_command_writes_the_output_line_and_summary(self):
+        output = self.root / "github_output"
+        summary = self.root / "summary.md"
+        with contextlib.redirect_stderr(io.StringIO()):
+            main(["select", "--output", str(output), "--summary", str(summary), "--chip-root", str(self.root)],
+                 stdin=io.StringIO("src/python_testing/TC_Alpha.py\n"))
+            main(["select", "--output", str(output), "--chip-root", str(self.root)],
+                 stdin=io.StringIO("src/python_testing/test_metadata.yaml\n"))
+        first, second = output.read_text().splitlines()
+        key, value = first.split("=", 1)
+        self.assertEqual(key, "python_test_slices")
+        self.assertEqual(json.loads(value)["TC_[A-M]"], r"/(TC_Alpha)\.py$")
+        self.assertEqual(second, "python_test_slices=")
+        self.assertIn("`TC_Alpha.py`: changed", summary.read_text())
+
+
+class TestSelectHelpers(unittest.TestCase):
+
+    def test_runner_matches_follows_the_runner_semantics(self):
+        self.assertTrue(runner_matches("TC_[F-I]", "src/python_testing/TC_FAN_3_5.py"))
+        self.assertFalse(runner_matches("!TC_[A-S]", "src/python_testing/TC_FAN_3_5.py"))
+        self.assertTrue(runner_matches("!TC_[A-S]", "src/python_testing/TC_WEBRTCP_2_1.py"))
+        self.assertTrue(runner_matches(r"/(TC_FAN_3_5)\.py$", "src/python_testing/TC_FAN_3_5.py"))
+        self.assertFalse(runner_matches(r"/(TC_FAN_3_5)\.py$", "src/python_testing/TC_FAN_3_5_1.py"))
+
+    def test_imported_names(self):
+        source = textwrap.dedent("""
+            import a.b.c
+            from d import e, f
+            from .g import h
+            from .. import i
+            from x import *
+        """)
+        self.assertEqual(imported_names(source, "pkg/sub/mod.py"),
+                         {"a.b.c", "d", "d.e", "d.f", "pkg.sub.g", "pkg.sub.g.h", "pkg", "pkg.i", "x"})
+        self.assertEqual(imported_names("def broken(:\n", "TC_X.py"), set())
+
+
+class TestSelectOnThisRepository(unittest.TestCase):
+    """The selection against the real tree and workflow, so drift between them shows up here."""
+
+    def test_a_changed_test_lands_in_exactly_one_shard(self):
+        selection = select(["src/python_testing/TC_FAN_3_5.py"])
+        self.assertEqual(list(selection.tests), ["TC_FAN_3_5.py"])
+        self.assertEqual([f for f, regex in selection.slices.items() if regex != NO_TESTS], ["TC_[F-I]"])
+
+    def test_every_test_the_regular_run_picks_up_matches_a_shard(self):
+        root = Path(__file__).resolve().parents[2]
+        tests = [f"src/python_testing/{path.name}" for path in sorted((root / "src/python_testing").glob("TC_*.py"))]
+        selection = select(tests)
+        self.assertIsNone(selection.full_reason)
+        self.assertGreater(len(selection.tests), 400)
 
 
 class TestGatedWorkflows(unittest.TestCase):
