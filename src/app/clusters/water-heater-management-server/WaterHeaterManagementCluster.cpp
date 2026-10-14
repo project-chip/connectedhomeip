@@ -41,7 +41,8 @@ namespace WaterHeaterManagement {
 
 WaterHeaterManagementCluster::WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate,
                                                            BitMask<Feature> aFeatures) :
-    DefaultServerCluster({ aEndpointId, WaterHeaterManagement::Id }), mDelegate(aDelegate), mFeature(aFeatures)
+    DefaultServerCluster({ aEndpointId, WaterHeaterManagement::Id }),
+    mDelegate(aDelegate), mFeature(aFeatures)
 {
     /* set the base class delegates endpointId */
     mDelegate.SetEndpointId(aEndpointId);
