@@ -1136,7 +1136,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                     // If controller is not running, clear work item from the subscription queue
                     MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
                     std::lock_guard lock(self->_lock);
-                    [self _clearSubscriptionPoolWork];
+                    [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
                 }];
             } skipIfResetSince:nil inNanoseconds:0 description:description];
         } else {
@@ -1759,6 +1759,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_handleResubscriptionNeededWithDelayOnDeviceQueue resubscriptionBlock asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
+            {
+                std::lock_guard lock(self->_lock);
+                if (self->_subscriptionResetGeneration != subscriptionResetGeneration) {
+                    // A reset after this work took its slot (e.g. the ReadClient teardown
+                    // queued by invalidate) removed the ReadClient it was going to
+                    // resubscribe, and may not have released the slot.  Release it if it
+                    // is still ours.
+                    MTR_LOG("%@ subscription was reset since ReadClient resubscription work was scheduled - skipping", self);
+                    [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
+                    return;
+                }
+            }
+
             [self _triggerResubscribeWithReason:@"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO poolWorkCompletion:poolWorkCompletion];
         } errorHandler:^(NSError * _Nonnull error) {
             mtr_strongify(self);
@@ -1767,7 +1780,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             // If controller is not running, clear work item from the subscription queue
             MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
             std::lock_guard lock(self->_lock);
-            [self _clearSubscriptionPoolWork];
+            [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
         }];
     };
 
@@ -1898,7 +1911,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 // If controller is not running, clear work item from the subscription queue
                 MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
                 std::lock_guard lock(self->_lock);
-                [self _clearSubscriptionPoolWork];
+                [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
             }];
     };
 
