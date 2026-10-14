@@ -51,9 +51,9 @@ const ValveConfigurationAndControlCluster::ValveContext kValveContext2 = {
     .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet()
                                 .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
                                 .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
-    .config               = kStartUpConfig2,
-    .tsTracker            = nullptr,
-    .delegate             = nullptr,
+    .config    = kStartUpConfig2,
+    .tsTracker = nullptr,
+    .delegate  = nullptr,
 };
 const ValveConfigurationAndControlCluster::ValveContext kValveContext3 = {
     .features             = {},
