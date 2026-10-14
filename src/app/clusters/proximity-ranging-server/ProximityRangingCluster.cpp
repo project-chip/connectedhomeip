@@ -122,7 +122,6 @@ DataModel::ActionReturnStatus ProximityRangingCluster::ReadAttribute(const DataM
         return encoder.Encode(mFeatureMap);
 
     case Attributes::RangingConstraints::Id:
-        VerifyOrReturnError(mOptionalAttributeSet.IsSet(Attributes::RangingConstraints::Id), Status::UnsupportedAttribute);
         return mDriver.GetRangingConstraints(encoder);
 
     case Attributes::ClusterRevision::Id:

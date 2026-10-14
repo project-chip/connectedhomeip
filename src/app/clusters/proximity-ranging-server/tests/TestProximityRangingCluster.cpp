@@ -1181,21 +1181,6 @@ TEST_F(TestProximityRangingCluster, TestAttributeListWithRangingConstraints)
                                         }));
 }
 
-TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsNotEnabled)
-{
-    TestServerClusterContext context;
-    TimerDelegateMock timer;
-
-    ProximityRangingCluster cluster(kTestEndpointId, ProximityRangingCluster::Config(timer));
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ClusterTester tester(cluster);
-
-    Attributes::RangingConstraints::TypeInfo::DecodableType list;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::RangingConstraints::Id, list), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
 TEST_F(TestProximityRangingCluster, TestReadRangingConstraintsNoAdapter)
 {
     TestServerClusterContext context;
