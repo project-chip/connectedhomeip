@@ -781,8 +781,8 @@ void WaterHeaterInit()
     delegate.SetEndpointId(1);
     static WaterHeaterManagement::Instance instance(
         1, delegate,
-        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
-                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+        BitMask<WaterHeaterManagement::Feature>(WaterHeaterManagement::Feature::kTankPercent,
+                                                WaterHeaterManagement::Feature::kEnergyManagement));
     VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
     VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
                        "Failed to initialise Thermostat cluster.");
