@@ -2082,7 +2082,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute selectedTemperatureLevel;
+    ram      attribute selectedTemperatureLevel default = 0;
     callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

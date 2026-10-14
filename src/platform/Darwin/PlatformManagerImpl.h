@@ -65,6 +65,7 @@ public:
     CHIP_ERROR StopBleScan();
 
     bool RegisterSignalHandler(int sig, dispatch_block_t block);
+    // Unregistering blocks until the dispatch source is finalized.
     bool UnregisterSignalHandler(int sig);
     void UnregisterAllSignalHandlers();
 

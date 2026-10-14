@@ -112,6 +112,10 @@ static void SetActiveDeviceType(std::string deviceType)
 
 #include "DeviceFactoryPlatformOverride.h"
 
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+#include "MosaicoUsbConsole.h"
+#endif
+
 namespace {
 
 std::string KebabCaseToTitleCase(const std::string & input)
@@ -633,6 +637,10 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
 
 extern "C" void app_main()
 {
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+    ESP_ERROR_CHECK_WITHOUT_ABORT(InitMosaicoUsbConsole());
+#endif
+
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)

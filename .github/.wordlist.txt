@@ -50,6 +50,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+AMOLED
 ANC
 announcementReason
 AnnounceOTAProvider
@@ -179,6 +180,7 @@ BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
+BSP
 bt
 btmgmt
 BTN
@@ -269,6 +271,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+ClosureControl
 CMAC
 cmake
 CMakeLists
@@ -1004,6 +1007,7 @@ Mockito
 ModeSelect
 modprobe
 Modustoolbox
+Mosaico
 moveMode
 MoveToHue
 MoveToLevel
@@ -1140,6 +1144,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OTG
 OU
 outform
 outgoingCommands
