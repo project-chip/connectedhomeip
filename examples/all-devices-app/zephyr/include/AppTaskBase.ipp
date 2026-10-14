@@ -325,6 +325,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    // mOTARequestorAttributes is passed twice as the same object provides attribute storage and OTA event generation.
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
                                                 mOTARequestorAttributes, mOTARequestorAttributes));
 
