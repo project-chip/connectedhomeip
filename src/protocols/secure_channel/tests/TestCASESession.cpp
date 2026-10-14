@@ -3103,10 +3103,21 @@ TEST_F_FROM_FIXTURE(TestCASESession, TCPConnectionClosedDuringSendSigma3DeletesS
         EXPECT_EQ(delegateCommissioner.mLastError, expectedError);
         EXPECT_EQ(delegateCommissioner.mLastStage, SessionEstablishmentStage::kSentSigma1);
         EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+#if CHIP_CONFIG_SLOW_CRYPTO
+        // With CHIP_CONFIG_SLOW_CRYPTO, OnMessageReceived flushes a standalone MRP Ack for each
+        // received Sigma message (Sigma1 and Sigma2 when Sigma3 send fails; Sigma1, Sigma2, and
+        // Sigma3 when Sigma3 send succeeds).
+        constexpr uint32_t kExpectedSentOnSigma3Success = 7u;
+        constexpr uint32_t kExpectedSentOnSigma3Failure = 4u;
+#else
         // When sendError == CHIP_NO_ERROR, Sigma1, Sigma2, Sigma3, and the responder's success StatusReport
         // are sent (4 messages); when sendError != CHIP_NO_ERROR, only Sigma1 and Sigma2 are sent (2 messages).
+        constexpr uint32_t kExpectedSentOnSigma3Success = 4u;
+        constexpr uint32_t kExpectedSentOnSigma3Failure = 2u;
+#endif
         // In neither case does HandleSigma2_and_SendSigma3 send an initiator error StatusReport after eviction.
-        EXPECT_EQ(loopback.mSentMessageCount, (sendError == CHIP_NO_ERROR) ? 4u : 2u);
+        EXPECT_EQ(loopback.mSentMessageCount,
+                  (sendError == CHIP_NO_ERROR) ? kExpectedSentOnSigma3Success : kExpectedSentOnSigma3Failure);
 
         loopback.SetLoopbackTransportDelegate(nullptr);
         loopback.Reset();
