@@ -60,7 +60,8 @@ Only the MAINTAINER SETTINGS block below is expected to change. Edit it when:
 
 Nothing here changes for new tests, helpers, apps or shard filters. Modules the
 test framework imports from the test tree are found automatically.
-test_python_test_scope.py checks these settings against the repository.
+The Lint Code Base workflow runs test_python_test_scope.py, which checks these
+settings against the repository and says what to fix when they drift.
 """
 
 import argparse

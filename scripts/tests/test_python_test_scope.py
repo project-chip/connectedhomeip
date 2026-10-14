@@ -34,7 +34,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # pylint: disable=wrong-import-position
 from python_test_scope import (NO_TESTS, UNFILTERED_JOB_APPS, built_apps, ci_variables, classify, environment_file,  # noqa: E402
-                               imported_names, main, runner_matches, select)
+                               excluded_tests, framework_imports, imported_names, load_metadata, main, runner_matches, scan_tree,
+                               select, shard_filters)
 
 
 class TestClassify(unittest.TestCase):
@@ -364,34 +365,60 @@ class TestSelectHelpers(unittest.TestCase):
         self.assertEqual(imported_names("def broken(:\n", "TC_X.py"), set())
 
 
-class TestSelectOnThisRepository(unittest.TestCase):
-    """The selection against the real tree and workflow, so drift between them shows up here."""
+class RepositoryGuard(unittest.TestCase):
+    """Base for the checks that read this repository; the Lint Code Base workflow runs them.
 
-    def test_a_changed_test_lands_in_exactly_one_shard(self):
-        selection = select(["src/python_testing/TC_FAN_3_5.py"])
-        self.assertEqual(list(selection.tests), ["TC_FAN_3_5.py"])
-        self.assertEqual([f for f, regex in selection.slices.items() if regex != NO_TESTS], ["TC_[F-I]"])
-
-    def test_mdns_discovery_counts_as_framework(self):
-        # matter/testing/commissioning.py imports mdns_discovery.mdns_discovery.
-        selection = select(["src/python_testing/mdns_discovery/utils/network.py"])
-        self.assertIn("imported by the test framework", selection.full_reason)
-
-    def test_every_test_the_regular_run_picks_up_matches_a_shard(self):
-        root = Path(__file__).resolve().parents[2]
-        tests = [f"src/python_testing/{path.name}" for path in sorted((root / "src/python_testing").glob("TC_*.py"))]
-        selection = select(tests)
-        self.assertIsNone(selection.full_reason)
-        self.assertGreater(len(selection.tests), 400)
-
-
-class TestAppBuildsOnThisRepository(unittest.TestCase):
-    """The REPL build job's app conditions against the environment file they serve."""
+    A failure says what to fix and, under GitHub Actions, also annotates the line to change.
+    """
 
     ROOT = Path(__file__).resolve().parents[2]
+    WORKFLOWS = ".github/workflows"
+    TREE = "src/python_testing"
+
+    def fail_with_fix(self, path: str, line_pattern: str, message: str) -> None:
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            lines = (self.ROOT / path).read_text().splitlines()
+            line = next((n for n, text in enumerate(lines, 1) if re.search(line_pattern, text)), 1)
+            print(f"\n::error file={path},line={line}::{message}", flush=True)
+        self.fail(message)
+
+    def runnable_tests(self) -> list[str]:
+        excluded = excluded_tests(load_metadata(self.ROOT / self.TREE / "test_metadata.yaml"))
+        return sorted(p.name for p in (self.ROOT / self.TREE).glob("*.py") if p.name not in excluded)
+
+
+class TestSelectionGuards(RepositoryGuard):
+
+    def test_every_runnable_test_is_selected_into_exactly_one_shard(self):
+        selection = select([f"{self.TREE}/{name}" for name in self.runnable_tests()])
+        if selection.full_reason:
+            self.fail_with_fix("scripts/tests/python_test_scope.py", r"^def select",
+                               f"Selecting every runnable test fell back to a full run: {selection.full_reason}. "
+                               "Fix: the rules in select() no longer match the test tree.")
+        self.assertEqual(sorted(selection.tests), self.runnable_tests())
+        filters = shard_filters(self.ROOT)
+        for name in self.runnable_tests():
+            shards = [f for f in filters if runner_matches(f, f"{self.TREE}/{name}")]
+            if len(shards) != 1:
+                self.fail_with_fix(f"{self.WORKFLOWS}/tests.yaml", r"^\s+filter: \[",
+                                   f"{name} matches {len(shards)} REPL shard filters {shards}. "
+                                   "Fix: make the filter list match each test exactly once "
+                                   "(scripts/tools/estimate_repl_test_split.py reports overlaps).")
+
+    def test_modules_the_framework_imports_run_every_shard(self):
+        tree = self.ROOT / self.TREE
+        for package in sorted(framework_imports(tree, scan_tree(tree))):
+            module = next(iter(sorted(tree.glob(f"{package}/**/*.py"))), tree / f"{package}.py")
+            with self.subTest(package=package):
+                selection = select([module.relative_to(self.ROOT).as_posix()])
+                self.assertIn("imported by the test framework", selection.full_reason)
+
+
+class TestBuildGuards(RepositoryGuard):
+    """The REPL build job's app conditions against the environment file they serve."""
 
     def setUp(self):
-        self.workflow = yaml.safe_load((self.ROOT / ".github/workflows/tests.yaml").read_text())
+        self.workflow = yaml.safe_load((self.ROOT / self.WORKFLOWS / "tests.yaml").read_text())
         self.variables = environment_file(self.ROOT)
         self.apps = built_apps(self.variables)
 
@@ -406,16 +433,22 @@ class TestAppBuildsOnThisRepository(unittest.TestCase):
 
     def test_each_app_build_runs_when_the_selection_needs_one_of_its_apps(self):
         for step, targets in self.build_steps():
-            with self.subTest(step=step["name"]):
-                expected = "env.PYTHON_TEST_APPS == ''" + "".join(
-                    f" || contains(env.PYTHON_TEST_APPS, ',{n},')" for n in self.produced(targets))
-                self.assertEqual(step.get("if"), expected)
+            expected = "env.PYTHON_TEST_APPS == ''" + "".join(
+                f" || contains(env.PYTHON_TEST_APPS, ',{n},')" for n in self.produced(targets))
+            if step.get("if") != expected:
+                self.fail_with_fix(f"{self.WORKFLOWS}/tests.yaml", rf"- name: {re.escape(step['name'])}$",
+                                   f"REPL build step {step['name']!r} does not build when the selection needs its apps. "
+                                   f"Fix: give it  if: {expected}")
 
     def test_every_app_in_the_environment_file_has_a_build_step(self):
         produced = {n for _, targets in self.build_steps() for n in self.produced(targets)}
-        # The OTA images come from a script step that always runs.
-        self.assertEqual(self.apps - produced, {"SU_OTA_REQUESTOR_V2"})
-        self.assertIn("SU_OTA_REQUESTOR_V2", UNFILTERED_JOB_APPS)
+        # Apps an always-running step makes, such as the OTA images, are listed as always built.
+        for name in sorted(self.apps - produced - set(UNFILTERED_JOB_APPS)):
+            self.fail_with_fix(f"{self.WORKFLOWS}/tests.yaml", rf'echo "{name}:',
+                               f"{name} is in the REPL environment file, but no REPL build step with --target builds it. "
+                               f"Fix: build it in a step with  if: env.PYTHON_TEST_APPS == '' || "
+                               f"contains(env.PYTHON_TEST_APPS, ',{name},'), or, if an always-running step makes it, "
+                               "add it to UNFILTERED_JOB_APPS in scripts/tests/python_test_scope.py.")
 
     def test_the_unfiltered_job_needs_only_the_apps_always_built(self):
         used = set()
@@ -427,14 +460,13 @@ class TestAppBuildsOnThisRepository(unittest.TestCase):
             for script in re.findall(r"--script (\S+\.py)", run):
                 used.update(ci_variables((self.ROOT / script).read_text()) & self.apps)
         self.assertTrue(used)
-        self.assertLessEqual(used, set(UNFILTERED_JOB_APPS), sorted(used - set(UNFILTERED_JOB_APPS)))
+        if extra := sorted(used - set(UNFILTERED_JOB_APPS)):
+            self.fail_with_fix("scripts/tests/python_test_scope.py", r"^UNFILTERED_JOB_APPS =",
+                               f"The unfiltered REPL job runs tests on {extra}, which a narrowed build skips. "
+                               "Fix: add them to UNFILTERED_JOB_APPS in scripts/tests/python_test_scope.py.")
 
-    def test_the_probe_change_builds_four_apps(self):
-        selection = select(["src/python_testing/TC_FAN_3_5.py", "src/python_testing/TC_SC_4_1.py"])
-        self.assertEqual(selection.apps, ["ALL_CLUSTERS_APP", "ALL_DEVICES_APP", "LIT_ICD_APP", "SU_OTA_REQUESTOR_V2"])
 
-
-class TestGatedWorkflows(unittest.TestCase):
+class TestGateGuards(RepositoryGuard):
     """Guards the gate's wiring in the workflow files.
 
     A job that needs a skipped job is skipped too, unless its condition uses a status
@@ -443,34 +475,38 @@ class TestGatedWorkflows(unittest.TestCase):
     stop running on master.
     """
 
-    WORKFLOWS = Path(__file__).resolve().parents[2] / ".github" / "workflows"
     SCOPE_JOB = {"if": "github.event_name == 'pull_request'", "uses": "./.github/workflows/pull-request-scope.yaml"}
     GATE = "needs.pr_scope.outputs.python_tests_only != 'true'"
 
     def gated_workflows(self):
-        for path in sorted(self.WORKFLOWS.glob("*.y*ml")):
+        for path in sorted((self.ROOT / self.WORKFLOWS).glob("*.y*ml")):
             jobs = (yaml.safe_load(path.read_text()) or {}).get("jobs") or {}
             if "pr_scope" in jobs:
-                yield path.name, jobs
+                yield f"{self.WORKFLOWS}/{path.name}", jobs
 
     def test_workflows_are_gated(self):
         self.assertGreater(len(list(self.gated_workflows())), 0)
 
     def test_scope_job_runs_on_pull_requests_only(self):
-        for name, jobs in self.gated_workflows():
-            with self.subTest(workflow=name):
-                self.assertEqual(jobs["pr_scope"], self.SCOPE_JOB)
+        for path, jobs in self.gated_workflows():
+            if jobs["pr_scope"] != self.SCOPE_JOB:
+                self.fail_with_fix(path, r"^\s+pr_scope:\s*$",
+                                   "The pr_scope job must call the gate on pull requests only. "
+                                   "Fix: give it exactly  if: github.event_name == 'pull_request'  and  "
+                                   "uses: ./.github/workflows/pull-request-scope.yaml")
 
     def test_gated_jobs_still_run_when_the_scope_job_is_skipped(self):
-        for name, jobs in self.gated_workflows():
+        for path, jobs in self.gated_workflows():
             for job, body in jobs.items():
                 needs = body.get("needs", [])
                 if "pr_scope" not in ([needs] if isinstance(needs, str) else needs):
                     continue
-                with self.subTest(workflow=name, job=job):
-                    condition = str(body.get("if", ""))
-                    self.assertTrue(condition.startswith("${{ !cancelled() && "), condition)
-                    self.assertIn(self.GATE, condition)
+                condition = str(body.get("if", ""))
+                if not condition.startswith("${{ !cancelled() && ") or self.GATE not in condition:
+                    self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$",
+                                       f"Job {job} needs pr_scope, so without !cancelled() it stops running on master "
+                                       "and in the merge queue, where pr_scope is skipped. "
+                                       f"Fix: if: ${{{{ !cancelled() && <its own condition> && {self.GATE} }}}}")
 
 
 if __name__ == "__main__":
