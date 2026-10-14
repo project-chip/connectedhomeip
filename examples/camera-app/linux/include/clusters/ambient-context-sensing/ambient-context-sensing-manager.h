@@ -31,7 +31,7 @@ namespace chip::app::Clusters::AmbientContextSensing {
 class AmbientContextSensingManager : public AmbientContextSensingDelegate
 {
 public:
-    AmbientContextSensingManager() = default;
+    AmbientContextSensingManager()           = default;
     ~AmbientContextSensingManager() override = default;
 
     // AmbientContextSensingDelegate implementation
