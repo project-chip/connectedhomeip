@@ -330,6 +330,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
+    # Which crypto backends run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
     nightly_asan_crypto_backends:
         name: Nightly ASAN Testing across Crypto Backends
         if: github.actor != 'restyled-io[bot]'
@@ -356,7 +357,6 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
                     && rm -rf out/linux-x64-tests-mbedtls-asan-clang
-            # Which backends run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
             - name: ASAN unit tests - PSA
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -495,6 +495,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
+    # Which unit-test configurations run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
     nightly_unit_tests_various_features:
         name: Nightly Unit Tests - Linux (various features)
         if: github.actor != 'restyled-io[bot]'
