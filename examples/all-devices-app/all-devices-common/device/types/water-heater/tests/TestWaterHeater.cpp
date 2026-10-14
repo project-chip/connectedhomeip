@@ -91,7 +91,7 @@ public:
     Protocols::InteractionModel::Status
     GetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap> & runningState) const override
     {
-        runningState = {};
+        runningState = kHeat;
         return Protocols::InteractionModel::Status::Success;
     }
     Protocols::InteractionModel::Status SetRunningState(BitMask<Clusters::Thermostat::RelayStateBitmap>, bool & changed) override
