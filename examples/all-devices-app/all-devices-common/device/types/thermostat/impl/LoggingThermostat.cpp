@@ -81,8 +81,8 @@ FullThermostat::Context MakeLoggingContext(const LoggingThermostat::Context & co
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    FullThermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this),
-    mFabricTable(context.fabricTable), mGroupDataProvider(context.groupDataProvider)
+    FullThermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
+    mGroupDataProvider(context.groupDataProvider)
 {
     static_assert(MATTER_ARRAY_SIZE(kPresetScenarios) == kPresetCapacity);
     // Start with two built-in presets, leaving room for a user-defined preset.

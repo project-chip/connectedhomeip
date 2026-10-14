@@ -46,12 +46,12 @@ public:
     };
 
     FullThermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
-               Clusters::Thermostat::Delegate & thermostatDelegate,
-               Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-               Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
-               Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
-               Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate);
+                   Clusters::Thermostat::Delegate & thermostatDelegate,
+                   Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
+                   Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
+                   Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
+                   Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
+                   Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate);
     ~FullThermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

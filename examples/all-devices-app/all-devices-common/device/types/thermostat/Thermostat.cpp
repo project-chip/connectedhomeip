@@ -20,12 +20,12 @@
 namespace chip::app {
 
 FullThermostat::FullThermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
-                       Clusters::Thermostat::Delegate & thermostatDelegate,
-                       Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
-                       Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
-                       Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
-                       Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
-                       Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate) :
+                               Clusters::Thermostat::Delegate & thermostatDelegate,
+                               Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
+                               Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
+                               Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
+                               Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
+                               Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
     mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
     mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate),
