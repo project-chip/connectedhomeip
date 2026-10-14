@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
+def enableGms = !project.hasProperty('matterEnableGms') || matterEnableGms.toBoolean()
+
 android {
     namespace 'com.google.chip.chiptool'
     compileSdkVersion 34
@@ -78,6 +80,12 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            java.srcDirs += enableGms ? ['src/gms/java'] : ['src/nogms/java']
+        }
+    }
+
     if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
         externalNativeBuild {
             cmake {
@@ -131,6 +139,9 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation "androidx.camera:camera-view:${camerax_version}"
 
+    if (enableGms) {
+        implementation 'com.google.android.gms:play-services-threadnetwork:16.2.1'
+    }
     implementation 'com.google.protobuf:protobuf-java:3.22.0'
 }
 
