@@ -49,6 +49,7 @@ OTARequestorCluster::~OTARequestorCluster()
     // (LazyRegisteredServerCluster::Destroy calls the destructor directly without
     // first calling Shutdown). RemoveFabricDelegate is a no-op if not registered.
     mFabricTable.RemoveFabricDelegate(this);
+    mAttributes.ClearInteractionModelContext(*this);
 }
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
@@ -62,6 +63,7 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 void OTARequestorCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mFabricTable.RemoveFabricDelegate(this);
+    mAttributes.ClearInteractionModelContext(*this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -200,17 +202,13 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
 CHIP_ERROR OTARequestorCluster::GenerateVersionAppliedEvent(const DefaultOTARequestorEventGenerator::VersionAppliedEvent & event)
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    VerifyOrReturnError(eventNumber.has_value(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return mAttributes.GenerateVersionAppliedEvent(event);
 }
 
 CHIP_ERROR OTARequestorCluster::GenerateDownloadErrorEvent(const DefaultOTARequestorEventGenerator::DownloadErrorEvent & event)
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    VerifyOrReturnError(eventNumber.has_value(), CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    return mAttributes.GenerateDownloadErrorEvent(event);
 }
 
 } // namespace chip::app::Clusters

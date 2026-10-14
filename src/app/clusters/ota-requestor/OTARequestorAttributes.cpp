@@ -114,6 +114,33 @@ CHIP_ERROR OTARequestorAttributes::SetInteractionModelContext(EndpointId endpoin
     return CHIP_NO_ERROR;
 }
 
+void OTARequestorAttributes::ClearInteractionModelContext(AttributeChangeListener & attributeChangeListener)
+{
+    assertChipStackLockedByCurrentThread();
+    if (mAttributeChangeListener == &attributeChangeListener)
+    {
+        mAttributeChangeListener = nullptr;
+        mEventsGenerator        = nullptr;
+        mEndpointId             = kInvalidEndpointId;
+    }
+}
+
+CHIP_ERROR OTARequestorAttributes::GenerateVersionAppliedEvent(const VersionAppliedEvent & event)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mEventsGenerator != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mEventsGenerator->GenerateEvent(event, mEndpointId).has_value(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestorAttributes::GenerateDownloadErrorEvent(const DownloadErrorEvent & event)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mEventsGenerator != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mEventsGenerator->GenerateEvent(event, mEndpointId).has_value(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIndex)
 {
     assertChipStackLockedByCurrentThread();

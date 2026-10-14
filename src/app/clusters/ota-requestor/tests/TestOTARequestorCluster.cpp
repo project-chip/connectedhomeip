@@ -100,6 +100,20 @@ struct TestOTARequestorCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    static void ExpectAttributesDetached(OTARequestorAttributes & attributes, chip::Testing::TestServerClusterContext & context)
+    {
+        context.ChangeListener().DirtyList().clear();
+        attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying,
+                                  OTARequestorAttributes::OTAChangeReasonEnum::kSuccess, DataModel::NullNullable);
+        attributes.SetUpdatePossible(false);
+        EXPECT_EQ(attributes.SetUpdateStateProgress(50), CHIP_NO_ERROR);
+        EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+        EXPECT_EQ(attributes.GenerateVersionAppliedEvent({ 1, 2 }), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(attributes.GenerateDownloadErrorEvent({ 1, 2, DataModel::NullNullable, DataModel::NullNullable }),
+                  CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
+    }
 };
 
 TEST_F(TestOTARequestorCluster, TestCreate)
@@ -542,6 +556,98 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventBeforeStartupFails)
     DownloadError::Type event{ 0x12345678u, 0x123456789ABCDEF0u, DataModel::NullNullable, DataModel::NullNullable };
     EXPECT_NE(cluster.GenerateDownloadErrorEvent(event), CHIP_NO_ERROR);
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
+}
+
+TEST_F(TestOTARequestorCluster, AttributesGenerateRuntimeEvents)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DefaultOTARequestorEventGenerator & generator = attributes;
+    ASSERT_EQ(generator.GenerateVersionAppliedEvent({ 0x12345678u, 0xABCDu }), CHIP_NO_ERROR);
+    auto versionEvent = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(versionEvent.has_value());
+    EXPECT_EQ(versionEvent->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
+    VersionApplied::DecodableType versionData;
+    ASSERT_EQ(versionEvent->GetEventData(versionData), CHIP_NO_ERROR);
+    EXPECT_EQ(versionData.softwareVersion, 0x12345678u);
+    EXPECT_EQ(versionData.productID, 0xABCDu);
+
+    ASSERT_EQ(generator.GenerateDownloadErrorEvent({ 0x12345678u, 0x123456789ABCDEF0u, 83u, 0x0FEDCBA987654321 }), CHIP_NO_ERROR);
+    auto downloadEvent = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(downloadEvent.has_value());
+    EXPECT_EQ(downloadEvent->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
+    DownloadError::DecodableType downloadData;
+    ASSERT_EQ(downloadEvent->GetEventData(downloadData), CHIP_NO_ERROR);
+    EXPECT_EQ(downloadData.softwareVersion, 0x12345678u);
+    EXPECT_EQ(downloadData.bytesDownloaded, 0x123456789ABCDEF0u);
+    ASSERT_FALSE(downloadData.progressPercent.IsNull());
+    EXPECT_EQ(downloadData.progressPercent.Value(), 83u);
+    ASSERT_FALSE(downloadData.platformCode.IsNull());
+    EXPECT_EQ(downloadData.platformCode.Value(), 0x0FEDCBA987654321);
+    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
+}
+
+TEST_F(TestOTARequestorCluster, AttributesRejectRuntimeEventsBeforeStartup)
+{
+    OTARequestorAttributes attributes;
+    EXPECT_EQ(attributes.GenerateVersionAppliedEvent({ 1, 2 }), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(attributes.GenerateDownloadErrorEvent({ 1, 2, DataModel::NullNullable, DataModel::NullNullable }),
+              CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestOTARequestorCluster, ShutdownClearsAttributesContextAndAllowsRestart)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ExpectAttributesDetached(attributes, context);
+
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    attributes.SetUpdatePossible(true);
+    EXPECT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_EQ(attributes.GenerateVersionAppliedEvent({ 1, 2 }), CHIP_NO_ERROR);
+    EXPECT_TRUE(context.EventsGenerator().GetNextEvent().has_value());
+    EXPECT_EQ(attributes.GenerateDownloadErrorEvent({ 1, 2, DataModel::NullNullable, DataModel::NullNullable }), CHIP_NO_ERROR);
+    EXPECT_TRUE(context.EventsGenerator().GetNextEvent().has_value());
+}
+
+TEST_F(TestOTARequestorCluster, DestructionClearsAttributesContext)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    {
+        OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    }
+    ExpectAttributesDetached(attributes, context);
+}
+
+TEST_F(TestOTARequestorCluster, UnusedClusterDoesNotClearAttributesContext)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaCommands otaCommands;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    {
+        OTARequestorCluster unusedCluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
+    }
+
+    attributes.SetUpdatePossible(false);
+    EXPECT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_EQ(attributes.GenerateVersionAppliedEvent({ 1, 2 }), CHIP_NO_ERROR);
+    EXPECT_TRUE(context.EventsGenerator().GetNextEvent().has_value());
 }
 
 // OnFabricRemoved clears the removed fabric's DefaultOTAProviders entry, leaves other fabrics

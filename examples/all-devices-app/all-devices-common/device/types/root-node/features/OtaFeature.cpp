@@ -27,16 +27,16 @@ namespace app {
 CHIP_ERROR OtaFeature::RegisterFeatureClusters(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
                                                RootNode::Context & rootContext, Clusters::GeneralCommissioningCluster &)
 {
-    mContext.cluster.Create(endpointId, mContext.otaCommands, mContext.attributes, rootContext.fabricTable);
-    return provider.AddCluster(mContext.cluster.Registration());
+    mOtaRequestorCluster.Create(endpointId, mContext.otaCommands, mContext.attributes, rootContext.fabricTable);
+    return provider.AddCluster(mOtaRequestorCluster.Registration());
 }
 
 void OtaFeature::UnregisterFeatureClusters(CodeDrivenDataModelProvider & provider)
 {
-    if (mContext.cluster.IsConstructed())
+    if (mOtaRequestorCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mContext.cluster.Cluster()));
-        mContext.cluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mOtaRequestorCluster.Cluster()));
+        mOtaRequestorCluster.Destroy();
     }
 }
 

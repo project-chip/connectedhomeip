@@ -19,18 +19,20 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
-#include <app/clusters/ota-requestor/OTARequestorCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
 namespace chip {
-app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> & GetOTARequestorCluster();
+OTARequestorAttributes & GetOTARequestorAttributes();
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator();
 } // namespace chip
+#else
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
 #if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR

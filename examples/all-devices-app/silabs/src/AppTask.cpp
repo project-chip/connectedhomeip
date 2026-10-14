@@ -48,7 +48,6 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <app/server/Dnssd.h>
@@ -263,7 +262,6 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     chip::app::OtaFeature::Context otaContext{
         .otaCommands = gRequestorCore,
         .attributes  = chip::GetOTARequestorAttributes(),
-        .cluster     = chip::GetOTARequestorCluster(),
     };
 #endif // SILABS_OTA_ENABLED
 

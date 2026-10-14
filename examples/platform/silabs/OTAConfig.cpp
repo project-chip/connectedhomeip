@@ -90,15 +90,9 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
-// which is where these singletons normally live. The application composes the cluster
-// using the platform-owned storage supplied here.
+// which is where these singletons normally live. The application supplies these
+// attributes to the feature-owned cluster, which connects them to the Interaction Model.
 namespace chip {
-app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> & GetOTARequestorCluster()
-{
-    static app::LazyRegisteredServerCluster<app::Clusters::OTARequestorCluster> cluster;
-    return cluster;
-}
-
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
     static OTARequestorAttributes gOtaRequestorAttributes;
@@ -107,7 +101,7 @@ OTARequestorAttributes & GetOTARequestorAttributes()
 
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
-    return GetOTARequestorCluster().Cluster();
+    return GetOTARequestorAttributes();
 }
 
 } // namespace chip
@@ -121,10 +115,6 @@ chip::BDXDownloader gDownloader;
 
 void OTAConfig::Init()
 {
-#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
-    VerifyOrReturn(chip::GetOTARequestorCluster().IsConstructed(),
-                   ChipLogError(AppServer, "OTA Requestor cluster is not registered"));
-#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 

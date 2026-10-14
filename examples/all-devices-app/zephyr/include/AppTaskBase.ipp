@@ -225,7 +225,6 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     OtaFeature::Context otaContext{
         .otaCommands = mOTARequestorCore,
         .attributes  = mOTARequestorAttributes,
-        .cluster     = mOTARequestorCluster,
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
@@ -324,11 +323,10 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    VerifyOrReturnError(mOTARequestorCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
-                                                mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
+                                                mOTARequestorAttributes, mOTARequestorAttributes));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);
