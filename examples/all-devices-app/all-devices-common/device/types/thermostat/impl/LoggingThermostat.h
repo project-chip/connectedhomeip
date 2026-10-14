@@ -32,7 +32,7 @@ class LoggingThermostat : public Clusters::IdentifyDelegate,
                           public Clusters::Thermostat::ThermostatPresets::Delegate,
                           public Clusters::Thermostat::ThermostatHold::Delegate,
                           public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
-                          public Thermostat
+                          public FullThermostat
 {
 public:
     struct Context

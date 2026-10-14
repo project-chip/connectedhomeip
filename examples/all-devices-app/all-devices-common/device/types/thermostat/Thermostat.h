@@ -22,7 +22,10 @@
 
 namespace chip::app {
 
-class Thermostat : public SingleEndpoint
+/// A Thermostat device with heating, cooling, AutoMode and Presets support and the
+/// delegates they require. Device types are expected to be generic; devices that
+/// need a narrower cluster composition should build their own class instead.
+class FullThermostat : public SingleEndpoint
 {
 public:
     using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
@@ -42,14 +45,14 @@ public:
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
-    Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
+    FullThermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                Clusters::Thermostat::Delegate & thermostatDelegate,
                Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
                Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
                Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
                Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate);
-    ~Thermostat() override = default;
+    ~FullThermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;

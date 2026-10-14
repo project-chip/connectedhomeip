@@ -19,7 +19,7 @@
 
 namespace chip::app {
 
-Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
+FullThermostat::FullThermostat(const Context & context, Clusters::IdentifyDelegate & identifyDelegate,
                        Clusters::Thermostat::Delegate & thermostatDelegate,
                        Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate,
                        Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
@@ -32,7 +32,7 @@ Thermostat::Thermostat(const Context & context, Clusters::IdentifyDelegate & ide
     mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate)
 {}
 
-CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR FullThermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
@@ -54,7 +54,7 @@ CHIP_ERROR Thermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider
     return CHIP_NO_ERROR;
 }
 
-void Thermostat::Unregister(CodeDrivenDataModelProvider & provider)
+void FullThermostat::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
     UnregisterAdditionalClusters(provider);

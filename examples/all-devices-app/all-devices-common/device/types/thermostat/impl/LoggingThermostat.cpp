@@ -52,9 +52,9 @@ bool IsSupportedMode(thermostat::SystemModeEnum mode, const BitFlags<thermostat:
     return false;
 }
 
-Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & context)
+FullThermostat::Context MakeLoggingContext(const LoggingThermostat::Context & context)
 {
-    Thermostat::Context loggingContext{
+    FullThermostat::Context loggingContext{
         .timerDelegate      = context.timerDelegate,
         .features           = context.features,
         .optionalAttributes = context.optionalAttributes,
@@ -81,8 +81,8 @@ Thermostat::Context MakeLoggingContext(const LoggingThermostat::Context & contex
 } // namespace
 
 LoggingThermostat::LoggingThermostat(const Context & context) :
-    Thermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this), mFabricTable(context.fabricTable),
-    mGroupDataProvider(context.groupDataProvider)
+    FullThermostat(MakeLoggingContext(context), *this, *this, *this, *this, *this, *this, *this),
+    mFabricTable(context.fabricTable), mGroupDataProvider(context.groupDataProvider)
 {
     static_assert(MATTER_ARRAY_SIZE(kPresetScenarios) == kPresetCapacity);
     // Start with two built-in presets, leaving room for a user-defined preset.
