@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
     # Builds and runs the host unit-test suite with the PSA and mbedTLS crypto backends.
-    # Which crypto backends run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
+    # See docs/ci-cd/host_unit_tests.md for which crypto backends run on PRs, pushes and nightly.
     crypto_backend_unit_tests:
         name: Crypto Backend Unit Tests (PSA, mbedTLS)
         if: github.actor != 'restyled-io[bot]'

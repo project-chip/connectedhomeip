@@ -330,7 +330,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
-    # Which crypto backends run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
+    # See docs/ci-cd/host_unit_tests.md for which crypto backends run on PRs, pushes and nightly.
     nightly_asan_crypto_backends:
         name: Nightly ASAN Testing across Crypto Backends
         if: github.actor != 'restyled-io[bot]'
@@ -495,7 +495,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
-    # Which unit-test configurations run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
+    # See docs/ci-cd/host_unit_tests.md for which unit-test configurations run on PRs, pushes and nightly.
     nightly_unit_tests_various_features:
         name: Nightly Unit Tests - Linux (various features)
         if: github.actor != 'restyled-io[bot]'
