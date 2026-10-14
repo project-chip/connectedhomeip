@@ -873,9 +873,10 @@ the other checks still run, and the merge queue runs everything.
 
 On such a pull request the REPL test shards run only the tests it changes and
 the tests that import a module it changes; a shard with none of them skips its
-steps. The `REPL Tests - Linux (BUILD)` job summary lists the selected tests.
-The unfiltered `REPL Tests - Linux (RUN)` job runs as usual. The rules are in
-`scripts/tests/python_test_scope.py`.
+steps. The REPL build job builds only the apps those tests name in their CI
+arguments, plus the ones the unfiltered `REPL Tests - Linux (RUN)` job needs,
+which runs as usual. The `REPL Tests - Linux (BUILD)` job summary lists the
+selected tests and apps. The rules are in `scripts/tests/python_test_scope.py`.
 
 ## Running ALL or a subset of tests when changing application code
 

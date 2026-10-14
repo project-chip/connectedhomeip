@@ -40,7 +40,9 @@ prints `python_test_slices=<JSON>`: for each REPL shard filter, a regex that
 selects the shard's share of the tests, or "none". It prints an empty value when
 every shard must run as usual. `--previous-metadata` takes test_metadata.yaml as
 it was before the change, so that a change to it selects only the tests whose
-exclusion it changes.
+exclusion it changes. `--github-env` also writes PYTHON_TEST_APPS, the
+comma-delimited REPL environment variables of the apps those tests and the
+unfiltered REPL job need, for the REPL build job's app build steps.
 """
 
 import argparse
@@ -80,7 +82,13 @@ UNSHARDED_DIRECTORIES = ("test_testing/", "post_certification_tests/")
 
 WORKFLOW = ".github/workflows/tests.yaml"
 SHARD_JOB = "repl_tests_linux_run"
+ENV_FILE_STEP = "Generate an argument environment file"
 NO_TESTS = "none"
+
+# Built for every pull request: the unfiltered REPL job runs its tests on them.
+UNFILTERED_JOB_APPS = ("ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2")
+
+CI_ARGUMENTS = re.compile(r"=== BEGIN CI TEST ARGUMENTS ===(.*?)=== END CI TEST ARGUMENTS ===", re.S)
 
 
 def full_run_reason(path: str) -> str | None:
@@ -209,6 +217,27 @@ def excluded_tests(metadata: dict) -> dict[str, str]:
     return excluded
 
 
+def ci_variables(source: str) -> set[str]:
+    """Return the ${VARIABLE} placeholders in a test's CI arguments block, across all its runs."""
+    block = CI_ARGUMENTS.search(source)
+    return set(re.findall(r"\$\{([A-Z_0-9]+)\}", block.group(1))) if block else set()
+
+
+def environment_file(chip_root: Path) -> dict[str, str]:
+    """Return the variables the REPL environment file defines, with their paths."""
+    import yaml
+    workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
+    for step in workflow["jobs"][SHARD_JOB]["steps"]:
+        if step.get("name") == ENV_FILE_STEP:
+            return dict(re.findall(r'echo "([A-Z_0-9]+): ([^"]+)" >> /tmp/test_env.yaml', step["run"]))
+    return {}
+
+
+def built_apps(variables: dict[str, str]) -> set[str]:
+    """Return the variables whose path is an artifact of the REPL build job."""
+    return {name for name, path in variables.items() if path.startswith("objdir-clone/")}
+
+
 @dataclass
 class Selection:
     """The REPL tests a pull request needs.
@@ -220,6 +249,8 @@ class Selection:
     tests: dict[str, str] = field(default_factory=dict)
     not_run: dict[str, str] = field(default_factory=dict)
     slices: dict[str, str] = field(default_factory=dict)
+    # The built apps the selected tests and the unfiltered REPL job need.
+    apps: list[str] = field(default_factory=list)
 
 
 def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata: dict | None = None) -> Selection:
@@ -295,6 +326,15 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
     for f in filters:
         share = sorted(rel[:-len(".py")] for rel in selection.tests if runner_matches(f, TEST_TREE + rel))
         selection.slices[f] = "/(" + "|".join(map(re.escape, share)) + r")\.py$" if share else NO_TESTS
+
+    variables = environment_file(chip_root)
+    apps = set(UNFILTERED_JOB_APPS)
+    for rel in selection.tests:
+        for name in ci_variables((tree / rel).read_text(errors="replace")):
+            if name not in variables:
+                return Selection(full_reason=f"{TEST_TREE}{rel} uses ${{{name}}}, which the REPL environment file does not define")
+            apps.add(name)
+    selection.apps = sorted(apps & built_apps(variables))
     return selection
 
 
@@ -309,6 +349,7 @@ def summary_markdown(selection: Selection) -> str:
     else:
         lines.append("The REPL shards have no test to run; the unfiltered REPL job still runs.")
     lines.extend(f"- `{rel}`: {why}" for rel, why in sorted(selection.tests.items()))
+    lines += ["", "The REPL build job builds only " + ", ".join(f"`{app}`" for app in selection.apps) + "."]
     if selection.not_run:
         lines += ["", "Changed but not run on pull requests:"]
         lines.extend(f"- `{rel}` {why}" for rel, why in sorted(selection.not_run.items()))
@@ -328,6 +369,8 @@ def main(argv: list[str] | None = None, stdin: TextIO = sys.stdin) -> int:
                                help="file to append the output line to, such as $GITHUB_OUTPUT")
     select_parser.add_argument("--summary", type=argparse.FileType("a"),
                                help="file to append a markdown description to, such as $GITHUB_STEP_SUMMARY")
+    select_parser.add_argument("--github-env", type=argparse.FileType("a"),
+                               help="file to append PYTHON_TEST_APPS to, such as $GITHUB_ENV; nothing is written when every app must be built")
     select_parser.add_argument("--previous-metadata", type=Path,
                                help="test_metadata.yaml before the change; without it a change to that file runs every shard")
     select_parser.add_argument("--chip-root", type=Path, default=CHIP_ROOT, help=argparse.SUPPRESS)
@@ -345,6 +388,8 @@ def main(argv: list[str] | None = None, stdin: TextIO = sys.stdin) -> int:
     selection = select(stdin, args.chip_root, previous)
     slices = "" if selection.full_reason else json.dumps(selection.slices, separators=(",", ":"))
     print(f"python_test_slices={slices}", file=args.output)
+    if args.github_env and not selection.full_reason:
+        print(f"PYTHON_TEST_APPS=,{','.join(selection.apps)},", file=args.github_env)
     if args.summary:
         print(summary_markdown(selection), file=args.summary)
     print(summary_markdown(selection), file=sys.stderr)
