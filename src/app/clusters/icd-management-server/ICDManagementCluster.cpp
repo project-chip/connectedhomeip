@@ -27,6 +27,8 @@
 #include <app/server/Server.h> // nogncheck
 #endif
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

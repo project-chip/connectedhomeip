@@ -209,11 +209,12 @@ TEST_F(TestIcdManagementCluster, TestUserActiveModeTriggerInstruction)
 
     // Instruction exceeding kUserActiveModeTriggerInstructionMaxLength (128 bytes) is truncated.
     {
-        static constexpr char kLongBuffer[200] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        static constexpr char kLongBuffer[] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                              "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                              "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        static_assert(sizeof(kLongBuffer) - 1 > IcdManagement::kUserActiveModeTriggerInstructionMaxLength,
+                      "Test instruction must exceed kUserActiveModeTriggerInstructionMaxLength");
         const CharSpan longInstruction(kLongBuffer, sizeof(kLongBuffer) - 1);
-        ASSERT_GT(longInstruction.size(), IcdManagement::kUserActiveModeTriggerInstructionMaxLength);
 
         ICDManagementCluster cluster(kRootEndpointId, keystore, fabricTable, icdConfig, optionalAttributes, optionalCommands,
                                      userActiveModeTriggerHint, longInstruction);
