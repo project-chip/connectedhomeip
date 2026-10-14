@@ -30,8 +30,8 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate) :
 
 WaterValve::WaterValve(TimerDelegate & timerDelegate,
                        const std::optional<ValveConfigurationAndControlCluster::ValveContext> & context, Listener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
-    mValveContext(context), mListener(listener)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
+    mTimerDelegate(timerDelegate), mValveContext(context), mListener(listener)
 {}
 
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
