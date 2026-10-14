@@ -39,8 +39,6 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_10.py
-      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
@@ -295,6 +293,11 @@ not_automated:
 # root and applications built with BLE and Wi-Fi.
 dedicated_runner:
     - name: TC_CNET_4_2.py
+      runner: ble-thread
+      reason:
+          Needs root for its mocked BLE and Thread topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_10.py
       runner: ble-thread
       reason:
           Needs root for its mocked BLE and Thread topology. Run it with sudo
