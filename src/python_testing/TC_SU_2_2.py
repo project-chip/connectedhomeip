@@ -208,14 +208,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-        # Set up named pipes for the provider
-        self.provider_app_pipe = self.user_params.get('provider_app_pipe', "")
-        self.provider_app_pipe_out = self.user_params.get('provider_app_pipe_out', "")
-
-        # On CI the provider_app_pipe and provider_app_pipe_out arguments are required, so fail here
-        # if either is None or empty rather than letting the test run until Step 8 and fail there.
-        if self.is_pics_sdk_ci_only and (not self.provider_app_pipe or not self.provider_app_pipe_out):
-            asserts.fail("Missing argument provider_app_pipe or provider_app_pipe_out. Specify using --string-arg provider_app_pipe:<path> and --string-arg provider_app_pipe_out:<path>")
+        # Set up named pipes for the provider, if not defined add the default values
+        self.provider_app_pipe = self.user_params.get('provider_app_pipe', "/tmp/provider_2_2_fifo")
+        self.provider_app_pipe_out = self.user_params.get('provider_app_pipe_out', "/tmp/provider_2_2_fifo_out")
 
     def _next_provider_log_path(self):
         """Return a fresh, unique log-file path for the next provider start.
