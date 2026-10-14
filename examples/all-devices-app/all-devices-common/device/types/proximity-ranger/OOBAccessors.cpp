@@ -33,7 +33,9 @@ using RangingConstraint = Clusters::ProximityRanging::Structs::RangingConstraint
 std::optional<CHIP_ERROR> ProximityRangerOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
     if (action.data_equal("SetRangingConstraints"_span))
+    {
         return HandleSetRangingConstraints(tlvData);
+    }
 
     return std::nullopt;
 }
@@ -58,7 +60,9 @@ std::optional<CHIP_ERROR> ProximityRangerOOBAccessor::HandleSetRangingConstraint
     {
         TLV::Tag tag = reader.GetTag();
         if (!TLV::IsContextTag(tag))
+        {
             continue;
+        }
 
         switch (TLV::TagNumFromTag(tag))
         {
@@ -92,7 +96,9 @@ std::optional<CHIP_ERROR> ProximityRangerOOBAccessor::HandleSetRangingConstraint
     VerifyOrReturnError(hasEndpointId && hasConstraints, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (endpointId != mEndpointId)
+    {
         return std::nullopt;
+    }
 
     return mDevice.SetRangingConstraints(Span<const RangingConstraint>(constraints.data(), constraints.size()));
 }
