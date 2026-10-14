@@ -83,7 +83,9 @@ CHIP_ERROR ProximityRangingTranslator::TranslateAndExecute(EndpointId endpointId
 {
     std::string actionName = json["Name"].asString();
     if (actionName == "SetRangingConstraints")
+    {
         return TranslateSetRangingConstraints(endpointId, json, registry);
+    }
 
     return CHIP_ERROR_NOT_FOUND;
 }
@@ -112,7 +114,9 @@ CHIP_ERROR ProximityRangingTranslator::TranslateSetRangingConstraints(EndpointId
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kTagConstraints), TLV::kTLVType_Array, arrayType));
     for (const auto & entry : constraints)
+    {
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), entry));
+    }
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 

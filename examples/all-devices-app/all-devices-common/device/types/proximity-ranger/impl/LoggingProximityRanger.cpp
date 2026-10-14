@@ -74,11 +74,17 @@ CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
         LoggingRangingAdapter * adapter = AdapterFor(entry.technology);
         VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         for (size_t i = 0; i < std::size(adapters); i++)
+        {
             if (adapters[i] == adapter)
+            {
                 perAdapter[i].push_back(entry);
+            }
+        }
     }
     for (size_t i = 0; i < std::size(adapters); i++)
+    {
         adapters[i]->SetConstraints(Span<const RangingConstraint>(perAdapter[i].data(), perAdapter[i].size()));
+    }
 
     return CHIP_NO_ERROR;
 }
