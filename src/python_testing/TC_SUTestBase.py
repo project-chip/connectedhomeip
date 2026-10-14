@@ -651,5 +651,4 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         if len(events) == 0:
             return -1
-        else:
-            return max([e.Header.EventNumber for e in events])
+        return max([e.Header.EventNumber for e in events])
