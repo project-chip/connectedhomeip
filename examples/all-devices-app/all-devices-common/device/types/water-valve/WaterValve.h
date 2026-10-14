@@ -100,13 +100,8 @@ protected:
     void HandleRemainingDurationTick(uint32_t duration) override;
 
     TimerDelegate & mTimerDelegate;
-<<<<<<< HEAD
     Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
     const WaterValveConfig mConfig;
-=======
-    std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
-    Listener * mListener = nullptr;
->>>>>>> ed0c08e48ba (Remove level/duration local caching)
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };
