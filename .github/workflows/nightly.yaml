@@ -356,7 +356,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
                     && rm -rf out/linux-x64-tests-mbedtls-asan-clang
-            # mbedTLS and PSA also run in unit_integration_test.yaml, but on master only when crypto paths change.
+            # Which backends run on PRs, pushes and nightly: docs/ci-cd/host_unit_tests.md
             - name: ASAN unit tests - PSA
               run: |
                   ./scripts/run_in_build_env.sh \
