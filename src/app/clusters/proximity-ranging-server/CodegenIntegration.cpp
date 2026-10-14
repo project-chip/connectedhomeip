@@ -32,14 +32,14 @@ ProximityRangingServer::~ProximityRangingServer()
     Deinit();
 }
 
-CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features, uint32_t optionalAttributeBits)
+CHIP_ERROR ProximityRangingServer::Init(BitMask<Feature> features, ProximityRangingCluster::OptionalAttributeSet optionalAttributes)
 {
     VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_ALREADY_INITIALIZED);
 
     mCluster.Create(mEndpointId,
                     ProximityRangingCluster::Config(mTimerDelegate)
                         .WithFeatures(features)
-                        .WithOptionalAttributes(optionalAttributeBits)
+                        .WithOptionalAttributes(optionalAttributes)
                         .WithAdapters(mAdapters));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());

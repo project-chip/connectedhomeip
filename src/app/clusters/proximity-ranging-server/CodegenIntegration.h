@@ -71,8 +71,10 @@ public:
     /**
      * Construct the underlying cluster with the supplied feature set and optional attributes
      * and register it with the codegen data model provider.
+     *
+     * @param optionalAttributes Optional attributes to enable (default none)
      */
-    CHIP_ERROR Init(BitMask<Feature> features, uint32_t optionalAttributeBits = 0);
+    CHIP_ERROR Init(BitMask<Feature> features, ProximityRangingCluster::OptionalAttributeSet optionalAttributes = {});
 
     /**
      * Unregister and tear down the underlying cluster. Safe to call if Init() was
