@@ -14,35 +14,33 @@
 #limitations under the License.
 #
 
-import("//build_overrides/build.gni") import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+source_set("irrigation-system") {
+  sources = [
+    "IrrigationSystem.cpp",
+    "IrrigationSystem.h",
+  ]
 
-    source_set("irrigation-system"){ sources =
-                                         [
-                                             "IrrigationSystem.cpp",
-                                             "IrrigationSystem.h",
-                                         ]
+  public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server",
+    "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
 
-                                     public_deps =
-                                         [
-                                             "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
-                                             "${chip_root}/src/app/clusters/valve-configuration-and-control-server",
-                                             "${chip_root}/zzz_generated/app-common/devices/",
-                                         ] }
+source_set("logging") {
+  sources = [
+    "impl/LoggingIrrigationSystem.cpp",
+    "impl/LoggingIrrigationSystem.h",
+    "impl/ValveConfigurations.cpp",
+  ]
 
-source_set("logging")
-{
-    sources =
-        [
-            "impl/LoggingIrrigationSystem.cpp",
-            "impl/LoggingIrrigationSystem.h",
-            "impl/ValveConfigurations.cpp",
-        ]
-
-        public_deps = [
-            ":irrigation-system",
-            "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
-            "${chip_root}/src/app/clusters/flow-measurement-server",
-            "${chip_root}/src/app/clusters/identify-server",
-            "${chip_root}/src/app/clusters/operational-state-server",
-        ]
+  public_deps = [
+    ":irrigation-system",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/src/app/clusters/flow-measurement-server",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/app/clusters/operational-state-server",
+  ]
 }
