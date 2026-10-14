@@ -1897,7 +1897,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return asyncio.run_coroutine_threadsafe(coro, _shared_blocking_probe_loop()).result()
 
-    async def _resolve_dut_commissioned(self) -> bool:
+    async def _resolve_dut_commissioned(self, expect_commissioned: bool) -> bool:
         """Whether the DUT is commissioned on this fabric: DNS-SD first, then CASE.
 
         matter.testing.commissioning.is_commissioned is a passive DNS-SD probe, so a True
@@ -1907,7 +1907,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         undiscoverable -- same-host, IPv4-only, or simply slow to answer -- also reads False.
 
         Confirm a negative over CASE, which resolves through the chip stack's own resolver and
-        therefore covers the setups the DNS-SD probe cannot see.
+        therefore covers the setups the DNS-SD probe cannot see. expect_commissioned is the
+        caller's expected outcome and only sizes the CASE budget; it never changes the result.
         """
         try:
             if await is_commissioned(self.default_controller, self.dut_node_id):
@@ -1923,8 +1924,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # Same evidence heuristic as _capture_dut_baseline: give a real DUT room to bring up a
         # session, while keeping the expected-failure case (a genuinely uncommissioned DUT,
-        # which every MatterTestUncommissionedDevice test hits) cheap.
-        dut_evidence = (self.matter_test_config.commissioning_method is not None
+        # which every MatterTestUncommissionedDevice test hits) cheap. A caller expecting a
+        # commissioned DUT counts as evidence on its own: the TH commissions the DUT in its
+        # suite setup and launches scripts without --commissioning-method, so neither of the
+        # other signals is set there.
+        dut_evidence = (expect_commissioned
+                        or self.matter_test_config.commissioning_method is not None
                         or self._dut_confirmed_available)
         case_timeout_ms = 5000 if dut_evidence else 500
         try:
@@ -1940,9 +1945,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                        "expect this on same-host or IPv4-only setups.", self.dut_node_id)
         return True
 
-    def _is_dut_commissioned_blocking(self) -> bool:
+    def _is_dut_commissioned_blocking(self, expect_commissioned: bool) -> bool:
         """Sync wrapper over _resolve_dut_commissioned for the marker preconditions."""
-        return self._run_blocking(self._resolve_dut_commissioned())
+        return self._run_blocking(self._resolve_dut_commissioned(expect_commissioned))
 
     def _assert_device_commissioning_precondition(self, expect_commissioned: bool) -> None:
         """Hard-fail class setup if the DUT's commissioning state does not match the marker.
@@ -1950,7 +1955,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Called from the device-state markers' ``setup_class``. Resolves the DUT's state via
         :meth:`_resolve_dut_commissioned` (DNS-SD, then CASE for a negative).
         """
-        commissioned = self._is_dut_commissioned_blocking()
+        commissioned = self._is_dut_commissioned_blocking(expect_commissioned)
         if expect_commissioned:
             asserts.assert_true(
                 commissioned,
@@ -1975,7 +1980,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         because a commissioner test's target device generally does not exist yet at that point.
         Delegates to :func:`matter.testing.commissioning.is_commissioned`.
         """
-        commissioned = self._is_dut_commissioned_blocking()
+        commissioned = self._is_dut_commissioned_blocking(expect_commissioned=True)
         asserts.assert_true(
             commissioned,
             f"Expected DUT node {self.dut_node_id} to be commissioned on this fabric after commissioning, "

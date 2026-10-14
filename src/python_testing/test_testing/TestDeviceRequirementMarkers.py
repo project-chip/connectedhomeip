@@ -26,6 +26,7 @@ paths, so they stay meaningful if a class is moved or renamed.
 
 import ast
 import asyncio
+import contextlib
 import importlib.util
 import sys
 import unittest
@@ -396,8 +397,10 @@ def _make_stub(loop, case_reachable: bool = False):
         _dut_confirmed_available=False,
     )
     stub._run_blocking = lambda coro: MatterBaseTest._run_blocking(stub, coro)
-    stub._resolve_dut_commissioned = lambda: MatterBaseTest._resolve_dut_commissioned(stub)
-    stub._is_dut_commissioned_blocking = lambda: MatterBaseTest._is_dut_commissioned_blocking(stub)
+    stub._resolve_dut_commissioned = lambda expect_commissioned: MatterBaseTest._resolve_dut_commissioned(
+        stub, expect_commissioned)
+    stub._is_dut_commissioned_blocking = lambda expect_commissioned: MatterBaseTest._is_dut_commissioned_blocking(
+        stub, expect_commissioned)
     return stub
 
 
@@ -561,6 +564,32 @@ class TestCommissioningPreconditionChecks(unittest.TestCase):
                 MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=True)
         finally:
             loop.close()
+
+    def _case_timeout_ms_for(self, expect_commissioned: bool) -> int:
+        """Run the precondition with a DNS-SD miss under TH conditions (no --commissioning-method,
+        nothing commissioned by the framework this run) and return the CASE budget it used."""
+        loop = asyncio.new_event_loop()
+        try:
+            stub = _make_stub(loop, case_reachable=False)
+            # Only the budget is under test here; the pass/fail outcome is covered above.
+            with mock.patch.object(matter_testing_module, "is_commissioned", new=mock.AsyncMock(return_value=False)), \
+                    contextlib.suppress(signals.TestFailure):
+                MatterBaseTest._assert_device_commissioning_precondition(stub, expect_commissioned=expect_commissioned)
+            stub.default_controller.GetConnectedDevice.assert_awaited_once()
+            return stub.default_controller.GetConnectedDevice.await_args.kwargs["timeoutMs"]
+        finally:
+            loop.close()
+
+    def test_commissioned_marker_gets_full_case_budget_without_other_evidence(self):
+        """Regression: the TH commissions the DUT in its own suite setup and launches scripts
+        without --commissioning-method, so the marker is the only evidence a DUT exists. The CASE
+        confirmation must still get the full budget there, or a commissioned DUT that DNS-SD
+        missed (e.g. a Thread DUT) can hard-fail class setup."""
+        self.assertEqual(self._case_timeout_ms_for(expect_commissioned=True), 5000)
+
+    def test_uncommissioned_marker_keeps_case_budget_short(self):
+        """MatterTestUncommissionedDevice expects CASE to fail, so it keeps the short budget."""
+        self.assertEqual(self._case_timeout_ms_for(expect_commissioned=False), 500)
 
     def test_commissioned_marker_setup_class_enforces_precondition(self):
         """MatterTestCommissionedDevice.setup_class calls super().setup_class() then asserts the
