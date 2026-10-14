@@ -18,17 +18,13 @@
 
 #include <app/BufferedReadCallback.h>
 #include <app/InteractionModelEngine.h>
-<<<<<<< HEAD
-#include <lib/support/ScopedBuffer.h>
-=======
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
-#include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
->>>>>>> 57eea39 ([BufferedReadCallback] double-check for nullptr before trying to deference/use the data TLV (#71928))
 
 namespace chip {
 namespace app {
