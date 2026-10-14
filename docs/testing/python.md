@@ -869,7 +869,12 @@ A pull request whose changed files all sit under `src/python_testing`, outside
 `matter_testing_infrastructure` and the `requirements*.txt` files, skips the
 workflows that only build or test code elsewhere, such as the example builds and
 the YAML test suites; their jobs show as skipped. The REPL test jobs, lint and
-the other checks still run, and the merge queue runs everything. The rule is in
+the other checks still run, and the merge queue runs everything.
+
+On such a pull request the REPL test shards run only the tests it changes and
+the tests that import a module it changes; a shard with none of them skips its
+steps. The `REPL Tests - Linux (BUILD)` job summary lists the selected tests.
+The unfiltered `REPL Tests - Linux (RUN)` job runs as usual. The rules are in
 `scripts/tests/python_test_scope.py`.
 
 ## Running ALL or a subset of tests when changing application code
