@@ -845,7 +845,7 @@ jobs:
                   git fetch --no-tags --quiet --depth=2 origin "$GITHUB_SHA"
                   git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
                   git show HEAD^1:src/python_testing/test_metadata.yaml > "$RUNNER_TEMP/previous-test-metadata.yaml"
-                  scripts/run_in_build_env.sh "scripts/tests/python_test_scope.py select --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
+                  scripts/run_in_build_env.sh "scripts/tests/python_test_scope.py select --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --github-env '$GITHUB_ENV' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
 
             - name: Setup and Restore Cache
               id: ccache
@@ -858,7 +858,12 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
+            # On a pull request that only changes Python tests, the selection step sets
+            # PYTHON_TEST_APPS to the apps its tests and the unfiltered REPL job need,
+            # and each app build below runs only when it builds one of them. Unset,
+            # as on every other run, everything builds.
             - name: Build apps for REPL tests with unified build
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',AIR_PURIFIER_APP,') || contains(env.PYTHON_TEST_APPS, ',BRIDGE_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_LOCK_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_MICROWAVE_OVEN_APP,') || contains(env.PYTHON_TEST_APPS, ',CHIP_RVC_APP,') || contains(env.PYTHON_TEST_APPS, ',OTA_PROVIDER_APP,') || contains(env.PYTHON_TEST_APPS, ',WATER_LEAK_DETECTOR_APP,')
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -876,6 +881,7 @@ jobs:
                   rm -rf out/unified-build
 
             - name: Build linux-x64-closure
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CLOSURE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-closure-${BUILD_VARIANT}-clang-test
@@ -884,6 +890,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-clusters
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_CLUSTERS_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test
@@ -892,6 +899,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-clusters-no-groupcast
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_CLUSTERS_NO_GROUPCAST_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-no-groupcast-${BUILD_VARIANT}-clang-test
@@ -900,6 +908,7 @@ jobs:
                   "
 
             - name: Build linux-x64-all-devices
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_DEVICES_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-${BUILD_VARIANT}-clang-test
@@ -909,6 +918,7 @@ jobs:
             # The Commissioning Proxy tests drive BLE and Wi-Fi through mock D-Bus
             # servers, so they need an application with both compiled in.
             - name: Build linux-x64-all-devices with BLE and Wi-Fi
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ALL_DEVICES_BLE_WIFI_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test
@@ -916,6 +926,7 @@ jobs:
                   && rm -rf out/linux-x64-all-devices-${BLE_WIFI_BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-lit-icd
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',LIT_ICD_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-clang-test
@@ -923,6 +934,7 @@ jobs:
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-electrical-protection
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ELECTRICAL_PROTECTION_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-electrical-protection-${BUILD_VARIANT}-clang-test
@@ -930,6 +942,7 @@ jobs:
                   && rm -rf out/linux-x64-electrical-protection-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-energy-gateway
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',ENERGY_GATEWAY_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-clang-test
@@ -937,6 +950,7 @@ jobs:
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-evse
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',EVSE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-evse-${BUILD_VARIANT}-clang-test
@@ -944,6 +958,7 @@ jobs:
                   && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-water-heater
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',WATER_HEATER_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-water-heater-${BUILD_VARIANT}-clang-test
@@ -951,6 +966,7 @@ jobs:
                   && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-network-manager
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',NETWORK_MANAGEMENT_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-clang-test
@@ -958,6 +974,7 @@ jobs:
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_ADMIN_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
@@ -965,6 +982,7 @@ jobs:
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_BRIDGE_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
@@ -972,6 +990,7 @@ jobs:
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',FABRIC_SYNC_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
@@ -981,6 +1000,7 @@ jobs:
             # TODO: camera app works for asan-gcc, while asan-clang reports some false positives related to libdatachannel,
             # consider switching camera and camera-controller to asan-clang once Issue #43340 is resolved.
             - name: Build linux-x64-camera
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CAMERA_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-${BUILD_VARIANT}
@@ -988,6 +1008,7 @@ jobs:
                   && rm -rf out/linux-x64-camera-${BUILD_VARIANT}"
 
             - name: Build linux-x64-camera-controller
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',CAMERA_CONTROLLER_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-controller-${BUILD_VARIANT}
@@ -995,6 +1016,7 @@ jobs:
                   && rm -rf out/linux-x64-camera-controller-${BUILD_VARIANT}"
 
             - name: Build linux-x64-light-data-model-no-unique-id
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',LIGHTING_APP_NO_UNIQUE_ID,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
@@ -1002,6 +1024,7 @@ jobs:
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-terms-and-conditions
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',TERMS_AND_CONDITIONS_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang
@@ -1009,6 +1032,7 @@ jobs:
                   && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-tv-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',TV_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-tv-app-${BUILD_VARIANT}-clang
@@ -1016,6 +1040,7 @@ jobs:
                   && rm -rf out/linux-x64-tv-app-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-python-bindings
+              if: env.PYTHON_TEST_APPS == ''
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang
@@ -1023,6 +1048,7 @@ jobs:
                   && rm -rf out/linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-jf-control-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',JF_CONTROL_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-control-app-${BUILD_VARIANT}-clang
@@ -1030,6 +1056,7 @@ jobs:
                   && rm -rf out/linux-x64-jf-control-app-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-jf-admin-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',JF_ADMIN_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app-${BUILD_VARIANT}-clang
@@ -1040,6 +1067,7 @@ jobs:
               run: ccache -s
 
             - name: Build linux-x64-requestor-app
+              if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',OTA_REQUESTOR_APP,')
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test

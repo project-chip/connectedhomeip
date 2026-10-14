@@ -21,6 +21,7 @@ import contextlib
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import textwrap
@@ -32,7 +33,8 @@ import yaml
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # pylint: disable=wrong-import-position
-from python_test_scope import NO_TESTS, classify, imported_names, main, runner_matches, select  # noqa: E402
+from python_test_scope import (NO_TESTS, UNFILTERED_JOB_APPS, built_apps, ci_variables, classify, environment_file,  # noqa: E402
+                               imported_names, main, runner_matches, select)
 
 
 class TestClassify(unittest.TestCase):
@@ -138,6 +140,8 @@ class TestSelect(unittest.TestCase):
         "TC_Gamma.py": CI_BLOCK + "import pkg.front\n",
         "TC_Zeta.py": CI_BLOCK + "LAUNCHER = 'support_modules/launcher.py'\n",
         "TC_Omega.py": CI_BLOCK + "import support_modules\n",
+        "TC_Icd.py": CI_BLOCK.replace("ALL_CLUSTERS_APP", "LIT_ICD_APP") + "# --string-arg server:${PUSH_AV_SERVER} ${TRACE_APP}\n",
+        "TC_Unknown.py": CI_BLOCK.replace("ALL_CLUSTERS_APP", "NOT_IN_THE_ENV_FILE_APP"),
         "TC_HelperBase.py": "from support_modules import shared\n",
         "TC_Manual.py": "",
         "TC_Slow_1.py": CI_BLOCK,
@@ -160,6 +164,13 @@ class TestSelect(unittest.TestCase):
         "nightly": [{"name": "TC_Slow_1.py", "reason": "slow"}],
     }
     FILTERS = ["", "TC_[A-M]", "!TC_[A-M]"]
+    ENV_FILE = "".join(f'echo "{name}: {path}" >> /tmp/test_env.yaml\n' for name, path in [
+        ("ALL_CLUSTERS_APP", "objdir-clone/linux-x64-all-clusters/chip-all-clusters-app"),
+        ("LIT_ICD_APP", "objdir-clone/linux-x64-lit-icd/lit-icd-app"),
+        ("SU_OTA_REQUESTOR_V2", "objdir-clone/chip-ota-requestor-app_v2.min.ota"),
+        ("PUSH_AV_SERVER", "src/tools/push_av_server/src/server.py"),
+        ("TRACE_APP", "out/trace_data/app-{SCRIPT_BASE_NAME}"),
+    ])
 
     def setUp(self):
         self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
@@ -168,7 +179,9 @@ class TestSelect(unittest.TestCase):
             (tree / rel).parent.mkdir(parents=True, exist_ok=True)
             (tree / rel).write_text(text)
         (tree / "test_metadata.yaml").write_text(yaml.safe_dump(self.METADATA))
-        workflow = {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}}}}}
+        workflow = {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}},
+                                                      "steps": [{"name": "Generate an argument environment file",
+                                                                 "run": self.ENV_FILE}]}}}
         (self.root / ".github/workflows").mkdir(parents=True)
         (self.root / ".github/workflows/tests.yaml").write_text(yaml.safe_dump(workflow))
 
@@ -222,6 +235,25 @@ class TestSelect(unittest.TestCase):
         self.assert_selected(self.select("TC_Removed.py"))
         # Nothing imports the deleted module any more; its importers changed with it.
         self.assert_selected(self.select("support_modules/deleted_module.py"))
+
+    def test_the_build_covers_the_selected_tests_and_the_unfiltered_job(self):
+        self.assertEqual(self.select("TC_Alpha.py").apps, ["ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2"])
+        # Placeholders outside the CI arguments block, and paths that are not build outputs, add no app.
+        self.assertEqual(self.select("TC_Icd.py").apps, ["ALL_CLUSTERS_APP", "LIT_ICD_APP", "SU_OTA_REQUESTOR_V2"])
+        self.assertEqual(self.select("README.md").apps, ["ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2"])
+
+    def test_an_app_the_environment_file_lacks_builds_everything(self):
+        selection = self.select("TC_Unknown.py")
+        self.assertIn("NOT_IN_THE_ENV_FILE_APP", selection.full_reason)
+        self.assertEqual(selection.apps, [])
+
+    def test_select_command_writes_the_app_list_only_for_a_narrowed_build(self):
+        env = self.root / "github_env"
+        with contextlib.redirect_stderr(io.StringIO()):
+            for change in ("src/python_testing/TC_Icd.py", "src/python_testing/test_metadata.yaml"):
+                main(["select", "--output", os.devnull, "--github-env", str(env), "--chip-root", str(self.root)],
+                     stdin=io.StringIO(change + "\n"))
+        self.assertEqual(env.read_text(), "PYTHON_TEST_APPS=,ALL_CLUSTERS_APP,LIT_ICD_APP,SU_OTA_REQUESTOR_V2,\n")
 
     def test_a_metadata_change_selects_the_tests_whose_exclusion_it_changes(self):
         tree = self.root / "src/python_testing"
@@ -326,6 +358,55 @@ class TestSelectOnThisRepository(unittest.TestCase):
         selection = select(tests)
         self.assertIsNone(selection.full_reason)
         self.assertGreater(len(selection.tests), 400)
+
+
+class TestAppBuildsOnThisRepository(unittest.TestCase):
+    """The REPL build job's app conditions against the environment file they serve."""
+
+    ROOT = Path(__file__).resolve().parents[2]
+
+    def setUp(self):
+        self.workflow = yaml.safe_load((self.ROOT / ".github/workflows/tests.yaml").read_text())
+        self.variables = environment_file(self.ROOT)
+        self.apps = built_apps(self.variables)
+
+    def build_steps(self):
+        for step in self.workflow["jobs"]["repl_tests_linux_build"]["steps"]:
+            targets = re.findall(r"--target\s+(\S+)", step.get("run") or "")
+            if targets:
+                yield step, targets
+
+    def produced(self, targets):
+        return sorted(n for n in self.apps if any(self.variables[n].startswith(f"objdir-clone/{t}/") for t in targets))
+
+    def test_each_app_build_runs_when_the_selection_needs_one_of_its_apps(self):
+        for step, targets in self.build_steps():
+            with self.subTest(step=step["name"]):
+                expected = "env.PYTHON_TEST_APPS == ''" + "".join(
+                    f" || contains(env.PYTHON_TEST_APPS, ',{n},')" for n in self.produced(targets))
+                self.assertEqual(step.get("if"), expected)
+
+    def test_every_app_in_the_environment_file_has_a_build_step(self):
+        produced = {n for _, targets in self.build_steps() for n in self.produced(targets)}
+        # The OTA images come from a script step that always runs.
+        self.assertEqual(self.apps - produced, {"SU_OTA_REQUESTOR_V2"})
+        self.assertIn("SU_OTA_REQUESTOR_V2", UNFILTERED_JOB_APPS)
+
+    def test_the_unfiltered_job_needs_only_the_apps_always_built(self):
+        used = set()
+        for step in self.workflow["jobs"]["repl_tests_linux_run"]["steps"]:
+            if "matrix.filter == ''" not in str(step.get("if")).replace("matrix.filter==''", "matrix.filter == ''"):
+                continue
+            run = step.get("run") or ""
+            used.update(n for n in self.apps if self.variables[n].split("/")[1] in run)
+            for script in re.findall(r"--script (\S+\.py)", run):
+                used.update(ci_variables((self.ROOT / script).read_text()) & self.apps)
+        self.assertTrue(used)
+        self.assertLessEqual(used, set(UNFILTERED_JOB_APPS), sorted(used - set(UNFILTERED_JOB_APPS)))
+
+    def test_the_probe_change_builds_four_apps(self):
+        selection = select(["src/python_testing/TC_FAN_3_5.py", "src/python_testing/TC_SC_4_1.py"])
+        self.assertEqual(selection.apps, ["ALL_CLUSTERS_APP", "ALL_DEVICES_APP", "LIT_ICD_APP", "SU_OTA_REQUESTOR_V2"])
 
 
 class TestGatedWorkflows(unittest.TestCase):
