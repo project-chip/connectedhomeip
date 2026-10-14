@@ -305,13 +305,6 @@ private:
                                 const DataModel::Nullable<uint16_t> & userIndex, const Span<const CredentialStruct> & credentials,
                                 const DataModel::Nullable<FabricIndex> & fabricIdx, const DataModel::Nullable<NodeId> & nodeId,
                                 bool opSuccess);
-
-    /// Applies a lock-state change, emitting events and scheduling auto-relock.
-    CHIP_ERROR ApplyLockStateChange(DlLockState newState, OperationSourceEnum opSource,
-                                    const DataModel::Nullable<uint16_t> & userIndex,
-                                    const Span<const CredentialStruct> & credentials,
-                                    const DataModel::Nullable<FabricIndex> & fabricIdx, const DataModel::Nullable<NodeId> & nodeId,
-                                    bool sendLockOperationEvent);
 };
 
 } // namespace DoorLock

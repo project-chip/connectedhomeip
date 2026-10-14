@@ -545,7 +545,55 @@ CHIP_ERROR DoorLockCluster::SetLockState(DlLockState newState, OperationSourceEn
                                          const DataModel::Nullable<FabricIndex> & fabricIdx,
                                          const DataModel::Nullable<NodeId> & nodeId)
 {
-    return ApplyLockStateChange(newState, opSource, userIndex, credentials, fabricIdx, nodeId, /* sendLockOperationEvent */ true);
+    SetAttributeValue(mLockState, newState, LockState::Id);
+
+    // DlLockState::kNotFullyLocked has no appropriate event and unclear
+    // auto-relocking semantics, so skip it.
+    VerifyOrReturnError(newState == DlLockState::kLocked || newState == DlLockState::kUnlocked ||
+                            newState == DlLockState::kUnlatched,
+                        CHIP_NO_ERROR);
+
+    LockOperationTypeEnum opType = LockOperationTypeEnum::kUnlock;
+    if (newState == DlLockState::kLocked)
+    {
+        opType = LockOperationTypeEnum::kLock;
+    }
+    else if (newState == DlLockState::kUnlatched)
+    {
+        opType = LockOperationTypeEnum::kUnlatch;
+    }
+
+    // Any pending auto-relock is obsolete once a lock operation takes effect: a
+    // stale timer would otherwise relock a door that was unlocked (with
+    // AutoRelockTime = 0) in the meantime.
+    if (opType == LockOperationTypeEnum::kLock)
+    {
+        mTimerDelegate.CancelTimer(&mAutoRelockTimerContext);
+    }
+
+    if (opSource == OperationSourceEnum::kRemote && (fabricIdx.IsNull() || nodeId.IsNull()))
+    {
+        ChipLogError(Zcl, "Received SetLockState for remote operation without fabricIdx or nodeId");
+    }
+
+    SendLockOperationEvent(opType, opSource, OperationErrorEnum::kUnspecified, userIndex, credentials, fabricIdx, nodeId,
+                           /* opSuccess */ true);
+
+    // Reset the wrong-code attempts when a lock/unlock succeeded with credentials.
+    if (!credentials.empty())
+    {
+        ResetWrongCodeEntryAttempts();
+    }
+
+    // Spec 5.3.3.25: 0 = disabled; unlock operations from any source are timed.
+    // Lock and unlatch operations are not relocked here, and UnlockWithTimeout
+    // schedules its own one-shot timer instead of using AutoRelockTime.
+    if (opType == LockOperationTypeEnum::kUnlock && mAutoRelockTime != 0)
+    {
+        ScheduleAutoRelock(mAutoRelockTime);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DoorLockCluster::SetDoorState(DataModel::Nullable<DoorStateEnum> doorState)
@@ -736,66 +784,6 @@ std::optional<DataModel::ActionReturnStatus> DoorLockCluster::HandleRemoteLockOp
     }
 
     return success ? DataModel::ActionReturnStatus(Status::Success) : DataModel::ActionReturnStatus(Status::Failure);
-}
-
-CHIP_ERROR DoorLockCluster::ApplyLockStateChange(DlLockState newState, OperationSourceEnum opSource,
-                                                 const DataModel::Nullable<uint16_t> & userIndex,
-                                                 const Span<const CredentialStruct> & credentials,
-                                                 const DataModel::Nullable<FabricIndex> & fabricIdx,
-                                                 const DataModel::Nullable<NodeId> & nodeId, bool sendLockOperationEvent)
-{
-    SetAttributeValue(mLockState, newState, LockState::Id);
-
-    // DlLockState::kNotFullyLocked has no appropriate event and unclear
-    // auto-relocking semantics, so skip it.
-    VerifyOrReturnError(newState == DlLockState::kLocked || newState == DlLockState::kUnlocked ||
-                            newState == DlLockState::kUnlatched,
-                        CHIP_NO_ERROR);
-
-    LockOperationTypeEnum opType = LockOperationTypeEnum::kUnlock;
-    if (newState == DlLockState::kLocked)
-    {
-        opType = LockOperationTypeEnum::kLock;
-    }
-    else if (newState == DlLockState::kUnlatched)
-    {
-        opType = LockOperationTypeEnum::kUnlatch;
-    }
-
-    // Any pending auto-relock is obsolete once a lock operation takes effect: a
-    // stale timer would otherwise relock a door that was unlocked (with
-    // AutoRelockTime = 0) in the meantime.
-    if (opType == LockOperationTypeEnum::kLock)
-    {
-        mTimerDelegate.CancelTimer(&mAutoRelockTimerContext);
-    }
-
-    if (opSource == OperationSourceEnum::kRemote && (fabricIdx.IsNull() || nodeId.IsNull()))
-    {
-        ChipLogError(Zcl, "Received SetLockState for remote operation without fabricIdx or nodeId");
-    }
-
-    if (sendLockOperationEvent)
-    {
-        SendLockOperationEvent(opType, opSource, OperationErrorEnum::kUnspecified, userIndex, credentials, fabricIdx, nodeId,
-                               /* opSuccess */ true);
-    }
-
-    // Reset the wrong-code attempts when a lock/unlock succeeded with credentials.
-    if (!credentials.empty())
-    {
-        ResetWrongCodeEntryAttempts();
-    }
-
-    // Spec 5.3.3.25: 0 = disabled; unlock operations from any source are timed.
-    // Lock and unlatch operations are not relocked here, and UnlockWithTimeout
-    // schedules its own one-shot timer instead of using AutoRelockTime.
-    if (opType == LockOperationTypeEnum::kUnlock && mAutoRelockTime != 0)
-    {
-        ScheduleAutoRelock(mAutoRelockTime);
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace DoorLock
