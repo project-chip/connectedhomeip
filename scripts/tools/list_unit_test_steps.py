@@ -83,7 +83,8 @@ def list_steps(workflows_dir: Path) -> str:
             for step in job.get("steps", []):
                 run = step.get("run") or ""
                 step_args = [m.group(2) for m in GN_ARGS.finditer(run) if not m.group(2).startswith("$")]
-                gn_args = step_args or gn_args
+                if step_args or "gn_gen.sh" in run:
+                    gn_args = step_args
                 if not TEST_STEP.search(run):
                     continue
                 targets = [t for t in TARGET.findall(run) if "tests" in t and "fuzz" not in t]
