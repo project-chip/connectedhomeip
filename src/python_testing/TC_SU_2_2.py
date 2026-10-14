@@ -637,7 +637,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         events_response_s1 = await controller.ReadEvent(
             requestor_node_id,
             events=[(0, state_transition_event_s1, urgent)],
-            fabricFiltered=True
+            fabricFiltered=True,
         )
         state_transitions_s1 = [event.Data for event in events_response_s1
                                 if event.Header.EventId == state_transition_event_s1.event_id]
@@ -817,6 +817,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #2.5 - Closing the provider process.', step_number_s2)
         self.terminate_provider()
+        state_transition_last_event_number_s2 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
 
         self.step(3)
         # ------------------------------------------------------------------------------------
@@ -908,7 +909,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         events_response = await controller.ReadEvent(
             requestor_node_id,
             events=[(0, state_transition_event, urgent)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=state_transition_last_event_number_s2
         )
         # Read the last StateTransitionEvent triggered
         if len(events_response) == 0:
@@ -988,6 +990,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             f"Elapsed: {elapsed_s3:.2f}s, expected >= {min_interval_s3 - tolerance_s3}s.")
 
         logger.info('%s: Phase C complete — DUT is in the kDownloading state', step_number_s3)
+        state_transition_last_event_number_s3 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
+        download_error_last_event_number_s3 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError)
 
         # [Start of Step #6 TC_SU_2_7]
         self.step(4)
@@ -1011,9 +1015,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 node_id=requestor_node_id,
                 endpoint=0,
             )
-            logger.info('%s: Step #4.1 - UpdateStateProgress is %s', step_number_s4, update_state_progress)
+            logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress)
             if isinstance(update_state_progress, int) and update_state_progress >= 1:
-                logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s)',
+                logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s %%)',
                             step_number_s4, update_state_progress)
                 break
             remaining = progress_deadline - time.time()
@@ -1036,13 +1040,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.current_provider_app_proc.kill()
         # Save the time after provider kill()
         provider_termination_time = time.time()
-        download_error_event = Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError
-        download_error_events_after_kill = await controller.ReadEvent(
-            requestor_node_id,
-            events=[(0, download_error_event, urgent)],
-            fabricFiltered=True
-        )
-        logger.info("%s DownloadError events after provider kill() %s", step_number_s4, download_error_events_after_kill)
 
         logger.info('%s: Step #4.3 - Wait for DUT to go back to kIdle after killing the provider, at termination time: %d',
                     step_number_s4, provider_termination_time)
@@ -1067,16 +1064,17 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Once kIdle is received the script must wait for the DownloadError event.
 
         # Check whether a DownloadError was triggered here
+        download_error_event_obj = Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError
         download_error_events = await controller.ReadEvent(
             requestor_node_id,
-            events=[(0, download_error_event, urgent)],
-            fabricFiltered=True
+            events=[(0, download_error_event_obj, urgent)],
+            fabricFiltered=True,
+            eventNumberFilter=download_error_last_event_number_s3
         )
-        logger.info("%s DownloadError events gathered after kIdle: %s", step_number_s4, download_error_events)
+        logger.info("%s DownloadError events gathered after kIdle: %s and filtering after DownloadErrorEventNumber %d", step_number_s4, download_error_events, download_error_last_event_number_s3)
         event_download_error = None
-        # No DownloadError event identified (no new events since the provider was killed), so
-        # subscribe and wait for the DUT to emit it.
-        if len(download_error_events) - len(download_error_events_after_kill) == 0:
+        # No DownloadErrorEvent using ReadEvent with eventNumber filter found.
+        if len(download_error_events) == 0:
             await self._start_subscription_bounded(
                 subscription_download_error, step_number_s4,
                 dev_ctrl=controller,
@@ -1091,12 +1089,20 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             event_download_error = subscription_download_error.wait_for_event_report(
                 Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError, timeout_sec=10 * STEP_RESERVE_SEC)
             subscription_download_error.cancel()
-
-        elif len(download_error_events) - len(download_error_events_after_kill) == 1:
-            # One event (as expected) was identified, retrieve the last one.
-            event_download_error = download_error_events[-1].Data
+        elif len(download_error_events) >= 1:
+            # Read the event that has DownloadProgress
+            for download_event in download_error_events:
+                # In this step the download is cancelled when the progress is >=1 % so read the event that matches this condition
+                # Consider the ReadEvent only Read events that are in this step by using the eventNumberFilter
+                event_progress = 0
+                # ProgressPercent can be None
+                if download_event.Data.progressPercent is not NullValue:
+                    event_progress  = int(download_event.Data.progressPercent)
+                if int(event_progress) >= 1:
+                    event_download_error = download_event.Data
+                    break
         else:
-            asserts.fail("More or one DownloadError events gathered %s", download_error_events)
+            asserts.fail("No DownloadError Event found")
 
         if update_state_progress is NullValue:
             # If the UpdateState is Unknow the value can be Null
@@ -1117,7 +1123,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         state_transition_events = await controller.ReadEvent(
             requestor_node_id,
             events=[(0, Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, urgent)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=state_transition_last_event_number_s3
         )
         kIdleEventData = None
         # There must be a state transition Event to kIdle
@@ -1327,6 +1334,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         logger.info('%s: Step #5.5 - Closing the provider process.', step_number_s5)
         self.terminate_provider()
+        state_transition_last_event_number_s5 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
 
         # [Start of Step #3 TC_SU_2_7]
         self.step(6)
@@ -1403,7 +1411,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         events_response_for_kfailure = await controller.ReadEvent(
             requestor_node_id,
             events=[(0, state_transition_event_for_kfailure, urgent)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=state_transition_last_event_number_s5
         )
         # Look for the event reporting kIdle
         failure_report = None
@@ -1553,6 +1562,11 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             timeout_sec=10 * STEP_RESERVE_SEC,
         )
         subscription_update_state_attr_s8.cancel()
+        state_transition_last_event_number_s8 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
+        version_applied_last_event_number_s8 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied)
+        # Make sure the device does not have any records of VersionAppliedEvent
+        asserts.assert_equal(version_applied_last_event_number_s8, -1, f"VersionAppliedEvent found before Appying the Software Update with EventNumber:{version_applied_last_event_number_s8}")
+
         # [End of Step #5 TC_SU_2_7]
         self.step(9)
         # ------------------------------------------------------------------------------------
@@ -1773,7 +1787,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         events_response = await controller.ReadEvent(
             requestor_node_id,
             events=[(0, state_transition_event_s9, urgent)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=state_transition_last_event_number_s8
         )
         logger.info("StateTransition events gathered: %s", events_response)
         if len(events_response) == 0:
@@ -1897,7 +1912,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                              "ProductID from BasicInformationCluster is not the same from the VersionAppliedEvent")
         # Software version already validated at verify_applied_basic_information and compared with ota_image_version
         # [End of Step #1 from TC_SU_2_7]
-
         self.step(10)
         # ------------------------------------------------------------------------------------
         # [STEP_10]: Prerequisites - Setup Provider
