@@ -28,18 +28,18 @@ namespace chip::app {
 class WaterValve : public SingleEndpoint, public Clusters::ValveConfigurationAndControl::Delegate
 {
 public:
-    class WaterValveListener
+    class Listener
     {
     public:
-        virtual ~WaterValveListener() = default;
-        virtual void OnValveOpened()  = 0;
-        virtual void OnValveClosed()  = 0;
+        virtual ~Listener()          = default;
+        virtual void OnValveOpened() = 0;
+        virtual void OnValveClosed() = 0;
     };
 
     WaterValve(TimerDelegate & timerDelegate);
     WaterValve(TimerDelegate & timerDelegate,
                const std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> & context,
-               WaterValveListener * listener = nullptr);
+               Listener * listener = nullptr);
     ~WaterValve() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -71,9 +71,22 @@ public:
         context.delegate = this;
         return context;
     }
-    bool IsOpen() const { return mOpenLevel.has_value(); }
-    std::optional<Percent> OpenLevel() const { return mOpenLevel; }
-    std::optional<uint32_t> RemainingDuration() const { return mRemainingDuration; }
+    bool IsOpen() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), false);
+        auto state = mValveCluster.Cluster().GetCurrentState();
+        return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
+    }
+    DataModel::Nullable<Percent> OpenLevel() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
+        return mValveCluster.Cluster().GetCurrentLevel();
+    }
+    DataModel::Nullable<uint32_t> RemainingDuration() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
+        return mValveCluster.Cluster().GetRemainingDuration();
+    }
 
 protected:
     // Clusters::ValveConfigurationAndControl::Delegate implementation
@@ -81,11 +94,9 @@ protected:
     CHIP_ERROR HandleCloseValve() override;
     void HandleRemainingDurationTick(uint32_t duration) override;
 
-    std::optional<Percent> mOpenLevel;
-    std::optional<uint32_t> mRemainingDuration;
     TimerDelegate & mTimerDelegate;
     std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
-    WaterValveListener * mListener = nullptr;
+    Listener * mListener = nullptr;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };

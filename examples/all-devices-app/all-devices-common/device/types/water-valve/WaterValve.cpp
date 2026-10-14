@@ -29,10 +29,9 @@ WaterValve::WaterValve(TimerDelegate & timerDelegate) :
 {}
 
 WaterValve::WaterValve(TimerDelegate & timerDelegate,
-                       const std::optional<ValveConfigurationAndControlCluster::ValveContext> & context,
-                       WaterValveListener * listener) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
-    mTimerDelegate(timerDelegate), mValveContext(context), mListener(listener)
+                       const std::optional<ValveConfigurationAndControlCluster::ValveContext> & context, Listener * listener) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
+    mValveContext(context), mListener(listener)
 {}
 
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -84,8 +83,6 @@ DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Per
     {
         mValveCluster.Cluster().UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen);
     }
-    mOpenLevel = targetLevel;
-    mRemainingDuration.reset();
     if (mListener != nullptr)
     {
         mListener->OnValveOpened();
@@ -101,8 +98,7 @@ CHIP_ERROR WaterValve::HandleCloseValve()
         mValveCluster.Cluster().UpdateCurrentLevel(0);
         mValveCluster.Cluster().UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kClosed);
     }
-    mOpenLevel.reset();
-    mRemainingDuration.reset();
+
     if (mListener != nullptr)
     {
         mListener->OnValveClosed();
@@ -128,7 +124,6 @@ CHIP_ERROR WaterValve::OpenValve(DataModel::Nullable<Percent> level, DataModel::
 void WaterValve::HandleRemainingDurationTick(uint32_t duration)
 {
     ChipLogProgress(AppServer, "WaterValve: Remaining duration tick: %lu", static_cast<unsigned long>(duration));
-    mRemainingDuration = duration;
 }
 
 } // namespace chip::app
