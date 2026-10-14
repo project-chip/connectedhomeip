@@ -19,6 +19,7 @@
 #include <app/clusters/flow-measurement-server/FlowMeasurementCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
+#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <device/types/irrigation-system/IrrigationSystem.h>
 #include <device/types/water-valve/WaterValve.h>
 
@@ -29,22 +30,29 @@
 namespace chip {
 namespace app {
 
-class LoggingMasterValve : public MasterValve
+/// Physical master valve on the main supply line. Optional in irrigation systems and not a Matter endpoint:
+/// the irrigation system opens it before the first zone opens and closes it after the last zone closes.
+class LoggingMasterValve
 {
 public:
-    CHIP_ERROR Open() override
+    CHIP_ERROR Open()
     {
         ChipLogProgress(AppServer, "IrrigationSystem: Opening master valve");
         mOpen = true;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Close() override
+    CHIP_ERROR Close()
     {
         ChipLogProgress(AppServer, "IrrigationSystem: Closing master valve");
         mOpen = false;
         return CHIP_NO_ERROR;
     }
+
+    bool IsOpen() const { return mOpen; }
+
+private:
+    bool mOpen = false;
 };
 
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
@@ -53,13 +61,19 @@ class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalSt
                                 public Clusters::IdentifyDelegate
 {
 public:
+    struct ValveList
+    {
+        std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
+        Span<const EndpointComposition::SemanticTag> tags;
+    };
+
     struct PausedZone
     {
         Percent level;
         DataModel::Nullable<uint32_t> remainingDuration;
     };
 
-    LoggingIrrigationSystem(TimerDelegate & timerDelegate, std::vector<IrrigationSystem::ValveList> valves, bool hasMasterValve) :
+    LoggingIrrigationSystem(TimerDelegate & timerDelegate, std::vector<ValveList> valves, bool hasMasterValve) :
         IrrigationSystem(timerDelegate), mValveContext(std::move(valves))
     {
         if (hasMasterValve)
@@ -84,7 +98,7 @@ public:
 
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
-    static std::vector<IrrigationSystem::ValveList> ValveConfiguration();
+    static std::vector<ValveList> ValveConfiguration();
     static constexpr bool kHasMasterValve = true;
 
     void OnValveOpened() override;
@@ -121,7 +135,7 @@ private:
                              EndpointComposition composition) override;
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
     std::vector<std::optional<PausedZone>> mPausedZones;
-    std::vector<IrrigationSystem::ValveList> mValveContext;
+    std::vector<ValveList> mValveContext;
     std::vector<std::unique_ptr<WaterValve>> mWaterValves;
     std::optional<LoggingMasterValve> mMasterValve; // empty when the system has no master valve
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
