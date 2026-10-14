@@ -105,10 +105,11 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         return "[TC-PROXR-2.4] Periodic Proximity Ranging Functionality (DUT as Server)"
 
     def pics_TC_PROXR_2_4(self) -> list[str]:
-        # The plan lists a top-level {PICS_SA_PERIODIC} = PROXR.S.A0000(PeriodicRangingSupport),
-        # but PeriodicRangingSupport is a field of RangingCapabilitiesStruct (A0000), not an
-        # attribute-level PICS code. Periodic support is instead read from the device per
-        # technology (step 2) and used to gate the technology branches (see DECISIONS.md).
+        # The plan's periodic trigger is the per-technology PeriodicRangingSupport field of
+        # each RangingCapabilitiesStruct element, read from the device in step 2 and used to
+        # gate the technology branches; a device that does not advertise periodic support for
+        # a technology skips that branch. The cluster-level PROXR.S.A0000 ("Periodic Ranging"
+        # function) PICS is therefore not used as a gate for this test (see DECISIONS.md).
         return ["PROXR.S"]
 
     def steps_TC_PROXR_2_4(self) -> list[TestStep]:
@@ -139,7 +140,12 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct; for each technology exercised "
                      "below, PeriodicRangingSupport is true; save the elements."),
-            TestStep(3, "TH reads WiFiDevIK from DUT_I and DUT_R", "Verify octstr values and save both."),
+            TestStep("3a", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiRoundTripTimeRanging; save the values."),
+            TestStep("3b", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiNextGenerationRanging; save the values."),
             TestStep(4, "TH reads BLTDevIK, BLTCSSecurityLevel, BLTCSModeCapability from DUT_I and DUT_R",
                      "Verify octstr/enum values and save all."),
             TestStep(5, "TH reads BLEDeviceID from DUT_I and DUT_R", "Verify uint64 values and save both."),
@@ -329,15 +335,41 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             feature_bit=Feature.kBleBeaconRssi, candidate_technologies=(RangingTechEnum.kBLEBeaconRSSIRanging,),
             require_periodic=True)
 
-        # ---- Step 3: WiFi identities ----
-        if wifi_tech is not None:
-            self.step(3)
+        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on the new PICS ----
+        # Same split as TC-PROXR-2.3: 3a (WFUSDPD + A0001=WiFiRoundTripTimeRanging) and 3b
+        # (WFUSDPD + A0002=WiFiNextGenerationRanging), gated via check_pics per the plan
+        # (see DECISIONS.md). WiFiDevIK is one technology-independent attribute, so whichever
+        # sub-step runs saves the self.wifi_ik_i/r the WiFi periodic block consumes; each
+        # sub-step also asserts its per-technology capability element on both DUTs.
+        self.wifi_ik_i = self.wifi_ik_r = None
+
+        async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
             self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),
+                                       f"DUT_I RangingCapabilities must list an element with Technology {technology.name}")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_r, technology),
+                                       f"DUT_R RangingCapabilities must list an element with Technology {technology.name}")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0001"):
+            self.step("3a")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiRoundTripTimeRanging)
         else:
-            self._skip(3, wifi_reason)
+            self._skip("3a", "PROXR.S.F00 and PROXR.S.A0001 are not both set in PICS")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0002"):
+            self.step("3b")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
+        else:
+            self._skip("3b", "PROXR.S.F00 and PROXR.S.A0002 are not both set in PICS")
+
+        # Mirror blt_run_tech: the WiFi periodic block runs only when the technology was
+        # negotiated AND the identity was read; otherwise it skips with an explicit reason.
+        if wifi_tech is not None and self.wifi_ik_i is None:
+            wifi_reason = "WiFiDevIK not read: neither PROXR.S.A0001 nor PROXR.S.A0002 set in PICS"
+        wifi_run_tech = wifi_tech if (wifi_tech is not None and self.wifi_ik_i is not None) else None
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
         self.blt_mode = None
@@ -423,7 +455,7 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
                                                    start_time=0, end_time=_PERIODIC_END_TIME_S,
                                                    interval=interval, technology=wifi_tech)
         await self._run_periodic_block(
-            6, wifi_tech, wifi_reason,
+            6, wifi_run_tech, wifi_reason,
             _mk_wifi(RangingRoleEnum.kWiFiSubscriberRole, "wifi_ik_r", _PERIODIC_INTERVAL_S),
             _mk_wifi(RangingRoleEnum.kWiFiPublisherRole, "wifi_ik_i", None),
             _v_wifi, caps_i, caps_r)
