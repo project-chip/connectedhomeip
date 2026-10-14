@@ -109,13 +109,13 @@ qemu.yaml / Tizen / Build and run tests
 unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run PSA unit tests (ASan)
   on:     push{"branches": ["master", "v*-branch"]}, pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
-  if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+  if:     (github.event_name == 'push' && github.ref != 'refs/heads/master') || steps.changed_paths.outputs.crypto == 'true'
   filter: changed_paths.crypto = src/credentials/**, src/crypto/**, src/pw_backends/**, third_party/pigweed/**, third_party/mbedtls/**, .github/workflows/unit_integration_test.yaml
   targets: linux-x64-tests-psa-asan-clang
 
 unit_integration_test.yaml / Crypto Backend Unit Tests (PSA, mbedTLS) / Build and run mbedTLS unit tests (ASan)
   on:     push{"branches": ["master", "v*-branch"]}, pull_request, merge_group
   job-if: github.actor != 'restyled-io[bot]'
-  if:     github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+  if:     (github.event_name == 'push' && github.ref != 'refs/heads/master') || steps.changed_paths.outputs.crypto == 'true'
   filter: changed_paths.crypto = src/credentials/**, src/crypto/**, src/pw_backends/**, third_party/pigweed/**, third_party/mbedtls/**, .github/workflows/unit_integration_test.yaml
   targets: linux-x64-tests-mbedtls-asan-clang

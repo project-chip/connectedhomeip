@@ -44,7 +44,10 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            # Runs before bootstrap so PRs that match neither filter skip the whole job body.
+            # dorny/paths-filter runs git on push, before bootstrap has marked the workspace as safe.
+            - name: Mark workspace as a safe git directory
+              run: git config --global --add safe.directory "$(pwd)"
+            # Runs before bootstrap so runs that do not match the filter skip the whole job body.
             - name: Detect changed paths
               uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
               id: changed_paths
@@ -59,19 +62,27 @@ jobs:
                         - 'third_party/mbedtls/**'
                         - '.github/workflows/unit_integration_test.yaml'
             - name: Checkout submodules & Bootstrap
-              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+              # Master pushes follow the filter too; nightly.yaml runs both backends on the full tree.
+              # Release branches have no nightly, so their pushes always run.
+              if: >
+                  (github.event_name == 'push' && github.ref != 'refs/heads/master') ||
+                  steps.changed_paths.outputs.crypto == 'true'
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
                 bootstrap-log-name: bootstrap-logs-unittest-crypto-backends
             - name: Build and run PSA unit tests (ASan)
-              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+              if: >
+                  (github.event_name == 'push' && github.ref != 'refs/heads/master') ||
+                  steps.changed_paths.outputs.crypto == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-psa-asan-clang build" \
                     && rm -rf out/linux-x64-tests-psa-asan-clang
             - name: Build and run mbedTLS unit tests (ASan)
-              if: github.event_name == 'push' || steps.changed_paths.outputs.crypto == 'true'
+              if: >
+                  (github.event_name == 'push' && github.ref != 'refs/heads/master') ||
+                  steps.changed_paths.outputs.crypto == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
