@@ -20,8 +20,8 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <credentials/FabricTable.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <lib/support/TimerDelegateMock.h>
 #include <devices/Types.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <algorithm>
@@ -56,16 +56,13 @@ public:
 
     FabricTable & GetFabricTable() const override { return mFabricTable; }
     DataModel::Nullable<Clusters::Thermostat::temperature> GetLocalTemperature() const override { return 2000; }
-    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<Clusters::Thermostat::temperature>, bool & changed)
-        override
+    Protocols::InteractionModel::Status SetLocalTemperature(DataModel::Nullable<Clusters::Thermostat::temperature>,
+                                                            bool & changed) override
     {
         changed = false;
         return Protocols::InteractionModel::Status::Success;
     }
-    Clusters::Thermostat::SystemModeEnum GetSystemMode() const override
-    {
-        return Clusters::Thermostat::SystemModeEnum::kOff;
-    }
+    Clusters::Thermostat::SystemModeEnum GetSystemMode() const override { return Clusters::Thermostat::SystemModeEnum::kOff; }
     Protocols::InteractionModel::Status SetSystemMode(Clusters::Thermostat::SystemModeEnum, bool & changed) override
     {
         changed = false;
@@ -75,14 +72,13 @@ public:
     {
         return Clusters::Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly;
     }
-    Protocols::InteractionModel::Status
-    SetControlSequenceOfOperation(Clusters::Thermostat::ControlSequenceOfOperationEnum, bool & changed) override
+    Protocols::InteractionModel::Status SetControlSequenceOfOperation(Clusters::Thermostat::ControlSequenceOfOperationEnum,
+                                                                      bool & changed) override
     {
         changed = false;
         return Protocols::InteractionModel::Status::Success;
     }
-    Protocols::InteractionModel::Status
-    GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & runningMode) const override
+    Protocols::InteractionModel::Status GetRunningMode(Clusters::Thermostat::ThermostatRunningModeEnum & runningMode) const override
     {
         runningMode = Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
         return Protocols::InteractionModel::Status::Success;
@@ -103,33 +99,29 @@ public:
         changed = false;
         return Protocols::InteractionModel::Status::Success;
     }
-    Protocols::InteractionModel::Status
-    SetRemoteSensing(BitMask<Clusters::Thermostat::RemoteSensingBitmap>, bool & changed) override
+    Protocols::InteractionModel::Status SetRemoteSensing(BitMask<Clusters::Thermostat::RemoteSensingBitmap>,
+                                                         bool & changed) override
     {
         changed = false;
         return Protocols::InteractionModel::Status::Success;
     }
 
-    Protocols::InteractionModel::Status
-    GetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature & setpoint) const override
+    Protocols::InteractionModel::Status GetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature & setpoint) const override
     {
         setpoint = 3000;
         return Protocols::InteractionModel::Status::Success;
     }
-    Protocols::InteractionModel::Status
-    SetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature, bool & changed) override
+    Protocols::InteractionModel::Status SetOccupiedHeatingSetpoint(Clusters::Thermostat::temperature, bool & changed) override
     {
         changed = false;
         return Protocols::InteractionModel::Status::Success;
     }
-    Protocols::InteractionModel::Status
-    GetAbsMinHeatSetpointLimit(Clusters::Thermostat::temperature & limit) const override
+    Protocols::InteractionModel::Status GetAbsMinHeatSetpointLimit(Clusters::Thermostat::temperature & limit) const override
     {
         limit = 0;
         return Protocols::InteractionModel::Status::Success;
     }
-    Protocols::InteractionModel::Status
-    GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & limit) const override
+    Protocols::InteractionModel::Status GetAbsMaxHeatSetpointLimit(Clusters::Thermostat::temperature & limit) const override
     {
         limit = 10000;
         return Protocols::InteractionModel::Status::Success;
@@ -212,7 +204,7 @@ class FailingOptionalClusterWaterHeater : public WaterHeater
 public:
     using WaterHeater::WaterHeater;
 
-    CHIP_ERROR registrationError = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR registrationError             = CHIP_ERROR_INTERNAL;
     unsigned unregisterOptionalClustersCalls = 0;
 
 protected:
@@ -222,7 +214,7 @@ protected:
 
 TEST_F(WaterHeaterTestFixture, RegistersExpectedEndpointAndClusters)
 {
-    auto device = MakeDevice();
+    auto device                      = MakeDevice();
     constexpr EndpointId kEndpointId = 1;
 
     EXPECT_EQ(device.GetEndpointId(), kInvalidEndpointId);
@@ -231,7 +223,7 @@ TEST_F(WaterHeaterTestFixture, RegistersExpectedEndpointAndClusters)
 
     const std::vector<ClusterId> expectedClusterIds = { Clusters::Descriptor::Id, Clusters::WaterHeaterMode::Id,
                                                         Clusters::Thermostat::Id, Clusters::WaterHeaterManagement::Id };
-    auto sortedExpectedClusterIds = expectedClusterIds;
+    auto sortedExpectedClusterIds                   = expectedClusterIds;
     std::sort(sortedExpectedClusterIds.begin(), sortedExpectedClusterIds.end());
     EXPECT_EQ(GetServerClusterIds(kEndpointId), sortedExpectedClusterIds);
 
