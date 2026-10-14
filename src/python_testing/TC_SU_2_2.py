@@ -1066,7 +1066,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             fabricFiltered=True,
             eventNumberFilter=download_error_last_event_number_s3
         )
-        logger.info("%s DownloadError events gathered after kIdle: %s and filtering after DownloadErrorEventNumber %d", step_number_s4, download_error_events, download_error_last_event_number_s3)
+        logger.info("%s DownloadError events gathered after kIdle: %s and filtering after DownloadErrorEventNumber %d",
+                    step_number_s4, download_error_events, download_error_last_event_number_s3)
         event_download_error = None
         # No DownloadErrorEvent using ReadEvent with eventNumber filter found.
         if len(download_error_events) == 0:
@@ -1092,7 +1093,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 event_progress = 0
                 # ProgressPercent can be None
                 if download_event.Data.progressPercent is not NullValue:
-                    event_progress  = int(download_event.Data.progressPercent)
+                    event_progress = int(download_event.Data.progressPercent)
                 if int(event_progress) >= 1:
                     event_download_error = download_event.Data
                     break
@@ -1560,7 +1561,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         state_transition_last_event_number_s8 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition)
         version_applied_last_event_number_s8 = await self.get_latest_event_number(Clusters.OtaSoftwareUpdateRequestor.Events.VersionApplied)
         # Make sure the device does not have any records of VersionAppliedEvent
-        asserts.assert_equal(version_applied_last_event_number_s8, -1, f"VersionAppliedEvent found before Appying the Software Update with EventNumber:{version_applied_last_event_number_s8}")
+        asserts.assert_equal(version_applied_last_event_number_s8, -1,
+                             f"VersionAppliedEvent found before Appying the Software Update with EventNumber:{version_applied_last_event_number_s8}")
 
         # [End of Step #5 TC_SU_2_7]
         self.step(9)
