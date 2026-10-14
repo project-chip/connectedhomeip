@@ -29,25 +29,7 @@ CHIP_ERROR IrrigationSystem::Register(EndpointIdAllocator & allocator, CodeDrive
     DeviceRegistrationTransaction transaction(*this, provider);
     mEndpointId = allocator.Allocate();
     ReturnErrorOnFailure(RegisterDescriptor(mEndpointId, provider, composition));
-
-    if (mConfig.withIdentify)
-    {
-        Clusters::IdentifyCluster::Config Iconfig(mEndpointId, mTimerDelegate);
-        Iconfig.WithDelegate(&mIdentifyDelegate);
-        mIdentifyCluster.Create(Iconfig);
-
-        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-    }
-    if (mConfig.withOperationalState)
-    {
-        mOperationalStateCluster.Create(mEndpointId, mOperationalStateDelegate);
-        ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
-    }
-    if (mConfig.withFlowMeasurement)
-    {
-        mFlowMeasurementCluster.Create(mEndpointId);
-        ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
-    }
+    ReturnErrorOnFailure(RegisterOptionalClusters(mEndpointId, provider));
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
     ReturnErrorOnFailure(RegisterParts(allocator, provider, composition));
@@ -60,23 +42,8 @@ void IrrigationSystem::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterParts(provider);
     UnregisterDescriptor(mEndpointId, provider);
+    UnregisterOptionalClusters(provider);
     mEndpointId = kInvalidEndpointId;
-
-    if (mIdentifyCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
-    }
-    if (mFlowMeasurementCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mFlowMeasurementCluster.Cluster()));
-        mFlowMeasurementCluster.Destroy();
-    }
-    if (mOperationalStateCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
-        mOperationalStateCluster.Destroy();
-    }
 }
 
 } // namespace app
