@@ -120,8 +120,8 @@ void OTARequestorAttributes::ClearInteractionModelContext(AttributeChangeListene
     if (mAttributeChangeListener == &attributeChangeListener)
     {
         mAttributeChangeListener = nullptr;
-        mEventsGenerator        = nullptr;
-        mEndpointId             = kInvalidEndpointId;
+        mEventsGenerator         = nullptr;
+        mEndpointId              = kInvalidEndpointId;
     }
 }
 
