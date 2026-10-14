@@ -36,17 +36,10 @@ MANUAL_ALLOWLIST:
     - wake-on-lan-cluster.xml
 
 INCOMPLETE_METADATA_ALLOWLIST:
-    - commodity-price-cluster.xml
     - electrical-energy-measurement-cluster.xml
     - electrical-power-measurement-cluster.xml
-    - energy-evse-mode-cluster.xml
-    - fan-control-cluster.xml
     - general-commissioning-cluster.xml
     - global-structs.xml
-    - laundry-dryer-controls-cluster.xml
-    - localization-configuration-cluster.xml
-    - media-input-cluster.xml
-    - microwave-oven-control-cluster.xml
     - mode-select-cluster.xml
     - power-source-configuration-cluster.xml
     - pressure-measurement-cluster.xml
