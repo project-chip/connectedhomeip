@@ -51,9 +51,9 @@ const ValveConfigurationAndControlCluster::ValveContext kValveContext2 = {
     .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet()
                                 .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
                                 .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
-    .config    = kStartUpConfig2,
-    .tsTracker = nullptr,
-    .delegate  = nullptr,
+    .config               = kStartUpConfig2,
+    .tsTracker            = nullptr,
+    .delegate             = nullptr,
 };
 const ValveConfigurationAndControlCluster::ValveContext kValveContext3 = {
     .features             = {},
@@ -77,18 +77,18 @@ const EndpointComposition::SemanticTag kValve3[] = {
 
 } // namespace
 
-std::vector<IrrigationSystem::ValveList> LoggingIrrigationSystem::ValveConfiguration()
+std::vector<LoggingIrrigationSystem::ValveList> LoggingIrrigationSystem::ValveConfiguration()
 {
-    return std::vector<IrrigationSystem::ValveList>{
-        IrrigationSystem::ValveList{
+    return std::vector<ValveList>{
+        ValveList{
             .valveContext = kValveContext1,
             .tags         = Span<const EndpointComposition::SemanticTag>(kValve1),
         },
-        IrrigationSystem::ValveList{
+        ValveList{
             .valveContext = kValveContext2,
             .tags         = Span<const EndpointComposition::SemanticTag>(kValve2),
         },
-        IrrigationSystem::ValveList{
+        ValveList{
             .valveContext = kValveContext3,
             .tags         = Span<const EndpointComposition::SemanticTag>(kValve3),
         },
