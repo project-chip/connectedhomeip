@@ -17,9 +17,6 @@
 
 #pragma once
 
-#include <app/clusters/flow-measurement-server/FlowMeasurementCluster.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <clusters/shared/Enums.h>
@@ -52,25 +49,14 @@ protected:
 class IrrigationSystem : public DeviceInterface
 {
 public:
-    struct Config
-    {
-        bool withIdentify         = false;
-        bool withOperationalState = false;
-        bool withFlowMeasurement  = false;
-    };
-
     struct ValveList
     {
         std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
-    IrrigationSystem(TimerDelegate & TDelegate, Clusters::IdentifyDelegate & IDelegate,
-                     Clusters::OperationalState::OperationalStateCluster::Delegate & ODelegate, const Config & config) :
-        DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)),
-
-        mTimerDelegate(TDelegate), mIdentifyDelegate(IDelegate), mOperationalStateDelegate(ODelegate), mConfig(config)
-
+    IrrigationSystem(TimerDelegate & timerDelegate) :
+        DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kIrrigationSystem, 1)), mTimerDelegate(timerDelegate)
     {}
     ~IrrigationSystem() override = default;
 
@@ -78,39 +64,27 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::IdentifyCluster & IdentifyCluster()
-    {
-        VerifyOrDie(mIdentifyCluster.IsConstructed());
-        return mIdentifyCluster.Cluster();
-    }
-    Clusters::OperationalState::OperationalStateCluster & OperationalStateCluster()
-    {
-        VerifyOrDie(mOperationalStateCluster.IsConstructed());
-        return mOperationalStateCluster.Cluster();
-    }
-    Clusters::FlowMeasurementCluster & FlowMeasurementCluster()
-    {
-        VerifyOrDie(mFlowMeasurementCluster.IsConstructed());
-        return mFlowMeasurementCluster.Cluster();
-    }
     EndpointId GetEndpointId() const { return mEndpointId; }
-
-    bool HasOperationalState() const { return mOperationalStateCluster.IsConstructed(); }
 
 protected:
     TimerDelegate & mTimerDelegate;
+
+    // Hook for subclasses to add optional clusters (Identify, Operational State, Flow Measurement, ...)
+    // to the irrigation system endpoint. Called before the endpoint is added. Default: none added.
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Counterpart to RegisterOptionalClusters(). Also called when Register() fails partway, so
+    // implementations must only remove clusters that were constructed.
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:
     virtual CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                                      EndpointComposition composition)    = 0;
     virtual void UnregisterParts(CodeDrivenDataModelProvider & provider) = 0;
     EndpointId mEndpointId                                               = kInvalidEndpointId;
-    Clusters::IdentifyDelegate & mIdentifyDelegate;
-    Clusters::OperationalState::OperationalStateCluster::Delegate & mOperationalStateDelegate;
-    const Config mConfig;
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
-    LazyRegisteredServerCluster<Clusters::FlowMeasurementCluster> mFlowMeasurementCluster;
 };
 
 } // namespace app
