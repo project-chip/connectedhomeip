@@ -196,6 +196,19 @@ def scan_tree(tree: Path) -> dict[str, TreeFile]:
     return files
 
 
+def framework_imports(tree: Path, files: dict[str, TreeFile]) -> set[str]:
+    """Return the test-tree packages and modules the test framework package imports.
+
+    Every test runs the framework, so a change to one of them can affect any test.
+    """
+    framework = tree / Path(FRAMEWORK_PACKAGE).relative_to(TEST_TREE)
+    imported = set()
+    for path in framework.rglob("*.py"):
+        source = path.read_text(errors="replace")
+        imported.update(name.split(".")[0] for name in imported_names(source, path.relative_to(framework).as_posix()))
+    return imported & {rel.split("/")[0].removesuffix(".py") for rel in files}
+
+
 def shard_filters(chip_root: Path) -> list[str]:
     """Return the REPL shard filters, as the split estimator reads them."""
     import yaml
@@ -268,6 +281,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
     tree = chip_root / TEST_TREE
     excluded = excluded_tests(load_metadata(tree / "test_metadata.yaml"))
     files = scan_tree(tree)
+    used_by_framework = framework_imports(tree, files)
     selection = Selection()
 
     def runnable(rel: str) -> bool:
@@ -291,6 +305,8 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
             if rel.endswith(".md"):
                 continue
             return Selection(full_reason=f"{path} is not Python, so which tests read it is unknown")
+        if rel.split("/")[0].removesuffix(".py") in used_by_framework:
+            return Selection(full_reason=f"{path} is imported by the test framework, which every test runs")
         if runnable(rel):
             selection.tests[rel] = "changed"
         elif "/" not in rel and rel in excluded and rel in files:

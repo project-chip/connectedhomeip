@@ -157,6 +157,10 @@ class TestSelect(unittest.TestCase):
         "pkg/tests/test_back.py": "",
         "test_testing/TestThing.py": "",
         "post_certification_tests/checks.py": "",
+        "netpkg/__init__.py": "",
+        "netpkg/discovery.py": "",
+        "TC_Net.py": CI_BLOCK + "from netpkg.discovery import browse\n",
+        "matter_testing_infrastructure/matter/testing/commissioning.py": "def probe():\n    from netpkg.discovery import browse\n",
         "README.md": "",
     }
     METADATA = {
@@ -301,6 +305,12 @@ class TestSelect(unittest.TestCase):
         self.assertIn("outside the Python test tree",
                       select(["src/python_testing/TC_Alpha.py", "src/app/server/Server.cpp"], self.root).full_reason)
 
+    def test_a_module_the_framework_imports_runs_every_shard(self):
+        # Every test goes through the framework, not only the tests that import the module.
+        self.assertIn("imported by the test framework", self.select("netpkg/discovery.py").full_reason)
+        self.assertIn("imported by the test framework", self.select("netpkg/__init__.py").full_reason)
+        self.assert_selected(self.select("TC_Net.py"), "TC_Net.py")
+
     def test_a_test_no_shard_filter_matches_runs_every_shard(self):
         (self.root / ".github/workflows/tests.yaml").write_text(yaml.safe_dump(
             {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": ["", "TC_[A-M]"]}}}}}))
@@ -351,6 +361,11 @@ class TestSelectOnThisRepository(unittest.TestCase):
         selection = select(["src/python_testing/TC_FAN_3_5.py"])
         self.assertEqual(list(selection.tests), ["TC_FAN_3_5.py"])
         self.assertEqual([f for f, regex in selection.slices.items() if regex != NO_TESTS], ["TC_[F-I]"])
+
+    def test_mdns_discovery_counts_as_framework(self):
+        # matter/testing/commissioning.py imports mdns_discovery.mdns_discovery.
+        selection = select(["src/python_testing/mdns_discovery/utils/network.py"])
+        self.assertIn("imported by the test framework", selection.full_reason)
 
     def test_every_test_the_regular_run_picks_up_matches_a_shard(self):
         root = Path(__file__).resolve().parents[2]
