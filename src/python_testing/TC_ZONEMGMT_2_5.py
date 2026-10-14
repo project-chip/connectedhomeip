@@ -38,6 +38,7 @@
 
 import logging
 import sys
+import time
 
 from mobly import asserts
 
@@ -417,9 +418,14 @@ class TC_ZONEMGMT_2_5(MatterTestCommissionedDevice):
                 prompt_msg=f"Press enter and immediately start motion activity in remote zone {zoneID_Remote}.",
             )
 
-            event = event_listener.wait_for_event_report(
-                cluster.Events.ZoneTriggered, timeout_sec=30.0
-            )
+            deadline = time.monotonic() + 30.0
+            while True:
+                remaining = deadline - time.monotonic()
+                event = event_listener.wait_for_event_type_report(
+                    cluster.Events.ZoneTriggered, timeout_sec=remaining
+                )
+                if event.zone == zoneID_Remote:
+                    break
             log.info("Rx'd ZoneTriggered event: %s", event)
             asserts.assert_equal(
                 type(event),
