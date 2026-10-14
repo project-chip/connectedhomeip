@@ -76,9 +76,22 @@ public:
         context.delegate = this;
         return context;
     }
-    bool IsOpen() const { return mOpenLevel.has_value(); }
-    std::optional<Percent> OpenLevel() const { return mOpenLevel; }
-    std::optional<uint32_t> RemainingDuration() const { return mRemainingDuration; }
+    bool IsOpen() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), false);
+        auto state = mValveCluster.Cluster().GetCurrentState();
+        return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
+    }
+    DataModel::Nullable<Percent> OpenLevel() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
+        return mValveCluster.Cluster().GetCurrentLevel();
+    }
+    DataModel::Nullable<uint32_t> RemainingDuration() const
+    {
+        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
+        return mValveCluster.Cluster().GetRemainingDuration();
+    }
 
 protected:
     // Clusters::ValveConfigurationAndControl::Delegate implementation
@@ -86,11 +99,14 @@ protected:
     CHIP_ERROR HandleCloseValve() override;
     void HandleRemainingDurationTick(uint32_t duration) override;
 
-    std::optional<Percent> mOpenLevel;
-    std::optional<uint32_t> mRemainingDuration;
     TimerDelegate & mTimerDelegate;
+<<<<<<< HEAD
     Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
     const WaterValveConfig mConfig;
+=======
+    std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> mValveContext;
+    Listener * mListener = nullptr;
+>>>>>>> ed0c08e48ba (Remove level/duration local caching)
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };
