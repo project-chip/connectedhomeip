@@ -743,9 +743,14 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Groups (server) */                                                                                \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8),                                                                   \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                       /* NameSupport */           \
-        { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(READABLE) },    /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0005), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* NameSupport */                                                            \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
         { ZAP_SIMPLE_DEFAULT(0x00), 0x00000000, 1, ZAP_TYPE(BOOLEAN),                                                              \
@@ -872,11 +877,14 @@
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Occupancy Sensing (server) */                                                                     \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(BITMAP8),                                                                   \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* Occupancy */                                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* Occupancy */                                                              \
         { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8),                                                                     \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* OccupancySensorType */                         \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* OccupancySensorType */                                                    \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8),                                                                   \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* OccupancySensorTypeBitmap */                   \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* OccupancySensorTypeBitmap */                                              \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
@@ -1413,7 +1421,7 @@
       .clusterId = 0x00000004, \
       .attributes = ZAP_ATTRIBUTE_INDEX(212), \
       .attributeCount = 3, \
-      .clusterSize = 7, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 67 ), \
@@ -1491,7 +1499,7 @@
       .clusterId = 0x00000406, \
       .attributes = ZAP_ATTRIBUTE_INDEX(271), \
       .attributeCount = 5, \
-      .clusterSize = 3, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -1509,7 +1517,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 21, 0 },                                                                                           \
-        { ZAP_CLUSTER_INDEX(21), 8, 90 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(21), 8, 80 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1521,7 +1529,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (90)
+#define ATTRIBUTE_MAX_SIZE (80)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

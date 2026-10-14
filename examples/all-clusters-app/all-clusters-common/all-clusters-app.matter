@@ -7602,9 +7602,9 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute nameSupport;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -8124,12 +8124,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -8281,7 +8281,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Stop;
@@ -8295,7 +8295,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8333,7 +8333,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8345,7 +8345,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8369,7 +8369,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8381,7 +8381,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8417,7 +8417,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -8486,7 +8486,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    callback attribute clusterRevision;
   }
 
   server cluster OperationalState {
@@ -8501,7 +8501,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Pause;
@@ -8522,7 +8522,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Pause;
@@ -8557,7 +8557,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 2;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command ChangeToMode;
@@ -8989,9 +8989,9 @@ endpoint 1 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap default = 1;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;
@@ -9427,12 +9427,12 @@ endpoint 2 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -9510,9 +9510,9 @@ endpoint 2 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap default = 1;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
     callback attribute PIROccupiedToUnoccupiedDelay;

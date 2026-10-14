@@ -2684,12 +2684,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport default = 0x80;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;

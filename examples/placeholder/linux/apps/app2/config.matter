@@ -9580,7 +9580,7 @@ endpoint 0 {
     ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
     ram      attribute PICoolingDemand;
     ram      attribute PIHeatingDemand;
-    callback attribute HVACSystemTypeConfiguration default = 0;
+    callback attribute HVACSystemTypeConfiguration;
     callback attribute localTemperatureCalibration default = 0;
     ram      attribute occupiedCoolingSetpoint default = 0x0A28;
     ram      attribute occupiedHeatingSetpoint default = 0x07D0;
@@ -9600,25 +9600,25 @@ endpoint 0 {
     ram      attribute numberOfDailyTransitions default = 4;
     ram      attribute temperatureSetpointHold default = 0x00;
     callback attribute temperatureSetpointHoldDuration;
-    callback attribute thermostatProgrammingOperationMode default = 0x00;
+    callback attribute thermostatProgrammingOperationMode;
     callback attribute thermostatRunningState;
-    callback attribute setpointChangeSource default = 0x00;
+    callback attribute setpointChangeSource;
     callback attribute setpointChangeAmount;
-    callback attribute setpointChangeSourceTimestamp default = 0x00;
+    callback attribute setpointChangeSourceTimestamp;
     callback attribute occupiedSetback;
     callback attribute occupiedSetbackMin;
     callback attribute occupiedSetbackMax;
     callback attribute unoccupiedSetback;
     callback attribute unoccupiedSetbackMin;
     callback attribute unoccupiedSetbackMax;
-    callback attribute emergencyHeatDelta default = 0x009F6;
-    callback attribute ACType default = 0x00;
-    callback attribute ACCapacity default = 0x00;
+    callback attribute emergencyHeatDelta;
+    callback attribute ACType;
+    callback attribute ACCapacity;
     callback attribute ACRefrigerantType;
-    callback attribute ACCompressorType default = 0x00;
-    callback attribute ACLouverPosition default = 0x00;
+    callback attribute ACCompressorType;
+    callback attribute ACLouverPosition;
     callback attribute ACCoilTemperature;
-    callback attribute ACCapacityformat default = 0x00;
+    callback attribute ACCapacityformat;
     ram      attribute featureMap default = 0x000b;
     callback attribute clusterRevision;
   }
@@ -9829,12 +9829,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -9999,18 +9999,18 @@ endpoint 1 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute PIROccupiedToUnoccupiedDelay;
-    ram      attribute PIRUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute PIRUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute PIRUnoccupiedToOccupiedDelay;
+    callback attribute PIRUnoccupiedToOccupiedThreshold;
     callback attribute ultrasonicOccupiedToUnoccupiedDelay;
-    ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute ultrasonicUnoccupiedToOccupiedDelay;
+    callback attribute ultrasonicUnoccupiedToOccupiedThreshold;
     callback attribute physicalContactOccupiedToUnoccupiedDelay;
-    ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute physicalContactUnoccupiedToOccupiedDelay;
+    callback attribute physicalContactUnoccupiedToOccupiedThreshold;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }

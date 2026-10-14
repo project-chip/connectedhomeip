@@ -2860,9 +2860,9 @@ endpoint 3 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy default = 0;
-    ram      attribute occupancySensorType default = 0;
-    ram      attribute occupancySensorTypeBitmap default = 0x1;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
     callback attribute generatedCommandList;

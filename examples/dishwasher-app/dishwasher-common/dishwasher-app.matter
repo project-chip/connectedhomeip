@@ -1694,9 +1694,9 @@ endpoint 0 {
 
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute nameSupport;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -1930,9 +1930,9 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute nameSupport;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -1975,7 +1975,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Pause;

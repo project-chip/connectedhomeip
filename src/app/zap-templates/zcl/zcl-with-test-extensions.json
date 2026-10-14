@@ -229,7 +229,12 @@
             },
             "ClusterRevision"
         ],
-        "Ambient Sensing Union": ["UnionName", "UnionHealth"],
+        "Ambient Sensing Union": [
+            "UnionName",
+            "UnionHealth",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Audio Control": [
             "ClusterRevision",
             {
@@ -288,7 +293,9 @@
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
         "Bridged Device Basic Information": [
             "DeviceLocation",
-            "ProductAppearance"
+            "ProductAppearance",
+            "ConfigurationVersion",
+            "ProductID"
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
@@ -337,7 +344,9 @@
             "NumCachedResults",
             "CacheTimeout",
             "CachedResults",
-            "WiFiBand"
+            "WiFiBand",
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Commodity Price": [
             "TariffUnit",
@@ -469,7 +478,15 @@
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
-            "SupportsConcurrentConnection"
+            "SupportsConcurrentConnection",
+            "TCAcceptedVersion",
+            "TCMinRequiredVersion",
+            "TCAcknowledgements",
+            "TCAcknowledgementsRequired",
+            "TCUpdateDeadline",
+            "IsCommissioningWithoutPower",
+            "NetworkRecoveryReason",
+            "RecoveryIdentifier"
         ],
         "General Diagnostics": [
             "NetworkInterfaces",
@@ -609,7 +626,17 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "ClusterRevision"
+            "ClusterRevision",
+            "Occupancy",
+            "OccupancySensorType",
+            "OccupancySensorTypeBitmap",
+            "PIRUnoccupiedToOccupiedDelay",
+            "PIRUnoccupiedToOccupiedThreshold",
+            "UltrasonicUnoccupiedToOccupiedDelay",
+            "UltrasonicUnoccupiedToOccupiedThreshold",
+            "PhysicalContactUnoccupiedToOccupiedDelay",
+            "PhysicalContactUnoccupiedToOccupiedThreshold",
+            "FeatureMap"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -710,7 +737,8 @@
             "InterfaceEnabled",
             "ActiveDatasetTimestamp",
             "PendingDatasetTimestamp",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Thread Network Diagnostics": [
             "Channel",
@@ -893,8 +921,18 @@
             },
             "ClusterRevision"
         ],
-        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Microwave Oven Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Mode Select": [
             "ClusterRevision",
             "SupportedModes",
@@ -927,8 +965,18 @@
             "FeatureMap",
             "ClusterRevision"
         ],
-        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Oven Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Refrigerator Alarm": [
             {
                 "name": "Mask",
@@ -951,10 +999,21 @@
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
-        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Operational State": [
             "PhaseList",
             "CurrentPhase",
@@ -962,7 +1021,8 @@
             "OperationalStateList",
             "OperationalState",
             "OperationalError",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "RVC Operational State": [
             "PhaseList",
@@ -971,7 +1031,8 @@
             "OperationalStateList",
             "OperationalState",
             "OperationalError",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Oven Cavity Operational State": [
             "PhaseList",
@@ -980,7 +1041,8 @@
             "OperationalStateList",
             "OperationalState",
             "OperationalError",
-            "ClusterRevision"
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
@@ -1165,7 +1227,12 @@
             "ShortCircuitRating",
             "ResidualCurrentRating",
             "ArcFaultRating",
-            "FeatureMap"
+            "FeatureMap",
+            "ArcCause",
+            "ClusterRevision",
+            "Mask",
+            "State",
+            "Supported"
         ],
         "Electrical Power Measurement": [
             "PowerMode",
@@ -1271,13 +1338,23 @@
             "ClusterRevision"
         ],
         "Water Heater Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "Wi-Fi Network Management": ["SSID", "PassphraseSurrogate"],
+        "Wi-Fi Network Management": [
+            "SSID",
+            "PassphraseSurrogate",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
             "ThreadNetworkTableSize"
         ],
-        "Service Area": ["CurrentArea", "EstimatedEndTime", "FeatureMap"],
+        "Service Area": [
+            "CurrentArea",
+            "EstimatedEndTime",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Camera AV Stream Management": [
             "VideoSensorParams",
             "MinViewportResolution",
@@ -1314,7 +1391,8 @@
             "StatusLightEnabled",
             "StatusLightBrightness",
             "ImageRotationDiscreteAngles",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Camera AV Settings User Level Management": [
             "FeatureMap",
@@ -1407,7 +1485,50 @@
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason",
-            "ClusterRevision"
+            "ClusterRevision",
+            "ACLouverPosition",
+            "HVACSystemTypeConfiguration",
+            "ACCapacity",
+            "ACCapacityformat",
+            "ACCoilTemperature",
+            "ACCompressorType",
+            "ACErrorCode",
+            "ACRefrigerantType",
+            "ACType",
+            "CriticalFreezeProtection",
+            "CriticalOverheatProtection",
+            "EmergencyHeatDelta",
+            "NumberOfSensorScheduleTransitions",
+            "OccupiedSetback",
+            "OccupiedSetbackMax",
+            "OccupiedSetbackMin",
+            "SetpointChangeAmount",
+            "SetpointChangeSource",
+            "SetpointChangeSourceTimestamp",
+            "ThermostatProgrammingOperationMode",
+            "UnoccupiedSetback",
+            "UnoccupiedSetbackMax",
+            "UnoccupiedSetbackMin",
+            {
+                "name": "Occupancy",
+                "keepDefault": true
+            },
+            {
+                "name": "OutdoorTemperature",
+                "keepDefault": true
+            },
+            {
+                "name": "RemoteSensing",
+                "keepDefault": true
+            },
+            {
+                "name": "UnoccupiedCoolingSetpoint",
+                "keepDefault": true
+            },
+            {
+                "name": "UnoccupiedHeatingSetpoint",
+                "keepDefault": true
+            }
         ],
         "Thermostat User Interface Configuration": [
             "ClusterRevision",
@@ -1619,7 +1740,37 @@
                 "keepDefault": true
             },
             "ClusterRevision"
-        ]
+        ],
+        "Groups": ["ClusterRevision", "FeatureMap", "NameSupport"],
+        "OTA Software Update Provider": ["ClusterRevision", "FeatureMap"],
+        "Proximity Ranging": [
+            "BLEDeviceID",
+            "BLTCSModeCapability",
+            "BLTCSSecurityLevel",
+            "BLTDevIK",
+            "WiFiDevIK",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
+        "Electrical Alarm": [
+            "ClusterRevision",
+            "FeatureMap",
+            "Latch",
+            "Mask",
+            "State",
+            "Supported",
+            "OverVoltageThreshold",
+            "UnderVoltageThreshold",
+            "OverFrequencyThreshold",
+            "UnderFrequencyThreshold",
+            "OverPowerThreshold",
+            "UnderPowerThreshold",
+            "OverCurrentThreshold",
+            "UnderCurrentThreshold",
+            "PowerImportThreshold",
+            "PowerExportThreshold"
+        ],
+        "Thermostat Mode": ["CurrentMode", "FeatureMap"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

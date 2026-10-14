@@ -6661,9 +6661,9 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute nameSupport;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -6998,12 +6998,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7297,9 +7297,9 @@ endpoint 1 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -7539,12 +7539,12 @@ endpoint 2 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -7617,9 +7617,9 @@ endpoint 2 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
