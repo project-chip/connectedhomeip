@@ -6,11 +6,7 @@ subsystem. It uses `all-devices-app` on Linux and `chip-tool`.
 
 The procedure is generic. Section 3 describes each step with placeholders and
 explains every parameter, and Sections 4 and 5 apply it to the Doorbell to
-Chime pair, which is currently the only device pair that sends commands through
-`BindingHandler`.
-
-For the design of the subsystem itself, see
-[BindingHandler Design & Interaction Architecture](../../docs/design/binding_handler.md).
+Chime pair.
 
 ---
 
@@ -35,17 +31,6 @@ Three pieces of configuration must line up for a command to be delivered:
 3. **A trigger** makes the initiator device call
    `DispatchSimpleBindingCommand(...)` for its local endpoint. In the POSIX app,
    triggers are JSON messages written to the named pipe given with `--app-pipe`.
-
-### Binding-capable device types
-
-| Device type (`--device`) | Client clusters it can send       | Named-pipe trigger | Sends through `BindingHandler` |
-| ------------------------ | --------------------------------- | ------------------ | ------------------------------ |
-| `doorbell`               | Chime (`0x0556` / 1366)           | `ShortPress`       | Yes (`PlayChimeSound`)         |
-| `on-off-light-switch`    | On/Off (`0x0006`), Identify (`3`) | None yet           | No (binding table only)        |
-
-A device type can be used as an initiator once it has a Binding cluster on its
-endpoint, a code path that calls `DispatchSimpleBindingCommand` (or
-`DispatchBindingCommand`), and a way to trigger that code path. See Section 6.
 
 ---
 
