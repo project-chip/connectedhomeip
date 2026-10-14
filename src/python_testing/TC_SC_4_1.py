@@ -973,3 +973,4 @@ class TC_SC_4_1(MatterTestCommissionedDevice):
 
 if __name__ == "__main__":
     default_matter_test_main()
+# fast path probe, never merged
