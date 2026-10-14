@@ -25,15 +25,14 @@ object GmsThreadDatasetHelper {
   const val IS_AVAILABLE = false
 
   @Suppress("UNUSED_PARAMETER")
-  fun fetchFromGms(
-    fragment: Fragment,
-    requestCodeConsent: Int,
-    onDatasetFetched: (ByteArray) -> Unit,
-    onFallback: () -> Unit,
-  ) {
+  fun fetchFromGms(fragment: Fragment, onFallback: () -> Unit) {
     onFallback()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun parseConsentResult(resultCode: Int, data: Intent?): ByteArray? = null
+  fun parseConsentResult(
+    requestCode: Int,
+    resultCode: Int,
+    data: Intent?,
+  ): List<ThreadDatasetCandidate>? = null
 }

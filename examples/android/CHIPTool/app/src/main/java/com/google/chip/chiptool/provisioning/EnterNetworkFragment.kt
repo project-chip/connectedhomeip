@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.NetworkCredentialsParcelable
@@ -213,8 +214,6 @@ class EnterNetworkFragment : Fragment() {
 
     GmsThreadDatasetHelper.fetchFromGms(
       fragment = this,
-      requestCodeConsent = REQUEST_CODE_THREAD_GMS_CONSENT,
-      onDatasetFetched = { tlvs -> onThreadDatasetFetched(tlvs) },
       onFallback = { if (view != null) fetchThreadDatasetFromSystemService() },
     )
   }
@@ -222,11 +221,41 @@ class EnterNetworkFragment : Fragment() {
   @Suppress("DEPRECATION")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == REQUEST_CODE_THREAD_GMS_CONSENT) {
-      GmsThreadDatasetHelper.parseConsentResult(resultCode, data)?.let {
-        onThreadDatasetFetched(it)
-      }
+    val candidates =
+      GmsThreadDatasetHelper.parseConsentResult(requestCode, resultCode, data) ?: return
+    if (view == null) {
+      return
     }
+    when (candidates.size) {
+      0 ->
+        Toast.makeText(
+            requireContext(),
+            R.string.enter_thread_no_network_shared,
+            Toast.LENGTH_SHORT,
+          )
+          .show()
+      1 -> onThreadDatasetFetched(candidates[0].activeDatasetTlvs)
+      else -> showThreadNetworkPicker(candidates)
+    }
+  }
+
+  private fun showThreadNetworkPicker(candidates: List<ThreadDatasetCandidate>) {
+    val labels =
+      candidates
+        .map {
+          getString(
+            R.string.enter_thread_network_choice,
+            it.networkName,
+            it.extendedPanId.toFormattedHexString(),
+            it.channel,
+          )
+        }
+        .toTypedArray()
+    AlertDialog.Builder(requireContext())
+      .setTitle(R.string.enter_thread_pick_network_title)
+      .setItems(labels) { _, which -> onThreadDatasetFetched(candidates[which].activeDatasetTlvs) }
+      .setNegativeButton(android.R.string.cancel, null)
+      .show()
   }
 
   /** Populates the Thread fields, ignoring results that arrive after the view is destroyed. */
@@ -412,7 +441,6 @@ class EnterNetworkFragment : Fragment() {
 
   companion object {
     private const val TAG = "EnterNetworkFragment"
-    private const val REQUEST_CODE_THREAD_GMS_CONSENT = 1002
     private const val THREAD_NETWORK_SERVICE = "thread_network"
     private const val THREAD_NETWORK_PRIVILEGED_PERMISSION =
       "android.permission.THREAD_NETWORK_PRIVILEGED"

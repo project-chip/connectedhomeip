@@ -19,10 +19,12 @@ package com.google.chip.chiptool.provisioning
 
 import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.threadnetwork.GetAllActiveCredentialsRequest
 import com.google.android.gms.threadnetwork.ThreadNetwork
 import com.google.android.gms.threadnetwork.ThreadNetworkClient
 import com.google.android.gms.threadnetwork.ThreadNetworkCredentials
@@ -30,18 +32,18 @@ import com.google.android.gms.threadnetwork.ThreadNetworkCredentials
 /** GMSCore ThreadNetwork implementation enabled when `matterEnableGms=true`. */
 object GmsThreadDatasetHelper {
   private const val TAG = "GmsThreadDatasetHelper"
+  private const val REQUEST_CODE_ACTIVE_CREDENTIALS = 1002
+  private const val REQUEST_CODE_PREFERRED_CREDENTIALS = 1003
   const val IS_AVAILABLE = true
 
   /**
-   * Fetches the active dataset via GMS ThreadNetwork. Callbacks run on the main thread and may
-   * arrive after [fragment] is detached; callers must tolerate that.
+   * Requests Thread network credentials via GMS ThreadNetwork: all active networks reachable
+   * through nearby border routers, or the preferred network if that is unavailable. The credentials
+   * are delivered through the consent intent result (see [parseConsentResult]); [onFallback] runs
+   * when Play services or the credentials are unavailable. Callbacks run on the main thread and may
+   * arrive after the fragment view is destroyed.
    */
-  fun fetchFromGms(
-    fragment: Fragment,
-    requestCodeConsent: Int,
-    onDatasetFetched: (ByteArray) -> Unit,
-    onFallback: () -> Unit,
-  ) {
+  fun fetchFromGms(fragment: Fragment, onFallback: () -> Unit) {
     try {
       val context = fragment.requireContext()
       // Without Play services, GoogleApiManager keeps the call pending while it offers a
@@ -55,31 +57,20 @@ object GmsThreadDatasetHelper {
         return
       }
       val client = ThreadNetwork.getClient(context)
-      Log.d(TAG, "Attempting GMS ThreadNetwork.getClient().allCredentials")
-      client.allCredentials
-        .addOnSuccessListener { credentialsList ->
-          Log.d(TAG, "GMS getAllCredentials onSuccess: size=${credentialsList?.size}")
-          val tlvs = credentialsList?.firstOrNull()?.activeOperationalDataset
-          if (tlvs != null && tlvs.isNotEmpty()) {
-            Log.d(TAG, "Successfully fetched Thread dataset TLVs from GMS getAllCredentials()")
-            onDatasetFetched(tlvs)
+      client
+        .getAllActiveCredentials(GetAllActiveCredentialsRequest.newBuilder().build())
+        .addOnSuccessListener { result ->
+          if (fragment.view == null) {
             return@addOnSuccessListener
           }
-          Log.w(
-            TAG,
-            "GMS ThreadNetwork returned empty credentials list, " +
-              "attempting getPreferredCredentials consent fallback",
-          )
-          fetchPreferredGmsCredentials(client, fragment, requestCodeConsent, onFallback)
+          if (!launchConsent(fragment, result?.intentSender, REQUEST_CODE_ACTIVE_CREDENTIALS)) {
+            fetchPreferredCredentials(client, fragment, onFallback)
+          }
         }
         .addOnFailureListener { e ->
-          Log.w(
-            TAG,
-            "GMS ThreadNetwork getAllCredentials failed, " +
-              "attempting getPreferredCredentials consent fallback",
-            e,
-          )
-          fetchPreferredGmsCredentials(client, fragment, requestCodeConsent, onFallback)
+          // For example LOCAL_NETWORK_NOT_CONNECTED when the phone is not on Wi-Fi.
+          Log.w(TAG, "GMS getAllActiveCredentials failed, trying getPreferredCredentials", e)
+          fetchPreferredCredentials(client, fragment, onFallback)
         }
     } catch (e: Exception) {
       Log.d(TAG, "GMS ThreadNetwork API failed, falling back to system service", e)
@@ -87,33 +78,23 @@ object GmsThreadDatasetHelper {
     }
   }
 
-  private fun fetchPreferredGmsCredentials(
+  private fun fetchPreferredCredentials(
     client: ThreadNetworkClient,
     fragment: Fragment,
-    requestCodeConsent: Int,
     onFallback: () -> Unit,
   ) {
     try {
       client.preferredCredentials
         .addOnSuccessListener { result ->
-          Log.d(TAG, "GMS getPreferredCredentials onSuccess: $result")
-          if (!fragment.isAdded) {
+          if (fragment.view == null) {
             return@addOnSuccessListener
           }
-          val sender = result?.intentSender
-          if (sender != null) {
-            try {
-              @Suppress("DEPRECATION")
-              fragment.startIntentSenderForResult(sender, requestCodeConsent, null, 0, 0, 0, null)
-              return@addOnSuccessListener
-            } catch (e: Exception) {
-              Log.e(TAG, "Failed to launch GMS Thread consent intent", e)
-            }
+          if (!launchConsent(fragment, result?.intentSender, REQUEST_CODE_PREFERRED_CREDENTIALS)) {
+            onFallback()
           }
-          onFallback()
         }
         .addOnFailureListener { e ->
-          Log.w(TAG, "GMS getPreferredCredentials failed", e)
+          Log.w(TAG, "GMS getPreferredCredentials failed, falling back to system service", e)
           onFallback()
         }
     } catch (e: Exception) {
@@ -122,17 +103,59 @@ object GmsThreadDatasetHelper {
     }
   }
 
-  fun parseConsentResult(resultCode: Int, data: Intent?): ByteArray? {
-    if (resultCode != Activity.RESULT_OK || data == null) {
-      return null
+  /** Launches the GMS consent prompt; returns false if there is nothing to launch or it failed. */
+  private fun launchConsent(fragment: Fragment, sender: IntentSender?, requestCode: Int): Boolean {
+    if (sender == null) {
+      return false
     }
     return try {
-      ThreadNetworkCredentials.fromIntentSenderResultData(data).activeOperationalDataset.takeIf {
-        it.isNotEmpty()
-      }
+      @Suppress("DEPRECATION")
+      fragment.startIntentSenderForResult(sender, requestCode, null, 0, 0, 0, null)
+      true
+    } catch (e: Exception) {
+      Log.e(TAG, "Failed to launch GMS Thread consent intent", e)
+      false
+    }
+  }
+
+  /**
+   * Returns the networks shared through a consent prompt launched by [fetchFromGms], an empty list
+   * if the user declined or nothing usable was shared, or null if [requestCode] is not ours.
+   */
+  fun parseConsentResult(
+    requestCode: Int,
+    resultCode: Int,
+    data: Intent?,
+  ): List<ThreadDatasetCandidate>? {
+    if (
+      requestCode != REQUEST_CODE_ACTIVE_CREDENTIALS &&
+        requestCode != REQUEST_CODE_PREFERRED_CREDENTIALS
+    ) {
+      return null
+    }
+    if (resultCode != Activity.RESULT_OK || data == null) {
+      return emptyList()
+    }
+    return try {
+      val credentials =
+        if (requestCode == REQUEST_CODE_ACTIVE_CREDENTIALS) {
+          ThreadNetworkCredentials.parseListFromIntentSenderResultData(data)
+        } else {
+          listOf(ThreadNetworkCredentials.fromIntentSenderResultData(data))
+        }
+      credentials
+        .filter { it.activeOperationalDataset.isNotEmpty() }
+        .map {
+          ThreadDatasetCandidate(
+            it.networkName,
+            it.extendedPanId,
+            it.channel,
+            it.activeOperationalDataset,
+          )
+        }
     } catch (e: Exception) {
       Log.e(TAG, "Failed to parse ThreadNetworkCredentials from intent result", e)
-      null
+      emptyList()
     }
   }
 }

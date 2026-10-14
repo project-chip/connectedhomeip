@@ -140,7 +140,7 @@ dependencies {
     implementation "androidx.camera:camera-view:${camerax_version}"
 
     if (enableGms) {
-        implementation 'com.google.android.gms:play-services-threadnetwork:16.0.0'
+        implementation 'com.google.android.gms:play-services-threadnetwork:16.2.1'
     }
     implementation 'com.google.protobuf:protobuf-java:3.22.0'
 }
