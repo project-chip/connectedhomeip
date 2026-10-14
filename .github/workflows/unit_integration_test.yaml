@@ -44,9 +44,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            # dorny/paths-filter runs git on push, before bootstrap has marked the workspace as safe.
-            - name: Mark workspace as a safe git directory
-              run: git config --global --add safe.directory "$(pwd)"
             # Runs before bootstrap so runs that do not match the filter skip the whole job body.
             - name: Detect changed paths
               uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
