@@ -9,8 +9,7 @@ workflow change alters that list, run it with `--update` and update the tables
 below in the same PR. The `code-lints` job in `lint.yml` runs it with `--check`.
 
 Release branches (`v*-branch`) run their own copy of each workflow. On push they
-behave like a master push, except that Crypto Backend Unit Tests always run;
-scheduled (nightly) workflows do not run on them.
+behave like a master push; scheduled (nightly) workflows do not run on them.
 
 ## Linux and macOS host
 
