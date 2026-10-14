@@ -16,6 +16,9 @@
  */
 #pragma once
 
+#include <app/clusters/flow-measurement-server/FlowMeasurementCluster.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <device/types/irrigation-system/IrrigationSystem.h>
 #include <device/types/water-valve/WaterValve.h>
 
@@ -46,7 +49,8 @@ public:
 
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                 public IrrigationSystem,
-                                public WaterValve::WaterValveListener
+                                public WaterValve::Listener,
+                                public Clusters::IdentifyDelegate
 {
 public:
     struct PausedZone
@@ -55,11 +59,8 @@ public:
         DataModel::Nullable<uint32_t> remainingDuration;
     };
 
-    LoggingIrrigationSystem(Clusters::IdentifyDelegate & identifyDelegate, TimerDelegate & timerDelegate,
-                            std::vector<IrrigationSystem::ValveList> valves, bool hasMasterValve,
-                            const IrrigationSystem::Config & config) :
-        IrrigationSystem(timerDelegate, identifyDelegate, *this, config),
-        mValveContext(std::move(valves))
+    LoggingIrrigationSystem(TimerDelegate & timerDelegate, std::vector<IrrigationSystem::ValveList> valves, bool hasMasterValve) :
+        IrrigationSystem(timerDelegate), mValveContext(std::move(valves))
     {
         if (hasMasterValve)
         {
@@ -90,6 +91,31 @@ public:
 
     void OnValveClosed() override;
 
+    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
+
+    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override;
+
+    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
+
+    bool IsTriggerEffectEnabled() const override { return true; }
+
+    bool HasOperationalState() const { return mOperationalStateCluster.IsConstructed(); }
+
+    Clusters::IdentifyCluster & IdentifyCluster()
+    {
+        VerifyOrDie(mIdentifyCluster.IsConstructed());
+        return mIdentifyCluster.Cluster();
+    }
+    Clusters::OperationalState::OperationalStateCluster & OperationalStateCluster()
+    {
+        VerifyOrDie(mOperationalStateCluster.IsConstructed());
+        return mOperationalStateCluster.Cluster();
+    }
+
+protected:
+    CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider) override;
+    void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
+
 private:
     CHIP_ERROR RegisterParts(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                              EndpointComposition composition) override;
@@ -98,6 +124,9 @@ private:
     std::vector<IrrigationSystem::ValveList> mValveContext;
     std::vector<std::unique_ptr<WaterValve>> mWaterValves;
     std::optional<LoggingMasterValve> mMasterValve; // empty when the system has no master valve
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
+    LazyRegisteredServerCluster<Clusters::FlowMeasurementCluster> mFlowMeasurementCluster;
 };
 
 } // namespace app

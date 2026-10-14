@@ -58,15 +58,12 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
         // Save before closing: closing clears the valve's open level and remaining duration.
-        auto openLevel = mWaterValves[i]->OpenLevel();
-        if (!openLevel.has_value())
+        if (!mWaterValves[i]->IsOpen())
         {
             continue;
         }
         // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
-        auto remaining = mWaterValves[i]->RemainingDuration();
-        mPausedZones[i] =
-            PausedZone{ *openLevel, remaining.has_value() ? DataModel::MakeNullable(*remaining) : DataModel::NullNullable };
+        mPausedZones[i] = PausedZone{ mWaterValves[i]->OpenLevel().ValueOr(100), mWaterValves[i]->RemainingDuration() };
         if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
         {
             mPausedZones[i].reset();
@@ -104,6 +101,54 @@ void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError 
     if (error != CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void LoggingIrrigationSystem::OnIdentifyStart(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::OnIdentifyStart()");
+}
+
+void LoggingIrrigationSystem::OnIdentifyStop(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::OnIdentifyStop()");
+}
+
+void LoggingIrrigationSystem::OnTriggerEffect(Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::OnTriggerEffect()");
+}
+
+CHIP_ERROR LoggingIrrigationSystem::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(this));
+    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+
+    mOperationalStateCluster.Create(endpoint, *this);
+    ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
+
+    mFlowMeasurementCluster.Create(endpoint);
+    ReturnErrorOnFailure(provider.AddCluster(mFlowMeasurementCluster.Registration()));
+
+    return CHIP_NO_ERROR;
+}
+
+void LoggingIrrigationSystem::UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mIdentifyCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+        mIdentifyCluster.Destroy();
+    }
+    if (mFlowMeasurementCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mFlowMeasurementCluster.Cluster()));
+        mFlowMeasurementCluster.Destroy();
+    }
+    if (mOperationalStateCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalStateCluster.Cluster()));
+        mOperationalStateCluster.Destroy();
     }
 }
 
