@@ -29,6 +29,7 @@ from pathlib import Path
 from types import MethodType, SimpleNamespace
 
 import matter.clusters as Clusters
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import UnknownProblemLocation
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 from matter.tlv import TLVReader
@@ -156,6 +157,60 @@ class TestRecordAcceptedViolation(unittest.TestCase):
 
     def test_dut_without_spec_version_records_warning(self):
         self.assertEqual(self._severities_recorded(None), ['warning'])
+
+
+class TestFeatureGatedCommandFields(unittest.TestCase):
+    """A field the DUT ignores for lack of a feature accepts any value, so it must not be probed."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+
+    def _discovered(self, cluster, feature_map: int, commands: list) -> set[tuple[str, str]]:
+        """Run the real discovery against a one-cluster stand-in composition."""
+        test = SimpleNamespace(
+            endpoints_tlv={1: {cluster.id: {
+                GlobalAttributeIds.FEATURE_MAP_ID: feature_map,
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [command.command_id for command in commands],
+            }}},
+            xml_clusters=self.xml_clusters,
+            _command_field_enum_type=IDMBaseTest._command_field_enum_type,
+        )
+        return {(info.command_name, info.field.name) for info in IDMBaseTest.discover_constrained_command_fields(test)}
+
+    def test_field_whose_conformance_names_the_feature(self):
+        # Step.Speed is [SP] in the data model, so conformance evaluation alone decides it.
+        feature = Clusters.ClosureDimension.Bitmaps.Feature
+        commands = [Clusters.ClosureDimension.Commands.Step]
+        without_speed = self._discovered(Clusters.ClosureDimension, feature.kPositioning, commands)
+        self.assertIn(('Step', 'NumberOfSteps'), without_speed)
+        self.assertNotIn(('Step', 'Speed'), without_speed)
+        self.assertIn(('Step', 'Speed'),
+                      self._discovered(Clusters.ClosureDimension, feature.kPositioning | feature.kSpeed, commands))
+
+    def test_closure_dimension_fields_gated_by_spec_text(self):
+        # SetTarget/GroupedSetTarget/GroupedStep Speed are plain optional in the data model.
+        feature = Clusters.ClosureDimension.Bitmaps.Feature
+        commands = [Clusters.ClosureDimension.Commands.SetTarget, Clusters.ClosureDimension.Commands.GroupedSetTarget,
+                    Clusters.ClosureDimension.Commands.GroupedStep]
+        speed_fields = {('SetTarget', 'Speed'), ('GroupedSetTarget', 'Speed'), ('GroupedStep', 'Speed')}
+        without_speed = self._discovered(Clusters.ClosureDimension, feature.kPositioning, commands)
+        self.assertFalse(speed_fields & without_speed)
+        self.assertIn(('GroupedStep', 'NumberOfSteps'), without_speed)
+        self.assertLessEqual(speed_fields,
+                             self._discovered(Clusters.ClosureDimension, feature.kPositioning | feature.kSpeed, commands))
+
+    def test_closure_control_fields_gated_by_spec_text(self):
+        feature = Clusters.ClosureControl.Bitmaps.Feature
+        commands = [Clusters.ClosureControl.Commands.MoveTo, Clusters.ClosureControl.Commands.GroupedMoveTo]
+        gated_fields = {('MoveTo', 'Position'), ('MoveTo', 'Speed'), ('GroupedMoveTo', 'Position'), ('GroupedMoveTo', 'Speed')}
+        self.assertFalse(gated_fields & self._discovered(Clusters.ClosureControl, feature.kMotionLatching, commands))
+        self.assertEqual(gated_fields, self._discovered(
+            Clusters.ClosureControl, feature.kPositioning | feature.kMotionLatching | feature.kSpeed, commands))
+
+    def test_ungated_field_is_kept(self):
+        commands = [Clusters.MicrowaveOvenControl.Commands.AddMoreTime]
+        self.assertIn(('AddMoreTime', 'TimeToAdd'), self._discovered(Clusters.MicrowaveOvenControl, 0, commands))
 
 
 if __name__ == "__main__":

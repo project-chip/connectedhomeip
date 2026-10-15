@@ -39,7 +39,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.conformance import is_disallowed, is_obsolete
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, is_disallowed, is_obsolete
 from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
@@ -288,6 +288,60 @@ _NUMERIC_TYPE_RANGES: dict[str, tuple[int, int]] = {
     'posix-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
     'temperature': (-27315, 0x7FFF),
 }
+
+# Command fields whose processing the cluster spec ties to a feature that the field's
+# conformance does not name, as {(cluster_id, command_id): {field_id: feature}}. A server
+# without the feature must treat the field as absent, so a conformant DUT accepts any
+# value in it, and the field is probed only where the cluster's FeatureMap has the
+# feature. Fields whose conformance names the feature itself (e.g. ClosureDimension
+# Step.Speed, [SP]) are excluded by conformance evaluation and need no entry here.
+FEATURE_GATED_COMMAND_FIELDS: dict[tuple[int, int], dict[int, int]] = {
+    # Per MoveTo's Effect on Receipt, a field whose feature is not supported SHALL be
+    # treated as absent, ignored and have no effect. GroupedMoveTo is processed identically.
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/f9465a8d28db0e3582ca2a235fa43b645f816fdc/src/app_clusters/ClosureControl.adoc
+    (Clusters.ClosureControl.id, Clusters.ClosureControl.Commands.MoveTo.command_id): {
+        0: Clusters.ClosureControl.Bitmaps.Feature.kPositioning,  # Position
+        1: Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching,  # Latch
+        2: Clusters.ClosureControl.Bitmaps.Feature.kSpeed,  # Speed
+    },
+    (Clusters.ClosureControl.id, Clusters.ClosureControl.Commands.GroupedMoveTo.command_id): {
+        0: Clusters.ClosureControl.Bitmaps.Feature.kPositioning,  # Position
+        1: Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching,  # Latch
+        2: Clusters.ClosureControl.Bitmaps.Feature.kSpeed,  # Speed
+    },
+    # Same rule in SetTarget's Effect on Receipt; GroupedSetTarget is processed
+    # identically. GroupedStep is processed identically to Step, whose Speed is [SP].
+    # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/f9465a8d28db0e3582ca2a235fa43b645f816fdc/src/app_clusters/ClosureDimension.adoc
+    (Clusters.ClosureDimension.id, Clusters.ClosureDimension.Commands.SetTarget.command_id): {
+        0: Clusters.ClosureDimension.Bitmaps.Feature.kPositioning,  # Position
+        1: Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching,  # Latch
+        2: Clusters.ClosureDimension.Bitmaps.Feature.kSpeed,  # Speed
+    },
+    (Clusters.ClosureDimension.id, Clusters.ClosureDimension.Commands.GroupedSetTarget.command_id): {
+        0: Clusters.ClosureDimension.Bitmaps.Feature.kPositioning,  # Position
+        1: Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching,  # Latch
+        2: Clusters.ClosureDimension.Bitmaps.Feature.kSpeed,  # Speed
+    },
+    (Clusters.ClosureDimension.id, Clusters.ClosureDimension.Commands.GroupedStep.command_id): {
+        2: Clusters.ClosureDimension.Bitmaps.Feature.kSpeed,  # Speed
+    },
+}
+
+
+def command_field_applies(cluster_id: int, command_id: int, field: XmlDataTypeComponent,
+                          conformance_data: ConformanceAssessmentData) -> bool:
+    """Whether the DUT processes this command field, given the cluster's features.
+
+    A field the DUT's cluster does not implement is ignored rather than validated, so a
+    violating value in it is accepted by a conformant DUT and must not be probed. That is
+    the case when the field's conformance is not met (e.g. [SP] without the SP feature),
+    and for the fields FEATURE_GATED_COMMAND_FIELDS ties to a feature the DUT lacks.
+    """
+    decision = field.conformance(conformance_data).decision
+    if decision in (ConformanceDecision.NOT_APPLICABLE, ConformanceDecision.DISALLOWED):
+        return False
+    required_feature = FEATURE_GATED_COMMAND_FIELDS.get((cluster_id, command_id), {}).get(field.value)
+    return required_feature is None or bool(conformance_data.feature_map & required_feature)
 
 
 def _encodable_numeric_range(datatype: str, is_nullable: bool) -> tuple[int, int] | None:
@@ -1176,7 +1230,8 @@ class IDMBaseTest(BasicCompositionTests):
         cluster's AcceptedCommandList with the spec-parsed command definitions
         and the generated Python command classes, and returns one entry per
         constrained field. Clusters/commands on the constraint-fuzzing deny
-        lists are excluded.
+        lists are excluded, as are fields the cluster does not process given its
+        features (see command_field_applies).
 
         An enum-typed field counts as constrained even when it declares no
         <constraint> element: an enum bounds its field through the values its
@@ -1196,6 +1251,11 @@ class IDMBaseTest(BasicCompositionTests):
 
                 xml_cluster = self.xml_clusters[cluster_id]
                 accepted_command_ids = cluster_data.get(GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, [])
+                conformance_data = ConformanceAssessmentData(
+                    feature_map=cluster_data.get(GlobalAttributeIds.FEATURE_MAP_ID, 0),
+                    attribute_list=cluster_data.get(GlobalAttributeIds.ATTRIBUTE_LIST_ID, []),
+                    all_command_list=accepted_command_ids + cluster_data.get(GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, []),
+                    cluster_revision=cluster_data.get(GlobalAttributeIds.CLUSTER_REVISION_ID, 0))
                 for command_id in accepted_command_ids:
                     if not is_standard_command_id(command_id):
                         continue
@@ -1220,6 +1280,10 @@ class IDMBaseTest(BasicCompositionTests):
                     for field in xml_command.fields.values():
                         has_constraints = field.constraints is not None and field.constraints.has_constraints()
                         if not has_constraints and field.value not in enum_values_by_field:
+                            continue
+                        if not command_field_applies(cluster_id, command_id, field, conformance_data):
+                            log.info("Skipping %s.%s.%s on EP%s: not processed with the cluster's features",
+                                     xml_cluster.name, xml_command.name, field.name, endpoint_id)
                             continue
                         infos.append(CommandFieldInfo(
                             endpoint_id=endpoint_id,
