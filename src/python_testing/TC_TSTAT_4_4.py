@@ -156,8 +156,7 @@ class TC_TSTAT_4_4(MatterTestCommissionedDevice, ThermostatBaseTest):
     def steps_TC_TSTAT_4_4(self) -> list[TestStep]:
         """Returns the list of test steps for TC-TSTAT-4.4."""
         return [
-            TestStep("1", "Commission DUT to TH",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2a", "TH reads the FeatureMap attribute.",
                      "Verify that the SENSORS bit (bit 11) is set in the FeatureMap value."),
             TestStep("2b", "TH reads the Sensors attribute.",

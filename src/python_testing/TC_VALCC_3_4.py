@@ -55,7 +55,7 @@ class TC_VALCC_3_4(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_3_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read AttributeList attribute"),
             TestStep(3, "Verify LevelStep is supported"),
             TestStep(4, "Read LevelStep attribute"),

@@ -89,7 +89,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
     def steps_TC_PROXR_2_3(self) -> list[TestStep]:
         resp = "Verify both DUT_I and DUT_R respond with a StartRangingResponse whose SessionID is a non-zero uint8; save both."
         return [
-            TestStep(1, "Commission DUT_I and DUT_R to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT_I and DUT_R to TH"),
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct and save the elements."),
             TestStep(3, "TH reads WiFiDevIK from DUT_I and DUT_R", "Verify octstr values and save both."),
