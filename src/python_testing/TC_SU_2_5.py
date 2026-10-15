@@ -296,6 +296,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Step #1.0 - OTA Download in progress waiting for kDelayedOnApply', step_number_s1)
         # Create a liveness matcher to wait for the kDelayedOnApply
         progress_liveness_last_progress = [None]
+
         def progress_liveness(report):
             if report.attribute != Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
                 return False
@@ -456,7 +457,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         subscription_attr_cluster.await_all_expected_report_matches(
             [matcher_combined_obj],
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
-        
+
         logger.info("%s Waiting for the DelayedApplyAction interval of %s seconds.", step_number_s2, delayed_apply_action_time)
 
         # Wait for the device to reach kDelayedOnApply (configured value: 60 seconds; specification value: 120 seconds).
