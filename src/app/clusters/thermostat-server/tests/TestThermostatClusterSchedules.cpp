@@ -766,7 +766,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsHeatingSetpoi
 
     // mHeatingDelegate's AbsMinHeatSetpointLimit defaults to 700 (7.00C); 100 is below that.
     ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
-    transition.heatingSetpoint                   = MakeOptional<int16_t>(100);
+    transition.heatingSetpoint                   = MakeOptional(static_cast<int16_t>(100));
     ScheduleTransitionStruct::Type transitions[] = { transition };
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
@@ -787,7 +787,7 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleAcceptsHeatingSetpoi
     ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
 
     ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
-    transition.heatingSetpoint                   = MakeOptional<int16_t>(2000);
+    transition.heatingSetpoint                   = MakeOptional(static_cast<int16_t>(2000));
     ScheduleTransitionStruct::Type transitions[] = { transition };
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
