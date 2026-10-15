@@ -31,9 +31,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
@@ -52,11 +50,9 @@ DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0 /* endpoint */,
                                                                          &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(
-    0 /* endpoint */);
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /* endpoint */);
 #endif
 
 } // namespace
@@ -85,9 +81,7 @@ CHIP_ERROR AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(sWiFiCommissioningInstance.Init());
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
     ReturnErrorOnFailure(sThreadNetworkDriver.Init());
@@ -115,7 +109,8 @@ CHIP_ERROR AppTask::Init()
     ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 
     // The rendezvous flag must match the radios actually compiled in.
-    // TODO: advertise Wi-Fi PAF once that transport is supported by this example.
+    // TODO: advertise Wi-Fi PAF and commissioning over Thread once those transports
+    // are supported by this example.
     ConfigurationMgr().LogDeviceConfig();
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
