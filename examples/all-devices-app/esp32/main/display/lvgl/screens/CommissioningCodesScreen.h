@@ -29,6 +29,10 @@
  */
 void ShowCommissioningCodes(lv_obj_t * parent, const char * qrCodePayload, const char * manualPairingCode);
 
+/// Shown instead of the codes once the node has a fabric: without the Basic Commissioning
+/// Method, a later commissioning window carries a passcode of its own.
+void ShowCommissionedNotice(lv_obj_t * parent, uint8_t fabricCount);
+
 /**
  * Convenience entry point matching RenderScreenFn: queries setup codes and
  * calls ShowCommissioningCodes().

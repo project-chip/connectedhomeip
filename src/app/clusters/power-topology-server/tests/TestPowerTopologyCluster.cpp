@@ -1063,6 +1063,259 @@ TEST_F(TestPowerTopologyCluster, SuccessfulChunkedListWriteKeepsTheNewNodes)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Removing a fabric while a list write for it is in progress drops that write's rollback snapshot,
+// so a failure notification arriving afterwards cannot restore the removed fabric's entries.
+TEST_F(TestPowerTopologyCluster, FabricRemovalDuringListWriteDropsItsSnapshot)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = kTestFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = static_cast<FabricIndex>(kTestFabricIndex + 1);
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage12;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage12,
+    });
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    Structs::CircuitNodeStruct::Type f1[] = { MakeCircuitNode(0x1001, NullOptional, NullOptional),
+                                              MakeCircuitNode(0x1002, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f1),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type f2[] = { MakeCircuitNode(0x2001, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric2);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f2),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type replacement[] = { MakeCircuitNode(0x1003, NullOptional, NullOptional) };
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, fabric1);
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(replacement),
+                                    ListWritingPattern::ClearAllThenAppendItems),
+              IMStatus::Success);
+
+    ASSERT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(circuitStorage12.CountForFabric(fabric1), 0u);
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteFailure, fabric1);
+
+    EXPECT_EQ(circuitStorage12.CountForFabric(fabric1), 0u);
+    ASSERT_EQ(circuitStorage12.Count(), 1u);
+    CircuitNodeStorage::Node remaining;
+    ASSERT_EQ(circuitStorage12.GetNodeAtIndex(0, remaining), CHIP_NO_ERROR);
+    EXPECT_EQ(remaining.fabricIndex, fabric2);
+    EXPECT_EQ(remaining.node, static_cast<NodeId>(0x2001));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A fabric removed while its list write has emptied its entries has nothing left to purge, but the
+// snapshot of its previous entries must still be dropped.
+TEST_F(TestPowerTopologyCluster, FabricRemovalWithEmptiedEntriesDropsItsSnapshot)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = kTestFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = static_cast<FabricIndex>(kTestFabricIndex + 1);
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage14;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage14,
+    });
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    Structs::CircuitNodeStruct::Type f1[] = { MakeCircuitNode(0x1001, NullOptional, NullOptional),
+                                              MakeCircuitNode(0x1002, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f1),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type f2[] = { MakeCircuitNode(0x2001, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric2);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f2),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    // The write has cleared fabric1's entries and not yet added any.
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, fabric1);
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+    EXPECT_EQ(circuitStorage14.CountForFabric(fabric1), 0u);
+
+    ASSERT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteFailure, fabric1);
+
+    EXPECT_EQ(circuitStorage14.CountForFabric(fabric1), 0u);
+    ASSERT_EQ(circuitStorage14.Count(), 1u);
+    CircuitNodeStorage::Node remaining;
+    ASSERT_EQ(circuitStorage14.GetNodeAtIndex(0, remaining), CHIP_NO_ERROR);
+    EXPECT_EQ(remaining.fabricIndex, fabric2);
+    EXPECT_EQ(remaining.node, static_cast<NodeId>(0x2001));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// A fabric removed while the cluster is shut down cannot release the snapshot through
+// OnFabricRemoved, so Shutdown drops it.
+TEST_F(TestPowerTopologyCluster, ShutdownDuringListWriteDropsItsSnapshot)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = kTestFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = static_cast<FabricIndex>(kTestFabricIndex + 1);
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage15;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage15,
+    });
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    Structs::CircuitNodeStruct::Type f1[] = { MakeCircuitNode(0x1001, NullOptional, NullOptional),
+                                              MakeCircuitNode(0x1002, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f1),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type f2[] = { MakeCircuitNode(0x2001, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric2);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f2),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    // The write has cleared fabric1's entries and not yet added any.
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, fabric1);
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+    EXPECT_EQ(circuitStorage15.CountForFabric(fabric1), 0u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteFailure, fabric1);
+
+    EXPECT_EQ(circuitStorage15.CountForFabric(fabric1), 0u);
+    ASSERT_EQ(circuitStorage15.Count(), 1u);
+    CircuitNodeStorage::Node remaining;
+    ASSERT_EQ(circuitStorage15.GetNodeAtIndex(0, remaining), CHIP_NO_ERROR);
+    EXPECT_EQ(remaining.fabricIndex, fabric2);
+    EXPECT_EQ(remaining.node, static_cast<NodeId>(0x2001));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Removing one fabric leaves another fabric's in-progress list write able to roll back.
+TEST_F(TestPowerTopologyCluster, FabricRemovalKeepsAnotherFabricsListWriteSnapshot)
+{
+    chip::Testing::TestServerClusterContext context;
+    chip::Testing::FabricTestFixture fabricHelper{ &context.StorageDelegate() };
+
+    FabricIndex fabric1 = kTestFabricIndex;
+    ASSERT_EQ(fabricHelper.SetUpTestFabric(fabric1), CHIP_NO_ERROR);
+    FabricIndex fabric2 = static_cast<FabricIndex>(kTestFabricIndex + 1);
+    ASSERT_EQ(fabricHelper.AddAdditionalTestFabric(fabric2), CHIP_NO_ERROR);
+
+    BitMask<Feature> features(Feature::kElectricalCircuit);
+    FixedCircuitNodeStorage circuitStorage13;
+    MockPowerTopologyDelegate dummyDelegate;
+
+    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .delegate           = dummyDelegate,
+        .features           = features,
+        .fabricTable        = &fabricHelper.GetFabricTable(),
+        .circuitNodeStorage = &circuitStorage13,
+    });
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    const ConcreteAttributePath listPath(kTestEndpointId, PowerTopology::Id, ElectricalCircuitNodes::Id);
+
+    Structs::CircuitNodeStruct::Type f1[] = { MakeCircuitNode(0x1001, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric1);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f1),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    Structs::CircuitNodeStruct::Type f2[] = { MakeCircuitNode(0x2001, NullOptional, NullOptional) };
+    tester.SetFabricIndex(fabric2);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(f2),
+                                    ListWritingPattern::ReplaceAll),
+              IMStatus::Success);
+
+    std::string tooLong(PowerTopologyCluster::kMaxNodeLabelLength + 1, 'x');
+    Structs::CircuitNodeStruct::Type rejected[] = {
+        MakeCircuitNode(0x2002, NullOptional, MakeOptional(CharSpan(tooLong.data(), tooLong.size()))),
+    };
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteBegin, fabric2);
+    EXPECT_EQ(tester.WriteAttribute(ElectricalCircuitNodes::Id, DataModel::List<Structs::CircuitNodeStruct::Type>(rejected),
+                                    ListWritingPattern::ClearAllThenAppendItems),
+              IMStatus::ConstraintError);
+
+    ASSERT_EQ(fabricHelper.GetFabricTable().Delete(fabric1), CHIP_NO_ERROR);
+
+    cluster.ListAttributeWriteNotification(listPath, DataModel::ListWriteOperation::kListWriteFailure, fabric2);
+
+    EXPECT_EQ(circuitStorage13.CountForFabric(fabric1), 0u);
+    ASSERT_EQ(circuitStorage13.Count(), 1u);
+    CircuitNodeStorage::Node remaining;
+    ASSERT_EQ(circuitStorage13.GetNodeAtIndex(0, remaining), CHIP_NO_ERROR);
+    EXPECT_EQ(remaining.fabricIndex, fabric2);
+    EXPECT_EQ(remaining.node, static_cast<NodeId>(0x2001));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // DefaultCircuitNodeStorage owns the persistence that used to live in the cluster, so it needs its
 // own round-trip coverage: the cluster-level tests above deliberately use a non-persisting storage.
 TEST_F(TestPowerTopologyCluster, DefaultCircuitNodeStoragePersistsAcrossInstances)
