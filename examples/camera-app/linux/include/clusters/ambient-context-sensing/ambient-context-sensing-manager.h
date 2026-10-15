@@ -48,9 +48,9 @@ private:
     static constexpr uint8_t kMaxPredictedActivity           = 5;
     static constexpr uint8_t kMaxSensorFusionSupported       = 20;
 
-    SemanticTagType mAmbientContextTypeSupportedBuf[kMaxAmbientContextTypeSupported];
-    PredictActivity mPredictedActivityBuf[kMaxPredictedActivity];
-    SemanticTagType mSensorFusionSupportedBuf[kMaxSensorFusionSupported];
+    SemanticTagType mAmbientContextTypeSupportedBuf[kMaxAmbientContextTypeSupported]{};
+    PredictActivity mPredictedActivityBuf[kMaxPredictedActivity]{};
+    SemanticTagType mSensorFusionSupportedBuf[kMaxSensorFusionSupported]{};
 
     // From spec, the constraint on AmbientContextType is 1 to SimultaneousDetectionLimit.
     std::unique_ptr<AmbientContextSensed> mAmbientContextTypeList[kMaxSimultaneousDetectionLimit];

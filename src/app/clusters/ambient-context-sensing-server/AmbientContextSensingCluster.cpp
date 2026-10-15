@@ -104,6 +104,16 @@ void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
     mAmbientContextTypeListSize = 0;
     mSensorFusionSupportedList  = {};
     mHoldTimeDelegate.CancelTimer(this);
+
+    // Reset detection-derived state so a subsequent Startup() does not observe
+    // stale attribute values from this run.
+    mObjectCount                 = 0;
+    mPredictedActivityList       = {};
+    mHumanActivityDetected       = false;
+    mObjectIdentified            = false;
+    mAudioContextDetected        = false;
+    mObjectCountThresholdReached = false;
+
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
