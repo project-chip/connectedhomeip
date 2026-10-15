@@ -54,10 +54,6 @@ ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
         {
             return sessionHandle->AsSecureSession()->GetPeer();
         }
-        if (sessionHandle->IsGroupSession())
-        {
-            return sessionHandle->AsIncomingGroupSession()->GetPeer();
-        }
         return ScopedNodeId();
     }
 
@@ -176,6 +172,10 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, AtomicAttrib
         return false;
     }
     if (mAttributeIds.AllocatedSize() == 0 || mAttributeIds.AllocatedSize() != attributeStatuses.AllocatedSize())
+    {
+        return false;
+    }
+    if (mNodeId != GetSourceScopedNodeId(commandObj))
     {
         return false;
     }
@@ -300,7 +300,15 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         case Presets::Id:
         case Schedules::Id:
         case SensorSchedule::Id:
-            statusCode = InAtomicWrite(std::make_optional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
+            if (InAtomicWrite(std::make_optional(attributeStatus.attributeID)))
+            {
+                statusCode = Status::Busy;
+            }
+            else if (mState == State::Open)
+            {
+                // Only one Atomic Write State is supported, and it belongs to another client.
+                statusCode = Status::ResourceExhausted;
+            }
             break;
         default:
             statusCode = Status::InvalidCommand;
@@ -384,7 +392,7 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
     if (!InAtomicWrite(commandObj, attributeStatuses))
     {
-        // There's no open atomic write
+        // This client has no open atomic write for these attributes
         return Status::InvalidInState;
     }
 
@@ -491,6 +499,11 @@ std::optional<DataModel::ActionReturnStatus> AtomicWriteSession::InvokeCommand(c
     {
     case Commands::AtomicRequest::Id: {
         handled = true;
+        // Only a CASE session provides both an accessing fabric and a valid Atomic Writer ID.
+        if (handler->GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+        {
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
         Commands::AtomicRequest::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
 

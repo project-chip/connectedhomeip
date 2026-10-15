@@ -504,6 +504,39 @@ static const NSTimeInterval kShortMonitorWaitElapsedSeconds = 0.5;
     return advertiser;
 }
 
+typedef void (^TestBrowseHandler)(DNSServiceFlags flags, uint32_t interfaceIndex, const char * name);
+
+static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char * name, const char * regtype, const char * domain, void * context)
+{
+    if (errorCode == kDNSServiceErr_NoError) {
+        ((__bridge TestBrowseHandler) context)(flags, interfaceIndex, name);
+    }
+}
+
+- (void)stopAdvertisingInstance:(NSString *)instanceName advertiser:(DNSServiceRef)advertiser
+{
+    NSMutableSet<NSNumber *> * interfaces = [NSMutableSet set];
+    __block BOOL moreComing = YES;
+    TestBrowseHandler handler = ^(DNSServiceFlags flags, uint32_t interfaceIndex, const char * name) {
+        moreComing = (flags & kDNSServiceFlagsMoreComing) != 0;
+        if (![instanceName isEqualToString:@(name)]) {
+            return;
+        }
+        if (flags & kDNSServiceFlagsAdd) {
+            [interfaces addObject:@(interfaceIndex)];
+        } else {
+            [interfaces removeObject:@(interfaceIndex)];
+        }
+    };
+    DNSServiceRef browser = NULL;
+    XCTAssertEqual(DNSServiceBrowse(&browser, 0, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, TestBrowseCallback, (__bridge void *) handler), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceSetDispatchQueue(browser, dispatch_get_main_queue()), kDNSServiceErr_NoError);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (!moreComing && interfaces.count > 0); } timeout:kPromptSeconds description:[instanceName stringByAppendingString:@" browsable"]]);
+    DNSServiceRefDeallocate(advertiser);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (!moreComing && interfaces.count == 0); } timeout:kPromptSeconds description:[instanceName stringByAppendingString:@" removed"]]);
+    DNSServiceRefDeallocate(browser);
+}
+
 - (MTRDeviceConnectivityMonitor *)startedMonitorForInstance:(NSString *)instanceName reports:(NSMutableArray *)reports
 {
     NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
@@ -863,7 +896,7 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
                                                                                    readCompleted = YES;
                                                                                }];
     XCTAssertTrue([self waitUntil:^{ return readCompleted; } timeout:kCASEEstablishmentSeconds description:@"CASE session to the peer established"]);
-    DNSServiceRefDeallocate(peerAdvertiser);
+    [self stopAdvertisingInstance:peerInstanceName advertiser:peerAdvertiser];
     return controller;
 }
 #endif
@@ -967,40 +1000,33 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     [controller unitTestSetConnectivityMonitorWaitSeconds:kShortMonitorWaitSeconds];
     [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
 
-    // The timeout is queued behind this hold, and the check right behind the timeout.
-    dispatch_semaphore_t holding = dispatch_semaphore_create(0);
-    dispatch_semaphore_t releaseHold = dispatch_semaphore_create(0);
+    // The request starts in this Matter queue turn, so its timeout queues behind it and the check behind the timeout.
     dispatch_queue_t resultQueue = dispatch_queue_create("session-result", DISPATCH_QUEUE_SERIAL);
-    __block BOOL sessionDelivered = NO;
-    __block BOOL checked = NO;
+    __block atomic_bool sessionDelivered = false;
+    __block atomic_bool checked = false;
     __block BOOL deliveredByTimeoutTurn = NO;
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-        [controller syncRunOnWorkQueue:^{
-            dispatch_semaphore_signal(holding);
-            dispatch_semaphore_wait(releaseHold, DISPATCH_TIME_FOREVER);
-            [controller asyncDispatchToMatterQueue:^{
-                dispatch_sync(resultQueue, ^{
-                    deliveredByTimeoutTurn = sessionDelivered;
-                });
-                checked = YES;
-            } errorHandler:nil];
-        } error:nil];
-    });
-    XCTAssertEqual(dispatch_semaphore_wait(holding, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0);
-
+    __block NSUInteger monitorCountDuringRequest = 0;
     NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
     MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
-    [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:resultQueue completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
-        XCTAssertNil(error);
-        sessionDelivered = YES;
-    }];
-    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"session request waits on its connectivity monitor");
-    [NSThread sleepForTimeInterval:kShortMonitorWaitElapsedSeconds];
-    dispatch_semaphore_signal(releaseHold);
+    [controller asyncDispatchToMatterQueue:^{
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:resultQueue completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            atomic_store(&sessionDelivered, true);
+        }];
+        monitorCountDuringRequest = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+        [NSThread sleepForTimeInterval:kShortMonitorWaitElapsedSeconds];
+        [controller asyncDispatchToMatterQueue:^{
+            dispatch_sync(resultQueue, ^{
+                deliveredByTimeoutTurn = atomic_load(&sessionDelivered);
+            });
+            atomic_store(&checked, true);
+        } errorHandler:nil];
+    } errorHandler:nil];
 
-    XCTAssertTrue([self waitUntil:^{ return checked; } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&checked); } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
+    XCTAssertEqual(monitorCountDuringRequest, countBefore + 1, @"session request waits on its connectivity monitor");
     XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
-    XCTAssertTrue([self waitUntil:^{ return sessionDelivered; } timeout:kPromptSeconds description:@"session delivered"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&sessionDelivered); } timeout:kPromptSeconds description:@"session delivered"]);
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
