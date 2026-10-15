@@ -31,19 +31,11 @@ struct WaterValveConfig
     Clusters::ValveConfigurationAndControlCluster::StartupConfiguration startup{ DataModel::NullNullable };
     Clusters::ValveConfigurationAndControl::TimeSyncTracker * tsTracker = nullptr;
 };
-
-class WaterValve : public SingleEndpoint, public Clusters::ValveConfigurationAndControl::Delegate
+class WaterValve : public SingleEndpoint
 {
 public:
-    class Listener
-    {
-    public:
-        virtual ~Listener()          = default;
-        virtual void OnValveOpened() = 0;
-        virtual void OnValveClosed() = 0;
-    };
-
-    explicit WaterValve(TimerDelegate & timerDelegate, const WaterValveConfig & config = {}, Listener * listener = nullptr);
+    explicit WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurationAndControl::Delegate & delegate,
+                        const WaterValveConfig & config = {});
 
     ~WaterValve() override = default;
 
@@ -76,13 +68,9 @@ public:
     }
 
 protected:
-    // Clusters::ValveConfigurationAndControl::Delegate implementation
-    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
-    CHIP_ERROR HandleCloseValve() override;
-    void HandleRemainingDurationTick(uint32_t duration) override;
     TimerDelegate & mTimerDelegate;
+    Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
     const WaterValveConfig mConfig;
-    Listener * mListener = nullptr;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::ValveConfigurationAndControlCluster> mValveCluster;
 };
