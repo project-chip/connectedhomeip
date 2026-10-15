@@ -865,11 +865,12 @@ Ex:
 
 ## Pull requests that only change Python tests
 
-A pull request whose changed files all sit under `src/python_testing`, outside
-`matter_testing_infrastructure` and the `requirements*.txt` files, skips the
-workflows that only build or test code elsewhere, such as the example builds and
-the YAML test suites; their jobs show as skipped. The REPL test jobs, lint and
-the other checks still run, and the merge queue runs everything.
+A pull request whose changed files are all Python files, `test_metadata.yaml` or
+documentation under `src/python_testing`, outside
+`matter_testing_infrastructure`, skips the workflows that only build or test
+code elsewhere, such as the example builds and the YAML test suites; their jobs
+show as skipped. The REPL test jobs, lint and the other checks still run, and
+the merge queue runs everything.
 
 On such a pull request the REPL test shards run only the tests it changes and
 the tests that import a module it changes; a shard with none of them skips its

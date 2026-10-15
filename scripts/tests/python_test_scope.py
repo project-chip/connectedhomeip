@@ -19,9 +19,10 @@
 
 A pull request whose changes all sit in the Python certification test tree
 (`src/python_testing`) cannot affect any build, or any test outside that tree,
-as long as it leaves alone the test framework package and the files the builds
-read. The workflows that only build or test code elsewhere then skip their
-jobs; see `.github/workflows/pull-request-scope.yaml`.
+as long as it changes only Python files, test_metadata.yaml and documentation,
+and leaves the test framework package alone. The workflows that only build or
+test code elsewhere then skip their jobs; see
+`.github/workflows/pull-request-scope.yaml`.
 
 The REPL test jobs, which run the Python tests, always run. On such a pull
 request their shards run only the tests it changes and the tests that import a
@@ -48,20 +49,24 @@ How to maintain
 ---------------
 Only the MAINTAINER SETTINGS block below is expected to change. Edit it when:
 
--   a build, or the macOS Python environment build, starts reading another file
-    under src/python_testing: add it to PYTHON_ENVIRONMENT_FILES;
 -   execute_python_tests.py changes which test_metadata.yaml sections the
     regular run leaves out: update EXCLUDED_SECTIONS. If it changes how
-    `--regex` matches, update runner_matches() too;
+    `--regex` matches, update runner_matches() too. If it moves, update RUNNER;
+    if it starts importing a module from the test tree, add that module to
+    REPL_SELECTION_FILES;
 -   the unfiltered REPL job (filter "") runs tests on another app: add it to
     UNFILTERED_JOB_APPS;
 -   tests.yaml renames the REPL run job or the step that writes the REPL
     environment file: update SHARD_JOB or ENV_FILE_STEP.
 
-Nothing here changes for new tests, helpers, apps or shard filters. Modules the
-test framework imports from the test tree are found automatically.
-The Lint Code Base workflow runs test_python_test_scope.py, which checks these
-settings against the repository and says what to fix when they drift.
+Nothing here changes for new tests, helpers, apps, shard filters or other files
+in the tree: any file there that is not Python, test_metadata.yaml or
+documentation means a full run, so a build that starts reading one needs no
+edit. Modules the test framework imports from the test tree are found
+automatically. The Lint Code Base workflow runs test_python_test_scope.py,
+which checks these settings and the workflow wiring against the repository,
+including which tests execute_python_tests.py really runs, and says what to fix
+when they drift.
 """
 
 import argparse
@@ -82,19 +87,17 @@ TEST_TREE = "src/python_testing/"
 # Every test depends on this package, so a change in it means a full CI run.
 FRAMEWORK_PACKAGE = "src/python_testing/matter_testing_infrastructure/"
 
-# Update when a build, or the macOS Python environment build, starts reading
-# another file under src/python_testing. A change to one of these means a full CI run.
-PYTHON_ENVIRONMENT_FILES = frozenset({
-    "src/python_testing/requirements.nfc.txt",
-    "src/python_testing/requirements.txt",
-})
-
-# A build file under src/python_testing means a full CI run.
-BUILD_FILE_SUFFIXES = (".gn", ".gni")
+# Within the tree, only Python files, test_metadata.yaml and documentation are
+# Python test changes. Any other file there, such as a requirements, build or data
+# file, may be read by a build, so a change to it means a full CI run.
+PYTHON_TEST_SUFFIXES = (".py", ".md", "/README")
 
 # These decide which tests the REPL shards run, so a change to them runs every shard.
+# Update RUNNER if execute_python_tests.py moves, and add any module it imports from
+# the test tree.
+RUNNER = "src/python_testing/execute_python_tests.py"
 METADATA_FILE = "src/python_testing/test_metadata.yaml"
-REPL_SELECTION_FILES = frozenset({"src/python_testing/execute_python_tests.py", METADATA_FILE})
+REPL_SELECTION_FILES = frozenset({RUNNER, METADATA_FILE})
 
 # Update when execute_python_tests.py (cmd_run) changes which test_metadata.yaml
 # sections the regular REPL run leaves out. Each maps to where its tests run instead.
@@ -132,10 +135,8 @@ def full_run_reason(path: str) -> str | None:
         return "outside the Python test tree"
     if path.startswith(FRAMEWORK_PACKAGE):
         return "in the test framework package"
-    if path in PYTHON_ENVIRONMENT_FILES:
-        return "installed by every Python environment build"
-    if path.endswith(BUILD_FILE_SUFFIXES):
-        return "a build file"
+    if path != METADATA_FILE and not path.endswith(PYTHON_TEST_SUFFIXES):
+        return "not a Python, test_metadata.yaml or documentation file, so a build may read it"
     return None
 
 
@@ -355,9 +356,7 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
         if path in REPL_SELECTION_FILES:
             return Selection(full_reason=f"{path} decides which tests run")
         if not rel.endswith(".py"):
-            if rel.endswith(".md"):
-                continue
-            return Selection(full_reason=f"{path} is not Python, so which tests read it is unknown")
+            continue  # documentation: classify() let nothing else through
         if rel.split("/")[0].removesuffix(".py") in used_by_framework:
             return Selection(full_reason=f"{path} is imported by the test framework, which every test runs")
         if runnable(rel):

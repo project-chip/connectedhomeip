@@ -66,8 +66,8 @@ jobs:
 
             - name: Check Python test scope rules
               if: always()
-              # The rules that let Python-test-only pull requests skip unrelated CI read tests.yaml and
-              # test_metadata.yaml; this fails with the fix to apply when either drifts from them.
+              # The rules that let Python-test-only pull requests skip unrelated CI read the workflows,
+              # test_metadata.yaml and execute_python_tests.py; this fails with the fix to apply when any drifts.
               run: python3 -m unittest scripts/tests/test_python_test_scope.py
 
             - name: Check for orphaned gn files
