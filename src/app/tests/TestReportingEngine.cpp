@@ -32,6 +32,7 @@
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <crypto/CryptoBuildConfig.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -96,6 +97,7 @@ public:
     static bool InsertToDirtySet(const AttributePathParams & aPath);
 
     void TestBuildAndSendSingleReportData();
+    void TestBuildAndSendSingleReportDataLargePayload();
     void TestMergeOverlappedAttributePath();
     void TestMergeAttributePathWhenDirtySetPoolExhausted();
 
@@ -224,6 +226,131 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
               CHIP_NO_ERROR);
 
     DrainAndServiceIO();
+}
+
+class LargeReportDataModel : public TestImCustomDataModel
+{
+public:
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        if (request.path.mEndpointId == kTestEndpointId && request.path.mClusterId == kTestClusterId &&
+            request.path.mAttributeId == kTestFieldId1)
+        {
+            return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
+                uint8_t buf[1024] = { 0 };
+                // 70 * 1024 = 71,680 bytes, exceeding kMaxLargeAppMessageLen (63,885)
+                // and kLegacyDefaultMaxLargeAppMessageLen (63,744) to force report chunking.
+                for (int i = 0; i < 70; i++)
+                {
+                    ReturnErrorOnFailure(listEncoder.Encode(ByteSpan(buf, sizeof(buf))));
+                }
+                return CHIP_NO_ERROR;
+            });
+        }
+        return TestImCustomDataModel::ReadAttribute(request, encoder);
+    }
+};
+
+TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePayload)
+{
+#if !INET_CONFIG_ENABLE_TCP_ENDPOINT
+    GTEST_SKIP() << "TCP endpoint / large packet buffers disabled on this platform.";
+#elif CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+    // The single-part PSA AEAD path uses a stack buffer sized for one UDP MTU, so it cannot
+    // encrypt the large-payload chunks this test produces (see CHIPCryptoPALPSA.cpp).
+    // TODO(#74514): remove this skip once single-part AEAD can handle large payloads.
+    GTEST_SKIP() << "Single-part PSA AEAD cannot encrypt large payloads.";
+#else
+    LargeReportDataModel largeDataModel;
+    InteractionModelEngine::GetInstance()->SetDataModelProvider(&largeDataModel);
+
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                          app::reporting::GetDefaultReportScheduler()),
+              CHIP_NO_ERROR);
+
+    auto makeReadRequest = [](System::PacketBufferHandle & buf) {
+        System::PacketBufferTLVWriter writer;
+        ReadRequestMessage::Builder readRequestBuilder;
+        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        writer.Init(std::move(buf));
+        EXPECT_EQ(readRequestBuilder.Init(&writer), CHIP_NO_ERROR);
+        AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+        EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathBuilder.Node(1)
+                           .Endpoint(kTestEndpointId)
+                           .Cluster(kTestClusterId)
+                           .Attribute(kTestFieldId1)
+                           .EndOfAttributePathIB());
+        EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
+        EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage());
+        EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_EQ(writer.Finalize(&buf), CHIP_NO_ERROR);
+    };
+
+    DummyDelegate dummy;
+    TestExchangeDelegate delegate;
+
+    // Configure session to simulate a TCP connection.
+    Transport::SecureSession * session  = GetSessionBobToAlice()->AsSecureSession();
+    Transport::PeerAddress origPeerAddr = session->GetPeerAddress();
+    SessionParameters origParams        = session->GetRemoteSessionParameters();
+    session->SetPeerAddress(Transport::PeerAddress::TCP(GetAddress(), CHIP_PORT + 1));
+    EXPECT_TRUE(session->AllowsLargePayload());
+
+    // Case 1: Legacy TCP peer that does not advertise MaxTCPPayloadSize (0).
+    // Report chunk must be clamped to kLegacyDefaultMaxLargeAppMessageLen so SessionManager::PrepareMessage succeeds.
+    {
+        SessionParameters legacyParams = origParams;
+        legacyParams.SetMaxTCPPayloadSize(0);
+        session->SetRemoteSessionParameters(legacyParams);
+
+        Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(&delegate);
+        System::PacketBufferHandle readRequestbuf;
+        makeReadRequest(readRequestbuf);
+
+        app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                     app::reporting::GetDefaultReportScheduler());
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kLegacyDefaultMaxLargeAppMessageLen + kMaxTagLen);
+        readHandler.OnInitialRequest(std::move(readRequestbuf));
+
+        EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
+                  CHIP_NO_ERROR);
+        readHandler.Close();
+        DrainAndServiceIO();
+    }
+
+    // Case 2: TCP peer advertising an explicit smaller MaxTCPPayloadSize (4096 bytes).
+    {
+        constexpr uint32_t kNegotiatedMaxPayload = 4096;
+        SessionParameters customParams           = origParams;
+        customParams.SetMaxTCPPayloadSize(kNegotiatedMaxPayload);
+        session->SetRemoteSessionParameters(customParams);
+
+        Messaging::ExchangeContext * exchangeCtx = NewExchangeToAlice(&delegate);
+        System::PacketBufferHandle readRequestbuf;
+        makeReadRequest(readRequestbuf);
+
+        app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
+                                     app::reporting::GetDefaultReportScheduler());
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload + kMaxTagLen);
+        readHandler.OnInitialRequest(std::move(readRequestbuf));
+
+        EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),
+                  CHIP_NO_ERROR);
+        readHandler.Close();
+        DrainAndServiceIO();
+    }
+
+    session->SetPeerAddress(origPeerAddr);
+    session->SetRemoteSessionParameters(origParams);
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+    InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && !CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
 }
 
 TEST_F_FROM_FIXTURE(TestReportingEngine, TestMergeOverlappedAttributePath)

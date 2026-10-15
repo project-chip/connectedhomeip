@@ -17,6 +17,7 @@
  */
 
 #include "DeviceHeader.h"
+#include "Ui.h"
 
 #include <cstdio>
 
@@ -26,23 +27,21 @@ lv_obj_t * CreateDeviceHeader(lv_obj_t * parent, const char * title, EndpointId 
 {
     lv_obj_t * card = lv_obj_create(parent);
     lv_obj_set_width(card, LV_PCT(100));
-    lv_obj_set_height(card, 26);
+    lv_obj_set_height(card, LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(card, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(card, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_hor(card, 8, LV_PART_MAIN);
-    lv_obj_set_style_pad_ver(card, 2, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(card, Ui::Px(16, 8), LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(card, Ui::Px(10, 2), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(card, Ui::SurfaceRaised(), LV_PART_MAIN);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_obj_t * titleLabel = lv_label_create(card);
-    lv_label_set_text(titleLabel, title);
-    lv_obj_set_style_text_color(titleLabel, lv_palette_lighten(LV_PALETTE_BLUE, 2), LV_PART_MAIN);
+    lv_obj_t * titleLabel = Ui::CreateHeading(card, title);
+    lv_label_set_long_mode(titleLabel, LV_LABEL_LONG_DOT);
+    lv_obj_set_flex_grow(titleLabel, 1);
 
     char epBuf[16];
-    snprintf(epBuf, sizeof(epBuf), "Ep %u", static_cast<unsigned int>(endpointId));
-    lv_obj_t * epLabel = lv_label_create(card);
-    lv_label_set_text(epLabel, epBuf);
-    lv_obj_set_style_text_color(epLabel, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
-
+    snprintf(epBuf, sizeof(epBuf), "EP %u", static_cast<unsigned int>(endpointId));
+    Ui::CreatePill(card, epBuf, Ui::Accent());
     return card;
 }
 

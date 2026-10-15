@@ -59,7 +59,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -237,7 +237,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -330,18 +330,19 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
 
+    # See docs/ci-cd/host_unit_tests.md for which crypto backends run on PRs, pushes and nightly.
     nightly_asan_crypto_backends:
         name: Nightly ASAN Testing across Crypto Backends
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             options: --privileged
 
         steps:
             - name: Checkout
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -356,7 +357,6 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-x64-tests-mbedtls-asan-clang build" \
                     && rm -rf out/linux-x64-tests-mbedtls-asan-clang
-            # PSA also runs in unit_integration_test.yaml, but only when crypto/credentials/pigweed paths change.
             - name: ASAN unit tests - PSA
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -413,16 +413,16 @@ jobs:
                   path: gh-pages
 
             - name: Generate Allure Report
-              uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
-              with:
-                  allure_results: junit-results
-                  allure_report: allure-report
-                  gh_pages: gh-pages
-                  allure_history: allure-history
-                  subfolder: allure-report/nightly
-                  keep_reports: 120
-                  # This is the name that will show up in the Dashboard Overview
-                  report_name: "Nightly CI Tests"
+              # --report-name is the name that will show up in the Dashboard Overview
+              run: |
+                  scripts/tools/generate_allure_history.py \
+                      --results junit-results \
+                      --gh-pages gh-pages \
+                      --output allure-history \
+                      --report allure-report \
+                      --subfolder allure-report/nightly \
+                      --keep-reports 120 \
+                      --report-name "Nightly CI Tests"
 
             - name: Upload Allure Report
               uses: actions/upload-artifact@v7
@@ -458,7 +458,7 @@ jobs:
         runs-on: namespace-profile-4x16
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -474,7 +474,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
@@ -489,6 +489,46 @@ jobs:
               run: >-
                   ./scripts/run_in_build_env.sh "scripts/build/build_examples.py
                   --target linux-x64-tests-msan-clang build"
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # See docs/ci-cd/host_unit_tests.md for which unit-test configurations run on PRs, pushes and nightly.
+    nightly_unit_tests_various_features:
+        name: Nightly Unit Tests - Linux (various features)
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 120
+
+        runs-on: ubuntu-latest
+
+        env:
+            BUILD_TYPE: various_features
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux unit_tests
+                  bootstrap-log-name: bootstrap-logs-unittest-various-features
+            - name: Setup Build
+              # Bundles ICD, ARL and rotating-device-id (with clang/asan/boringssl) into one build
+              run: |
+                  scripts/build/gn_gen.sh --args='is_clang=true is_asan=true chip_crypto="boringssl" chip_enable_rotating_device_id=true chip_enable_icd_server=true chip_enable_icd_lit=true chip_enable_access_restrictions=true chip_build_all_platform_tests=true'
+            - name: Run Build
+              run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
+            - name: Run Tests
+              run: scripts/tests/gn_tests.sh
             - name: Notify Slack on Failure
               if: failure()
               uses: ./.github/actions/notify-slack-failure

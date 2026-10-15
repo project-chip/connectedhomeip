@@ -16351,7 +16351,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddFile
  *
- * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage.
+ * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX).
  */
 - (void)addFileWithParams:(MTRMediaFileManagementClusterAddFileParams *)params completion:(void (^)(MTRMediaFileManagementClusterAddFileResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -20223,6 +20223,23 @@ typedef NS_ENUM(uint8_t, MTRDataTypeCertificationTypeEnum) {
     MTRDataTypeCertificationTypeEnumDeviceAttestationPKI MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRDataTypeCertificationTypeEnumOperationalPKI MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRDataTypeCertificationTypeEnumVIDSignerPKI MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosurePanelTag) {
+    MTRDataTypeClosurePanelTagLift MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosurePanelTagTilt MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosurePanelTagSliding MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosurePanelTagRotate MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRDataTypeClosureTag) {
+    MTRDataTypeClosureTagCovering MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRDataTypeClosureTagWindow MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRDataTypeClosureTagBarrier MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRDataTypeClosureTagCabinet MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRDataTypeClosureTagGate MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRDataTypeClosureTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRDataTypeClosureTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x06,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {

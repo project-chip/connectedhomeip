@@ -24,48 +24,28 @@
 
 using RenderScreenFn = std::function<void(lv_obj_t * parent)>;
 
+/**
+ * Push/pop screen navigation with a breadcrumb bar. Every entry point takes the
+ * display lock's owner for granted: call from the LVGL task, or from another
+ * thread with the display lock held.
+ */
 namespace NavigationStack {
 
-/**
- * Initializes the hierarchical navigation shell on @a rootScreen.
- * Must be called while holding the LVGL lock.
- */
 void Init(lv_obj_t * rootScreen);
 
-/**
- * Pushes a new screen to the navigation stack.
- * @param title Breadcrumb label displayed in the top bar.
- * @param renderFn Callback to populate the content container.
- */
 void Push(const std::string & title, RenderScreenFn renderFn);
-
-/**
- * Pops the current top screen from the stack and returns to its parent.
- */
 void Pop();
-
-/**
- * Pops all screens above @a level in the stack.
- */
 void PopTo(size_t level);
-
-/**
- * Pops back to the root screen (level 0).
- */
 void ResetToRoot();
 
-/**
- * Returns the current stack depth.
- */
+/// Rebuilds the current screen in place, for content that changed underneath it.
+void RefreshCurrent();
 size_t GetDepth();
 
-/**
- * Forgets the stack contents and the widgets created by Init().
- *
- * Call this before deleting those widgets (for example with lv_obj_clean() on the root
- * screen), otherwise the shell keeps pointers to freed objects. Navigation calls render
- * nothing until Init() runs again.
- */
+/// Connectivity shown at the right end of the bar.
+void SetIndicators(bool wifiConnected, bool bleConnected, uint8_t fabricCount);
+
+/// Forgets the widgets before the caller deletes them.
 void Detach();
 
 } // namespace NavigationStack

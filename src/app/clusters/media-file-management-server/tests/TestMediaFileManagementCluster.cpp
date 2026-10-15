@@ -54,7 +54,7 @@ public:
         file.name     = CharSpan::fromCharString("file");
         file.size     = 1000;
         file.mimeType = CharSpan::fromCharString("video/mp4");
-        file.imageUri = CharSpan::fromCharString("bdx://node/thumb.jpg");
+        file.imageURI = CharSpan::fromCharString("bdx://node/thumb.jpg");
         return CHIP_NO_ERROR;
     }
 
@@ -83,9 +83,8 @@ public:
         return Status::Success;
     }
 
-    Status
-    HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
-                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override
+    Status HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
+                                    const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes) override
     {
         mRequestSharedFilesCalled = true;
         return Status::Success;
@@ -194,7 +193,7 @@ TEST_F(TestMediaFileManagementCluster, InvokeAddFile)
     request.name     = CharSpan::fromCharString("Song.mp3");
     request.size     = 3500;
     request.mimeType = CharSpan::fromCharString("audio/mpeg");
-    request.imageUri = CharSpan::fromCharString("bdx://node/thumb.jpg");
+    request.imageURI = CharSpan::fromCharString("bdx://node/thumb.jpg");
 
     auto result = tester.Invoke<Commands::AddFile::Type, Commands::AddFileResponse::DecodableType>(request);
     EXPECT_TRUE(result.IsSuccess());
@@ -235,7 +234,7 @@ TEST_F(TestMediaFileManagementCluster, InvokeSharingCommandWithoutFeatureFails)
     request.name       = CharSpan::fromCharString("vid.mp4");
     request.size       = 100;
     request.mimeType   = CharSpan::fromCharString("video/mp4");
-    request.imageUri   = CharSpan::fromCharString("bdx://node/p.jpg");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
 
     auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
     EXPECT_FALSE(result.IsSuccess());
