@@ -83,6 +83,9 @@ public:
     Protocols::InteractionModel::Status GetMaxHeatSetpointLimit(temperature & maxHeatSetpointLimit) const override;
     Protocols::InteractionModel::Status SetMaxHeatSetpointLimit(temperature maxHeatSetpointLimit, bool & changed) override;
 
+    Protocols::InteractionModel::Status GetCriticalFreezeProtection(bool & enabled) const override;
+    Protocols::InteractionModel::Status GetCriticalOverheatProtection(bool & enabled) const override;
+
 private:
     EndpointId mEndpointId;
     AttributePersistenceProvider * mProvider = nullptr;
@@ -101,6 +104,9 @@ private:
     temperature mAbsMaxHeatSetpointLimit;
     temperature mMinHeatSetpointLimit;
     temperature mMaxHeatSetpointLimit;
+
+    bool mCriticalFreezeProtection   = false;
+    bool mCriticalOverheatProtection = false;
 
     Protocols::InteractionModel::Status SaveSetpoint(AttributeId attributeId, temperature value);
 };

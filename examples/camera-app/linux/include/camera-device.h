@@ -344,6 +344,7 @@ public:
 
     CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
+    bool GetCameraSupportsPerZoneDetect() override { return true; }
     bool IsValidAnalysisZone(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
@@ -362,6 +363,9 @@ public:
     void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
+
+    void HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                     uint16_t identifiedContextId);
 
     uint8_t GetMaxAnalysisStreams() override { return mMaxAnalysisStreams; }
     std::vector<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> GetSupportedAmbientContexts() override;
@@ -440,7 +444,8 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
     uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
-    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
+                                                            StreamUsageEnum::kAnalysis };
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;

@@ -531,9 +531,16 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                 Zcl, "Transport Options verification from command data[ep=%d]: Motion Time Control (MaxDuration) Constraint Error",
                 mEndpointId));
     }
+    else if (triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
+    {
+        VerifyOrReturnValue(
+            !triggerOptions.motionTimeControl.HasValue(), Status::InvalidCommand,
+            ChipLogError(
+                Zcl, "Transport Options verification from command data[ep=%d]: Found Motion Time Control which is not expected ",
+                mEndpointId));
+    }
     else
     {
-
         VerifyOrReturnValue(
             !triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Found motion zones which is not expected",
@@ -571,6 +578,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     }
 
     if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+        triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext ||
         triggerOptions.triggerType == TransportTriggerTypeEnum::kCommand)
     {
         VerifyOrReturnValue(triggerOptions.maxPreRollLen.HasValue(), Status::InvalidCommand,
@@ -916,6 +924,13 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
             kRootEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
+                // The spec requires a push transport's TLS endpoint to carry a non-null ccdid; a null one means no
+                // client certificate is associated with the endpoint, which the caller reports as an invalid TLS endpoint.
+                VerifyOrReturnError(!TLSEndpoint.ccdid.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
+                                    ChipLogError(Zcl,
+                                                 "HandleAllocatePushTransport[ep=%d]: TLS endpoint %u has no client certificate",
+                                                 mEndpointId, commandData.transportOptions.TLSEndpointID));
+
                 // Use heap allocation for large certificate buffers to reduce stack usage
                 auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
                 auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();

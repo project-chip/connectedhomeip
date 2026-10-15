@@ -48,13 +48,13 @@ from TC_EWATERHTRBase import EWATERHTRBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
+class TC_EWATERHTR_2_1(MatterTestCommissionedDevice, EWATERHTRBase):
 
     def desc_TC_EWATERHTR_2_1(self) -> str:
         """Returns a description of this test"""

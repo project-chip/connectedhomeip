@@ -46,14 +46,14 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_17(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_17(MatterTestCommissionedDevice, AVSMTestBase):
     def desc_TC_AVSM_2_17(self) -> str:
         return "[TC-AVSM-2.17] Validate stream Soft Privacy and Livestream handling with Server as DUT"
 

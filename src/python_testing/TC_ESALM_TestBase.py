@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ TRIGGERS: dict[str, tuple[int, int]] = {
 }
 
 
-class ElectricalAlarmTestBaseHelper(MatterBaseTest):
+class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
     """Shared procedure for TC-ESALM-3.1 through 3.10.
 
     The test plan defines those cases as one alarm lifecycle per alarm class, all including the

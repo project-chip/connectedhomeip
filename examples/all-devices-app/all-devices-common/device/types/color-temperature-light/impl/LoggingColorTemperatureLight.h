@@ -18,16 +18,16 @@
 #pragma once
 
 #include <device/capabilities/color-light/impl/LoggingLightDriver.h>
+#include <device/types/color-temperature-light/ColorTemperatureLight.h>
 
 namespace chip {
 namespace app {
 
 /**
  * Color Temperature Light (device type 0x010C) whose output side only logs, so the device can be
- * exercised without anything behind it. See LoggingLightDriver for the delegate implementations;
- * this class only supplies the device type and its Conformance.
+ * exercised without anything behind it.
  */
-class LoggingColorTemperatureLight : public LoggingLightDriver
+class LoggingColorTemperatureLight : private LoggingLightDriver, public ColorTemperatureLight
 {
 public:
     explicit LoggingColorTemperatureLight(const Context & context);

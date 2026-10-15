@@ -48,8 +48,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kZone   = 0,
-    kReason = 1,
+    kZone       = 0,
+    kReason     = 1,
+    kNodeID     = 2,
+    kEndpointID = 3,
 };
 
 struct Type
@@ -62,6 +64,8 @@ public:
 
     uint16_t zone                       = static_cast<uint16_t>(0);
     ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -75,6 +79,8 @@ public:
 
     uint16_t zone                       = static_cast<uint16_t>(0);
     ZoneEventTriggeredReasonEnum reason = static_cast<ZoneEventTriggeredReasonEnum>(0);
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -84,8 +90,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kZone   = 0,
-    kReason = 1,
+    kZone       = 0,
+    kReason     = 1,
+    kNodeID     = 2,
+    kEndpointID = 3,
 };
 
 struct Type
@@ -98,6 +106,8 @@ public:
 
     uint16_t zone                     = static_cast<uint16_t>(0);
     ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -111,6 +121,8 @@ public:
 
     uint16_t zone                     = static_cast<uint16_t>(0);
     ZoneEventStoppedReasonEnum reason = static_cast<ZoneEventStoppedReasonEnum>(0);
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::EndpointId> endpointID;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

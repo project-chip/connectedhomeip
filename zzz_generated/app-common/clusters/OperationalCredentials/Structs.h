@@ -119,6 +119,7 @@ enum class Fields : uint8_t
     kPAASupportedProfiles = 0,
     kPAISupportedProfiles = 1,
     kDACSupportedProfiles = 2,
+    kCDSupportedProfiles  = 3,
 };
 
 struct Type
@@ -129,6 +130,8 @@ public:
     chip::BitMask<AttestationCryptoProfileBitmap> PAISupportedProfiles =
         static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
     chip::BitMask<AttestationCryptoProfileBitmap> DACSupportedProfiles =
+        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
+    chip::BitMask<AttestationCryptoProfileBitmap> CDSupportedProfiles =
         static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

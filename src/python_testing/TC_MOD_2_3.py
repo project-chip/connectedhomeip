@@ -44,14 +44,14 @@ from TC_GC_common import is_groupcast_on_root_node
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # ModeSelect attribute IDs
 current_mode_attribute_id = 0x00000003
 
 
-class TC_MOD_2_3(MatterBaseTest):
+class TC_MOD_2_3(MatterTestCommissionedDevice):
 
     def desc_TC_MOD_2_3(self) -> str:
         """Returns a description of this test"""
