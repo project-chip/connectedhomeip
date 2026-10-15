@@ -7603,7 +7603,7 @@ endpoint 0 {
 
   server cluster Groups {
     callback attribute nameSupport;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
@@ -7702,7 +7702,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -8065,7 +8065,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command ProvisionRootCertificate;
@@ -8085,7 +8085,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command ProvisionEndpoint;
@@ -8128,7 +8128,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
@@ -8210,7 +8210,7 @@ endpoint 1 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL default = "https://example.com";
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command InstantAction;
@@ -8294,7 +8294,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command ChangeToMode;
@@ -8406,7 +8406,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -8552,13 +8552,13 @@ endpoint 1 {
   server cluster ThermostatMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    ram      attribute startUpMode;
+    callback attribute startUpMode;
     callback attribute coreModeTags;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 2;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
     handle command ChangeToModeByCoreTag;
@@ -8727,33 +8727,33 @@ endpoint 1 {
     emits event RunningStateChange;
     emits event RunningModeChange;
     emits event ActivePresetChange;
-    ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
-    ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute localTemperatureCalibration default = 0x00;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x14;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
-    ram      attribute temperatureSetpointHold default = 0;
-    ram      attribute temperatureSetpointHoldDuration;
+    callback attribute localTemperature;
+    callback attribute absMinHeatSetpointLimit default = 0x02BC;
+    callback attribute absMaxHeatSetpointLimit default = 0x0BB8;
+    callback attribute absMinCoolSetpointLimit default = 0x0640;
+    callback attribute absMaxCoolSetpointLimit default = 0x0C80;
+    callback attribute localTemperatureCalibration default = 0x00;
+    callback attribute occupiedCoolingSetpoint default = 0x0A28;
+    callback attribute occupiedHeatingSetpoint default = 0x07D0;
+    callback attribute minHeatSetpointLimit default = 0x02BC;
+    callback attribute maxHeatSetpointLimit default = 0x0BB8;
+    callback attribute minCoolSetpointLimit default = 0x0640;
+    callback attribute maxCoolSetpointLimit default = 0x0C80;
+    callback attribute minSetpointDeadBand default = 0x14;
+    callback attribute controlSequenceOfOperation default = 0x04;
+    callback attribute systemMode default = 0x01;
+    callback attribute temperatureSetpointHold default = 0;
+    callback attribute temperatureSetpointHoldDuration;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
-    ram      attribute numberOfPresets default = 0;
-    ram      attribute numberOfSchedules default = 0;
-    ram      attribute numberOfScheduleTransitionPerDay default = 0xFF;
-    ram      attribute activePresetHandle;
-    ram      attribute activeScheduleHandle;
+    callback attribute numberOfPresets;
+    callback attribute numberOfSchedules;
+    callback attribute numberOfScheduleTransitionPerDay;
+    callback attribute activePresetHandle;
+    callback attribute activeScheduleHandle;
     callback attribute presets;
     callback attribute schedules;
-    ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute setpointHoldExpiryTimestamp;
     callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
@@ -8768,7 +8768,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0F23;
+    callback attribute featureMap default = 0x0F23;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
@@ -9272,8 +9272,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command PlayChimeSound;
   }
@@ -9431,7 +9431,7 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;

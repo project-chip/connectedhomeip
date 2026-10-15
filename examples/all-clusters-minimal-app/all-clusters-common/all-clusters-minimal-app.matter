@@ -6662,7 +6662,7 @@ endpoint 0 {
 
   server cluster Groups {
     callback attribute nameSupport;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
@@ -6750,7 +6750,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -6927,7 +6927,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -7002,7 +7002,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
@@ -7073,7 +7073,7 @@ endpoint 1 {
   server cluster Actions {
     callback attribute actionList;
     callback attribute endpointLists;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -7207,11 +7207,11 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
-    ram      attribute featureMap default = 1;
+    callback attribute localTemperature;
+    callback attribute occupiedHeatingSetpoint default = 0x07D0;
+    callback attribute controlSequenceOfOperation default = 0x04;
+    callback attribute systemMode default = 0x01;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
@@ -7543,7 +7543,7 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;

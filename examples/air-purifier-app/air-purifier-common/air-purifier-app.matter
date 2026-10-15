@@ -3583,17 +3583,17 @@ endpoint 5 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 1000;
-    ram      attribute absMaxHeatSetpointLimit default = 3000;
-    ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute controlSequenceOfOperation default = 2;
-    ram      attribute systemMode default = 0;
-    ram      attribute thermostatRunningState default = 0;
+    callback attribute localTemperature;
+    callback attribute absMinHeatSetpointLimit default = 1000;
+    callback attribute absMaxHeatSetpointLimit default = 3000;
+    callback attribute occupiedHeatingSetpoint default = 2000;
+    callback attribute controlSequenceOfOperation default = 2;
+    callback attribute systemMode default = 0;
+    callback attribute thermostatRunningState default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

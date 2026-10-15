@@ -3009,7 +3009,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
@@ -3425,19 +3425,19 @@ endpoint 5 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature default = 2000;
-    ram      attribute absMinHeatSetpointLimit default = 700;
-    ram      attribute absMaxHeatSetpointLimit default = 3000;
-    persist  attribute PIHeatingDemand default = 0;
-    persist  attribute occupiedHeatingSetpoint default = 2000;
-    persist  attribute minHeatSetpointLimit default = 700;
-    persist  attribute maxHeatSetpointLimit default = 3000;
-    persist  attribute controlSequenceOfOperation default = 2;
-    persist  attribute systemMode default = 4;
+    callback attribute localTemperature default = 2000;
+    callback attribute absMinHeatSetpointLimit default = 700;
+    callback attribute absMaxHeatSetpointLimit default = 3000;
+    callback attribute PIHeatingDemand default = 0;
+    callback attribute occupiedHeatingSetpoint default = 2000;
+    callback attribute minHeatSetpointLimit default = 700;
+    callback attribute maxHeatSetpointLimit default = 3000;
+    callback attribute controlSequenceOfOperation default = 2;
+    callback attribute systemMode default = 4;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

@@ -3224,7 +3224,7 @@ endpoint 1 {
 
   server cluster Groups {
     callback attribute nameSupport;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;

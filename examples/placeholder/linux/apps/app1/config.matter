@@ -9130,7 +9130,7 @@ endpoint 0 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -9387,24 +9387,24 @@ endpoint 0 {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    ram      attribute vendorName;
-    ram      attribute vendorID;
-    ram      attribute productName;
-    persist  attribute nodeLabel;
-    ram      attribute hardwareVersion default = 0;
-    ram      attribute hardwareVersionString;
-    ram      attribute softwareVersion default = 0;
-    ram      attribute softwareVersionString;
-    ram      attribute manufacturingDate default = "20210614123456ZZ";
-    ram      attribute partNumber;
-    ram      attribute productURL;
-    ram      attribute productLabel;
-    ram      attribute serialNumber;
-    ram      attribute reachable default = 1;
-    ram      attribute uniqueID;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute nodeLabel;
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate;
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    callback attribute reachable default = 1;
+    callback attribute uniqueID;
     callback attribute productAppearance;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster Switch {
@@ -9443,7 +9443,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -9608,34 +9608,34 @@ endpoint 0 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
+    callback attribute localTemperature;
     callback attribute outdoorTemperature;
     callback attribute occupancy default = 1;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
+    callback attribute absMinHeatSetpointLimit default = 0x02BC;
     callback attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute PICoolingDemand;
-    ram      attribute PIHeatingDemand;
+    callback attribute absMinCoolSetpointLimit default = 0x0640;
+    callback attribute absMaxCoolSetpointLimit default = 0x0C80;
+    callback attribute PICoolingDemand;
+    callback attribute PIHeatingDemand;
     callback attribute HVACSystemTypeConfiguration;
     callback attribute localTemperatureCalibration default = 0;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    callback attribute occupiedCoolingSetpoint default = 0x0A28;
+    callback attribute occupiedHeatingSetpoint default = 0x07D0;
     callback attribute unoccupiedCoolingSetpoint default = 0x0A28;
     callback attribute unoccupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x14;
+    callback attribute minHeatSetpointLimit default = 0x02BC;
+    callback attribute maxHeatSetpointLimit default = 0x0BB8;
+    callback attribute minCoolSetpointLimit default = 0x0640;
+    callback attribute maxCoolSetpointLimit default = 0x0C80;
+    callback attribute minSetpointDeadBand default = 0x14;
     callback attribute remoteSensing default = 0x0;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    callback attribute controlSequenceOfOperation default = 0x04;
+    callback attribute systemMode default = 0x01;
     callback attribute thermostatRunningMode default = 0x00;
-    ram      attribute startOfWeek default = 0;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute temperatureSetpointHold default = 0x00;
+    callback attribute startOfWeek;
+    callback attribute numberOfWeeklyTransitions;
+    callback attribute numberOfDailyTransitions;
+    callback attribute temperatureSetpointHold default = 0x00;
     callback attribute temperatureSetpointHoldDuration;
     callback attribute thermostatProgrammingOperationMode;
     callback attribute thermostatRunningState;
@@ -9656,7 +9656,7 @@ endpoint 0 {
     callback attribute ACLouverPosition;
     callback attribute ACCoilTemperature;
     callback attribute ACCapacityformat;
-    ram      attribute featureMap default = 0x000b;
+    callback attribute featureMap default = 0x000b;
     callback attribute clusterRevision;
   }
 
@@ -9870,7 +9870,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AddGroup;
