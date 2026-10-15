@@ -54,6 +54,11 @@ if (chip_device_platform != "none") {
         "${chip_root}/src/lib/dnssd",
         "${chip_root}/src/lib/dnssd/minimal_mdns",
       ]
+
+      if (chip_device_platform == "darwin") {
+        test_sources += [ "TestDarwinDnssdResolve.cpp" ]
+        public_deps += [ "${chip_root}/src/platform/Darwin:dnssd_buildconfig" ]
+      }
     }
 
     # These tests appear to be broken on Mac.
