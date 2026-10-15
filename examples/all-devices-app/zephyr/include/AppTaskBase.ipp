@@ -238,10 +238,10 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     VerifyOrReturnError(rootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    ReturnErrorOnFailure(rootNode->RootNode::Register(rootAllocator, *mDataModelProvider));
+    ReturnErrorOnFailure(rootNode->Register(rootAllocator, *mDataModelProvider));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    mOTARequestorCluster = &rootNode->template GetFeature<OtaFeature>().Cluster();
+    mOTARequestorCluster = &rootNode->GetFeature<OtaFeature>().Cluster();
 #endif
     mRootNode = std::move(rootNode);
 

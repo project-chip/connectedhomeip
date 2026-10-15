@@ -348,7 +348,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     VerifyOrReturnError(rootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     chip::app::ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    ReturnErrorOnFailure(rootNode->chip::app::RootNode::Register(rootAllocator, *sDataModelProvider));
+    ReturnErrorOnFailure(rootNode->Register(rootAllocator, *sDataModelProvider));
 #if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
     chip::SetDefaultOTARequestorEventGenerator(rootNode->GetFeature<chip::app::OtaFeature>().Cluster());
 #endif
