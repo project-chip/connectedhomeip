@@ -134,9 +134,16 @@ public:
             return *this;
         }
 
+        Config & WithUnionHealth(AmbientSensingUnion::UnionHealthEnum health)
+        {
+            mUnionHealth = health;
+            return *this;
+        }
+
         EndpointId mEndpointId;
-        CharSpan mUnionName                     = CharSpan();
-        AmbientSensingUnionDelegate * mDelegate = nullptr;
+        CharSpan mUnionName                               = CharSpan();
+        AmbientSensingUnionDelegate * mDelegate           = nullptr;
+        AmbientSensingUnion::UnionHealthEnum mUnionHealth = AmbientSensingUnion::UnionHealthEnum::kNonFunctional;
     };
 
     ~AmbientSensingUnionCluster() override = default;
@@ -157,6 +164,7 @@ public:
     void SetDelegate(AmbientSensingUnionDelegate * delegate) { mDelegate = delegate; }
 
     CHIP_ERROR SetUnionName(const CharSpan & unionName);
+    CHIP_ERROR SetUnionHealth(AmbientSensingUnion::UnionHealthEnum health);
 
     CharSpan GetUnionName() const;
     AmbientSensingUnion::UnionHealthEnum GetUnionHealth() const { return mUnionHealth; }
@@ -200,8 +208,6 @@ private:
                                            AmbientSensingUnion::UnionContributorStatusEnum previousStatus);
 
     CHIP_ERROR EncodeContributorList(AttributeValueEncoder & encoder);
-
-    void RecalculateUnionHealth();
 
     void PersistUnionName();
 

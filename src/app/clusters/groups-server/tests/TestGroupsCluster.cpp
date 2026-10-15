@@ -190,7 +190,7 @@ TEST_F(TestGroupsCluster, TestReadAttributes)
 
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester->ReadAttribute(Groups::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, Groups::kRevision);
+    EXPECT_EQ(clusterRevision, kGroupsClusterRevisionBeforeGroupcast);
 }
 
 // Tests the basic success case of the AddGroup command.

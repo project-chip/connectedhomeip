@@ -33,27 +33,32 @@ struct ZoneInformationStorage : ZoneInformationStruct
     ZoneInformationStorage(){};
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-                           const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+                           const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage,
+                           const Optional<NodeId> & aNodeID = NullOptional, const Optional<EndpointId> & aEndpointID = NullOptional)
     {
-        Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage);
+        Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage, aNodeID, aEndpointID);
     }
 
     ZoneInformationStorage(const ZoneInformationStorage & aZoneInfoStorage) { *this = aZoneInfoStorage; }
 
     ZoneInformationStorage & operator=(const ZoneInformationStorage & aZoneInfoStorage)
     {
-        Set(aZoneInfoStorage.zoneID, aZoneInfoStorage.zoneType, aZoneInfoStorage.zoneSource, aZoneInfoStorage.twoDCartZoneStorage);
+        Set(aZoneInfoStorage.zoneID, aZoneInfoStorage.zoneType, aZoneInfoStorage.zoneSource, aZoneInfoStorage.twoDCartZoneStorage,
+            aZoneInfoStorage.nodeID, aZoneInfoStorage.endpointID);
         return *this;
     }
 
     void Set(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-             const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+             const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage, const Optional<NodeId> & aNodeID = NullOptional,
+             const Optional<EndpointId> & aEndpointID = NullOptional)
     {
         zoneID              = aZoneID;
         zoneType            = aZoneType;
         zoneSource          = aZoneSource;
         twoDCartZoneStorage = aTwoDCartZoneStorage;
         twoDCartesianZone   = twoDCartZoneStorage;
+        nodeID              = aNodeID;
+        endpointID          = aEndpointID;
     }
 
     Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;

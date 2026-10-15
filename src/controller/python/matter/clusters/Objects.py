@@ -320,6 +320,31 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class ClosurePanelTag(MatterIntEnum):
+            kLift = 0x00
+            kTilt = 0x01
+            kSliding = 0x02
+            kRotate = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
+        class ClosureTag(MatterIntEnum):
+            kCovering = 0x00
+            kWindow = 0x01
+            kBarrier = 0x02
+            kCabinet = 0x03
+            kGate = 0x04
+            kGarageDoor = 0x05
+            kDoor = 0x06
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 7
+
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
             kAirPurifier = 0x01
@@ -13489,7 +13514,6 @@ class GroupKeyManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="groupTable", Tag=0x00000001, Type=typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct]),
                 ClusterObjectFieldDescriptor(Label="maxGroupsPerFabric", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="maxGroupKeysPerFabric", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="groupcastAdoption", Tag=0x00000004, Type=typing.Optional[typing.List[GroupKeyManagement.Structs.GroupcastAdoptionStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -13501,7 +13525,6 @@ class GroupKeyManagement(Cluster):
     groupTable: typing.List[GroupKeyManagement.Structs.GroupInfoMapStruct] = field(default_factory=lambda: [])
     maxGroupsPerFabric: uint = 0
     maxGroupKeysPerFabric: uint = 0
-    groupcastAdoption: typing.Optional[typing.List[GroupKeyManagement.Structs.GroupcastAdoptionStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -13580,19 +13603,6 @@ class GroupKeyManagement(Cluster):
             epochStartTime1: 'typing.Union[Nullable, uint]' = NullValue
             epochKey2: 'typing.Union[Nullable, bytes]' = NullValue
             epochStartTime2: 'typing.Union[Nullable, uint]' = NullValue
-
-        @dataclass
-        class GroupcastAdoptionStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupcastAdopted", Tag=0, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            groupcastAdopted: 'bool' = False
-            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -13752,22 +13762,6 @@ class GroupKeyManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
-
-        @dataclass
-        class GroupcastAdoption(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0000003F
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000004
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[GroupKeyManagement.Structs.GroupcastAdoptionStruct]])
-
-            value: typing.Optional[typing.List[GroupKeyManagement.Structs.GroupcastAdoptionStruct]] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -53172,14 +53166,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             fileID: 'uint' = 0
             name: 'str' = ""
             size: 'uint' = 0
             mimeType: 'str' = ""
-            imageUri: 'str' = ""
+            imageURI: 'str' = ""
 
     class Commands:
         @dataclass
@@ -53196,13 +53190,13 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=3, Type=str),
                     ])
 
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
         @dataclass
         class AddFileResponse(ClusterCommand):
@@ -53251,12 +53245,12 @@ class MediaFileManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="requestID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Optional[typing.List[str]]),
                     ])
 
             clientName: str = ""
             requestID: uint = 0
-            supportedMimeTypes: typing.Union[None, Nullable, typing.List[str]] = None
+            supportedMimeTypes: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GetSharedFile(ClusterCommand):
@@ -53286,11 +53280,11 @@ class MediaFileManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
+                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
                     ])
 
             status: MediaFileManagement.Enums.FileStatusEnum = 0
-            fileDescription: typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = None
+            fileDescription: typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = NullValue
 
         @dataclass
         class OfferFile(ClusterCommand):
@@ -53307,14 +53301,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             clientName: str = ""
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
     class Attributes:
         @dataclass

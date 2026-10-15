@@ -46,6 +46,7 @@ private:
     std::optional<CHIP_ERROR> HandleRemoveAmbientSensingNonMatterContributor(ByteSpan tlvData) const;
     std::optional<CHIP_ERROR> HandleUpdateAmbientSensingContributorStatus(ByteSpan tlvData) const;
     std::optional<CHIP_ERROR> HandleSetAmbientSensingUnionName(ByteSpan tlvData) const;
+    std::optional<CHIP_ERROR> HandleSetAmbientSensingUnionHealth(ByteSpan tlvData) const;
 
     Clusters::AmbientContextSensingCluster & mCluster;
     Clusters::AmbientSensingUnionCluster & mUnionCluster;

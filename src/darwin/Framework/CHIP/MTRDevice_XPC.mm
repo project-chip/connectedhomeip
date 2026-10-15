@@ -176,6 +176,17 @@
     });
 }
 
+- (void)_interestedPathsChanged
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [super _interestedPathsChanged];
+
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
+}
+
 #pragma mark - Client Callbacks (MTRDeviceDelegate)
 
 // required methods for MTRDeviceDelegates

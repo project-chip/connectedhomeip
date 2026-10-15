@@ -74,7 +74,7 @@
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21"
     ],
-    "DiagnosticsLogs": ["Test_TC_DLOG_2_1"],
+    "DiagnosticsLogs": [],
     "Descriptor": ["Test_TC_DESC_2_1"],
     "DeviceEnergyManagementMode": [],
     "EnergyEVSEMode": [],
@@ -143,7 +143,6 @@
     "OTASoftwareUpdate": [
         "Test_TC_SU_1_1",
         "Test_TC_SU_2_1",
-        "Test_TC_SU_2_2",
         "Test_TC_SU_2_3",
         "Test_TC_SU_2_4",
         "Test_TC_SU_2_5",

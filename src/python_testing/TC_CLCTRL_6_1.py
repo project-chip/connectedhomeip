@@ -32,6 +32,51 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure-no-lt:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure-no-ps-no-sp:1 --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -44,7 +89,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -70,7 +115,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
-class TC_CLCTRL_6_1(MatterBaseTest):
+class TC_CLCTRL_6_1(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

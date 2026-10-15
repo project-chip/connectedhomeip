@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <device/capabilities/dimmable-load/DimmableLoad.h>
+#include <device/types/dimmable-light/DimmableLight.h>
 #include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(DimmableLoad & device, NamedPipe::Dispatcher & dispatcher);
+void RegisterNamedPipeTranslators(DimmableLight & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

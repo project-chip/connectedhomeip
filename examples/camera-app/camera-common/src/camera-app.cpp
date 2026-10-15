@@ -79,6 +79,10 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     BitFlags<ZoneManagement::Feature, uint32_t> zoneMgmtFeatures(
         ZoneManagement::Feature::kTwoDimensionalCartesianZone, ZoneManagement::Feature::kPerZoneSensitivity,
         ZoneManagement::Feature::kUserDefined, ZoneManagement::Feature::kFocusZones);
+    if (LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis)
+    {
+        zoneMgmtFeatures.Set(ZoneManagement::Feature::kRemoteZones);
+    }
 
     uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
     uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
@@ -127,6 +131,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         else
         {
             mAVAnalysisServer.Cluster().SetCameraClient(&mAVAnalysisCameraClient);
+            mAVAnalysisServer.Cluster().SetWebRTCClient(&mAVAnalysisWebRTCClient);
         }
     }
 

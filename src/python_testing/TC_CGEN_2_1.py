@@ -38,13 +38,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CGEN_2_1(MatterBaseTest):
+class TC_CGEN_2_1(MatterTestCommissionedDevice):
     def desc_TC_CGEN_2_1(self) -> str:
         return "[TC-CGEN-2.1] Breadcrumb, BasicCommissioningInfo, RegulatoryConfig, LocationCapability and SupportsConcurrentConnection attributes [{DUT_Server}]"
 

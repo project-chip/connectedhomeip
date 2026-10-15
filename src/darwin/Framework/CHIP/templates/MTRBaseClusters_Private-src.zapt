@@ -3,6 +3,7 @@
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}
@@ -26,11 +27,13 @@
 {{/zcl_attributes_server}}
 
 @end
+#endif
 {{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} (PrivateExtensions)
 
 {{#zcl_commands}}
@@ -57,6 +60,7 @@
 {{/zcl_attributes_server}}
 
 @end
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

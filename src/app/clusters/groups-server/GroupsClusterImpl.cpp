@@ -198,8 +198,13 @@ DataModel::ActionReturnStatus GroupsClusterImpl::ReadAttribute(const DataModel::
 
     switch (request.path.mAttributeId)
     {
-    case ClusterRevision::Id:
-        return encoder.Encode(kRevision);
+    case ClusterRevision::Id: {
+        // Forcefully set the revision to the last Groups cluster revision with full command support (4).
+        // With revision 5+, The groups cluster is soft deprecated in favor of the Groupcast cluster.
+        // Group revision 5, is a stubbed implementation for backwards compatibility. See StubbedGroupsCluster.cpp.
+        constexpr uint16_t klastLegacyGroupRevision = 4;
+        return encoder.Encode(klastLegacyGroupRevision);
+    }
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);

@@ -19,45 +19,31 @@
 
 #include <device/capabilities/color-light/ColorLight.h>
 #include <device/capabilities/color-light/impl/ColorConverter.h>
+#include <device/capabilities/dimmable-load/impl/LoggingDimmableDelegate.h>
 
 namespace chip {
 namespace app {
 
 /**
  * A ColorLight whose output side only logs, so the device can be exercised without anything behind
- * it. It supplies itself as every delegate ColorLight needs.
+ * it. It supplies itself as every delegate ColorLight needs:
+ *   - LoggingDimmableDelegate: OnOffDelegate, OnOffEffectDelegate, LevelControlDelegate
+ *   - ColorConverter:          ColorControlDelegate
+ *   - IdentifyDelegate:        IdentifyDelegate
  *
  * A real product does not use this: it implements the delegate interfaces against its PWM/LED
  * channels and hands them to ColorLight, which is why ColorLight itself knows nothing about this
  * class.
  */
-class LoggingLightDriver : public ColorLight,
-                           public Clusters::OnOffDelegate,
-                           public Clusters::LevelControlDelegate,
-                           public Clusters::OnOffEffectDelegate,
-                           public ColorConverter,
-                           public Clusters::IdentifyDelegate
+class LoggingLightDriver : public LoggingDimmableDelegate, public ColorConverter, public Clusters::IdentifyDelegate
 {
 public:
-    LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                       const Conformance & conformance);
+    LoggingLightDriver()           = default;
     ~LoggingLightDriver() override = default;
 
+    ColorLight::Delegates GetDelegates();
+
 protected:
-    // OnOffDelegate
-    void OnOffStartup(bool on) override;
-    void OnOnOffChanged(bool on) override;
-
-    // LevelControlDelegate
-    void OnLevelChanged(uint8_t level) override;
-    void OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> options) override;
-    void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) override;
-    void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) override;
-
-    // OnOffEffectDelegate
-    DataModel::ActionReturnStatus TriggerDelayedAllOff(Clusters::OnOff::DelayedAllOffEffectVariantEnum effect) override;
-    DataModel::ActionReturnStatus TriggerDyingLight(Clusters::OnOff::DyingLightEffectVariantEnum effect) override;
-
     // ColorControlDelegate. Both output channels the device types built on this driver advertise are
     // logged; HueSaturation and EnhancedHue are left at their no-op defaults because neither device
     // type advertises those features, so the cluster never feeds them.
