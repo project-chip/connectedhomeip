@@ -5803,9 +5803,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::Percent & value, chip::Perce
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
 } // namespace Condition
 
 namespace DegradationDirection {
@@ -5819,13 +5816,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::WaterTankLeve
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::WaterTankLevelMonitoring::DegradationDirectionEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace DegradationDirection
 
 namespace ChangeIndication {
@@ -5839,12 +5829,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::WaterTankLeve
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::WaterTankLevelMonitoring::ChangeIndicationEnum value, MarkAttributeDirty markDirty);
 } // namespace ChangeIndication
 
 namespace InPlaceIndicator {
@@ -5856,9 +5840,6 @@ inline void GetDefaultOr(EndpointId endpoint, bool & value, bool fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace InPlaceIndicator
 
 namespace LastChangedTime {
@@ -5871,14 +5852,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<uint32_t> & va
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace LastChangedTime
 
 namespace FeatureMap {
@@ -5890,9 +5863,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -5904,9 +5874,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
