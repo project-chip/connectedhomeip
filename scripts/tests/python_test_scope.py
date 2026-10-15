@@ -123,6 +123,7 @@ ENV_FILE_STEP = "Generate an argument environment file"
 # ==== END OF MAINTAINER SETTINGS ====
 
 CHIP_ROOT = Path(__file__).resolve().parents[2]
+SCRIPT = Path(__file__).resolve().relative_to(CHIP_ROOT).as_posix()
 NO_TESTS = "none"
 CI_ARGUMENTS = re.compile(r"=== BEGIN CI TEST ARGUMENTS ===(.*?)=== END CI TEST ARGUMENTS ===", re.S)
 
@@ -164,7 +165,8 @@ def shard_job(chip_root: Path) -> dict:
     workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
     job = (workflow.get("jobs") or {}).get(SHARD_JOB)
     if job is None:
-        raise LookupError(f"{WORKFLOW} has no job {SHARD_JOB}. Fix: update SHARD_JOB in {Path(__file__).name}.")
+        raise LookupError(f"{WORKFLOW} has no job {SHARD_JOB}. Fix: in {SCRIPT}, set SHARD_JOB to the new name of the "
+                          "REPL job that runs the test shards.")
     return job
 
 
@@ -174,7 +176,7 @@ def shard_filters(chip_root: Path) -> list[str]:
         filters = shard_job(chip_root)["strategy"]["matrix"]["filter"]
     except KeyError:
         raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no strategy.matrix.filter list. "
-                          f"Fix: update shard_filters() in {Path(__file__).name}.") from None
+                          f"Fix: in {SCRIPT}, update shard_filters() to read the shard filters from their new place.") from None
     return [f for f in filters if f]
 
 
@@ -184,7 +186,7 @@ def environment_file(chip_root: Path) -> dict[str, str]:
         if step.get("name") == ENV_FILE_STEP:
             return dict(re.findall(r'echo "([A-Z_0-9]+): ([^"]+)" >> /tmp/test_env.yaml', step["run"]))
     raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no step named {ENV_FILE_STEP!r}. "
-                      f"Fix: update ENV_FILE_STEP in {Path(__file__).name}.")
+                      f"Fix: in {SCRIPT}, set ENV_FILE_STEP to the new name of the step that writes /tmp/test_env.yaml.")
 
 
 def built_apps(variables: dict[str, str]) -> set[str]:
