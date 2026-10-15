@@ -91,17 +91,27 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
 // which is where these singletons normally live. The application supplies these
-// attributes to the feature-owned cluster, which connects them to the Interaction Model.
+// attributes to the feature-owned cluster and uses that cluster as the event generator.
 namespace chip {
+namespace {
+DefaultOTARequestorEventGenerator * gDefaultOTARequestorEventGenerator = nullptr;
+} // namespace
+
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
     static OTARequestorAttributes gOtaRequestorAttributes;
     return gOtaRequestorAttributes;
 }
 
+void SetDefaultOTARequestorEventGenerator(DefaultOTARequestorEventGenerator & eventGenerator)
+{
+    gDefaultOTARequestorEventGenerator = &eventGenerator;
+}
+
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
-    return GetOTARequestorAttributes();
+    VerifyOrDie(gDefaultOTARequestorEventGenerator != nullptr);
+    return *gDefaultOTARequestorEventGenerator;
 }
 
 } // namespace chip

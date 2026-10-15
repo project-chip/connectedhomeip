@@ -29,6 +29,7 @@
 
 namespace chip {
 OTARequestorAttributes & GetOTARequestorAttributes();
+void SetDefaultOTARequestorEventGenerator(DefaultOTARequestorEventGenerator & eventGenerator);
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator();
 } // namespace chip
 #else

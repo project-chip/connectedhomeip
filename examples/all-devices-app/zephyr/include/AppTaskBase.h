@@ -43,6 +43,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
 #include <memory>
@@ -141,6 +142,7 @@ protected:
     DeviceLayer::DefaultOTARequestorDriver mOTARequestorDriver;
     chip::BDXDownloader mOTADownloader;
     chip::OTARequestorAttributes mOTARequestorAttributes;
+    Clusters::OTARequestorCluster * mOTARequestorCluster = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
     std::unique_ptr<RootNode> mRootNode;

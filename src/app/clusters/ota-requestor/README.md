@@ -30,14 +30,6 @@ created and can be accessed through `GetOTARequestorAttributes` in
 `CodegenIntegration.h`. When using code-driven clusters this must be created by
 the app.
 
-This also implements `DefaultOTARequestorEventGenerator` and can be passed as
-the event generator to `DefaultOTARequestor::Init`. Cluster startup connects it
-to the Interaction Model for StateTransition, VersionApplied, and DownloadError
-events. Shutdown and destruction detach the event generator and attribute-change
-listener. The attributes object must outlive the cluster; runtime event
-generation before startup or after shutdown returns
-`CHIP_ERROR_INCORRECT_STATE`.
-
 ### OTARequestorCluster
 
 This implements the interface the data model provider uses to handle attributes,

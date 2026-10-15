@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/data-model-provider/EventsGenerator.h>
@@ -37,7 +36,7 @@ namespace chip {
 // attributes dirty when they're changed. Updates the storage when the default OTA
 // providers list changes. Generates events when the update state changes. All
 // methods must be invoked with the Matter lock held.
-class OTARequestorAttributes : public DefaultOTARequestorEventGenerator
+class OTARequestorAttributes
 {
 public:
     using OTAChangeReasonEnum  = app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
@@ -71,10 +70,6 @@ public:
 
     CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, AttributeChangeListener & attributeChangeListener,
                                           app::DataModel::EventsGenerator & eventsGenerator);
-    void ClearInteractionModelContext(AttributeChangeListener & attributeChangeListener);
-
-    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent & event) override;
-    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent & event) override;
 
     // This loads the default OTA provider list and update state attributes from storage. This will not generate events.
     CHIP_ERROR SetStorageAndLoadAttributes(OTARequestorStorage & storage);

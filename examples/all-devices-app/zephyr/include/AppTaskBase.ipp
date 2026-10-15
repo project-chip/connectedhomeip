@@ -228,17 +228,22 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
 #else
     using RootNodeType = RootNodeWith<NetworkFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
 
 #endif
 
-    VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(rootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
+    ReturnErrorOnFailure(rootNode->RootNode::Register(rootAllocator, *mDataModelProvider));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    mOTARequestorCluster = &rootNode->template GetFeature<OtaFeature>().Cluster();
+#endif
+    mRootNode = std::move(rootNode);
 
     NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = mGroupDataProvider,
@@ -323,11 +328,11 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    VerifyOrReturnError(mOTARequestorCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    // mOTARequestorAttributes is passed twice as the same object provides attribute storage and OTA event generation.
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
-                                                mOTARequestorAttributes, mOTARequestorAttributes));
+                                                mOTARequestorAttributes, *mOTARequestorCluster));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);
