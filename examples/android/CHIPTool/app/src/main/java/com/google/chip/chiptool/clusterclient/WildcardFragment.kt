@@ -439,22 +439,21 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
   }
 
   private suspend fun read(isFabricFiltered: Boolean, eventMin: Long?) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        deviceController.readPath(
+          reportCallback,
+          devicePtr,
+          attributePath.ifEmpty { null },
+          eventPath.ifEmpty { null },
+          isFabricFiltered,
+          /* imTimeoutMs= */ 0,
+          eventMin
+        )
       }
-    deviceController.readPath(
-      reportCallback,
-      devicePtr,
-      attributePath.ifEmpty { null },
-      eventPath.ifEmpty { null },
-      isFabricFiltered,
-      /* imTimeoutMs= */ 0,
-      eventMin
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+    }
   }
 
   private fun addWriteRequest() {
@@ -743,42 +742,42 @@ class WildcardFragment : Fragment(), AddressUpdateFragment.ICDCheckInMessageCall
     val clusterId = 62L // OperationalCredentials
     val attributeId = 5L // CurrentFabricIndex
     val deviceId = addressUpdateFragment.deviceId
-    val devicePointer =
-      try {
-        ChipClient.getConnectedDevicePointer(context, deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        return 0U
-      }
-    return suspendCoroutine { cont ->
-      deviceController.readAttributePath(
-        object : ReportCallback {
-          override fun onError(
-            attributePath: ChipAttributePath?,
-            eventPath: ChipEventPath?,
-            e: java.lang.Exception
-          ) {
-            cont.resume(0u)
-          }
+    return try {
+      ChipClient.withConnectedDevice(context, deviceId) { devicePointer ->
+        suspendCoroutine { cont ->
+          deviceController.readAttributePath(
+            object : ReportCallback {
+              override fun onError(
+                attributePath: ChipAttributePath?,
+                eventPath: ChipEventPath?,
+                e: java.lang.Exception
+              ) {
+                cont.resume(0u)
+              }
 
-          override fun onReport(nodeState: NodeState?) {
-            val state =
-              nodeState
-                ?.getEndpointState(endpointId.toInt())
-                ?.getClusterState(clusterId)
-                ?.getAttributeState(attributeId)
-            if (state == null) {
-              cont.resume(0u)
-              return
-            }
-            val ret = TlvReader(state.tlv).getUInt(AnonymousTag)
-            cont.resume(ret)
-          }
-        },
-        devicePointer,
-        listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
-        0 /* imTimeoutMs */
-      )
+              override fun onReport(nodeState: NodeState?) {
+                val state =
+                  nodeState
+                    ?.getEndpointState(endpointId.toInt())
+                    ?.getClusterState(clusterId)
+                    ?.getAttributeState(attributeId)
+                if (state == null) {
+                  cont.resume(0u)
+                  return
+                }
+                val ret = TlvReader(state.tlv).getUInt(AnonymousTag)
+                cont.resume(ret)
+              }
+            },
+            devicePointer,
+            listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)),
+            0 /* imTimeoutMs */
+          )
+        }
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      0U
     }
   }
 

@@ -272,30 +272,28 @@ class GroupSettingFragment : Fragment() {
   private suspend fun sendKeySetWrite(
     groupKeySetStruct: GroupKeyManagementClusterGroupKeySetStruct
   ) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
+        cluster.keySetWrite(
+          object : ChipClusters.DefaultClusterCallback {
+            override fun onError(e: Exception?) {
+              Log.d(TAG, "onError : ", e)
+              showMessage("onError : ${e.toString()}")
+            }
+
+            override fun onSuccess() {
+              Log.d(TAG, "onResponse")
+              showMessage("onResponse")
+            }
+          },
+          groupKeySetStruct
+        )
       }
-    val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
-
-    cluster.keySetWrite(
-      object : ChipClusters.DefaultClusterCallback {
-        override fun onError(e: Exception?) {
-          Log.d(TAG, "onError : ", e)
-          showMessage("onError : ${e.toString()}")
-        }
-
-        override fun onSuccess() {
-          Log.d(TAG, "onResponse")
-          showMessage("onResponse")
-        }
-      },
-      groupKeySetStruct
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun writeGroupKeyMapBtnClick() {
@@ -317,35 +315,34 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun writeGroupKeyMap(groupId: UInt, groupKeySetId: UInt) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
-    cluster.writeGroupKeyMapAttribute(
-      object : ChipClusters.DefaultClusterCallback {
-        override fun onError(e: Exception?) {
-          Log.d(TAG, "onError : ", e)
-          showMessage("Error : ${e.toString()}")
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
+        cluster.writeGroupKeyMapAttribute(
+          object : ChipClusters.DefaultClusterCallback {
+            override fun onError(e: Exception?) {
+              Log.d(TAG, "onError : ", e)
+              showMessage("Error : ${e.toString()}")
+            }
 
-        override fun onSuccess() {
-          Log.d(TAG, "onResponse")
-          showMessage("write Success")
-        }
-      },
-      arrayListOf(
-        ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct(
-          groupId.toInt(),
-          groupKeySetId.toInt(),
-          deviceController.fabricIndex
+            override fun onSuccess() {
+              Log.d(TAG, "onResponse")
+              showMessage("write Success")
+            }
+          },
+          arrayListOf(
+            ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct(
+              groupId.toInt(),
+              groupKeySetId.toInt(),
+              deviceController.fabricIndex
+            )
+          )
         )
-      )
-    )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun sendAddGroupBtnClick() {
@@ -366,55 +363,52 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun sendAddGroup(groupId: UInt, groupName: String) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        val cluster = ChipClusters.GroupsCluster(devicePtr, 0)
+        cluster.addGroup(
+          object : ChipClusters.GroupsCluster.AddGroupResponseCallback {
+            override fun onError(e: Exception?) {
+              Log.d(TAG, "onError : ", e)
+              showMessage("Error : ${e.toString()}")
+            }
+
+            override fun onSuccess(status: Int?, groupID: Int?) {
+              Log.d(TAG, "onResponse")
+              showMessage("onResponse : $status, $groupID")
+            }
+          },
+          groupId.toInt(),
+          groupName
+        )
       }
-    val cluster = ChipClusters.GroupsCluster(devicePtr, 0)
-
-    cluster.addGroup(
-      object : ChipClusters.GroupsCluster.AddGroupResponseCallback {
-        override fun onError(e: Exception?) {
-          Log.d(TAG, "onError : ", e)
-          showMessage("Error : ${e.toString()}")
-        }
-
-        override fun onSuccess(status: Int?, groupID: Int?) {
-          Log.d(TAG, "onResponse")
-          showMessage("onResponse : $status, $groupID")
-        }
-      },
-      groupId.toInt(),
-      groupName
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private suspend fun readAccessControl() {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
-    val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
-    cluster.readAclAttribute(
-      object : ChipClusters.AccessControlCluster.AclAttributeCallback {
-        override fun onError(e: Exception?) {
-          Log.d(TAG, "onError : ", e)
-          showMessage("Error : $e")
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
+        cluster.readAclAttribute(
+          object : ChipClusters.AccessControlCluster.AclAttributeCallback {
+            override fun onError(e: Exception?) {
+              Log.d(TAG, "onError : ", e)
+              showMessage("Error : $e")
+            }
 
-        override fun onSuccess(value: MutableList<AccessControlClusterAccessControlEntryStruct>?) {
-          requireActivity().runOnUiThread { showAddAccessControlDialog(value) }
-        }
+            override fun onSuccess(value: MutableList<AccessControlClusterAccessControlEntryStruct>?) {
+              requireActivity().runOnUiThread { showAddAccessControlDialog(value) }
+            }
+          }
+        )
       }
-    )
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   private fun showAddAccessControlDialog(
@@ -456,16 +450,7 @@ class GroupSettingFragment : Fragment() {
     groupId: UInt,
     privilege: UInt
   ) {
-    val devicePtr =
-      try {
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-      } catch (e: IllegalStateException) {
-        Log.d(TAG, "getConnectedDevicePointer exception", e)
-        showMessage("Get DevicePointer fail!")
-        return
-      }
     // If GroupID is already added to AccessControl, do not add it.
-    val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
     val sendEntry = ArrayList<AccessControlClusterAccessControlEntryStruct>()
     for (entry in value) {
       if (
@@ -489,20 +474,28 @@ class GroupSettingFragment : Fragment() {
       )
     sendEntry.add(newEntry)
 
-    cluster.writeAclAttribute(
-      object : ChipClusters.DefaultClusterCallback {
-        override fun onError(e: Exception?) {
-          Log.d(TAG, "onError : ", e)
-          showMessage("Error : ${e.toString()}")
-        }
+    try {
+      ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) { devicePtr ->
+        val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
+        cluster.writeAclAttribute(
+          object : ChipClusters.DefaultClusterCallback {
+            override fun onError(e: Exception?) {
+              Log.d(TAG, "onError : ", e)
+              showMessage("Error : ${e.toString()}")
+            }
 
-        override fun onSuccess() {
-          Log.d(TAG, "onResponse")
-          showMessage("write Success")
-        }
-      },
-      sendEntry
-    )
+            override fun onSuccess() {
+              Log.d(TAG, "onResponse")
+              showMessage("write Success")
+            }
+          },
+          sendEntry
+        )
+      }
+    } catch (e: IllegalStateException) {
+      Log.d(TAG, "getConnectedDevicePointer exception", e)
+      showMessage("Get DevicePointer fail!")
+    }
   }
 
   override fun onStart() {

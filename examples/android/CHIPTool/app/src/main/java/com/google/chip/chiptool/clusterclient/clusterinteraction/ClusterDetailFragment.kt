@@ -20,7 +20,6 @@ import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
-import com.google.chip.chiptool.ChipClient.getConnectedDevicePointer
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionHistoryFragment.Companion.clusterInteractionHistoryList
@@ -69,7 +68,7 @@ class ClusterDetailFragment : Fragment() {
     deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
     scope.launch {
       try {
-        devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
+        devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       } catch (e: IllegalStateException) {
         Log.d(TAG, "getConnectedDevicePointer exception", e)
         showMessage("Get DevicePointer fail!")
@@ -117,6 +116,10 @@ class ClusterDetailFragment : Fragment() {
 
   override fun onDestroyView() {
     super.onDestroyView()
+    // Release the native device pointer to prevent a memory leak (issue #21539).
+    if (::selectedCluster.isInitialized) {
+      ChipClient.getDeviceController(requireContext()).releaseConnectedDevicePointer(devicePtr)
+    }
     _binding = null
   }
 

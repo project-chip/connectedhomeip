@@ -135,15 +135,12 @@ object ChipClient {
 
   /**
    * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
+   *
+   * Prefer [withConnectedDevice] over this function. Callers of this function are responsible for
+   * calling [ChipDeviceController.releaseConnectedDevicePointer] when done with the pointer to
+   * avoid a native memory leak.
    */
   suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
-    // TODO (#21539) This is a memory leak because we currently never call
-    // releaseConnectedDevicePointer
-    // once we are done with the returned device pointer. Memory leak was introduced since the
-    // refactor
-    // that introduced it was very large in order to fix a use after free, which was considered
-    // to be
-    // worse than the memory leak that was introduced.
     return suspendCancellableCoroutine { continuation ->
       getDeviceController(context)
         .getConnectedDevicePointer(
@@ -151,16 +148,40 @@ object ChipClient {
           object : GetConnectedDeviceCallback {
             override fun onDeviceConnected(devicePointer: Long) {
               Log.d(TAG, "Got connected device pointer")
-              continuation.resume(devicePointer)
+              if (continuation.isActive) {
+                continuation.resume(devicePointer)
+              }
             }
 
             override fun onConnectionFailure(nodeId: Long, error: Exception) {
               val errorMessage = "Unable to get connected device with nodeId $nodeId"
               Log.e(TAG, errorMessage, error)
-              continuation.resumeWithException(IllegalStateException(errorMessage))
+              if (continuation.isActive) {
+                continuation.resumeWithException(IllegalStateException(errorMessage))
+              }
             }
           }
         )
+    }
+  }
+
+  /**
+   * Acquires a native device pointer for [nodeId], invokes [block] with it, and then releases the
+   * pointer via [ChipDeviceController.releaseConnectedDevicePointer] in a `finally` block.
+   *
+   * This is the preferred way to interact with a connected device. It ensures the native pointer is
+   * always released, preventing the memory leak described in issue #21539.
+   */
+  suspend fun <T> withConnectedDevice(
+    context: Context,
+    nodeId: Long,
+    block: suspend (devicePointer: Long) -> T
+  ): T {
+    val devicePointer = getConnectedDevicePointer(context, nodeId)
+    return try {
+      block(devicePointer)
+    } finally {
+      getDeviceController(context).releaseConnectedDevicePointer(devicePointer)
     }
   }
 }
