@@ -18,6 +18,7 @@
 """Unit tests for python_test_scope.py."""
 
 import contextlib
+import difflib
 import io
 import json
 import os
@@ -384,9 +385,25 @@ class RepositoryGuard(unittest.TestCase):
     SCOPE_SCRIPT = "scripts/tests/python_test_scope.py"
 
     @staticmethod
-    def message(problem: str, fix: str, *code: str, note: str | None = None) -> str:
-        """Lay out a failure: what is wrong, the fix, any code to paste on lines of its own, then a note."""
-        return "\n".join([problem, f"Fix: {fix}", *(f"    {line}" for line in code), *([note] if note else [])])
+    def message(problem: str, fix: str, *code: str, note: str | None = None,
+                alternative: tuple[str, list[str]] | None = None) -> str:
+        """Lay out a failure: what is wrong, the fix and its code, an alternative fix and its code, then a note."""
+        lines = [problem, f"Fix: {fix}", *(f"    {line}" for line in code)]
+        if alternative:
+            lines += [f"Or: {alternative[0]}", *(f"    {line}" for line in alternative[1])]
+        return "\n".join(lines + ([note] if note else []))
+
+    @staticmethod
+    def settings_dict(name: str, entries: dict[str, str]) -> list[str]:
+        """Code lines for a settings dictionary, written the way python_test_scope.py writes it."""
+        return [f"{name} = {{", *(f'    "{key}": "{value}",' for key, value in entries.items()), "}"]
+
+    @staticmethod
+    def own_condition(condition: str, *drop: str) -> str:
+        """A job's condition without the ${{ }} wrapper and without the given terms."""
+        inner = condition.strip().removeprefix("${{").removesuffix("}}").strip()
+        own = " && ".join(part.strip() for part in inner.split("&&") if part.strip() and part.strip() not in drop)
+        return f"({own})" if "||" in own else own
 
     def fail_with_fix(self, path: str, line_pattern: str, message: str, after: str | None = None) -> None:
         """Fail with `message`, annotating the first line matching `line_pattern`, after the first matching `after`."""
@@ -404,8 +421,24 @@ class RepositoryGuard(unittest.TestCase):
         try:
             return reader(*args)
         except LookupError as error:
-            setting = re.search(r"(?:set|update) (\w+)", str(error))
-            self.fail_with_fix(self.SCOPE_SCRIPT, rf"^(def )?{setting.group(1) if setting else 'WORKFLOW'}\b", str(error))
+            text = str(error)
+            setting = (re.search(r"(?:set|update) (\w+)", text) or re.search(r"(WORKFLOW)", "WORKFLOW")).group(1)
+            if suggestion := self.renamed(setting):
+                text = f"{text.rstrip('.')}:\n    {setting} = \"{suggestion}\""
+            self.fail_with_fix(self.SCOPE_SCRIPT, rf"^(def )?{setting}\b", text)
+
+    def renamed(self, setting: str) -> str | None:
+        """The new name for SHARD_JOB or ENV_FILE_STEP, when tests.yaml has exactly one candidate."""
+        jobs = (yaml.safe_load((self.ROOT / self.TESTS_WORKFLOW).read_text()) or {}).get("jobs") or {}
+        if setting == "SHARD_JOB":
+            names = [job for job, body in jobs.items()
+                     if isinstance(((body.get("strategy") or {}).get("matrix") or {}).get("filter"), list)]
+        elif setting == "ENV_FILE_STEP":
+            names = [step.get("name") for step in (jobs.get(SHARD_JOB) or {}).get("steps") or []
+                     if 'echo "' in str(step.get("run")) and "/tmp/test_env.yaml" in str(step.get("run"))]
+        else:
+            return None
+        return names[0] if len(names) == 1 else None
 
     def environment(self) -> dict[str, str]:
         """Return the REPL environment file's variables; it must name at least one build output."""
@@ -415,7 +448,9 @@ class RepositoryGuard(unittest.TestCase):
                                self.message(f"python_test_scope.py finds no app in the '{ENV_FILE_STEP}' step of "
                                             f"{self.TESTS_WORKFLOW}, so it cannot tell which apps a pull request's tests need.",
                                             "if that step's echo lines or the objdir-clone/ app paths changed format, update "
-                                            f"environment_file() and built_apps() in {self.SCOPE_SCRIPT}."))
+                                            f"environment_file() and built_apps() in {self.SCOPE_SCRIPT}, which read lines like:",
+                                            'echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/'
+                                            'chip-all-clusters-app" >> /tmp/test_env.yaml'))
         return variables
 
     def runnable_tests(self) -> list[str]:
@@ -433,10 +468,13 @@ class TestSelectionGuards(RepositoryGuard):
 
     def runner_source(self) -> str:
         if not (self.ROOT / RUNNER).is_file():
+            # The runner is the file that defines the run command.
+            moved = [path.relative_to(self.ROOT).as_posix() for path in sorted((self.ROOT / self.TREE).glob("*.py"))
+                     if "def cmd_run(" in path.read_text(errors="replace")]
             self.fail_with_fix(self.SCOPE_SCRIPT, r"^RUNNER =",
                                self.message(f"{RUNNER} does not exist.",
                                             f"in {self.SCOPE_SCRIPT}, set RUNNER to the runner's new path:",
-                                            'RUNNER = "src/python_testing/<new name>.py"'))
+                                            f'RUNNER = "{moved[0] if len(moved) == 1 else "src/python_testing/<new name>.py"}"'))
         return (self.ROOT / RUNNER).read_text()
 
     def runner_runs(self, *regexes: str) -> set[str]:
@@ -508,18 +546,27 @@ class TestSelectionGuards(RepositoryGuard):
                     f"The runner now leaves out the tests listed under {section} in test_metadata.yaml, such as "
                     f"{sorted(missing)[0]}, but {self.SCOPE_SCRIPT} still sends them to the REPL shards.",
                     f"in {self.SCOPE_SCRIPT}, add the section to EXCLUDED_SECTIONS:",
-                    f'"{section}": "is listed under {section} in test_metadata.yaml",'))
+                    *self.settings_dict("EXCLUDED_SECTIONS", {
+                        **EXCLUDED_SECTIONS, section: f"is listed under {section} in test_metadata.yaml"})))
             if added and not missing and section in EXCLUDED_SECTIONS and added <= names:
                 self.fail_with_fix(self.SCOPE_SCRIPT, r"^EXCLUDED_SECTIONS =", self.message(
                     f"The runner now runs the tests listed under {section} in test_metadata.yaml, such as "
                     f"{sorted(added)[0]}, but {self.SCOPE_SCRIPT} still leaves them out.",
-                    f'in {self.SCOPE_SCRIPT}, remove "{section}" from EXCLUDED_SECTIONS.'))
+                    f'in {self.SCOPE_SCRIPT}, remove "{section}" from EXCLUDED_SECTIONS:',
+                    *self.settings_dict("EXCLUDED_SECTIONS", {
+                        key: value for key, value in EXCLUDED_SECTIONS.items() if key != section})))
         given = " with a pull request's test list" if narrowed else ""
+        # Show how the runner picks files now, from its own source.
+        lines = self.runner_source().splitlines()
+        start = next((n for n, line in enumerate(lines) if line.strip() == "for pattern in regex:"), None)
+        end = next((n for n in range(start or 0, len(lines)) if "if match(path)" in lines[n]), None) if start is not None else None
+        runner_code = textwrap.dedent("\n".join(lines[start:end + 1])).splitlines() if end is not None else []
         self.fail_with_fix(self.SCOPE_SCRIPT, r"^def runner_matches\b", self.message(
             f"For the REPL shard {shard!r}{given}, the runner picks different tests than {self.SCOPE_SCRIPT} expects "
             f"(only the runner: {sorted(added)[:3]}, only the script: {sorted(missing)[:3]}), so "
             "the runner's --regex matching has changed.",
-            f"in {self.SCOPE_SCRIPT}, update runner_matches() to pick files the way {RUNNER} run --regex does now."))
+            f"in {self.SCOPE_SCRIPT}, update runner_matches() to pick files the way {RUNNER} now does"
+            + (":" if runner_code else "."), *runner_code))
 
     def test_the_runner_imports_nothing_else_from_the_test_tree(self):
         files = scan_tree(self.ROOT / self.TREE)
@@ -556,8 +603,9 @@ class TestBuildGuards(RepositoryGuard):
                                self.message(f"No job in {self.TESTS_WORKFLOW} has the step 'Select Python tests for this pull "
                                             f"request' (id {self.SELECT_STEP}), so {ONLY} run every REPL test and build every app "
                                             "again.",
-                                            f"in {self.TESTS_WORKFLOW}, keep that step in the job that builds the REPL apps, before "
-                                            "its app build steps."))
+                                            f"in {self.TESTS_WORKFLOW}, put that step back in the job that builds the REPL apps, "
+                                            "before its app build steps. This shows it as it last was:",
+                                            f"git log -p -1 -S 'id: {self.SELECT_STEP}' -- {self.TESTS_WORKFLOW}"))
         self.variables = self.environment()
         self.apps = built_apps(self.variables)
 
@@ -586,7 +634,8 @@ class TestBuildGuards(RepositoryGuard):
             ((self.workflow["jobs"][self.build_job].get("outputs") or {}).get("python_test_slices") == output, self.build_job,
              f"give job {self.build_job} this output:", ["outputs:", f"    python_test_slices: {output}"]),
             (self.build_job in self.needs(self.shard_job), SHARD_JOB,
-             f"add {self.build_job} to the needs: list of job {SHARD_JOB}.", []),
+             f"add {self.build_job} to the needs: list of job {SHARD_JOB}:",
+             [f"needs: [{', '.join([*self.needs(self.shard_job), self.build_job])}]"]),
             (f"needs.{self.build_job}.outputs.python_test_slices" in selection and "[matrix.filter]" in selection, SHARD_JOB,
              f"give job {SHARD_JOB} this environment variable:",
              ["env:", f"    PYTHON_TEST_SELECTION: ${{{{ fromJSON(needs.{self.build_job}.outputs.python_test_slices || '{{}}')"
@@ -634,15 +683,24 @@ class TestBuildGuards(RepositoryGuard):
             if not CI_ARGUMENTS.search(source):
                 self.fail_with_fix(path, r"^", self.message(
                     f"The REPL shards run {name}, but it has no CI arguments block, which they need to run it.",
-                    f"in {path}, add a '# === BEGIN CI TEST ARGUMENTS ===' block, or list {name} under not_automated in "
-                    f"{self.TREE}/test_metadata.yaml.",
+                    f"in {path}, add a CI arguments block near the top, set for the app it tests, like:",
+                    "# === BEGIN CI TEST ARGUMENTS ===", "# test-runner-runs:", "#   run1:", "#     app: ${ALL_CLUSTERS_APP}",
+                    "#     app-args: --discriminator 1234 --KVS kvs1", "#     script-args: >",
+                    "#       --storage-path admin_storage.json", "#       --commissioning-method on-network",
+                    "#       --discriminator 1234", "#       --passcode 20202021", "#     factory-reset: true",
+                    "#     quiet: true", "# === END CI TEST ARGUMENTS ===",
+                    alternative=(f"if CI cannot run it, list it under not_automated in {self.TREE}/test_metadata.yaml:",
+                                 [f"- name: {name}", "  reason: <why CI cannot run it>"]),
                     note=f"If the block markers changed for every test, update CI_ARGUMENTS in {self.SCOPE_SCRIPT} instead."))
             for variable in sorted(ci_variables(source) - set(self.variables)):
+                close = difflib.get_close_matches(variable, self.variables, n=1)
                 self.fail_with_fix(path, rf"\$\{{{variable}\}}", self.message(
                     f"{name} uses ${{{variable}}} in its CI arguments, but the '{ENV_FILE_STEP}' step of "
                     f"{self.TESTS_WORKFLOW} does not define it.",
-                    f"correct the name in {path}, or define it in that step:",
-                    f'echo "{variable}: <path>" >> /tmp/test_env.yaml',
+                    *((f"in {path}, use the defined name:", f"${{{close[0]}}}") if close else
+                      ("define it in that step:", f'echo "{variable}: <path>" >> /tmp/test_env.yaml')),
+                    alternative=(("if it is a new variable, define it in that step:",
+                                  [f'echo "{variable}: <path>" >> /tmp/test_env.yaml']) if close else None),
                     note=f"If that step's echo lines changed format, update environment_file() in {self.SCOPE_SCRIPT} instead."))
 
     def test_each_app_build_runs_when_the_selection_needs_one_of_its_apps(self):
@@ -672,11 +730,17 @@ class TestBuildGuards(RepositoryGuard):
         produced = {n for _, targets in self.build_steps() for n in self.produced(targets)}
         # Apps an always-running step makes, such as the OTA images, are listed as always built.
         for name in sorted(self.apps - produced - set(UNFILTERED_JOB_APPS)):
+            target = self.variables[name].split("/")[1]
             self.fail_with_fix(self.TESTS_WORKFLOW, rf'echo "{name}:', self.message(
                 f"{name} is defined in the '{ENV_FILE_STEP}' step of {self.TESTS_WORKFLOW}, but no step of job "
                 f"{self.build_job} builds it with --target, so nothing builds it when a test needs it.",
-                f"in {self.TESTS_WORKFLOW}, build it in a step of job {self.build_job} with this condition:",
-                f"if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',{name},')",
+                f"in {self.TESTS_WORKFLOW}, build it in a step of job {self.build_job} like:",
+                f"- name: Build {target.split('-${BUILD_VARIANT}')[0]}",
+                f"  if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',{name},')",
+                "  run: >-",
+                '      ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py',
+                f"      --target {target}",
+                f"      build --copy-artifacts-to objdir-clone && rm -rf out/{target}\"",
                 note=f"If a step that always runs makes it, like the OTA images, add {name} to UNFILTERED_JOB_APPS in "
                 f"{self.SCOPE_SCRIPT} instead."))
 
@@ -739,11 +803,7 @@ class TestGateGuards(RepositoryGuard):
         for path, job, body in self.gated_jobs():
             condition = str(body.get("if", ""))
             if not condition.startswith("${{ !cancelled() && ") or self.GATE not in condition:
-                inner = condition.strip().removeprefix("${{").removesuffix("}}").strip()
-                own = " && ".join(part.strip() for part in inner.split("&&")
-                                  if part.strip() and part.strip() not in ("!cancelled()", self.GATE)) or "<its own condition>"
-                if "||" in own:
-                    own = f"({own})"
+                own = self.own_condition(condition, "!cancelled()", self.GATE) or "<its own condition>"
                 self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
                     f"Job {job} waits for the pr_scope job, which is skipped on master and in the merge queue, so without "
                     "!cancelled() in its condition the job silently stops running there.",
@@ -761,11 +821,14 @@ class TestGateGuards(RepositoryGuard):
                 for read in sorted(set(re.findall(rf"{self.TREE}/[\w.*/-]+", content))):
                     if classify([read])[0]:
                         through = f" through {source}" if source != path else ""
+                        others = [need for need in self.needs(body) if need != "pr_scope"]
+                        own = self.own_condition(str(body.get("if", "")), "!cancelled()", self.GATE)
                         self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
                             f"Job {job} is skipped on {ONLY}, but it reads {read}{through}, which they can change, so a "
                             "break there would go unseen until the merge queue.",
-                            f"in {path}, remove pr_scope from the needs: list of job {job} and the python_tests_only "
-                            "check from its condition, or stop it reading that file."))
+                            f"in {path}, stop gating job {job}, or stop it reading that file. Ungated, the job starts:",
+                            f"{job}:", *([f"    needs: [{', '.join(others)}]"] if others else []),
+                            *([f"    if: {own}"] if own else [])))
 
 
 if __name__ == "__main__":
