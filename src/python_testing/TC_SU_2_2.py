@@ -99,6 +99,14 @@ STEP6_CYCLE_TIMEOUT_SEC = 120
 # is not idle already, which is the exceptional case: the preceding step normally leaves it
 # quiescent on its periodic query timer.
 IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC = 120
+# Log line every OTA provider prints on receiving a QueryImage, whatever it then answers: see
+# OtaProviderLogic::QueryImage in src/app/clusters/ota-provider/OTAProviderCluster.cpp, which
+# logs it before dispatching to the application delegate. Step 4 polls it on the provider's
+# stdout as an out-of-band barrier: it is the only way to tell a query the provider actually
+# answered (with the invalid ImageURI under test) from one that died in a CASE session left
+# over from a previous provider process, since both leave the DUT in the same
+# kQuerying→kIdle transition.
+PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
 
 
 class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
