@@ -97,6 +97,14 @@ public:
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
 
+    /**
+     * @brief Check whether a preset handle exists in the Presets attribute.
+     *
+     * Used by Schedules to validate a schedule's (or schedule transition's) PresetHandle field. Returns true
+     * when the Presets feature isn't supported, since there is then no Presets list to validate against.
+     */
+    virtual bool PresetHandleExists(const ByteSpan & presetHandle) { return true; }
+
 protected:
     ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
                           Thermostat::Delegate & delegate);

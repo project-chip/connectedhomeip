@@ -378,6 +378,18 @@ public:
         return setpoints;
     }
 
+    bool PresetHandleExists(const ByteSpan & presetHandle) override
+    {
+        if constexpr (kHasPresets)
+        {
+            return mPresets.IsPresetHandlePresentInPresets(presetHandle);
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override
     {
         if constexpr (kHasPresets)
