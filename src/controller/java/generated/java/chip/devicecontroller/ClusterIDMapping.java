@@ -5007,7 +5007,6 @@ public class ClusterIDMapping {
             GroupTable(1L),
             MaxGroupsPerFabric(2L),
             MaxGroupKeysPerFabric(3L),
-            GroupcastAdoption(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -19770,7 +19769,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageUri(3),;
+        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageURI(3),;
                     private final int id;
                     AddFileCommandField(int id) {
                         this.id = id;
@@ -19838,7 +19837,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageUri(4),;
+                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageURI(4),;
                     private final int id;
                     OfferFileCommandField(int id) {
                         this.id = id;

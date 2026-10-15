@@ -16104,7 +16104,6 @@ public class ChipClusters {
     private static final long GROUP_TABLE_ATTRIBUTE_ID = 1L;
     private static final long MAX_GROUPS_PER_FABRIC_ATTRIBUTE_ID = 2L;
     private static final long MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID = 3L;
-    private static final long GROUPCAST_ADOPTION_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -16231,10 +16230,6 @@ public class ChipClusters {
 
     public interface GroupTableAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct> value);
-    }
-
-    public interface GroupcastAdoptionAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -16370,46 +16365,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readGroupcastAdoptionAttribute(
-        GroupcastAdoptionAttributeCallback callback) {
-      readGroupcastAdoptionAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readGroupcastAdoptionAttributeWithFabricFilter(
-        GroupcastAdoptionAttributeCallback callback, boolean isFabricFiltered) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GROUPCAST_ADOPTION_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GROUPCAST_ADOPTION_ATTRIBUTE_ID, isFabricFiltered);
-    }
-
-    public void writeGroupcastAdoptionAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value) {
-      writeGroupcastAdoptionAttribute(callback, value, 0);
-    }
-
-    public void writeGroupcastAdoptionAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
-      writeAttribute(new WriteAttributesCallbackImpl(callback), GROUPCAST_ADOPTION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeGroupcastAdoptionAttribute(
-        GroupcastAdoptionAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GROUPCAST_ADOPTION_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, GROUPCAST_ADOPTION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -65196,11 +65151,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void addFile(AddFileResponseCallback callback, String name, Long size, String mimeType, String imageUri) {
-      addFile(callback, name, size, mimeType, imageUri, 0);
+    public void addFile(AddFileResponseCallback callback, String name, Long size, String mimeType, String imageURI) {
+      addFile(callback, name, size, mimeType, imageURI, 0);
     }
 
-    public void addFile(AddFileResponseCallback callback, String name, Long size, String mimeType, String imageUri, int timedInvokeTimeoutMs) {
+    public void addFile(AddFileResponseCallback callback, String name, Long size, String mimeType, String imageURI, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -65216,9 +65171,9 @@ public class ChipClusters {
       BaseTLVType mimeTypetlvValue = new StringType(mimeType);
       elements.add(new StructElement(mimeTypeFieldID, mimeTypetlvValue));
 
-      final long imageUriFieldID = 3L;
-      BaseTLVType imageUritlvValue = new StringType(imageUri);
-      elements.add(new StructElement(imageUriFieldID, imageUritlvValue));
+      final long imageURIFieldID = 3L;
+      BaseTLVType imageURItlvValue = new StringType(imageURI);
+      elements.add(new StructElement(imageURIFieldID, imageURItlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -65265,11 +65220,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void requestSharedFiles(DefaultClusterCallback callback, String clientName, Integer requestID, @Nullable Optional<ArrayList<String>> supportedMimeTypes) {
+    public void requestSharedFiles(DefaultClusterCallback callback, String clientName, Integer requestID, Optional<ArrayList<String>> supportedMimeTypes) {
       requestSharedFiles(callback, clientName, requestID, supportedMimeTypes, 0);
     }
 
-    public void requestSharedFiles(DefaultClusterCallback callback, String clientName, Integer requestID, @Nullable Optional<ArrayList<String>> supportedMimeTypes, int timedInvokeTimeoutMs) {
+    public void requestSharedFiles(DefaultClusterCallback callback, String clientName, Integer requestID, Optional<ArrayList<String>> supportedMimeTypes, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -65282,7 +65237,7 @@ public class ChipClusters {
       elements.add(new StructElement(requestIDFieldID, requestIDtlvValue));
 
       final long supportedMimeTypesFieldID = 2L;
-      BaseTLVType supportedMimeTypestlvValue = supportedMimeTypes != null ? supportedMimeTypes.<BaseTLVType>map((nonOptionalsupportedMimeTypes) -> ArrayType.generateArrayType(nonOptionalsupportedMimeTypes, (elementnonOptionalsupportedMimeTypes) -> new StringType(elementnonOptionalsupportedMimeTypes))).orElse(new EmptyType()) : new NullType();
+      BaseTLVType supportedMimeTypestlvValue = supportedMimeTypes.<BaseTLVType>map((nonOptionalsupportedMimeTypes) -> ArrayType.generateArrayType(nonOptionalsupportedMimeTypes, (elementnonOptionalsupportedMimeTypes) -> new StringType(elementnonOptionalsupportedMimeTypes))).orElse(new EmptyType());
       elements.add(new StructElement(supportedMimeTypesFieldID, supportedMimeTypestlvValue));
 
       StructType commandArgs = new StructType(elements);
@@ -65312,7 +65267,7 @@ public class ChipClusters {
           final long statusFieldID = 0L;
           Integer status = null;
           final long fileDescriptionFieldID = 1L;
-          @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription = null;
+          @Nullable ChipStructs.MediaFileManagementClusterFileDescriptionStruct fileDescription = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -65322,7 +65277,7 @@ public class ChipClusters {
             } else if (element.contextTagNum() == fileDescriptionFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
                 StructType castingValue = element.value(StructType.class);
-                fileDescription = Optional.of(ChipStructs.MediaFileManagementClusterFileDescriptionStruct.decodeTlv(castingValue));
+                fileDescription = ChipStructs.MediaFileManagementClusterFileDescriptionStruct.decodeTlv(castingValue);
               }
             }
           }
@@ -65330,11 +65285,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void offerFile(DefaultClusterCallback callback, String clientName, String name, Long size, String mimeType, String imageUri) {
-      offerFile(callback, clientName, name, size, mimeType, imageUri, 0);
+    public void offerFile(DefaultClusterCallback callback, String clientName, String name, Long size, String mimeType, String imageURI) {
+      offerFile(callback, clientName, name, size, mimeType, imageURI, 0);
     }
 
-    public void offerFile(DefaultClusterCallback callback, String clientName, String name, Long size, String mimeType, String imageUri, int timedInvokeTimeoutMs) {
+    public void offerFile(DefaultClusterCallback callback, String clientName, String name, Long size, String mimeType, String imageURI, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -65354,9 +65309,9 @@ public class ChipClusters {
       BaseTLVType mimeTypetlvValue = new StringType(mimeType);
       elements.add(new StructElement(mimeTypeFieldID, mimeTypetlvValue));
 
-      final long imageUriFieldID = 4L;
-      BaseTLVType imageUritlvValue = new StringType(imageUri);
-      elements.add(new StructElement(imageUriFieldID, imageUritlvValue));
+      final long imageURIFieldID = 4L;
+      BaseTLVType imageURItlvValue = new StringType(imageURI);
+      elements.add(new StructElement(imageURIFieldID, imageURItlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -65371,7 +65326,7 @@ public class ChipClusters {
     }
 
     public interface GetSharedFileResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription);
+      void onSuccess(Integer status, @Nullable ChipStructs.MediaFileManagementClusterFileDescriptionStruct fileDescription);
     }
 
     public interface AvailableFilesAttributeCallback extends BaseAttributeCallback {

@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_11(MatterTestCommissionedDevice, AVSMTestBase):
     def desc_TC_AVSM_2_11(self) -> str:
         return "[TC-AVSM-2.11] Validate SetStreamPriorities Functionality with Server as DUT"
 
@@ -171,22 +171,29 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
                              "The read StreamUsagePriorities is different from the one set in SetStreamPriorities")
 
         self.step(4)
-        try:
-            notSupportedStreamUsage = next(
-                (e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kInternal), None)
-            await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
-            )
-            asserts.fail(
-                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages"
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
-            )
-            pass
+        notSupportedStreamUsage = next(
+            (e for e in Globals.Enums.StreamUsageEnum
+             if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kUnknownEnumValue),
+            None)
+        if notSupportedStreamUsage is None:
+            # A DUT that lists every StreamUsage leaves no value to send;
+            # the DYNAMIC_CONSTRAINT_ERROR path cannot be exercised on such a DUT.
+            log.info("DUT supports every StreamUsage; no unsupported value exists to send, skipping step 4")
+            self.mark_current_step_skipped()
+        else:
+            try:
+                await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
+                )
+                asserts.fail(
+                    "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages"
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.DynamicConstraintError,
+                    "Unexpected error returned expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                )
 
         self.step(5)
         try:

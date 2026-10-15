@@ -30,6 +30,19 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -39,14 +52,14 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
 
-class TC_CLCTRL_2_1(MatterBaseTest):
+class TC_CLCTRL_2_1(MatterTestCommissionedDevice):
     async def read_closurecontrol_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

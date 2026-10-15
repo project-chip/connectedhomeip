@@ -15,13 +15,13 @@
  */
 
 #include "OOBAccessors.h"
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/types/on-off-light/OnOffLight.h>
 #include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 
 namespace chip::app {
 
-void RegisterOOBAccessors(OnOffLoad & device, OOBAccessorRegistry & registry)
+void RegisterOOBAccessors(OnOffLight & device, OOBAccessorRegistry & registry)
 {
     LogErrorOnFailure(registry.Register(std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId())));
 }

@@ -49,7 +49,7 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ kSendTrustedRootCert = 18
 kSendNOC = 19
 
 
-class TC_CGEN_2_4(MatterBaseTest):
+class TC_CGEN_2_4(MatterTestCommissionedDevice):
 
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:

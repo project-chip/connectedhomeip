@@ -25,10 +25,14 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/administrator-commissioning-server",
+    "${chip_root}/src/app/server:commissioning_window_manager",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
   ]
 }

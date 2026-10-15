@@ -40,7 +40,7 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import EndpointCheckFunction, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ def has_speaker_audio_clusters() -> EndpointCheckFunction:
     return accept
 
 
-class TC_AUDIOCONTROL_2_8(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_8(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_8(self) -> str:
         return "[TC-AUDIOCONTROL-2.8] On/Off and Level Control Cluster Interaction with DUT as Server"

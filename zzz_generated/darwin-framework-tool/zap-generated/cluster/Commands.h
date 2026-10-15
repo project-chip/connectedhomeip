@@ -41992,7 +41992,6 @@ public:
 | * GroupTable                                                        | 0x0001 |
 | * MaxGroupsPerFabric                                                | 0x0002 |
 | * MaxGroupKeysPerFabric                                             | 0x0003 |
-| * GroupcastAdoption                                                 | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -42623,150 +42622,6 @@ public:
         return CHIP_NO_ERROR;
     }
 };
-
-#if MTR_ENABLE_PROVISIONAL
-
-/*
- * Attribute GroupcastAdoption
- */
-class ReadGroupKeyManagementGroupcastAdoption : public ReadAttribute {
-public:
-    ReadGroupKeyManagementGroupcastAdoption()
-        : ReadAttribute("groupcast-adoption")
-    {
-    }
-
-    ~ReadGroupKeyManagementGroupcastAdoption()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTRReadParams alloc] init];
-        if (mFabricFiltered.HasValue()) {
-            params.filterByFabric = mFabricFiltered.Value();
-        }
-        [cluster readAttributeGroupcastAdoptionWithParams:params completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"GroupKeyManagement.GroupcastAdoption response %@", [value description]);
-            if (error == nil) {
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-            } else {
-                LogNSError("GroupKeyManagement GroupcastAdoption read Error", error);
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-            }
-            SetCommandExitStatus(error);
-        }];
-        return CHIP_NO_ERROR;
-    }
-};
-
-class WriteGroupKeyManagementGroupcastAdoption : public WriteAttribute {
-public:
-    WriteGroupKeyManagementGroupcastAdoption()
-        : WriteAttribute("groupcast-adoption")
-        , mComplex(&mValue)
-    {
-        AddArgument("attr-name", "groupcast-adoption");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteGroupKeyManagementGroupcastAdoption()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
-        constexpr chip::AttributeId attributeId = chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTRWriteParams alloc] init];
-        params.timedWriteTimeout = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
-        NSArray * _Nonnull value;
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            for (auto & entry_0 : mValue) {
-                MTRGroupKeyManagementClusterGroupcastAdoptionStruct * newElement_0;
-                newElement_0 = [MTRGroupKeyManagementClusterGroupcastAdoptionStruct new];
-                newElement_0.groupcastAdopted = [NSNumber numberWithBool:entry_0.groupcastAdopted];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                [array_0 addObject:newElement_0];
-            }
-            value = array_0;
-        }
-
-        [cluster writeAttributeGroupcastAdoptionWithValue:value params:params completion:^(NSError * _Nullable error) {
-            if (error != nil) {
-                LogNSError("GroupKeyManagement GroupcastAdoption write Error", error);
-                TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-            }
-            SetCommandExitStatus(error);
-        }];
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>> mComplex;
-};
-
-class SubscribeAttributeGroupKeyManagementGroupcastAdoption : public SubscribeAttribute {
-public:
-    SubscribeAttributeGroupKeyManagementGroupcastAdoption()
-        : SubscribeAttribute("groupcast-adoption")
-    {
-    }
-
-    ~SubscribeAttributeGroupKeyManagementGroupcastAdoption()
-    {
-    }
-
-    CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::GroupKeyManagement::Id;
-        constexpr chip::CommandId attributeId = chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        __auto_type * cluster = [[MTRBaseClusterGroupKeyManagement alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
-        if (mKeepSubscriptions.HasValue()) {
-            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
-        }
-        if (mFabricFiltered.HasValue()) {
-            params.filterByFabric = mFabricFiltered.Value();
-        }
-        if (mAutoResubscribe.HasValue()) {
-            params.resubscribeAutomatically = mAutoResubscribe.Value();
-        }
-        [cluster subscribeAttributeGroupcastAdoptionWithParams:params
-            subscriptionEstablished:^() { mSubscriptionEstablished = YES; }
-            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                NSLog(@"GroupKeyManagement.GroupcastAdoption response %@", [value description]);
-                if (error == nil) {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
-                } else {
-                    TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
-                }
-                SetCommandExitStatus(error);
-            }];
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-#endif // MTR_ENABLE_PROVISIONAL
 
 /*
  * Attribute GeneratedCommandList
@@ -174410,7 +174265,7 @@ public:
         AddArgument("MimeType", &mRequest.mimeType);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
 #endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
@@ -174436,7 +174291,7 @@ public:
         params.mimeType = [[NSString alloc] initWithBytes:mRequest.mimeType.data() length:mRequest.mimeType.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.imageUri = [[NSString alloc] initWithBytes:mRequest.imageUri.data() length:mRequest.imageUri.size() encoding:NSUTF8StringEncoding];
+        params.imageURI = [[NSString alloc] initWithBytes:mRequest.imageURI.data() length:mRequest.imageURI.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -174562,18 +174417,14 @@ public:
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.supportedMimeTypes.HasValue()) {
-            if (mRequest.supportedMimeTypes.Value().IsNull()) {
-                params.supportedMimeTypes = nil;
-            } else {
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    for (auto & entry_2 : mRequest.supportedMimeTypes.Value().Value()) {
-                        NSString * newElement_2;
-                        newElement_2 = [[NSString alloc] initWithBytes:entry_2.data() length:entry_2.size() encoding:NSUTF8StringEncoding];
-                        [array_2 addObject:newElement_2];
-                    }
-                    params.supportedMimeTypes = array_2;
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                for (auto & entry_1 : mRequest.supportedMimeTypes.Value()) {
+                    NSString * newElement_1;
+                    newElement_1 = [[NSString alloc] initWithBytes:entry_1.data() length:entry_1.size() encoding:NSUTF8StringEncoding];
+                    [array_1 addObject:newElement_1];
                 }
+                params.supportedMimeTypes = array_1;
             }
         } else {
             params.supportedMimeTypes = nil;
@@ -174600,7 +174451,7 @@ public:
 
 private:
     chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>> mComplex_SupportedMimeTypes;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::CharSpan>>> mComplex_SupportedMimeTypes;
 };
 
 #endif // MTR_ENABLE_PROVISIONAL
@@ -174685,7 +174536,7 @@ public:
         AddArgument("MimeType", &mRequest.mimeType);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
 #endif // MTR_ENABLE_PROVISIONAL
         ClusterCommand::AddArguments();
     }
@@ -174714,7 +174565,7 @@ public:
         params.mimeType = [[NSString alloc] initWithBytes:mRequest.mimeType.data() length:mRequest.mimeType.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-        params.imageUri = [[NSString alloc] initWithBytes:mRequest.imageUri.data() length:mRequest.imageUri.size() encoding:NSUTF8StringEncoding];
+        params.imageURI = [[NSString alloc] initWithBytes:mRequest.imageURI.data() length:mRequest.imageURI.size() encoding:NSUTF8StringEncoding];
 #endif // MTR_ENABLE_PROVISIONAL
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -221171,11 +221022,6 @@ void registerClusterGroupKeyManagement(Commands & commands)
         make_unique<SubscribeAttributeGroupKeyManagementMaxGroupsPerFabric>(), //
         make_unique<ReadGroupKeyManagementMaxGroupKeysPerFabric>(), //
         make_unique<SubscribeAttributeGroupKeyManagementMaxGroupKeysPerFabric>(), //
-#if MTR_ENABLE_PROVISIONAL
-        make_unique<ReadGroupKeyManagementGroupcastAdoption>(), //
-        make_unique<WriteGroupKeyManagementGroupcastAdoption>(), //
-        make_unique<SubscribeAttributeGroupKeyManagementGroupcastAdoption>(), //
-#endif // MTR_ENABLE_PROVISIONAL
         make_unique<ReadGroupKeyManagementGeneratedCommandList>(), //
         make_unique<SubscribeAttributeGroupKeyManagementGeneratedCommandList>(), //
         make_unique<ReadGroupKeyManagementAcceptedCommandList>(), //

@@ -87,6 +87,11 @@ LOGGER.setLevel(logging.INFO)
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 _SUMMARY_MAX_HEX_CHARS = 128
+# Redacted in the execution summary. Matches both MatterTestConfig fields
+# (wifi_ssid, wifi_passphrase) and the --string-arg PIXITs (wifi_ssid, wifi_password,
+# PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS).
+_SUMMARY_REDACTED_KEYS = frozenset({"wifi_ssid", "wifi_passphrase", "wifi_password",
+                                    "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"})
 
 
 class TestError(Exception):
@@ -1381,6 +1386,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
+        if key in _SUMMARY_REDACTED_KEYS:
+            return "***REDACTED***"
         if isinstance(value, bytes):
             hex_value = value.hex()
             if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:

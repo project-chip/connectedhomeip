@@ -44,15 +44,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
-    """Implementation of test case TC-AVANALY-2.5."""
-
+class TC_AVANALY_2_5(MatterTestCommissionedDevice, AVANALYTestBase):
     def desc_TC_AVANALY_2_5(self) -> str:
         """Returns the description of TC-AVANALY-2.5."""
         return "[TC-AVANALY-2.5] Validate EstablishAnalysisStream functionality with Server as DUT"
@@ -170,17 +168,23 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         current_streams = await self.read_avanaly_attribute_expect_success(endpoint, attributes.CurrentAnalysisStreamCount)
         log.info("CurrentAnalysisStreamCount: %d", current_streams)
 
-        self.step(4)
         invalid_camera_node_id = self.user_params.get("invalid_camera_node_id")
         if invalid_camera_node_id is not None:
+            self.step(4)
+            invalid_node_id = (
+                int(invalid_camera_node_id, 0)
+                if isinstance(invalid_camera_node_id, str)
+                else int(invalid_camera_node_id)
+            )
             await self.send_establish_analysis_stream_cmd(
-                endpoint, node_id=int(invalid_camera_node_id), expected_status=Status.NotFound
+                endpoint, node_id=invalid_node_id, expected_status=Status.NotFound
             )
         else:
-            log.info("Test environment has single DUT node; skipping invalid NodeID check (use --user-params invalid_camera_node_id:<id> to execute)")
+            self.skip_step(4)
+            log.info("Skipping Step 4: invalid_camera_node_id not provided (use --int-arg invalid_camera_node_id:<id> to execute)")
 
         self.step(5)
-        node_id = self.dut_node_id
+        node_id = self.get_camera_node_id()
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStreamResponse: %s", resp)
         asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")
@@ -208,23 +212,34 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
         self.step(9)
         # Activate with unknown stream ID -> expect NOT_FOUND
         existing_stream_ids = {s.analysisStreamID for s in analysis_streams}
-        unknown_stream_id = next(i for i in range(0xFFEE, 0xFFFF) if i not in existing_stream_ids)
+        unknown_stream_id = next(i for i in range(0xFFFF) if i not in existing_stream_ids)
         await self.send_activate_analysis_stream_cmd(
             endpoint, analysis_stream_id=unknown_stream_id, expected_status=Status.NotFound
         )
 
-        # Discover transport endpoint hosting WebRTCTransportProvider or PushAvStreamTransport
+        # Discover transport endpoint hosting WebRTCTransportProvider or PushAvStreamTransport on the camera node
+        webrtc_endpoint = self.user_params.get("webrtc_endpoint_id")
+        if webrtc_endpoint is not None:
+            webrtc_endpoint = int(webrtc_endpoint, 0) if isinstance(webrtc_endpoint, str) else int(webrtc_endpoint)
+        pushav_endpoint = self.user_params.get("pushav_endpoint_id")
+        if pushav_endpoint is not None:
+            pushav_endpoint = int(pushav_endpoint, 0) if isinstance(pushav_endpoint, str) else int(pushav_endpoint)
+        endpoints_without_transport = []
+
         parts_list = await self.read_single_attribute_check_success(
-            endpoint=0, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList
+            endpoint=0,
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            node_id=node_id,
         )
         all_endpoints = [0] + list(parts_list)
-        webrtc_endpoint = None
-        pushav_endpoint = None
-        endpoints_without_transport = []
 
         for ep in all_endpoints:
             server_list = await self.read_single_attribute_check_success(
-                endpoint=ep, cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.ServerList
+                endpoint=ep,
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.ServerList,
+                node_id=node_id,
             )
             has_webrtc = Clusters.WebRTCTransportProvider.id in server_list
             has_pushav = Clusters.PushAvStreamTransport.id in server_list
@@ -235,9 +250,14 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
             if not has_webrtc and not has_pushav:
                 endpoints_without_transport.append(ep)
 
-        # Fallback to endpoint if no transport cluster was found on the device
-        if webrtc_endpoint is None and pushav_endpoint is None:
+        # Fallback to endpoint only in single-node loopback mode if no transport cluster was found
+        if webrtc_endpoint is None and pushav_endpoint is None and node_id == self.dut_node_id:
             webrtc_endpoint = endpoint
+
+        asserts.assert_true(
+            webrtc_endpoint is not None or pushav_endpoint is not None,
+            f"No WebRTCTransportProvider or PushAvStreamTransport endpoint discovered on camera node {node_id}",
+        )
 
         # Find an endpoint that does not host WebRTC or PushAV transport clusters
         invalid_endpoint = endpoints_without_transport[0] if endpoints_without_transport else 0xFFFF
@@ -249,35 +269,13 @@ class TC_AVANALY_2_5(MatterBaseTest, AVANALYTestBase):
 
         self.step(10)
         # Activate with invalid endpoint ID -> expect NOT_FOUND per test plan
-        if not self.is_ci:
-            await self.send_activate_analysis_stream_cmd(
-                endpoint,
-                analysis_stream_id=stream_id,
-                webrtc_endpoint_id=invalid_endpoint if selected_transport == "webrtc" else None,
-                pushav_endpoint_id=invalid_endpoint if selected_transport == "pushav" else None,
-                expected_status=Status.NotFound,
-            )
-        else:
-            cmd = Clusters.Objects.AvAnalysis.Commands.ActivateAnalysisStream(
-                analysisStreamID=stream_id,
-                webRTCEndpointID=invalid_endpoint if selected_transport == "webrtc" else None,
-                pushAVEndpointID=invalid_endpoint if selected_transport == "pushav" else None,
-            )
-            try:
-                await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-                log.warning(
-                    "CI reference app does not yet validate transport endpoint ID; returned Success instead of NOT_FOUND"
-                )
-                # Deactivate stream back to PendingInitiation so step 11 can activate it
-                await self.send_deactivate_analysis_stream_cmd(
-                    endpoint, analysis_stream_id=stream_id, expected_status=Status.Success
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(
-                    e.status,
-                    Status.NotFound,
-                    f"Expected NOT_FOUND for invalid transport endpoint ID, got {e.status}",
-                )
+        await self.send_activate_analysis_stream_cmd(
+            endpoint,
+            analysis_stream_id=stream_id,
+            webrtc_endpoint_id=invalid_endpoint if selected_transport == "webrtc" else None,
+            pushav_endpoint_id=invalid_endpoint if selected_transport == "pushav" else None,
+            expected_status=Status.NotFound,
+        )
 
         self.step(11)
         # Activate with valid endpoint ID -> expect SUCCESS

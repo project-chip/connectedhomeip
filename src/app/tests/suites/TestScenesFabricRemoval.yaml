@@ -215,7 +215,10 @@ tests:
                         EpochStartTime2: 1120002,
                     }
 
+    # GroupKeyMap cannot be written when Groupcast is adopted (GC.S); the
+    # GC.S path below maps the keyset to the group via JoinGroup instead.
     - label: "Preparation step TH2 Map KeySets to GroupId."
+      PICS: "!GC.S"
       identity: "beta"
       cluster: "Group Key Management"
       endpoint: 0

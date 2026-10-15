@@ -94,7 +94,7 @@ public:
         CustomerAppTask::ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
 #else
         AppTask::GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
-#endif
+#endif // defined(CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK)
         return pw::OkStatus();
     }
 };

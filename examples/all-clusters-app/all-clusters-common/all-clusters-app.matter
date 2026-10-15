@@ -109,6 +109,23 @@ enum CertificationTypeEnum : enum8 {
   kVIDSignerPKI = 2;
 }
 
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -2981,16 +2998,10 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  fabric_scoped struct GroupcastAdoptionStruct {
-    boolean groupcastAdopted = 0;
-    fabric_idx fabricIndex = 254;
-  }
-
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4347,6 +4358,56 @@ cluster HepaFilterMonitoring = 113 {
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
+  revision 1;
+
+  shared enum ChangeIndicationEnum : enum8 {
+    kOK = 0 [spec_name = "OK"];
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  shared enum DegradationDirectionEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  shared enum ProductIdentifierTypeEnum : enum8 {
+    kUPC = 0 [spec_name = "UPC"];
+    kGTIN8 = 1 [spec_name = "GTIN-8"];
+    kEAN = 2 [spec_name = "EAN"];
+    kGTIN14 = 3 [spec_name = "GTIN-14"];
+    kOEM = 4 [spec_name = "OEM"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+    kReplacementProductList = 0x4;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
+  command ResetCondition(): DefaultSuccess = 0;
+}
+
+/** This generic cluster provides an interface to the current condition of a resource. */
+cluster WaterTankLevelMonitoring = 121 {
   revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
@@ -6856,9 +6917,9 @@ cluster TlsCertificateManagement = 2049 {
   }
 
   readonly attribute int8u maxRootCertificates = 0;
-  readonly attribute TLSCertStruct provisionedRootCertificates[] = 1;
+  readonly attribute fabric_sensitive TLSCertStruct provisionedRootCertificates[] = 1;
   readonly attribute int8u maxClientCertificates = 2;
-  readonly attribute TLSClientCertificateDetailStruct provisionedClientCertificates[] = 3;
+  readonly attribute fabric_sensitive TLSClientCertificateDetailStruct provisionedClientCertificates[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6974,7 +7035,7 @@ cluster TlsClientManagement = 2050 {
   }
 
   readonly attribute int8u maxProvisioned = 0;
-  readonly attribute TLSEndpointStruct provisionedEndpoints[] = 1;
+  readonly attribute fabric_sensitive TLSEndpointStruct provisionedEndpoints[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7990,6 +8051,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
+    callback attribute PQCDeviceAttestationProfile;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8013,7 +8075,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8570,6 +8631,22 @@ endpoint 1 {
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
+    callback attribute lastChangedTime;
+    callback attribute replacementProductList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command ResetCondition;
+  }
+
+  server cluster WaterTankLevelMonitoring {
     callback attribute condition;
     callback attribute degradationDirection;
     callback attribute changeIndication;

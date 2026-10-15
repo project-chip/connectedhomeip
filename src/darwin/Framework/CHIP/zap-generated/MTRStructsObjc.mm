@@ -3401,36 +3401,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRGroupKeyManagementClusterGroupcastAdoptionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupcastAdopted = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRGroupKeyManagementClusterGroupcastAdoptionStruct alloc] init];
-
-    other.groupcastAdopted = self.groupcastAdopted;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupcastAdopted:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupcastAdopted, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRFixedLabelClusterLabelStruct
 - (instancetype)init
 {
@@ -11845,7 +11815,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
     }
     return self;
 }
@@ -11858,14 +11828,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 

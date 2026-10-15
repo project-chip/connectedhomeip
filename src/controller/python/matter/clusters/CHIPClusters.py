@@ -3567,13 +3567,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
-                "attributeName": "GroupcastAdoption",
-                "attributeId": 0x00000004,
-                "type": "",
-                "reportable": True,
-                "writable": True,
-            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -14420,7 +14413,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
             0x00000002: {
@@ -14454,7 +14447,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
         },

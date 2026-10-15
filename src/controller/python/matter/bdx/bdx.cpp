@@ -164,9 +164,13 @@ public:
                 gOnFailedToObtainTransferCallback(transferInfo->OnTransferObtainedContext, ToPyChipError(result));
             }
         }
-        else if (gOnTransferCompletedCallback && transferInfo)
+        else if (transferInfo)
         {
-            gOnTransferCompletedCallback(transferInfo->OnTransferCompletedContext, ToPyChipError(result));
+            // A rejected transfer was never accepted, so it has no completion context to notify.
+            if (gOnTransferCompletedCallback && transferInfo->OnTransferCompletedContext != nullptr)
+            {
+                gOnTransferCompletedCallback(transferInfo->OnTransferCompletedContext, ToPyChipError(result));
+            }
             mTransfers->RemoveTransferInfo(transferInfo);
         }
         ReleaseTransfer(mSystemLayer, transfer);

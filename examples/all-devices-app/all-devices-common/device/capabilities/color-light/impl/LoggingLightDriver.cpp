@@ -20,102 +20,19 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
-using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
 
-// Passing *this as every delegate is safe: ColorLight only stores the references, and nothing calls
-// through them before Register() runs.
-LoggingLightDriver::LoggingLightDriver(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                                       const Conformance & conformance) :
-    ColorLight(deviceTypes, context,
-               Delegates{ .onOff = *this, .levelControl = *this, .effect = *this, .color = *this, .identify = *this }, conformance)
-{}
-
-// OnOffDelegate
-
-void LoggingLightDriver::OnOffStartup(bool on)
+ColorLight::Delegates LoggingLightDriver::GetDelegates()
 {
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnOffStartup() -> %s", on ? "ON" : "OFF");
-}
-
-void LoggingLightDriver::OnOnOffChanged(bool on)
-{
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnOnOffChanged() -> %s", on ? "ON" : "OFF");
-}
-
-// LevelControlDelegate
-
-void LoggingLightDriver::OnLevelChanged(uint8_t level)
-{
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnLevelChanged() -> %u", level);
-}
-
-void LoggingLightDriver::OnOptionsChanged(BitMask<LevelControl::OptionsBitmap> options)
-{
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnOptionsChanged() -> 0x%02X", options.Raw());
-}
-
-void LoggingLightDriver::OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel)
-{
-    if (onLevel.IsNull())
-    {
-        ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnOnLevelChanged() -> NULL");
-        return;
-    }
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnOnLevelChanged() -> %u", onLevel.Value());
-}
-
-void LoggingLightDriver::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate)
-{
-    if (defaultMoveRate.IsNull())
-    {
-        ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnDefaultMoveRateChanged() -> NULL");
-        return;
-    }
-    ChipLogProgress(DeviceLayer, "LoggingLightDriver::OnDefaultMoveRateChanged() -> %u", defaultMoveRate.Value());
-}
-
-// OnOffEffectDelegate
-//
-// OnOffEffectDelegate::TriggerEffect checks the EffectIdentifier but casts the EffectVariant
-// straight from the wire without validating it, so an unrecognized variant reaches these methods
-// and only they can reject it. ConstraintError is the status the SDK uses for a command field whose
-// value is outside the range its type allows.
-
-DataModel::ActionReturnStatus LoggingLightDriver::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum effect)
-{
-    switch (effect)
-    {
-    case OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade:
-        ChipLogProgress(DeviceLayer, "DelayedAllOff: FastFade");
-        break;
-    case OnOff::DelayedAllOffEffectVariantEnum::kNoFade:
-        ChipLogProgress(DeviceLayer, "DelayedAllOff: NoFade");
-        break;
-    case OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade:
-        ChipLogProgress(DeviceLayer, "DelayedAllOff: SlowFade");
-        break;
-    default:
-        ChipLogError(DeviceLayer, "DelayedAllOff: unknown variant %u", to_underlying(effect));
-        return Status::ConstraintError;
-    }
-    return Status::Success;
-}
-
-DataModel::ActionReturnStatus LoggingLightDriver::TriggerDyingLight(OnOff::DyingLightEffectVariantEnum effect)
-{
-    switch (effect)
-    {
-    case OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff:
-        ChipLogProgress(DeviceLayer, "DyingLight: FadeOff");
-        break;
-    default:
-        ChipLogError(DeviceLayer, "DyingLight: unknown variant %u", to_underlying(effect));
-        return Status::ConstraintError;
-    }
-    return Status::Success;
+    return ColorLight::Delegates{
+        .onOff        = *this,
+        .levelControl = *this,
+        .effect       = *this,
+        .color        = *this,
+        .identify     = *this,
+    };
 }
 
 // ColorControlDelegate

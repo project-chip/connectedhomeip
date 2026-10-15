@@ -1093,7 +1093,10 @@ CHIP_ERROR AudioControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             }
             break;
         default:
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an
+            // attribute that is not implemented on the endpoint is ignored rather than failing
+            // the recall.
+            break;
         }
     }
     ReturnErrorOnFailure(pairIterator.GetStatus());

@@ -61,13 +61,13 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_FAN_3_5(MatterBaseTest):
+class TC_FAN_3_5(MatterTestCommissionedDevice):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
