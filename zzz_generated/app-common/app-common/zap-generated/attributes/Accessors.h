@@ -6438,9 +6438,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -12478,9 +12475,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -12643,9 +12637,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -12808,9 +12799,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -12971,9 +12959,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13134,9 +13119,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13299,9 +13281,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13462,9 +13441,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13625,9 +13601,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13793,9 +13766,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -13956,9 +13926,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -14260,14 +14227,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
@@ -14280,14 +14239,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
@@ -14300,14 +14251,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MaxMeasuredValue
 
 namespace PeakMeasuredValue {
@@ -14320,14 +14263,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
@@ -14339,9 +14274,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace PeakMeasuredValueWindow
 
 namespace AverageMeasuredValue {
@@ -14354,14 +14286,6 @@ inline void GetDefaultOr(EndpointId endpoint, DataModel::Nullable<float> & value
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
-                                        MarkAttributeDirty markDirty);
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
@@ -14373,9 +14297,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace AverageMeasuredValueWindow
 
 namespace Uncertainty {
@@ -14387,9 +14308,6 @@ inline void GetDefaultOr(EndpointId endpoint, float & value, float fallback)
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, float * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, float value, MarkAttributeDirty markDirty);
 } // namespace Uncertainty
 
 namespace MeasurementUnit {
@@ -14403,13 +14321,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::SmokeConcentr
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementUnitEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
@@ -14423,13 +14334,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::SmokeConcentr
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::MeasurementMediumEnum value,
-                                        MarkAttributeDirty markDirty);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
@@ -14443,12 +14347,6 @@ inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::SmokeConcentr
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::SmokeConcentrationMeasurement::LevelValueEnum value, MarkAttributeDirty markDirty);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -14460,9 +14358,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -14474,9 +14369,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -14704,9 +14596,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint32_t & value, uint32_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -14718,9 +14607,6 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
         value = fallback;
     }
 }
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
