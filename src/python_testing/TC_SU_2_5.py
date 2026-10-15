@@ -385,6 +385,8 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=extra_arguments,
         )
 
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+
         # Software Version attribute handler
         software_version_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -442,7 +444,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         step_number_matcher = step_number_s2
         progress_liveness_last_progress = [None]
 
-        # Wait the DUT to see an active download
         matcher_combined_obj = AttributeMatcher.from_callable(
             description=f"{step_number_s2} - Step 1 matcher: Waiting DUT to see the Download",
             matcher=matcher_combined
@@ -494,12 +495,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
 
         # Wait for the kApplying State
-        update_state_match = AttributeMatcher.from_callable(
-            "UpdateState is kApplying",
-            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        subscription_attr_cluster.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=STEP_RESERVE_SEC)
-        time_to_kapplying_s2 = time.time()
+        time_to_kapplying_s2 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
+            target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
+            forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+                              Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
+            timeout_sec=STEP_RESERVE_SEC,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
         time_taken_from_delay_to_apply_s2 = time_to_kapplying_s2 - time_for_kdelayed_apply_s2
 
         logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",
@@ -535,6 +537,8 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
+
+        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
 
         # Software Version attribute handler
         software_version_attr_handler = AttributeSubscriptionHandler(
@@ -608,7 +612,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # Device is downloading the image
         progress_seen = False
-        last_progress = 0
         download_completed = False
 
         def check_ota_download_matcher(report):
@@ -617,7 +620,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             Args:
                 report : Report value
             """
-            nonlocal progress_seen, last_progress, download_completed
+            nonlocal progress_seen, download_completed
             attribute = report.attribute
             value = report.value
             # UpdateStateProgress
@@ -648,8 +651,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # The DUT does not apply the update and returns to kIdle because the action is set to Discontinue.
         logger.info("%s Waiting for the DUT to return to kIdle because ApplyUpdateAction is Discontinue", step_number_s3)
-        subscription_attr_cluster.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
         update_state_match = AttributeMatcher.from_callable(
             "Waiting UpdateState is Idle",
             lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
