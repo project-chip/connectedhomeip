@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.chip.chiptool.ChipClient
@@ -16,7 +17,9 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import com.google.chip.chiptool.databinding.ClusterInteractionFragmentBinding
-import kotlin.properties.Delegates
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -27,7 +30,6 @@ class ClusterInteractionFragment : Fragment() {
 
   private lateinit var scope: CoroutineScope
   private lateinit var addressUpdateFragment: AddressUpdateFragment
-  private var devicePtr by Delegates.notNull<Long>()
 
   private var _binding: ClusterInteractionFragmentBinding? = null
   private val binding
@@ -45,29 +47,47 @@ class ClusterInteractionFragment : Fragment() {
     binding.endpointList.visibility = View.GONE
     binding.getEndpointListBtn.setOnClickListener {
       scope.launch {
-        devicePtr =
-          try {
-            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
-          } catch (e: IllegalStateException) {
-            Log.d(TAG, "getConnectedDevicePointer exception", e)
-            showMessage("getConnectedDevicePointer fail!")
-            return@launch
-          }
         showMessage("Retrieving endpoints")
-        binding.endpointList.visibility = View.VISIBLE
+        try {
+          val endpoints =
+            ChipClient.withConnectedDevice(requireContext(), addressUpdateFragment.deviceId) {
+              devicePtr ->
+              suspendCoroutine<List<EndpointItem>> { cont ->
+                ChipClusters.DescriptorCluster(devicePtr, 0)
+                  .readPartsListAttribute(
+                    object : ChipClusters.DescriptorCluster.PartsListAttributeCallback {
+                      override fun onSuccess(value: MutableList<Int>?) {
+                        val list = ArrayList<EndpointItem>()
+                        list.add(EndpointItem(0))
+                        value?.forEach { list.add(EndpointItem(it)) }
+                        cont.resume(list)
+                      }
+
+                      override fun onError(error: Exception?) {
+                        cont.resumeWithException(
+                          error ?: RuntimeException("Error reading parts list")
+                        )
+                      }
+                    }
+                  )
+              }
+            }
+          requireActivity().runOnUiThread {
+            binding.endpointList.adapter = EndpointAdapter(endpoints, EndpointListener())
+            binding.endpointList.visibility = View.VISIBLE
+          }
+        } catch (e: Exception) {
+          Log.e(TAG, "Error reading parts list", e)
+          showMessage("Error reading endpoints: ${e.message}")
+        }
       }
     }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-    var dataList: List<EndpointItem> = ArrayList()
-    // TODO: Dynamically retrieve endpoint information using descriptor cluster
-    // hardcode the endpoint for now
-    for (i in 0 until 2) {
-      dataList += EndpointItem(i)
-    }
 
-    binding.endpointList.adapter = EndpointAdapter(dataList, EndpointListener())
+    // Start with an empty list. Will be populated dynamically when Retrieve is clicked.
+    binding.endpointList.adapter = EndpointAdapter(emptyList(), EndpointListener())
     binding.endpointList.layoutManager = LinearLayoutManager(requireContext())
     binding.bottomNavigationBar.setOnNavigationItemSelectedListener(bottomNavigationListener)
 
