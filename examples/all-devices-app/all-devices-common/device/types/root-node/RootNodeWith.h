@@ -67,7 +67,7 @@ public:
     {
         return std::get<Feature>(mFeatures);
     }
-    
+
     using RootNode::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {

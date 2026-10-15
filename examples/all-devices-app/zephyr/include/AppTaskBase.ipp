@@ -228,10 +228,10 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
 #else
     using RootNodeType = RootNodeWith<NetworkFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
 
 #endif
 

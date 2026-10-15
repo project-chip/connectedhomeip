@@ -281,23 +281,23 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::IcdFeature, chip::app::OtaFeature>;
-    auto rootNode = std::make_unique<RootNodeType>(
+    auto rootNode      = std::make_unique<RootNodeType>(
         rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext, otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
-    auto rootNode = std::make_unique<RootNodeType>(
-        rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext,
+                                                   chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, otaContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::IcdFeature, chip::app::OtaFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(
+    auto rootNode      = std::make_unique<RootNodeType>(
         rootNodeContext,
         chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
         icdContext, otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::OtaFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(
+    auto rootNode      = std::make_unique<RootNodeType>(
         rootNodeContext,
         chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
         otaContext);
@@ -305,18 +305,18 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #else
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::IcdFeature, chip::app::OtaFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, icdContext, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, icdContext, otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::OtaFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, otaContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 #else // SILABS_OTA_ENABLED
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::IcdFeature>;
-    auto rootNode = std::make_unique<RootNodeType>(
-        rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext,
+                                                   chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
     auto rootNode =
@@ -325,20 +325,20 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature, chip::app::IcdFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(
+    auto rootNode      = std::make_unique<RootNodeType>(
         rootNodeContext,
         chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() },
         icdContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::WifiFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(
+    auto rootNode      = std::make_unique<RootNodeType>(
         rootNodeContext,
         chip::app::WifiFeature::Context{ .wifiDriver = *chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance() });
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #else
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::IcdFeature>;
-    auto rootNode     = std::make_unique<RootNodeType>(rootNodeContext, icdContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, icdContext);
 #else
     auto rootNode = std::make_unique<chip::app::RootNode>(rootNodeContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
