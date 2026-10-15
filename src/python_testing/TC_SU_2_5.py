@@ -65,7 +65,17 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+# Nominal execution reserve kept aside for each not-yet-started step when handing the
+# remaining test budget to a wait, so early steps cannot starve later ones.
 STEP_RESERVE_SEC = 60
+# Log line every OTA provider prints on receiving a QueryImage, whatever it then answers: see
+# OtaProviderLogic::QueryImage in src/app/clusters/ota-provider/OTAProviderCluster.cpp, which
+# logs it before dispatching to the application delegate. Step 4 polls it on the provider's
+# stdout as an out-of-band barrier: it is the only way to tell a query the provider actually
+# answered (with the invalid ImageURI under test) from one that died in a CASE session left
+# over from a previous provider process, since both leave the DUT in the same
+# kQuerying→kIdle transition.
+PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
 
 
 class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):

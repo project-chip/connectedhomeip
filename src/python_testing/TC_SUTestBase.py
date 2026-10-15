@@ -53,14 +53,6 @@ SUBSCRIPTION_START_TIMEOUT_SEC = 60
 # Bound for the reachability probe that runs when a subscription fails to establish. Only needs
 # to answer "does the DUT still talk to this controller at all", so it is kept short.
 SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
-# Log line every OTA provider prints on receiving a QueryImage, whatever it then answers: see
-# OtaProviderLogic::QueryImage in src/app/clusters/ota-provider/OTAProviderCluster.cpp, which
-# logs it before dispatching to the application delegate. Step 4 polls it on the provider's
-# stdout as an out-of-band barrier: it is the only way to tell a query the provider actually
-# answered (with the invalid ImageURI under test) from one that died in a CASE session left
-# over from a previous provider process, since both leave the DUT in the same
-# kQuerying→kIdle transition.
-PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
