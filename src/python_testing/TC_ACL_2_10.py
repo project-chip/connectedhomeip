@@ -66,7 +66,8 @@ class TC_ACL_2_10(MatterTestCommissionedDevice):
 
     def steps_TC_ACL_2_10(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 commissions DUT using admin node ID"),
+            TestStep(1, "TH1 commissions DUT using admin node ID",
+                     is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID",

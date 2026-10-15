@@ -55,7 +55,7 @@ class TC_AVANALY_2_13(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_13(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done"),
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads AmbientContextTypeSupported from Ambient Context Sensing cluster. Save as sensor_supported."),
             TestStep(3, "TH reads SupportedAmbientContexts from AV Analysis cluster. Save as analysis_supported."),
             TestStep(4, "Verify analysis_supported is a subset of sensor_supported."),

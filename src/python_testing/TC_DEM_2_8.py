@@ -70,7 +70,8 @@ class TC_DEM_2_8(MatterTestCommissionedDevice, DEMTestBase):
     def steps_TC_DEM_2_8(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
+                     is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify ConstraintBasedAdjustment feature is supported on the cluster. Verify StateForecastReporting feature is supported on the cluster. Verify PowerForecastReporting feature is not supported on the cluster."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",

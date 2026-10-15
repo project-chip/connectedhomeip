@@ -90,7 +90,8 @@ class TC_NETIM_1_3(MatterTestCommissionedDevice):
         # Collects every Identity returned by a successful QueryIdentity for validation in step 16.
         returned_identities = []
 
-        self.step(1, "Commissioning, already done.")
+        self.step(1, "Commissioning, already done.",
+                  is_commissioning=True)
 
         self.step(2, "TH sends ImportAdminSecret with a valid Network Administrator Shared Secret to establish an active "
                      "identity.",
