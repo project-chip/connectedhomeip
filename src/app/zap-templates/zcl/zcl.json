@@ -3,7 +3,10 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip"],
+    "xmlRoot": [
+        ".",
+        "./data-model/chip"
+    ],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -167,9 +170,15 @@
     "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {
@@ -326,8 +335,16 @@
             "VendorID",
             "VendorName"
         ],
-        "Binding": ["FeatureMap", "ClusterRevision"],
-        "Chime": ["SelectedChime", "Enabled", "ClusterRevision", "FeatureMap"],
+        "Binding": [
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Chime": [
+            "SelectedChime",
+            "Enabled",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Dynamic Lighting": [
             "ClusterRevision",
             "FeatureMap",
@@ -443,7 +460,10 @@
             },
             "ClusterRevision"
         ],
-        "Diagnostic Logs": ["ClusterRevision", "FeatureMap"],
+        "Diagnostic Logs": [
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Door Lock": [
             "AliroReaderVerificationKey",
             "AliroReaderGroupIdentifier",
@@ -652,7 +672,9 @@
                 "keepDefault": true
             }
         ],
-        "Joint Fabric Datastore": ["Status"],
+        "Joint Fabric Datastore": [
+            "Status"
+        ],
         "Laundry Dryer Controls": [
             "ClusterRevision",
             "SelectedDrynessLevel",
@@ -782,7 +804,11 @@
             "global_struct",
             "nullable_global_struct"
         ],
-        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "User Label": [
+            "LabelList",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Flow Measurement": [
             "ClusterRevision",
             "FeatureMap",
@@ -919,15 +945,22 @@
             },
             "ClusterRevision"
         ],
-        "Channel": ["Lineup", "CurrentChannel"],
+        "Channel": [
+            "Lineup",
+            "CurrentChannel"
+        ],
         "Media Playback": [
             "SampledPosition",
             "ActiveAudioTrack",
             "ActiveTextTrack",
             "ContentInfo"
         ],
-        "Application Launcher": ["CurrentApp"],
-        "Application Basic": ["Application"],
+        "Application Launcher": [
+            "CurrentApp"
+        ],
+        "Application Basic": [
+            "Application"
+        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -1193,7 +1226,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Carbon Dioxide Concentration Measurement": [
             "MeasuredValue",
@@ -1207,7 +1241,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Nitrogen Dioxide Concentration Measurement": [
             "MeasuredValue",
@@ -1221,7 +1256,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Ozone Concentration Measurement": [
             "MeasuredValue",
@@ -1235,7 +1271,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "PM2.5 Concentration Measurement": [
             "MeasuredValue",
@@ -1249,7 +1286,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Formaldehyde Concentration Measurement": [
             "MeasuredValue",
@@ -1263,7 +1301,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "PM1 Concentration Measurement": [
             "MeasuredValue",
@@ -1277,7 +1316,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "PM10 Concentration Measurement": [
             "MeasuredValue",
@@ -1291,7 +1331,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Total Volatile Organic Compounds Concentration Measurement": [
             "MeasuredValue",
@@ -1305,7 +1346,8 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Radon Concentration Measurement": [
             "MeasuredValue",
@@ -1319,7 +1361,23 @@
             "MeasurementUnit",
             "MeasurementMedium",
             "LevelValue",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
+        ],
+        "Smoke Concentration Measurement": [
+            "MeasuredValue",
+            "MinMeasuredValue",
+            "MaxMeasuredValue",
+            "PeakMeasuredValue",
+            "PeakMeasuredValueWindow",
+            "AverageMeasuredValue",
+            "AverageMeasuredValueWindow",
+            "Uncertainty",
+            "MeasurementUnit",
+            "MeasurementMedium",
+            "LevelValue",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Air Quality": [
             "AirQuality",
@@ -1336,7 +1394,8 @@
             "PeriodicEnergyImported",
             "PeriodicEnergyExported",
             "CumulativeEnergyReset",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Electrical Grid Conditions": [
             "LocalGenerationAvailable",
@@ -1492,7 +1551,9 @@
         "Thread Network Directory": [
             "PreferredExtendedPanID",
             "ThreadNetworks",
-            "ThreadNetworkTableSize"
+            "ThreadNetworkTableSize",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Service Area": [
             "CurrentArea",
@@ -1556,7 +1617,11 @@
             "PanMax",
             "MovementState"
         ],
-        "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Fixed Label": [
+            "LabelList",
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",
             "SoilMoistureMeasuredValue",
@@ -2002,7 +2067,10 @@
             },
             "NameSupport"
         ],
-        "OTA Software Update Provider": ["ClusterRevision", "FeatureMap"],
+        "OTA Software Update Provider": [
+            "ClusterRevision",
+            "FeatureMap"
+        ],
         "Proximity Ranging": [
             "BLEDeviceID",
             "BLTCSModeCapability",
@@ -2048,7 +2116,14 @@
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT"
+    ],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,

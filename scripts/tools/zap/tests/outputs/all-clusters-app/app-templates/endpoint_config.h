@@ -2090,8 +2090,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* CumulativeEnergyReset */                                                  \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                             /* FeatureMap */                 \
-        { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */            \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Device Energy Management (server) */                                                              \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(ENUM8),                                                                     \
@@ -2808,8 +2810,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Carbon Dioxide Concentration Measurement (server) */                                              \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -2847,8 +2851,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Nitrogen Dioxide Concentration Measurement (server) */                                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -2886,8 +2892,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Ozone Concentration Measurement (server) */                                                       \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -2925,8 +2933,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: PM2.5 Concentration Measurement (server) */                                                       \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -2964,8 +2974,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Formaldehyde Concentration Measurement (server) */                                                \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -3003,8 +3015,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: PM1 Concentration Measurement (server) */                                                         \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -3042,8 +3056,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: PM10 Concentration Measurement (server) */                                                        \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -3081,8 +3097,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Total Volatile Organic Compounds Concentration Measurement (server) */                            \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -3120,8 +3138,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Radon Concentration Measurement (server) */                                                       \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 4, ZAP_TYPE(SINGLE),                                                                    \
@@ -3159,8 +3179,10 @@
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* LevelValue */                                                             \
         { ZAP_EMPTY_DEFAULT(), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
-              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) },                                                  /* FeatureMap */            \
-        { ZAP_SIMPLE_DEFAULT(0x0006), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* ClusterRevision */       \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* FeatureMap */                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                                                                    \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ClusterRevision */                                                        \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Wake on LAN (server) */                                                                           \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 13, ZAP_TYPE(CHAR_STRING),                                                              \
@@ -5087,7 +5109,7 @@
       .clusterId = 0x00000091, \
       .attributes = ZAP_ATTRIBUTE_INDEX(486), \
       .attributeCount = 8, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5347,7 +5369,7 @@
       .clusterId = 0x0000040C, \
       .attributes = ZAP_ATTRIBUTE_INDEX(741), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5360,7 +5382,7 @@
       .clusterId = 0x0000040D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(754), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5373,7 +5395,7 @@
       .clusterId = 0x00000413, \
       .attributes = ZAP_ATTRIBUTE_INDEX(767), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5386,7 +5408,7 @@
       .clusterId = 0x00000415, \
       .attributes = ZAP_ATTRIBUTE_INDEX(780), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5399,7 +5421,7 @@
       .clusterId = 0x0000042A, \
       .attributes = ZAP_ATTRIBUTE_INDEX(793), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5412,7 +5434,7 @@
       .clusterId = 0x0000042B, \
       .attributes = ZAP_ATTRIBUTE_INDEX(806), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5425,7 +5447,7 @@
       .clusterId = 0x0000042C, \
       .attributes = ZAP_ATTRIBUTE_INDEX(819), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5438,7 +5460,7 @@
       .clusterId = 0x0000042D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(832), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5451,7 +5473,7 @@
       .clusterId = 0x0000042E, \
       .attributes = ZAP_ATTRIBUTE_INDEX(845), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5464,7 +5486,7 @@
       .clusterId = 0x0000042F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(858), \
       .attributeCount = 13, \
-      .clusterSize = 2, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = nullptr, \
@@ -5677,7 +5699,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 82 },                                                                                          \
-        { ZAP_CLUSTER_INDEX(28), 73, 2902 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(28), 73, 2880 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 83 },                                                                                         \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -5691,7 +5713,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3067)
+#define ATTRIBUTE_MAX_SIZE (3045)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
