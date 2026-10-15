@@ -49,6 +49,60 @@ class TestBleScanDevices(unittest.TestCase):
         self.assertEqual(devices[0].discriminator, 3840)
         self.assert_deleted()
 
+    def test_queued_device_is_delivered_after_discovery_deadline(self):
+        clock = Mock(return_value=0)
+        original_start = self.start_scan
+
+        def start_scan(*arguments):
+            scanner = original_start(*arguments)
+            clock.return_value = 2
+            return scanner
+
+        self.handle.pychip_ble_scanner_start.side_effect = start_scan
+        with patch.object(scan_devices, 'monotonic', clock):
+            devices = list(scan_devices.DiscoverSync(1000))
+        self.assertEqual([device.address for device in devices], ['probe-device'])
+        self.assert_deleted()
+
+    def test_devices_received_after_discovery_deadline_are_excluded(self):
+        clock = Mock(return_value=0)
+        original_start = self.start_scan
+
+        def start_scan(*arguments):
+            clock.return_value = 2
+            return original_start(*arguments)
+
+        self.handle.pychip_ble_scanner_start.side_effect = start_scan
+        with patch.object(scan_devices, 'monotonic', clock):
+            self.assertEqual(list(scan_devices.DiscoverSync(1000)), [])
+        self.assert_deleted()
+
+    def test_deadline_drain_uses_fixed_snapshot(self):
+        self.events = ['device']
+        clock = Mock(return_value=0)
+        receiver = scan_devices._DeviceInfoReceiver(1)
+        original_get = receiver.queue.get_nowait
+        original_start = self.start_scan
+
+        def start_scan(*arguments):
+            scanner = original_start(*arguments)
+            clock.return_value = 2
+            return scanner
+
+        def get_while_producer_continues():
+            data = original_get()
+            receiver.queue.put(scan_devices.DeviceInfo('late-producer', 1, 2, 3))
+            return data
+
+        self.handle.pychip_ble_scanner_start.side_effect = start_scan
+        with patch.object(scan_devices, 'monotonic', clock), \
+                patch.object(scan_devices, '_DeviceInfoReceiver', return_value=receiver), \
+                patch.object(receiver.queue, 'get_nowait', side_effect=get_while_producer_continues) as get:
+            devices = list(scan_devices.DiscoverSync(1000))
+        self.assertEqual([device.address for device in devices], ['probe-device'])
+        get.assert_called_once_with()
+        self.assert_deleted()
+
     def test_early_close_deletes_scanner(self):
         generator = scan_devices.DiscoverSync(1000)
         self.assertEqual(next(generator).discriminator, 3840)

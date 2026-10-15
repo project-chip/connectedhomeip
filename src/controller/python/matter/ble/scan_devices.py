@@ -62,12 +62,14 @@ class _DeviceInfoReceiver:
     completion or a ChipStackError on failure.
     """
 
-    def __init__(self):
+    def __init__(self, deadline: float | None = None):
         self.queue = Queue()
         self.error: ChipStackError | None = None
+        self.deadline = deadline
 
     def OnDeviceScanned(self, address, discriminator, vendor, product):
-        self.queue.put(DeviceInfo(address, discriminator, vendor, product))
+        if self.deadline is None or monotonic() <= self.deadline:
+            self.queue.put(DeviceInfo(address, discriminator, vendor, product))
 
     def OnScanComplete(self):
         self.queue.put(None)
@@ -88,7 +90,8 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
     as soon as the underlying BLE manager detects changes.
 
     Args:
-      timeoutMs:    scan will complete after this time
+    timeoutMs:    discovery deadline; already captured results remain available
+              to a delayed consumer after this time
       adapter:      what adapter to choose. Either an AdapterInfo object or
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
@@ -106,7 +109,7 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
     handle = _GetBleLibraryHandle()
 
     nativeList = handle.pychip_ble_adapter_list_new()
-    if nativeList == 0:
+    if not nativeList:
         raise ChipStackError(_CHIP_ERROR_INTERNAL, 'Failed to list available adapters')
 
     try:
@@ -115,23 +118,33 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
                     nativeList).decode('utf8')):
                 continue
 
-            receiver = _DeviceInfoReceiver()
             deadline = monotonic() + timeoutMs / 1000
+            receiver = _DeviceInfoReceiver(deadline)
             scanner = handle.pychip_ble_scanner_start(
                 ctypes.py_object(receiver),
                 handle.pychip_ble_adapter_list_get_raw_adapter(nativeList),
                 timeoutMs, ScanFoundCallback, ScanIsDoneCallback, ScanHasErrorCallback)
 
-            if scanner == 0:
+            if not scanner:
+                if receiver.error is not None:
+                    raise receiver.error
                 raise ChipStackError(_CHIP_ERROR_INTERNAL, 'Failed to start BLE scan')
 
             try:
+                pending_at_deadline = None
                 while True:
-                    remaining = deadline - monotonic()
-                    if remaining <= 0:
-                        break
+                    if pending_at_deadline is None:
+                        remaining = deadline - monotonic()
+                        if remaining <= 0:
+                            pending_at_deadline = receiver.queue.qsize()
                     try:
-                        data = receiver.queue.get(timeout=remaining)
+                        if pending_at_deadline is None:
+                            data = receiver.queue.get(timeout=remaining)
+                        else:
+                            if pending_at_deadline == 0:
+                                break
+                            pending_at_deadline -= 1
+                            data = receiver.queue.get_nowait()
                     except Empty:
                         break
                     if data is None:
