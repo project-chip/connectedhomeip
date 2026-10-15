@@ -18,6 +18,7 @@ source_set("door-lock-server") {
   sources = [
     "DoorLockCluster.cpp",
     "DoorLockCluster.h",
+    "door-lock-types.h",
   ]
 
   # NOTE (transition): door-lock-delegate.h is intentionally NOT listed here
