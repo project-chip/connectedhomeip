@@ -328,7 +328,11 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
-    LogErrorOnFailure(InitBindingHandler());
+    // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
+    auto & server = Server::GetInstance();
+    LogErrorOnFailure(InitBindingManager(
+        Clusters::Binding::Manager::GetInstance(),
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;
