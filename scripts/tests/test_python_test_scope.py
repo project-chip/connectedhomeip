@@ -569,7 +569,7 @@ class TestBuildGuards(RepositoryGuard):
             ((self.workflow["jobs"][self.build_job].get("outputs") or {}).get("python_test_slices") == output, self.build_job,
              f"give job {self.build_job} this output:", ["outputs:", f"    python_test_slices: {output}"]),
             (self.build_job in self.needs(self.shard_job), SHARD_JOB,
-             f"add {self.build_job} to the needs of job {SHARD_JOB}.", []),
+             f"add {self.build_job} to the needs: list of job {SHARD_JOB}.", []),
             (f"needs.{self.build_job}.outputs.python_test_slices" in selection and "[matrix.filter]" in selection, SHARD_JOB,
              f"give job {SHARD_JOB} this environment variable:",
              ["env:", f"    PYTHON_TEST_SELECTION: ${{{{ fromJSON(needs.{self.build_job}.outputs.python_test_slices || '{{}}')"
@@ -633,12 +633,18 @@ class TestBuildGuards(RepositoryGuard):
             expected = "env.PYTHON_TEST_APPS == ''" + "".join(
                 f" || contains(env.PYTHON_TEST_APPS, ',{n},')" for n in self.produced(targets))
             if step.get("if") != expected:
-                built = ", ".join(self.produced(targets)) or "nothing a test names in its CI arguments"
-                if "if" not in step:
-                    problem = f"has no if:, so it always builds {built}, even for a pull request whose changed tests don't use it."
+                apps = self.produced(targets)
+                if not apps:
+                    problem = ("runs on every pull request, though no test names what it builds in its CI arguments."
+                               if "if" not in step else
+                               "has a condition that doesn't match what it builds, which no test names in its CI arguments.")
+                elif "if" not in step:
+                    them = "it" if len(apps) == 1 else "them"
+                    problem = f"runs on every pull request, so it builds {', '.join(apps)} even when the changed tests don't use {them}."
                 else:
-                    problem = (f"has an if: that doesn't match what it builds ({built}), so on {ONLY} it can skip an app "
-                               "the changed tests need, or build one they don't.")
+                    problem = (f"has a condition that doesn't match the {'app' if len(apps) == 1 else 'apps'} it builds "
+                               f"({', '.join(apps)}), so on {ONLY} it can skip an app the changed tests need, or build one "
+                               "they don't.")
                 self.fail_with_fix(self.TESTS_WORKFLOW, rf"- name: {re.escape(step['name'])}$", self.message(
                     f"The REPL build step {step['name']!r} {problem}",
                     f"in {self.TESTS_WORKFLOW}, give that step this condition:", f"if: {expected}",
@@ -722,8 +728,8 @@ class TestGateGuards(RepositoryGuard):
                 if "||" in own:
                     own = f"({own})"
                 self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
-                    f"Job {job} needs pr_scope, which is skipped on master and in the merge queue, so without !cancelled() "
-                    "the job silently stops running there.",
+                    f"Job {job} waits for the pr_scope job, which is skipped on master and in the merge queue, so without "
+                    "!cancelled() in its condition the job silently stops running there.",
                     f"in {path}, give job {job} this condition:", f"if: ${{{{ !cancelled() && {own} && {self.GATE} }}}}"))
 
     def test_gated_jobs_read_no_python_test_files(self):
@@ -741,8 +747,8 @@ class TestGateGuards(RepositoryGuard):
                         self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
                             f"Job {job} is skipped on {ONLY}, but it reads {read}{through}, which they can change, so a "
                             "break there would go unseen until the merge queue.",
-                            f"in {path}, remove pr_scope from the needs of job {job} and the python_tests_only check from "
-                            "its if:, or stop it reading that file."))
+                            f"in {path}, remove pr_scope from the needs: list of job {job} and the python_tests_only "
+                            "check from its condition, or stop it reading that file."))
 
 
 if __name__ == "__main__":
