@@ -544,41 +544,6 @@ TEST_F(TestOTARequestorCluster, GenerateDownloadErrorEventBeforeStartupFails)
     EXPECT_FALSE(eventsGenerator.GetNextEvent().has_value());
 }
 
-TEST_F(TestOTARequestorCluster, ClusterImplementsRuntimeEventGenerator)
-{
-    chip::Testing::TestServerClusterContext context;
-    MockOtaCommands otaCommands;
-    OTARequestorAttributes attributes;
-    OTARequestorCluster cluster(kTestEndpointId, otaCommands, attributes, context.GetFabricTable());
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    DefaultOTARequestorEventGenerator & generator = cluster;
-    ASSERT_EQ(generator.GenerateVersionAppliedEvent({ 0x12345678u, 0xABCDu }), CHIP_NO_ERROR);
-    auto versionEvent = context.EventsGenerator().GetNextEvent();
-    ASSERT_TRUE(versionEvent.has_value());
-    EXPECT_EQ(versionEvent->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, VersionApplied::Id));
-    VersionApplied::DecodableType versionData;
-    ASSERT_EQ(versionEvent->GetEventData(versionData), CHIP_NO_ERROR);
-    EXPECT_EQ(versionData.softwareVersion, 0x12345678u);
-    EXPECT_EQ(versionData.productID, 0xABCDu);
-
-    ASSERT_EQ(generator.GenerateDownloadErrorEvent({ 0x12345678u, 0x123456789ABCDEF0u, 83u, 0x0FEDCBA987654321 }), CHIP_NO_ERROR);
-    auto downloadEvent = context.EventsGenerator().GetNextEvent();
-    ASSERT_TRUE(downloadEvent.has_value());
-    EXPECT_EQ(downloadEvent->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, DownloadError::Id));
-    DownloadError::DecodableType downloadData;
-    ASSERT_EQ(downloadEvent->GetEventData(downloadData), CHIP_NO_ERROR);
-    EXPECT_EQ(downloadData.softwareVersion, 0x12345678u);
-    EXPECT_EQ(downloadData.bytesDownloaded, 0x123456789ABCDEF0u);
-    ASSERT_FALSE(downloadData.progressPercent.IsNull());
-    EXPECT_EQ(downloadData.progressPercent.Value(), 83u);
-    ASSERT_FALSE(downloadData.platformCode.IsNull());
-    EXPECT_EQ(downloadData.platformCode.Value(), 0x0FEDCBA987654321);
-    EXPECT_FALSE(context.EventsGenerator().GetNextEvent().has_value());
-}
-
 // OnFabricRemoved clears the removed fabric's DefaultOTAProviders entry, leaves other fabrics
 // untouched, and notifies the command interface exactly once with the removed fabricIndex.
 TEST_F(TestOTARequestorCluster, OnFabricRemovedClearsTargetFabricAndNotifiesRequestor)

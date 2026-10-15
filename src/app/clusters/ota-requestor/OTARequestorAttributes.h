@@ -70,7 +70,6 @@ public:
 
     CHIP_ERROR SetInteractionModelContext(EndpointId endpointId, AttributeChangeListener & attributeChangeListener,
                                           app::DataModel::EventsGenerator & eventsGenerator);
-
     // This loads the default OTA provider list and update state attributes from storage. This will not generate events.
     CHIP_ERROR SetStorageAndLoadAttributes(OTARequestorStorage & storage);
 
