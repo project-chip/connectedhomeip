@@ -128,6 +128,15 @@ tests:
       response:
           saveAs: NumberOfPresetsValue
 
+    - label:
+          "Saving value for comparision in step 47 read NumberOfSchedules
+          attribute"
+      PICS: TSTAT.S.F07
+      command: "readAttribute"
+      attribute: "NumberOfSchedules"
+      response:
+          saveAs: NumberOfSchedulesValue
+
     - label: "Step 2: TH reads the LocalTemperature attribute from the DUT"
       command: "readAttribute"
       attribute: "LocalTemperature"
@@ -699,6 +708,7 @@ tests:
       response:
           constraints:
               type: list
+              maxLength: NumberOfSchedulesValue
 
     - label:
           "Step 48: TH reads the SetpointHoldExpiryTimestamp attribute from the

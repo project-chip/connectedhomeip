@@ -17,7 +17,9 @@
 
 #include "ThermostatClusterAtomic.h"
 
+#include <access/AccessControl.h>
 #include <app/GlobalAttributes.h>
+#include <clusters/Thermostat/MetadataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <functional>
@@ -78,6 +80,48 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
         attributeRequestCount++;
     }
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
+}
+
+/**
+ * @brief Checks if the client has permission to write to the requested attribute
+ *
+ * @param[in] commandObj The command handler object.
+ * @param[in] commandPath The concrete command path.
+ * @param[in] attributeId The attribute ID being requested.
+ * @return Status::Success if the client has write access, Status::UnsupportedAccess otherwise.
+ */
+Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, AttributeId attributeId)
+{
+    if (commandObj == nullptr)
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    auto entry = DataModel::ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>::EntryFor(attributeId);
+    if (!entry.has_value())
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    Access::RequestPath requestPath{
+        .cluster     = commandPath.mClusterId,
+        .endpoint    = commandPath.mEndpointId,
+        .requestType = Access::RequestType::kAttributeWriteRequest,
+        .entityId    = attributeId,
+    };
+
+    auto writePrivilege = entry->GetWritePrivilege();
+    if (!writePrivilege.has_value())
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) != CHIP_NO_ERROR)
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    return Status::Success;
 }
 
 } // anonymous namespace
@@ -365,6 +409,24 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
     if (!InAtomicWrite(commandObj, attributeStatuses))
     {
         return Status::InvalidInState;
+    }
+
+    status = Status::Success;
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+    {
+        auto & attributeStatus = attributeStatuses[i];
+        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
+        if (statusCode != Status::Success)
+        {
+            attributeStatus.statusCode = to_underlying(statusCode);
+            status                     = Status::Failure;
+        }
+    }
+    if (status != Status::Success)
+    {
+        Rollback();
+        SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
+        return std::nullopt;
     }
 
     status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWritePrecommit);

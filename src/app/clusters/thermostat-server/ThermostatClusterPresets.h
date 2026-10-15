@@ -182,6 +182,7 @@ public:
     Protocols::InteractionModel::Status PrecommitPresets();
 
     bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
+    bool IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch);
 
 private:
     ThermostatClusterBase & mCluster;

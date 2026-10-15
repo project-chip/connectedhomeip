@@ -458,6 +458,15 @@ bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHa
     return false;
 }
 
+bool ThermostatPresets::IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch)
+{
+    if (mAtomicWriteSession.InAtomicWrite(std::make_optional(Presets::Id)))
+    {
+        return CountPresetsInPendingListWithPresetHandle(mDelegate, presetHandleToMatch) > 0;
+    }
+    return IsPresetHandlePresentInPresets(presetHandleToMatch);
+}
+
 Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
@@ -650,6 +659,13 @@ Status ThermostatPresets::PrecommitPresets()
         if (IsBuiltIn(preset) && !found)
         {
             return Status::ConstraintError;
+        }
+
+        // If a removed preset is referenced by any schedule or schedule transition, return INVALID_IN_STATE.
+        if (!found && !preset.GetPresetHandle().IsNull() &&
+            mCluster.IsPresetHandleInUseBySchedules(preset.GetPresetHandle().Value()))
+        {
+            return Status::InvalidInState;
         }
     }
 
