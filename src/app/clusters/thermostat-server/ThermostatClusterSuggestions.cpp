@@ -75,30 +75,29 @@ CHIP_ERROR RemoveExpiredSuggestions(chip::app::Clusters::Thermostat::ThermostatS
  * found", this distinguishes the two so callers that take a destructive action (e.g. removing a stale thermostat
  * suggestion) on "not found" do not do so on a transient enumeration error.
  *
- * @param[in]  delegate The Presets delegate to use.
- * @param[in]  presetHandle The preset handle to look for.
- * @param[out] exists Set to true if a preset with this handle is present in the Presets attribute list, false
- *             otherwise.
+ * @param[in] delegate The Presets delegate to use.
+ * @param[in] presetHandle The preset handle to look for.
  *
- * @return CHIP_NO_ERROR if the Presets attribute list was enumerated successfully, an error code if not.
+ * @return CHIP_NO_ERROR if a preset with this handle is present in the Presets attribute list.
+ * @return CHIP_ERROR_NOT_FOUND if the Presets attribute list was enumerated successfully but no preset with this
+ *         handle was found.
+ * @return another CHIP_ERROR if the Presets attribute list could not be enumerated.
  */
 CHIP_ERROR PresetHandleStillExists(chip::app::Clusters::Thermostat::ThermostatPresets::Delegate & delegate,
-                                   const chip::ByteSpan & presetHandle, bool & exists)
+                                   const chip::ByteSpan & presetHandle)
 {
-    exists = false;
     PresetStructWithOwnedMembers preset;
     for (uint8_t i = 0; true; i++)
     {
         CHIP_ERROR err = delegate.GetPresetAtIndex(i, preset);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return CHIP_NO_ERROR;
+            return CHIP_ERROR_NOT_FOUND;
         }
         ReturnErrorOnFailure(err);
 
         if (!preset.GetPresetHandle().IsNull() && preset.GetPresetHandle().Value().data_equal(presetHandle))
         {
-            exists = true;
             return CHIP_NO_ERROR;
         }
     }
@@ -418,8 +417,16 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
             return false;
         }
 
-        err = PresetHandleStillExists(mPresets.GetDelegate(), suggestion.GetPresetHandle(), presetStillExists[i]);
-        if (err != CHIP_NO_ERROR)
+        err = PresetHandleStillExists(mPresets.GetDelegate(), suggestion.GetPresetHandle());
+        if (err == CHIP_NO_ERROR)
+        {
+            presetStillExists[i] = true;
+        }
+        else if (err == CHIP_ERROR_NOT_FOUND)
+        {
+            presetStillExists[i] = false;
+        }
+        else
         {
             ChipLogError(
                 Zcl, "RemoveThermostatSuggestionsForRemovedPresets: PresetHandleStillExists failed with error %" CHIP_ERROR_FORMAT,
