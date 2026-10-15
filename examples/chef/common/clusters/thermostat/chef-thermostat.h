@@ -129,19 +129,19 @@ public:
 
 private:
     [[maybe_unused]] EndpointId mEndpointId = kInvalidEndpointId;
-    temperature mAbsMinHeatSetpointLimit   = kDefaultAbsMinHeatSetpointLimit;
-    temperature mAbsMaxHeatSetpointLimit   = kDefaultAbsMaxHeatSetpointLimit;
-    temperature mMinHeatSetpointLimit      = kDefaultAbsMinHeatSetpointLimit;
-    temperature mMaxHeatSetpointLimit      = kDefaultAbsMaxHeatSetpointLimit;
-    temperature mOccupiedHeatingSetpoint   = kDefaultHeatingSetpoint;
-    temperature mUnoccupiedHeatingSetpoint = kDefaultHeatingSetpoint;
-    temperature mAbsMinCoolSetpointLimit   = kDefaultAbsMinCoolSetpointLimit;
-    temperature mAbsMaxCoolSetpointLimit   = kDefaultAbsMaxCoolSetpointLimit;
-    temperature mMinCoolSetpointLimit      = kDefaultAbsMinCoolSetpointLimit;
-    temperature mMaxCoolSetpointLimit      = kDefaultAbsMaxCoolSetpointLimit;
-    temperature mOccupiedCoolingSetpoint   = kDefaultCoolingSetpoint;
-    temperature mUnoccupiedCoolingSetpoint = kDefaultCoolingSetpoint;
-    temperature mMinDeadband               = kDefaultDeadBand;
+    temperature mAbsMinHeatSetpointLimit    = kDefaultAbsMinHeatSetpointLimit;
+    temperature mAbsMaxHeatSetpointLimit    = kDefaultAbsMaxHeatSetpointLimit;
+    temperature mMinHeatSetpointLimit       = kDefaultAbsMinHeatSetpointLimit;
+    temperature mMaxHeatSetpointLimit       = kDefaultAbsMaxHeatSetpointLimit;
+    temperature mOccupiedHeatingSetpoint    = kDefaultHeatingSetpoint;
+    temperature mUnoccupiedHeatingSetpoint  = kDefaultHeatingSetpoint;
+    temperature mAbsMinCoolSetpointLimit    = kDefaultAbsMinCoolSetpointLimit;
+    temperature mAbsMaxCoolSetpointLimit    = kDefaultAbsMaxCoolSetpointLimit;
+    temperature mMinCoolSetpointLimit       = kDefaultAbsMinCoolSetpointLimit;
+    temperature mMaxCoolSetpointLimit       = kDefaultAbsMaxCoolSetpointLimit;
+    temperature mOccupiedCoolingSetpoint    = kDefaultCoolingSetpoint;
+    temperature mUnoccupiedCoolingSetpoint  = kDefaultCoolingSetpoint;
+    temperature mMinDeadband                = kDefaultDeadBand;
 };
 
 class ChefThermostatHoldDelegate : public ThermostatHold::Delegate
