@@ -50,8 +50,8 @@ public:
     explicit TestCustomContext(int & destructorCount, int * dispatchCount = nullptr,
                                Clusters::Binding::TableEntry * lastEntry = nullptr, OperationalDeviceProxy ** lastPeer = nullptr,
                                Messaging::ExchangeManager ** lastExchangeManager = nullptr) :
-        mDestructorCount(destructorCount), mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer),
-        mLastExchangeManager(lastExchangeManager)
+        mDestructorCount(destructorCount),
+        mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer), mLastExchangeManager(lastExchangeManager)
     {}
 
     ~TestCustomContext() override { mDestructorCount++; }
