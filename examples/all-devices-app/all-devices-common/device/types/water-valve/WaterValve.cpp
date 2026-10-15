@@ -25,8 +25,8 @@ namespace chip::app {
 
 WaterValve::WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurationAndControl::Delegate & delegate,
                        const WaterValveConfig & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate),
-    mValveDelegate(delegate), mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
+    mTimerDelegate(timerDelegate), mValveDelegate(delegate), mConfig(config)
 {}
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {

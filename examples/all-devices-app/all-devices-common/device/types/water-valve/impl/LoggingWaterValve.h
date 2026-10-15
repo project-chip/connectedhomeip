@@ -24,7 +24,7 @@ namespace app {
 class LoggingWaterValve : public Clusters::ValveConfigurationAndControl::Delegate, public WaterValve
 {
 public:
-    LoggingWaterValve(TimerDelegate & timerDelegate) : WaterValve(timerDelegate, *this) {};
+    LoggingWaterValve(TimerDelegate & timerDelegate) : WaterValve(timerDelegate, *this){};
     ~LoggingWaterValve() override = default;
 
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
