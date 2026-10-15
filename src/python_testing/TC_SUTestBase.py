@@ -152,7 +152,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             "ACTION: check that the DUT is powered and on the network. A one-off drop-out is an "
             "environment problem — re-run the test. A DUT that repeatedly stops answering at this "
             "point is itself the defect and must not be retried away.")
-    
+
     async def _announce_until_provider_queried(self, controller, provider_node_id: int, requestor_node_id: int,
                                                timeout_sec: float, step_name: str,
                                                retry_interval_sec: float = 60.0) -> None:
