@@ -21,7 +21,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
+#include <clusters/BasicInformation/Events.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>
 #include <clusters/OperationalCredentials/Commands.h>
 #include <clusters/OperationalCredentials/Enums.h>
