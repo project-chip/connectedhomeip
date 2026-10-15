@@ -16,12 +16,17 @@ name: Bloat Check
 on:
     workflow_dispatch:
     schedule:
-        - cron: "*/5 * * * *"
+        # Runs of the size-reporting workflows are enumerated by the fallback
+        # scan in memdf.util.github when the repository artifact listing is
+        # unavailable. Scans are bounded by --github-scan-hours below; a 30
+        # minute cadence keeps the expected API usage for each scan within the
+        # hourly limit of the GITHUB_TOKEN.
+        - cron: "*/30 * * * *"
 
 concurrency:
     group: ${{ github.workflow }}
     # Don't cancel an already-running bloat check just because it took more
-    # than 5 minutes to run and our cron job is trying to schedule a new one.
+    # than 30 minutes to run and our cron job is trying to schedule a new one.
     cancel-in-progress: false
 
 jobs:
@@ -39,6 +44,11 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Self test
+              # This workflow failed silently for a long time; keep the tool
+              # from rotting unnoticed between real scans.
+              run: |
+                  python3 scripts/tools/memory/test_gh_report.py
             - name: Report
               run: |
                   scripts/tools/memory/gh_report.py \
@@ -49,5 +59,6 @@ jobs:
                     --github-limit-artifact-pages 50 \
                     --github-limit-artifacts 500 \
                     --github-limit-comments 20 \
+                    --github-scan-hours 6 \
                     --github-repository project-chip/connectedhomeip \
                     --github-api-token "${{ secrets.GITHUB_TOKEN }}"

@@ -127,6 +127,22 @@ class SizeContext:
                                             not config['database.readonly'])
         self.db.open()
 
+    @staticmethod
+    def _record_size_artifact(
+            size_artifacts: dict[str, dict[str, fastcore.basics.AttrDict]],
+            a: fastcore.basics.AttrDict) -> None:
+        """Record a size artifact, keeping the newest artifact per (group, commit)."""
+        if a.group not in size_artifacts:
+            size_artifacts[a.group] = {}
+        existing = size_artifacts[a.group].get(a.commit)
+        if (existing is not None
+                and getattr(existing, 'created_at', None)
+                and getattr(a, 'created_at', None)
+                and existing.created_at >= a.created_at):
+            return
+        size_artifacts[a.group][a.commit] = a
+        log.debug("ASG: artifact %d '%s'", a.id, a.name)
+
     def add_sizes_from_github(self):
         """Read size report artifacts from github."""
 
@@ -134,18 +150,45 @@ class SizeContext:
         # after we have the entire list.
         size_artifacts: dict[str, dict[str, fastcore.basics.AttrDict]] = {}
         for a in self.gh.get_size_artifacts():
-            if a.group not in size_artifacts:
-                size_artifacts[a.group] = {}
-            size_artifacts[a.group][a.commit] = a
-            log.debug("ASG: artifact %d '%s'", a.id, a.name)
+            self._record_size_artifact(size_artifacts, a)
+
+        # If reporting on a specific PR and no artifacts for it were returned by
+        # the general scan, look up the PR's head commit directly.
+        only_pr = self.config['github.limit-pr']
+        if only_pr:
+            has_pr_artifact = any(
+                str(r.pr) == str(only_pr)
+                for group_reports in size_artifacts.values()
+                for r in group_reports.values()
+            )
+            if not has_pr_artifact:
+                if pr_commit := self.get_newest_commit(only_pr):
+                    log.debug("ASP: Fetching PR #%d artifacts for commit '%s'",
+                              only_pr, pr_commit)
+                    for a in self.gh.get_size_artifacts_for_commit(pr_commit):
+                        self._record_size_artifact(size_artifacts, a)
 
         # Determine required size artifacts.
+        #
+        # Fetching a missing parent may record artifacts for groups (or
+        # commits) not yet in size_artifacts, so iterate over snapshots.
         artifact_limit = self.config['github.limit-artifacts']
         required_artifact_ids: set[int] = set()
-        for group, group_reports in size_artifacts.items():
+        queried_parents: set[str] = set()
+        for group, group_reports in list(size_artifacts.items()):
             log.debug("ASG: group '%s'", group)
-            for report in group_reports.values():
+            for report in list(group_reports.values()):
                 if self.should_report(report.event):
+                    if only_pr and str(report.pr) != str(only_pr):
+                        continue
+                    if (report.parent not in group_reports
+                            and report.parent not in queried_parents):
+                        queried_parents.add(report.parent)
+                        log.debug("ASP: Fetching parent artifacts for '%s'",
+                                  report.parent)
+                        for pa in self.gh.get_size_artifacts_for_commit(
+                                report.parent):
+                            self._record_size_artifact(size_artifacts, pa)
                     if report.parent not in group_reports:
                         log.debug("ASN:  No match for '%s'", report.name)
                         continue
