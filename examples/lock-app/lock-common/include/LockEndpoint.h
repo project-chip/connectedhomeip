@@ -72,8 +72,8 @@ public:
     LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
                  uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser,
                  uint8_t numberOfHolidaySchedules) :
-        mEndpointId{ endpointId }, mLockState{ DlLockState::kLocked }, mDoorState{ DoorStateEnum::kDoorClosed },
-        mLockUsers(numberOfLockUsersSupported),
+        mEndpointId{ endpointId },
+        mLockState{ DlLockState::kLocked }, mDoorState{ DoorStateEnum::kDoorClosed }, mLockUsers(numberOfLockUsersSupported),
         mLockCredentials(DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES, std::vector<LockCredentialInfo>(numberOfCredentialsSupported + 1)),
         mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
         mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser)),
