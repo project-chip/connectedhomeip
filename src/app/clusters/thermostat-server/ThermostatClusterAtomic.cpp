@@ -333,9 +333,13 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
     status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
+        // If we've gotten this far, then the client has manage permission to call AtomicRequest,
+        // which is also the privilege necessary to write to the atomic attributes, so no need to do
+        // the "If the client does not have sufficient privilege to write to the attribute" check
+        // from the spec.
         auto & attributeStatus = attributeStatuses[i];
-        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
-        if (statusCode == Status::Success)
+        auto statusCode        = Status::Success;
+        switch (attributeStatus.attributeID)
         {
         case Presets::Id:
         case Schedules::Id:
