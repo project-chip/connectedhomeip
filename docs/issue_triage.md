@@ -89,61 +89,62 @@ types or functionality) as well as individual examples.
 
 ### Per example
 
-| Example path                                   | Contact                      | Note(s)      |
-| ---------------------------------------------- | ---------------------------- | ------------ |
-| `examples/air-purifier-app`                    |                              | UNMAINTAINED |
-| `examples/air-quality-sensor-app`              |                              | UNMAINTAINED |
-| `examples/all-clusters-app`                    |                              | UNMAINTAINED |
-| `examples/all-clusters-minimal-app`            |                              | UNMAINTAINED |
-| `examples/all-devices-app`                     | Andrei Litvin, Sergio Soares |              |
-| `examples/android`                             |                              | UNMAINTAINED |
-| `examples/bridge-app`                          |                              | UNMAINTAINED |
-| `examples/build_overrides`                     |                              | UNMAINTAINED |
-| `examples/camera-app`                          | Charles Kim, Mark Trayer     |              |
-| `examples/camera-controller`                   | Charles Kim, Mark Trayer     |              |
-| `examples/chef`                                | Shreyas Bhandare             |              |
-| `examples/chip-tool`                           |                              | UNMAINTAINED |
-| `examples/closure-app`                         | Satyanaag Bollimpalli        |              |
-| `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
-| `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
-| `examples/dishwasher-app`                      |                              | UNMAINTAINED |
-| `examples/energy-gateway-app`                  | James Harrow                 |              |
-| `examples/energy-management`                   | Louis-Philip Beliveau        |              |
-| `examples/evse-app`                            | James Harrow                 |              |
-| `examples/fabric-admin`                        |                              | UNMAINTAINED |
-| `examples/fabric-bridge-app`                   |                              | UNMAINTAINED |
-| `examples/java-matter-controller`              |                              | UNMAINTAINED |
-| `examples/jf-admin-app`                        | Doru Gucea                   |              |
-| `examples/jf-control-app`                      | Doru Gucea                   |              |
-| `examples/kotlin-matter-controller`            |                              | UNMAINTAINED |
-| `examples/laundry-washer-app`                  |                              | UNMAINTAINED |
-| `examples/lighting-app`                        | Junior Martinez              |              |
-| `examples/lighting-app-data-mode-no-unique-id` |                              | UNMAINTAINED |
-| `examples/light-switch-app`                    |                              | UNMAINTAINED |
-| `examples/lit-icd-app`                         | Junior Martinez              |              |
-| `examples/lock-app`                            |                              | UNMAINTAINED |
-| `examples/log-source-app`                      |                              | UNMAINTAINED |
-| `examples/microwave-oven-app`                  | Rob Bultman                  |              |
-| `examples/minimal-mdns`                        | Andrei Litvin                |              |
-| `examples/network-manager-app`                 | Thomas Lea                   |              |
-| `examples/ota-provider-app`                    |                              | UNMAINTAINED |
-| `examples/ota-requestor-app`                   |                              | UNMAINTAINED |
-| `examples/persistent-storage`                  |                              | UNMAINTAINED |
-| `examples/placeholder`                         |                              | UNMAINTAINED |
-| `examples/providers`                           |                              | UNMAINTAINED |
-| `examples/pump-app`                            |                              | UNMAINTAINED |
-| `examples/pump-controller-app`                 |                              | UNMAINTAINED |
-| `examples/refrigerator-app`                    |                              | UNMAINTAINED |
-| `examples/resource-monitoring-app`             |                              | UNMAINTAINED |
-| `examples/rvc-app`                             |                              | UNMAINTAINED |
-| `examples/smoke-co-alarm-app`                  |                              | UNMAINTAINED |
-| `examples/temperature-measurement-app`         |                              | UNMAINTAINED |
-| `examples/terms-and-conditions-app`            | James Swan                   |              |
-| `examples/thermostat`                          |                              | UNMAINTAINED |
-| `examples/thread-br-app`                       |                              | UNMAINTAINED |
-| `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic |              |
-| `examples/tv-casting-app`                      | Chris DeCenzo, Lazar Kovacic |              |
-| `examples/virtual-device-app`                  |                              | UNMAINTAINED |
-| `examples/water-heater-app`                    | James Harrow                 |              |
-| `examples/water-leak-detector-app`             |                              | UNMAINTAINED |
-| `examples/window-app`                          |                              | UNMAINTAINED |
+| Example path                                   | Contact                            | Note(s)      |
+| ---------------------------------------------- | ---------------------------------- | ------------ |
+| `examples/air-purifier-app`                    |                                    | UNMAINTAINED |
+| `examples/air-quality-sensor-app`              |                                    | UNMAINTAINED |
+| `examples/all-clusters-app`                    |                                    | UNMAINTAINED |
+| `examples/all-clusters-minimal-app`            |                                    | UNMAINTAINED |
+| `examples/all-devices-app`                     | Andrei Litvin, Sergio Soares       |              |
+| `examples/android`                             |                                    | UNMAINTAINED |
+| `examples/av-analysis-app`                     | Sayon Deep, Pradip De, Mark Trayer |              |
+| `examples/bridge-app`                          |                                    | UNMAINTAINED |
+| `examples/build_overrides`                     |                                    | UNMAINTAINED |
+| `examples/camera-app`                          | Charles Kim, Mark Trayer           |              |
+| `examples/camera-controller`                   | Charles Kim, Mark Trayer           |              |
+| `examples/chef`                                | Shreyas Bhandare                   |              |
+| `examples/chip-tool`                           |                                    | UNMAINTAINED |
+| `examples/closure-app`                         | Satyanaag Bollimpalli              |              |
+| `examples/contact-sensor-app`                  |                                    | UNMAINTAINED |
+| `examples/darwin-framework-tool`               | Boris Zbarsky                      |              |
+| `examples/dishwasher-app`                      |                                    | UNMAINTAINED |
+| `examples/energy-gateway-app`                  | James Harrow                       |              |
+| `examples/energy-management`                   | Louis-Philip Beliveau              |              |
+| `examples/evse-app`                            | James Harrow                       |              |
+| `examples/fabric-admin`                        |                                    | UNMAINTAINED |
+| `examples/fabric-bridge-app`                   |                                    | UNMAINTAINED |
+| `examples/java-matter-controller`              |                                    | UNMAINTAINED |
+| `examples/jf-admin-app`                        | Doru Gucea                         |              |
+| `examples/jf-control-app`                      | Doru Gucea                         |              |
+| `examples/kotlin-matter-controller`            |                                    | UNMAINTAINED |
+| `examples/laundry-washer-app`                  |                                    | UNMAINTAINED |
+| `examples/lighting-app`                        | Junior Martinez                    |              |
+| `examples/lighting-app-data-mode-no-unique-id` |                                    | UNMAINTAINED |
+| `examples/light-switch-app`                    |                                    | UNMAINTAINED |
+| `examples/lit-icd-app`                         | Junior Martinez                    |              |
+| `examples/lock-app`                            |                                    | UNMAINTAINED |
+| `examples/log-source-app`                      |                                    | UNMAINTAINED |
+| `examples/microwave-oven-app`                  | Rob Bultman                        |              |
+| `examples/minimal-mdns`                        | Andrei Litvin                      |              |
+| `examples/network-manager-app`                 | Thomas Lea                         |              |
+| `examples/ota-provider-app`                    |                                    | UNMAINTAINED |
+| `examples/ota-requestor-app`                   |                                    | UNMAINTAINED |
+| `examples/persistent-storage`                  |                                    | UNMAINTAINED |
+| `examples/placeholder`                         |                                    | UNMAINTAINED |
+| `examples/providers`                           |                                    | UNMAINTAINED |
+| `examples/pump-app`                            |                                    | UNMAINTAINED |
+| `examples/pump-controller-app`                 |                                    | UNMAINTAINED |
+| `examples/refrigerator-app`                    |                                    | UNMAINTAINED |
+| `examples/resource-monitoring-app`             |                                    | UNMAINTAINED |
+| `examples/rvc-app`                             |                                    | UNMAINTAINED |
+| `examples/smoke-co-alarm-app`                  |                                    | UNMAINTAINED |
+| `examples/temperature-measurement-app`         |                                    | UNMAINTAINED |
+| `examples/terms-and-conditions-app`            | James Swan                         |              |
+| `examples/thermostat`                          |                                    | UNMAINTAINED |
+| `examples/thread-br-app`                       |                                    | UNMAINTAINED |
+| `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic       |              |
+| `examples/tv-casting-app`                      | Chris DeCenzo, Lazar Kovacic       |              |
+| `examples/virtual-device-app`                  |                                    | UNMAINTAINED |
+| `examples/water-heater-app`                    | James Harrow                       |              |
+| `examples/water-leak-detector-app`             |                                    | UNMAINTAINED |
+| `examples/window-app`                          |                                    | UNMAINTAINED |
