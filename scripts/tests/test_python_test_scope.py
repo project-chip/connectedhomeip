@@ -368,6 +368,9 @@ class TestSelectHelpers(unittest.TestCase):
         self.assertEqual(imported_names("def broken(:\n", "TC_X.py"), set())
 
 
+ONLY = "pull requests that only change Python tests"
+
+
 class RepositoryGuard(unittest.TestCase):
     """Base for the checks that read this repository; the Lint Code Base workflow runs them.
 
@@ -380,13 +383,20 @@ class RepositoryGuard(unittest.TestCase):
     TREE = "src/python_testing"
     SCOPE_SCRIPT = "scripts/tests/python_test_scope.py"
 
+    @staticmethod
+    def message(problem: str, fix: str, *code: str, note: str | None = None) -> str:
+        """Lay out a failure: what is wrong, the fix, any code to paste on lines of its own, then a note."""
+        return "\n".join([problem, f"Fix: {fix}", *(f"    {line}" for line in code), *([note] if note else [])])
+
     def fail_with_fix(self, path: str, line_pattern: str, message: str, after: str | None = None) -> None:
         """Fail with `message`, annotating the first line matching `line_pattern`, after the first matching `after`."""
         if os.environ.get("GITHUB_ACTIONS") == "true":
             lines = (self.ROOT / path).read_text().splitlines()
             start = next((n for n, text in enumerate(lines) if re.search(after, text)), 0) if after else 0
             line = next((n for n, text in enumerate(lines[start:], start + 1) if re.search(line_pattern, text)), 1)
-            print(f"\n::error file={path},line={line}::{message}", flush=True)
+            # Workflow commands take one line; GitHub shows %0A as a line break in the annotation.
+            text = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+            print(f"\n::error file={path},line={line}::{text}", flush=True)
         self.fail(message)
 
     def read(self, reader, *args):
@@ -402,9 +412,10 @@ class RepositoryGuard(unittest.TestCase):
         variables = self.read(environment_file, self.ROOT)
         if not built_apps(variables):
             self.fail_with_fix(self.SCOPE_SCRIPT, r"^def environment_file\b",
-                               f"python_test_scope.py finds no app in the '{ENV_FILE_STEP}' step of {self.TESTS_WORKFLOW}, so it "
-                               "cannot tell which apps a pull request's tests need. Fix: if that step's echo lines or the "
-                               f"objdir-clone/ app paths changed format, update environment_file() and built_apps() in {self.SCOPE_SCRIPT}.")
+                               self.message(f"python_test_scope.py finds no app in the '{ENV_FILE_STEP}' step of "
+                                            f"{self.TESTS_WORKFLOW}, so it cannot tell which apps a pull request's tests need.",
+                                            "if that step's echo lines or the objdir-clone/ app paths changed format, update "
+                                            f"environment_file() and built_apps() in {self.SCOPE_SCRIPT}."))
         return variables
 
     def runnable_tests(self) -> list[str]:
@@ -423,7 +434,9 @@ class TestSelectionGuards(RepositoryGuard):
     def runner_source(self) -> str:
         if not (self.ROOT / RUNNER).is_file():
             self.fail_with_fix(self.SCOPE_SCRIPT, r"^RUNNER =",
-                               f"{RUNNER} does not exist. Fix: in {self.SCOPE_SCRIPT}, set RUNNER to the runner's new path.")
+                               self.message(f"{RUNNER} does not exist.",
+                                            f"in {self.SCOPE_SCRIPT}, set RUNNER to the runner's new path:",
+                                            'RUNNER = "src/python_testing/<new name>.py"'))
         return (self.ROOT / RUNNER).read_text()
 
     def runner_runs(self, *regexes: str) -> set[str]:
@@ -441,10 +454,11 @@ class TestSelectionGuards(RepositoryGuard):
             if "ModuleNotFoundError" in error and os.environ.get("GITHUB_ACTIONS") != "true":
                 self.skipTest(f"{RUNNER} cannot run in this Python: {error}")
             self.fail_with_fix(self.SCOPE_SCRIPT, r"^RUNNER =",
-                               f"Could not list the tests the runner runs: {RUNNER} run --dry-run failed with {error}. "
-                               f"Fix: if the runner moved, set RUNNER in {self.SCOPE_SCRIPT} to its new path; if it fails on an "
-                               "import, fix that import; if its command line changed, update runner_runs() in "
-                               "scripts/tests/test_python_test_scope.py.")
+                               self.message(f"Could not list the tests the runner runs: {RUNNER} run --dry-run failed with "
+                                            f"{error}.",
+                                            f"if the runner moved, set RUNNER in {self.SCOPE_SCRIPT} to its new path; if it fails "
+                                            "on an import, fix that import; if its command line changed, update runner_runs() in "
+                                            "scripts/tests/test_python_test_scope.py."))
         return {Path(script).name for script in re.findall(r"--script (\S+\.py)", result.stdout)}
 
     def test_every_runnable_test_is_selected_into_exactly_one_shard(self):
@@ -452,19 +466,21 @@ class TestSelectionGuards(RepositoryGuard):
         selection = self.read(select, [f"{self.TREE}/{name}" for name in self.runnable_tests()])
         if selection.full_reason:
             self.fail_with_fix(self.SCOPE_SCRIPT, r"^def select",
-                               f"Selecting every test the REPL shards run fell back to running everything: {selection.full_reason}. "
-                               "Fix: correct what that names; if it names nothing wrong, the rules in select() in "
-                               f"{self.SCOPE_SCRIPT} no longer match the test tree.")
+                               self.message("Selecting every test the REPL shards run fell back to running everything: "
+                                            f"{selection.full_reason}.",
+                                            "correct what that names; if it names nothing wrong, the rules in select() in "
+                                            f"{self.SCOPE_SCRIPT} no longer match the test tree."))
         self.assertEqual(sorted(selection.tests), self.runnable_tests())
         filters = self.read(shard_filters, self.ROOT)
         for name in self.runnable_tests():
             shards = [f for f in filters if runner_matches(f, f"{self.TREE}/{name}")]
             if len(shards) != 1:
                 self.fail_with_fix(self.TESTS_WORKFLOW, r"^\s+filter: \[",
-                                   f"{name} matches {len(shards)} of the REPL shard filters {shards}, so "
-                                   f"{'no shard runs it' if not shards else 'more than one shard runs it'}. Fix: in "
-                                   f"{self.TESTS_WORKFLOW}, change the filter list of job {SHARD_JOB} so that it matches each test "
-                                   "exactly once (scripts/tools/estimate_repl_test_split.py reports overlaps).")
+                                   self.message(f"{name} matches {len(shards)} of the REPL shard filters {shards}, so "
+                                                f"{'no shard runs it' if not shards else 'more than one shard runs it'}.",
+                                                f"in {self.TESTS_WORKFLOW}, change the filter list of job {SHARD_JOB} so that it "
+                                                "matches each test exactly once.",
+                                                note="scripts/tools/estimate_repl_test_split.py reports overlaps."))
 
     def test_each_shard_runs_what_the_runner_runs(self):
         # Every test selected, so each shard's selection regex names its whole share.
@@ -480,12 +496,13 @@ class TestSelectionGuards(RepositoryGuard):
                 if actual != expected:
                     narrowed = ", when also given the list of tests a pull request needs," if len(regexes) > 1 else ","
                     self.fail_with_fix(self.SCOPE_SCRIPT, r"^EXCLUDED_SECTIONS =",
-                                       f"For the REPL shard {shard!r}{narrowed} {RUNNER} runs {len(actual)} tests, but "
-                                       f"{self.SCOPE_SCRIPT} expects {len(expected)} (only the runner: {sorted(actual - expected)[:5]}, "
-                                       f"only the script: {sorted(expected - actual)[:5]}); the script must predict exactly which tests "
-                                       f"each shard runs. Fix: in {self.SCOPE_SCRIPT}, make EXCLUDED_SECTIONS list the test_metadata.yaml "
-                                       "sections the runner leaves out (see cmd_run), and make runner_matches() match files the way "
-                                       "its --regex option does.")
+                                       self.message(f"For the REPL shard {shard!r}{narrowed} {RUNNER} runs {len(actual)} tests, "
+                                                    f"but {self.SCOPE_SCRIPT}, which must predict exactly which tests each shard "
+                                                    f"runs, expects {len(expected)}. Only the runner: {sorted(actual - expected)[:5]}. "
+                                                    f"Only the script: {sorted(expected - actual)[:5]}.",
+                                                    f"in {self.SCOPE_SCRIPT}, make EXCLUDED_SECTIONS list the test_metadata.yaml "
+                                                    "sections the runner leaves out (see cmd_run), and make runner_matches() match "
+                                                    "files the way its --regex option does."))
 
     def test_the_runner_imports_nothing_else_from_the_test_tree(self):
         files = scan_tree(self.ROOT / self.TREE)
@@ -493,9 +510,10 @@ class TestSelectionGuards(RepositoryGuard):
         for rel, info in sorted(files.items()):
             if f"{self.TREE}/{rel}" not in REPL_SELECTION_FILES and imports_module(imported, info.module):
                 self.fail_with_fix(self.SCOPE_SCRIPT, r"^REPL_SELECTION_FILES =",
-                                   f"{RUNNER} imports {self.TREE}/{rel}, so changing that file can change which tests run, but "
-                                   f"such a change would not make every shard run. Fix: in {self.SCOPE_SCRIPT}, add "
-                                   f"\"{self.TREE}/{rel}\" to REPL_SELECTION_FILES.")
+                                   self.message(f"{RUNNER} imports {self.TREE}/{rel}, so changing that file can change which "
+                                                "tests run, but such a change would not make every shard run.",
+                                                f"in {self.SCOPE_SCRIPT}, add this path to REPL_SELECTION_FILES:",
+                                                f'"{self.TREE}/{rel}"'))
 
     def test_modules_the_framework_imports_run_every_shard(self):
         tree = self.ROOT / self.TREE
@@ -518,10 +536,11 @@ class TestBuildGuards(RepositoryGuard):
                                if any(step.get("id") == self.SELECT_STEP for step in body.get("steps") or [])), None)
         if self.build_job is None:
             self.fail_with_fix(self.TESTS_WORKFLOW, r"- name: Build python env",
-                               f"No job in {self.TESTS_WORKFLOW} has the step 'Select Python tests for this pull request' (id "
-                               f"{self.SELECT_STEP}), so a pull request that changes only Python tests runs every REPL test and "
-                               f"builds every app again. Fix: in {self.TESTS_WORKFLOW}, keep that step in the job that builds the "
-                               "REPL apps, before its app build steps.")
+                               self.message(f"No job in {self.TESTS_WORKFLOW} has the step 'Select Python tests for this pull "
+                                            f"request' (id {self.SELECT_STEP}), so {ONLY} run every REPL test and build every app "
+                                            "again.",
+                                            f"in {self.TESTS_WORKFLOW}, keep that step in the job that builds the REPL apps, before "
+                                            "its app build steps."))
         self.variables = self.environment()
         self.apps = built_apps(self.variables)
 
@@ -548,19 +567,23 @@ class TestBuildGuards(RepositoryGuard):
                      if f"{Path(RUNNER).name} run" in str(step.get("run")) and "matrix.filter" in str(step.get("run"))]
         checks = [
             ((self.workflow["jobs"][self.build_job].get("outputs") or {}).get("python_test_slices") == output, self.build_job,
-             f"give job {self.build_job}  outputs: python_test_slices: {output}"),
-            (self.build_job in self.needs(self.shard_job), SHARD_JOB, f"add {self.build_job} to the needs of job {SHARD_JOB}"),
+             f"give job {self.build_job} this output:", ["outputs:", f"    python_test_slices: {output}"]),
+            (self.build_job in self.needs(self.shard_job), SHARD_JOB,
+             f"add {self.build_job} to the needs of job {SHARD_JOB}.", []),
             (f"needs.{self.build_job}.outputs.python_test_slices" in selection and "[matrix.filter]" in selection, SHARD_JOB,
-             f"give job {SHARD_JOB}  env: PYTHON_TEST_SELECTION: ${{{{ fromJSON(needs.{self.build_job}.outputs.python_test_slices "
-             "|| '{}')[matrix.filter] }}"),
+             f"give job {SHARD_JOB} this environment variable:",
+             ["env:", f"    PYTHON_TEST_SELECTION: ${{{{ fromJSON(needs.{self.build_job}.outputs.python_test_slices || '{{}}')"
+              "[matrix.filter] }}"]),
             (bool(run_steps) and all(self.passes_selection(step["run"]) for step in run_steps), SHARD_JOB,
-             f"pass --regex \"$PYTHON_TEST_SELECTION\", when it is set, to {Path(RUNNER).name} in job {SHARD_JOB}"),
+             f"in the step of job {SHARD_JOB} that runs {Path(RUNNER).name}, pass it the selection when there is one:",
+             ['SELECTION=""', 'if [ -n "$PYTHON_TEST_SELECTION" ]; then', "    SELECTION=\"--regex '$PYTHON_TEST_SELECTION'\"", "fi",
+              f"... {Path(RUNNER).name} run ... --regex '${{{{matrix.filter}}}}' $SELECTION ..."]),
         ]
-        for ok, job, fix in checks:
+        for ok, job, fix, code in checks:
             if not ok:
                 self.fail_with_fix(self.TESTS_WORKFLOW, rf"^\s+{re.escape(job)}:\s*$",
-                                   "The REPL shards no longer receive the list of tests that a pull request changing only Python "
-                                   f"tests needs, so every shard runs all its tests. Fix: in {self.TESTS_WORKFLOW}, {fix}.")
+                                   self.message(f"The REPL shards no longer receive the list of tests to run, so on {ONLY} "
+                                                "every shard runs all its tests.", f"in {self.TESTS_WORKFLOW}, {fix}", *code))
 
     def test_shard_steps_skip_shards_with_nothing_to_run(self):
         steps = self.shard_job.get("steps") or []
@@ -572,27 +595,38 @@ class TestBuildGuards(RepositoryGuard):
                     or condition.removeprefix("${{").startswith("failure()")):
                 continue
             name = step.get("name") or step.get("uses")
+            guard = "env.PYTHON_TEST_SELECTION != 'none'"
+            current = str(step.get("if", "")).strip()
+            if not current:
+                wanted = guard
+            elif current.startswith("${{") and current.endswith("}}"):
+                wanted = f"{current[:-2].rstrip()} && {guard} }}}}"
+            else:
+                wanted = f"{current} && {guard}"
             self.fail_with_fix(self.TESTS_WORKFLOW, rf"^\s*(- )?(name|uses): {re.escape(name)}\s*$",
-                               "On a pull request that changes only Python tests, a REPL shard that has none of its tests "
-                               f"skips checkout and setup, but step {name!r} of job {SHARD_JOB} still runs there. Fix: in "
-                               f"{self.TESTS_WORKFLOW}, add  env.PYTHON_TEST_SELECTION != 'none'  to that step's if:, as the "
-                               "steps around it have.", after=rf"^\s+{SHARD_JOB}:\s*$")
+                               self.message(f"On {ONLY}, a REPL shard with none of the changed tests skips checkout and "
+                                            f"setup, but step {name!r} of job {SHARD_JOB} still runs there.",
+                                            f"in {self.TESTS_WORKFLOW}, give that step this condition, as the steps around it "
+                                            "have:", f"if: {wanted}"),
+                               after=rf"^\s+{SHARD_JOB}:\s*$")
 
     def test_every_placeholder_a_test_uses_is_in_the_environment_file(self):
         for name in self.runnable_tests():
             path = f"{self.TREE}/{name}"
             source = (self.ROOT / path).read_text(errors="replace")
             if not CI_ARGUMENTS.search(source):
-                self.fail_with_fix(path, r"^", f"The REPL shards run {name}, but it has no CI arguments block "
-                                   "('# === BEGIN CI TEST ARGUMENTS ==='), which they need to run it. Fix: in "
-                                   f"{path}, add that block, or list {name} under not_automated in {self.TREE}/test_metadata.yaml; "
-                                   f"if the block markers changed for every test, update CI_ARGUMENTS in {self.SCOPE_SCRIPT}.")
+                self.fail_with_fix(path, r"^", self.message(
+                    f"The REPL shards run {name}, but it has no CI arguments block, which they need to run it.",
+                    f"in {path}, add a '# === BEGIN CI TEST ARGUMENTS ===' block, or list {name} under not_automated in "
+                    f"{self.TREE}/test_metadata.yaml.",
+                    note=f"If the block markers changed for every test, update CI_ARGUMENTS in {self.SCOPE_SCRIPT} instead."))
             for variable in sorted(ci_variables(source) - set(self.variables)):
-                self.fail_with_fix(path, rf"\$\{{{variable}\}}",
-                                   f"{name} uses ${{{variable}}} in its CI arguments, but the '{ENV_FILE_STEP}' step of "
-                                   f"{self.TESTS_WORKFLOW} does not define it. Fix: correct the name in {path}, or define it in "
-                                   "that step; if that step's echo lines changed format, update environment_file() in "
-                                   f"{self.SCOPE_SCRIPT}.")
+                self.fail_with_fix(path, rf"\$\{{{variable}\}}", self.message(
+                    f"{name} uses ${{{variable}}} in its CI arguments, but the '{ENV_FILE_STEP}' step of "
+                    f"{self.TESTS_WORKFLOW} does not define it.",
+                    f"correct the name in {path}, or define it in that step:",
+                    f'echo "{variable}: <path>" >> /tmp/test_env.yaml',
+                    note=f"If that step's echo lines changed format, update environment_file() in {self.SCOPE_SCRIPT} instead."))
 
     def test_each_app_build_runs_when_the_selection_needs_one_of_its_apps(self):
         for step, targets in self.build_steps():
@@ -601,27 +635,27 @@ class TestBuildGuards(RepositoryGuard):
             if step.get("if") != expected:
                 built = ", ".join(self.produced(targets)) or "nothing a test names in its CI arguments"
                 if "if" not in step:
-                    problem = (f"has no if:, so it builds {built} even on a pull request that changes only Python tests "
-                               "and does not need it")
+                    problem = f"has no if:, so it always builds {built}, even for a pull request whose changed tests don't use it."
                 else:
-                    problem = (f"has an if: that does not match what it builds ({built}), so on a pull request that changes "
-                               "only Python tests it can skip an app those tests need, or build one they do not")
-                self.fail_with_fix(self.TESTS_WORKFLOW, rf"- name: {re.escape(step['name'])}$",
-                                   f"The REPL build step {step['name']!r} {problem}. Fix: in {self.TESTS_WORKFLOW}, set that "
-                                   f"step's condition to  if: {expected}  (PYTHON_TEST_APPS lists the apps named in the CI "
-                                   "arguments of the tests a pull request runs; it is empty on every other run, so the step "
-                                   "then always builds).")
+                    problem = (f"has an if: that doesn't match what it builds ({built}), so on {ONLY} it can skip an app "
+                               "the changed tests need, or build one they don't.")
+                self.fail_with_fix(self.TESTS_WORKFLOW, rf"- name: {re.escape(step['name'])}$", self.message(
+                    f"The REPL build step {step['name']!r} {problem}",
+                    f"in {self.TESTS_WORKFLOW}, give that step this condition:", f"if: {expected}",
+                    note=f"PYTHON_TEST_APPS lists the apps needed on {ONLY}. On all other runs it is empty, so the step "
+                    "always builds."))
 
     def test_every_app_in_the_environment_file_has_a_build_step(self):
         produced = {n for _, targets in self.build_steps() for n in self.produced(targets)}
         # Apps an always-running step makes, such as the OTA images, are listed as always built.
         for name in sorted(self.apps - produced - set(UNFILTERED_JOB_APPS)):
-            self.fail_with_fix(self.TESTS_WORKFLOW, rf'echo "{name}:',
-                               f"{name} is defined in the '{ENV_FILE_STEP}' step of {self.TESTS_WORKFLOW}, but no step of job "
-                               f"{self.build_job} builds it with --target, so nothing builds it when a test needs it. Fix: in "
-                               f"{self.TESTS_WORKFLOW}, build it in a step of job {self.build_job} with  if: env.PYTHON_TEST_APPS "
-                               f"== '' || contains(env.PYTHON_TEST_APPS, ',{name},'); or, if a step that always runs makes it, "
-                               f"like the OTA images, add {name} to UNFILTERED_JOB_APPS in {self.SCOPE_SCRIPT}.")
+            self.fail_with_fix(self.TESTS_WORKFLOW, rf'echo "{name}:', self.message(
+                f"{name} is defined in the '{ENV_FILE_STEP}' step of {self.TESTS_WORKFLOW}, but no step of job "
+                f"{self.build_job} builds it with --target, so nothing builds it when a test needs it.",
+                f"in {self.TESTS_WORKFLOW}, build it in a step of job {self.build_job} with this condition:",
+                f"if: env.PYTHON_TEST_APPS == '' || contains(env.PYTHON_TEST_APPS, ',{name},')",
+                note=f"If a step that always runs makes it, like the OTA images, add {name} to UNFILTERED_JOB_APPS in "
+                f"{self.SCOPE_SCRIPT} instead."))
 
     def test_the_unfiltered_job_needs_only_the_apps_always_built(self):
         used = set()
@@ -635,11 +669,12 @@ class TestBuildGuards(RepositoryGuard):
         self.assertTrue(used)
         if extra := sorted(used - set(UNFILTERED_JOB_APPS)):
             them = "it" if len(extra) == 1 else "them"
-            self.fail_with_fix(self.SCOPE_SCRIPT, r"^UNFILTERED_JOB_APPS =",
-                               f"The unfiltered REPL job (filter \"\") runs tests on {', '.join(extra)}, but on a pull request "
-                               f"that changes only Python tests the REPL build job builds {them} only when one of that pull "
-                               f"request's tests needs {them}. Fix: in {self.SCOPE_SCRIPT}, add {', '.join(map(repr, extra))} to "
-                               "UNFILTERED_JOB_APPS, the apps built on every pull request.")
+            apps = ", ".join(f'"{app}"' for app in [*UNFILTERED_JOB_APPS, *extra])
+            self.fail_with_fix(self.SCOPE_SCRIPT, r"^UNFILTERED_JOB_APPS =", self.message(
+                f"The unfiltered REPL job (filter \"\") runs tests on {', '.join(extra)}, but on {ONLY} the REPL build "
+                f"job builds {them} only when their tests need {them}.",
+                f"in {self.SCOPE_SCRIPT}, add {them} to UNFILTERED_JOB_APPS, the apps built on every pull request:",
+                f"UNFILTERED_JOB_APPS = ({apps})"))
 
 
 class TestGateGuards(RepositoryGuard):
@@ -672,19 +707,24 @@ class TestGateGuards(RepositoryGuard):
     def test_scope_job_runs_on_pull_requests_only(self):
         for path, jobs in self.gated_workflows():
             if jobs["pr_scope"] != self.SCOPE_JOB:
-                self.fail_with_fix(path, r"^\s+pr_scope:\s*$",
-                                   "The pr_scope job must run the gate on pull requests only. Fix: in "
-                                   f"{path}, give it exactly  if: github.event_name == 'pull_request'  and  "
-                                   "uses: ./.github/workflows/pull-request-scope.yaml")
+                self.fail_with_fix(path, r"^\s+pr_scope:\s*$", self.message(
+                    "The pr_scope job must run the gate on pull requests only.", f"in {path}, make it exactly:",
+                    "pr_scope:", "    if: github.event_name == 'pull_request'",
+                    "    uses: ./.github/workflows/pull-request-scope.yaml"))
 
     def test_gated_jobs_still_run_when_the_scope_job_is_skipped(self):
         for path, job, body in self.gated_jobs():
             condition = str(body.get("if", ""))
             if not condition.startswith("${{ !cancelled() && ") or self.GATE not in condition:
-                self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$",
-                                   f"Job {job} needs pr_scope, which is skipped on master and in the merge queue, so without "
-                                   f"!cancelled() the job silently stops running there. Fix: in {path}, set the if: of job {job} "
-                                   f"to  ${{{{ !cancelled() && <its own condition> && {self.GATE} }}}}")
+                inner = condition.strip().removeprefix("${{").removesuffix("}}").strip()
+                own = " && ".join(part.strip() for part in inner.split("&&")
+                                  if part.strip() and part.strip() not in ("!cancelled()", self.GATE)) or "<its own condition>"
+                if "||" in own:
+                    own = f"({own})"
+                self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
+                    f"Job {job} needs pr_scope, which is skipped on master and in the merge queue, so without !cancelled() "
+                    "the job silently stops running there.",
+                    f"in {path}, give job {job} this condition:", f"if: ${{{{ !cancelled() && {own} && {self.GATE} }}}}"))
 
     def test_gated_jobs_read_no_python_test_files(self):
         # What the job's steps name, and what the scripts they run name.
@@ -698,11 +738,11 @@ class TestGateGuards(RepositoryGuard):
                 for read in sorted(set(re.findall(rf"{self.TREE}/[\w.*/-]+", content))):
                     if classify([read])[0]:
                         through = f" through {source}" if source != path else ""
-                        self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$",
-                                           f"Job {job} is skipped on a pull request that changes only Python tests, but it reads "
-                                           f"{read}{through}, which such a pull request can change, so a break there would go "
-                                           f"unseen until the merge queue. Fix: in {path}, remove pr_scope from the needs of job "
-                                           f"{job} and the python_tests_only check from its if:, or stop it reading that file.")
+                        self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
+                            f"Job {job} is skipped on {ONLY}, but it reads {read}{through}, which they can change, so a "
+                            "break there would go unseen until the merge queue.",
+                            f"in {path}, remove pr_scope from the needs of job {job} and the python_tests_only check from "
+                            "its if:, or stop it reading that file."))
 
 
 if __name__ == "__main__":

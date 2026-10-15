@@ -165,7 +165,7 @@ def shard_job(chip_root: Path) -> dict:
     workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
     job = (workflow.get("jobs") or {}).get(SHARD_JOB)
     if job is None:
-        raise LookupError(f"{WORKFLOW} has no job {SHARD_JOB}. Fix: in {SCRIPT}, set SHARD_JOB to the new name of the "
+        raise LookupError(f"{WORKFLOW} has no job {SHARD_JOB}.\nFix: in {SCRIPT}, set SHARD_JOB to the new name of the "
                           "REPL job that runs the test shards.")
     return job
 
@@ -175,7 +175,7 @@ def shard_filters(chip_root: Path) -> list[str]:
     try:
         filters = shard_job(chip_root)["strategy"]["matrix"]["filter"]
     except KeyError:
-        raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no strategy.matrix.filter list. "
+        raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no strategy.matrix.filter list.\n"
                           f"Fix: in {SCRIPT}, update shard_filters() to read the shard filters from their new place.") from None
     return [f for f in filters if f]
 
@@ -185,7 +185,7 @@ def environment_file(chip_root: Path) -> dict[str, str]:
     for step in shard_job(chip_root).get("steps") or []:
         if step.get("name") == ENV_FILE_STEP:
             return dict(re.findall(r'echo "([A-Z_0-9]+): ([^"]+)" >> /tmp/test_env.yaml', step["run"]))
-    raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no step named {ENV_FILE_STEP!r}. "
+    raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no step named {ENV_FILE_STEP!r}.\n"
                       f"Fix: in {SCRIPT}, set ENV_FILE_STEP to the new name of the step that writes /tmp/test_env.yaml.")
 
 
