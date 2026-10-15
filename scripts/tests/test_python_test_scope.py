@@ -34,8 +34,8 @@ import yaml
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # pylint: disable=wrong-import-position
-from python_test_scope import (CI_ARGUMENTS, ENV_FILE_STEP, NO_TESTS, REPL_SELECTION_FILES, RUNNER, SHARD_JOB,  # noqa: E402
-                               UNFILTERED_JOB_APPS, built_apps, ci_variables, classify, environment_file, excluded_tests,
+from python_test_scope import (CI_ARGUMENTS, ENV_FILE_STEP, EXCLUDED_SECTIONS, NO_TESTS, REPL_SELECTION_FILES, RUNNER,  # noqa: E402
+                               SHARD_JOB, UNFILTERED_JOB_APPS, built_apps, ci_variables, classify, environment_file, excluded_tests,
                                framework_imports, imported_names, imports_module, load_metadata, main, runner_matches, scan_tree,
                                select, shard_filters, shard_job)
 
@@ -494,15 +494,32 @@ class TestSelectionGuards(RepositoryGuard):
                     continue
                 actual = self.runner_runs(*regexes)
                 if actual != expected:
-                    narrowed = ", when also given the list of tests a pull request needs," if len(regexes) > 1 else ","
-                    self.fail_with_fix(self.SCOPE_SCRIPT, r"^EXCLUDED_SECTIONS =",
-                                       self.message(f"For the REPL shard {shard!r}{narrowed} {RUNNER} runs {len(actual)} tests, "
-                                                    f"but {self.SCOPE_SCRIPT}, which must predict exactly which tests each shard "
-                                                    f"runs, expects {len(expected)}. Only the runner: {sorted(actual - expected)[:5]}. "
-                                                    f"Only the script: {sorted(expected - actual)[:5]}.",
-                                                    f"in {self.SCOPE_SCRIPT}, make EXCLUDED_SECTIONS list the test_metadata.yaml "
-                                                    "sections the runner leaves out (see cmd_run), and make runner_matches() match "
-                                                    "files the way its --regex option does."))
+                    self.fail_runner_mismatch(shard, len(regexes) > 1, actual, expected)
+
+    def fail_runner_mismatch(self, shard: str, narrowed: bool, actual: set[str], expected: set[str]) -> None:
+        """Fail naming the one setting to change: a test_metadata.yaml section, or runner_matches()."""
+        metadata = load_metadata(self.ROOT / self.TREE / "test_metadata.yaml")
+        sections = {name: {item["name"] for item in items or []} for name, items in metadata.items() if isinstance(items, list)}
+        missing, added = expected - actual, actual - expected
+        # A section explains the difference only when it accounts for all of it.
+        for section, names in sections.items():
+            if missing and not added and section not in EXCLUDED_SECTIONS and missing == names & expected:
+                self.fail_with_fix(self.SCOPE_SCRIPT, r"^EXCLUDED_SECTIONS =", self.message(
+                    f"The runner now leaves out the tests listed under {section} in test_metadata.yaml, such as "
+                    f"{sorted(missing)[0]}, but {self.SCOPE_SCRIPT} still sends them to the REPL shards.",
+                    f"in {self.SCOPE_SCRIPT}, add the section to EXCLUDED_SECTIONS:",
+                    f'"{section}": "is listed under {section} in test_metadata.yaml",'))
+            if added and not missing and section in EXCLUDED_SECTIONS and added <= names:
+                self.fail_with_fix(self.SCOPE_SCRIPT, r"^EXCLUDED_SECTIONS =", self.message(
+                    f"The runner now runs the tests listed under {section} in test_metadata.yaml, such as "
+                    f"{sorted(added)[0]}, but {self.SCOPE_SCRIPT} still leaves them out.",
+                    f'in {self.SCOPE_SCRIPT}, remove "{section}" from EXCLUDED_SECTIONS.'))
+        given = " with a pull request's test list" if narrowed else ""
+        self.fail_with_fix(self.SCOPE_SCRIPT, r"^def runner_matches\b", self.message(
+            f"For the REPL shard {shard!r}{given}, the runner picks different tests than {self.SCOPE_SCRIPT} expects "
+            f"(only the runner: {sorted(added)[:3]}, only the script: {sorted(missing)[:3]}), so "
+            "the runner's --regex matching has changed.",
+            f"in {self.SCOPE_SCRIPT}, update runner_matches() to pick files the way {RUNNER} run --regex does now."))
 
     def test_the_runner_imports_nothing_else_from_the_test_tree(self):
         files = scan_tree(self.ROOT / self.TREE)
