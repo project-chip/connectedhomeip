@@ -43,7 +43,7 @@ CHIP_ERROR FullThermostat::Register(EndpointId endpoint, CodeDrivenDataModelProv
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     mThermostatCluster.Create(
-        endpoint, mContext.features, ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
+        endpoint, Features(), ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
         mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate, mPresetsDelegate, mHoldDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 

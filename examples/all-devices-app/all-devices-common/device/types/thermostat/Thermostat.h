@@ -36,12 +36,6 @@ public:
     struct Context
     {
         TimerDelegate & timerDelegate;
-        BitFlags<Clusters::Thermostat::Feature> features = {
-            Clusters::Thermostat::Feature::kHeating,
-            Clusters::Thermostat::Feature::kCooling,
-            Clusters::Thermostat::Feature::kAutoMode,
-            Clusters::Thermostat::Feature::kPresets,
-        };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
@@ -57,7 +51,16 @@ public:
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    const BitFlags<Clusters::Thermostat::Feature> & Features() const { return mContext.features; }
+    /// Fixed feature set: it must match ThermostatClusterType, which registers all the
+    /// attributes and commands these features imply at compile time.
+    static constexpr BitFlags<Clusters::Thermostat::Feature> kFeatures = {
+        Clusters::Thermostat::Feature::kHeating,
+        Clusters::Thermostat::Feature::kCooling,
+        Clusters::Thermostat::Feature::kAutoMode,
+        Clusters::Thermostat::Feature::kPresets,
+    };
+
+    const BitFlags<Clusters::Thermostat::Feature> & Features() const { return kFeatures; }
     bool HasThermostatCluster() const { return mThermostatCluster.IsConstructed(); }
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
     ThermostatClusterType & ThermostatCluster() { return mThermostatCluster.Cluster(); }

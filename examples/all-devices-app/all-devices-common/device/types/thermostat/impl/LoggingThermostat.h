@@ -40,12 +40,6 @@ public:
         FabricTable & fabricTable;
         Credentials::GroupDataProvider & groupDataProvider;
         TimerDelegate & timerDelegate;
-        BitFlags<Clusters::Thermostat::Feature> features = {
-            Clusters::Thermostat::Feature::kHeating,
-            Clusters::Thermostat::Feature::kCooling,
-            Clusters::Thermostat::Feature::kAutoMode,
-            Clusters::Thermostat::Feature::kPresets,
-        };
         Clusters::Thermostat::OptionalAttributes optionalAttributes = {};
     };
 
