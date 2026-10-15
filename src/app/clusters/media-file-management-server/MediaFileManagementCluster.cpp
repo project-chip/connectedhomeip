@@ -119,7 +119,7 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
         // addresses operational node IDs. Reject group/PASE subjects up front.
         VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
         AddFileResponse::Type response;
-        Status status = mDelegate.HandleAddFile(peer, req.name, req.size, req.mimeType, req.imageUri, response);
+        Status status = mDelegate.HandleAddFile(peer, req.name, req.size, req.mimeType, req.imageURI, response);
         VerifyOrReturnValue(status == Status::Success, status);
         handler->AddResponse(request.path, response);
         return std::nullopt;
@@ -149,7 +149,7 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
         OfferFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
         VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
-        return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageUri);
+        return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageURI);
     }
     default:
         return Status::UnsupportedCommand;
