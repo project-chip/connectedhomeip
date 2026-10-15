@@ -250,11 +250,12 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Step #1.0 - Controller sends AnnounceOTAProvider command', step_number_s1)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
-        state_sequence = []
-        progress_values = []
+        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
+        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("%s Provider pipe status after AnnounceOTAProvider: %s", step_number_s1, pipe_data)
+
         downloading_seen = False
         progress_seen = False
-        download_completed = False
         step_number_matcher = step_number_s1
 
         def matcher_combined(report):
@@ -264,56 +265,54 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             - Validates that UpdateState reaches kDownloading.
             - Validates that UpdateStateProgress has a value from 1 to 100.
             """
-            nonlocal state_sequence, progress_values, downloading_seen, progress_seen, download_completed
+            nonlocal downloading_seen, progress_seen
             val = getattr(report.value, "value", report.value)
-
             current_time = time.time()
-
             # UpdateState
             if report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState:
                 if val is not None and val == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading:
                     if not downloading_seen:
                         downloading_seen = True
-                        state_sequence.append(Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
                         logger.info('%s: State observed: %s at %s', step_number_matcher, val, current_time)
-
             # UpdateStateProgress
             elif report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
                 # logger.info("Report matcher_combined %d progress", report.value)
                 if val is not None and isinstance(val, int) and 1 <= val <= 100:
                     if not progress_seen:
                         progress_seen = True
-                        progress_values.append(val)
                         logger.info('%s: Progress observed: %s at %s', step_number_matcher, val, current_time)
-                    if progress_seen and val is not None and isinstance(val, int) and val >= 99:
-                        download_completed = True
-
-            return downloading_seen and progress_seen and download_completed
+            return downloading_seen and progress_seen
 
         matcher_combined_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s1} - Step 1 matcher: Downloading and progress reach  99%",
+            description=f"{step_number_s1} - Step 1 matcher: Waiting DUT to start the download",
             matcher=matcher_combined
         )
-
-        self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
-        pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        logger.info("%s Provider pipe status after AnnounceOTAProvider: %s", step_number_s1, pipe_data)
-
-        # Wait for the download to complete.
-        logger.info('%s: Step #1.0 - Waiting for the OTA download to complete', step_number_s1)
+        # Wait for the download to start.
+        logger.info('%s: Step #1.0 - Waiting for the OTA download to start', step_number_s1)
         subscription_attr_cluster.await_all_expected_report_matches(
             [matcher_combined_obj],
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
 
-        logger.info('%s: Step #1.0 - OTA Download about to complete!', step_number_s1)
-        logger.info('%s: Step #1.0 - Waiting for kDelayedOnApply', step_number_s1)
+        logger.info('%s: Step #1.0 - OTA Download in progress waiting for kDelayedOnApply', step_number_s1)
+        # Create a liveness matcher to wait for the kDelayedOnApply
+        progress_liveness_last_progress = [None]
+        def progress_liveness(report):
+            if report.attribute != Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress:
+                return False
+            val = getattr(report.value, "value", report.value)
+            if val is None or val == progress_liveness_last_progress[0]:
+                return False
+            progress_liveness_last_progress[0] = val
+            return True
+
         # Wait for the device to reach kDelayedOnApply (configured value: 60 seconds; specification value: 120 seconds).
-        time_for_kDelayed_apply = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
+        time_for_kDelayed_apply_s1 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
             forbidden_values=set(),
             timeout_sec=self.remaining_test_budget_sec(
                 reserve_sec=STEP_RESERVE_SEC),
-            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            liveness_matcher=progress_liveness
         )
         logger.info('%s: Step #1.0 - kDelayedOnApply observed after the download completed', step_number_s1)
         await asyncio.sleep(0.1)
@@ -344,14 +343,14 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        time_for_kApplying = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
+        time_for_kApplying_s1 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
             target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
             forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
                               Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading},
             timeout_sec=STEP_RESERVE_SEC,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
-        time_taken_from_delay_to_apply_s1 = time_for_kApplying - time_for_kDelayed_apply
+        time_taken_from_delay_to_apply_s1 = time_for_kApplying_s1 - time_for_kDelayed_apply_s1
         logger.info("%s Time taken from kDelayedOnApply to kApplying: %s seconds",
                     step_number_s1, time_taken_from_delay_to_apply_s1)
         asserts.assert_greater_equal(time_taken_from_delay_to_apply_s1, 120, "Time for kApplying is lower than 120 seconds")
@@ -437,16 +436,14 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         )
 
         # Reset the variables used by matcher_combined in Step 1 before reusing it in Step 2.
-        state_sequence = []
-        progress_values = []
         downloading_seen = False
         progress_seen = False
-        download_completed = False
         step_number_matcher = step_number_s2
+        progress_liveness_last_progress = [None]
 
-        # Use matcher_combined to track download progress until it reaches 99%.
+        # Wait the DUT to see an active download
         matcher_combined_obj = AttributeMatcher.from_callable(
-            description=f"{step_number_s2} - Waiting for Download and progress reach  99%",
+            description=f"{step_number_s2} - Step 1 matcher: Waiting DUT to see the Download",
             matcher=matcher_combined
         )
 
@@ -454,19 +451,23 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info("%s Provider pipe status after AnnounceOTAProvider: %s", step_number_s2, pipe_data)
 
-        # Wait for the device to start and complete the download.
-        logger.info('%s: Step #2.0 - Waiting for the OTA download to complete', step_number_s2)
+        # Wait for the DUT to start the download and see progress
+        logger.info('%s: Step #2.0 - Waiting for the OTA Download to start', step_number_s2)
         subscription_attr_cluster.await_all_expected_report_matches(
             [matcher_combined_obj],
             timeout_sec=self.remaining_test_budget_sec(reserve_sec=STEP_RESERVE_SEC))
-
+        
         logger.info("%s Waiting for the DelayedApplyAction interval of %s seconds.", step_number_s2, delayed_apply_action_time)
-        update_state_match = AttributeMatcher.from_callable(
-            "UpdateState is kDelayedOnApply",
-            lambda report: report.attribute == Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState and report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
-        subscription_attr_cluster.await_all_expected_report_matches(
-            [update_state_match], timeout_sec=STEP_RESERVE_SEC)
-        time_for_kdelayed_apply_s2 = time.time()
+
+        # Wait for the device to reach kDelayedOnApply (configured value: 60 seconds; specification value: 120 seconds).
+        time_for_kdelayed_apply_s2 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
+            target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+            forbidden_values=set(),
+            timeout_sec=self.remaining_test_budget_sec(
+                reserve_sec=STEP_RESERVE_SEC),
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+            liveness_matcher=progress_liveness
+        )
         # Avoid race condition
         await asyncio.sleep(0.1)
 
@@ -504,7 +505,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                     step_number_s2, time_taken_from_delay_to_apply_s2)
         asserts.assert_greater_equal(time_taken_from_delay_to_apply_s2, delayed_apply_action_time,
                                      "Time for kApplying is lower than 180 seconds")
-
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
