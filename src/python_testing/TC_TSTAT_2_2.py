@@ -339,7 +339,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("2d")
         # Verified in 2c
-        log.info("Test step verified in 2c.")
+        if self.pics_guard(hasCoolingFeature):
+            log.info("Test step verified in 2c.")
 
         self.step("3a")
         if self.pics_guard(hasHeatingFeature):
@@ -363,7 +364,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("3d")
         # Verified in 3c
-        log.info("Test step verified in 3c.")
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 3c.")
 
         self.step("4a")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
@@ -387,7 +389,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("4d")
         # Verified in 4c
-        log.info("Test step verified in 4c.")
+        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
+            log.info("Test step verified in 4c.")
 
         self.step("5a")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
@@ -411,7 +414,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("5d")
         # Verified in 5c
-        log.info("Test step verified in 5c.")
+        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
+            log.info("Test step verified in 5c.")
 
         self.step("6a")
         if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
@@ -607,7 +611,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("13c")
         # Verified in 13a
-        log.info("Test step verified in 13a.")
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 13a.")
 
         self.step("14a")
         if self.pics_guard(hasHeatingFeature):
@@ -616,7 +621,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("14b")
         # Verified in 14a
-        log.info("Test step verified in 14a.")
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 14a.")
 
         self.step("15a")
         if self.pics_guard(hasCoolingFeature):
@@ -634,7 +640,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("15c")
         # Verified in 15a
-        log.info("Test step verified in 15a.")
+        if self.pics_guard(hasCoolingFeature):
+            log.info("Test step verified in 15a.")
 
         self.step("16a")
         if self.pics_guard(hasCoolingFeature):
@@ -643,7 +650,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("16b")
         # Verified in 16a
-        log.info("Test step verified in 16a.")
+        if self.pics_guard(hasCoolingFeature):
+            log.info("Test step verified in 16a.")
 
         self.step("17a")
         if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
@@ -655,7 +663,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("17b")
         # Verified in 17a
-        log.info("Test step verified in 17a.")
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            log.info("Test step verified in 17a.")
 
         self.step("18a")
         if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
@@ -667,7 +676,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("18b")
         # Verified in 18a
-        log.info("Test step verified in 18a.")
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            log.info("Test step verified in 18a.")
 
 
 if __name__ == "__main__":
