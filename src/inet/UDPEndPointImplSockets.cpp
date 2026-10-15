@@ -502,6 +502,7 @@ void UDPEndPointImplSockets::CloseImpl()
 
 CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 {
+    VerifyOrReturnError(mState != State::kClosed, CHIP_ERROR_INCORRECT_STATE);
     if (mSocket == kInvalidSocketFd)
     {
         constexpr int type     = (SOCK_DGRAM | SOCK_CLOEXEC);
@@ -770,7 +771,6 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         if (lStatus == CHIP_ERROR_POSIX(ENOTCONN) || lStatus == CHIP_ERROR_POSIX(EBADF) ||
             lStatus == CHIP_ERROR_POSIX(ESHUTDOWN) || lStatus == CHIP_ERROR_POSIX(ENXIO))
         {
-            LogErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).ClearCallbackOnPendingRead(mWatch));
             Close();
         }
 

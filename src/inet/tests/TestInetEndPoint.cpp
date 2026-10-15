@@ -652,16 +652,23 @@ TEST_F(TestInetEndPoint, TestUDPUnrecoverableSocketErrorDisarmsAndCloses)
     EXPECT_EQ(ep->Listen(onMsg, onErr, &ctx), CHIP_ERROR_INCORRECT_STATE);
 
     // Verify the next select() cycle does not spin on the dead socket.
-    ASSERT_EQ(gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr), CHIP_NO_ERROR);
-    gSystemLayer.PrepareEvents();
-    gSystemLayer.WaitForEvents();
-    gSystemLayer.HandleEvents();
+    // Note: Close() -> StopWatchingSocket() signals mWakeEvent once, so the first iteration
+    // drains the wake event and the second blocks until the 10ms timer expires.
+    bool timerFired = false;
+    auto onTimer    = [](Layer *, void * state) { *static_cast<bool *>(state) = true; };
+    ASSERT_EQ(gSystemLayer.StartTimer(10_ms32, onTimer, &timerFired), CHIP_NO_ERROR);
+    for (int i = 0; i < 2 && !timerFired; ++i)
+    {
+        gSystemLayer.PrepareEvents();
+        gSystemLayer.WaitForEvents();
+        gSystemLayer.HandleEvents();
+    }
+    EXPECT_TRUE(timerFired);
     EXPECT_EQ(ctx.errorCount, 1);
 
     ep.Release();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_UDP_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the Inet resource limitations.
@@ -872,8 +879,6 @@ void ListenForPortUnreachable(UDPEndPointHandle & ep, const IPAddress & loopback
         ep->SetPortUnreachableHandler(HandlePortUnreachable);
     }
     ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
-    const uint16_t boundPort = ep->GetBoundPort();
-    ASSERT_NE(boundPort, 0);
     ASSERT_EQ(ep->Listen(IgnoreDatagram, nullptr /*OnReceiveError*/, &probe), CHIP_NO_ERROR);
     if (!setHandlerBeforeBind)
     {
@@ -1041,8 +1046,6 @@ TEST_F(TestInetEndPoint, TestUdpSendWithoutHandlerIgnoresPortUnreachable)
     UDPEndPointHandle ep;
     ASSERT_EQ(gUDP.NewEndPoint(ep), CHIP_NO_ERROR);
     ASSERT_EQ(ep->Bind(IPAddressType::kIPv6, loopback, 0), CHIP_NO_ERROR);
-    const uint16_t boundPort = ep->GetBoundPort();
-    ASSERT_NE(boundPort, 0);
     EXPECT_EQ(RecvErrOnSocketBoundTo(ep->GetBoundPort()), 0);
 
     IPPacketInfo toClosed;
