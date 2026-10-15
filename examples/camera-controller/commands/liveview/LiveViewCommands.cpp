@@ -45,7 +45,27 @@ CHIP_ERROR LiveViewStopCommand::RunCommand()
 {
     ChipLogProgress(Camera, "Run LiveViewStopCommand");
 
-    camera::DeviceManager::Instance().StopVideoStream(mVideoStreamID);
+    uint16_t effectiveStreamId = 0;
+    if (mVideoStreamID.HasValue())
+    {
+        effectiveStreamId = mVideoStreamID.Value();
+    }
+    else
+    {
+        auto activeStreamId = camera::DeviceManager::Instance().GetActiveLiveViewStreamId(mPeerNodeId);
+        if (!activeStreamId.has_value())
+        {
+            ChipLogError(
+                Camera, "No active LiveView stream tracked for node 0x" ChipLogFormatX64 "; please pass video-stream-id explicitly",
+                ChipLogValueX64(mPeerNodeId));
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        effectiveStreamId = activeStreamId.value();
+        ChipLogProgress(Camera, "Using active LiveView stream id %u for node 0x" ChipLogFormatX64, effectiveStreamId,
+                        ChipLogValueX64(mPeerNodeId));
+    }
 
-    return camera::DeviceManager::Instance().DeallocateVideoStream(mPeerNodeId, mVideoStreamID);
+    camera::DeviceManager::Instance().StopVideoStream(effectiveStreamId);
+
+    return camera::DeviceManager::Instance().DeallocateVideoStream(mPeerNodeId, effectiveStreamId);
 }
