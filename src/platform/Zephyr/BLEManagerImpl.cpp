@@ -94,6 +94,10 @@ const bt_uuid_128 UUID128_CHIPoBLEChar_TX =
 const bt_uuid_128 UUID128_CHIPoBLEChar_C3 =
     BT_UUID_INIT_128(0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64);
 #endif
+#if CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
+const bt_uuid_128 UUID128_CHIPoBLEChar_ChipID =
+    BT_UUID_INIT_128(0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0xA1, 0x01);
+#endif
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
@@ -128,6 +132,12 @@ bt_gatt_attr sChipoBleAttributes[] = {
                                BT_GATT_CHRC_READ,
                                BT_GATT_PERM_READ,
                                BLEManagerImpl::HandleC3Read, nullptr, nullptr),
+#endif
+#if CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
+        BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_ChipID.uuid,
+                               BT_GATT_CHRC_READ,
+                               BT_GATT_PERM_READ,
+                               BLEManagerImpl::HandleChipIDRead, nullptr, nullptr),
 #endif
 };
 
@@ -409,9 +419,9 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
@@ -1135,6 +1145,36 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
     // field is 2 bytes long. So, the cast to uint16_t should be fine.
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
                              static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
+}
+#endif
+
+#if CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "efuse.h"
+#ifdef __cplusplus
+}
+#endif
+#include <zephyr/drivers/hwinfo.h>
+ssize_t BLEManagerImpl::HandleChipIDRead(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
+                                         uint16_t offset)
+{
+    // Example chip_id data storage (replace with actual chip_id value)
+    // uint8_t chip_id[] = { 0x42, 0xe3, 0x03, 0xb4, 0xcf, 0x3c, 0xe6, 0x32, 0x36, 0x37, 0x36, 0x42, 0x50, 0x55, 0x76, 0xce };
+    ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE Chip ID (ConnId 0x%02x)", bt_conn_index(conId));
+
+    uint8_t chip_id[16]  = { 0 };
+    uint8_t ieee_addr[8] = { 0 };
+
+    if (efuse_get_ieee_addr(ieee_addr) != DRV_API_SUCCESS)
+    {
+        ChipLogDetail(DeviceLayer, "Failed to get chip ID.");
+        return 0;
+    }
+
+    memcpy(chip_id, ieee_addr, 8);
+    return bt_gatt_attr_read(conId, attr, buf, len, offset, chip_id, sizeof(chip_id));
 }
 #endif
 

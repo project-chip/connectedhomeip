@@ -38,6 +38,7 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/ContactSensorManager.cpp
                src/ZclCallbacks.cpp
+               ${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
@@ -62,4 +63,8 @@ endif()
 if(CONFIG_OPENTHREAD_SNTP_CLIENT)
   target_sources(app PRIVATE
                    ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
+
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+  zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
+    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
 endif()

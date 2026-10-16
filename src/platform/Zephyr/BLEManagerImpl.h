@@ -155,6 +155,12 @@ public:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
+
+#if CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
+    static ssize_t HandleChipIDRead(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
+                                    uint16_t offset);
+#endif
+
 #ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
     void SetCustomAdvertising(Span<bt_data> CustomAdvertising);
     void SetCustomScanResponse(Span<bt_data> CustomScanResponse);

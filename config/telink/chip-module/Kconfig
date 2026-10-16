@@ -348,3 +348,11 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  After removing the last fabric the device will wait for the defined time and then perform
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
+
+config EXPOSE_CHIP_ID_VIA_BLE
+	bool "Enable CHIP-ID via ble"
+    default n
+
+config DEFERRED_ATTR_STORAGE
+	bool "Defer the storage time of attributes"
+	default n
