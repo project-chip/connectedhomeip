@@ -724,6 +724,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, SaveFailuresPreserveReloa
     EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(), ClusterStatusCode(Status::Busy));
     EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
     EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
     restoredDelegate.mSavePresetResult = Status::Success;
     auto & storage                     = mClusterTester.GetTestContext().StorageDelegate();
@@ -731,6 +732,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, SaveFailuresPreserveReloa
     auto allowWrites = MakeDefer([&storage] { storage.SetRejectWrites(false); });
     EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(), ClusterStatusCode(Status::Failure));
     EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 2u);
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
     ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 2u);
     EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
@@ -742,6 +744,8 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, SaveFailuresPreserveReloa
     storage.SetRejectWrites(false);
     ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
     EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 3u);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
     ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 3u);
     EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.back().GetPresetID(), 2);
 }
