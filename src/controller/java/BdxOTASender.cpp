@@ -47,8 +47,8 @@ constexpr size_t kMaxConcurrentBdxSessions = 8;
 
 BdxOTASession::BdxOTASession(BdxOTASender * owner, jobject otaDelegate, System::Layer * systemLayer, FabricIndex fabricIndex,
                              NodeId nodeId, uint64_t creationOrder) :
-    mOwner(owner), mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId),
-    mCreationOrder(creationOrder)
+    mOwner(owner),
+    mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId), mCreationOrder(creationOrder)
 {}
 
 BdxOTASession::~BdxOTASession()

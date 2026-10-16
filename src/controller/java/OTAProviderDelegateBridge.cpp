@@ -193,10 +193,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     }
 
     otaProviderDelegate = mOtaProviderDelegate.ObjectRef();
-    err = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleQueryImage",
-                                                  "(JIIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/"
-                                                  "devicecontroller/OTAProviderDelegate$QueryImageResponse;",
-                                                  &handleQueryImageMethod);
+    err                 = JniReferences::GetInstance().FindMethod(env, otaProviderDelegate, "handleQueryImage",
+                                                                  "(JIIJLjava/lang/Integer;Ljava/lang/String;Ljava/lang/Boolean;[B)Lchip/"
+                                                                                  "devicecontroller/OTAProviderDelegate$QueryImageResponse;",
+                                                                  &handleQueryImageMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find handleQueryImage method"));
 
     if (hardwareVersion.HasValue())
