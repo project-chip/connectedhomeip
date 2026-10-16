@@ -457,6 +457,30 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOver
     EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectedNameDoesNotAdvancePresetID)
+{
+    Commands::MPTZSavePreset::Type request;
+    request.name = "FirstPreset"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+
+    mClusterTester.GetDirtyList().clear();
+    request.name = "012345678901234567890123456789012"_span;
+    auto result  = mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, 1u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+
+    request.name = "SecondPreset"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 2u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 2);
+}
+
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetRejectsOverlengthUpdates)
 {
     Commands::MPTZSavePreset::Type request;
