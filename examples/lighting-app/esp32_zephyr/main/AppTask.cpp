@@ -28,6 +28,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#error "This example does not support Wi-Fi and Thread at the same time: set CONFIG_CHIP_WIFI=n when CONFIG_OPENTHREAD=y"
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
