@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -461,7 +461,7 @@ def write_device_unique_data(args, out_dirs, pai_cert):
                                          int(row['PIN Code']), pai_cert['key_pem'], pai_cert['cert_pem'])
             dac_cert_storage = read_der_file(dacs[0])
             dac_key_storage = read_key_bin_file(dacs[1])
-            if args.secure_programming_verification == False:
+            if not args.secure_programming_verification:
                 nvs_memory_append('dac_cert', dac_cert_storage)
                 nvs_memory_append('dac_key', dac_key_storage)
             else:
@@ -518,7 +518,7 @@ def save_dac_cert_and_keys(dac_cert, dac_key, chip_id, file_path):
 
 
 def generate_partition(args, dacs_cert, out_dirs):
-    log.info('Generating partition image: offset: 0x{:X} size: 0x{:X}'.format(args.offset, args.size))
+    log.info('Generating partition image: offset: 0x%X size: 0x%X', args.offset, args.size)
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
@@ -537,15 +537,14 @@ def generate_partition(args, dacs_cert, out_dirs):
     if args.secure_programming_verification:
         dac_cert_key_file_path = os.path.join(output_dir, 'dac_cert_key.bin')
         dac_cert_storage = read_der_file(dacs_cert[0])
-        log.info("dac_cert_storaget (Hex): {}".format(dac_cert_storage.hex()))
+        log.info("dac_cert_storage (Hex): %s", dac_cert_storage.hex())
         dac_key_storage = read_key_bin_file(dacs_cert[1])
-        log.info("dac_key_storage (Hex): {}".format(dac_key_storage.hex()))
         chip_id_bytes = bytes.fromhex(args.chip_id)
-        log.info("chip_id_bytes (Hex): {}".format(chip_id_bytes.hex()))
+        log.info("chip_id_bytes (Hex): %s", chip_id_bytes.hex())
         save_dac_cert_and_keys(dac_cert_storage, dac_key_storage, chip_id_bytes, dac_cert_key_file_path)
-        log.info(f"DAC certificate and key have been saved to {dac_cert_key_file_path}")
+        log.info("DAC certificate and key have been saved to %s", dac_cert_key_file_path)
 
-    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv']), 'r') as csvf:
+    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv'])) as csvf:
         pin_disc_dict = csv.DictReader(csvf)
         row = pin_disc_dict.__next__()
 
@@ -554,9 +553,9 @@ def generate_partition(args, dacs_cert, out_dirs):
         pid = args.product_id
         vid = args.vendor_id
 
-        log.info("Discriminator = {}".format(discriminator))
-        log.info("PID = 0x{:X}".format(pid))
-        log.info("VID = 0x{:X}".format(vid))
+        log.info("Discriminator = %s", discriminator)
+        log.info("PID = 0x%X", pid)
+        log.info("VID = 0x%X", vid)
 
         # Convert Discriminator, PID, and VID to bytes
         discriminator_bytes = discriminator.to_bytes(2, byteorder='little')
@@ -575,7 +574,7 @@ def generate_partition(args, dacs_cert, out_dirs):
         with open(ext_bin_file_path, 'wb') as ext_bin_file:
             ext_bin_file.write(extended_data)
 
-        log.info(f"Extended binary data written to {ext_bin_file_path}")
+        log.info("Extended binary data written to %s", ext_bin_file_path)
 
 
 def generate_json_summary(args, out_dirs, pai_certs, dacs_cert, serial_num: str):
@@ -766,7 +765,7 @@ def get_and_validate_args():
         try:
             chip_id_bytes = bytes.fromhex(args.chip_id)
             if len(chip_id_bytes) != 16:
-                raise ValueError()
+                raise ValueError
         except ValueError:
             log.error("--chip-id must be a valid 16-byte hex string (32 hex characters).")
             sys.exit(1)
