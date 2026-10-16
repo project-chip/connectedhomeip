@@ -18,7 +18,6 @@
 
 #include <AppMain.h>
 #include <cstdint>
-#include <memory>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -27,6 +26,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -437,7 +437,7 @@ void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSenso
 {
     if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
     {
-        ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(dev->GetEndpointId(), dev->GetMeasuredValue()));
     }
 }
 
@@ -506,53 +506,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 
     return ret;
 }
-
-class TempMeasurementAttrAccess : public AttributeAccessInterface
-{
-public:
-    TempMeasurementAttrAccess(EndpointId endpointId, DeviceTempSensor * device) :
-        AttributeAccessInterface(chip::MakeOptional(endpointId), TemperatureMeasurement::Id), mDevice(device)
-    {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mClusterId != TemperatureMeasurement::Id)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        switch (aPath.mAttributeId)
-        {
-        case TemperatureMeasurement::Attributes::MeasuredValue::Id:
-            return aEncoder.Encode(mDevice->GetMeasuredValue());
-
-        case TemperatureMeasurement::Attributes::MinMeasuredValue::Id:
-            return aEncoder.Encode(mDevice->mMin);
-
-        case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id:
-            return aEncoder.Encode(mDevice->mMax);
-
-        case TemperatureMeasurement::Attributes::FeatureMap::Id:
-            return aEncoder.Encode(static_cast<uint32_t>(ZCL_TEMPERATURE_SENSOR_FEATURE_MAP));
-
-        case TemperatureMeasurement::Attributes::ClusterRevision::Id:
-            return aEncoder.Encode(static_cast<uint16_t>(ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION));
-
-        default:
-            break;
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    DeviceTempSensor * mDevice;
-};
-
-static std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement1;
-static std::unique_ptr<TempMeasurementAttrAccess> gTempMeasurement2;
-static std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement1;
-static std::unique_ptr<TempMeasurementAttrAccess> gComposedTempMeasurement2;
 
 class BridgedPowerSourceAttrAccess : public AttributeAccessInterface
 {
@@ -984,25 +937,13 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
-    gTempMeasurement1 = std::make_unique<TempMeasurementAttrAccess>(TempSensor1.GetEndpointId(), &TempSensor1);
-    gTempMeasurement2 = std::make_unique<TempMeasurementAttrAccess>(TempSensor2.GetEndpointId(), &TempSensor2);
-
-    gComposedTempMeasurement1 =
-        std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor1.GetEndpointId(), &ComposedTempSensor1);
-    gComposedTempMeasurement2 =
-        std::make_unique<TempMeasurementAttrAccess>(ComposedTempSensor2.GetEndpointId(), &ComposedTempSensor2);
-
-    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement1.get()),
-               ChipLogError(NotSpecified, "Failed to register gTempMeasurement1"));
-
-    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gTempMeasurement2.get()),
-               ChipLogError(NotSpecified, "Failed to register gTempMeasurement2"));
-
-    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement1.get()),
-               ChipLogError(NotSpecified, "Failed to register gComposedTempMeasurement1"));
-
-    VerifyOrDo(AttributeAccessInterfaceRegistry::Instance().Register(gComposedTempMeasurement2.get()),
-               ChipLogError(NotSpecified, "Failed to register gComposedTempMeasurement2"));
+    DeviceTempSensor * tempSensors[] = { &TempSensor1, &TempSensor2, &ComposedTempSensor1, &ComposedTempSensor2 };
+    for (DeviceTempSensor * sensor : tempSensors)
+    {
+        const EndpointId endpointId = sensor->GetEndpointId();
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(endpointId, sensor->mMin, sensor->mMax));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, sensor->GetMeasuredValue()));
+    }
 
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
