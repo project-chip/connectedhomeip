@@ -7084,6 +7084,108 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThan(values.count, 100);
 }
 
+- (void)_waitForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller resolvingAddress:(BOOL)resolving
+{
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:60];
+    while ([controller unitTestIsResolvingAddressForNodeID:nodeID] != resolving) {
+        if ([deadline timeIntervalSinceNow] <= 0) {
+            XCTFail("Timed out waiting for resolvingAddress == %d", resolving);
+            return;
+        }
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    }
+}
+
+- (MTRDevice *)_subscribingDeviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller delegate:(MTRDeviceTestDelegate *)delegate
+{
+    // Make the subscription start a new CASE setup instead of reusing the commissioning session.
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] invalidateCASESession];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForNodeID:nodeID controller:controller resolvingAddress:YES];
+    return device;
+}
+
+- (void)test051_OperationalAdvertisementDuringAddressResolution
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    [app terminate];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * device = [self _subscribingDeviceWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
+
+    [controller syncRunOnWorkQueue:^{
+        [controller operationalInstanceAdded:@(kDeviceId2)];
+    } error:nil];
+    // Drain the release check's hop and the hop that reports a released setup's failure.
+    [controller syncRunOnWorkQueue:^{} error:nil];
+    [controller syncRunOnWorkQueue:^{} error:nil];
+
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateSubscribing);
+    XCTAssertTrue([controller unitTestIsResolvingAddressForNodeID:@(kDeviceId2)]);
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    XCTAssertTrue([self restartApp:app additionalArguments:@[]]);
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+}
+
+- (void)test052_OperationalAdvertisementAfterAddressResolution
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+    [app suspend];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * device = [self _subscribingDeviceWithNodeID:@(kDeviceId2) controller:controller delegate:delegate];
+
+    [self _waitForNodeID:@(kDeviceId2) controller:controller resolvingAddress:NO];
+
+    XCTestExpectation * unsubscribedExpectation = [self expectationWithDescription:@"CASE setup released"];
+    unsubscribedExpectation.assertForOverFulfill = NO;
+    delegate.onInternalStateChanged = ^{
+        if ([device _getInternalState] == MTRInternalDeviceStateUnsubscribed) {
+            [unsubscribedExpectation fulfill];
+        }
+    };
+
+    [controller syncRunOnWorkQueue:^{
+        [controller operationalInstanceAdded:@(kDeviceId2)];
+    } error:nil];
+
+    [self waitForExpectations:@[ unsubscribedExpectation ] timeout:kTimeoutInSeconds];
+    delegate.onInternalStateChanged = nil;
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    [app resume];
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
