@@ -136,7 +136,7 @@ uint8_t TLSClientManagementCluster::GetMaxProvisioned() const
     return mMaxProvisioned;
 }
 
-/** @brief Encode the invoking fabric's endpoints and propagate delegate or list-encoder failures. */
+// helper method to get the TlsClientManagement provisioned endpoints encoded into a list
 CHIP_ERROR
 TLSClientManagementCluster::EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
                                                        const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -145,13 +145,6 @@ TLSClientManagementCluster::EncodeProvisionedEndpoints(EndpointId matterEndpoint
                                      [&](auto & endpoint) -> CHIP_ERROR { return encoder.Encode(endpoint); });
 }
 
-/**
- * @brief Decode a fabric-scoped TLS endpoint command and dispatch it to its validated handler.
- * @param request The command path and accessing-fabric context supplied by the framework.
- * @param input_arguments The encoded command fields.
- * @param handler The handler used to encode command responses.
- * @return A decode or command status, or std::nullopt when the command handler has encoded a response.
- */
 std::optional<DataModel::ActionReturnStatus> TLSClientManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                        chip::TLV::TLVReader & input_arguments,
                                                                                        CommandHandler * handler)
@@ -180,13 +173,6 @@ std::optional<DataModel::ActionReturnStatus> TLSClientManagementCluster::InvokeC
     }
 }
 
-/**
- * @brief Validate an endpoint request before certificate lookups, delegate effects, and attribute notifications.
- * @param commandHandler Supplies the accessing fabric and receives the allocated endpoint-ID response.
- * @param req The decoded hostname, port, and certificate references.
- * @return ConstraintError for invalid fields, a certificate/delegate failure, or std::nullopt after encoding the response.
- * Port zero is outside the declared endpoint-port range and must not allocate or persist an endpoint.
- */
 std::optional<DataModel::ActionReturnStatus>
 TLSClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHandler,
                                                     const Commands::ProvisionEndpoint::DecodableType & req)

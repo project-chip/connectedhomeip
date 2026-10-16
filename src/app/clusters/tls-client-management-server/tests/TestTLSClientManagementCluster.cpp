@@ -62,7 +62,6 @@ public:
     uint32_t rootLookupCount   = 0;
     uint32_t clientLookupCount = 0;
 
-    /** @brief Leave certificate state in memory; this mock does not load or persist certificates. */
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
 
     void Finish() override {}
@@ -73,13 +72,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Stub unused certificate retrieval; command tests consult HasRootCertificateEntry instead. */
     CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry) override
     {
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Look up a root certificate and count accesses to verify request validation precedes lookup. */
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id) override
     {
         ++rootLookupCount;
@@ -98,13 +95,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Stub unused certificate retrieval; command tests consult HasClientCertificateEntry instead. */
     CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) override
     {
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Look up a client certificate and count accesses to verify request validation precedes lookup. */
     CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id) override
     {
         ++clientLookupCount;
@@ -178,10 +173,8 @@ public:
     Protocols::InteractionModel::Status removeStatus = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mutateReferenceCountError             = CHIP_NO_ERROR;
 
-    /** @brief Keep mock endpoints in memory without loading or writing persistent storage. */
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
 
-    /** @brief Encode the retained endpoint fields, including their port, for attribute-read controls. */
     CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
     {
         for (auto & endpoint : endpoints)
@@ -201,7 +194,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Return a matching endpoint with its original hostname, certificate references, and port. */
     CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                            LoadedEndpointCallback callback) override
     {
@@ -222,7 +214,6 @@ public:
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    /** @brief Count provision calls and retain endpoint fields to expose allocation before invalid-port rejection. */
     Protocols::InteractionModel::ClusterStatusCode
     ProvisionEndpoint(EndpointId matterEndpoint, FabricIndex fabric,
                       const Commands::ProvisionEndpoint::DecodableType & provisionReq, uint16_t & endpointID) override
@@ -383,7 +374,6 @@ TEST_F(TestTLSClientManagementCluster, TestReadFeatureMap)
     EXPECT_EQ(featureMap, 0u);
 }
 
-/** @brief Decode an empty endpoint list as the attribute-read control for rejected provisioning. */
 TEST_F(TestTLSClientManagementCluster, TestReadProvisionedEndpointsEmpty)
 {
     Attributes::ProvisionedEndpoints::TypeInfo::DecodableType list;
@@ -393,7 +383,6 @@ TEST_F(TestTLSClientManagementCluster, TestReadProvisionedEndpointsEmpty)
     EXPECT_FALSE(it.Next());
 }
 
-/** @brief Retain successful provisioning with a valid port and root certificate as a command-response control. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
 {
     Commands::ProvisionEndpoint::Type request;
@@ -415,10 +404,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints[0].endpointID, 1);
 }
 
-/**
- * @brief Reject port zero with valid certificates before allocating an endpoint or notifying attributes.
- * Exercise both a null and a present client certificate through command TLV encoding and decoding.
- */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
 {
     mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
@@ -464,7 +449,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
     }
 }
 
-/** @brief Return the port constraint error before consulting absent root or client certificate entries. */
 TEST_F(TestTLSClientManagementCluster, TestZeroPortValidationPrecedesCertificateLookup)
 {
     for (bool missingRoot : { true, false })
@@ -501,7 +485,6 @@ TEST_F(TestTLSClientManagementCluster, TestZeroPortValidationPrecedesCertificate
     }
 }
 
-/** @brief Accept ports 1, 443, and 65535 without narrowing the valid range or changing certificate-reference handling. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointValidPortBoundaries)
 {
     mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
@@ -560,7 +543,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointValidPortBoundaries)
     EXPECT_EQ(mMockCertTable.clientLookupCount, 3u);
 }
 
-/** @brief Reject a port-zero update without consuming an ID or changing a previously provisioned endpoint. */
 TEST_F(TestTLSClientManagementCluster, TestZeroPortPreservesProvisionedEndpoint)
 {
     Commands::ProvisionEndpoint::Type request;
@@ -618,7 +600,6 @@ TEST_F(TestTLSClientManagementCluster, TestZeroPortPreservesProvisionedEndpoint)
     }
 }
 
-/** @brief Keep hostname and CA-ID constraint checks isolated from port validation by supplying a valid port. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 {
     // Test hostname too short
@@ -642,7 +623,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
     EXPECT_FALSE(result.IsSuccess());
 }
 
-/** @brief Preserve the missing-root-certificate response for an otherwise valid endpoint request. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
@@ -660,7 +640,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
     }
 }
 
-/** @brief Preserve the missing-client-certificate response for an otherwise valid endpoint request. */
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointClientCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
@@ -673,7 +652,6 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointClientCertNotFound)
     EXPECT_FALSE(result.IsSuccess());
 }
 
-/** @brief Provision with a valid port and retain successful lookup of the resulting endpoint and hostname. */
 TEST_F(TestTLSClientManagementCluster, TestFindEndpointSuccess)
 {
     // First provision an endpoint
@@ -720,7 +698,6 @@ TEST_F(TestTLSClientManagementCluster, TestFindEndpointNotFound)
     }
 }
 
-/** @brief Reject endpoint IDs outside the declared range before invoking the lookup delegate. */
 TEST_F(TestTLSClientManagementCluster, TestFindEndpointConstraintError)
 {
     Commands::FindEndpoint::Type request;
@@ -734,7 +711,6 @@ TEST_F(TestTLSClientManagementCluster, TestFindEndpointConstraintError)
     }
 }
 
-/** @brief Provision with a valid port and retain removal of the resulting endpoint. */
 TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointSuccess)
 {
     // First provision an endpoint
