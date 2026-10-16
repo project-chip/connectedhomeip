@@ -413,12 +413,6 @@ DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::I
     return Status::Success;
 }
 
-/**
- * @brief Validate the requested start against current time and the forecast window before invoking the delegate.
- *
- * @return Success after verifying the delegate's forecast update; ConstraintError for invalid times or updates;
- *         Failure when the forecast or current time is unavailable; otherwise the decoding or delegate error.
- */
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
                                                                                           TLV::TLVReader & input_arguments)
 {
@@ -462,7 +456,6 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         return Status::ConstraintError;
     }
 
-    // Null means the forecast can start immediately, but the requested time must still be in the future.
     uint32_t earliestStartTimeEpoch = earliestStartTimeNullable.IsNull() ? matterEpoch : earliestStartTimeNullable.Value();
     uint32_t duration               = forecast.endTime - forecast.startTime;
     if (commandData.requestedStartTime < earliestStartTimeEpoch)

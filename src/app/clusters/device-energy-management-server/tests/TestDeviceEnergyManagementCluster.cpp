@@ -709,11 +709,9 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerRangeAdjustRequest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-/** @brief Count start-time delegate calls while retaining the existing mock's forecast updates. */
 class StartTimeAdjustmentDelegate : public DeviceEnergyManagementMockDelegate
 {
 public:
-    /** @brief Record a call and apply the requested start time to the mock forecast. */
     Protocols::InteractionModel::Status StartTimeAdjustRequest(uint32_t requestedStartTime, AdjustmentCauseEnum cause) override
     {
         startTimeAdjustCalls++;
@@ -723,11 +721,9 @@ public:
     uint32_t startTimeAdjustCalls = 0;
 };
 
-/** @brief Allow start-time tests to simulate an unavailable real-time clock. */
 class StartTimeAdjustmentClock : public System::Clock::Internal::RAIIMockClock
 {
 public:
-    /** @brief Return the configured failure, or read the controlled real-time value. */
     CHIP_ERROR GetClock_RealTimeMS(System::Clock::Milliseconds64 & currentTime) override
     {
         ReturnErrorOnFailure(realTimeStatus);
@@ -741,7 +737,6 @@ struct TestStartTimeAdjustment : public TestDeviceEnergyManagementCluster
 {
     static constexpr uint32_t kNow = 1000;
 
-    /** @brief Start a cluster with an unstarted forecast, a stale earliest start, and a controlled clock. */
     void SetUp() override
     {
         SetMatterTime(kNow);
@@ -762,17 +757,14 @@ struct TestStartTimeAdjustment : public TestDeviceEnergyManagementCluster
         ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     }
 
-    /** @brief Shut down the cluster before its context and delegate are destroyed. */
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    /** @brief Set the clock from Matter epoch seconds without changing the host's clock. */
     void SetMatterTime(uint32_t matterEpoch)
     {
         clock.mRealTime = System::Clock::Microseconds64((static_cast<uint64_t>(matterEpoch) + kChipEpochSecondsSinceUnixEpoch) *
                                                         kMicrosecondsPerSecond);
     }
 
-    /** @brief Check the rejection status, absence of delegate calls, and unchanged forecast read over TLV. */
     void ExpectRejectedStartTime(
         uint32_t requestedStartTime,
         Protocols::InteractionModel::Status expectedStatus = Protocols::InteractionModel::Status::ConstraintError)
@@ -803,7 +795,6 @@ struct TestStartTimeAdjustment : public TestDeviceEnergyManagementCluster
         EXPECT_EQ(forecast.latestEndTime, originalForecast.latestEndTime);
     }
 
-    /** @brief Check that a valid request reaches the delegate and updates the encoded forecast consistently. */
     void ExpectAcceptedStartTime(uint32_t requestedStartTime)
     {
         const auto originalForecast = delegate.GetForecast().Value();
@@ -834,7 +825,6 @@ struct TestStartTimeAdjustment : public TestDeviceEnergyManagementCluster
     ClusterTester tester{ cluster };
 };
 
-/** @brief Reject past and current start times even when a concrete earliest start is stale or null. */
 TEST_F(TestStartTimeAdjustment, RejectsPastAndCurrentStartTimes)
 {
     const DataModel::Nullable<uint32_t> earliestStartTimes[] = { DataModel::MakeNullable(0U), DataModel::MakeNullable(kNow - 100),
@@ -849,7 +839,6 @@ TEST_F(TestStartTimeAdjustment, RejectsPastAndCurrentStartTimes)
     }
 }
 
-/** @brief Accept future requests for stale, future, and null earliest-start values. */
 TEST_F(TestStartTimeAdjustment, AcceptsFutureStartTimes)
 {
     ExpectAcceptedStartTime(kNow + 1);
@@ -859,7 +848,6 @@ TEST_F(TestStartTimeAdjustment, AcceptsFutureStartTimes)
     ExpectAcceptedStartTime(kNow + 100);
 }
 
-/** @brief Preserve the existing inclusive forecast bounds while rejecting requests outside them. */
 TEST_F(TestStartTimeAdjustment, ForecastWindowBoundaries)
 {
     delegate.GetForecastMutable().Value().earliestStartTime.SetValue(DataModel::MakeNullable(kNow + 100));
@@ -870,7 +858,6 @@ TEST_F(TestStartTimeAdjustment, ForecastWindowBoundaries)
     ExpectRejectedStartTime(kNow + 1001);
 }
 
-/** @brief Reject end-time arithmetic wraparound while accepting the largest representable valid end. */
 TEST_F(TestStartTimeAdjustment, RejectsEndTimeOverflow)
 {
     constexpr uint32_t kLatestEndTime = std::numeric_limits<uint32_t>::max() - 1;
@@ -879,7 +866,6 @@ TEST_F(TestStartTimeAdjustment, RejectsEndTimeOverflow)
     ExpectAcceptedStartTime(kLatestEndTime - 100);
 }
 
-/** @brief Reject every earliest-start variant without side effects when current time is unavailable. */
 TEST_F(TestStartTimeAdjustment, RejectsUnavailableCurrentTime)
 {
     clock.realTimeStatus                                     = CHIP_ERROR_REAL_TIME_NOT_SYNCED;
@@ -892,7 +878,6 @@ TEST_F(TestStartTimeAdjustment, RejectsUnavailableCurrentTime)
     }
 }
 
-/** @brief Re-read current time on successive requests while the advertised earliest start remains stale. */
 TEST_F(TestStartTimeAdjustment, RechecksCurrentTimeAfterClockAdvances)
 {
     ExpectAcceptedStartTime(kNow + 200);
@@ -902,7 +887,6 @@ TEST_F(TestStartTimeAdjustment, RechecksCurrentTimeAfterClockAdvances)
     ExpectAcceptedStartTime(kNow + 51);
 }
 
-/** @brief Exercise ordinary earliest-start and latest-end rejection with a controlled, available clock. */
 TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
 {
     System::Clock::Internal::RAIIMockClock clock;
