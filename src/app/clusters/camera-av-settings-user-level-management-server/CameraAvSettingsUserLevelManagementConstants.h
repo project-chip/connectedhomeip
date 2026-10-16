@@ -102,9 +102,8 @@ public:
     std::string GetName() const { return mName; }
     bool SetName(chip::CharSpan aName)
     {
-        VerifyOrReturnValue(
-            aName.size() <= kMaxMPTZPresetNameLength, false,
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Preset name exceeds the maximum byte length"));
+        VerifyOrReturnValue(aName.size() <= kMaxMPTZPresetNameLength, false,
+                            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Preset name exceeds the maximum byte length"));
         mName = std::string(aName.begin(), aName.end());
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
         return true;

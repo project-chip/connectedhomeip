@@ -606,8 +606,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetFullListHon
     ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), testMaxPresets);
     EXPECT_EQ(mMockDelegate.mSavePresetCalls, testMaxPresets);
 
-    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id,
-                                            Attributes::MPTZPresets::Id);
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
     uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
     MutableByteSpan before(beforeBuffer);
@@ -1379,8 +1378,7 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, SkipsMigratedOve
 
     uint8_t migratedBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
     MutableByteSpan migrated(migratedBuffer);
-    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id,
-                                            Attributes::MPTZPresets::Id);
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().ReadValue(presetsPath, migrated), CHIP_NO_ERROR);
     EXPECT_TRUE(encoded.data_equal(migrated));
 
