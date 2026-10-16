@@ -1097,6 +1097,12 @@ TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightne
         EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
         EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount);
     }
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kLow),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::StatusLightBrightness::Id));
+    EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount + 1);
 }
 
 /**
@@ -1123,6 +1129,11 @@ TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightne
         EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
         EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount);
     }
+
+    EXPECT_EQ(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::StatusLightBrightness::Id));
+    EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount + 1);
 }
 
 /**
@@ -1160,6 +1171,10 @@ TEST_F(TestCameraAVStreamManagementCluster, TestStatusLightBrightnessPersistence
         EXPECT_EQ(tester.ReadAttribute(Attributes::StatusLightBrightness::Id, brightness), CHIP_NO_ERROR);
         EXPECT_EQ(brightness, testCase.expected);
         EXPECT_EQ(server.GetStatusLightBrightness(), testCase.expected);
+
+        uint8_t persistedValue = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persistedValue, static_cast<uint8_t>(0)));
+        EXPECT_EQ(persistedValue, testCase.storedValue);
     }
 }
 
