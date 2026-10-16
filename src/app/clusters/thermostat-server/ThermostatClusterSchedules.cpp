@@ -781,11 +781,13 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
             {
                 return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
-            if (transition.coolingSetpoint.HasValue() && !coolLimits.Valid(transition.coolingSetpoint.Value()))
+            if (transition.coolingSetpoint.HasValue() &&
+                (!setpoints.coolSupported || !coolLimits.Valid(transition.coolingSetpoint.Value())))
             {
                 return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
-            if (transition.heatingSetpoint.HasValue() && !heatLimits.Valid(transition.heatingSetpoint.Value()))
+            if (transition.heatingSetpoint.HasValue() &&
+                (!setpoints.heatSupported || !heatLimits.Valid(transition.heatingSetpoint.Value())))
             {
                 return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }

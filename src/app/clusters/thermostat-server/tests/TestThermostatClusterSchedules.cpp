@@ -798,6 +798,63 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleAcceptsHeatingSetpoi
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsCoolingSetpointWhenCoolingNotSupported)
+{
+    // This fixture's cluster only has Feature::kHeating, so a transition's coolingSetpoint must be rejected
+    // regardless of whether it falls within the (unused) default cooling limits.
+    ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
+    transition.coolingSetpoint                   = MakeOptional(static_cast<int16_t>(2000));
+    ScheduleTransitionStruct::Type transitions[] = { transition };
+    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsHeatingSetpointWhenHeatingNotSupported)
+{
+    // Mirrors the cooling-only check above for a cooling-only cluster: a transition's heatingSetpoint must be
+    // rejected even though it falls within the (unused) default heating limits.
+    BitFlags<Feature> features(Feature::kCooling, Feature::kMatterScheduleConfiguration);
+
+    mSchedulesDelegate.mScheduleTypes.clear();
+    mSchedulesDelegate.mScheduleTypes.push_back({
+        .systemMode           = SystemModeEnum::kCool,
+        .numberOfSchedules    = kTestMaxSchedules,
+        .scheduleTypeFeatures = static_cast<uint16_t>(to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints)),
+    });
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mCoolingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(tester.Invoke(MakeAtomicRequest(AtomicRequestTypeEnum::kBeginWrite)).IsSuccess());
+
+    ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
+    transition.heatingSetpoint                   = MakeOptional(static_cast<int16_t>(2000));
+    ScheduleTransitionStruct::Type transitions[] = { transition };
+    ScheduleStruct::Type schedule = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions));
+    schedule.systemMode           = SystemModeEnum::kCool;
+    ScheduleStruct::Type list[]   = { schedule };
+    auto writeStatus =
+        tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
+    EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsTooManyTransitionsHardCap)
 {
     ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
