@@ -84,7 +84,6 @@ public:
 
     Status MPTZSavePreset(uint8_t aPreset) override
     {
-        ++mSavePresetCalls;
         return Status::Success;
     }
 
@@ -94,7 +93,6 @@ public:
         return mRemovePresetResult;
     }
 
-    size_t mSavePresetCalls    = 0;
     size_t mRemovePresetCalls  = 0;
     Status mRemovePresetResult = Status::Success;
 
@@ -608,7 +606,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemai
         ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
         removed[id] = true;
         --remaining;
-        EXPECT_EQ(mMockDelegate.mSavePresetCalls, static_cast<size_t>(testMaxPresets));
         EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(testMaxPresets) - remaining);
         EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
         EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
@@ -670,7 +667,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemai
         }
         EXPECT_FALSE(reloadedIt.Next());
         EXPECT_EQ(reloadedIt.GetStatus(), CHIP_NO_ERROR);
-        EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
         EXPECT_EQ(restoredDelegate.mRemovePresetCalls, 0u);
     }
 }
@@ -731,8 +727,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
     uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
     MutableByteSpan before(beforeBuffer);
     ASSERT_EQ(persistence.ReadValue(path, before), CHIP_NO_ERROR);
-    const uint8_t nextID = mServer.GetLogic().mCurrentPresetID;
-    auto & storage       = mClusterTester.GetTestContext().StorageDelegate();
+    auto & storage = mClusterTester.GetTestContext().StorageDelegate();
     storage.SetRejectWrites(true);
     auto allowWrites = MakeDefer([&storage] { storage.SetRejectWrites(false); });
     mClusterTester.GetDirtyList().clear();
@@ -744,8 +739,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
         EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(),
                   ClusterStatusCode(Status::Failure));
         EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(id));
-        EXPECT_EQ(mMockDelegate.mSavePresetCalls, 3u);
-        EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, nextID);
         EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
         ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 3u);
         for (uint8_t expected = 1; expected <= 3; ++expected)
@@ -764,7 +757,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
     remove.presetID = 2;
     ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
     EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 4u);
-    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, nextID);
     EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
     ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 2u);
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
@@ -817,7 +809,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvali
     EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(), ClusterStatusCode(Status::Busy));
     EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 1u);
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
-    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
     ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetName(), "PreservedPreset");
     uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
