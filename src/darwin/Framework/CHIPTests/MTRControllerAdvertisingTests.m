@@ -20,7 +20,9 @@
 #import <XCTest/XCTest.h>
 #import <dns_sd.h>
 
+#import "MTRDeviceTestDelegate.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 
@@ -28,6 +30,9 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kTimeoutInSeconds = 3;
 
 static NSString * NodeIDAsString(NSNumber * nodeID) { return [NSString stringWithFormat:@"%016llX", nodeID.unsignedLongLongValue]; }
+
+static NSString * const kLocalDomainName = @"local.";
+static NSString * const kSRPDomainName = @"default.service.arpa.";
 
 @interface MTRControllerAdvertisingTestsOperationalBrowser : NSObject
 @property NSSet<NSString *> * discoveredNodes;
@@ -118,6 +123,12 @@ static const DNSServiceFlags kBrowseFlags = 0;
 
 @implementation MTRControllerAdvertisingTests {
     dispatch_queue_t _storageQueue;
+    MTRDeviceController * _controller;
+    MTRDevice * _device;
+    MTRDeviceTestDelegateWithSubscriptionSetupOverride * _deviceDelegate;
+    NSString * _deviceInstanceName;
+    NSString * _otherInstanceName;
+    NSUInteger _advertisementsSeen;
 }
 
 + (void)tearDown
@@ -136,6 +147,10 @@ static const DNSServiceFlags kBrowseFlags = 0;
 - (void)tearDown
 {
     // Per-test teardown, runs after each test.
+    [_controller shutdown];
+    _controller = nil;
+    _device = nil;
+    _deviceDelegate = nil;
     [self stopFactory];
     _storageQueue = nil;
     [super tearDown];
@@ -273,6 +288,134 @@ static const DNSServiceFlags kBrowseFlags = 0;
     XCTAssertFalse([controller2 isRunning]);
     [controller3 shutdown];
     XCTAssertFalse([controller3 isRunning]);
+}
+
+- (void)startControllerWithDevice
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storage = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+    _controller = [self startControllerWithRootKeys:rootKeys
+                                    operationalKeys:operationalKeys
+                                           fabricID:@(0x1122334455667788)
+                                             nodeID:@(0x1827364554637281)
+                                            storage:storage
+                               advertiseOperational:NO
+                                              error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue([_controller isRunning]);
+
+    NSNumber * deviceNodeID = @(0x5566778899AABBCC);
+    NSString * fabricPart = [NSString stringWithFormat:@"%016llX", _controller.compressedFabricID.unsignedLongLongValue];
+    _deviceInstanceName = [NSString stringWithFormat:@"%@-%@", fabricPart, NodeIDAsString(deviceNodeID)];
+    _otherInstanceName = [NSString stringWithFormat:@"%@-%@", fabricPart, NodeIDAsString(@(0x5566778899AABBCD))];
+
+    _device = [MTRDevice deviceWithNodeID:deviceNodeID controller:_controller];
+    _deviceDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    _deviceDelegate.skipSetupSubscription = YES;
+    __weak __auto_type weakSelf = self;
+    _deviceDelegate.onOperationalAdvertisementSeen = ^{
+        __auto_type strongSelf = weakSelf;
+        if (strongSelf) {
+            strongSelf->_advertisementsSeen++;
+        }
+    };
+    [_device setDelegate:_deviceDelegate queue:dispatch_get_main_queue()];
+}
+
+// Each result is @[ flags, interface index, instance name, domain ].
+- (NSUInteger)advertisementsSeenForBrowseResults:(NSArray<NSArray *> *)results
+{
+    __block NSUInteger seen = 0;
+    [_controller syncRunOnWorkQueue:^{
+        NSUInteger before = self->_advertisementsSeen;
+        for (NSArray * result in results) {
+            [self->_controller unitTestInjectOperationalBrowseResultWithFlags:[result[0] unsignedIntValue]
+                                                               interfaceIndex:[result[1] unsignedIntValue]
+                                                                 instanceName:result[2]
+                                                                       domain:result[3]];
+        }
+        seen = self->_advertisementsSeen - before;
+    } error:nil];
+    return seen;
+}
+
+- (void)test002_AdvertisementOnSeveralInterfacesAndDomainsNotifiesOnce
+{
+    [self startControllerWithDevice];
+    NSString * name = _deviceInstanceName;
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(2), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(0), name, kSRPDomainName ],
+    ]];
+    XCTAssertEqual(seen, 1);
+}
+
+- (void)test003_AdvertisementThatReappearsNotifiesAgain
+{
+    [self startControllerWithDevice];
+    NSString * name = _deviceInstanceName;
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ],
+        @[ @(0), @(1), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ],
+    ]];
+    XCTAssertEqual(seen, 2);
+}
+
+- (void)test004_AdvertisementStillPresentElsewhereDoesNotNotify
+{
+    [self startControllerWithDevice];
+    NSString * name = _deviceInstanceName;
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(2), name, kLocalDomainName ],
+        @[ @(0), @(1), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ],
+    ]];
+    XCTAssertEqual(seen, 1);
+    seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(0), @(1), name, kLocalDomainName ],
+        @[ @(0), @(2), name, kLocalDomainName ],
+        @[ @(kDNSServiceFlagsAdd), @(2), name, kLocalDomainName ],
+    ]];
+    XCTAssertEqual(seen, 1);
+}
+
+- (void)test005_RestartedBrowseNotifiesAgain
+{
+    [self startControllerWithDevice];
+    NSString * name = _deviceInstanceName;
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[ @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ] ]];
+    XCTAssertEqual(seen, 1);
+    [_controller suspend];
+    [_controller resume];
+    seen = [self advertisementsSeenForBrowseResults:@[ @[ @(kDNSServiceFlagsAdd), @(1), name, kLocalDomainName ] ]];
+    XCTAssertEqual(seen, 1);
+}
+
+- (void)test006_BatchEndingInRemovalOfAnotherInstanceNotifies
+{
+    [self startControllerWithDevice];
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(kDNSServiceFlagsAdd | kDNSServiceFlagsMoreComing), @(1), _deviceInstanceName, kLocalDomainName ],
+        @[ @(0), @(1), _otherInstanceName, kLocalDomainName ],
+    ]];
+    XCTAssertEqual(seen, 1);
+}
+
+- (void)test007_AdvertisementRemovedWithinBatchDoesNotNotify
+{
+    [self startControllerWithDevice];
+    NSString * name = _deviceInstanceName;
+    NSUInteger seen = [self advertisementsSeenForBrowseResults:@[
+        @[ @(kDNSServiceFlagsAdd | kDNSServiceFlagsMoreComing), @(1), name, kLocalDomainName ],
+        @[ @(0), @(1), name, kLocalDomainName ],
+    ]];
+    XCTAssertEqual(seen, 0);
 }
 
 @end

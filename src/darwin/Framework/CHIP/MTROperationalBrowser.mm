@@ -86,6 +86,7 @@ void MTROperationalBrowser::EnsureBrowse()
     }
 
     mAddedInstanceNames = [[NSMutableSet alloc] init];
+    mPresentInstances = [[NSMutableDictionary alloc] init];
 
     mInitialized = true;
 
@@ -103,6 +104,7 @@ void MTROperationalBrowser::StopBrowse()
     ChipLogProgress(Controller, "%p stopping persistent operational browse", this);
     if (mInitialized) {
         mAddedInstanceNames = nil;
+        mPresentInstances = nil;
         DNSServiceRefDeallocate(mBrowseRef);
         mInitialized = false;
     }
@@ -130,14 +132,26 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     }
 
     auto * newInstanceName = [NSString stringWithUTF8String:aName];
-    if (!(aFlags & kDNSServiceFlagsAdd)) {
-        MTR_LOG("Matter operational instance advertisement removed: '%@'\n", newInstanceName);
-        // Make sure that we don't notify about things that appear and then disappear.
-        [self->mAddedInstanceNames removeObject:newInstanceName];
-        return;
+    auto * domain = @(StringOrNullMarker(aDomain));
+    NSArray * location = @[ @(aInterfaceId), domain ];
+    NSMutableSet<NSArray *> * locations = self->mPresentInstances[newInstanceName];
+    if (aFlags & kDNSServiceFlagsAdd) {
+        MTR_LOG("Matter operational instance advertisement added: '%@' on interface %" PRIu32 " in %@", newInstanceName, aInterfaceId, domain);
+        if (locations == nil) {
+            locations = [[NSMutableSet alloc] init];
+            self->mPresentInstances[newInstanceName] = locations;
+            [self->mAddedInstanceNames addObject:newInstanceName];
+        }
+        [locations addObject:location];
+    } else {
+        MTR_LOG("Matter operational instance advertisement removed: '%@' on interface %" PRIu32 " in %@", newInstanceName, aInterfaceId, domain);
+        [locations removeObject:location];
+        if (locations.count == 0) {
+            [self->mPresentInstances removeObjectForKey:newInstanceName];
+            // Make sure that we don't notify about things that appear and then disappear.
+            [self->mAddedInstanceNames removeObject:newInstanceName];
+        }
     }
-
-    [self->mAddedInstanceNames addObject:newInstanceName];
 
     if (aFlags & kDNSServiceFlagsMoreComing) {
         // Just wait for those other notifications, so we coalesce everything.
@@ -157,6 +171,13 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
     }
     [self->mAddedInstanceNames removeAllObjects];
 }
+
+#ifdef DEBUG
+void MTROperationalBrowser::UnitTestInjectBrowseResult(DNSServiceFlags aFlags, uint32_t aInterfaceId, const char * aName, const char * aDomain)
+{
+    OnBrowse(nullptr, aFlags, aInterfaceId, kDNSServiceErr_NoError, aName, kOperationalType, aDomain, this);
+}
+#endif
 
 MTROperationalBrowser::~MTROperationalBrowser()
 {

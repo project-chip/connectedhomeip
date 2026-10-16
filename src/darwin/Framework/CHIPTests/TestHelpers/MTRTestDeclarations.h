@@ -85,6 +85,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+// Must be called on the Matter queue.
+- (void)unitTestInjectOperationalBrowseResultWithFlags:(uint32_t)flags interfaceIndex:(uint32_t)interfaceIndex instanceName:(NSString *)instanceName domain:(NSString *)domain;
 @end
 
 @interface MTRBaseDevice (TestDebug)
