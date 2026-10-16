@@ -54,7 +54,6 @@ using chip::Testing::IsAttributesListEqualTo;
 static constexpr chip::EndpointId kTestEndpointId = 1;
 static constexpr uint8_t testMaxPresets           = 5;
 
-// Minimal mock delegate for testing
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
@@ -70,20 +69,12 @@ public:
         return Status::Success;
     }
 
-    /**
-     * @brief Accept relative mechanical movement without invoking completion or changing the test's stored position.
-     * @return Success; the test drives the completion callback explicitly.
-     */
     Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
-    /**
-     * @brief Accept a preset move without calling completion; tests drive the completion callback explicitly.
-     * @return Success to let the cluster enter the moving state.
-     */
     Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback) override
     {
@@ -116,20 +107,6 @@ public:
         return Status::Success;
     }
 
-    /**
-     * @brief Accept a viewport request without applying it to a physical stream.
-     * @return Success so tests can inspect the cluster's viewport update.
-     */
-    Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) override
-    {
-        return Status::Success;
-    }
-
-    /**
-     * @brief Accept relative digital movement while leaving the supplied viewport unchanged.
-     * @param aViewport The output viewport, left unchanged because this mock has no camera-stream geometry.
-     * @return Success so the test can inspect the cluster's range and stream-ID handling.
-     */
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
                             Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport) override
     {
