@@ -812,8 +812,8 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsCoolingSetpoi
     ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
     transition.coolingSetpoint                   = MakeOptional(static_cast<int16_t>(2000));
     ScheduleTransitionStruct::Type transitions[] = { transition };
-    ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
-                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
+    ScheduleStruct::Type list[]                  = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                                  DataModel::List<const ScheduleTransitionStruct::Type>(transitions)) };
     auto writeStatus =
         tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
     EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -844,10 +844,10 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsHeatingSetpoi
     ScheduleTransitionStruct::Type transition    = MakeScheduleTransition(0, ScheduleDayOfWeekBitmap::kMonday);
     transition.heatingSetpoint                   = MakeOptional(static_cast<int16_t>(2000));
     ScheduleTransitionStruct::Type transitions[] = { transition };
-    ScheduleStruct::Type schedule = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
-                                                 DataModel::List<const ScheduleTransitionStruct::Type>(transitions));
-    schedule.systemMode           = SystemModeEnum::kCool;
-    ScheduleStruct::Type list[]   = { schedule };
+    ScheduleStruct::Type schedule                = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                                DataModel::List<const ScheduleTransitionStruct::Type>(transitions));
+    schedule.systemMode                          = SystemModeEnum::kCool;
+    ScheduleStruct::Type list[]                  = { schedule };
     auto writeStatus =
         tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll);
     EXPECT_EQ(writeStatus, CHIP_IM_GLOBAL_STATUS(ConstraintError));
