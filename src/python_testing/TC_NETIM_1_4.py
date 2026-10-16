@@ -112,25 +112,27 @@ class TC_NETIM_1_4(MatterTestCommissionedDevice):
         self.step("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared Secrets used by "
                                     "this test with strictly increasing timestamps.",
                   is_commissioning=True)
-        # Timestamps are spaced a few seconds apart, strictly increasing, and all in the past (the newest is
-        # "now"), so a DUT with a trusted real-time clock cannot see one more than a minute ahead of its own
-        # time and reject the import with DYNAMIC_CONSTRAINT_ERROR. Only ordering against the stored NASS
-        # matters here. Each NASS uses a distinct random raw secret, so each derives a distinct Network
-        # Identity; NASSa is reused verbatim for the idempotent re-import.
-        base = matter_epoch_now() - 40
+        # Timestamps are spaced a few seconds apart, strictly increasing, to prevent issues with real-time clock constraints,
+        # we are prefilling the secrets with now minus 40 seconds (the newest is "now"), so a DUT with a trusted real-time
+        # clock cannot see one more than a minute ahead of its own time and reject the import with DYNAMIC_CONSTRAINT_ERROR.
+        # Only ordering against the stored NASS matters here. Each NASS uses a distinct random raw secret,
+        # so each derives a distinct Network Identity; NASSa is reused verbatim for the idempotent re-import.
+        timestamp_a = matter_epoch_now() - 40
+        timestamp_b = timestamp_a + 10
+        timestamp_c = timestamp_b + 10
         raw_a = secrets.token_bytes(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
-        timestamp_d = base + 30
-        nass_a = encode_network_administrator_secret(created=base, raw_secret=raw_a)
-        nass_b = encode_network_administrator_secret(created=base + 10, raw_secret=secrets.token_bytes(
+        timestamp_d = timestamp_c + 10
+        nass_a = encode_network_administrator_secret(created=timestamp_a, raw_secret=raw_a)
+        nass_b = encode_network_administrator_secret(created=timestamp_b, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
-        nass_c = encode_network_administrator_secret(created=base + 20, raw_secret=secrets.token_bytes(
+        nass_c = encode_network_administrator_secret(created=timestamp_c, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
         nass_d = encode_network_administrator_secret(created=timestamp_d, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
-        nass_e = encode_network_administrator_secret(created=base + 40, raw_secret=secrets.token_bytes(
+        nass_e = encode_network_administrator_secret(created=timestamp_d + 10, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
         # A NASS whose timestamp is below TimeStampB (base + 10), used to exercise the monotonic check.
-        nass_older_than_b = encode_network_administrator_secret(created=base + 5, raw_secret=secrets.token_bytes(
+        nass_older_than_b = encode_network_administrator_secret(created=timestamp_a + 5, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
         # Not a valid NASS TLV; DecodeNetworkAdministratorSecret must reject it.
         malformed_nass = b"\xde\xad\xbe\xef"

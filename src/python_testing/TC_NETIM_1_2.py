@@ -156,6 +156,7 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
                   expectation="The list includes an entry with ClientIndex idxA and the 20-byte identifier of ClientIdentityA.")
         clients_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
+        client_table_length = len(clients_list)
         matching = [c for c in clients_list if c.clientIndex == idx_a and c.clientIdentifier == identifier_a]
         asserts.assert_equal(len(matching), 1,
                              "Clients does not contain the added ClientIdentityA (matching ClientIndex and identifier).")
@@ -190,9 +191,7 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
                      "one additional AddClient using a Timed Interaction.",
                   expectation="The additional AddClient (beyond clientTableSize) responds with RESOURCE_EXHAUSTED.")
         # Fill the table to the capacity read in step 8, then confirm one more AddClient is rejected.
-        current_clients = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
-        fill_needed = client_table_size - len(current_clients)
+        fill_needed = client_table_size - client_table_length
         asserts.assert_greater(fill_needed, 0, "Client Table is already at capacity before the fill step.")
         log.info("Filling the Client Table to its capacity of %d entries (%d additional); this issues ~%d timed invokes.",
                  client_table_size, fill_needed, fill_needed + 1)
