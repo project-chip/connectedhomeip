@@ -468,9 +468,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     //   3. Subscription reset (including when getSessionForNode fails)
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
 
-    // Incremented whenever the subscription is reset, so that ReadClient
-    // resubscription work scheduled before the reset can tell, once it gets a
-    // pool slot, that the ReadClient it was meant to resubscribe is gone.
+    // Incremented whenever the subscription is reset or ends, so that
+    // ReadClient resubscription work scheduled before that can tell, once it
+    // gets a pool slot, that the ReadClient it was meant to resubscribe is gone.
     uint64_t _subscriptionResetGeneration;
 
     // Tracking of initial subscribe latency.  When _initialSubscribeStart is
@@ -3115,6 +3115,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(self->_lock);
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
 }
+
+- (void)unitTestEndSubscriptionAsReadClientGivingUp
+{
+    assertChipStackLockedByCurrentThread();
+
+    ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
+    if (readClient == nullptr) {
+        MTR_LOG_ERROR("%@ unitTestEndSubscriptionAsReadClientGivingUp called with no ReadClient", self);
+        return;
+    }
+
+    // A ReadClient that gives up reports an error and then OnDone. Shutting
+    // the subscription down only produces the OnDone part.
+    [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+    InteractionModelEngine::GetInstance()->ShutdownSubscriptions(readClient->GetFabricIndex(), readClient->GetPeerNodeId());
+}
 #endif
 
 // assume lock is held
@@ -3313,6 +3329,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                    // OnDone
                                    std::lock_guard lock(self->_lock);
+
+                                   // Pending ReadClient resubscription work has nothing
+                                   // left to resubscribe: _doHandleSubscriptionReset
+                                   // releases its slot if it has one and schedules a
+                                   // retry instead.
+                                   self->_subscriptionResetGeneration++;
+
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {
