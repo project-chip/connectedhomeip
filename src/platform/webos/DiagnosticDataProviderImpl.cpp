@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
             {
                 // The usecase of this function is embedded devices,on which we can interact with the WiFi
                 // driver to get the accurate number of muticast and unicast packets accurately.
-                // On Linux simulation, we can only get the total packets received, the total bytes transmitted,
+                // On WebOS simulation, we can only get the total packets received, the total bytes transmitted,
                 // the multicast packets received and receiver ring buff overflow.
 
                 struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
@@ -266,7 +266,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // The usecase of this function is embedded devices,on which we would need to intercept
     // malloc/calloc/free and then record the maximum amount of heap memory,in bytes, that
     // has been used by the Node.
-    // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
+    // On WebOS, since it uses virtual memory, whereby a page of memory could be copied to
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
     // to know accurately peak physical memory it use.
     // Update the maximum heap high watermark if the current heap usage exceeds it.
@@ -295,6 +295,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     struct mallinfo mallocInfo = mallinfo();
     maxHeapHighWatermark       = mallocInfo.uordblks;
 #endif
+    // On WebOS, the write operation is non-op since we always rely on the mallinfo system
+    // function to get the current heap memory.
 
     return CHIP_NO_ERROR;
 }
@@ -416,7 +418,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following hardware faults statically.
+    // On WebOS Simulation, set following hardware faults statically.
     ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kRadio)));
     ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kSensor)));
     ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kPowerSource)));
@@ -429,7 +431,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following radio faults statically.
+    // On WebOS Simulation, set following radio faults statically.
     ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kWiFiFault)));
     ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kCellularFault)));
     ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
@@ -442,7 +444,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following radio faults statically.
+    // On WebOS Simulation, set following radio faults statically.
     ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
     ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
     ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));

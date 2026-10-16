@@ -22,5 +22,5 @@ gdbus_library("openthread") {
   c_namespace = "Openthread"
   interface_prefix = "io.openthread"
   c_generate_object_manager = false
-  dbus_out_dir = "platform/Linux/dbus/openthread"
+  dbus_out_dir = "platform/webos/dbus/openthread"
 }
