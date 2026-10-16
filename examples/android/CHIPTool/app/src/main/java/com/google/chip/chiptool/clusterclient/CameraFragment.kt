@@ -845,6 +845,7 @@ class CameraFragment : Fragment() {
       try {
         ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId, true)
       } catch (e: IllegalStateException) {
+        downloadFileOutputStream.close()
         Log.d(TAG, "getConnectedDevicePointer exception", e)
         scope.launch(Dispatchers.Main) {
           Toast.makeText(requireContext(), "Get DevicePointer fail!", Toast.LENGTH_SHORT).show()

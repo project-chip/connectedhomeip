@@ -2413,6 +2413,11 @@ JNI_METHOD(void, webRTCTransportSolicitOffer)
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    if (wrapper == nullptr)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
 
     ChipLogProgress(Controller, "webRTCTransportSolicitOffer() called with device ID and callback object");
 
@@ -2469,6 +2474,11 @@ JNI_METHOD(void, webRTCTransportProvideOffer)
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    if (wrapper == nullptr)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
 
     ChipLogProgress(Controller, "webRTCTransportProvideOffer() called with device ID and callback object");
 

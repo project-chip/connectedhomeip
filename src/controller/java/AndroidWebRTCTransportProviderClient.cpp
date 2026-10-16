@@ -249,7 +249,13 @@ void AndroidWebRTCTransportProviderClient::HandleCommandResponse(void * appConte
 
     chip::TLV::TLVReader reader;
     reader.Init(payload, length);
-    ReturnOnFailure(reader.Next(), ChipLogError(Controller, "Wrong TLV Payload."));
+
+    if (CHIP_ERROR err = reader.Next(); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Wrong TLV Payload.");
+        self->NotifyError(err);
+        return;
+    }
 
     if (commandId == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id)
     {
