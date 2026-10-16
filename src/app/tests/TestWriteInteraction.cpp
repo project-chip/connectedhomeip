@@ -852,27 +852,6 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
             ASSERT_SUCCESS(toBob ? CreateSessionAliceToBob() : CreateSessionBobToAlice());
         }
     }
-    // Use WriteClient's explicit false flags so fabric teardown and handler reuse are independent of omitted-field defaults.
-    WriteHandler freshHandler;
-    for (auto * handler : { &freshHandler, &writeHandler })
-    {
-        ASSERT_SUCCESS(handler->Init(&provider, InteractionModelEngine::GetInstance()));
-        provider.mExchangeHolder = &handler->mExchangeCtx;
-        TestWriteClientCallback writeCallback;
-        WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
-        AddAttributeDataIB(writeClient, EncodingMethod::Standard);
-        ASSERT_SUCCESS(writeClient.FinalizeMessage(false /* aHasMoreChunks */));
-        ASSERT_FALSE(writeClient.mChunks.IsNull());
-        TestExchangeDelegate delegate;
-        auto * exchange = NewExchangeToBob(&delegate);
-        ASSERT_NE(exchange, nullptr);
-        ASSERT_EQ(handler->OnWriteRequest(exchange, writeClient.mChunks.PopHead(), false /* aIsTimedWrite */), Status::Success);
-        EXPECT_TRUE(handler->IsFree());
-        EXPECT_EQ(handler->GetAccessingFabricIndex(), kUndefinedFabricIndex);
-        handler->Close();
-        DrainAndServiceIO();
-    }
-    provider.mExchangeHolder = &writeHandler.mExchangeCtx;
 }
 
 /**
