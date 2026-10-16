@@ -66,7 +66,7 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
     def steps_TC_MEDIAFILEMANAGEMENT_3_1(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH subscribes to SharedFilesAdded events on the DUT before "
-                     "issuing any request, so no event can be missed.", is_commissioning=True),
+                     "issuing any request, so no event can be missed."),
             TestStep(1, "TH sends a RequestSharedFiles command to the DUT with ClientName='Test Harness' and a "
                      "client-generated RequestID.",
                      "The DUT responds with a success status response. The DUT may require user consent before "

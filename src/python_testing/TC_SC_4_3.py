@@ -82,7 +82,7 @@ MAX_T_VALUE = 6
 class TC_SC_4_3(MatterTestCommissionedDevice):
 
     def steps_TC_SC_4_3(self):
-        return [TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+        return [TestStep("precondition", "DUT is commissioned on the same fabric as TH."),
                 TestStep(1, "TH reads ServerList attribute from the Descriptor cluster on EP0.",
                          "If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False."),
                 TestStep(2, "If supports_icd is true:",

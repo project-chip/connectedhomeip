@@ -196,7 +196,7 @@ class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
 
     def steps_TC_COMPRO_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT (proxy) to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT (proxy) to TH"),
             TestStep(2, "TH reads Transport attribute", "Store as valid_transports"),
             TestStep(3, "TH reads WiFiBand attribute (if WI supported)", "Store as valid_bands"),
             TestStep(4, "For each transport bit in valid_transports: Ensure ED is commissionable "

@@ -53,7 +53,7 @@ class TC_CADMIN_1_25(MatterTestCommissionedDevice):
 
     def steps_TC_CADMIN_1_25(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH_CR1 subscribes to WindowStatus attribute on DUT_CE",
                      "Verify TH_CR1 receives WindowStatus subscription notification"),
             TestStep(3, "TH_CR1 subscribes to AdminFabricIndex attribute on DUT_CE",

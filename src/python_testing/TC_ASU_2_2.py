@@ -72,7 +72,7 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
 
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Sensing Union Cluster on the endpoint under test.")
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)

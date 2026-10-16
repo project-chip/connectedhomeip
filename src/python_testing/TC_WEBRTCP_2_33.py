@@ -181,7 +181,7 @@ class TC_WEBRTCP_2_33(MatterTestCommissionedDevice, WEBRTCPTestBase):
     @async_test_body
     async def test_TC_WEBRTCP_2_33(self) -> None:
         """[TC-WEBRTCP-2.33] Validate WebRTC video and audio stream reuse and media delivery across consecutive sessions (referenceCount 0 -> 1 -> 0 -> 1)"""
-        self.step("precondition", "DUT commissioned", is_commissioning=True)
+        self.step("precondition", "DUT commissioned")
         endpoint = self.get_endpoint()
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
