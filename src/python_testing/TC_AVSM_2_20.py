@@ -43,13 +43,13 @@ from TC_AVSMTestBase import AVSMTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_20(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_20(MatterTestCommissionedDevice, AVSMTestBase):
     disable_wildcard_subscription = True
 
     def desc_TC_AVSM_2_20(self) -> str:
@@ -57,7 +57,7 @@ class TC_AVSM_2_20(MatterBaseTest, AVSMTestBase):
 
     def steps_TC_AVSM_2_20(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT. Verify F_SNP is supported."),
             TestStep(3, "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT. Verify the number of allocated snapshot streams in the list is 0."),
             TestStep(4, "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on DUT. Store this value in aSnapshotCapabilities."),

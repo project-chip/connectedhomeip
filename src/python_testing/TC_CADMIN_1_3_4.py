@@ -56,6 +56,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import has_cluster, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 
@@ -65,7 +66,7 @@ opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
 
 
-class TC_CADMIN(CADMINBaseTest):
+class TC_CADMIN(MatterTestCommissionedDevice, CADMINBaseTest):
     # Opt out of the framework background subscription: it joins the existing fabric as a
     # second operational node (controller_node_id + 123456), which adds a second operational
     # mDNS SRV record per fabric. Combined with the fabrics this test commissions, that pushes
@@ -255,7 +256,7 @@ class TC_CADMIN(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE"),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using ECM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
@@ -289,7 +290,7 @@ class TC_CADMIN(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE"),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),

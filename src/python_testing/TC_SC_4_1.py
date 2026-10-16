@@ -78,7 +78,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.commissioning import get_setup_payload_info_config
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -111,14 +111,14 @@ class SetupCodeType(enum.IntEnum):
     NONE_SUPLIED = 2
 
 
-class TC_SC_4_1(MatterBaseTest):
+class TC_SC_4_1(MatterTestCommissionedDevice):
     # Cached by get_exposed_device_types() so its per-endpoint Descriptor
     # reads run once per test instead of once per verification pass
     _exposed_device_types: set[int] | None = None
 
     def steps_TC_SC_4_1(self):
         return [
-            TestStep("precondition", "DUT is commissioned on the same fabric as TH.", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned on the same fabric as TH."),
 
             # DUT DETAILS
             #

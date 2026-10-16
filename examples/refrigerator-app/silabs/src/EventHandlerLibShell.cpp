@@ -32,6 +32,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAlarm;
+using chip::Protocols::InteractionModel::Status;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;

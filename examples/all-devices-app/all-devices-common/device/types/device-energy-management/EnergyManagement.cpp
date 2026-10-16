@@ -110,6 +110,18 @@ Protocols::InteractionModel::Status EnergyManagement::CancelRequest()
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status EnergyManagement::PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+                                                                              const Optional<int64_t> maxPower,
+                                                                              const uint32_t duration, AdjustmentCauseEnum cause)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status EnergyManagement::CancelPowerRangeAdjustRequest()
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
 ESATypeEnum EnergyManagement::GetESAType()
 {
     return ESATypeEnum::kEvse;
@@ -150,13 +162,18 @@ const DataModel::Nullable<Structs::ForecastStruct::Type> & EnergyManagement::Get
     return mForecast;
 }
 
+const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> & EnergyManagement::GetPowerRangeAdjustment()
+{
+    return mPowerRangeAdjustment;
+}
+
 CHIP_ERROR EnergyManagement::SetESAState(ESAStateEnum state)
 {
     VerifyOrReturnValue(mESAState != state, CHIP_NO_ERROR);
     mESAState = state;
 
     VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
-    mProvider->NotifyAttributeChanged({ SingleEndpoint::GetEndpointId(), Id, Attributes::ESAState::Id },
+    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::ESAState::Id },
                                       DataModel::AttributeChangeType::kReportable);
 
     return CHIP_NO_ERROR;

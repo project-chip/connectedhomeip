@@ -190,17 +190,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
-    if (sessionHandle->AllowsLargePayload())
-    {
-        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
-        size_t limit        = std::min(remoteLimit, kMaxLargeAppMessageLen);
-        VerifyOrReturnError(message->TotalLength() <= limit, CHIP_ERROR_MESSAGE_TOO_LONG);
-    }
-    else
-    {
-        VerifyOrReturnError(message->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
-    }
+    VerifyOrReturnError(message->TotalLength() <= sessionHandle->GetMaxAppMessageLen(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
 #if CHIP_PROGRESS_LOGGING
     NodeId destination;
@@ -949,7 +939,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn.IsNull())
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && (ctxt == nullptr || ctxt->conn.IsNull()))
     {
         ChipLogError(Inet, "Connection object is missing for received message.");
         return;
@@ -963,13 +953,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         return;
     }
 
-    Transport::SecureSession * secureSession  = session.Value()->AsSecureSession();
-    Transport::PeerAddress mutablePeerAddress = peerAddress;
-    CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
-    }
+    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Associate the secure session with the connection, if not done already.
@@ -1070,6 +1054,17 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
+
+        // Only a message with a new message counter may change the peer address: old messages can be
+        // captured and resent by anyone, and would otherwise let a third party choose where we send
+        // this session's traffic. If a peer changes its address, a retransmit from the new address
+        // therefore does not update it; its next new message does.
+        Transport::PeerAddress mutablePeerAddress = peerAddress;
+        CorrectPeerAddressInterfaceID(mutablePeerAddress);
+        if (secureSession->GetPeerAddress() != mutablePeerAddress)
+        {
+            secureSession->SetPeerAddress(mutablePeerAddress);
+        }
     }
 
     if (mCB != nullptr)

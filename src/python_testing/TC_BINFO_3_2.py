@@ -39,11 +39,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_BINFO_3_2(MatterBaseTest):
+class TC_BINFO_3_2(MatterTestCommissionedDevice):
     async def read_binfo_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.BasicInformation
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -53,7 +53,7 @@ class TC_BINFO_3_2(MatterBaseTest):
 
     def steps_TC_BINFO_3_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
             TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),

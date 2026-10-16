@@ -55,13 +55,13 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, pics
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PWRTL_2_1(MatterBaseTest):
+class TC_PWRTL_2_1(MatterTestCommissionedDevice):
 
     @property
     def default_endpoint(self) -> int:
@@ -78,7 +78,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
         cluster = Clusters.PowerTopology
         attributes = cluster.Attributes
 
-        self.step(1, "Commission DUT to TH (already done)", is_commissioning=True)
+        self.step(1, "Commission DUT to TH (already done)")
 
         attribute_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.AttributeList)

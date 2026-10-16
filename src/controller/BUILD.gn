@@ -62,6 +62,7 @@ static_library("controller") {
     "CHIPCommissionableNodeController.h",
     "CHIPDeviceController.h",
     "CHIPDeviceControllerSystemState.h",
+    "CertificateChainRequestTracker.h",
     "CommissioneeDeviceProxy.h",
     "CommissioningDelegate.h",
     "CommissioningWindowOpener.h",
@@ -70,6 +71,7 @@ static_library("controller") {
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
+    "NetworkIdentityRegistrar.h",
     "SetUpCodePairer.h",
   ]
 
@@ -86,7 +88,11 @@ static_library("controller") {
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
+      "ControllerOperation.cpp",
+      "ControllerOperation.h",
       "ExampleOperationalCredentialsIssuer.cpp",
+      "NetworkIdentityManagementRegistrar.cpp",
+      "NetworkIdentityManagementRegistrar.h",
       "SetUpCodePairer.cpp",
     ]
 
@@ -96,6 +102,7 @@ static_library("controller") {
     if (chip_enable_read_client) {
       sources += [
         "CHIPDeviceController.cpp",
+        "CertificateChainRequestTracker.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",
       ]

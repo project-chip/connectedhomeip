@@ -21,7 +21,10 @@ if (chip_build_tests) {
   chip_test_suite("tests") {
     output_name = "TestDeviceTypeParser"
 
-    test_sources = [ "TestDeviceTypeParser.cpp" ]
+    test_sources = [
+      "TestAppOptions.cpp",
+      "TestDeviceTypeParser.cpp",
+    ]
 
     cflags = [ "-Wconversion" ]
 

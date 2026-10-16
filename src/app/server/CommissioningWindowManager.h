@@ -17,20 +17,35 @@
 
 #pragma once
 
+#include <optional>
+
+#include <app/FailSafeContext.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningModeProvider.h>
+#include <app/server/Dnssd.h>
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/Ble.h>
+#endif
+#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/ClusterEnums.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
+
+namespace Testing {
+// Forward declaration of CommissioningWindowManagerTestAccess to allow it to be friends with CommissioningWindowManager
+class CommissioningWindowManagerTestAccess;
+} // namespace Testing
 
 enum class CommissioningWindowAdvertisement
 {
@@ -38,25 +53,29 @@ enum class CommissioningWindowAdvertisement
     kDnssdOnly,
 };
 
-class Server;
-
 class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
                                    public SessionEstablishmentDelegate,
                                    public app::CommissioningModeProvider,
                                    public SessionDelegate
 {
+    friend class Testing::CommissioningWindowManagerTestAccess;
+
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+        SessionManager & sessionManager;
+        Messaging::ExchangeManager & exchangeManager;
+        app::FailSafeContext & failSafeContext;
+        app::DnssdServer & dnssdServer = app::DnssdServer::Instance();
+#if CONFIG_NETWORK_LAYER_BLE
+        Ble::BleLayer & bleLayer;
+#endif
+    };
+
     CommissioningWindowManager() : mPASESession(*this) {}
 
-    CHIP_ERROR Init(Server * server)
-    {
-        if (server == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        mServer = server;
-        return CHIP_NO_ERROR;
-    }
+    void Init(const Context & context) { mContext.emplace(context); }
 
     System::Clock::Seconds32 MaxCommissioningTimeout() const;
 
@@ -67,6 +86,16 @@ public:
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    /**
+     * Allow or forbid advertising this device's own commissioning window over Wi-Fi PAF.
+     * Allowed by default.  A device that needs the NAN radio for something else while a
+     * window is open — a commissioning proxy subscribing on a commissionee's behalf — sets
+     * this false, so opening a window advertises on the other supported transports only.
+     */
+    void SetWiFiPAFAdvertisingAllowed(bool allowed) { mWiFiPAFAdvertisingAllowed = allowed; }
+#endif
 
     /**
      * Open the pairing window using default configured parameters.
@@ -158,7 +187,11 @@ private:
 
     CHIP_ERROR StartAdvertisement();
 
-    CHIP_ERROR StopAdvertisement(bool aShuttingDown);
+    // aKeepPAFPublish: leave the WiFi-PAF publisher running.  Used by
+    // OnSessionEstablished so the PAFTP session that just established PASE
+    // stays alive for post-PASE commissioning traffic.  The publisher is
+    // cancelled instead when the commissioning window closes, or on shutdown.
+    CHIP_ERROR StopAdvertisement(bool aShuttingDown, bool aKeepPAFPublish = false);
 
     // Start a timer that will call HandleCommissioningWindowTimeout, and then
     // start advertising and listen for PASE.
@@ -209,7 +242,7 @@ private:
     void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
 
     AppDelegate * mAppDelegate = nullptr;
-    Server * mServer           = nullptr;
+    std::optional<Context> mContext;
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum mWindowStatus =
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
@@ -218,6 +251,9 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mIsWiFiPAF = false;
+    // Sticky: set once by the application, and not reset by Init() or ResetState(), so it
+    // survives every open/close cycle of the commissioning window.
+    bool mWiFiPAFAdvertisingAllowed = true;
     // Both 0 and kUndefinedWiFiPafSessionId are invalid publish-id.
     // Use 0 as the default value so that the PAF definition does not need to be included.
     uint32_t mPublishId = 0;

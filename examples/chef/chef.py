@@ -45,6 +45,31 @@ _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "noip_rootnode_dimmablelight_bCwGYSDpoe",  # Broken.
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
 ]
+# Reduced set of devices for Linux presubmit CI that provides 100% coverage
+# of all C++ cluster implementations and preprocessor branches under examples/chef/common.
+_REDUCED_LINUX_CI_DEVICES = [
+    "multi_column_switch",
+    "rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45",
+    "rootnode_castingvideoplayer_contentapp_34699714e7",
+    "rootnode_chime_9991598b3f",
+    "rootnode_contactsensor_lightsensor_occupancysensor_temperaturesensor_pressuresensor_flowsensor_humiditysensor_airqualitysensor_powersource_367e7cea91",
+    "rootnode_dishwasher_cc105034fe",
+    "rootnode_doorlock_aNKYAreMXE",
+    "rootnode_heatpump_87ivjRAECh",
+    "rootnode_laundrydryer_01796fe396",
+    "rootnode_laundrywasher_fb10d238c8",
+    "rootnode_microwaveoven_37420684d3",
+    "rootnode_modeselect_6860d3a65a",
+    "rootnode_oven_temperaturecontrolledcabinet_cooktop_cooksurface_738dd18832",
+    "rootnode_pump_5f904818cc",
+    "rootnode_rainsensor_a7aa5d7738",
+    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
+    "rootnode_roboticvacuumcleaner_1807ff0c49",
+    "rootnode_smokecoalarm_686fe0dcb8",
+    "rootnode_waterheater_21bd13d651",
+    "rootnode_watervalve_6bb39f1f67",
+    "rootnode_windowcovering_RLCxaGi9Yx",
+]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
 
@@ -385,9 +410,13 @@ def main() -> int:
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
     parser.add_option("", "--ci_linux",
-                      help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
+                      help=("Builds all non-excluded Chef Examples on Linux for postsubmit CI. "
                             "Devices are built without -c for faster compilation."),
                       dest="ci_linux", action="store_true")
+    parser.add_option("", "--ci_linux_reduced",
+                      help=("Builds a reduced set of Chef Examples on Linux for presubmit CI. "
+                            "Devices are built without -c for faster compilation."),
+                      dest="ci_linux_reduced", action="store_true")
     parser.add_option("", "--cpu_type",
                       help="CPU type to compile for. Linux only.",
                       choices=["arm64", "arm", "x64"])
@@ -426,10 +455,17 @@ def main() -> int:
     # CI Linux
     #
 
-    if options.ci_linux:
-        for device_name in _DEVICE_LIST:
-            if device_name in _EXCLUDE_DEVICE_FROM_LINUX_CI:
-                continue
+    if options.ci_linux or options.ci_linux_reduced:
+        target_devices = (
+            _REDUCED_LINUX_CI_DEVICES
+            if options.ci_linux_reduced
+            else list(set(_DEVICE_LIST) - set(_EXCLUDE_DEVICE_FROM_LINUX_CI))
+        )
+        for device_name in target_devices:
+            if device_name not in _DEVICE_LIST:
+                flush_print(
+                    f"{device_name} in Linux CI list but not {_DEVICE_FOLDER}!")
+                exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
             command = f"./chef.py -br -d {device_name} -t linux"
             flush_print(f"Building {command}", with_border=True)

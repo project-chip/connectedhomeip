@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInThermostatModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThermostatMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInGroupcastCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Groupcast;
@@ -1697,6 +1706,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ScenesManagement::Id: {
         return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
+    }
+    case Clusters::ThermostatMode::Id: {
+        return CommandNeedsTimedInvokeInThermostatModeCluster(commandID);
     }
     case Clusters::Groupcast::Id: {
         return CommandNeedsTimedInvokeInGroupcastCluster(commandID);

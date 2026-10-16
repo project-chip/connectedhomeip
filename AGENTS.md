@@ -45,6 +45,20 @@ unless explicitly asked to look there:
     -   Optimize for resource usage (RAM/Flash).
     -   Be cautious with complex templates that could lead to code bloat.
 
+## API Stability
+
+Public APIs often have consumers outside this tree, so source compatibility is
+something to think about when changing or extending them. Breaking compatibility
+is not strictly prohibited, but should only be done for good reasons. There is
+no hard line between public and internal APIs: how much compatibility matters in
+a given area depends on how likely it is to be used by external clients, and on
+whether the API itself is considered stable or belongs to a feature still in
+development.
+
+Where compatibility shapes a decision, record it in a comment or the commit
+message; a deliberate break and a deliberate workaround both read as accidents
+otherwise.
+
 ## API preferences
 
 -   Prefer using `chip::Span` from `src/lib/support/Span.h` to pointer + size
@@ -111,7 +125,9 @@ product baseline patterns before modifying or generating code.
 
 ## Common Commands
 
-Most commands require an activated environment.
+Most commands require an activated environment. The user may or may not have
+already done that before running an agent harness; if `$PW_PROJECT_ROOT` is set
+the environment is probably active.
 
 ### Environment Activation
 

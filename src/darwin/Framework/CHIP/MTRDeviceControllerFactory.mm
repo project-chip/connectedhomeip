@@ -79,6 +79,14 @@ using namespace chip::Tracing::DarwinFramework;
 
 @end
 
+constexpr uint16_t kPublisherSelectedMaxIntervalFloor = 10 * 60;
+
+MTR_TESTABLE_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory ()
++ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
+                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval;
+@end
+
 class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
     CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & readHandler, Transport::SecureSession & secureSession) override
     {
@@ -86,7 +94,8 @@ class MTRApplicationCallback : public app::ReadHandler::ApplicationCallback {
         uint16_t requestedMaxInterval = 0;
         readHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
 
-        uint16_t maximumMaxInterval = std::max(kSubscriptionMaxIntervalPublisherLimit, requestedMaxInterval);
+        uint16_t maximumMaxInterval = [MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:requestedMinInterval
+                                                                                          maxIntervalCeiling:requestedMaxInterval];
         return readHandler.SetMaxReportingInterval(maximumMaxInterval);
     }
 };
@@ -190,6 +199,12 @@ MTR_DIRECT_MEMBERS
 + (void)initialize
 {
     MTRFrameworkInit();
+}
+
++ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
+                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval
+{
+    return std::max({ requestedMinInterval, requestedMaxInterval, kPublisherSelectedMaxIntervalFloor });
 }
 
 + (MTRDeviceControllerFactory *)sharedInstance

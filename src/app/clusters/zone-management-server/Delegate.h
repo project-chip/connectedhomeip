@@ -56,6 +56,26 @@ public:
                                                                         uint16_t & outZoneID) = 0;
 
     /**
+     *    @brief Command Delegate for creation of TwoDCartesianZone with optional RemoteZone identifiers.
+     *
+     *   @param[in]  zone        Structure with parameters for defining a TwoDCartesian zone.
+     *   @param[in]  nodeId      Optional remote NodeId associated with the zone.
+     *   @param[in]  endpointId  Optional remote EndpointId associated with the zone.
+     *   @param[out] outZoneID   Indicates the ID of the created zone.
+     *
+     *   @return Success if the creation is successful and a zoneID was
+     *   produced; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
+     */
+    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
+                                                                        const Optional<NodeId> & nodeId,
+                                                                        const Optional<EndpointId> & endpointId,
+                                                                        uint16_t & outZoneID)
+    {
+        return CreateTwoDCartesianZone(zone, outZoneID);
+    }
+
+    /**
      *    @brief Command Delegate for updating of a TwoDCartesianZone with the provided parameters.
      *
      *   @param[in] zoneID  Indicates the ID of the zone to update.
@@ -66,6 +86,24 @@ public:
      *   rejected with an appropriate error.
      */
     virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) = 0;
+
+    /**
+     *    @brief Command Delegate for updating of a TwoDCartesianZone with optional RemoteZone identifiers.
+     *
+     *   @param[in] zoneID      Indicates the ID of the zone to update.
+     *   @param[in] zone        Structure with parameters for a TwoDCartesian zone.
+     *   @param[in] nodeId      Optional remote NodeId associated with the zone.
+     *   @param[in] endpointId  Optional remote EndpointId associated with the zone.
+     *
+     *   @return Success if the update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone,
+                                                                        const Optional<NodeId> & nodeId,
+                                                                        const Optional<EndpointId> & endpointId)
+    {
+        return UpdateTwoDCartesianZone(zoneID, zone);
+    }
 
     /**
      *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.
@@ -106,6 +144,15 @@ public:
      *   rejected with an appropriate error.
      */
     virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
+
+    /**
+     * @brief verifies whether a zone with the provided zoneId is present on the server, and not a Privacy Zone.
+     *
+     * @param[in] zoneId Indicates the Id of the zone to be checked against known zones
+     *
+     * @return true if the zoneId is found, and the use is not privacy.
+     */
+    virtual bool IsValidAnalysisZone(const uint16_t zoneId) = 0;
 
     /**
      *   @brief Delegate callback for notifying change in an attribute.

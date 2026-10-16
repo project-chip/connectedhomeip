@@ -55,16 +55,6 @@ class HumidistatCluster(private val controller: MatterController, private val en
     object SubscriptionEstablished : SupportedModesAttributeSubscriptionState()
   }
 
-  class MistTypeAttribute(val value: UByte?)
-
-  sealed class MistTypeAttributeSubscriptionState {
-    data class Success(val value: UByte?) : MistTypeAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : MistTypeAttributeSubscriptionState()
-
-    object SubscriptionEstablished : MistTypeAttributeSubscriptionState()
-  }
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -935,7 +925,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readMistTypeAttribute(): MistTypeAttribute {
+  suspend fun readMistTypeAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
@@ -962,18 +952,13 @@ class HumidistatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return MistTypeAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun writeMistTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
@@ -1019,7 +1004,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   suspend fun subscribeMistTypeAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<MistTypeAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
       listOf(
@@ -1038,7 +1023,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            MistTypeAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1056,21 +1041,16 @@ class HumidistatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(MistTypeAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(MistTypeAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
