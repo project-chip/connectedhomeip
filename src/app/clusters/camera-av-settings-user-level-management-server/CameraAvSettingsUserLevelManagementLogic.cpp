@@ -250,7 +250,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     {
         MPTZPresetStruct::Type preset;
         ReturnErrorOnFailure(DataModel::Decode(reader, preset));
-        VerifyOrReturnError(preset.name.size() <= kMaxMPTZPresetNameLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        if (preset.name.size() > kMaxMPTZPresetNameLength)
+        {
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Dropping stored preset %d with %u-byte name", mEndpointId,
+                         preset.presetID, static_cast<unsigned>(preset.name.size()));
+            continue;
+        }
         MPTZPresetHelper aMptzPresetHelper;
 
         aMptzPresetHelper.SetPresetID(preset.presetID);
