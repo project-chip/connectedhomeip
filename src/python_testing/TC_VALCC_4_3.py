@@ -56,7 +56,7 @@ class TC_VALCC_4_3(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_4_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Verify TimeSync feature is supported"),
             TestStep("3a", "Read UTCTime attribute from Time Synchronization cluster"),

@@ -54,7 +54,7 @@ class TC_VALCC_4_5(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_4_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Send Open command with duration set to 5"),
             TestStep(3, "Read OpenDuration attribute"),
             TestStep(4, "Read RemainingDuration attribute"),

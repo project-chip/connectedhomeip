@@ -7808,12 +7808,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Water Tank Level Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
  * @brief Messages Cluster PresentMessagesRequest Command callback (from client)
  */
 bool emberAfMessagesClusterPresentMessagesRequestCallback(
