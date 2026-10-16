@@ -208,7 +208,7 @@ class TC_OPSTATE_BASE:
     ############################
 
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
                 TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
                 TestStep(4, "TH reads from the DUT the AttributeList attribute"),
@@ -301,7 +301,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.1
     ############################
     def STEPS_TC_OPSTATE_BASE_2_1(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the PhaseList attribute"),
                 TestStep(3, "TH reads from the DUT the CurrentPhase attribute"),
                 TestStep(4, "TH reads from the DUT the CountdownTime attribute"),
@@ -535,7 +535,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.2
     ############################
     def STEPS_TC_OPSTATE_BASE_2_2(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Start Command"),
                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                 TestStep(4, "TH sends Start command to the DUT"),
@@ -720,7 +720,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.3
     ############################
     def STEPS_TC_OPSTATE_BASE_2_3(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                 TestStep(4, "TH sends Pause command to the DUT"),
@@ -899,7 +899,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.4
     ############################
     def STEPS_TC_OPSTATE_BASE_2_4(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Set up a subscription to the OperationalError event"),
                 TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
                 TestStep(4, "TH reads from the DUT the OperationalState attribute")
@@ -966,7 +966,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.5
     ############################
     def STEPS_TC_OPSTATE_BASE_2_5(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
                 TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
                 TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
@@ -1215,7 +1215,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
     ############################
     def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Subscribe to CountdownTime attribute"),
                 TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
                          "the initial value of the CountdownTime is greater than 30, "

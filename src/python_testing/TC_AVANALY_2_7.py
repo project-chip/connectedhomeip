@@ -59,7 +59,7 @@ class TC_AVANALY_2_7(MatterTestCommissionedDevice, AVANALYTestBase):
     def steps_TC_AVANALY_2_7(self) -> list[TestStep]:
         """Returns the list of test steps for TC-AVANALY-2.7."""
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH enables multiple context triggers (e.g., Context A and Context B). Verify success response."),
             TestStep(3, "Simulate detection of Context A (e.g. Person)."),
             TestStep(

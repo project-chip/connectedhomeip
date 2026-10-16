@@ -1637,7 +1637,8 @@ CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> 
 
 std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
 {
-    static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
+                                                                 StreamUsageEnum::kAnalysis };
     return supportedStreamUsage;
 }
 
@@ -2121,6 +2122,11 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
 {
     return mAVAnalysisManager;
+}
+
+AmbientContextSensing::AmbientContextSensingDelegate & CameraDevice::GetAmbientContextSensingDelegate()
+{
+    return mAmbientContextSensingManager;
 }
 
 MediaController & CameraDevice::GetMediaController()
