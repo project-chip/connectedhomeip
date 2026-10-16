@@ -1154,13 +1154,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return Status::Success;
 }
 
-/**
- * @brief Remove a known preset after delegate acceptance and a successful persistence write.
- * @param commandData The preset ID to remove.
- * @return ConstraintError for an out-of-range ID, NotFound for an absent ID, the delegate's rejection status,
- *         Failure on persistence error, or Success after refreshing the allocation cursor and notifying subscribers.
- * Persistence failure retains the active list and allocation cursor and emits no attribute notification.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRemovePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::DecodableType & commandData)
