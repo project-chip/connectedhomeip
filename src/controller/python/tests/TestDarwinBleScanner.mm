@@ -143,7 +143,7 @@ TEST_F(TestDarwinBleScanner, QueuedCallbacksCannotUseContextAfterDeletion)
     context.alive = false;
     dispatch_sync(scanner.workQueue, ^{
         [scanner stopTimeoutReached];
-        [scanner centralManager:nil didDiscoverPeripheral:nil advertisementData:@{ } RSSI:@0];
+        [scanner centralManager:nil didDiscoverPeripheral:nil advertisementData:@{} RSSI:@0];
         [scanner centralManagerDidUpdateState:nil];
     });
     EXPECT_EQ(context.completions.load(), 0u);
