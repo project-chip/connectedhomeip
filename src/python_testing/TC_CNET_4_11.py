@@ -16,6 +16,7 @@
 #
 
 import asyncio
+import contextlib
 import logging
 import os
 import platform
@@ -33,7 +34,43 @@ from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
+# @pixit and @harness_params only exist in newer SDKs. On older ones (e.g. the SDK image shipped with some
+# Test-Harness releases) they become no-ops and the test validates its parameters itself.
+try:
+    from matter.testing.pixit import pixit
+except ImportError:
+    def pixit(*args, **kwargs):
+        return lambda func: func
+try:
+    from matter.testing.harness_params import harness_params
+except ImportError:
+    def harness_params(*args, **kwargs):
+        return lambda func: func
+
+try:
+    import sdbus  # Linux only; a dependency of matter_testing on Linux
+except ImportError:
+    sdbus = None
+
 logger = logging.getLogger(__name__)
+
+PIXIT_1ST_AP_SSID = "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
+PIXIT_1ST_AP_CREDENTIALS = "PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS"
+PIXIT_2ND_AP_SSID = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+PIXIT_2ND_AP_CREDENTIALS = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"
+# The runner only keeps --wifi-ssid / --wifi-passphrase for ble-wifi and nfc-wifi commissioning, so a DUT that is
+# already commissioned (no or on-network commissioning method) passes the first access point as PIXITs instead.
+FIRST_AP_USAGE = (f"Only needed when the DUT is already commissioned (otherwise --wifi-ssid / --wifi-passphrase with "
+                  f"--commissioning-method ble-wifi are used): --string-arg {PIXIT_1ST_AP_SSID}:MyFirstSSID "
+                  f"{PIXIT_1ST_AP_CREDENTIALS}:MyFirstPassword")
+PIXIT_USAGE = (f"Pass both PIXITs in a single --string-arg flag, e.g.: "
+               f"--string-arg {PIXIT_2ND_AP_SSID}:MySecondSSID {PIXIT_2ND_AP_CREDENTIALS}:MySecondPassword "
+               f"(quote the whole NAME:VALUE pair if a value has spaces)")
+
+TH_CONNECTION_WARNING = (
+    "This test switches the TH's own Wi-Fi connection between the two access points. If you are "
+    "logged in to the TH over SSH via its Wi-Fi interface, your session will drop when the network "
+    "changes. Connect the TH to your network via Ethernet so the test can run through without interruption.")
 logging.basicConfig(level=logging.INFO)
 
 
@@ -328,10 +365,29 @@ async def detect_wifi_interface():
         physical_interfaces = [c for c in candidates if not c.startswith('p2p-dev-')]
         if physical_interfaces:
             return physical_interfaces[0]
+        # The ctrl_interface directory is not visible inside the TH SDK container; fall back to sysfs,
+        # which shows the host's interfaces because the container uses the host network namespace.
+        sys_net = "/sys/class/net"
+        if os.path.isdir(sys_net):
+            wireless = sorted(i for i in os.listdir(sys_net) if os.path.isdir(os.path.join(sys_net, i, "wireless")))
+            if wireless:
+                return wireless[0]
         return None
     except Exception as e:
         logger.error("detect_wifi_interface: Error: %s", e)
         return None
+
+
+# wpa_supplicant SET_NETWORK fields that carry secrets; their values never go to logs or error messages
+WPA_SECRET_FIELDS = ("psk", "password", "sae_password", "wep_key0", "wep_key1", "wep_key2", "wep_key3")
+
+
+def redact_wpa_command(cmd: str) -> str:
+    """Returns a wpa_supplicant control command safe to log: the value of a secret field is replaced."""
+    parts = cmd.split(" ", 3)
+    if len(parts) == 4 and parts[0].upper() == "SET_NETWORK" and parts[2] in WPA_SECRET_FIELDS:
+        return f"{parts[0]} {parts[1]} {parts[2]} ***"
+    return cmd
 
 
 async def wpa_command(iface, cmd):
@@ -352,10 +408,10 @@ async def wpa_command(iface, cmd):
         resp, _ = sock.recvfrom(4096)
         return resp.decode(errors="ignore").strip()
     except TimeoutError:
-        logger.error("wpa_command: Timed out waiting for reply to '%s' on %s", cmd, iface)
+        logger.error("wpa_command: Timed out waiting for reply to '%s' on %s", redact_wpa_command(cmd), iface)
         raise
     except Exception as e:
-        logger.error("wpa_command: Error sending '%s' to %s: %s", cmd, iface, e)
+        logger.error("wpa_command: Error sending '%s' to %s: %s", redact_wpa_command(cmd), iface, e)
         raise
     finally:
         sock.close()
@@ -388,8 +444,109 @@ async def scan_and_find_ssid(interface, target_ssid):
     return False
 
 
+WPAS_DBUS_SERVICE = "fi.w1.wpa_supplicant1"
+WPAS_DBUS_PATH = "/fi/w1/wpa_supplicant1"
+
+WPAS_DBUS_INTERFACE = "fi.w1.wpa_supplicant1.Interface"
+WIFI_KEY_MGMT = "WPA-PSK WPA-PSK-SHA256 SAE"   # WPA2-Personal and WPA3-Personal
+ASSOCIATION_ATTEMPTS = 2                      # Per connect call; keeps one call within NETWORK_CHANGE_TIMEOUT
+TH_JOIN_ATTEMPTS = 2                          # Times change_networks retries joining the TH to the DUT's new network
+
+
+def association_hint(state) -> str:
+    """Explains the most likely cause for the wpa_supplicant state an association attempt got stuck in."""
+    if state in ("scanning", "disconnected", "inactive"):
+        return ("The TH never found a matching network: check the SSID, that the access point is on 2.4 GHz and in "
+                "range of the TH, and that its security is WPA2 or WPA3-Personal.")
+    if state in ("authenticating", "associating", "associated", "4way_handshake", "group_handshake"):
+        return ("The TH found the network but could not complete the connection: check the password, and if the "
+                "access point is WPA3-only, try WPA2 or WPA2/WPA3 mixed mode (some Wi-Fi drivers lack WPA3 support).")
+    return ""
+
+
+async def wpa_dbus_call(bus, path, interface, member, signature="", *args):
+    """Calls a D-Bus method with sdbus' low-level API. Proxy classes are avoided on purpose: sdbus allows only
+    one class per interface name per process, and matter.testing.linux.wifi already declares these."""
+    msg = bus.new_method_call_message(WPAS_DBUS_SERVICE, path, interface, member)
+    if signature:
+        msg.append_data(signature, *args)
+    reply = await bus.call_async(msg)
+    return reply.get_contents()
+
+
+def open_wpa_dbus():
+    """Opens a new system bus connection. A fresh connection per call keeps it bound to the running event loop
+    (setup/teardown use separate asyncio.run() loops)."""
+    return sdbus.sd_bus_open_system()
+
+
+async def connect_wifi_linux_dbus(interface, ssid, password) -> ConnectionResult | None:
+    """Connects to WiFi through wpa_supplicant's D-Bus API.
+
+    This is the path used when the test runs inside the TH SDK container: the container gets the host's
+    D-Bus system socket, but not wpa_supplicant's ctrl_interface directory, and the TH runs wpa_supplicant
+    with D-Bus enabled (-u). Returns None when the D-Bus API is unavailable so the caller can fall back
+    to the ctrl_interface socket.
+    """
+
+    if sdbus is None:
+        return None
+
+    try:
+        bus = open_wpa_dbus()
+        iface_path = await asyncio.wait_for(
+            wpa_dbus_call(bus, WPAS_DBUS_PATH, WPAS_DBUS_SERVICE, "GetInterface", "s", interface),
+            timeout=WPA_SOCKET_TIMEOUT)
+    except Exception as e:
+        logger.info("connect_wifi_linux_dbus: wpa_supplicant D-Bus API not available for %s (%s)", interface, e)
+        return None
+
+    async def iface_call(member, signature="", *args):
+        return await wpa_dbus_call(bus, iface_path, WPAS_DBUS_INTERFACE, member, signature, *args)
+
+    network_props = {"ssid": ("s", ssid)}
+    if password:
+        network_props["psk"] = ("s", password)
+        # Accept WPA2 and WPA3 (SAE) access points, e.g. phone hotspots default to WPA3. SAE needs PMF,
+        # so make it optional (1) rather than off; WPA2-only APs still work.
+        network_props["key_mgmt"] = ("s", WIFI_KEY_MGMT)
+        network_props["ieee80211w"] = ("u", 1)
+    else:
+        network_props["key_mgmt"] = ("s", "NONE")
+
+    state = ""
+    try:
+        for attempt in range(1, ASSOCIATION_ATTEMPTS + 1):
+            # Fails with NotConnected when there is no current association
+            with contextlib.suppress(Exception):
+                await iface_call("Disconnect")
+            await iface_call("RemoveAllNetworks")
+            network_path = await iface_call("AddNetwork", "a{sv}", network_props)
+            await iface_call("SelectNetwork", "o", network_path)
+
+            start_time = time.time()
+            while time.time() - start_time < CONNECTION_TIMEOUT:
+                _, state = await wpa_dbus_call(bus, iface_path, "org.freedesktop.DBus.Properties", "Get", "ss",
+                                               WPAS_DBUS_INTERFACE, "State")
+                if state == "completed":
+                    logger.info("connect_wifi_linux_dbus: %s associated with %s", interface, ssid)
+                    return await wait_for_ip(interface)
+                await asyncio.sleep(1)
+
+            logger.warning("connect_wifi_linux_dbus: Attempt %s/%s to join %s timed out (state: %s)",
+                           attempt, ASSOCIATION_ATTEMPTS, ssid, state)
+            if attempt < ASSOCIATION_ATTEMPTS:
+                await asyncio.sleep(RETRY_DELAY)
+    except Exception as e:
+        logger.error("connect_wifi_linux_dbus: Exception during connection: %s", e)
+        return ConnectionResult(1, str(e))
+
+    return ConnectionResult(1, f"could not join '{ssid}' (wpa_supplicant state: {state}). {association_hint(state)}")
+
+
 async def connect_wifi_linux(ssid, password) -> ConnectionResult:
-    """Connects to WiFi using wpa_supplicant commands in Linux (for both desktop, Raspberry Pi and Docker)"""
+    """Connects to WiFi using wpa_supplicant in Linux (desktop, Raspberry Pi and the TH Docker container).
+    Uses the D-Bus API when available, otherwise the ctrl_interface socket."""
 
     if isinstance(ssid, bytes):
         ssid = ssid.decode()
@@ -400,6 +557,15 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
     if not interface:
         logger.error("connect_wifi_linux: No WiFi interface found")
         return ConnectionResult(1, "No WiFi interface found")
+
+    dbus_result = await connect_wifi_linux_dbus(interface, ssid, password)
+    if dbus_result is not None:
+        return dbus_result
+
+    if not os.path.exists(f"/var/run/wpa_supplicant/{interface}"):
+        logger.error("connect_wifi_linux: wpa_supplicant is reachable neither via D-Bus nor via its ctrl_interface "
+                     "socket for %s", interface)
+        return ConnectionResult(1, "wpa_supplicant not reachable")
 
     try:
         await run_subprocess(privileged_cmd(["ip", "link", "set", interface, "up"]))
@@ -431,20 +597,29 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
 
         network_id = network_id.strip()
 
-        config_commands = [
-            f'SET_NETWORK {network_id} ssid "{ssid}"',
-            f'SET_NETWORK {network_id} psk "{password}"',
-            f'SET_NETWORK {network_id} key_mgmt WPA-PSK',
-            f'SET_NETWORK {network_id} proto RSN WPA',
-            f'SET_NETWORK {network_id} pairwise CCMP TKIP',
-            f'SET_NETWORK {network_id} group CCMP TKIP',
-        ]
+        if password:
+            config_commands = [
+                f'SET_NETWORK {network_id} ssid "{ssid}"',
+                f'SET_NETWORK {network_id} psk "{password}"',
+                f'SET_NETWORK {network_id} key_mgmt {WIFI_KEY_MGMT}',
+                f'SET_NETWORK {network_id} ieee80211w 1',
+                f'SET_NETWORK {network_id} proto RSN WPA',
+                f'SET_NETWORK {network_id} pairwise CCMP TKIP',
+                f'SET_NETWORK {network_id} group CCMP TKIP',
+            ]
+        else:
+            # Open network: no passphrase (wpa_supplicant rejects an empty psk)
+            config_commands = [
+                f'SET_NETWORK {network_id} ssid "{ssid}"',
+                f'SET_NETWORK {network_id} key_mgmt NONE',
+            ]
 
         for cmd in config_commands:
             result = await wpa_command(interface, cmd)
             if result.startswith("FAIL"):
-                logger.error("connect_wifi_linux: Failed to configure network: %s -> %s", cmd, result)
-                return ConnectionResult(1, f"Failed to configure network: {cmd}")
+                safe_cmd = redact_wpa_command(cmd)
+                logger.error("connect_wifi_linux: Failed to configure network: %s -> %s", safe_cmd, result)
+                return ConnectionResult(1, f"Failed to configure network: {safe_cmd}")
 
         await wpa_command(interface, f"ENABLE_NETWORK {network_id}")
         await wpa_command(interface, f"SELECT_NETWORK {network_id}")
@@ -503,7 +678,17 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
                 "connect_wifi_linux: Connection failed after %s attempts. Final status: %s, Last observed state: %s", MAX_ATTEMPTS, final_status, last_state)
             return ConnectionResult(1, f"Connection failed, last_state: {last_state}")
 
-        # Connection successful, get IP address
+        return await wait_for_ip(interface)
+
+    except Exception as e:
+        logger.error("connect_wifi_linux: Exception during connection: %s", e)
+        return ConnectionResult(1, str(e))
+
+
+async def wait_for_ip(interface) -> ConnectionResult:
+    """After association, renews the DHCP lease (when dhclient exists) and waits for an IPv4 address."""
+
+    try:
         # Release any existing DHCP lease and request new one
         await dhclient_renew(interface)
 
@@ -556,8 +741,42 @@ async def connect_wifi_linux(ssid, password) -> ConnectionResult:
         return ConnectionResult(1, str(e))
 
 
+async def run_command_output(cmd, timeout=ATTRIBUTE_READ_TIMEOUT) -> tuple[int, str]:
+    """Runs a command and returns (returncode, stdout+stderr). Unlike run_subprocess, the output is kept on failure."""
+
+    proc = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+    stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=timeout)
+    return proc.returncode, stdout.decode(errors="replace").strip()
+
+
+async def get_mac_current_ssid(interface) -> str | None:
+    """Returns the SSID the Mac is associated with, or None when macOS does not report it.
+
+    'networksetup -getairportnetwork' stopped reporting the SSID on recent macOS releases, so 'ipconfig getsummary'
+    (which shows it when run as root) is tried as well.
+    """
+
+    try:
+        _, out = await run_command_output(["/usr/sbin/networksetup", "-getairportnetwork", interface])
+        prefix = "Current Wi-Fi Network:"
+        if out.startswith(prefix):
+            return out[len(prefix):].strip()
+
+        _, out = await run_command_output(["/usr/sbin/ipconfig", "getsummary", interface])
+        for line in out.splitlines():
+            key, sep, value = line.strip().partition(" : ")
+            if sep and key == "SSID" and value and value != "<redacted>":
+                return value
+    except Exception as e:
+        logger.debug(" --- get_mac_current_ssid: %s", e)
+    return None
+
+
 async def connect_wifi_mac(ssid, password) -> ConnectionResult:
     """ Connects to WiFi with the SSID and Password provided as arguments using 'networksetup' in Mac."""
+
+    ssid_str = ssid.decode() if isinstance(ssid, bytes) else ssid
+    password_str = password.decode() if isinstance(password, bytes) else password
 
     if not shutil.which("networksetup"):
         logger.error(" --- connect_wifi_mac: 'networksetup' is not present. Please install 'networksetup'.")
@@ -577,59 +796,37 @@ async def connect_wifi_mac(ssid, password) -> ConnectionResult:
                         interface = line.split(":")[1].strip()
                         break
 
-        try:
-            await run_subprocess([
-                "networksetup",
-                "-setairportnetwork", interface, ssid, password
-            ], check=True)
-        except Exception as e:
-            logger.error(" --- connect_wifi_mac: networksetup command failed: %s", e)
-            return ConnectionResult(1, str(e))
+        # networksetup exits with 0 even when the join fails ("Could not find network ...",
+        # "Failed to join network ... Error: -3900"), so its output has to be checked too.
+        returncode, output = await run_command_output(
+            ["/usr/sbin/networksetup", "-setairportnetwork", interface, ssid_str, password_str],
+            timeout=CONNECTION_TIMEOUT * 2)
+        if returncode != 0 or any(word in output.lower() for word in ("error", "could not", "failed")):
+            logger.error(" --- connect_wifi_mac: networksetup could not join %s: %s", ssid_str, output or f"exit code {returncode}")
+            return ConnectionResult(1, output or f"networksetup exit code {returncode}")
 
         # Wait for connection to establish
         await asyncio.sleep(WIFI_WAIT)
 
-        if isinstance(ssid, bytes):
-            ssid_str = ssid.decode('utf-8')
-        else:
-            ssid_str = ssid
-
         for verify_attempt in range(1, 6):
-            try:
-                ip_output = await run_subprocess([
-                    "ipconfig", "getifaddr", interface
-                ], capture_output=True)
-
+            # Having an IP address alone proves nothing: it may still be the one from the previous network.
+            current_ssid = await get_mac_current_ssid(interface)
+            if current_ssid is not None and current_ssid != ssid_str:
+                logger.warning(" --- connect_wifi_mac: %s is on '%s', not '%s' (check %s/5)",
+                               interface, current_ssid, ssid_str, verify_attempt)
+            else:
+                ip_output = await run_subprocess(["ipconfig", "getifaddr", interface], capture_output=True)
                 if ip_output and ip_output.strip():
-                    try:
-                        gateway_output = await run_subprocess([
-                            "route", "-n", "get", "default"
-                        ], capture_output=True)
-
-                        # Extract gateway IP
-                        for line in gateway_output.splitlines():
-                            if "gateway:" in line:
-                                gateway = line.split("gateway:")[1].strip()
-                                # Quick ping test (1 packet, 2 second timeout)
-                                ping_result = await run_subprocess([
-                                    "ping", "-c", "1", "-W", "2000", gateway
-                                ], capture_output=True)
-                                if "1 packets received" in ping_result or "1 received" in ping_result:
-                                    break
-                    except Exception as ping_e:
-                        # Ping verification is optional, don't fail if it doesn't work
-                        logger.debug(" --- connect_wifi_mac: Gateway ping failed (non-critical): %s", ping_e)
-
+                    if current_ssid is None:
+                        logger.warning(" --- connect_wifi_mac: macOS does not report the current SSID; assuming %s was "
+                                       "joined because networksetup reported no error", ssid_str)
+                    logger.info(" --- connect_wifi_mac: TH Wi-Fi (%s) is on '%s' with IP %s",
+                                interface, ssid_str, ip_output.strip())
                     return ConnectionResult(0, "")
                 logger.warning(" --- connect_wifi_mac: No IP address yet on %s", interface)
 
-                if verify_attempt < 5:
-                    await asyncio.sleep(3)
-
-            except Exception as verify_e:
-                logger.warning(" --- connect_wifi_mac: Verification attempt %s/5 error: %s", verify_attempt, verify_e)
-                if verify_attempt < 5:
-                    await asyncio.sleep(3)
+            if verify_attempt < 5:
+                await asyncio.sleep(3)
 
         logger.error(" --- connect_wifi_mac: Failed to verify connection to %s after 5 attempts", ssid_str)
         return ConnectionResult(1, "Connection verification failed")
@@ -742,8 +939,9 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
 
         # Try to change TH network with multiple attempts
         th_success = False
+        th_error = "unknown error"
 
-        for th_attempt in range(1, MAX_ATTEMPTS + 1):
+        for th_attempt in range(1, TH_JOIN_ATTEMPTS + 1):
             try:
                 result = await asyncio.wait_for(
                     connect_host_wifi(ssid=ssid, password=password),
@@ -754,21 +952,23 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
                     await asyncio.sleep(3)
                     th_success = True
                     break
-                logger.warning(
-                    "change_networks: TH connection failed on attempt %s: %s", th_attempt, result.stderr if result else 'Unknown error')
+                th_error = result.stderr if result else "no result"
+                logger.warning("change_networks: TH connection failed on attempt %s: %s", th_attempt, th_error)
 
             except TimeoutError:
-                pass
+                # Keep a more specific reason from an earlier attempt, if there is one
+                if th_error == "unknown error":
+                    th_error = f"no connection within {NETWORK_CHANGE_TIMEOUT}s"
 
             except Exception as e:
                 logger.warning("change_networks: TH connection exception on attempt %s: %s", th_attempt, e)
 
-            if th_attempt < MAX_ATTEMPTS:
+            if th_attempt < TH_JOIN_ATTEMPTS:
                 await asyncio.sleep(RETRY_DELAY)
 
         if th_success:
             return  # Success!
-        logger.error("change_networks: TH failed to connect to %s after %s attempts", ssid, MAX_ATTEMPTS)
+        logger.error("change_networks: TH failed to connect to %s after %s attempts", ssid, TH_JOIN_ATTEMPTS)
 
         # Try fallback to original network immediately
         try:
@@ -783,10 +983,9 @@ async def change_networks(test, cluster, ssid, password, breadcrumb):
         except Exception as fallback_e:
             logger.error("change_networks: Fallback connection failed: %s", fallback_e)
 
-        if attempt < MAX_ATTEMPTS:
-            pass
-        else:
-            logger.error("change_networks: All retry attempts exhausted")
+        # The DUT was told to switch; the failure is on the TH side, which re-sending ConnectNetwork won't fix.
+        ssid_str = ssid.decode() if isinstance(ssid, bytes) else ssid
+        asserts.fail(f"The TH could not join '{ssid_str}' to follow the DUT: {th_error}")
 
     # All attempts failed, ensure we have fallback connectivity
     logger.error("change_networks: Failed to switch networks after %s retries.", MAX_ATTEMPTS)
@@ -900,6 +1099,11 @@ async def restore_lan_routes(original_routes):
 
 async def restore_original_network():
     """Restores TH Wi-Fi to original network after test."""
+
+    if original_ssid is None:
+        # The test stopped before it read the Wi-Fi parameters, so the TH network was never changed
+        logger.info("restore_original_network: TH Wi-Fi was not changed by the test, nothing to restore")
+        return
 
     try:
         logger.info("restore_original_network: Restoring TH Wi-Fi to original network...")
@@ -1035,7 +1239,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_11(self):
         return [
-            TestStep("precondition", "TH is commissioned", is_commissioning=True),
+            TestStep("precondition", f"TH is commissioned. NOTE: {TH_CONNECTION_WARNING}", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'."),
@@ -1043,7 +1247,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
                         "Verify that the Networks attribute list has an entry with the following fields:"
                         " 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
                         " 2. Connected is of type bool and is TRUE"),
-            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"
+            TestStep(4, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1",
                         "Verify that DUT sends NetworkConfigResponse to command with the following fields:"
                         " 1. NetworkingStatus is Success"
                         " 2. NetworkIndex matches previously saved 'Userwifi_netidx'"),
@@ -1055,8 +1259,9 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
                         "Verify that the Networks attribute list has an entry with the following fields:"
                         "NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
                         "Connected is of type bool and is FALSE"),
-            TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2"
-                        "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
+            TestStep(7, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2. "
+                        "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID. "
+                        "NOTE: an SSH session to the TH over Wi-Fi will drop here; connect the TH via Ethernet."),
             TestStep(8, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network",
                      "Verify that the TH successfully connects to the DUT"),
             TestStep(9, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT",
@@ -1077,7 +1282,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
                      "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:"
                      " 1. NetworkingStatus is success which is '0'"
                      " 2. DebugText is of type string with max length 512 or empty"),
-            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"
+            TestStep(16, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3. "
                      "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
             TestStep(17, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network",
                      "Verify that the TH successfully connects to the DUT"),
@@ -1094,27 +1299,42 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     def desc_TC_CNET_4_11(self):
         return "[TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command [DUT-Server]"
 
+    @harness_params(optional=("wifi_ssid", "wifi_passphrase"))
+    @pixit(PIXIT_1ST_AP_SSID, str, f"SSID of the first access point (plain text). {FIRST_AP_USAGE}",
+           required=False, default=None)
+    @pixit(PIXIT_1ST_AP_CREDENTIALS, str, f"Passphrase of the first access point (plain text). {FIRST_AP_USAGE}",
+           required=False, default=None, sensitive=True)
+    @pixit(PIXIT_2ND_AP_SSID, str, f"SSID of the second access point (plain text). {PIXIT_USAGE}")
+    @pixit(PIXIT_2ND_AP_CREDENTIALS, str, f"Passphrase of the second access point (plain text). {PIXIT_USAGE}",
+           sensitive=True)
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_11(self):
 
-        logger.info("test_TC_CNET_4_11: Waiting for mDNS service to stabilize before starting test...")
-        await asyncio.sleep(5)
+        logger.warning("test_TC_CNET_4_11: %s", TH_CONNECTION_WARNING)
 
         # Set the target device ID for mDNS discovery from DUT node ID
         set_target_device_id(self.dut_node_id)
         logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:<hex:7A6967626565686F6D65>")
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776f7264313233>")
-
+        # Read the values directly so this also works on SDKs without @pixit / @harness_params.
+        # First AP: --wifi-ssid / --wifi-passphrase when the test commissions over ble-wifi / nfc-wifi (the runner
+        # drops them for other methods), otherwise the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_* PIXITs.
+        test_params = self.matter_test_config.global_test_params
+        # Explicit None checks: an empty passphrase is valid (open network) and must not fall through to the PIXIT.
         wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
+        if wifi_1st_ap_ssid is None:
+            wifi_1st_ap_ssid = test_params.get(PIXIT_1ST_AP_SSID)
         wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
-        wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
-        wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
+        if wifi_1st_ap_credentials is None:
+            wifi_1st_ap_credentials = test_params.get(PIXIT_1ST_AP_CREDENTIALS)
+        asserts.assert_true(wifi_1st_ap_ssid is not None and wifi_1st_ap_credentials is not None,
+                            "The first access point is missing. Pass --wifi-ssid <SSID> --wifi-passphrase <passphrase> "
+                            f"with --commissioning-method ble-wifi, or for an already-commissioned DUT: {FIRST_AP_USAGE}")
+
+        missing_pixits = [name for name in (PIXIT_2ND_AP_SSID, PIXIT_2ND_AP_CREDENTIALS) if test_params.get(name) is None]
+        asserts.assert_false(missing_pixits, f"Missing PIXIT(s): {', '.join(missing_pixits)}. {PIXIT_USAGE}")
+        wifi_2nd_ap_ssid = test_params[PIXIT_2ND_AP_SSID]
+        wifi_2nd_ap_credentials = test_params[PIXIT_2ND_AP_CREDENTIALS]
 
         global original_ssid, original_password
         original_ssid = wifi_1st_ap_ssid
@@ -1326,10 +1546,12 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
         self.step(11)
 
         logger.info("Switching TH back to original network: %s", wifi_1st_ap_ssid)
-        await asyncio.wait_for(
+        result = await asyncio.wait_for(
             connect_host_wifi(wifi_1st_ap_ssid, wifi_1st_ap_credentials),
             timeout=NETWORK_CHANGE_TIMEOUT
         )
+        asserts.assert_true(result is not None and result.returncode == 0,
+                            f"TH failed to switch its Wi-Fi back to {wifi_1st_ap_ssid}: {result.stderr if result else 'no result'}")
         await asyncio.sleep(1)  # Brief delay for command processing
         # Note: find_matter_devices_mdns() removed - verify_operational_network already does mDNS discovery
 
