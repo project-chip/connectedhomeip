@@ -394,6 +394,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         
         # At this point is always over 120 seconds
         if wait_for_kapply:
+            logger.info("%s Did not find the kApplying at UpdateState event waiting for kApplying UpdateState",step_number_s1)
             # If the StateTransition to kApply is not yet visible wait DUT to reach the state
             time_for_kApplying_s1 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
                 target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
@@ -528,7 +529,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.write_to_app_pipe(command_dict={"Name": "GetApplyUpdateRequestStatus"}, app_pipe=self.provider_app_pipe)
         pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
         logger.info("%s Provider pipe status after kDelayedOnApply %s", step_number_s2, pipe_data)
-
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestActionResponse'],
                              Clusters.OtaSoftwareUpdateProvider.Enums.ApplyUpdateActionEnum.kAwaitNextAction, "Action from the provider is not AwaitNextAction")
         asserts.assert_equal(pipe_data['Payload']['ApplyUpdateRequestCount'],
@@ -584,6 +584,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # If the StateTransition to kApply is not yet visible wait DUT to reach the state
         if wait_for_kapply:
+            logger.info("%s Did not find the kApplying at UpdateState event waiting for kApplying UpdateState",step_number_s2)
             time_to_kapplying_s2 = subscription_attr_cluster.await_first_value_asserting_no_forbidden(
                 target_value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
                 forbidden_values={Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
