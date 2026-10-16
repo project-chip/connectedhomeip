@@ -398,8 +398,8 @@ void AndroidWebRTCTransportProviderClient::Cleanup()
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to schedule cleanup: %" CHIP_ERROR_FORMAT, err.Format());
-        delete this;
+        ChipLogError(Controller, "Failed to schedule cleanup: %" CHIP_ERROR_FORMAT ". Leaking memory to avoid Use-After-Free.",
+                     err.Format());
     }
 }
 
