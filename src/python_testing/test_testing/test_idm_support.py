@@ -209,8 +209,9 @@ class TestFeatureGatedCommandFields(unittest.TestCase):
             Clusters.ClosureControl, feature.kPositioning | feature.kMotionLatching | feature.kSpeed, commands))
 
     def test_ungated_field_is_kept(self):
-        commands = [Clusters.MicrowaveOvenControl.Commands.AddMoreTime]
-        self.assertIn(('AddMoreTime', 'TimeToAdd'), self._discovered(Clusters.MicrowaveOvenControl, 0, commands))
+        # ViewGroup has no side effects, so it is unlikely to be added to COMMAND_CONSTRAINT_DENIED_COMMANDS.
+        commands = [Clusters.Groups.Commands.ViewGroup]
+        self.assertIn(('ViewGroup', 'GroupID'), self._discovered(Clusters.Groups, 0, commands))
 
 
 if __name__ == "__main__":
