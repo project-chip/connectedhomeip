@@ -51,6 +51,7 @@ config CHIP_ENABLE_GROUPCAST
 	bool
 	default y
 
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"
