@@ -317,14 +317,13 @@ MicrowaveOvenControlCluster::HandleSetCookingParameters(const ConcreteCommandPat
     return status;
 }
 
-/** Validate positive added time and the overflow-safe total before notifying the application. */
 std::optional<DataModel::ActionReturnStatus>
 MicrowaveOvenControlCluster::HandleAddMoreTime(const Commands::AddMoreTime::DecodableType & commandData)
 {
     uint8_t opState = mIntegrationDelegate.GetCurrentOperationalState();
     VerifyOrReturnError(opState != to_underlying(OperationalState::OperationalStateEnum::kError), Status::InvalidInState);
 
-    // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
+    // Check timeToAdd before subtracting it from MaxCookTime to avoid unsigned underflow.
     VerifyOrReturnError(commandData.timeToAdd >= 1 && commandData.timeToAdd <= mAppDelegate.GetMaxCookTimeSec() &&
                             GetCookTimeSec() <= mAppDelegate.GetMaxCookTimeSec() - commandData.timeToAdd,
                         Status::ConstraintError,

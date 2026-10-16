@@ -357,7 +357,6 @@ TEST_F(TestMicrowaveOvenControlCluster, SetCookTimeSecTest)
     }
 }
 
-/** Verify that AddMoreTime is included in the accepted-command list only when supportsAddMoreTime is true. */
 TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
 {
     {
@@ -389,20 +388,16 @@ TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
 
 namespace {
 
-/** Select an operational state without invoking a real Operational State server. */
 class AddTimeOperationalState : public TestIntegrationDelegate
 {
 public:
-    /** Return the state selected by the test. */
     uint8_t GetCurrentOperationalState() const override { return state; }
     uint8_t state = to_underlying(OperationalState::OperationalStateEnum::kStopped);
 };
 
-/** Record application callback effects and expose a configurable maximum cooking time. */
 class RecordingCookTimeDelegate : public TestDelegate
 {
 public:
-    /** Capture the requested final time; apply mock countdown effects only on success. */
     Status HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec) override
     {
         ++calls;
@@ -414,7 +409,6 @@ public:
         return status;
     }
 
-    /** Return the maximum used for boundary and uint32 overflow controls. */
     uint32_t GetMaxCookTimeSec() const override { return maxCookTimeSec; }
 
     uint32_t maxCookTimeSec  = 86400;
@@ -424,20 +418,16 @@ public:
     Status status            = Status::Success;
 };
 
-/** Command-path fixture with AddMoreTime enabled and observable application callback effects. */
 struct TestAddMoreTime : public TestMicrowaveOvenControlCluster
 {
-    /** Start the cluster with a valid cooking time and clean observation counters. */
     void SetUp() override
     {
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
         ResetCookTime(kDefaultCookTimeSec);
     }
 
-    /** Shut down before the context and delegates are destroyed. */
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    /** Select a valid initial cooking time and clear previous callback/reporting effects. */
     void ResetCookTime(uint32_t currentTime)
     {
         ASSERT_EQ(cluster.SetCookTimeSec(currentTime), CHIP_NO_ERROR);
@@ -447,7 +437,6 @@ struct TestAddMoreTime : public TestMicrowaveOvenControlCluster
         testContext.ChangeListener().DirtyList().clear();
     }
 
-    /** Check status and preserve the cook time, mock countdown, callbacks, and dirty reports on rejection. */
     void ExpectRejectedTime(uint32_t timeToAdd, Status expected)
     {
         const auto currentTime = cluster.GetCookTimeSec();
@@ -467,7 +456,6 @@ struct TestAddMoreTime : public TestMicrowaveOvenControlCluster
         EXPECT_EQ(testContext.ChangeListener().DirtyList().size(), dirtyCount);
     }
 
-    /** Check successful time extension at both the delegate and attribute TLV boundary. */
     void ExpectAddedTime(uint32_t timeToAdd, uint32_t finalTime)
     {
         Commands::AddMoreTime::Type request;
@@ -498,7 +486,6 @@ struct TestAddMoreTime : public TestMicrowaveOvenControlCluster
     ClusterTester tester{ cluster };
 };
 
-/** TimeToAdd has minimum 1; reject zero in supported states before any application effect. */
 TEST_F(TestAddMoreTime, RejectsZeroInSupportedStates)
 {
     const auto states = { OperationalState::OperationalStateEnum::kStopped, OperationalState::OperationalStateEnum::kRunning,
@@ -520,7 +507,6 @@ TEST_F(TestAddMoreTime, RejectsZeroInSupportedStates)
     }
 }
 
-/** One second and an exact MaxCookTime total remain valid; excess and wrapped totals remain rejected. */
 TEST_F(TestAddMoreTime, PreservesTimeBoundariesAndOverflowProtection)
 {
     ResetCookTime(30);
@@ -549,7 +535,6 @@ TEST_F(TestAddMoreTime, PreservesTimeBoundariesAndOverflowProtection)
     ExpectRejectedTime(1, Status::ConstraintError);
 }
 
-/** Preserve the existing InvalidInState precedence for the Error state, including a zero request. */
 TEST_F(TestAddMoreTime, PreservesErrorStateRejection)
 {
     operationalState.state = to_underlying(OperationalState::OperationalStateEnum::kError);
@@ -559,7 +544,6 @@ TEST_F(TestAddMoreTime, PreservesErrorStateRejection)
     }
 }
 
-/** A failed application callback retains its status and does not commit cook-time changes. */
 TEST_F(TestAddMoreTime, PreservesDelegateFailure)
 {
     delegate.status = Status::Busy;
