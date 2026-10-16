@@ -73,13 +73,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SC_5_1(MatterBaseTest):
+class TC_SC_5_1(MatterTestCommissionedDevice):
 
     def desc_TC_SC_5_1(self) -> str:
         return "26.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group Member"
@@ -321,7 +321,7 @@ class TC_SC_5_1(MatterBaseTest):
             self.skip_step("12b")
 
         # Step 12b: GroupTable (GroupNames not supported)
-        else:
+        elif not groupcast_enabled:
             self.skip_step("12a")
             self.step("12b")
             group_table = await self.read_single_attribute_check_success(
@@ -330,6 +330,9 @@ class TC_SC_5_1(MatterBaseTest):
             asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")
             asserts.assert_equal(group_table[0].endpoints, [groups_endpoint], "GroupTable endpoints mismatch")
             asserts.assert_equal(group_table[0].groupName, "", "GroupTable groupName mismatch")
+        else:
+            self.skip_step("12a")
+            self.skip_step("12b")
 
         # Step 13: KeySetRemove
         self.step("13")

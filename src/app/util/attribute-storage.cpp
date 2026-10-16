@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-storage.h>
 
+#include <algorithm>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
@@ -1343,53 +1344,15 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
 
                     if (ptr == nullptr)
                     {
-                        size_t defaultValueSizeForBigEndianNudger = 0;
-                        // Bypasses compiler warning about unused variable for little endian platforms.
-                        (void) defaultValueSizeForBigEndianNudger;
-                        if ((am->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
+                        // A missing default (or one that cannot be resolved) leaves ptr null, which
+                        // emAfReadOrWriteAttribute treats as an array of all zeroes.
+                        AttributeDefaultValue defaultValue;
+                        if (emberAfGetAttributeDefaultValue(*am, defaultValue) == Protocols::InteractionModel::Status::Success)
                         {
-                            // This is intentionally 2 and not 4 bytes since defaultValue in min/max
-                            // attributes is still uint16_t.
-                            if (emberAfAttributeSize(am) <= 2)
-                            {
-                                static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
-                                              "if statement relies on size of max/min defaultValue being 2");
-                                ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger =
-                                    sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
-                            }
+                            // Defaults live in flash and are only read from here; emAfReadOrWriteAttribute
+                            // takes a non-const pointer because the same parameter is an output on reads.
+                            ptr = const_cast<uint8_t *>(defaultValue.rawData.data());
                         }
-                        else
-                        {
-                            if ((emberAfAttributeSize(am) <= 4) && !emberAfIsStringAttributeType(am->attributeType))
-                            {
-                                ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
-                            }
-                            else
-                            {
-                                ptr = (uint8_t *) am->defaultValue.ptrToDefaultValue;
-                            }
-                        }
-                        // At this point, ptr either points to a default value, or is NULL, in which case
-                        // it should be treated as if it is pointing to an array of all zeroes.
-
-#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
-                        // The default values for attributes that are less than or equal to
-                        // defaultValueSizeForBigEndianNudger in bytes are stored in an
-                        // uint32_t.  On big-endian platforms, a pointer to the default value
-                        // of size less than defaultValueSizeForBigEndianNudger will point to the wrong
-                        // byte.  So, for those cases, nudge the pointer forward so it points
-                        // to the correct byte.
-                        if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
-                        {
-                            ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
-                        }
-#endif // BIGENDIAN
                     }
 
                     emAfReadOrWriteAttribute(&record,
@@ -1632,3 +1595,62 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     emberAfIncreaseDataVersion(path);
     CodegenDataModelProvider::Instance().NotifyAttributeChanged(path, chip::app::DataModel::AttributeChangeType::kReportable);
 }
+
+namespace chip {
+namespace app {
+
+namespace {
+
+/// Dynamic endpoints are registered at runtime and carry no ZAP configuration.
+bool IsDynamicEndpoint(EndpointId endpoint)
+{
+    uint16_t index = findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
+    return (index != kEmberInvalidEndpointIndex) && (index >= emberAfFixedEndpointCount());
+}
+
+} // namespace
+
+Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                       AttributeDefaultValue & outDefault)
+{
+    const EmberAfCluster * cluster = emberAfFindServerCluster(endpoint, clusterId);
+    VerifyOrReturnError(cluster != nullptr, Status::UnsupportedCluster);
+
+    for (uint16_t i = 0; i < cluster->attributeCount; ++i)
+    {
+        const EmberAfAttributeMetadata & am = cluster->attributes[i];
+        if (am.attributeId != attributeId)
+        {
+            continue;
+        }
+
+        // Without a ZAP configuration, the only thing a dynamic endpoint can offer is what the
+        // application reports through the external read callback, so ask for that first. Strings are
+        // excluded because rawData is a view and the callback can only fill a buffer; they resolve
+        // from metadata, which for DECLARE_DYNAMIC_ATTRIBUTE means NotFound.
+        if (am.IsExternal() && !emberAfIsStringAttributeType(am.attributeType) &&
+            !emberAfIsLongStringAttributeType(am.attributeType) && am.size <= AttributeDefaultValue::kMaxOwnedValueSize &&
+            IsDynamicEndpoint(endpoint))
+        {
+            // The callback writes exactly am.size bytes in storage order, so unlike an inline flash
+            // default this needs no endianness adjustment.
+            // Zero-initialized: an application that returns Success without filling the buffer must
+            // not leak stack contents into the reported default.
+            uint8_t value[AttributeDefaultValue::kMaxOwnedValueSize] = {};
+            if (emberAfExternalAttributeReadCallback(endpoint, clusterId, &am, value, am.size) == Status::Success)
+            {
+                // Guaranteed by the am.size check above, which is the only way SetOwnedValue fails.
+                VerifyOrDie(outDefault.SetOwnedValue(ByteSpan(value, am.size), am.attributeType));
+                return Status::Success;
+            }
+            // The application does not serve this attribute; fall back to the declaration.
+        }
+
+        return emberAfGetAttributeDefaultValue(am, outDefault);
+    }
+
+    return Status::UnsupportedAttribute;
+}
+
+} // namespace app
+} // namespace chip

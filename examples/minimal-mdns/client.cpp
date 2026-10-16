@@ -212,7 +212,7 @@ private:
     void Report(const char * prefix, const chip::Dnssd::BytesRange & data)
     {
         MdnsExample::PacketReporter reporter(prefix, data);
-        if (!chip::Dnssd::ParsePacket(data, &reporter))
+        if (!chip::Dnssd::ParseMdnsPacket(data, &reporter))
         {
             printf("INVALID PACKET!!!!!!\n");
         }

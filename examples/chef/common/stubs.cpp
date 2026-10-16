@@ -31,7 +31,8 @@ using namespace chip::app::Clusters;
     defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
     defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
     defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
-    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_SMOKE_CONCENTRATION_MEASUREMENT_SERVER)
 #include "chef-concentration-measurement.h"
 #endif
 #if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
@@ -123,6 +124,10 @@ void InitIdentifyCluster()
 #include <app/clusters/smoke-co-alarm-server/CodegenIntegration.h>
 #include <smoke-co-alarm/chef-smoke-co-alarm.h>
 #endif // MATTER_DM_SMOKE_CO_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/thermostat/CodegenIntegration.h"
+#endif // MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace {
 
@@ -270,7 +275,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
     defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
     defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
-    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_SMOKE_CONCENTRATION_MEASUREMENT_SERVER)
     case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
     case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
     case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
@@ -281,6 +287,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
     case chip::app::Clusters::Pm10ConcentrationMeasurement::Id:
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
         return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
 #if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
@@ -331,7 +338,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
     defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
     defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
-    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_SMOKE_CONCENTRATION_MEASUREMENT_SERVER)
     case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
     case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
     case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
@@ -342,6 +350,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     case chip::app::Clusters::Pm10ConcentrationMeasurement::Id:
     case chip::app::Clusters::RadonConcentrationMeasurement::Id:
     case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+    case chip::app::Clusters::SmokeConcentrationMeasurement::Id:
         return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
 #if defined(MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER) || defined(MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER)
@@ -775,6 +784,82 @@ void WaterHeaterInit()
         WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
                                        to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
     VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+    VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                       "Failed to initialise Thermostat cluster.");
+#endif
+}
+
+/**
+ * This initializer is for the room air conditioner application rootnode_roomairconditioner_9cf3607804.
+ */
+void RoomAirConditionerInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_roomairconditioner_9cf3607804"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: RoomAirConditionerInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kRoomAirConditionerDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
+#endif
+}
+
+/**
+ * This initializer is for the thermostat application rootnode_thermostat_bm3fb8dhYi.
+ */
+void ThermostatInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "rootnode_thermostat_bm3fb8dhYi"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ThermostatInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kThermostatDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(1) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
+#endif
+}
+
+/**
+ * This initializer is for the air purifier application
+ * rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45.
+ */
+void AirPurifierInit()
+{
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME,
+               "rootnode_airpurifier_airqualitysensor_temperaturesensor_humiditysensor_thermostat_56de3d5f45"))
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: AirPurifierInit called more than once");
+    called = true;
+
+#if MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(5, Device::kThermostatDeviceTypeId))
+    {
+        VerifyOrDieWithMsg(Thermostat::Chef::InitThermostatClusterOnEndpoint(5) == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise Thermostat cluster.");
+    }
 #endif
 }
 
@@ -819,9 +904,20 @@ void SmokeCoAlarmInit()
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kSmokeCoAlarmDeviceTypeId))
     {
         static SmokeCoAlarm::ChefSmokeCoAlarmDelegate delegate;
+        // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+        constexpr uint32_t kExpiryDate = 3976214400;
         SmokeCoAlarmCluster::Config config;
-        config.featureMap.Set(SmokeCoAlarm::Feature::kSmokeAlarm).Set(SmokeCoAlarm::Feature::kCoAlarm);
-        config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+        config
+            .WithSmokeAlarm({
+                .withContaminationState = true,
+                .sensitivityLevel       = SmokeCoAlarm::SensitivityEnum::kStandard,
+            })
+            .WithCOAlarm()
+            .WithDeviceMuted()
+            .WithInterconnectSmokeAlarm()
+            .WithInterconnectCOAlarm()
+            .WithExpiryDate(kExpiryDate)
+            .WithUnmounted();
         VerifyOrDieWithMsg(SmokeCoAlarmServer::Instance().Init(1, config, &delegate) == CHIP_NO_ERROR, Zcl,
                            "Error: SmokeCoAlarmServer::Init failed");
     }
@@ -860,6 +956,9 @@ void ApplicationInit()
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
     WaterHeaterInit();
+    RoomAirConditionerInit();
+    ThermostatInit();
+    AirPurifierInit();
     ChimeInit();
     SmokeCoAlarmInit();
     InitModeSelect();

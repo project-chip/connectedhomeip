@@ -297,15 +297,25 @@ template("siwx917_sdk") {
     ]
 
     # Defines for Si917Y MCU
-    if (is_si917y_mcu) {
-      defines += [
-        "SI91X_32kHz_EXTERNAL_OSCILLATOR=1",
-        "SL_SI91X_ACX_MODULE=1",
-        "SI917Y_DEVKIT=1",
-      ]
+    if (is_si917y_acx) {
+      defines += [ "SL_SI91X_ACX_MODULE=1" ]
+    }
+
+    if (is_si91x_32khz_xo) {
+      defines += [ "SI91X_32kHz_EXTERNAL_OSCILLATOR=1" ]
+    }
+
+    if (is_si917y_devkit) {
+      defines += [ "SI917Y_DEVKIT=1" ]
     }
 
     defines += [ "SL_MATTER_USE_SI70XX_SENSOR=${sl_enable_si70xx_sensor}" ]
+
+    if (sl_use_provision_channel) {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=0" ]
+    }
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
@@ -586,7 +596,7 @@ template("siwx917_sdk") {
 
       config("siwx917_tinycrypt_config") {
         defines = [
-          "SL_MBEDTLS_USE_TINYCRYPT",
+          "SL_MBEDTLS_USE_TINYCRYPT=1",
           "MBEDTLS_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
         ]
 

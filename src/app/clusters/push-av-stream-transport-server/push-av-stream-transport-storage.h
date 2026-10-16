@@ -182,6 +182,51 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
         *this = triggerOptions;
     }
 
+    void UpdateMotionSensitivity(const Optional<DataModel::Nullable<uint8_t>> & newSensitivity)
+    {
+        if (newSensitivity.HasValue())
+        {
+            if (newSensitivity.Value().IsNull())
+            {
+                motionSensitivity.SetValue(DataModel::NullNullable);
+            }
+            else
+            {
+                motionSensitivity.SetValue(DataModel::MakeNullable(newSensitivity.Value().Value()));
+            }
+        }
+    }
+
+    CHIP_ERROR UpdateMotionZones(
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
+            newMotionZones)
+    {
+        if (!newMotionZones.HasValue())
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        if (newMotionZones.Value().IsNull())
+        {
+            mTransportZoneOptions.clear();
+            motionZones.SetValue(DataModel::NullNullable);
+            return CHIP_NO_ERROR;
+        }
+
+        std::vector<TransportZoneOptionsStruct> tempZones;
+        auto iter = newMotionZones.Value().Value().begin();
+        while (iter.Next())
+        {
+            tempZones.push_back(iter.GetValue());
+        }
+        ReturnErrorOnFailure(iter.GetStatus());
+
+        mTransportZoneOptions = std::move(tempZones);
+        motionZones.SetValue(DataModel::MakeNullable(
+            DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
+        return CHIP_NO_ERROR;
+    }
+
 private:
     std::vector<TransportZoneOptionsStruct> mTransportZoneOptions;
 };
@@ -508,6 +553,21 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         {
             audioStreams.ClearValue();
         }
+    }
+
+    void UpdateMotionSensitivity(const Optional<DataModel::Nullable<uint8_t>> & newSensitivity)
+    {
+        mTriggerOptionsStorage.UpdateMotionSensitivity(newSensitivity);
+        triggerOptions = mTriggerOptionsStorage;
+    }
+
+    CHIP_ERROR UpdateMotionZones(
+        const Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> &
+            newMotionZones)
+    {
+        ReturnErrorOnFailure(mTriggerOptionsStorage.UpdateMotionZones(newMotionZones));
+        triggerOptions = mTriggerOptionsStorage;
+        return CHIP_NO_ERROR;
     }
 
 private:

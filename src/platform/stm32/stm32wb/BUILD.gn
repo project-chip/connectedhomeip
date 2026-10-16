@@ -71,6 +71,7 @@ static_library("stm32wb") {
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
   ]
   public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]

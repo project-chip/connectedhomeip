@@ -23,50 +23,98 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AmbientSensingUnionClusterContributorStatusChangeStruct(
-  val contributorIndex: UInt,
+  val contributorNodeID: ULong?,
+  val contributorEndpointID: UInt?,
+  val contributorName: String?,
   val previousContributorStatus: UInt,
   val currentContributorStatus: UInt,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("AmbientSensingUnionClusterContributorStatusChangeStruct {\n")
-    append("\tcontributorIndex : $contributorIndex\n")
+    append("\tcontributorNodeID : $contributorNodeID\n")
+    append("\tcontributorEndpointID : $contributorEndpointID\n")
+    append("\tcontributorName : $contributorName\n")
     append("\tpreviousContributorStatus : $previousContributorStatus\n")
     append("\tcurrentContributorStatus : $currentContributorStatus\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_CONTRIBUTOR_INDEX), contributorIndex)
+      if (contributorNodeID != null) {
+        put(ContextSpecificTag(TAG_CONTRIBUTOR_NODE_ID), contributorNodeID)
+      } else {
+        putNull(ContextSpecificTag(TAG_CONTRIBUTOR_NODE_ID))
+      }
+      if (contributorEndpointID != null) {
+        put(ContextSpecificTag(TAG_CONTRIBUTOR_ENDPOINT_ID), contributorEndpointID)
+      } else {
+        putNull(ContextSpecificTag(TAG_CONTRIBUTOR_ENDPOINT_ID))
+      }
+      if (contributorName != null) {
+        put(ContextSpecificTag(TAG_CONTRIBUTOR_NAME), contributorName)
+      } else {
+        putNull(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
+      }
       put(ContextSpecificTag(TAG_PREVIOUS_CONTRIBUTOR_STATUS), previousContributorStatus)
       put(ContextSpecificTag(TAG_CURRENT_CONTRIBUTOR_STATUS), currentContributorStatus)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_CONTRIBUTOR_INDEX = 0
-    private const val TAG_PREVIOUS_CONTRIBUTOR_STATUS = 1
-    private const val TAG_CURRENT_CONTRIBUTOR_STATUS = 2
+    private const val TAG_CONTRIBUTOR_NODE_ID = 0
+    private const val TAG_CONTRIBUTOR_ENDPOINT_ID = 1
+    private const val TAG_CONTRIBUTOR_NAME = 2
+    private const val TAG_PREVIOUS_CONTRIBUTOR_STATUS = 3
+    private const val TAG_CURRENT_CONTRIBUTOR_STATUS = 4
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader,
     ): AmbientSensingUnionClusterContributorStatusChangeStruct {
       tlvReader.enterStructure(tlvTag)
-      val contributorIndex = tlvReader.getUInt(ContextSpecificTag(TAG_CONTRIBUTOR_INDEX))
+      val contributorNodeID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_CONTRIBUTOR_NODE_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CONTRIBUTOR_NODE_ID))
+          null
+        }
+      val contributorEndpointID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_CONTRIBUTOR_ENDPOINT_ID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CONTRIBUTOR_ENDPOINT_ID))
+          null
+        }
+      val contributorName =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CONTRIBUTOR_NAME))
+          null
+        }
       val previousContributorStatus =
         tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_CONTRIBUTOR_STATUS))
       val currentContributorStatus =
         tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_CONTRIBUTOR_STATUS))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
       return AmbientSensingUnionClusterContributorStatusChangeStruct(
-        contributorIndex,
+        contributorNodeID,
+        contributorEndpointID,
+        contributorName,
         previousContributorStatus,
         currentContributorStatus,
+        fabricIndex,
       )
     }
   }

@@ -69,6 +69,8 @@ Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16
     payload["ApplyUpdateRequestActionResponse"] = Json::UInt(GetOtaProviderExample().GetApplyRequestActionStatus());
     payload["ApplyUpdateRequestDelayResponse"]  = GetOtaProviderExample().GetApplyRequestDelayStatus();
     payload["ApplyUpdateRequestCount"]          = GetOtaProviderExample().GetApplyRequestCount();
+    payload["UpdateToken"]                      = GetOtaProviderExample().GetApplyUpdateRequestToken();
+    payload["NewVersion"]                       = GetOtaProviderExample().GetApplyUpdateRequestNewVersion();
     return payload;
 }
 
@@ -84,6 +86,7 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
     payload["UserConsentNeeded"]   = GetOtaProviderExample().GetUserConsentNeeded();
     payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
+    payload["UpdateToken"]         = GetOtaProviderExample().GetUpdateToken();
 
     const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 

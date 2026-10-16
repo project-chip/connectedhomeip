@@ -1681,6 +1681,19 @@ CHIP_ERROR BLEManagerImpl::HandleGAPCentralConnect(struct ble_gap_event * gapEve
 CHIP_ERROR BLEManagerImpl::HandleGAPPeripheralConnect(struct ble_gap_event * gapEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // A non-zero status means the connection was never established. NimBLE reports a link that
+    // drops during connection setup as BLE_GAP_EVENT_CONNECT with an error and sends no
+    // BLE_GAP_EVENT_DISCONNECT for it, so counting it would hold a connection slot forever and,
+    // with CHIPOBLE_SINGLE_CONNECTION, keep CHIPoBLE advertising stopped until reboot.
+    if (gapEvent->connect.status != 0)
+    {
+        ChipLogProgress(DeviceLayer, "BLE GAP connection failed during setup (con %u status %d); not counted, advertising resumes",
+                        gapEvent->connect.conn_handle, gapEvent->connect.status);
+        mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+        return CHIP_NO_ERROR;
+    }
+
     ChipLogProgress(DeviceLayer, "BLE GAP connection established (con %u)", gapEvent->connect.conn_handle);
 
     // Track the number of active GAP connections.

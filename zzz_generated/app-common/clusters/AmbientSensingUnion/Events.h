@@ -49,6 +49,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kAddedContributor = 0,
+    kFabricIndex      = 254,
 };
 
 struct Type
@@ -57,9 +58,12 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::UnionContributorAdded::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::UnionContributorStruct::Type> addedContributor;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -72,6 +76,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
     DataModel::DecodableList<Structs::UnionContributorStruct::DecodableType> addedContributor;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -82,6 +87,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kRemovedContributor = 0,
+    kFabricIndex        = 254,
 };
 
 struct Type
@@ -90,9 +96,12 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::UnionContributorRemoved::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::UnionContributorStruct::Type> removedContributor;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -105,6 +114,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
     DataModel::DecodableList<Structs::UnionContributorStruct::DecodableType> removedContributor;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -115,6 +125,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kContributorStatusChange = 0,
+    kFabricIndex             = 254,
 };
 
 struct Type
@@ -123,9 +134,12 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::UnionContributorStatusChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::ContributorStatusChangeStruct::Type> contributorStatusChange;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -138,6 +152,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AmbientSensingUnion::Id; }
 
     DataModel::DecodableList<Structs::ContributorStatusChangeStruct::DecodableType> contributorStatusChange;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

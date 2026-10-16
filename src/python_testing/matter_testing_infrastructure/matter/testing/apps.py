@@ -54,7 +54,14 @@ class AppServerSubprocess(Subprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str | None = None,
-                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer,
+                 wrapper: list[str] = []):
+        """Start an application server.
+
+        Args:
+            wrapper: Command prefixing the application, for example the
+                ``netns_cmd_wrapper`` of a Linux network namespace.
+        """
 
         if kvs_path is None:
             # Create a temporary KVS file in the specified storage directory. The underlying
@@ -63,7 +70,7 @@ class AppServerSubprocess(Subprocess):
             kvs_path = self.kvs_tmp_file.name
 
         # Build the command list
-        command = [app]
+        command = [*wrapper, app]
         if extra_args:
             command.extend(extra_args)
 

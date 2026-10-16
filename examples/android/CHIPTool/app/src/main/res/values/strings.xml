@@ -85,6 +85,17 @@
     <string name="enter_thread_xpanid_text">11:11:11:11:22:22:22:22</string>
     <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
     <string name="enter_thread_save_network_btn">Save network</string>
+    <string name="enter_thread_fetch_from_system_btn">Fetch dataset from system Thread manager</string>
+    <string name="enter_thread_fetch_success">Thread dataset successfully imported from system</string>
+    <string name="enter_thread_fetch_error">Failed to fetch Thread dataset: %1$s</string>
+    <string name="enter_thread_manager_unavailable">ThreadNetworkManager is not available on this device</string>
+    <string name="enter_thread_requires_api_34">ThreadNetworkManager requires Android 14 (API 34) or higher</string>
+    <string name="enter_thread_privileged_permission_required">THREAD_NETWORK_PRIVILEGED is not granted; install CHIPTool as a privileged app or build with matterEnableGms=true</string>
+    <string name="enter_thread_no_controller">No ThreadNetworkController available on this device</string>
+    <string name="enter_thread_pick_network_title">Select Thread network</string>
+    <string name="enter_thread_network_choice">%1$s (XPAN %2$s, channel %3$d)</string>
+    <string name="enter_thread_no_network_shared">No Thread network credentials were shared</string>
+    <string name="enter_thread_no_active_dataset">No active Thread operational dataset found on system</string>
 
     <string name="nfc_tag_action_title">CHIP NFC Tag read. Choose an action:</string>
     <string name="nfc_tag_action_show">Show device information</string>
