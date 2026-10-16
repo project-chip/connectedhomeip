@@ -169,7 +169,7 @@ public:
 
     void OnScanError(CHIP_ERROR error) override
     {
-        VerifyOrReturn(!mTerminalReported);
+        VerifyOrReturn(!mDeferringCompletion && !mTerminalReported);
         mTerminalReported = true;
         if (mErrorCallback)
         {

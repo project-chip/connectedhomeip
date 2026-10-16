@@ -7,6 +7,9 @@ MATTER_BLE_NATIVE_TEST_LIBRARY=/path/to/_ChipDeviceCtrl.so dbus-run-session -- \
     python src/controller/python/tests/test_ble_scan_native.py
 
 Ordinary Python test discovery skips these tests unless explicitly enabled.
+The double-failure regression additionally requires MATTER_BLE_TIMER_TEST_LIBRARY
+and LD_PRELOAD to select the test-only BleScanTimerFailure shared library from
+the same build. Its Linux C++ symbol interposition fails only the next timer.
 """
 
 import ctypes
@@ -27,6 +30,10 @@ class TestNativeBleScan(unittest.TestCase):
         session = os.environ.get('DBUS_SESSION_BUS_ADDRESS')
         if not session:
             raise RuntimeError('Run native BLE tests under dbus-run-session')
+        cls.bus_environment = patch.dict(os.environ, {'DBUS_SYSTEM_BUS_ADDRESS': session})
+        cls.bus_environment.start()
+        cls.addClassCleanup(cls.bus_environment.stop)
+        os.environ.pop('LD_PRELOAD', None)
         cls.fixture = Path(__file__).with_name('ble_test_bluez.py')
         cls.service_python = os.environ.get('MATTER_BLE_DBUS_PYTHON', '/usr/bin/python3')
         cls.service = subprocess.Popen([cls.service_python, str(cls.fixture)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -35,10 +42,6 @@ class TestNativeBleScan(unittest.TestCase):
             selector.register(cls.service.stdout, selectors.EVENT_READ)
             if not selector.select(timeout=5) or cls.service.stdout.readline().strip() != b'READY':
                 raise RuntimeError('Isolated BlueZ fixture did not become ready')
-        cls.bus_environment = patch.dict(os.environ, {'DBUS_SYSTEM_BUS_ADDRESS': session})
-        cls.bus_environment.start()
-        cls.addClassCleanup(cls.bus_environment.stop)
-
         import matter.native as native
         from matter.ble.library_handle import _GetBleLibraryHandle
 
@@ -124,6 +127,30 @@ class TestNativeBleScan(unittest.TestCase):
         self.delete_scanner()
         self.assertEqual(self.terminals, [('error', 0xAC)])
         self.assertEqual(self.control('counts'), [1, 1, True])
+
+    @unittest.skipUnless(os.environ.get('MATTER_BLE_TIMER_TEST_LIBRARY'), 'requires the test-only timer failure library')
+    def test_timer_failure_preserves_primary_error_when_stop_also_fails(self):
+        from matter.ble.scan_devices import DiscoverSync
+        from matter.exceptions import ChipStackError
+
+        timers = ctypes.CDLL(os.environ['MATTER_BLE_TIMER_TEST_LIBRARY'])
+        timers.SetBleScanTimerFailure.argtypes = [ctypes.c_bool]
+        timers.SetBleScanTimerFailure.restype = None
+        try:
+            self.control('stop-error')
+            timers.SetBleScanTimerFailure(True)
+            self.assertFalse(self.start_scanner())
+            self.assertEqual(self.terminals, [('error', 0x0B)])
+            self.assertEqual(self.control('counts'), [1, 1, True])
+
+            self.control('stop-error')
+            timers.SetBleScanTimerFailure(True)
+            with self.assertRaises(ChipStackError) as raised:
+                list(DiscoverSync(100))
+            self.assertEqual(raised.exception.code, 0x0B)
+            self.assertEqual(self.control('counts'), [1, 1, True])
+        finally:
+            timers.SetBleScanTimerFailure(False)
 
     def test_normal_expiry_reports_completion_once(self):
         self.assertTrue(self.start_scanner())

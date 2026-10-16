@@ -513,6 +513,16 @@ if (chip_support_commissioning_in_controller) {
   }
 }
 
+if (current_os == "linux" && chip_enable_ble &&
+    chip_support_commissioning_in_controller) {
+  shared_library("BleScanTimerFailure") {
+    testonly = true
+    sources = [ "tests/BleScanTimerFailure.cpp" ]
+    deps = [ ":ChipDeviceCtrl" ]
+    libs = [ "dl" ]
+  }
+}
+
 if (current_os == "mac" && chip_enable_ble &&
     chip_support_commissioning_in_controller) {
   pw_test("TestDarwinBleScanner") {
