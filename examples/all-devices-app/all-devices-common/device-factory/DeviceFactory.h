@@ -74,7 +74,7 @@
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
-#include <device/types/water-valve/WaterValve.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -858,7 +858,7 @@ private:
         {
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<WaterValve>(mContext->timerDelegate);
+                return MakeDevice<LoggingWaterValve>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)

@@ -36,3 +36,12 @@ source_set("water-valve") {
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 }
+
+source_set("logging") {
+  sources = [
+    "impl/LoggingWaterValve.cpp",
+    "impl/LoggingWaterValve.h",
+  ]
+
+  public_deps = [ ":water-valve" ]
+}
