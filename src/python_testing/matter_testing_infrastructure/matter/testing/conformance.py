@@ -125,6 +125,8 @@ class ConformanceParseParameters:
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
+    is_device_type: bool = False
+    device_type_revision: int | None = None
 
 
 @dataclass
@@ -133,15 +135,17 @@ class ConformanceAssessmentData:
     attribute_list: list[uint]
     all_command_list: list[uint]
     cluster_revision: uint
+    device_type_revision: uint | None = None
 
 
 @dataclass
 class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
-    def __init__(self):
+    def __init__(self, device_type_revision: uint | None = None):
         self.feature_map = uint(0)
         self.attribute_list = []
         self.all_command_list = []
         self.cluster_revision = uint(1)
+        self.device_type_revision = device_type_revision
 
 
 EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
@@ -291,6 +295,20 @@ class revision(ValueConformance):
         if self.value is None:
             return conformance_assessment_data.cluster_revision
         return self.value
+
+
+class device_type_revision(revision):
+    def __init__(self, value: str, default_revision: int | None = None):
+        super().__init__(value)
+        self.default_revision = default_revision
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        if self.value is None:
+            if conformance_assessment_data.device_type_revision is not None:
+                return conformance_assessment_data.device_type_revision
+            if self.default_revision is not None:
+                return self.default_revision
+        return super().get_value(conformance_assessment_data)
 
 
 # Conformance options that apply regardless of the element set of the cluster or device
@@ -545,7 +563,7 @@ class otherwise(Conformance):
         return ', '.join(op_strs)
 
 
-def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
+def parse_basic_callable_from_xml(element: ElementTree.Element, is_device_type: bool = False, default_device_type_revision: int | None = None) -> Conformance:
     """
     Parse simple, leaf-node conformance elements from XML.
 
@@ -595,6 +613,8 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
             if value is None:
                 raise ConformanceException(
                     f"Revision tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            if is_device_type:
+                return device_type_revision(value, default_revision=default_device_type_revision)
             return revision(value)
         raise BasicConformanceException(
             f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
@@ -657,11 +677,11 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conf
     raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 
-def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conformance:
+def parse_device_type_callable_from_xml(element: ElementTree.Element, default_device_type_revision: int | None = None) -> Conformance:
     ''' Only allows basic, or wrappers over things that degrade to basic.'''
     if not list(element):
         try:
-            return parse_basic_callable_from_xml(element)
+            return parse_basic_callable_from_xml(element, is_device_type=True, default_device_type_revision=default_device_type_revision)
         # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
         # For example, temperature controlled cabinet has conditions called "heating" and "cooling". The cluster conditions are dependent on them, but they're not
         # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
@@ -672,14 +692,14 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conform
                 return device_feature(element.attrib['name'])
             raise
 
-    ops = [parse_device_type_callable_from_xml(sub) for sub in element]
+    ops = [parse_device_type_callable_from_xml(sub, default_device_type_revision) for sub in element]
     return parse_wrapper_callable_from_xml(element, ops)
 
 
 def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Conformance:
     if not list(element):
         try:
-            return parse_basic_callable_from_xml(element)
+            return parse_basic_callable_from_xml(element, is_device_type=params.is_device_type, default_device_type_revision=params.device_type_revision)
         except BasicConformanceException:
             # If we get an exception here, it wasn't a basic type, so move on and check if its
             # something else.
