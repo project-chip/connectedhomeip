@@ -488,11 +488,18 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
                                  Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
                                  "GroupcastTesting event should report Success")
 
+            # We need to determined the groupcast adoption status to determine if the follow steps are allowed or not
+            # To do so, we check the group key management GCAST feature map and the group cluster revision.
+            grpkey_feature_map = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.FeatureMap)
+            isGroupcastEnabled = (grpkey_feature_map & Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast) != 0
+            groups_cluster_revision = await self.read_single_attribute_check_success(endpoint=groups_endpoint, cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.Revision)
+            isGroupcastAdopted = isGroupcastEnabled and groups_cluster_revision >= 5
+
             # Step 16c-16k: Update GroupKeyMap and test Group Session ID collisions
             # Direct GroupKeyMap updates are disallowed when Groupcast cluster is present per Matter spec.
-            if groupcast_enabled:
+            if isGroupcastAdopted:
                 logger.warning(
-                    "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast cluster is present. Tracked for test plan update."
+                    "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast is adopted."
                 )
                 self.mark_step_range_skipped("16c", "16k")
             else:
