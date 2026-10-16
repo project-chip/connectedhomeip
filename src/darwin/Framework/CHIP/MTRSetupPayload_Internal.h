@@ -27,8 +27,9 @@ MTR_DIRECT_MEMBERS
 @interface MTRSetupPayload ()
 
 - (instancetype)initWithSetupPayload:(const chip::SetupPayload &)setupPayload;
-- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload;
-- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode;
+- (nullable instancetype)initWithPayload:(NSString *)payload error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode error:(NSError * __autoreleasing *)error;
 
 @end
 

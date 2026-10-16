@@ -141,6 +141,51 @@
     XCTAssertNotNil(error);
 }
 
+- (void)testManualParser_ChecksumError
+{
+    // Make sure that a checksum failure in payload parsing results in MTRErrorCodeIntegrityCheckFailed
+    NSString * validCode = @"641286075300001000016";
+    NSString * badChecksumCode = @"641286075300001000017";
+
+    NSError * validError;
+    MTRSetupPayload * validPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:validCode error:&validError];
+    XCTAssertNil(validError);
+    XCTAssertNotNil(validPayload);
+
+    NSError * error;
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badChecksumCode error:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+
+    error = nil;
+    MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:badChecksumCode];
+    XCTAssertNil([parser populatePayload:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badChecksumCode error:nil]);
+    XCTAssertNil([parser populatePayload:nil]);
+}
+
+- (void)testQRCodeParser_InvalidCharacterError
+{
+    NSString * badCharacterCode = @"MT:M5L90MP500K64J0000?";
+
+    NSError * error;
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badCharacterCode error:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidIntegerValue);
+
+    error = nil;
+    MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:badCharacterCode];
+    XCTAssertNil([parser populatePayload:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeInvalidIntegerValue);
+
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:badCharacterCode error:nil]);
+    XCTAssertNil([parser populatePayload:nil]);
+}
+
 - (void)testQRCodeParser
 {
     NSError * error;

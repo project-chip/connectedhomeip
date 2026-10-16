@@ -1591,8 +1591,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL                    CHIP_CORE_ERROR(0xa8)
 
+/**
+ *  @def CHIP_ERROR_CASE_WRONG_FABRIC
+ *
+ *  @brief
+ *    The CASE peer's NOC fabric ID does not match the expected fabric.
+ */
+#define CHIP_ERROR_CASE_WRONG_FABRIC                          CHIP_CORE_ERROR(0xaa)
+
 // AVAILABLE: 0xa9
-// AVAILABLE: 0xaa
 
 /**
  * @def CHIP_EVENT_ID_FOUND
@@ -1643,8 +1650,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_DECODE_FAILED                               CHIP_CORE_ERROR(0xb0)
 
-// AVAILABLE: 0xb1
-// AVAILABLE: 0xb2
+/**
+ *  @def CHIP_ERROR_CASE_WRONG_PEER_NODEID
+ *
+ *  @brief
+ *    The CASE peer's NOC node ID does not match the expected peer node ID.
+ */
+#define CHIP_ERROR_CASE_WRONG_PEER_NODEID                     CHIP_CORE_ERROR(0xb1)
+
+/**
+ *  @def CHIP_ERROR_CASE_NOCCHAIN_INVALID
+ *
+ *  @brief
+ *    The CASE peer's operational certificate chain failed validation.
+ */
+#define CHIP_ERROR_CASE_NOCCHAIN_INVALID                      CHIP_CORE_ERROR(0xb2)
 
 /**
  *  @def CHIP_ERROR_DNS_SD_UNAUTHORIZED
@@ -1682,8 +1702,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB                     CHIP_CORE_ERROR(0xb6)
 
-// AVAILABLE: 0xb7
-// AVAILABLE: 0xb8
+/**
+ *  @def CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE
+ *
+ *  @brief
+ *    Decryption of a CASE Sigma2 or Sigma3 encrypted payload failed.
+ */
+#define CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE                 CHIP_CORE_ERROR(0xb7)
+
+/**
+ *  @def CHIP_ERROR_CASE_SIGNATURE_MISMATCH
+ *
+ *  @brief
+ *    The CASE peer's Sigma2 or Sigma3 signature failed verification.
+ */
+#define CHIP_ERROR_CASE_SIGNATURE_MISMATCH                    CHIP_CORE_ERROR(0xb8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB
@@ -1728,7 +1761,13 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_HSM                                         CHIP_CORE_ERROR(0xbd)
 
-// AVAILABLE: 0xbe
+/**
+ *  @def CHIP_ERROR_CASE_RESUME_MIC_MISMATCH
+ *
+ *  @brief
+ *    The Sigma2Resume MIC received by a CASE initiator failed verification.
+ */
+#define CHIP_ERROR_CASE_RESUME_MIC_MISMATCH                    CHIP_CORE_ERROR(0xbe)
 
 /**
  *  @def CHIP_ERROR_REAL_TIME_NOT_SYNCED
@@ -1797,8 +1836,21 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
 
-// AVAILABLE: 0xc7
-// AVAILABLE: 0xc8
+/**
+ *  @def CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING
+ *
+ *  @brief
+ *    The platform DNS-SD service is not running.
+ */
+#define CHIP_ERROR_DNS_SD_SERVICE_NOT_RUNNING                 CHIP_CORE_ERROR(0xc7)
+
+/**
+ *  @def CHIP_ERROR_DNS_SD_NXDOMAIN
+ *
+ *  @brief
+ *    DNS-SD reported that the queried name or record does not exist.
+ */
+#define CHIP_ERROR_DNS_SD_NXDOMAIN                            CHIP_CORE_ERROR(0xc8)
 
 /**
  * @def CHIP_ERROR_NO_SHARED_TRUSTED_ROOT

@@ -24,6 +24,10 @@
 @interface MTRErrorMappingTests : XCTestCase
 @end
 
+static const uint32_t kNoMemory = 0x0B;
+static const uint32_t kIntegrityCheckFailed = 0x13;
+static const uint32_t kIMStatusFailure = 0x501;
+
 @implementation MTRErrorMappingTests
 
 - (void)testPublicNonInteractionAPIValues
@@ -55,6 +59,61 @@
     __auto_type * newError = [MTRError errorForCHIPIntegerCode:chipError];
     XCTAssertEqual(newError.domain, MTRErrorDomain);
     XCTAssertEqual(newError.code, MTRErrorCodeGeneralError);
+}
+
+- (void)testCASEErrorsRoundTripWithoutAssociatedHolder
+{
+    const uint32_t caseErrors[] = { 0xAA, 0xB1, 0xB2, 0xB7, 0xB8, 0xBE };
+    for (size_t i = 0; i < sizeof(caseErrors) / sizeof(caseErrors[0]); i++) {
+        uint32_t chipError = caseErrors[i];
+        NSError * error = [MTRError errorForCHIPIntegerCode:chipError];
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
+
+        NSError * stripped = [NSError errorWithDomain:error.domain code:error.code userInfo:error.userInfo];
+        XCTAssertEqual([MTRError errorToCHIPIntegerCode:stripped], chipError, "Testing CHIP error 0x%x", chipError);
+    }
+}
+
+- (void)testUnderlyingErrorCode
+{
+    XCTAssertEqualObjects(MTRUnderlyingErrorCodeKey, @"errorCode");
+
+    NSError * generalError = [MTRError errorForCHIPIntegerCode:kNoMemory];
+    XCTAssertEqual(generalError.code, MTRErrorCodeGeneralError);
+    XCTAssertEqualObjects(generalError.userInfo[MTRUnderlyingErrorCodeKey], @(kNoMemory));
+
+    NSError * mappedError = [MTRError errorForCHIPIntegerCode:kIntegrityCheckFailed];
+    XCTAssertEqual(mappedError.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertEqualObjects(mappedError.userInfo[MTRUnderlyingErrorCodeKey], @(kIntegrityCheckFailed));
+
+    NSError * imError = [MTRError errorForCHIPIntegerCode:kIMStatusFailure];
+    XCTAssertEqualObjects(imError.domain, MTRInteractionErrorDomain);
+    XCTAssertEqual(imError.code, MTRInteractionErrorCodeFailure);
+    XCTAssertEqualObjects(imError.userInfo[MTRUnderlyingErrorCodeKey], @(kIMStatusFailure));
+    XCTAssertEqual([MTRError errorToCHIPIntegerCode:imError], kIMStatusFailure);
+}
+
+- (void)testAdditionalUserInfo
+{
+    NSDictionary * extraUserInfo = @{ @"someKey" : @"someValue", MTRUnderlyingErrorCodeKey : @(12345) };
+
+    NSError * error = [MTRError errorForCHIPIntegerCode:kIntegrityCheckFailed additionalUserInfo:extraUserInfo];
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+    XCTAssertEqualObjects(error.userInfo[@"someKey"], @"someValue");
+    XCTAssertEqualObjects(error.userInfo[MTRUnderlyingErrorCodeKey], @(kIntegrityCheckFailed));
+    XCTAssertNotNil(error.userInfo[NSLocalizedDescriptionKey]);
+    XCTAssertEqual([MTRError errorToCHIPIntegerCode:error], kIntegrityCheckFailed);
+
+    NSError * imError = [MTRError errorForCHIPIntegerCode:kIMStatusFailure additionalUserInfo:extraUserInfo];
+    XCTAssertEqualObjects(imError.domain, MTRInteractionErrorDomain);
+    XCTAssertEqual(imError.code, MTRInteractionErrorCodeFailure);
+    XCTAssertEqualObjects(imError.userInfo[@"someKey"], @"someValue");
+    XCTAssertEqualObjects(imError.userInfo[MTRUnderlyingErrorCodeKey], @(kIMStatusFailure));
+    XCTAssertNotNil(imError.userInfo[NSLocalizedDescriptionKey]);
+
+    XCTAssertNil([MTRError errorForCHIPIntegerCode:0 additionalUserInfo:extraUserInfo]);
 }
 
 @end

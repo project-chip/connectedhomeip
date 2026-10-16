@@ -1096,4 +1096,41 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     XCTAssertNil(controllerDelegate3.commissioningCompleteError);
 }
 
+- (void)test019_CommissioningFailureReportsNetworkCommissioningInfo
+{
+    __auto_type * expectation = [self expectationWithDescription:@"Commissioning complete"];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation attestationDelegate:nil failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate queue:dispatch_get_main_queue()];
+
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId)
+                                  networkCommissioningStatus:@(MTRNetworkCommissioningStatusAuthFailure)
+                                                  errorValue:@(-5)
+                                                   debugText:@"Wrong password"];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    NSError * error = controllerDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningStatusKey], @(MTRNetworkCommissioningStatusAuthFailure));
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningConnectErrorValueKey], @(-5));
+    XCTAssertEqualObjects(error.userInfo[MTRNetworkCommissioningDebugTextKey], @"Wrong password");
+
+    expectation = [self expectationWithDescription:@"Commissioning complete without network commissioning info"];
+    controllerDelegate.expectation = expectation;
+    [sController unitTestReportCommissioningFailureForNodeID:@(sDeviceId) networkCommissioningStatus:nil errorValue:nil debugText:nil];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    error = controllerDelegate.commissioningCompleteError;
+    XCTAssertNotNil(error);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningStatusKey]);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningConnectErrorValueKey]);
+    XCTAssertNil(error.userInfo[MTRNetworkCommissioningDebugTextKey]);
+}
+
+- (void)test020_PairDeviceWithBadChecksumReportsIntegrityCheckFailed
+{
+    NSError * error;
+    XCTAssertFalse([sController pairDevice:sDeviceId onboardingPayload:@"641286075300001000017" error:&error]);
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeIntegrityCheckFailed);
+}
+
 @end

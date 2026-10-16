@@ -464,6 +464,9 @@ protected:
 private:
     friend class TestCASESession;
 
+    // Keep in sync with the certificate-chain errors FabricTable::VerifyCredentials can return.
+    static CHIP_ERROR MapVerifyCredentialsError(CHIP_ERROR err);
+
     using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
 
     /*
