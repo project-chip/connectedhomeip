@@ -54,7 +54,11 @@ class CHIPFaultId(IntEnum):
     ClearInMemoryAllocatedVideoStreams = 34
     ClearInMemoryAllocatedAudioStreams = 35
     ClearInMemoryAllocatedSnapshotStreams = 36
-    LoadPersistedAllocatedVideoStreams = 37
+    LoadPersistentCameraAVSMAttributes = 37
+    CASESigma2WrongFabricId = 38
+    CASESigma2WrongPeerNodeId = 39
+    CASECorruptSigma2ResumeMIC = 40
+    CASESigma3WrongFabricId = 41
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 # IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h

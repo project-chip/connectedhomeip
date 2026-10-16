@@ -57,4 +57,18 @@
     XCTAssertEqual(newError.code, MTRErrorCodeGeneralError);
 }
 
+- (void)testCASEErrorsRoundTripWithoutAssociatedHolder
+{
+    const uint32_t caseErrors[] = { 0xAA, 0xB1, 0xB2, 0xB7, 0xB8, 0xBE };
+    for (size_t i = 0; i < sizeof(caseErrors) / sizeof(caseErrors[0]); i++) {
+        uint32_t chipError = caseErrors[i];
+        NSError * error = [MTRError errorForCHIPIntegerCode:chipError];
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
+
+        NSError * stripped = [NSError errorWithDomain:error.domain code:error.code userInfo:error.userInfo];
+        XCTAssertEqual([MTRError errorToCHIPIntegerCode:stripped], chipError, "Testing CHIP error 0x%x", chipError);
+    }
+}
+
 @end

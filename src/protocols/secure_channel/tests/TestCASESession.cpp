@@ -138,6 +138,7 @@ public:
                                           TestCASESecurePairingDelegate & delegateCommissioner);
 
     void SimulateUpdateNOCInvalidatePendingEstablishment();
+    void VerifyCredentialsErrorMapping();
 };
 
 void TestCASESession::ServiceEvents()
@@ -207,6 +208,7 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override
     {
         mNumPairingErrors++;
+        mLastError = error;
         if (error == CHIP_ERROR_BUSY)
         {
             mNumBusyResponses++;
@@ -214,6 +216,30 @@ public:
         if (error == CHIP_ERROR_INVALID_CASE_PARAMETER)
         {
             mNumInvalidParamResponse++;
+        }
+        if (error == CHIP_ERROR_CASE_SIGNATURE_MISMATCH)
+        {
+            mNumSignatureMismatch++;
+        }
+        if (error == CHIP_ERROR_CASE_NOCCHAIN_INVALID)
+        {
+            mNumNOCChainInvalid++;
+        }
+        if (error == CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE)
+        {
+            mNumSigmaDecryptFailure++;
+        }
+        if (error == CHIP_ERROR_CASE_WRONG_FABRIC)
+        {
+            mNumWrongFabric++;
+        }
+        if (error == CHIP_ERROR_CASE_WRONG_PEER_NODEID)
+        {
+            mNumWrongPeerNodeId++;
+        }
+        if (error == CHIP_ERROR_CASE_RESUME_MIC_MISMATCH)
+        {
+            mNumResumeMicMismatch++;
         }
     }
 
@@ -232,6 +258,13 @@ public:
     uint32_t mNumPairingComplete      = 0;
     uint32_t mNumBusyResponses        = 0;
     uint32_t mNumInvalidParamResponse = 0;
+    uint32_t mNumSignatureMismatch    = 0;
+    uint32_t mNumNOCChainInvalid      = 0;
+    uint32_t mNumSigmaDecryptFailure  = 0;
+    uint32_t mNumWrongFabric          = 0;
+    uint32_t mNumWrongPeerNodeId      = 0;
+    uint32_t mNumResumeMicMismatch    = 0;
+    CHIP_ERROR mLastError             = CHIP_NO_ERROR;
 };
 
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
@@ -874,14 +907,269 @@ TEST_F(TestCASESession, BadSignatureFailsCASE)
 
         if (faultInjectionID == FaultInjection::kFault_CASECorruptSigma2Signature)
         {
+            EXPECT_EQ(delegateInitiator.mNumSignatureMismatch, 1u);
+            EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_SIGNATURE_MISMATCH);
             EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
         }
         if (faultInjectionID == FaultInjection::kFault_CASECorruptSigma3Signature)
         {
+            EXPECT_EQ(delegateResponder.mNumSignatureMismatch, 1u);
+            EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_SIGNATURE_MISMATCH);
             EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
         }
     }
 }
+
+TEST_F(TestCASESession, FaultInjectedSigma2NOCCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma2NOC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateInitiator.mNumNOCChainInvalid, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_NOCCHAIN_INVALID);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2DecryptCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptTBEData2Encrypted, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateInitiator.mNumSigmaDecryptFailure, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2WrongFabricIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma2WrongFabricId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateInitiator.mNumWrongFabric, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_WRONG_FABRIC);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma2WrongPeerNodeIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma2WrongPeerNodeId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateInitiator.mNumWrongPeerNodeId, 1u);
+    EXPECT_EQ(delegateInitiator.mLastError, CHIP_ERROR_CASE_WRONG_PEER_NODEID);
+    EXPECT_EQ(delegateResponder.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3NOCCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma3NOC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumNOCChainInvalid, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_NOCCHAIN_INVALID);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_CERT_NOT_TRUSTED);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_CERT_EXPIRED);
+    EXPECT_NE(delegateResponder.mLastError, CHIP_ERROR_WRONG_CERT_DN);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+    EXPECT_EQ(delegateInitiator.mNumNOCChainInvalid, 0u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3WrongFabricIdSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASESigma3WrongFabricId, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumWrongFabric, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_WRONG_FABRIC);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+}
+
+TEST_F(TestCASESession, FaultInjectedSigma3DecryptCorruptionSurfacesCaseSpecificCode)
+{
+    TemporarySessionManager sessionManager(*this);
+    TestCASESecurePairingDelegate delegateInitiator;
+    TestCASESecurePairingDelegate delegateResponder;
+    CASESession pairingInitiator;
+    CASESession pairingResponder;
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptTBEData3Encrypted, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    pairingInitiator.SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&pairingInitiator);
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                            &pairingResponder),
+              CHIP_NO_ERROR);
+    pairingResponder.SetGroupDataProvider(&gDeviceGroupDataProvider);
+
+    EXPECT_SUCCESS(pairingResponder.PrepareForSessionEstablishment(sessionManager, &gDeviceFabrics, nullptr, nullptr,
+                                                                   &delegateResponder, ScopedNodeId(),
+                                                                   Optional<ReliableMessageProtocolConfig>::Missing()));
+    EXPECT_SUCCESS(pairingInitiator.EstablishSession(
+        sessionManager, &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextInitiator, nullptr,
+        nullptr, &delegateInitiator, Optional<ReliableMessageProtocolConfig>::Missing()));
+
+    ServiceEvents();
+
+    EXPECT_EQ(delegateInitiator.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateResponder.mNumSigmaDecryptFailure, 1u);
+    EXPECT_EQ(delegateResponder.mLastError, CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE);
+    EXPECT_EQ(delegateInitiator.mNumInvalidParamResponse, 1u);
+}
+
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 struct Sigma1Params
@@ -2035,6 +2323,134 @@ TEST_F(TestCASESession, Sigma2ResumeStatusReportSendFailureFailsInitiatorWithout
               CHIP_NO_ERROR);
 
     GetExchangeManager().CloseAllContextsForDelegate(nullptr);
+}
+
+TEST_F(TestCASESession, Sigma1ResumptionFallbackDoesNotSurfaceResumeMicMismatch)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_ERROR_KEY_NOT_FOUND);
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           &responderStorage, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    &initiatorStorage, nullptr, &delegateCommissioner,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumSigmaDecryptFailure, 0u);
+    EXPECT_EQ(delegateCommissioner.mLastError, CHIP_NO_ERROR);
+
+    chip::Platform::Delete(pairingCommissioner);
+    gPairingServer.Shutdown();
+}
+
+#if CHIP_WITH_NLFAULTINJECTION
+TEST_F(TestCASESession, FaultInjectedSigma2ResumeMICCorruptionSurfacesCaseSpecificCode)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionId;
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+
+    const FabricInfo * fabricInfo = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    ASSERT_NE(fabricInfo, nullptr);
+    ScopedNodeId initiator = fabricInfo->GetScopedNodeIdForNode(Node01_02);
+    ScopedNodeId responder = fabricInfo->GetScopedNodeIdForNode(Node01_01);
+
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
+
+    SessionResumptionTestStorage initiatorStorage(CHIP_NO_ERROR, responder, &resumptionId, &sharedSecret);
+    SessionResumptionTestStorage responderStorage(CHIP_NO_ERROR, initiator, &resumptionId, &sharedSecret);
+
+    EXPECT_EQ(FaultInjection::GetManager().FailAtFault(FaultInjection::kFault_CASECorruptSigma2ResumeMIC, 0, 1),
+              kFaultInjectionSuccessCode);
+
+    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
+
+    auto & loopback            = GetLoopback();
+    loopback.mSentMessageCount = 0;
+
+    EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
+                                                           &responderStorage, nullptr, &gDeviceGroupDataProvider),
+              CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
+    EXPECT_EQ(pairingCommissioner->EstablishSession(GetSecureSessionManager(), &gCommissionerFabrics,
+                                                    ScopedNodeId{ Node01_01, gCommissionerFabricIndex }, contextCommissioner,
+                                                    &initiatorStorage, nullptr, &delegateCommissioner,
+                                                    Optional<ReliableMessageProtocolConfig>::Missing()),
+              CHIP_NO_ERROR);
+    ServiceEvents();
+
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumResumeMicMismatch, 1u);
+    EXPECT_EQ(delegateCommissioner.mLastError, CHIP_ERROR_CASE_RESUME_MIC_MISMATCH);
+
+    chip::Platform::Delete(pairingCommissioner);
+    gPairingServer.Shutdown();
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
+
+TEST_F_FROM_FIXTURE(TestCASESession, VerifyCredentialsErrorMapping)
+{
+    const CHIP_ERROR kNocChainErrors[] = {
+        CHIP_ERROR_CERT_NOT_TRUSTED,
+        CHIP_ERROR_CERT_EXPIRED,
+        CHIP_ERROR_CERT_NOT_VALID_YET,
+        CHIP_ERROR_CERT_USAGE_NOT_ALLOWED,
+        CHIP_ERROR_WRONG_CERT_DN,
+        CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED,
+        CHIP_ERROR_CERT_PATH_TOO_LONG,
+        CHIP_ERROR_CERT_NOT_FOUND,
+        CHIP_ERROR_CA_CERT_NOT_FOUND,
+        CHIP_ERROR_WRONG_CERT_TYPE,
+        CHIP_ERROR_INVALID_SIGNATURE,
+        CHIP_ERROR_WRONG_TLV_TYPE,
+        CHIP_ERROR_INVALID_TLV_ELEMENT,
+        CHIP_ERROR_INVALID_TLV_TAG,
+        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT,
+        CHIP_ERROR_TLV_UNDERRUN,
+        CHIP_ERROR_END_OF_TLV,
+        CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
+        CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE,
+        CHIP_ERROR_WRONG_NODE_ID,
+    };
+    for (const auto & err : kNocChainErrors)
+    {
+        EXPECT_EQ(CASESession::MapVerifyCredentialsError(err), CHIP_ERROR_CASE_NOCCHAIN_INVALID) << err.Format();
+    }
+
+    EXPECT_EQ(CASESession::MapVerifyCredentialsError(CHIP_ERROR_FABRIC_MISMATCH_ON_ICA), CHIP_ERROR_CASE_WRONG_FABRIC);
+    EXPECT_EQ(CASESession::MapVerifyCredentialsError(CHIP_ERROR_NO_MEMORY), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(CASESession::MapVerifyCredentialsError(CHIP_ERROR_INTERNAL), CHIP_ERROR_INTERNAL);
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
