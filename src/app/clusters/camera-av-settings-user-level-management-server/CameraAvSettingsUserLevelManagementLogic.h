@@ -245,11 +245,13 @@ private:
      */
     void LoadPersistentAttributes();
 
+protected:
     /**
      * Helper function that manages preset IDs
      */
     void UpdatePresetID();
 
+private:
     /**
      * Helper function that validates whether a given video stream ID is already known
      */

@@ -54,6 +54,13 @@ using chip::Testing::IsAttributesListEqualTo;
 static constexpr chip::EndpointId kTestEndpointId = 1;
 static constexpr uint8_t testMaxPresets           = 5;
 
+class TestableCameraAvSettingsUserLevelManagementLogic : public CameraAvSettingsUserLevelMgmtServerLogic
+{
+public:
+    using CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic;
+    using CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID;
+};
+
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
@@ -666,8 +673,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadAllocatesLastAvaila
     EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
 }
 
-/** @brief Startup with presets disabled and zero capacity must finish without attempting modulo-zero ID allocation. */
-TEST_F(TestCameraAvSettingsUserLevelManagementCluster, StartupWithoutPresetsAllowsZeroCapacity)
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ZeroCapacityPresetIDUpdateDoesNotDivideByZero)
 {
     MockCameraAvSettingsUserLevelManagementDelegate delegate;
     CameraAvSettingsUserLevelManagementCluster cluster(kTestEndpointId, BitFlags<Feature>(Feature::kMechanicalPan), 0);
@@ -677,6 +683,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, StartupWithoutPresetsAllo
     EXPECT_TRUE(cluster.GetLogic().mMptzPresetHelpers.empty());
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(
         cluster, { Commands::MPTZSetPosition::kMetadataEntry, Commands::MPTZRelativeMove::kMetadataEntry }));
+
+    TestableCameraAvSettingsUserLevelManagementLogic logic(kTestEndpointId, {}, 0);
+    MPTZPresetHelper preset;
+    preset.SetPresetID(1);
+    logic.mMptzPresetHelpers.push_back(preset);
+    logic.UpdatePresetID();
+    EXPECT_EQ(logic.mCurrentPresetID, 1);
 }
 
 /**
