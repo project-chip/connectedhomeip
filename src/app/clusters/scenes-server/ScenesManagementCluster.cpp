@@ -780,7 +780,6 @@ ScenesManagementCluster::HandleRemoveAllScenes(FabricIndex fabricIndex,
     return response;
 }
 
-/** Store the current scene state and return the corresponding command response. */
 ScenesManagement::Commands::StoreSceneResponse::Type
 ScenesManagementCluster::HandleStoreScene(FabricIndex fabricIndex,
                                           const ScenesManagement::Commands::StoreScene::DecodableType & req)
@@ -803,7 +802,6 @@ ScenesManagementCluster::HandleStoreScene(FabricIndex fabricIndex,
     return response;
 }
 
-/** Validate RecallScene field constraints before applying the scene or updating FabricSceneInfo. */
 Protocols::InteractionModel::Status
 ScenesManagementCluster::HandleRecallScene(FabricIndex fabricIndex,
                                            const ScenesManagement::Commands::RecallScene::DecodableType & req)

@@ -68,7 +68,6 @@ public:
     {
         bool on = false;
 
-        /** Encode the mock on-state in the scene extension field set. */
         CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
         {
             TLV::TLVType outer;
@@ -77,7 +76,6 @@ public:
             return writer.EndContainer(outer);
         }
 
-        /** Decode the stored mock on-state from its TLV structure. */
         CHIP_ERROR Decode(TLV::TLVReader & reader)
         {
             TLV::TLVType outer;
@@ -124,7 +122,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** Serialize the current mock state for StoreScene. */
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
         VerifyOrReturnError(cluster == kMockClusterId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -136,7 +133,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** Decode stored mock state into an extension field set for ViewScene. */
     CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                            app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & extensionFieldSet) override
     {
@@ -157,7 +153,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /** Record the applied transition time and restore the serialized mock state. */
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           TransitionTimeMs timeMs) override
     {
@@ -892,7 +887,6 @@ TEST_F(TestScenesManagementCluster, StoreSceneResourceExhausted)
     ExpectCommandStatus(store_response_fail, Status::ResourceExhausted);
 }
 
-/** StoreScene followed by RecallScene restores the saved mock on-state. */
 TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
 {
     ClusterTester tester(cluster);
@@ -925,10 +919,8 @@ TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
     EXPECT_TRUE(mMockSceneHandler.mState.on);
 }
 
-/** Fixture with a stored scene that restores an observable state through the scene handler. */
 struct TestRecallSceneTransitionTime : public TestScenesManagementCluster
 {
-    /** Store an on-state scene with a known transition time, then turn the live state off. */
     void StoreRecallableScene(ClusterTester & tester, GroupId groupID)
     {
         AddSceneToTable(tester, groupID, kTestSceneId, "RecallScene", 1234);
@@ -942,7 +934,6 @@ struct TestRecallSceneTransitionTime : public TestScenesManagementCluster
         mMockSceneHandler.mState.on = false;
     }
 
-    /** Check rejection before handler invocation, reporting, or mutation of the stored scene. */
     void ExpectRejectedRecall(ClusterTester & tester, const RecallScene::Type & request)
     {
         ScenesManagementSceneTable::SceneTableEntry before;
@@ -964,7 +955,6 @@ struct TestRecallSceneTransitionTime : public TestScenesManagementCluster
     }
 };
 
-/** RecallScene accepts the inclusive maximum and zero as concrete overrides. */
 TEST_F(TestRecallSceneTransitionTime, AcceptsTransitionTimeBoundaries)
 {
     ClusterTester tester(cluster);
@@ -993,7 +983,6 @@ TEST_F(TestRecallSceneTransitionTime, AcceptsTransitionTimeBoundaries)
     }
 }
 
-/** The 60,000,000 ms command constraint applies to both grouped and global scenes. */
 TEST_F(TestRecallSceneTransitionTime, RejectsOversizedTransitionTimes)
 {
     ScopedAttributeChangeListenerRegistration listener(customDataModel, testContext);
@@ -1024,7 +1013,6 @@ TEST_F(TestRecallSceneTransitionTime, RejectsOversizedTransitionTimes)
     }
 }
 
-/** Omitted and null overrides, including the application API, use the stored transition time. */
 TEST_F(TestRecallSceneTransitionTime, UsesStoredTimeWithoutConcreteOverride)
 {
     ClusterTester tester(cluster);
@@ -1056,7 +1044,6 @@ TEST_F(TestRecallSceneTransitionTime, UsesStoredTimeWithoutConcreteOverride)
     EXPECT_TRUE(mMockSceneHandler.mState.on);
 }
 
-/** Reject an invalid override before lookup; a valid override still reports a missing scene. */
 TEST_F(TestRecallSceneTransitionTime, ValidatesBeforeSceneLookup)
 {
     ClusterTester tester(cluster);
@@ -1073,7 +1060,6 @@ TEST_F(TestRecallSceneTransitionTime, ValidatesBeforeSceneLookup)
     EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, 0u);
 }
 
-/** RecallScene reports NotFound for a scene that has not been stored. */
 TEST_F(TestScenesManagementCluster, RecallSceneNotFound)
 {
     ClusterTester tester(cluster);
