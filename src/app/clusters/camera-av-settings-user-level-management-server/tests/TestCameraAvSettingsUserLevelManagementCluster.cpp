@@ -57,68 +57,37 @@ static constexpr uint8_t testMaxPresets           = 5;
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
-    /**
-     * @brief Leave fixture-owned delegate state unchanged during cluster shutdown.
-     */
     void ShutdownApp() override {}
-
-    /**
-     * @brief Allow mechanical movement without introducing hardware-state dependencies into the tests.
-     * @return True so the cluster can exercise its movement handling.
-     */
     bool CanChangeMPTZ() override { return true; }
 
-    /**
-     * @brief Ignore allocation events; stream tests populate the cluster's stream list directly.
-     */
     void VideoStreamAllocated(uint16_t aStreamID) override {}
-    /**
-     * @brief Ignore deallocation events; stream tests control the cluster's stream list directly.
-     */
     void VideoStreamDeallocated(uint16_t aStreamID) override {}
-    /**
-     * @brief Ignore camera-stream defaults; individual tests provide explicit viewport values.
-     */
     void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override {}
 
-    /**
-     * @brief Accept absolute movement without invoking completion or changing the test's stored position.
-     * @return Success; the test drives the completion callback explicitly.
-     */
     Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                            PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
-    /**
-     * @brief Accept relative mechanical movement without invoking completion or changing the test's stored position.
-     * @return Success; the test drives the completion callback explicitly.
-     */
     Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
-    /**
-     * @brief Accept a preset move without calling completion; tests drive the completion callback explicitly.
-     * @return Success to let the cluster enter the moving state.
-     */
     Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
                             PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
-    /** @brief Count saves so removal tests can verify that removal does not invoke the save delegate. */
     Status MPTZSavePreset(uint8_t aPreset) override
     {
         ++mSavePresetCalls;
         return Status::Success;
     }
 
-    /** @brief Count removal attempts and return the status selected by the test. */
     Status MPTZRemovePreset(uint8_t aPreset) override
     {
         ++mRemovePresetCalls;
@@ -129,30 +98,17 @@ public:
     size_t mRemovePresetCalls  = 0;
     Status mRemovePresetResult = Status::Success;
 
-    /**
-     * @brief Accept a viewport request without applying it to a physical stream.
-     * @return Success so tests can inspect the cluster's viewport update.
-     */
     Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) override
     {
         return Status::Success;
     }
 
-    /**
-     * @brief Accept relative digital movement while leaving the supplied viewport unchanged.
-     * @param aViewport The output viewport, left unchanged because this mock has no camera-stream geometry.
-     * @return Success so the test can inspect the cluster's range and stream-ID handling.
-     */
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
                             Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport) override
     {
         return Status::Success;
     }
 
-    /**
-     * @brief Accept the startup notification without introducing additional application state.
-     * @return CHIP_NO_ERROR so tests can focus on the restored cluster state.
-     */
     CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
 };
 
@@ -554,9 +510,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     ASSERT_EQ(mptzPosition.zoom.Value(), presetZoom);
 }
 
-/**
- * @brief Verify successful removal updates the active list and rejects invalid or missing preset IDs.
- */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -630,10 +583,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 }
 
-/**
- * @brief Persist removal of first, middle, and last entries without changing remaining preset names or positions.
- * Read both the active attribute and stored TLV, then load a fresh cluster after every removal.
- */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemainingEntries)
 {
     const CharSpan names[] = { "First"_span, "Second"_span, "Third"_span, "Fourth"_span, "Fifth"_span };
@@ -725,7 +674,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemai
     }
 }
 
-/** @brief Removing the only preset must persist an empty list and keep it empty after a fresh startup. */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemoveOnlyPresetPersistsEmptyList)
 {
     Commands::MPTZSavePreset::Type save;
@@ -753,10 +701,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemoveOnlyPresetPersistsE
     EXPECT_TRUE(restored.GetLogic().mMptzPresetHelpers.empty());
 }
 
-/**
- * @brief A failed persistence write must retain all presets, stored bytes, the allocation cursor, and notifications.
- * Try first, middle, and last IDs while the storage delegate rejects writes but permits reads.
- */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailurePreservesState)
 {
     for (uint8_t id = 1; id <= 3; ++id)
@@ -800,7 +744,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
     }
 }
 
-/** @brief Invalid IDs and a delegate rejection must preserve the active and persisted preset list. */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvalidAndDeclinedRequests)
 {
     Commands::MPTZSavePreset::Type save;
@@ -838,9 +781,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvali
     EXPECT_TRUE(before.data_equal(after));
 }
 
-/**
- * @brief Verify viewport requests require a known stream and update its active viewport after delegate acceptance.
- */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
