@@ -256,7 +256,6 @@ public:
     /** @brief Returns the cumulative notification count since this mock was constructed. */
     uint32_t GetAttributeChangedCount() const { return mAttributeChangedCount; }
 
-    /** @brief Supplies deterministic JPEG fixture data at the requested resolution for snapshot command tests. */
     Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
                                                         const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot) override
