@@ -17,12 +17,17 @@ import("//build_overrides/chip.gni")
 
 source_set("water-valve") {
   sources = [
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "WaterValve.cpp",
     "WaterValve.h",
+    "WaterValveAccessor.cpp",
+    "WaterValveAccessor.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server",
     "${chip_root}/src/data-model-providers/codedriven",

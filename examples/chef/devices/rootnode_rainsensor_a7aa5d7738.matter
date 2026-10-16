@@ -1908,7 +1908,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1921,7 +1921,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2029,17 +2029,17 @@ endpoint 1 {
     emits event AlarmsStateChanged;
     emits event SensorFault;
     callback attribute currentSensitivityLevel;
-    ram      attribute supportedSensitivityLevels default = 10;
-    ram      attribute defaultSensitivityLevel default = 1;
+    callback attribute supportedSensitivityLevels default = 10;
+    callback attribute defaultSensitivityLevel default = 1;
     callback attribute alarmsActive;
     callback attribute alarmsSuppressed;
     callback attribute alarmsEnabled;
-    ram      attribute alarmsSupported default = 3;
+    callback attribute alarmsSupported default = 3;
     callback attribute sensorFault;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    callback attribute featureMap default = 15;
     callback attribute clusterRevision;
 
     handle command SuppressAlarm;
