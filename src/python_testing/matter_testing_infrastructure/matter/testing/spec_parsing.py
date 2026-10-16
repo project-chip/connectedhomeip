@@ -1841,8 +1841,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     feature_map=cluster_definition_xml[cid].feature_map,
                     attribute_map=cluster_definition_xml[cid].attribute_map,
                     command_map=cluster_definition_xml[cid].command_map,
-                    is_device_type=True,
-                    device_type_revision=revision)
+                    is_device_type=True)
                 conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]

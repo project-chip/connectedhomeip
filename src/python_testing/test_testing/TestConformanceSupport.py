@@ -803,7 +803,7 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
 
         params = ConformanceParseParameters(
             feature_map={}, attribute_map={}, command_map={},
-            is_device_type=True, device_type_revision=4
+            is_device_type=True
         )
 
         xml = create_xml(4)
@@ -823,13 +823,21 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         conformance_assessment_data.device_type_revision = 5
         asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
 
-        # Test fallback to default_revision when device_type_revision in assessment data is None
+        # Test fallback to cluster_revision when device_type_revision in assessment data is None
         empty_data = EmptyClusterGlobalAttributes()
-        asserts.assert_equal(xml_callable(empty_data).decision, ConformanceDecision.MANDATORY)
+        asserts.assert_equal(xml_callable(empty_data).decision, ConformanceDecision.NOT_APPLICABLE)
+
+        fallback_data = ConformanceAssessmentData(
+            feature_map=0, attribute_list=[], all_command_list=[], cluster_revision=4, device_type_revision=None
+        )
+        asserts.assert_equal(xml_callable(fallback_data).decision, ConformanceDecision.MANDATORY)
 
         # Test EmptyClusterGlobalAttributes with explicit device_type_revision
         empty_with_rev3 = EmptyClusterGlobalAttributes(device_type_revision=3)
         asserts.assert_equal(xml_callable(empty_with_rev3).decision, ConformanceDecision.NOT_APPLICABLE)
+
+        empty_with_rev4 = EmptyClusterGlobalAttributes(device_type_revision=4)
+        asserts.assert_equal(xml_callable(empty_with_rev4).decision, ConformanceDecision.MANDATORY)
 
         empty_with_rev5 = EmptyClusterGlobalAttributes(device_type_revision=5)
         asserts.assert_equal(xml_callable(empty_with_rev5).decision, ConformanceDecision.MANDATORY)
