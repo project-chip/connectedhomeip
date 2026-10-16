@@ -104,6 +104,8 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+
 /**
  * @brief Set deferred attributes storage
  *
@@ -132,10 +134,10 @@ DeferredAttribute gPersisters[] = {
 };
 
 // Deferred persistence will be auto-initialized as soon as the default persistence is initialized
-DefaultAttributePersistenceProvider gSimpleAttributePersistence;
 DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence,
                                                                  Span<DeferredAttribute>(gPersisters, ATTRIBUTES_ARRAY_SIZE),
                                                                  System::Clock::Milliseconds32(DEFERRED_STORAGE_TIME));
+#endif // CONFIG_DEFERRED_ATTR_STORAGE
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
