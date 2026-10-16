@@ -96,7 +96,7 @@ class TC_OPCREDS_3_4(MatterTestCommissionedDevice):
         return ['OPCREDS.S']
 
     def steps_TC_OPCREDS_3_4(self):
-        return [TestStep(1, commission_if_required('TH1'), is_commissioning=True),
+        return [TestStep(1, commission_if_required('TH1')),
                 TestStep(
                     2, f"TH1 {read_attribute('NOCs')} from the Node Operational Credentials cluster using a fabric-filtered read. Save the NOCs as nocs.", None, verify_noc()),
                 TestStep(

@@ -3578,10 +3578,16 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
 
 class MatterTestCommissioner(MatterBaseTest):
-    """Marker: the DUT is NOT already commissioned when the test starts, and the
-    test drives commissioning of it itself -- e.g. it calls commission_devices() /
-    CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
-    session to it.
+    """Marker: the DUT is NOT already commissioned on the TH fabric when the test starts, and
+    commissioning is part of what the test exercises. Two shapes qualify:
+
+    * The test drives commissioning OF the DUT itself -- e.g. it calls commission_devices() /
+      CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
+      session to it.
+    * The DUT is itself the commissioner and never joins the TH fabric at all: the test drives
+      it over a non-Matter channel (an interactive CLI, a WebSocket) and has it commission a
+      TH-side device. The TH's own Matter traffic targets that helper device, not dut_node_id.
+      The TC_WEBRTCR_2_* tests are this shape.
 
     This is keyed on the primary DUT's starting state, NOT on whether the test happens to
     exercise commissioner APIs: a test that merely commissions a second fabric or a helper

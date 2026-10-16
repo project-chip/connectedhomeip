@@ -90,10 +90,30 @@ CHIP_ERROR AmbientContextSensingCluster::Startup(ServerClusterContext & context)
 void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mAmbientContextTypeSupportedList = {};
+    if (mACSDelegate != nullptr)
+    {
+        for (auto it = mAmbientContextTypeList.begin(); it != mAmbientContextTypeList.end();)
+        {
+            AmbientContextSensed * item = &*it;
+            ++it;
+            mAmbientContextTypeList.Remove(item);
+            LogErrorOnFailure(mACSDelegate->DelDetection(item));
+        }
+    }
     mAmbientContextTypeList.Clear();
     mAmbientContextTypeListSize = 0;
     mSensorFusionSupportedList  = {};
     mHoldTimeDelegate.CancelTimer(this);
+
+    // Reset detection-derived state so a subsequent Startup() does not observe
+    // stale attribute values from this run.
+    mObjectCount                 = 0;
+    mPredictedActivityList       = {};
+    mHumanActivityDetected       = false;
+    mObjectIdentified            = false;
+    mAudioContextDetected        = false;
+    mObjectCountThresholdReached = false;
+
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
