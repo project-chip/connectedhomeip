@@ -140,6 +140,24 @@ class TestNativeBleScan(unittest.TestCase):
         self.assertNotEqual(self.terminals[0][1], 0)
         self.assertEqual(self.control('counts'), [1, 0, False])
 
+    def test_init_failure_reports_original_error_once(self):
+        self.adapter = None
+        self.assertFalse(self.start_scanner())
+        self.assertEqual(self.terminals, [('error', 0x2F)])
+        self.assertEqual(self.control('counts'), [0, 0, False])
+
+    def test_init_failure_reaches_python_without_deleting_a_null_scanner(self):
+        from matter.ble.scan_devices import DiscoverSync
+        from matter.exceptions import ChipStackError
+
+        with (
+            patch.object(self.handle, 'pychip_ble_adapter_list_get_raw_adapter', return_value=None),
+            self.assertRaises(ChipStackError) as raised,
+        ):
+            list(DiscoverSync(100))
+        self.assertEqual(raised.exception.code, 0x2F)
+        self.assertEqual(self.control('counts'), [0, 0, False])
+
     def test_stop_failure_reaches_python_iterator(self):
         from matter.ble.scan_devices import DiscoverSync
         from matter.exceptions import ChipStackError

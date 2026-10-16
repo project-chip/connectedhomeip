@@ -215,6 +215,10 @@ extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, u
     {
         err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
     }
+    else
+    {
+        delegate->OnScanError(err);
+    }
     if (err != CHIP_NO_ERROR)
     {
         delegate.reset();
