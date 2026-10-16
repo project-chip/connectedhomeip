@@ -611,6 +611,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemai
         EXPECT_EQ(mMockDelegate.mSavePresetCalls, static_cast<size_t>(testMaxPresets));
         EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(testMaxPresets) - remaining);
         EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+        EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
 
         Attributes::MPTZPresets::TypeInfo::DecodableType active;
         ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, active), CHIP_NO_ERROR);
@@ -686,6 +687,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemoveOnlyPresetPersistsE
     EXPECT_TRUE(mServer.GetLogic().mMptzPresetHelpers.empty());
     EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 1u);
     EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+    EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
 
     MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
     CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
@@ -742,6 +744,35 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
         ASSERT_EQ(persistence.ReadValue(path, after), CHIP_NO_ERROR);
         EXPECT_TRUE(before.data_equal(after));
     }
+
+    storage.SetRejectWrites(false);
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 2;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 4u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, nextID);
+    EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 2u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 3);
+
+    uint8_t storedBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan storedBytes(storedBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, storedBytes), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(storedBytes);
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    Attributes::MPTZPresets::TypeInfo::DecodableType stored;
+    ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
+    auto it = stored.begin();
+    constexpr uint8_t expectedIDs[] = { 1, 3 };
+    for (uint8_t expected : expectedIDs)
+    {
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, expected);
+    }
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvalidAndDeclinedRequests)
