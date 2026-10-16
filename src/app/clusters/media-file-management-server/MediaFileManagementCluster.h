@@ -78,6 +78,7 @@ private:
 
     CHIP_ERROR ReadAvailableFiles(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadSupportedMimeTypes(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    bool IsSupportedMimeType(CharSpan mimeType);
 };
 
 } // namespace Clusters

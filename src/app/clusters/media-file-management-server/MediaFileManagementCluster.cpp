@@ -31,6 +31,7 @@ namespace app {
 namespace Clusters {
 
 using namespace MediaFileManagement;
+using Protocols::InteractionModel::ClusterStatusCode;
 using Protocols::InteractionModel::Status;
 
 namespace {
@@ -100,6 +101,26 @@ CHIP_ERROR MediaFileManagementCluster::ReadSupportedMimeTypes(const AttributeVal
     return CHIP_NO_ERROR;
 }
 
+bool MediaFileManagementCluster::IsSupportedMimeType(CharSpan mimeType)
+{
+    for (size_t i = 0; i < kMaxSupportedMimeTypes; i++)
+    {
+        char buffer[kMaxMimeTypeLength] = {};
+        MutableCharSpan supported(buffer);
+        CHIP_ERROR err = mDelegate.GetSupportedMimeTypeAtIndex(i, supported);
+        if (err != CHIP_NO_ERROR)
+        {
+            // An empty SupportedMimeTypes list places no restriction on what can be stored.
+            return err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED && i == 0;
+        }
+        if (supported.data_equal(mimeType))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                        chip::TLV::TLVReader & input_arguments,
                                                                                        CommandHandler * handler)
@@ -149,6 +170,10 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
         OfferFile::DecodableType req;
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, req));
         VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
+        // OfferFile has no response payload, so an unadvertised MIME type is rejected with a
+        // cluster-specific status before the delegate is asked to download the file.
+        VerifyOrReturnValue(IsSupportedMimeType(req.mimeType),
+                            ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
         return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageURI);
     }
     default:
