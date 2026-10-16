@@ -122,7 +122,8 @@ TEST_F(TestDarwinBleScanner, TimerCompletesOnceAndDeleteAfterTimeoutDoesNotStopA
 {
     ScannerContext context;
     context.entered = dispatch_semaphore_create(0);
-    context.resume = dispatch_semaphore_create(1);
+    context.resume = dispatch_semaphore_create(0);
+    dispatch_semaphore_signal(context.resume);
     void * handle = Start(context);
     ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
     ScannerTestCentralManager * central = (ScannerTestCentralManager *) scanner.centralManager;
