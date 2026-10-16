@@ -242,8 +242,10 @@ bool LoadDACCertAndKey(uint8_t * base_buffer , struct FactoryData * factoryData)
 
 #if CONFIG_SOC_RISCV_TELINK_TL323X
         ske_dig_en();
+        unsigned int key = irq_lock();
         aes_decryption_be(chip_id, buffer + 2, dac_key_decrypt);
         aes_decryption_be(chip_id, buffer + 18, dac_key_decrypt + 16);
+        irq_unlock(key);
 #else
         aes_decrypt(chip_id, buffer + 2, dac_key_decrypt);
         aes_decrypt(chip_id, buffer + 18, dac_key_decrypt + 16);
