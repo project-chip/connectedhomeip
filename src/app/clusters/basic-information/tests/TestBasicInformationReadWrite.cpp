@@ -235,6 +235,22 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     EXPECT_TRUE(persistedLabel.Content().data_equal(newLabelSpan));
 }
 
+TEST_F(TestBasicInformationReadWrite, TestNodeLabelConstraintErrorKeepsOldValue)
+{
+    CharSpan validLabel = "Valid Label"_span;
+    ASSERT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, validLabel), CHIP_NO_ERROR);
+
+    CharSpan tooLongLabel = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456"_span;
+    ASSERT_EQ(tooLongLabel.size(), 33u);
+    EXPECT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, tooLongLabel),
+              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
+
+    char readBuffer[32];
+    CharSpan readSpan(readBuffer);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(readSpan.data_equal(validLabel));
+}
+
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
