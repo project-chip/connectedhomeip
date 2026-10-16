@@ -5,7 +5,10 @@
 
 #include <pw_unit_test/framework.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-completeness"
 #include "../matter/ble/darwin/Scanning.mm"
+#pragma clang diagnostic pop
 
 @interface ScannerTestCentralManager : NSObject
 @property (weak, nonatomic) id<CBCentralManagerDelegate> delegate;
