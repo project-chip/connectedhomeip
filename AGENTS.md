@@ -108,6 +108,18 @@ for full details.
     -   When an inline comment is necessary (e.g., for a non-obvious constraint
         or spec requirement), keep it to 1–3 lines. Use a table or compact ASCII
         diagram instead of paragraphs for state machines or event matrices.
+-   **Write for the Final Code, Not the Diff (Default to Deleting)**:
+    -   Keep a comment only if a future reader modifying the code would need it
+        to avoid breaking a non-obvious invariant, contract, or spec constraint.
+        When in doubt, delete the comment rather than shortening it.
+    -   Never narrate the diff or history in code comments (e.g., "moved X
+        before Y so Z does not happen", "this used to do Y") and do not explain
+        rejected alternatives that are not in the code. Put change history and
+        alternatives in the commit/PR description, and state only the current
+        invariant in the code.
+    -   Do not add comments that label obvious guards ("defensive check"), point
+        out visible code structure ("using a map keyed by X"), or explain
+        standard language/library mechanics.
 -   **Document API Contracts, Never Implementation Coupling**:
     -   It is fine for an inline comment to note a non-obvious API contract that
         the call site relies on, saving the reader from jumping to other headers
