@@ -26,6 +26,8 @@
 - (instancetype)initForScannerTestWithDelegate:(id<CBCentralManagerDelegate>)delegate queue:(dispatch_queue_t)queue;
 @end
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 @implementation CBCentralManager (ScannerLifetimeTests)
 - (instancetype)initForScannerTestWithDelegate:(id<CBCentralManagerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -34,6 +36,7 @@
     return self;
 }
 @end
+#pragma clang diagnostic pop
 
 namespace {
 
@@ -142,12 +145,14 @@ TEST_F(TestDarwinBleScanner, QueuedCallbacksCannotUseContextAfterDeletion)
     ScannerContext context;
     void * handle = Start(context);
     ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    CBCentralManager * central = scanner.centralManager;
+    CBPeripheral * peripheral = (CBPeripheral *) [[NSObject alloc] init];
     pychip_ble_scanner_delete(handle);
     context.alive = false;
     dispatch_sync(scanner.workQueue, ^{
         [scanner stopTimeoutReached];
-        [scanner centralManager:nil didDiscoverPeripheral:nil advertisementData:@{} RSSI:@0];
-        [scanner centralManagerDidUpdateState:nil];
+        [scanner centralManager:central didDiscoverPeripheral:peripheral advertisementData:@{} RSSI:@0];
+        [scanner centralManagerDidUpdateState:central];
     });
     EXPECT_EQ(context.completions.load(), 0u);
     EXPECT_EQ(context.errors.load(), 0u);
