@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <atomic>
 
 #import "MTROperationalCredentialsDelegate.h"
 
@@ -41,6 +42,38 @@ using namespace chip;
 using namespace TLV;
 using namespace Credentials;
 using namespace Crypto;
+
+@interface MTRIssuerCompletionSentinel : NSObject
+- (instancetype)initWithReleasedUncalledHandler:(dispatch_block_t)handler;
+- (void)markCalled;
+@end
+
+@implementation MTRIssuerCompletionSentinel {
+    dispatch_block_t _releasedUncalledHandler;
+    std::atomic<bool> _called;
+}
+
+- (instancetype)initWithReleasedUncalledHandler:(dispatch_block_t)handler
+{
+    if (self = [super init]) {
+        _releasedUncalledHandler = handler;
+        _called = false;
+    }
+    return self;
+}
+
+- (void)markCalled
+{
+    _called = true;
+}
+
+- (void)dealloc
+{
+    if (!_called) {
+        _releasedUncalledHandler();
+    }
+}
+@end
 
 MTROperationalCredentialsDelegate::MTROperationalCredentialsDelegate(MTRDeviceController_Concrete * deviceController)
     : mWeakController(deviceController)
@@ -133,6 +166,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
     VerifyOrReturnError(strongController != nil, CHIP_ERROR_INCORRECT_STATE);
 
     mOnNOCCompletionCallback = onCompletion;
+    uint64_t requestID = ++mExternalNOCChainRequestID;
 
     auto * csrInfo = [[MTROperationalCSRInfo alloc] initWithCSRNonce:AsData(csrNonce)
                                                       csrElementsTLV:AsData(csrElements)
@@ -167,18 +201,27 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                      firmwareInfo:firmwareInfo];
 
     MTRDeviceController_Concrete * __weak weakController = mWeakController;
+    auto * sentinel = [[MTRIssuerCompletionSentinel alloc] initWithReleasedUncalledHandler:^{
+        MTRDeviceController_Concrete * strongController = weakController;
+        if (strongController == nil || !strongController.isRunning) {
+            return;
+        }
+        MTR_LOG_ERROR("%@ operational certificate issuer released its completion without calling it", strongController);
+        this->ExternalNOCChainGenerated(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL], requestID);
+    }];
     dispatch_async(mOperationalCertificateIssuerQueue, ^{
         [mOperationalCertificateIssuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
                                        controller:strongController
                                        completion:^(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error) {
+                                           [sentinel markCalled];
                                            MTRDeviceController_Concrete * strongController = weakController;
                                            if (strongController == nil || !strongController.isRunning) {
                                                // No longer safe to touch "this"
                                                return;
                                            }
-                                           this->ExternalNOCChainGenerated(chain, error);
+                                           this->ExternalNOCChainGenerated(chain, error, requestID);
                                        }];
     });
 
@@ -186,7 +229,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 }
 
 void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
-    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error)
+    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID)
 {
     // Dispatch will only happen if the controller is still running, which means we
     // are safe to touch our members.
@@ -194,7 +237,8 @@ void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
         asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             assertChipStackLockedByCurrentThread();
 
-            if (mOnNOCCompletionCallback == nullptr) {
+            if (mOnNOCCompletionCallback == nullptr || requestID != mExternalNOCChainRequestID
+                || commissioner->GetCommissioningStage() != Controller::CommissioningStage::kGenerateNOCChain) {
                 return;
             }
 
