@@ -880,6 +880,7 @@ def BuildTelinkTarget():
         TargetPart('tl3228x', board=TelinkBoard.TL3228X),
         TargetPart('tl3228x_retention', board=TelinkBoard.TL3228X_RETENTION),
         TargetPart('tl3238x', board=TelinkBoard.TL3238X),
+        TargetPart('tl3238x_ml3m', board=TelinkBoard.TL3238X_ML3M),
         TargetPart('tl3238x_retention', board=TelinkBoard.TL3238X_RETENTION),
         TargetPart('tl5218x', board=TelinkBoard.TL5218X),
         TargetPart('tl5218x_retention', board=TelinkBoard.TL5218X_RETENTION),
