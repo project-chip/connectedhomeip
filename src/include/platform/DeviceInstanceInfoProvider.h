@@ -146,6 +146,22 @@ public:
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) = 0;
 
     /**
+     * @brief Obtain a manufacturing date string from the device's factory data.
+     *
+     * @param[in, out] buf Buffer to copy string.
+     *                 On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                 On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @param[in] bufSize Size of data, including the null terminator, that can be written to buf.
+     *                    This size should be +1 higher than maximum possible string.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetManufacturingDateString(char * buf, size_t bufSize)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
      * @brief Retrieve the optional vendor-specific suffix of the manufacturing date
      *        from the device's factory data.
      *
