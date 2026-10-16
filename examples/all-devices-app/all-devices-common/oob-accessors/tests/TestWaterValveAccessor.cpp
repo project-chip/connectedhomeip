@@ -19,8 +19,8 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <device/types/water-valve/WaterValve.h>
 #include <device/types/water-valve/WaterValveAccessor.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
@@ -59,7 +59,7 @@ protected:
     DefaultTimerDelegate mTimerDelegate;
     Testing::TestServerClusterContext mClusterContext;
     CodeDrivenDataModelProvider mProvider{ mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider() };
-    WaterValve mDevice{ mTimerDelegate };
+    LoggingWaterValve mDevice{ mTimerDelegate };
     InMemoryOOBAccessorRegistry mRegistry;
 };
 
