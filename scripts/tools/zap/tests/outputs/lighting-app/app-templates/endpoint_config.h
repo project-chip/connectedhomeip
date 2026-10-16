@@ -370,7 +370,7 @@
         { ZAP_EMPTY_DEFAULT(), 0x00000004, 8, ZAP_TYPE(INT64U),                                                                    \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) |                     \
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* ExtendedPanId */                                                          \
-        { ZAP_EMPTY_DEFAULT(), 0x00000005, 18, ZAP_TYPE(OCTET_STRING),                                                             \
+        { ZAP_EMPTY_DEFAULT(), 0x00000005, 18, ZAP_TYPE(IPV6PRE),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) |                     \
               ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE) }, /* MeshLocalPrefix */                                                        \
         { ZAP_EMPTY_DEFAULT(), 0x00000006, 8, ZAP_TYPE(INT64U),                                                                    \

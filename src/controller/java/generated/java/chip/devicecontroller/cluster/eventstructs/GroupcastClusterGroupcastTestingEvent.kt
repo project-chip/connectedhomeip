@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class GroupcastClusterGroupcastTestingEvent(
-  val sourceIpAddress: Optional<ByteArray>,
-  val destinationIpAddress: Optional<ByteArray>,
+  val sourceIpAddress: Optional<Any>,
+  val destinationIpAddress: Optional<Any>,
   val groupID: Optional<UInt>,
   val endpointID: Optional<UInt>,
   val clusterID: Optional<ULong>,
@@ -100,13 +100,13 @@ class GroupcastClusterGroupcastTestingEvent(
       tlvReader.enterStructure(tlvTag)
       val sourceIpAddress =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS)))
+          Optional.of(tlvReader.getAny(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS)))
         } else {
           Optional.empty()
         }
       val destinationIpAddress =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS)))
+          Optional.of(tlvReader.getAny(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS)))
         } else {
           Optional.empty()
         }

@@ -2287,7 +2287,7 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "MeshLocalPrefix",
                 "attributeId": 0x00000005,
-                "type": "bytes",
+                "type": "",
                 "reportable": True,
             },
             0x00000006: {
@@ -13166,7 +13166,7 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "LinkLocalAddress",
                 "attributeId": 0x00000001,
-                "type": "bytes",
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

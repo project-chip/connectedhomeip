@@ -28,9 +28,9 @@ class GeneralDiagnosticsClusterNetworkInterface(
   val isOperational: Boolean,
   val offPremiseServicesReachableIPv4: Boolean?,
   val offPremiseServicesReachableIPv6: Boolean?,
-  val hardwareAddress: ByteArray,
-  val IPv4Addresses: List<ByteArray>,
-  val IPv6Addresses: List<ByteArray>,
+  val hardwareAddress: Any,
+  val IPv4Addresses: List<Any>,
+  val IPv6Addresses: List<Any>,
   val type: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -111,20 +111,20 @@ class GeneralDiagnosticsClusterNetworkInterface(
           tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
           null
         }
-      val hardwareAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_HARDWARE_ADDRESS))
+      val hardwareAddress = tlvReader.getAny(ContextSpecificTag(TAG_HARDWARE_ADDRESS))
       val IPv4Addresses =
-        buildList<ByteArray> {
+        buildList<Any> {
           tlvReader.enterArray(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
+            add(tlvReader.getAny(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val IPv6Addresses =
-        buildList<ByteArray> {
+        buildList<Any> {
           tlvReader.enterArray(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
+            add(tlvReader.getAny(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

@@ -1455,7 +1455,7 @@ cluster NetworkCommissioning = 49 {
     char_string<16> networkName = 2;
     int16u channel = 3;
     int8u version = 4;
-    octet_string extendedAddress = 5;
+    hwadr extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
   }
@@ -1684,9 +1684,9 @@ cluster GeneralDiagnostics = 51 {
     boolean isOperational = 1;
     nullable boolean offPremiseServicesReachableIPv4 = 2;
     nullable boolean offPremiseServicesReachableIPv6 = 3;
-    octet_string hardwareAddress = 4;
-    octet_string IPv4Addresses[] = 5;
-    octet_string IPv6Addresses[] = 6;
+    hwadr hardwareAddress = 4;
+    ipv4adr IPv4Addresses[] = 5;
+    ipv6adr IPv6Addresses[] = 6;
     InterfaceTypeEnum type = 7;
   }
 
@@ -1886,7 +1886,7 @@ cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
-  readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
+  readonly attribute nullable ipv6pre<17> meshLocalPrefix = 5;
   readonly attribute optional int64u overrunCount = 6;
   readonly attribute NeighborTableStruct neighborTable[] = 7;
   readonly attribute RouteTableStruct routeTable[] = 8;

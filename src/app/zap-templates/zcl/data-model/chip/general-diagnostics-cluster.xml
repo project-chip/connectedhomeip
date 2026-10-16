@@ -92,10 +92,9 @@ Alchemy: v1.7.10
     <item fieldId="1" name="IsOperational" type="boolean"/>
     <item fieldId="2" name="OffPremiseServicesReachableIPv4" type="boolean" isNullable="true"/>
     <item fieldId="3" name="OffPremiseServicesReachableIPv6" type="boolean" isNullable="true"/>
-    <!-- TODO(#14075): HWADR not supported yet -->
-    <item fieldId="4" name="HardwareAddress" type="octet_string" min="6" max="8"/>
-    <item fieldId="5" name="IPv4Addresses" type="octet_string" array="true" length="4"/>
-    <item fieldId="6" name="IPv6Addresses" type="octet_string" array="true" length="8"/>
+    <item fieldId="4" name="HardwareAddress" type="hwadr" min="6" max="8"/>
+    <item fieldId="5" name="IPv4Addresses" type="ipv4adr" array="true" length="4"/>
+    <item fieldId="6" name="IPv6Addresses" type="ipv6adr" array="true" length="8"/>
     <item fieldId="7" name="Type" type="InterfaceTypeEnum" max="0x04"/>
   </struct>
 

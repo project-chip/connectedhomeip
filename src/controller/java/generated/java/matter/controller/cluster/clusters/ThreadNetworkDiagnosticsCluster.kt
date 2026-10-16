@@ -93,10 +93,10 @@ class ThreadNetworkDiagnosticsCluster(
     object SubscriptionEstablished : ExtendedPanIdAttributeSubscriptionState()
   }
 
-  class MeshLocalPrefixAttribute(val value: ByteArray?)
+  class MeshLocalPrefixAttribute(val value: Any?)
 
   sealed class MeshLocalPrefixAttributeSubscriptionState {
-    data class Success(val value: ByteArray?) : MeshLocalPrefixAttributeSubscriptionState()
+    data class Success(val value: Any?) : MeshLocalPrefixAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : MeshLocalPrefixAttributeSubscriptionState()
 
@@ -811,9 +811,9 @@ class ThreadNetworkDiagnosticsCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ByteArray? =
+    val decodedValue: Any? =
       if (!tlvReader.isNull()) {
-        tlvReader.getByteArray(AnonymousTag)
+        tlvReader.getAny(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -863,9 +863,9 @@ class ThreadNetworkDiagnosticsCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ByteArray? =
+          val decodedValue: Any? =
             if (!tlvReader.isNull()) {
-              tlvReader.getByteArray(AnonymousTag)
+              tlvReader.getAny(AnonymousTag)
             } else {
               tlvReader.getNull(AnonymousTag)
               null

@@ -3442,8 +3442,8 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
   }
 }
 public static class GroupcastClusterGroupcastTestingEvent {
-  public Optional<byte[]> sourceIpAddress;
-  public Optional<byte[]> destinationIpAddress;
+  public Optional<Object> sourceIpAddress;
+  public Optional<Object> destinationIpAddress;
   public Optional<Integer> groupID;
   public Optional<Integer> endpointID;
   public Optional<Long> clusterID;
@@ -3462,8 +3462,8 @@ public static class GroupcastClusterGroupcastTestingEvent {
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterGroupcastTestingEvent(
-    Optional<byte[]> sourceIpAddress,
-    Optional<byte[]> destinationIpAddress,
+    Optional<Object> sourceIpAddress,
+    Optional<Object> destinationIpAddress,
     Optional<Integer> groupID,
     Optional<Integer> endpointID,
     Optional<Long> clusterID,
@@ -3485,8 +3485,8 @@ public static class GroupcastClusterGroupcastTestingEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SOURCE_IP_ADDRESS_ID, sourceIpAddress.<BaseTLVType>map((nonOptionalsourceIpAddress) -> new ByteArrayType(nonOptionalsourceIpAddress)).orElse(new EmptyType())));
-    values.add(new StructElement(DESTINATION_IP_ADDRESS_ID, destinationIpAddress.<BaseTLVType>map((nonOptionaldestinationIpAddress) -> new ByteArrayType(nonOptionaldestinationIpAddress)).orElse(new EmptyType())));
+    values.add(new StructElement(SOURCE_IP_ADDRESS_ID, sourceIpAddress.<BaseTLVType>map((nonOptionalsourceIpAddress) -> new AnyType(nonOptionalsourceIpAddress)).orElse(new EmptyType())));
+    values.add(new StructElement(DESTINATION_IP_ADDRESS_ID, destinationIpAddress.<BaseTLVType>map((nonOptionaldestinationIpAddress) -> new AnyType(nonOptionaldestinationIpAddress)).orElse(new EmptyType())));
     values.add(new StructElement(GROUP_ID_ID, groupID.<BaseTLVType>map((nonOptionalgroupID) -> new UIntType(nonOptionalgroupID)).orElse(new EmptyType())));
     values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
     values.add(new StructElement(CLUSTER_ID_ID, clusterID.<BaseTLVType>map((nonOptionalclusterID) -> new UIntType(nonOptionalclusterID)).orElse(new EmptyType())));
@@ -3502,8 +3502,8 @@ public static class GroupcastClusterGroupcastTestingEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<byte[]> sourceIpAddress = Optional.empty();
-    Optional<byte[]> destinationIpAddress = Optional.empty();
+    Optional<Object> sourceIpAddress = Optional.empty();
+    Optional<Object> destinationIpAddress = Optional.empty();
     Optional<Integer> groupID = Optional.empty();
     Optional<Integer> endpointID = Optional.empty();
     Optional<Long> clusterID = Optional.empty();
@@ -3513,14 +3513,14 @@ public static class GroupcastClusterGroupcastTestingEvent {
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SOURCE_IP_ADDRESS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          sourceIpAddress = Optional.of(castingValue.value(byte[].class));
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          sourceIpAddress = Optional.of(castingValue.value(Object.class));
         }
       } else if (element.contextTagNum() == DESTINATION_IP_ADDRESS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          destinationIpAddress = Optional.of(castingValue.value(byte[].class));
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          destinationIpAddress = Optional.of(castingValue.value(Object.class));
         }
       } else if (element.contextTagNum() == GROUP_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3577,10 +3577,10 @@ public static class GroupcastClusterGroupcastTestingEvent {
     StringBuilder output = new StringBuilder();
     output.append("GroupcastClusterGroupcastTestingEvent {\n");
     output.append("\tsourceIpAddress: ");
-    output.append(sourceIpAddress.isPresent() ? Arrays.toString(sourceIpAddress.get()) : "");
+    output.append(sourceIpAddress);
     output.append("\n");
     output.append("\tdestinationIpAddress: ");
-    output.append(destinationIpAddress.isPresent() ? Arrays.toString(destinationIpAddress.get()) : "");
+    output.append(destinationIpAddress);
     output.append("\n");
     output.append("\tgroupID: ");
     output.append(groupID);
