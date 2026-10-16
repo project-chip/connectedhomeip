@@ -104,7 +104,6 @@ is tracked by git.
 You can get more details on `west build` with
 [Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
 
-
 ### VS Code devcontainer
 
 If you are using the VS Code devcontainer environment, initialize the NXP Zephyr
