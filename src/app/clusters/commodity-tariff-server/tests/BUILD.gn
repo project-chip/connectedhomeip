@@ -23,10 +23,11 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestCommodityTariffBaseDataClass.cpp",
+    "TestCommodityTariffCommands.cpp",
     "TestCommodityTariffContainers.cpp",
   ]
 
-  sources = []
+  sources = [ "../commodity-tariff-server.cpp" ]
 
   cflags = [ "-Wconversion" ]
 

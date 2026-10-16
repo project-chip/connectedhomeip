@@ -219,6 +219,8 @@ public:
     };
 
 private:
+    friend class TestCommodityTariffCommands;
+
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
