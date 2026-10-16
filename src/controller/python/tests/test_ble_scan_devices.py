@@ -1,3 +1,4 @@
+import ctypes
 import unittest
 from queue import Empty
 from unittest.mock import Mock, patch
@@ -161,6 +162,27 @@ class TestBleScanDevices(unittest.TestCase):
         with self.assertRaises(ChipStackError) as raised:
             list(scan_devices.DiscoverSync(1000))
         self.assertEqual(raised.exception.code, 0xAC)
+        self.assert_deleted()
+
+    def start_scan_with_wide_error(self, context, adapter, timeout, found_callback, done_callback, error_callback):
+        native_signature = ctypes.CFUNCTYPE(None, ctypes.py_object, ctypes.c_uint32)
+        native_callback = native_signature(ctypes.cast(error_callback, ctypes.c_void_p).value)
+        native_callback(context, 0x12340032)
+        return 3
+
+    def test_sync_preserves_full_error_through_native_width_callback(self):
+        self.handle.pychip_ble_scanner_start.side_effect = self.start_scan_with_wide_error
+        with self.assertRaises(ChipStackError) as raised:
+            list(scan_devices.DiscoverSync(1000))
+        self.assertEqual(raised.exception.code, 0x12340032)
+        self.assert_deleted()
+
+    def test_async_preserves_full_error_instead_of_treating_it_as_timeout(self):
+        self.handle.pychip_ble_scanner_start.side_effect = self.start_scan_with_wide_error
+        callbacks = self.run_async_scan()
+        callbacks.error.assert_called_once_with(0x12340032)
+        callbacks.done.assert_not_called()
+        callbacks.found.assert_not_called()
         self.assert_deleted()
 
     def test_async_normal_completion_calls_done_once(self):

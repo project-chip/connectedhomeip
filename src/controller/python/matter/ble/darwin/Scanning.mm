@@ -7,16 +7,19 @@
 
 namespace {
 struct PyObject;
+char kScannerQueueKey;
 using DeviceScannedCallback
     = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId, uint16_t productId);
 using ScanCompleteCallback = void (*)(PyObject * context);
 using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
 } // namespace
 
-@interface ChipDeviceBleScanner : NSObject <CBCentralManagerDelegate>
+@interface ChipDeviceBleScanner : NSObject <CBCentralManagerDelegate> {
+    BOOL _stopped;
+}
 
 @property (strong, nonatomic) dispatch_queue_t workQueue;
-@property (nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (strong, nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 
@@ -32,6 +35,8 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
             timeoutMs:(uint32_t)timeout;
 
 - (void)stopTimeoutReached;
+- (void)stop;
+- (void)stopOnQueue;
 
 @end
 
@@ -48,15 +53,17 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
         self.shortServiceUUID = chip::DeviceLayer::Internal::CBUUIDFromBleUUID(chip::Ble::CHIP_BLE_SVC_ID);
 
         _workQueue = dispatch_queue_create("com.chip.python.ble.work_queue", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_set_specific(_workQueue, &kScannerQueueKey, (__bridge void *) self, nullptr);
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
-        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_workQueue];
         _context = context;
         _scanCallback = scanCallback;
         _completeCallback = completeCallback;
         _errorCallback = errorCallback;
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:_workQueue];
 
+        __weak ChipDeviceBleScanner * weakSelf = self;
         dispatch_source_set_event_handler(_timer, ^{
-            [self stopTimeoutReached];
+            [weakSelf stopTimeoutReached];
         });
         dispatch_source_set_timer(
             _timer, dispatch_walltime(nullptr, timeout * NSEC_PER_MSEC), DISPATCH_TIME_FOREVER, 50 * NSEC_PER_MSEC);
@@ -70,6 +77,9 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
+    if (_stopped) {
+        return;
+    }
     NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
 
     if (![isConnectable boolValue]) {
@@ -101,18 +111,55 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
 
 - (void)stopTimeoutReached
 {
+    if (_stopped) {
+        return;
+    }
     ChipLogProgress(Ble, "Scan timeout reached.");
 
-    _completeCallback(_context);
-    _errorCallback(_context, CHIP_ERROR_TIMEOUT.AsInteger());
+    ScanCompleteCallback completeCallback = _completeCallback;
+    PyObject * context = _context;
+    [self stopOnQueue];
+    if (completeCallback != nullptr) {
+        completeCallback(context);
+    }
+}
 
-    dispatch_source_cancel(_timer);
-    [self.centralManager stopScan];
-    self.centralManager = nil;
+- (void)stop
+{
+    if (dispatch_get_specific(&kScannerQueueKey) == (__bridge void *) self) {
+        [self stopOnQueue];
+    } else {
+        dispatch_sync(_workQueue, ^{
+            [self stopOnQueue];
+        });
+    }
+}
+
+- (void)stopOnQueue
+{
+    if (_stopped) {
+        return;
+    }
+    _stopped = YES;
+    if (_timer != nil) {
+        dispatch_source_cancel(_timer);
+        dispatch_source_set_event_handler(_timer, nil);
+        _timer = nil;
+    }
+    [_centralManager stopScan];
+    _centralManager.delegate = nil;
+    _centralManager = nil;
+    _context = nullptr;
+    _scanCallback = nullptr;
+    _completeCallback = nullptr;
+    _errorCallback = nullptr;
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
+    if (_stopped) {
+        return;
+    }
     switch (central.state) {
     case CBManagerStatePoweredOn:
         ChipLogProgress(Ble, "Central BLE Manager is on. Starting to scan.");
@@ -146,5 +193,6 @@ extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, u
 
 extern "C" void pychip_ble_scanner_delete(void * scanner)
 {
-    CFRelease((CFTypeRef) scanner);
+    ChipDeviceBleScanner * nativeScanner = (__bridge_transfer ChipDeviceBleScanner *) scanner;
+    [nativeScanner stop];
 }
