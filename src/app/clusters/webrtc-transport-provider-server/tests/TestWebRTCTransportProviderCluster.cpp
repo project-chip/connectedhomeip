@@ -214,7 +214,6 @@ TEST_F(TestWebRTCTransportProviderCluster, TestReadClusterRevisionAttribute)
     server.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-/** Unsupported attributes retain their existing interaction-model status. */
 TEST_F(TestWebRTCTransportProviderCluster, TestReadUnsupportedAttribute)
 {
     TestServerClusterContext context;

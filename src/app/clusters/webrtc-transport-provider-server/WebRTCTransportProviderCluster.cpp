@@ -1149,7 +1149,6 @@ WebRTCTransportProviderCluster::HandleProvideAnswer(CommandHandler & commandHand
     return mDelegate.HandleProvideAnswer(sessionId, sdpAnswer);
 }
 
-/** Validate a nonempty candidate list and session ownership before invoking the application delegate. */
 std::optional<DataModel::ActionReturnStatus>
 WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & commandHandler,
                                                            const Commands::ProvideICECandidates::DecodableType & req)
