@@ -128,6 +128,10 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         return 0;
     };
     cdWriter.close = [](bool success) {
+        if (!success)
+        {
+            return 0;
+        }
         return settings_save_one(Internal::ZephyrConfig::kConfigKey_CertificationDeclaration, sCdBuf, sCdSavedBytes);
     };
 
