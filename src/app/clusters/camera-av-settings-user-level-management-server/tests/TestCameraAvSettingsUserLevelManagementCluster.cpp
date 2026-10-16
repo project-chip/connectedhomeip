@@ -82,10 +82,7 @@ public:
         return Status::Success;
     }
 
-    Status MPTZSavePreset(uint8_t aPreset) override
-    {
-        return Status::Success;
-    }
+    Status MPTZSavePreset(uint8_t aPreset) override { return Status::Success; }
 
     Status MPTZRemovePreset(uint8_t aPreset) override
     {
@@ -770,7 +767,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
     ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
     Attributes::MPTZPresets::TypeInfo::DecodableType stored;
     ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
-    auto it = stored.begin();
+    auto it                         = stored.begin();
     constexpr uint8_t expectedIDs[] = { 1, 3 };
     for (uint8_t expected : expectedIDs)
     {
