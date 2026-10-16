@@ -53,7 +53,7 @@ class TC_CGEN_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_CGEN_2_1(self):
         return [
-            TestStep("1", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("1", "DUT commissioned and preconditions"),
             TestStep("2", "TH reads the Breadcrumb attribute"),
             TestStep("3", "TH writes Breadcrumb = 1"),
             TestStep("4", "TH reads Breadcrumb again and verifies = 1"),

@@ -57,7 +57,7 @@ class TC_GC_2_4(MatterTestCommissionedDevice):
 
     def steps_TC_GC_2_4(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen."),
             TestStep("1d", "TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0"),

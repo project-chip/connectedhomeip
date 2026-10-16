@@ -76,7 +76,7 @@ class TC_MEDIAPLAYBACK_6_11(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase)
 
     def steps_TC_MEDIAPLAYBACK_6_11(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the Presets attribute from the DUT.",
                      "DUT replies with a list of Content Preset structs in which all PresetIDs are unique and "
                      "all Names are unique."),
