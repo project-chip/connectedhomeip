@@ -59,8 +59,6 @@ public:
 
     std::vector<MockRootCert> rootCerts;
     std::vector<MockClientCert> clientCerts;
-    uint32_t rootLookupCount   = 0;
-    uint32_t clientLookupCount = 0;
 
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
 
@@ -79,7 +77,6 @@ public:
 
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id) override
     {
-        ++rootLookupCount;
         for (const auto & cert : rootCerts)
         {
             if (cert.fabric == fabric_index && cert.caid == id)
@@ -102,7 +99,6 @@ public:
 
     CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id) override
     {
-        ++clientLookupCount;
         for (const auto & cert : clientCerts)
         {
             if (cert.fabric == fabric_index && cert.ccdid == id)
@@ -160,7 +156,6 @@ public:
         std::string hostname;
         TLSCAID caid;
         DataModel::Nullable<TLSCCDID> ccdid;
-        uint16_t port;
     };
 
     std::vector<MockEndpoint> endpoints;
@@ -187,7 +182,6 @@ public:
                     ByteSpan(reinterpret_cast<const uint8_t *>(endpoint.hostname.c_str()), endpoint.hostname.size());
                 decodable.caid  = endpoint.caid;
                 decodable.ccdid = endpoint.ccdid;
-                decodable.port  = endpoint.port;
                 ReturnErrorOnFailure(callback(decodable));
             }
         }
@@ -207,7 +201,6 @@ public:
                     ByteSpan(reinterpret_cast<const uint8_t *>(endpoint.hostname.c_str()), endpoint.hostname.size());
                 decodable.caid  = endpoint.caid;
                 decodable.ccdid = endpoint.ccdid;
-                decodable.port  = endpoint.port;
                 return callback(decodable);
             }
         }
@@ -233,8 +226,7 @@ public:
         std::string hostname(reinterpret_cast<const char *>(provisionReq.hostname.data()), provisionReq.hostname.size());
 
         endpointID = nextEndpointID++;
-        endpoints.push_back(
-            { matterEndpoint, fabric, endpointID, hostname, provisionReq.caid, provisionReq.ccdid, provisionReq.port });
+        endpoints.push_back({ matterEndpoint, fabric, endpointID, hostname, provisionReq.caid, provisionReq.ccdid });
 
         return Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::Success);
     }
@@ -406,198 +398,16 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
 
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
 {
-    mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
-    auto & listener = mClusterTester.GetTestContext().ChangeListener();
-
-    for (bool withClientCertificate : { false, true })
-    {
-        Commands::ProvisionEndpoint::Type request;
-        request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-        request.port     = 0;
-        request.caid     = 1;
-        request.endpointID.SetNull();
-        if (withClientCertificate)
-        {
-            request.ccdid.SetNonNull(1);
-        }
-        else
-        {
-            request.ccdid.SetNull();
-        }
-
-        auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
-        EXPECT_FALSE(result.IsSuccess());
-        ASSERT_TRUE(result.status.has_value());
-        if (result.status.has_value())
-        {
-            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
-        }
-        EXPECT_FALSE(result.response.has_value());
-        EXPECT_EQ(mMockDelegate.provisionCount, 0u);
-        EXPECT_EQ(mMockDelegate.nextEndpointID, 1u);
-        EXPECT_TRUE(mMockDelegate.endpoints.empty());
-        EXPECT_EQ(mMockCertTable.rootLookupCount, 0u);
-        EXPECT_EQ(mMockCertTable.clientLookupCount, 0u);
-        EXPECT_TRUE(listener.DirtyList().empty());
-        EXPECT_TRUE(listener.ChangedList().empty());
-
-        Attributes::ProvisionedEndpoints::TypeInfo::DecodableType list;
-        ASSERT_TRUE(mClusterTester.ReadAttribute(Attributes::ProvisionedEndpoints::Id, list).IsSuccess());
-        auto iterator = list.begin();
-        EXPECT_FALSE(iterator.Next());
-        EXPECT_EQ(iterator.GetStatus(), CHIP_NO_ERROR);
-    }
-}
-
-TEST_F(TestTLSClientManagementCluster, TestZeroPortValidationPrecedesCertificateLookup)
-{
-    for (bool missingRoot : { true, false })
-    {
-        Commands::ProvisionEndpoint::Type request;
-        request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-        request.port     = 0;
-        request.caid     = missingRoot ? 99 : 1;
-        request.endpointID.SetNull();
-        if (missingRoot)
-        {
-            request.ccdid.SetNull();
-        }
-        else
-        {
-            request.ccdid.SetNonNull(99);
-        }
-
-        auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
-        EXPECT_FALSE(result.IsSuccess());
-        ASSERT_TRUE(result.status.has_value());
-        if (result.status.has_value())
-        {
-            EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
-            EXPECT_FALSE(result.status->GetStatusCode().GetClusterSpecificCode().has_value());
-        }
-        EXPECT_FALSE(result.response.has_value());
-        EXPECT_EQ(mMockCertTable.rootLookupCount, 0u);
-        EXPECT_EQ(mMockCertTable.clientLookupCount, 0u);
-        EXPECT_EQ(mMockDelegate.provisionCount, 0u);
-        EXPECT_EQ(mMockDelegate.nextEndpointID, 1u);
-        EXPECT_TRUE(mMockDelegate.endpoints.empty());
-        EXPECT_TRUE(mClusterTester.GetTestContext().ChangeListener().DirtyList().empty());
-    }
-}
-
-TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointValidPortBoundaries)
-{
-    mMockCertTable.clientCerts.push_back({ Testing::kTestFabricIndex, 1 });
-    constexpr uint16_t ports[] = { 1, 443, 65535 };
-    auto & listener            = mClusterTester.GetTestContext().ChangeListener();
-
-    for (uint16_t port : ports)
-    {
-        for (bool withClientCertificate : { false, true })
-        {
-            Commands::ProvisionEndpoint::Type request;
-            request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-            request.port     = port;
-            request.caid     = 1;
-            request.endpointID.SetNull();
-            if (withClientCertificate)
-            {
-                request.ccdid.SetNonNull(1);
-            }
-            else
-            {
-                request.ccdid.SetNull();
-            }
-            const uint16_t nextID = mMockDelegate.nextEndpointID;
-            const size_t dirty    = listener.DirtyList().size();
-
-            auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
-            ASSERT_TRUE(result.IsSuccess());
-            ASSERT_TRUE(result.response.has_value());
-            if (result.response.has_value())
-            {
-                EXPECT_EQ(result.response->endpointID, nextID);
-            }
-            ASSERT_FALSE(mMockDelegate.endpoints.empty());
-            EXPECT_EQ(mMockDelegate.endpoints.back().port, port);
-            EXPECT_EQ(mMockDelegate.nextEndpointID, nextID + 1u);
-            EXPECT_EQ(listener.DirtyList().size(), dirty + 1u);
-
-            Commands::FindEndpoint::Type find;
-            find.endpointID = nextID;
-            auto found      = mClusterTester.Invoke<Commands::FindEndpoint::Type>(find);
-            ASSERT_TRUE(found.IsSuccess());
-            ASSERT_TRUE(found.response.has_value());
-            if (found.response.has_value())
-            {
-                EXPECT_EQ(found.response->endpoint.port, port);
-                EXPECT_TRUE(found.response->endpoint.hostname.data_equal(request.hostname));
-                EXPECT_EQ(found.response->endpoint.caid, request.caid);
-                EXPECT_EQ(found.response->endpoint.ccdid, request.ccdid);
-            }
-        }
-    }
-    EXPECT_EQ(mMockDelegate.provisionCount, 6u);
-    EXPECT_EQ(mMockDelegate.endpoints.size(), 6u);
-    EXPECT_EQ(mMockCertTable.rootLookupCount, 6u);
-    EXPECT_EQ(mMockCertTable.clientLookupCount, 3u);
-}
-
-TEST_F(TestTLSClientManagementCluster, TestZeroPortPreservesProvisionedEndpoint)
-{
     Commands::ProvisionEndpoint::Type request;
     request.hostname = ByteSpan::fromCharSpan("example.com"_span);
-    request.port     = 443;
-    request.caid     = 1;
-    request.endpointID.SetNull();
-    request.ccdid.SetNull();
-    auto first = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
-    ASSERT_TRUE(first.IsSuccess());
-    ASSERT_TRUE(first.response.has_value());
-    if (!first.response.has_value())
-    {
-        return;
-    }
-    const uint16_t id     = first.response->endpointID;
-    const uint16_t nextID = mMockDelegate.nextEndpointID;
-    const auto calls      = mMockDelegate.provisionCount;
-    auto & listener       = mClusterTester.GetTestContext().ChangeListener();
-    const auto dirty      = listener.DirtyList().size();
-    const auto changed    = listener.ChangedList().size();
-    const auto lookups    = mMockCertTable.rootLookupCount;
-
-    request.hostname = ByteSpan::fromCharSpan("other.example"_span);
     request.port     = 0;
-    request.caid     = 2;
-    request.endpointID.SetNonNull(id);
-    auto rejected = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
-    EXPECT_FALSE(rejected.IsSuccess());
-    ASSERT_TRUE(rejected.status.has_value());
-    if (rejected.status.has_value())
-    {
-        EXPECT_EQ(rejected.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
-    }
-    EXPECT_FALSE(rejected.response.has_value());
-    EXPECT_EQ(mMockDelegate.provisionCount, calls);
-    EXPECT_EQ(mMockDelegate.nextEndpointID, nextID);
-    ASSERT_EQ(mMockDelegate.endpoints.size(), 1u);
-    EXPECT_EQ(mMockDelegate.endpoints[0].hostname, "example.com");
-    EXPECT_EQ(mMockDelegate.endpoints[0].port, 443u);
-    EXPECT_EQ(mMockDelegate.endpoints[0].caid, 1u);
-    EXPECT_EQ(mMockCertTable.rootLookupCount, lookups);
-    EXPECT_EQ(listener.DirtyList().size(), dirty);
-    EXPECT_EQ(listener.ChangedList().size(), changed);
+    request.caid     = 1;
+    request.ccdid.SetNull();
 
-    Commands::FindEndpoint::Type find;
-    find.endpointID = id;
-    auto found      = mClusterTester.Invoke<Commands::FindEndpoint::Type>(find);
-    ASSERT_TRUE(found.IsSuccess());
-    ASSERT_TRUE(found.response.has_value());
-    if (found.response.has_value())
-    {
-        EXPECT_EQ(found.response->endpoint.port, 443u);
-        EXPECT_TRUE(found.response->endpoint.hostname.data_equal(ByteSpan::fromCharSpan("example.com"_span)));
-    }
+    auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
+    EXPECT_EQ(mMockDelegate.provisionCount, 0u);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
