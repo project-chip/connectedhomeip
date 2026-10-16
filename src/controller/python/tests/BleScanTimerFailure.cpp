@@ -26,7 +26,7 @@ CriticalFailure LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteC
     using StartTimerFunction = CriticalFailure (*)(LayerImplSelect *, Clock::Timeout, TimerCompleteCallback, void *);
     static auto startTimer   = reinterpret_cast<StartTimerFunction>(
         dlsym(RTLD_NEXT,
-              "_ZN4chip6System15LayerImplSelect10StartTimerENSt6chrono8durationIjSt5ratioILl1ELl1000EEEEPFvPNS0_5LayerEPvES9_"));
+                "_ZN4chip6System15LayerImplSelect10StartTimerENSt6chrono8durationIjSt5ratioILl1ELl1000EEEEPFvPNS0_5LayerEPvES9_"));
     VerifyOrDie(startTimer != nullptr);
     return startTimer(this, delay, onComplete, appState);
 }
