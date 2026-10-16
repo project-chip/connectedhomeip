@@ -249,10 +249,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_UNCONCURRENT_CONNECTION
     mBLERadioInitialized  = false;
     mPrescanState         = PrescanState::kIdle;
-    if (mInternalScanCallback == nullptr)
-    {
-        mInternalScanCallback = new InternalScanCallback(this);
-    }
 #endif /* CHIP_DEVICE_CONFIG_UNCONCURRENT_CONNECTION */
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
@@ -533,10 +529,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
         if (!mBLERadioInitialized)
         {
             mPrescanState = PrescanState::kInProgress;
-            CHIP_ERROR scanErr = chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
+
+            static InitScanCallback sInitScanCallback;
+            CHIP_ERROR scanErr = chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInitScanCallback);
             if (scanErr == CHIP_NO_ERROR)
             {
-                // Advertising resumes from InternalScanCallback::OnFinished once the prescan completes.
+                ChipLogProgress(DeviceLayer,
+                    "Advertising resumes from InternalScanCallback::OnFinished once the prescan completes");
                 return CHIP_NO_ERROR;
             }
 
@@ -544,10 +543,15 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
             ChipLogError(DeviceLayer, "Failed to start Thread prescan: %" CHIP_ERROR_FORMAT "; starting BLE directly",
                         scanErr.Format());
         }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "Thread prescan skipped: BLE radio already initialized");
+        }
     }
     else if (mPrescanState == PrescanState::kInProgress)
     {
-        // Thread prescan is ongoing, advertising resumes from InternalScanCallback::OnFinished.
+        ChipLogProgress(DeviceLayer,
+            "Thread prescan is ongoing, advertising resumes from InternalScanCallback::OnFinished.");
         return CHIP_NO_ERROR;
     }
 #endif /* CHIP_DEVICE_CONFIG_UNCONCURRENT_CONNECTION */
