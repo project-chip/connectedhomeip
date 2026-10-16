@@ -468,6 +468,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     //   3. Subscription reset (including when getSessionForNode fails)
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
 
+    // Bumped by every _resetSubscription, so a CASE completion can tell that the
+    // attempt it belongs to was torn down while CASE was in flight.
+    uint64_t _subscriptionResetGeneration;
+
     // Tracking of initial subscribe latency.  When _initialSubscribeStart is
     // nil, we are not tracking the latency.
     NSDate * _Nullable _initialSubscribeStart;
@@ -3022,6 +3026,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&_lock);
 
     [self.matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
+    _subscriptionResetGeneration++;
 
     [self _doHandleSubscriptionError:nil];
 
@@ -3082,9 +3087,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
-    if ([reason hasPrefix:sDeviceMayBeReachableReason]) {
-        self.doingCASEAttemptForDeviceMayBeReachable = YES;
-    }
+    // Assign rather than only set, because a CASE completion that is ignored
+    // below as stale no longer clears this.
+    self.doingCASEAttemptForDeviceMayBeReachable = [reason hasPrefix:sDeviceMayBeReachableReason];
 
     __block bool markUnreachableAfterWait = true;
 #ifdef DEBUG
@@ -3114,6 +3119,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Reference the object holder directly
     auto matterCPPObjectsHolder = self.matterCPPObjectsHolder;
+    uint64_t resetGeneration = _subscriptionResetGeneration;
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
     mtr_weakify(self);
     [self._concreteController
@@ -3124,18 +3130,34 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            mtr_strongify(self);
                            VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason directlyGetSessionForNode called back with nil MTRDevice"));
 
-                           self.doingCASEAttemptForDeviceMayBeReachable = NO;
-
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
+                               // Check for a teardown only once on the Matter queue: this
+                               // completion can run synchronously with _lock held.
                                [self->_deviceController asyncDispatchToMatterQueue:^{
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
-                                   [self _handleSubscriptionError:error];
-                                   [self _handleSubscriptionReset:retryDelay];
+                                   std::lock_guard lock(self->_lock);
+                                   if (resetGeneration != self->_subscriptionResetGeneration) {
+                                       MTR_LOG("%@ ignoring getSessionForNode error for a subscription attempt that was torn down", self);
+                                       return;
+                                   }
+
+                                   self.doingCASEAttemptForDeviceMayBeReachable = NO;
+                                   [self _doHandleSubscriptionError:error];
+                                   [self _doHandleSubscriptionReset:retryDelay];
                                } errorHandler:nil];
                                return;
+                           }
+
+                           {
+                               std::lock_guard lock(self->_lock);
+                               if (resetGeneration != self->_subscriptionResetGeneration) {
+                                   MTR_LOG("%@ ignoring CASE session for a subscription attempt that was torn down", self);
+                                   return;
+                               }
+                               self.doingCASEAttemptForDeviceMayBeReachable = NO;
                            }
 
                            [self _handleCASESessionEstablished:session.Value()];
