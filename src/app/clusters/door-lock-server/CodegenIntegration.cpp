@@ -2231,6 +2231,18 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
                     endpointId, modifierFabricIndex, userIndex, NullTerminated(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
+
+    // A changed UserUniqueID or UserType means this slot's identity changed, so any pending ExpiringUser
+    // first-use timestamp belongs to whoever held the slot before -- carrying it over would let a new
+    // ExpiringUser inherit a stale countdown, or deny access outright if it had already elapsed.
+    if (newUserUniqueId != user.userUniqueId || newUserType != user.userType)
+    {
+        if (auto * endpointContext = getContext(endpointId))
+        {
+            clearExpiringUserTracking(endpointContext, userIndex);
+        }
+    }
+
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);
 
