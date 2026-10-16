@@ -196,6 +196,11 @@ COMMAND_CONSTRAINT_DENIED_COMMANDS: frozenset[tuple[int, int]] = frozenset({
     # carve-out exempting the designator from validation for non-BDX protocols.
     # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/src/service_device_management/DiagnosticLogsCluster.adoc#514-effect-on-receipt
     (Clusters.DiagnosticLogs.id, Clusters.DiagnosticLogs.Commands.RetrieveLogsRequest.command_id),
+    # TODO: Remove once https://github.com/project-chip/connectedhomeip/issues/74740
+    # is fixed (https://github.com/project-chip/connectedhomeip/pull/74741).
+    # MicrowaveOvenControlCluster checks AddMoreTime's TimeToAdd only against
+    # MaxCookTime and returns SUCCESS for a TimeToAdd of 0, below its min 1 constraint.
+    (Clusters.MicrowaveOvenControl.id, Clusters.MicrowaveOvenControl.Commands.AddMoreTime.command_id),
     # Value-gated: DurationSeconds is only evaluated when TestOperation enables
     # testing; with the harness's default TestOperation the field
     # is ignored and the command returns SUCCESS. Enabling test mode to exercise the
