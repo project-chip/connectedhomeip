@@ -168,7 +168,6 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
     return CHIP_NO_ERROR;
 }
 
-/** Validate announcement fields before dispatching a provider announcement to the requestor. */
 std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                 chip::TLV::TLVReader & input_arguments,
                                                                                 CommandHandler * handler)
