@@ -67,11 +67,11 @@ from matter.testing.runner import default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_FAN_3_5(MatterTestCommissionedDevice):
-    def desc_TC_FAN_3_5(self) -> str:
+class TC_FAN_3_5_provisional(MatterTestCommissionedDevice):
+    def desc_TC_FAN_3_5_provisional(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
 
-    def steps_TC_FAN_3_5(self):
+    def steps_TC_FAN_3_5_provisional(self):
         return [TestStep("1", "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep("2", "[FC] TH checks the DUT for the presence of the OnOff cluster.",
                          "If the cluster is present, set it to On."),
@@ -700,7 +700,7 @@ class TC_FAN_3_5(MatterTestCommissionedDevice):
 
         The Step-command tests are driven by helper methods (`lowest_off_test`, `wrap_test`,
         `verify_baseline_values`) that are each invoked many times, so they cannot pass literal
-        step identifiers. This advances through the declared `steps_TC_FAN_3_5` list in order,
+        step identifiers. This advances through the declared `steps_TC_FAN_3_5_provisional` list in order,
         which also supports alphanumeric sub-step ids (e.g. "6a", "6b").
         """
         steps = self.get_test_steps(self.current_test_info.name)
@@ -1155,11 +1155,11 @@ class TC_FAN_3_5(MatterTestCommissionedDevice):
                 f"[FC] SpeedCurrent attribute value ({speed_current}) is not equal to the expected value ({speed_current_expected})."
             )
 
-    def pics_TC_FAN_3_5(self) -> list[str]:
+    def pics_TC_FAN_3_5_provisional(self) -> list[str]:
         return ["FAN.S"]
 
     @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kStep))
-    async def test_TC_FAN_3_5(self) -> None:
+    async def test_TC_FAN_3_5_provisional(self) -> None:
         # Setup
         self.endpoint = self.get_endpoint()
         self.subscriptions = None
