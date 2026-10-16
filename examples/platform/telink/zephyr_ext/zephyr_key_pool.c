@@ -121,15 +121,17 @@ bool key_pool_init(struct key_pool_data * key_pool)
         {
             break;
         }
+
+        /* Prioritize initialization, then register the GPIO interrupts */
+        k_work_init_delayable(&key_pool->work, key_pool_event_work);
+
         /* init all GPIOs are ready */
         for (size_t i = 0; i < key_pool->inp_len; i++)
         {
+            // Disable and clear any interrupt latched while the pin was floating
+            (void) gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_DISABLE);
+
             if (gpio_pin_configure_dt(&key_pool->inp[i], GPIO_INPUT))
-            {
-                result = false;
-                break;
-            }
-            if (gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_EDGE_BOTH))
             {
                 result = false;
                 break;
@@ -184,11 +186,23 @@ bool key_pool_init(struct key_pool_data * key_pool)
         {
             break;
         }
+
+        /* init all GPIOs interrupt are ready */
+        for (size_t i = 0; i < key_pool->inp_len; i++)
+        {
+            if (gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_EDGE_BOTH))
+            {
+                result = false;
+                break;
+            }
+        }
+        if (!result)
+        {
+            break;
+        }
+
         /* set all keys to current state */
         key_pool_poll(key_pool, true);
-        /* init work */
-        k_work_init_delayable(&key_pool->work, key_pool_event_work);
-        /* all done */
     } while (0);
 
     return result;
