@@ -2124,6 +2124,11 @@ AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
     return mAVAnalysisManager;
 }
 
+AmbientContextSensing::AmbientContextSensingDelegate & CameraDevice::GetAmbientContextSensingDelegate()
+{
+    return mAmbientContextSensingManager;
+}
+
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
