@@ -6703,8 +6703,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         };
     });
 
-    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
-    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and unitTestRequestSubscriptionWorkAfterAttemptWithDelay can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
+    [device unitTestRequestSubscriptionWorkAfterAttemptWithDelay:@(0)];
 
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
 }

@@ -69,7 +69,6 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
-- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)_handleReportEnd;
@@ -118,6 +117,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+- (void)unitTestRequestSubscriptionWorkAfterAttemptWithDelay:(NSNumber *)delayMs;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
