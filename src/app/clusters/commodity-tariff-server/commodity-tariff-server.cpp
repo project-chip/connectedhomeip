@@ -1107,11 +1107,9 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     }
     else
     {
-        status                  = Status::NotFound;
-        const auto & components = mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents();
-        auto component          = components.IsNull()
-                     ? nullptr
-                     : Utils::GetListEntryById<Structs::TariffComponentStruct::Type>(components.Value(), commandData.tariffComponentID);
+        status = Status::NotFound;
+        auto component =
+            FindTariffComponentById(mServerTariffAttrsCtx.mTariffProvider->GetTariffComponents(), commandData.tariffComponentID);
 
         if (component != nullptr)
         {
@@ -1222,11 +1220,8 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     }
     else
     {
-        status               = Status::NotFound;
-        const auto & entries = mServerTariffAttrsCtx.mTariffProvider->GetDayEntries();
-        auto entry           = entries.IsNull()
-                      ? nullptr
-                      : Utils::GetListEntryById<Structs::DayEntryStruct::Type>(entries.Value(), commandData.dayEntryID);
+        status     = Status::NotFound;
+        auto entry = FindDayEntryById(mServerTariffAttrsCtx.mTariffProvider->GetDayEntries(), commandData.dayEntryID);
 
         if (entry != nullptr)
         {
