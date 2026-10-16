@@ -3283,9 +3283,9 @@ endpoint 1 {
     callback attribute thermostatRunningMode default = 0;
     callback attribute temperatureSetpointHold default = 0;
     callback attribute temperatureSetpointHoldDuration;
-    callback attribute setpointChangeSource default = 0;
+    callback attribute setpointChangeSource;
     callback attribute setpointChangeAmount;
-    callback attribute setpointChangeSourceTimestamp default = 0;
+    callback attribute setpointChangeSourceTimestamp;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     callback attribute numberOfPresets;
