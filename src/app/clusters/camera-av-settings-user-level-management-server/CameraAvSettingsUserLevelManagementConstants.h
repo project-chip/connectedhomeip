@@ -52,7 +52,7 @@ constexpr size_t kArrayTlvOverhead = 2;
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
-// Maximum byte length of Name in MPTZSavePreset and MPTZPresetStruct.
+// Generated data model constraint shared by MPTZSavePresetRequest::name and MPTZPresetStruct::name.
 constexpr size_t kMaxMPTZPresetNameLength = 32;
 
 // Max size for an MPTZPresetStruct
@@ -88,20 +88,8 @@ private:
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type mMptzPosition;
 
 public:
-    /**
-     * @brief Destroy the owned preset data; allow destruction through a base helper pointer.
-     */
     virtual ~MPTZPresetHelper() = default;
-    /**
-     * @brief Create a preset with an empty name; the caller must assign its ID before use.
-     */
     MPTZPresetHelper() {}
-    /**
-     * @brief Construct a preset with an owned name; an overlength name leaves the name empty.
-     * @param aPreset The preset ID, whose range must be validated by the caller.
-     * @param aName The UTF-8 name, limited to 32 bytes.
-     * @param aPosition The saved position, preserving the presence of optional axes.
-     */
     MPTZPresetHelper(uint8_t aPreset, CharSpan aName, CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type aPosition)
     {
         SetPresetID(aPreset);
@@ -111,17 +99,7 @@ public:
 
     // Accessors and Mutators
     //
-    /**
-     * @brief Return an owned copy of the preset name that remains valid after the helper changes.
-     * @return The complete stored name, including an empty name.
-     */
     std::string GetName() const { return mName; }
-    /**
-     * @brief Copy a name of at most 32 bytes; an overlength name leaves the current value unchanged.
-     * The void signature is retained for source compatibility. Callers accepting external input must validate the
-     * length and report any error before calling this setter.
-     * @param aName The UTF-8 name, whose limit is measured in bytes.
-     */
     void SetName(chip::CharSpan aName)
     {
         VerifyOrReturn(aName.size() <= kMaxMPTZPresetNameLength,
@@ -130,26 +108,10 @@ public:
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
     }
 
-    /**
-     * @brief Return the ID assigned by the parameterized constructor or SetPresetID.
-     * @return The assigned preset ID. The caller must initialize the ID before reading it.
-     */
     uint8_t GetPresetID() const { return mPresetID; }
-    /**
-     * @brief Assign an ID without range validation.
-     * @param aPreset The ID, whose cluster-specific range must be validated by the caller.
-     */
     void SetPresetID(uint8_t aPreset) { mPresetID = aPreset; }
 
-    /**
-     * @brief Return the saved position, preserving absent optional pan, tilt, and zoom fields.
-     * @return A copy of the saved position.
-     */
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type GetMptzPosition() const { return mMptzPosition; }
-    /**
-     * @brief Copy a saved position without validating axis ranges.
-     * @param aPosition The saved position; the caller validates supported axes and their values.
-     */
     void SetMptzPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type aPosition) { mMptzPosition = aPosition; }
 };
 

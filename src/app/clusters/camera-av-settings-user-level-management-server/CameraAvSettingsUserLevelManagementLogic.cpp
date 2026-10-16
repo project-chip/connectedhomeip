@@ -128,10 +128,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBu
     return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-/**
- * @brief Notify the registered callback that an attribute changed; do nothing when no callback is installed.
- * @param aAttributeId The changed attribute on this cluster's endpoint.
- */
 void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeId)
 {
     if (mMarkDirtyCallback)
@@ -140,11 +136,6 @@ void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeI
     }
 }
 
-/**
- * @brief Persist the supplied mechanical position without changing the active position or notifying subscribers.
- * @param mptzPosition The position to encode in the attribute's persistent record.
- * @return CHIP_NO_ERROR on success, or a missing-provider, encoding, or storage error.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
     const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
@@ -161,11 +152,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
     return mAttributePersistenceProvider->WriteValue(path, bufferSpan);
 }
 
-/**
- * @brief Decode the stored mechanical position without applying it to the active position.
- * @param mptzPosition Receives the decoded position on success.
- * @return CHIP_NO_ERROR on success, or a missing-provider, storage, or decoding error.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
@@ -185,10 +171,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Persist the complete active preset list without changing it or notifying subscribers.
- * @return CHIP_NO_ERROR on success, or a missing-provider, allocation, encoding, or storage error.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -231,12 +213,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Load persisted presets, rejecting overlength names before copying them into owned storage.
- * @return CHIP_NO_ERROR for a complete list or an absent record, ConstraintError for an overlength name,
- *         or the storage, allocation, or decoding error.
- * LoadPersistentAttributes clears any partially loaded list on error; the persisted record is left unchanged.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -678,11 +654,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeMPTZPresets(At
     });
 }
 
-/**
- * @brief Encode the current digital-stream list without changing its entries or persistent records.
- * @param aEncoder The attribute encoder receiving the stream list.
- * @return CHIP_NO_ERROR on success, or an encoding error.
- */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -695,11 +666,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(At
     });
 }
 
-/**
- * @brief Restore position, presets, and digital streams, then notify the delegate that loading has completed.
- * Position-load errors select default axis values; preset or stream errors clear the corresponding active list.
- * Invalid preset records remain in storage, and delegate notification errors are ignored by the existing startup policy.
- */
 void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -753,13 +719,6 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
 }
 
-/**
- * @brief Validate supported axes and ask the delegate to move to an absolute mechanical position.
- * @param commandData The requested optional pan, tilt, and zoom values; at least one must be supplied.
- * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range value,
- *         Busy when movement is unavailable, or the delegate's status.
- * Success records the target and starts movement; the completion callback applies the position.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSetPosition(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::DecodableType & commandData)
@@ -855,13 +814,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-/**
- * @brief Validate relative mechanical movements, clamp their targets to axis limits, and call the delegate.
- * @param commandData The optional axis deltas; at least one supported axis must be supplied.
- * @return InvalidCommand for an unsupported or empty request, ConstraintError for an out-of-range delta,
- *         Busy when movement is unavailable, or the delegate's status.
- * Success records the clamped targets; the completion callback applies the position.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZRelativeMove(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::DecodableType & commandData)
@@ -1013,12 +965,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-/**
- * @brief Ask the delegate to move to a known preset; commit position values after its completion callback.
- * @param commandData The preset ID to look up.
- * @return ConstraintError for an out-of-range ID, NotFound for a missing preset, Busy when movement is unavailable,
- *         or the delegate's status. Success starts movement and marks MovementState as moving.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZMoveToPreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::DecodableType & commandData)
@@ -1082,13 +1028,6 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
-/**
- * @brief Save or update a preset using the current mechanical position and a name of at most 32 bytes.
- * @param commandData The optional preset ID and name. Invalid IDs or overlength names are rejected before delegate or state
- * effects.
- * @return Success after persistence, ConstraintError for invalid input, ResourceExhausted when no slot is available,
- *         the delegate's error status, or Failure when persistence fails and the list update is rolled back.
- */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData)
