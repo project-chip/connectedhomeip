@@ -768,8 +768,8 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         // - EBADF: File descriptor is invalid or reclaimed/closed by the OS.
         // - ESHUTDOWN: Socket receive/send channel has been shut down.
         // - ENXIO: Bound network interface index was detached/removed.
-        if (lStatus == CHIP_ERROR_POSIX(ENOTCONN) || lStatus == CHIP_ERROR_POSIX(EBADF) ||
-            lStatus == CHIP_ERROR_POSIX(ESHUTDOWN) || lStatus == CHIP_ERROR_POSIX(ENXIO))
+        if (lStatus == CHIP_ERROR_POSIX(ENOTCONN) || lStatus == CHIP_ERROR_POSIX(EBADF) || lStatus == CHIP_ERROR_POSIX(ESHUTDOWN) ||
+            lStatus == CHIP_ERROR_POSIX(ENXIO))
         {
             Close();
         }
