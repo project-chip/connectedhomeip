@@ -1080,7 +1080,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         // Make sure that the vector will not exceed the max size
         //
         VerifyOrReturnError(
-            mMptzPresetHelpers.size() != mMaxPresets, Status::ResourceExhausted,
+            mMptzPresetHelpers.size() < mMaxPresets, Status::ResourceExhausted,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: No more space for additional presets, MPTZSavePreset not possible",
                          mEndpointId));

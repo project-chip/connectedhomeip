@@ -552,6 +552,33 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadFullListReusesRemov
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadOversizedListRejectsImplicitSave)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "P"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+
+    constexpr uint8_t reducedMaxPresets = testMaxPresets - 1;
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, reducedMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(testMaxPresets));
+
+    ClusterTester restoredTester(restored);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "Rejected"_span;
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(testMaxPresets));
+}
+
 /**
  * @brief Restarting the same object must rebuild a cursor made stale by valid saves while it was stopped.
  * Another cluster instance adds ID 4 to storage; the restarted cluster must allocate ID 5.
