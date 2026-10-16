@@ -54,16 +54,6 @@ public:
         auto state = mValveCluster.Cluster().GetCurrentState();
         return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
     }
-    DataModel::Nullable<Percent> CurrentLevel() const
-    {
-        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
-        return mValveCluster.Cluster().GetCurrentLevel();
-    }
-    DataModel::Nullable<uint32_t> RemainingDuration() const
-    {
-        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
-        return mValveCluster.Cluster().GetRemainingDuration();
-    }
 
 protected:
     TimerDelegate & mTimerDelegate;
