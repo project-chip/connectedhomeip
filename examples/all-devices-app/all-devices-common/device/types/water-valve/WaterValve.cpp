@@ -75,19 +75,4 @@ Clusters::ValveConfigurationAndControlCluster & WaterValve::ValveConfigurationAn
     return mValveCluster.Cluster();
 }
 
-CHIP_ERROR WaterValve::CloseValve()
-{
-    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    return mValveCluster.Cluster().CloseValve();
-}
-CHIP_ERROR WaterValve::OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration)
-{
-    VerifyOrReturnError(mValveCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    // With the Level feature the cluster requires a non-null target level.
-    VerifyOrReturnError(!mValveCluster.Cluster().GetFeatureMap().Has(Clusters::ValveConfigurationAndControl::Feature::kLevel) ||
-                            !level.IsNull(),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    return mValveCluster.Cluster().OpenValve(level, duration);
-}
-
 } // namespace chip::app

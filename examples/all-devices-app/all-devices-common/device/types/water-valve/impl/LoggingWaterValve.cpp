@@ -15,23 +15,27 @@
  *    limitations under the License.
  */
 
-#include "app/data-model/Nullable.h"
-#include "lib/core/DataModelTypes.h"
+#include <app/data-model/Nullable.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 namespace chip {
 namespace app {
 
 DataModel::Nullable<Percent> LoggingWaterValve::HandleOpenValve(DataModel::Nullable<Percent> level)
 {
-    Percent targetLevel = level.ValueOr(100);
-    ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
     if (mValveCluster.IsConstructed() &&
         !mValveCluster.Cluster().GetFeatureMap().Has(Clusters::ValveConfigurationAndControl::Feature::kLevel))
     {
+        ChipLogProgress(AppServer, "WaterValve: Opening valve");
         mValveCluster.Cluster().UpdateCurrentState(Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen);
+        return DataModel::NullNullable;
     }
-    return DataModel::Nullable<Percent>(targetLevel);
+
+    Percent targetLevel = level.ValueOr(100);
+    ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
+
+    return DataModel::MakeNullable(targetLevel);
 }
 
 CHIP_ERROR LoggingWaterValve::HandleCloseValve()

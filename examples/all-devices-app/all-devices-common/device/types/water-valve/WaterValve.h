@@ -43,8 +43,6 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR CloseValve();
-    CHIP_ERROR OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration);
     // Public getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
