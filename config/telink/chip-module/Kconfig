@@ -304,7 +304,7 @@ config TFLM_FEATURE
 
 choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	prompt "An action to perform after removing the last fabric"
-	default CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 
 	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 	bool "After removing the last fabric erase NVS and reboot"
