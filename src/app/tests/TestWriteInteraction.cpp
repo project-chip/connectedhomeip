@@ -815,12 +815,18 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
                 }
             }
 
+            const auto session = exchange->GetSessionHandle();
+            PacketHeader packetHeader;
+            packetHeader.SetSessionId(session->AsSecureSession()->GetLocalSessionId())
+                .SetSessionType(Header::SessionType::kUnicastSession);
+            payloadHeader.SetExchangeID(exchange->GetExchangeId()).SetInitiator(!exchange->IsInitiator());
+
             // Model the peer acknowledging chunk 1's WriteResponse, then use the exchange receive path so ResponseExpected
             // is cleared before the handler processes the next message.
             GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(exchange);
-            const CHIP_ERROR expectedError =
-                termination == ListWriteTermination::kUnexpectedStatusResponse ? CHIP_ERROR_INVALID_MESSAGE_TYPE : CHIP_NO_ERROR;
-            EXPECT_EQ(exchange->HandleMessage(0, payloadHeader, {}, std::move(payload)), expectedError);
+            static_cast<SessionMessageDelegate &>(GetExchangeManager())
+                .OnMessageReceived(packetHeader, payloadHeader, session, SessionMessageDelegate::DuplicateMessage::No,
+                                   std::move(payload));
         }
 
         const bool completed = termination == ListWriteTermination::kFinalChunk;
