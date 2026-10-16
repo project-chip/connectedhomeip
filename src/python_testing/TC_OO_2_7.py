@@ -73,7 +73,7 @@ class TC_OO_2_7(MatterTestCommissionedDevice):
 
     def steps_TC_OO_2_7(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT. EpochKey0 only."),
             TestStep(
                 "0b",
