@@ -357,7 +357,7 @@ TEST_F(TestMicrowaveOvenControlCluster, SetCookTimeSecTest)
     }
 }
 
-/** Advertise AddMoreTime only when it is enabled in the cluster configuration. */
+/** Verify that AddMoreTime is included in the accepted-command list only when supportsAddMoreTime is true. */
 TEST_F(TestMicrowaveOvenControlCluster, AcceptedCommandsTest)
 {
     {
