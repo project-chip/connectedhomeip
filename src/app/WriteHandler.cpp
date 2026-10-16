@@ -76,7 +76,7 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mStateFlags.ClearAll();
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
@@ -634,7 +634,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+    boolValue = false;
     err       = writeRequestParser.GetTimedRequest(&boolValue);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);

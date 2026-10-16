@@ -703,7 +703,12 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsAfterReuse)
                     ASSERT_EQ(handler.OnWriteRequest(exchange, std::move(payload), false), Status::Success);
                     ASSERT_FALSE(handler.IsFree());
                     ASSERT_TRUE(handler.mStateFlags.Has(WriteHandler::StateBits::kHasMoreChunks));
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kIsTimedRequest);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kSuppressResponse);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kProcessingAttributeIsList);
+                    handler.mStateFlags.Set(WriteHandler::StateBits::kAttributeWriteSuccessful);
                     handler.Close();
+                    EXPECT_FALSE(handler.mStateFlags.HasAny());
                     DrainAndServiceIO();
                 }
 
