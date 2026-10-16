@@ -122,18 +122,21 @@ bool sHaveBLEConnections   = false;
  * @param DEFERRED_STORAGE_TIME The deferred time(ms) to store attributes
  */
 
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+
+#if CONFIG_DEFERRED_ATTR_STORAGE
+
 #define ATTRIBUTES_ARRAY_SIZE (3U)
 #define DEFERRED_STORAGE_TIME (500U)
 
 DeferredAttribute gPersisters[] = {
-#if CONFIG_DEFERRED_ATTR_STORAGE
+
     DeferredAttribute(
         ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
     DeferredAttribute(ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id,
                                             Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
     DeferredAttribute(
         ConcreteAttributePath(kExampleEndpointId, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id))
-#endif // CONFIG_DEFERRED_ATTR_STORAGE
 };
 
 // Deferred persistence will be auto-initialized as soon as the default persistence is initialized
@@ -411,7 +414,11 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     /* Add deferred storage attribute for provider */
+#if CONFIG_DEFERRED_ATTR_STORAGE
     app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+#else
+    app::SetAttributePersistenceProvider(&gSimpleAttributePersistence);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
