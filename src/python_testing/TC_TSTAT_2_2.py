@@ -33,6 +33,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device thermostat --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 from mobly import asserts
@@ -60,7 +74,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("1a", "Test Harness Client subscribes to events"),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),

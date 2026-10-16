@@ -63,7 +63,7 @@ class Test_TC_LCFG_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_LCFG_2_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads SupportedLocales attribute from DUT", "Read is successful"),
             TestStep(2, "TH reads ActiveLocale attribute from the DUT", "Read is successful"),
             TestStep(3, "TH writes new string not present in SupportedLocales attribute to ActiveLocale attribute"),

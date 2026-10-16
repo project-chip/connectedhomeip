@@ -85,7 +85,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         # Does the device implement the MinHeatSetpointLimit attribute?
         self.has_min_heat_limit = self.check_pics("TSTAT.S.A0015")
 
-        self.step("1a", "Commission DUT to TH", is_commissioning=True)
+        self.step("1a", "Commission DUT to TH")
 
         UnoccupiedHeatingSetpointValue = None
         UnoccupiedCoolingSetpointValue = None

@@ -56,7 +56,7 @@ class TC_BOOLCFG_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read AttributeList attribute", "DUT replies with the AttributeList attribute"),
             TestStep(3, "Read SupportedSensitivityLevels attribute", "DUT response is success"),
             TestStep(4, "Read DefaultSensitivityLevel attribute, if supported", "DUT response is success"),

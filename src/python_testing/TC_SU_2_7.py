@@ -166,7 +166,7 @@ class TC_SU_2_7(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
     def steps_TC_SU_2_7(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to \"Busy\"",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnQuery."),
             TestStep(2, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does not respond back to DUT.",

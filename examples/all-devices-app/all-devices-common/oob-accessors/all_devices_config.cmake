@@ -58,5 +58,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValveAccessor.cpp"
     )
 endif()

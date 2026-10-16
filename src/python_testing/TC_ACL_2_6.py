@@ -301,8 +301,7 @@ class TC_ACL_2_6(MatterTestCommissionedDevice):
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
-                "DUT is commissioned on TH1 fabric",
-                is_commissioning=True),
+                "DUT is commissioned on TH1 fabric"),
             TestStep(
                 2,
                 "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
