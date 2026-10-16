@@ -1095,6 +1095,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
         save.name = "StoredPreset"_span;
         ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
     }
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
     const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
     uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
@@ -1113,6 +1114,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
                   ClusterStatusCode(Status::Failure));
         EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(id));
         EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+        EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
         ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 3u);
         for (uint8_t expected = 1; expected <= 3; ++expected)
         {
@@ -1131,6 +1133,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailur
     ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
     EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 4u);
     EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
     ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 2u);
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 3);
@@ -1159,6 +1162,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvali
     Commands::MPTZSavePreset::Type save;
     save.name = "PreservedPreset"_span;
     ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
     const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
     uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
@@ -1182,6 +1186,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvali
     EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(), ClusterStatusCode(Status::Busy));
     EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 1u);
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
     ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
     EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetName(), "PreservedPreset");
     uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
