@@ -58,7 +58,7 @@ class TC_SC_3_1(MatterTestCommissionedDevice):
         self.th = self.default_controller
         case_capture.SetObserver(self.th)
 
-        self.step("1a", "TH and the DUT are commissioned.", is_commissioning=True)
+        self.step("1a", "TH and the DUT are commissioned.")
         try:
             await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
         except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected

@@ -62,8 +62,7 @@ class TC_MEDIAFILEMANAGEMENT_2_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
     def steps_TC_MEDIAFILEMANAGEMENT_2_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH ensures at least one file exists on the DUT, adding one "
-                     "with AddFile if AvailableFiles is empty, and records the AvailableStorage value.",
-                     is_commissioning=True),
+                     "with AddFile if AvailableFiles is empty, and records the AvailableStorage value."),
             TestStep(1, "TH sends a DeleteFile command to the DUT with the FileID of an existing file.",
                      "The DUT responds with a success status response (value 0x00)."),
             TestStep(2, "TH reads the AvailableFiles attribute from the DUT.",

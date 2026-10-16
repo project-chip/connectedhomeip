@@ -135,7 +135,7 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
                          "Verify DUT_I sends no further RangingResult."),
             ]
         steps = [
-            TestStep(1, "Commission DUT_I and DUT_R to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT_I and DUT_R to TH"),
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct; for each technology exercised "
                      "below, PeriodicRangingSupport is true; save the elements."),

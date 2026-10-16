@@ -3092,7 +3092,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -3105,7 +3105,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3224,21 +3224,21 @@ endpoint 1 {
 
   server cluster FanControl {
     callback attribute fanMode;
-    ram      attribute fanModeSequence default = 2;
+    callback attribute fanModeSequence default = 2;
     callback attribute percentSetting;
     callback attribute percentCurrent;
-    ram      attribute speedMax default = 10;
+    callback attribute speedMax default = 10;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x01;
+    callback attribute rockSupport default = 0x01;
     callback attribute rockSetting;
-    ram      attribute windSupport default = 0x03;
+    callback attribute windSupport default = 0x03;
     callback attribute windSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 63;
+    callback attribute featureMap default = 63;
     callback attribute clusterRevision;
 
     handle command Step;
@@ -3297,7 +3297,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -3316,7 +3316,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -3335,7 +3335,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -3354,7 +3354,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -3373,7 +3373,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -3392,7 +3392,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -3411,7 +3411,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -3430,7 +3430,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -3449,7 +3449,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -3468,7 +3468,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0006;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {
@@ -3502,9 +3502,9 @@ endpoint 3 {
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x8000;
-    ram      attribute maxMeasuredValue default = 0x8000;
-    ram      attribute tolerance default = 0;
+    callback attribute minMeasuredValue default = 0x8000;
+    callback attribute maxMeasuredValue default = 0x8000;
+    callback attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3543,9 +3543,9 @@ endpoint 4 {
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute tolerance;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 0x2710;
+    callback attribute tolerance;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -3583,17 +3583,17 @@ endpoint 5 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 1000;
-    ram      attribute absMaxHeatSetpointLimit default = 3000;
-    ram      attribute occupiedHeatingSetpoint default = 2000;
-    ram      attribute controlSequenceOfOperation default = 2;
-    ram      attribute systemMode default = 0;
-    ram      attribute thermostatRunningState default = 0;
+    callback attribute localTemperature;
+    callback attribute absMinHeatSetpointLimit default = 1000;
+    callback attribute absMaxHeatSetpointLimit default = 3000;
+    callback attribute occupiedHeatingSetpoint default = 2000;
+    callback attribute controlSequenceOfOperation default = 2;
+    callback attribute systemMode default = 0;
+    callback attribute thermostatRunningState default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

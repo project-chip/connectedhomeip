@@ -72,8 +72,9 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
-#include <device/types/water-valve/WaterValve.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -700,6 +701,17 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
         }
+        if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
+        {
+            RegisterCreator("thermostat", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingThermostat>(LoggingThermostat::Context{
+                    .fabricTable       = mContext->fabricTable,
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
         {
             RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
@@ -846,7 +858,7 @@ private:
         {
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<WaterValve>(mContext->timerDelegate);
+                return MakeDevice<LoggingWaterValve>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)

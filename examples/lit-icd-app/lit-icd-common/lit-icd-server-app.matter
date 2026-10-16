@@ -2322,7 +2322,7 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -2332,8 +2332,8 @@ endpoint 0 {
     callback attribute wiFiVersion;
     callback attribute channelNumber;
     callback attribute rssi;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster EthernetNetworkDiagnostics {
@@ -2346,7 +2346,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2359,7 +2359,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2421,8 +2421,8 @@ endpoint 0 {
     callback attribute registeredClients;
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
-    ram      attribute userActiveModeTriggerHint default = 0x111D;
-    ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
+    callback attribute userActiveModeTriggerHint default = 0x111D;
+    callback attribute userActiveModeTriggerInstruction default = "Restart the application";
     callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;

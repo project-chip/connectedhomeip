@@ -122,8 +122,7 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
         self.step(1, "Commissioning, already done. TH removes any clients from prior runs and generates the client identities "
                      "used by this test: a valid ClientIdentityA (keeping its private key), a valid ClientIdentityB, an invalid "
                      "identity (corrupted signature), and a colliding identity (re-signed with ClientIdentityA's key so it shares "
-                     "A's identifier but differs in bytes).",
-                  is_commissioning=True)
+                     "A's identifier but differs in bytes).")
         # Remove any clients left over from a prior run so the table starts empty.
         preexisting = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
