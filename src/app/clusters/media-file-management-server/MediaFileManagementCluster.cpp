@@ -101,24 +101,28 @@ CHIP_ERROR MediaFileManagementCluster::ReadSupportedMimeTypes(const AttributeVal
     return CHIP_NO_ERROR;
 }
 
-bool MediaFileManagementCluster::IsSupportedMimeType(CharSpan mimeType)
+CHIP_ERROR MediaFileManagementCluster::IsSupportedMimeType(CharSpan mimeType, bool & supported)
 {
     for (size_t i = 0; i < kMaxSupportedMimeTypes; i++)
     {
         char buffer[kMaxMimeTypeLength] = {};
-        MutableCharSpan supported(buffer);
-        CHIP_ERROR err = mDelegate.GetSupportedMimeTypeAtIndex(i, supported);
-        if (err != CHIP_NO_ERROR)
+        MutableCharSpan entry(buffer);
+        CHIP_ERROR err = mDelegate.GetSupportedMimeTypeAtIndex(i, entry);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             // An empty SupportedMimeTypes list places no restriction on what can be stored.
-            return err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED && i == 0;
+            supported = (i == 0);
+            return CHIP_NO_ERROR;
         }
-        if (supported.data_equal(mimeType))
+        ReturnErrorOnFailure(err);
+        if (entry.data_equal(mimeType))
         {
-            return true;
+            supported = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    supported = false;
+    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -172,8 +176,9 @@ std::optional<DataModel::ActionReturnStatus> MediaFileManagementCluster::InvokeC
         VerifyOrReturnValue(peer.IsOperational(), Status::InvalidInState);
         // OfferFile has no response payload, so an unadvertised MIME type is rejected with a
         // cluster-specific status before the delegate is asked to download the file.
-        VerifyOrReturnValue(IsSupportedMimeType(req.mimeType),
-                            ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+        bool mimeTypeSupported = false;
+        ReturnErrorOnFailure(IsSupportedMimeType(req.mimeType, mimeTypeSupported));
+        VerifyOrReturnValue(mimeTypeSupported, ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
         return mDelegate.HandleOfferFile(peer, req.clientName, req.name, req.size, req.mimeType, req.imageURI);
     }
     default:

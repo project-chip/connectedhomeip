@@ -215,7 +215,6 @@ class TC_MEDIAFILEMANAGEMENT_2_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
                 # A DUT that already reclaimed the file rejects the delete; that is not a
                 # failure of what this test verifies, so it must not mask the verdict.
                 log.warning("Could not delete the test file with FileID %d: %s", file_id, e)
-        super().teardown_test()
 
 
 if __name__ == "__main__":

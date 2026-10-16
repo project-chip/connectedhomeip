@@ -60,6 +60,7 @@ public:
 
     CHIP_ERROR GetSupportedMimeTypeAtIndex(size_t index, MutableCharSpan & mimeType) override
     {
+        ReturnErrorOnFailure(mMimeTypeError);
         if (index >= mMimeTypeCount)
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -107,6 +108,7 @@ public:
     uint64_t mAvailableStorage     = 500000;
     size_t mFileCount              = 2;
     size_t mMimeTypeCount          = 3;
+    CHIP_ERROR mMimeTypeError      = CHIP_NO_ERROR;
     bool mAddFileCalled            = false;
     bool mRequestSharedFilesCalled = false;
     bool mOfferFileCalled          = false;
@@ -306,6 +308,31 @@ TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithEmptyMimeTypeListAccep
     auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithMimeTypeLookupErrorFails)
+{
+    // A delegate that cannot report its SupportedMimeTypes must not make a supported
+    // type look unsupported; the failure is surfaced instead of UnsupportedMimeType.
+    delegate.mMimeTypeError = CHIP_ERROR_INTERNAL;
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("vid.mp4");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("video/mp4");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_NE(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+    EXPECT_FALSE(delegate.mOfferFileCalled);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

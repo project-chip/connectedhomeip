@@ -225,7 +225,6 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
             except InteractionModelError as e:
                 # Step 5 may already have deleted it; that must not mask the verdict.
                 log.warning("Could not delete the precondition file with FileID %d: %s", file_id, e)
-        super().teardown_test()
 
     def _collect_shared_files_events(self, event_handler: EventSubscriptionHandler, request_id: int,
                                      timeout_sec: float) -> list:
