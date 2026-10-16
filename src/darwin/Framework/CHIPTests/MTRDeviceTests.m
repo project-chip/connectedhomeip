@@ -7657,7 +7657,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
                                      clientQueue:queue
                                    reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                    }
-                         subscriptionEstablished:^() { }];
+                         subscriptionEstablished:^() {}];
 
     __weak __auto_type weakSelf = self;
     [self addTeardownBlock:^{
