@@ -28,7 +28,9 @@
 
 namespace chip::app::OOBDataSerializer {
 
-inline constexpr CharSpan kSetAttributeAction = "SetAttribute"_span;
+inline constexpr CharSpan kSetAttributeAction     = "SetAttribute"_span;
+inline constexpr CharSpan kPauseSimulationAction  = "PauseSimulation"_span;
+inline constexpr CharSpan kResumeSimulationAction = "ResumeSimulation"_span;
 
 static constexpr uint8_t kTagEndpointId  = 1;
 static constexpr uint8_t kTagClusterId   = 2;

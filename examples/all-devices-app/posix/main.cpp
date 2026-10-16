@@ -56,7 +56,9 @@
 #if PW_RPC_ENABLED
 #include <Rpc.h>
 #include <oob-accessors/pigweed/PigweedAttributeAccessor.h>
+#include <oob-accessors/pigweed/PigweedSimulationDelegate.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+#include <pigweed/rpc_services/Simulation.h>
 #endif // PW_RPC_ENABLED
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
@@ -239,6 +241,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #if PW_RPC_ENABLED
     static chip::app::PigweedAttributeAccessor sPwOobAccessor;
     chip::rpc::PigweedDebugAccessInterceptorRegistry::Instance().Register(&sPwOobAccessor);
+
+    static chip::app::PigweedSimulationDelegate sPwSimulationDelegate;
+    static chip::rpc::Simulation sSimulationService(&sPwSimulationDelegate);
+    chip::rpc::RegisterService(sSimulationService);
 
     const uint16_t rpcServerPort = AppOptions::GetConfig().rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort);
     chip::rpc::Init(rpcServerPort);

@@ -37,11 +37,13 @@ source_set("oob-accessors") {
     "OOBAccessorRegistry.h",
     "OOBDataSerializer.cpp",
     "OOBDataSerializer.h",
+    "SimulationAccessor.h",
   ]
 
   public_deps = [
     ":all_devices_config_buildconfig",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:simulated-devices",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

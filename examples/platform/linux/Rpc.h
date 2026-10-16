@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <pw_rpc/server.h>
 #include <queue>
 #include <vector>
 
@@ -35,6 +36,9 @@ using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId cl
                                              uint32_t actionId, std::vector<uint32_t> args);
 
 void SubscribeActions(RpcActionsSubscribeCallback subscriber);
+
+/// Registers an application-specific Pigweed RPC service with the platform RPC server.
+void RegisterService(pw::rpc::Service & service);
 
 int Init(uint16_t rpcServerPort);
 

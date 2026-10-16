@@ -18,30 +18,24 @@
 
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device/api/SimulatedDevice.h>
 #include <device/types/soil-sensor/SoilSensor.h>
-#include <platform/DefaultTimerDelegate.h>
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
 /**
  * Simulated soil sensor that increases the reported moisture level over time.
  */
-class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext
+class IncreasingMoistureSoilSensor : public SoilSensor, public SimulatedDevice
 {
 public:
-    IncreasingMoistureSoilSensor();
-    ~IncreasingMoistureSoilSensor() override;
+    explicit IncreasingMoistureSoilSensor(Simulator & simulator);
+    ~IncreasingMoistureSoilSensor() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    // TimerContext
-    void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
+    void OnSimulationTick() override;
 };
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app

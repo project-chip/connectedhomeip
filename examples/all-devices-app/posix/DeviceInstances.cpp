@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
+#include <oob-accessors/SimulationAccessor.h>
 
 #include <set>
 #include <utility>
@@ -107,6 +108,8 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
     });
+    LogErrorOnFailure(OOBAccessorRegistry::Instance().Register(
+        std::make_unique<SimulationAccessor>(PosixDeviceFactory::GetInstance().GetSimulator())));
     PosixDeviceFactory::ExecuteRegistrationHooks(mRootNode.RootDevice());
 
     for (const auto & entry : deviceEntries)

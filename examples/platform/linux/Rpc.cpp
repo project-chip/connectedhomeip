@@ -153,6 +153,11 @@ void RegisterServices(pw::rpc::Server & server)
 
 } // namespace
 
+void RegisterService(pw::rpc::Service & service)
+{
+    pw::rpc::system_server::Server().RegisterService(service);
+}
+
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 void SubscribeActions(RpcActionsSubscribeCallback subscriber)
 {

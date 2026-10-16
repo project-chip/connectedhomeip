@@ -146,6 +146,13 @@ pw_proto_library("thread_service") {
   prefix = "thread_service"
 }
 
+pw_proto_library("simulation_service") {
+  sources = [ "protos/simulation_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "simulation_service"
+}
+
 pw_proto_library("wifi_service") {
   sources = [ "protos/wifi_service.proto" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]

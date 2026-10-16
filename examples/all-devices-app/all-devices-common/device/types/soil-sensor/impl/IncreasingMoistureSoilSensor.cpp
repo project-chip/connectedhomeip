@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "IncreasingMoistureSoilSensor.h"
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -22,8 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
 namespace {
 constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
@@ -59,37 +59,26 @@ const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureCon
 
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(Simulator & simulator) :
+    SoilSensor(simulator.GetTimerDelegate(), kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig),
+    SimulatedDevice(simulator, kIncreaseMoistureIntervalSec)
 {}
-
-IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
-{
-    mTimerDelegate.CancelTimer(this);
-}
 
 CHIP_ERROR IncreasingMoistureSoilSensor::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                   EndpointComposition composition)
 {
     ReturnErrorOnFailure(SoilSensor::Register(endpoint, provider, composition));
-
-    CHIP_ERROR err = mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec);
-    if (err != CHIP_NO_ERROR)
-    {
-        SoilSensor::Unregister(provider);
-        return err;
-    }
-
+    StartSimulation();
     return CHIP_NO_ERROR;
 }
 
 void IncreasingMoistureSoilSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mTimerDelegate.CancelTimer(this);
+    StopSimulation();
     SoilSensor::Unregister(provider);
 }
 
-void IncreasingMoistureSoilSensor::TimerFired()
+void IncreasingMoistureSoilSensor::OnSimulationTick()
 {
     auto & soilCluster = SoilMeasurementCluster();
     auto moisture      = soilCluster.GetSoilMoistureMeasuredValue();
@@ -120,9 +109,6 @@ void IncreasingMoistureSoilSensor::TimerFired()
 
     ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", temperature.Value());
     LogErrorOnFailure(tempCluster.SetMeasuredValue(temperature));
-
-    VerifyOrDie(mTimerDelegate.StartTimer(this, kIncreaseMoistureIntervalSec) == CHIP_NO_ERROR);
 }
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app

@@ -24,6 +24,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
 #include <device-factory/DeviceRegistrationEntry.h>
+#include <device/api/Simulator.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -87,6 +88,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 
 namespace chip::app {
 
@@ -295,7 +297,17 @@ public:
         return instance;
     }
 
-    void Init(const Context & context) { mContext.emplace(context); }
+    void Init(const Context & context)
+    {
+        mContext.emplace(context);
+        mSimulator = std::make_unique<Simulator>(context.timerDelegate);
+    }
+
+    Simulator & GetSimulator()
+    {
+        VerifyOrDie(mSimulator != nullptr);
+        return *mSimulator;
+    }
 
     void RegisterCreator(const std::string & deviceTypeArg, DeviceCreator && creator)
     {
@@ -342,6 +354,7 @@ public:
 private:
     std::map<std::string, DeviceCreator> mRegistry;
     std::optional<Context> mContext;
+    std::unique_ptr<Simulator> mSimulator;
     std::string mDefaultDevice;
 
     DeviceFactory()
@@ -736,7 +749,10 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            RegisterCreator("soil-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<IncreasingMoistureSoilSensor>(GetSimulator());
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {

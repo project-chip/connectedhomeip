@@ -35,6 +35,26 @@ source_set("device-interface") {
   ]
 }
 
+source_set("simulated-devices") {
+  sources = [
+    "SimulatedDevice.cpp",
+    "SimulatedDevice.h",
+    "Simulator.cpp",
+    "Simulator.h",
+  ]
+
+  public_deps = [
+    ":device-interface",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_configs = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/device:includes",
+    "${chip_root}/src:includes",
+  ]
+}
+
 source_set("single-endpoint-device") {
   sources = [
     "SingleEndpoint.cpp",

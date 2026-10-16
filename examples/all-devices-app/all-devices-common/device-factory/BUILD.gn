@@ -36,6 +36,7 @@ source_set("device-factory") {
   public_deps = [
     ":device-registration-entry",
     ":enabled_devices_buildconfig",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:simulated-devices",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",

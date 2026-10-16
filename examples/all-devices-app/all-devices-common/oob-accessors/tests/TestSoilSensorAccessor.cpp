@@ -28,6 +28,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/OOBDataSerializer.h>
+#include <oob-accessors/SimulationAccessor.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <pw_unit_test/framework.h>
@@ -95,6 +96,7 @@ protected:
     }
 
     DefaultTimerDelegate mTimerDelegate;
+    Simulator mSimulator{ mTimerDelegate };
     Testing::TestServerClusterContext mClusterContext;
     CodeDrivenDataModelProvider mProvider{ mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider() };
     SoilSensor mDevice{ mTimerDelegate, kDefaultMoistureLimits, kDefaultTempConfig };
@@ -279,11 +281,11 @@ TEST_F(TestSoilSensorAccessor, UnhandledActionOrEndpoint)
 // Test 10: IncreasingMoistureSoilSensor registers, supports OOB accessors, and advances simulation from OOB state
 TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
 {
-    IncreasingMoistureSoilSensor sensor;
+    IncreasingMoistureSoilSensor sensor(mSimulator);
     EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
-    RegisterOOBAccessors(sensor, registry);
+    RegisterOOBAccessors(static_cast<SoilSensor &>(sensor), registry);
 
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
         ConcreteAttributePath(2, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id),
@@ -310,6 +312,45 @@ TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
     EXPECT_EQ(ReadTemperature(sensor).Value(), 2250);
 
     sensor.Unregister(mProvider);
+}
+
+TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_SimulationPauseResume)
+{
+    IncreasingMoistureSoilSensor sensor(mSimulator);
+    EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
+
+    InMemoryOOBAccessorRegistry registry;
+    EXPECT_EQ(registry.Register(std::make_unique<SimulationAccessor>(mSimulator)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(sensor.IsSimulationRunning());
+
+    // Pause via registry action
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_FALSE(sensor.IsSimulationRunning());
+
+    // Repeated pause while paused is a no-op
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_FALSE(sensor.IsSimulationRunning());
+
+    // Resume via registry action
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(sensor.IsSimulationRunning());
+
+    // Repeated resume while running is a no-op
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(sensor.IsSimulationRunning());
+
+    // Unregister stops the simulation
+    sensor.Unregister(mProvider);
+    EXPECT_FALSE(sensor.IsSimulationRunning());
+}
+
+TEST_F(TestSoilSensorAccessor, NonSimulatedSoilSensor_IgnoresSimulationActions)
+{
+    // mDevice is a base non-simulated SoilSensor registered in SetUp().
+    // Since it has no simulation control, simulation pause/resume actions are unhandled.
+    EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kPauseSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(mRegistry.HandleAction(OOBDataSerializer::kResumeSimulationAction, {}), CHIP_ERROR_NOT_FOUND);
 }
 
 } // namespace

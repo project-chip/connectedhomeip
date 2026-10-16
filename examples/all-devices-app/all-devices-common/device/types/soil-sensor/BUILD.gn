@@ -44,5 +44,8 @@ source_set("increasing") {
     "impl/IncreasingMoistureSoilSensor.h",
   ]
 
-  public_deps = [ ":soil-sensor" ]
+  public_deps = [
+    ":soil-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:simulated-devices",
+  ]
 }

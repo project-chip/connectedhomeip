@@ -190,6 +190,7 @@ executable("all-devices-app") {
       # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:simulation_service.nanopb_rpc",
       "${chip_root}/examples/platform/linux:pw_rpc",
     ]
 
