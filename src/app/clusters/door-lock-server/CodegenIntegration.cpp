@@ -374,9 +374,9 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
         if (nullptr == freeSlot)
         {
             ChipLogError(Zcl,
-                        "[checkExpiringUserAccess] Tracking table full, denying first use for userIndex=%d "
-                        "[endpointId=%d]",
-                        userIndex, endpointId);
+                         "[checkExpiringUserAccess] Tracking table full, denying first use for userIndex=%d "
+                         "[endpointId=%d]",
+                         userIndex, endpointId);
             return false;
         }
         freeSlot->valid             = true;
