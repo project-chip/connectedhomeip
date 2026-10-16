@@ -100,12 +100,14 @@ public:
     // Accessors and Mutators
     //
     std::string GetName() const { return mName; }
-    void SetName(chip::CharSpan aName)
+    bool SetName(chip::CharSpan aName)
     {
-        VerifyOrReturn(aName.size() <= kMaxMPTZPresetNameLength,
-                       ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Preset name exceeds the maximum byte length"));
+        VerifyOrReturnValue(
+            aName.size() <= kMaxMPTZPresetNameLength, false,
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Preset name exceeds the maximum byte length"));
         mName = std::string(aName.begin(), aName.end());
         ChipLogProgress(Zcl, "My preset name being set %s", mName.c_str());
+        return true;
     }
 
     uint8_t GetPresetID() const { return mPresetID; }

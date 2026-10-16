@@ -378,7 +378,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetHelperRejectsOverlengthNames)
 {
     MPTZPresetHelper preset;
-    preset.SetName("01234567890123456789012345678901"_span);
+    EXPECT_TRUE(preset.SetName("01234567890123456789012345678901"_span));
     const std::string originalName = preset.GetName();
     ASSERT_EQ(originalName.size(), 32u);
 
@@ -390,13 +390,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetHelperRejectsOv
                                         CharSpan(multibyteName.data(), multibyteName.size()) };
     for (CharSpan name : invalidNames)
     {
-        preset.SetName(name);
+        EXPECT_FALSE(preset.SetName(name));
         EXPECT_EQ(preset.GetName(), originalName);
         MPTZPresetHelper constructed(1, name, mServer.GetLogic().GetMptzPosition());
         EXPECT_TRUE(constructed.GetName().empty());
     }
 
-    preset.SetName(""_span);
+    EXPECT_TRUE(preset.SetName(""_span));
     EXPECT_TRUE(preset.GetName().empty());
     const std::string validMultibyteName = std::string(29, 'c') + "\xE7\x95\x8C";
     MPTZPresetHelper constructed(1, CharSpan(validMultibyteName.data(), validMultibyteName.size()),
