@@ -536,6 +536,23 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadFullListReusesRemov
     EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovalWrapsCursorToLowerFreeID)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.name = "Preset"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+        EXPECT_EQ(mMockDelegate.mLastSavedPresetID, id);
+    }
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, testMaxPresets);
+
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 2;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+}
+
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadOversizedListRejectsImplicitSave)
 {
     for (uint8_t id = 1; id <= testMaxPresets; ++id)
