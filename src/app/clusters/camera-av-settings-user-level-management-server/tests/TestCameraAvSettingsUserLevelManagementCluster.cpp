@@ -1297,7 +1297,8 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, MigratesMPTZPres
 
 TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, SkipsMigratedOverlengthPresetName)
 {
-    const std::string name(132, 'a');
+    const std::string boundaryName(33, 'b');
+    const std::string reportName(132, 'a');
     Structs::MPTZPresetStruct::Type preset;
     preset.presetID = 1;
     preset.name     = "ValidPreset"_span;
@@ -1311,14 +1312,25 @@ TEST_F(TestMigrateCameraAvSettingsUserLevelManagementMigration, SkipsMigratedOve
     ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType), CHIP_NO_ERROR);
     ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
     preset.presetID = 2;
-    preset.name     = CharSpan(name.data(), name.size());
+    preset.name     = CharSpan(boundaryName.data(), boundaryName.size());
+    ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    preset.presetID = 3;
+    preset.name     = CharSpan(reportName.data(), reportName.size());
     ASSERT_EQ(preset.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
     ASSERT_EQ(writer.EndContainer(arrayType), CHIP_NO_ERROR);
     ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-    WriteSafeTlv(Attributes::MPTZPresets::Id, ByteSpan(buffer, writer.GetLengthWritten()));
+    const ByteSpan encoded(buffer, writer.GetLengthWritten());
+    WriteSafeTlv(Attributes::MPTZPresets::Id, encoded);
     ASSERT_FALSE(HasFailure());
     StartServer();
     ASSERT_FALSE(HasFailure());
+
+    uint8_t migratedBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan migrated(migratedBuffer);
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id,
+                                            Attributes::MPTZPresets::Id);
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().ReadValue(presetsPath, migrated), CHIP_NO_ERROR);
+    EXPECT_TRUE(encoded.data_equal(migrated));
 
     Attributes::MPTZPresets::TypeInfo::DecodableType presets;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
