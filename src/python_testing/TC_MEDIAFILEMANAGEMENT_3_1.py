@@ -39,8 +39,8 @@ from TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing import matter_asserts
 from matter.interaction_model import InteractionModelError
+from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterTestCommissionedDevice

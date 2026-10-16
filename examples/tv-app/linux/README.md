@@ -179,8 +179,8 @@ survives a KVS factory reset but not a reboot.
 -   User consent: the tv-app has no consent UI. It grants consent automatically
     for both `RequestSharedFiles` and `OfferFile`, and logs
     `auto-granting consent ...` when it does. When a test asks you to approve a
-    share or accept an offered file on the DUT, no action is needed; press
-    Enter to continue.
+    share or accept an offered file on the DUT, no action is needed; press Enter
+    to continue.
 -   Sharing files: `RequestSharedFiles` shares every stored file that matches
     the optional `SupportedMimeTypes` filter, emitting one `SharedFilesAdded`
     event per file. At least one file must already be stored, for example one
