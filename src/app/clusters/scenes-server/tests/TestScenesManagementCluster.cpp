@@ -906,8 +906,8 @@ TEST_F(TestScenesManagementCluster, RecallSceneTransitionTimeConstraint)
     EXPECT_FALSE(mMockSceneHandler.mState.on);
 
     RecallScene::Type recall_request;
-    recall_request.groupID = kTestGroupId;
-    recall_request.sceneID = kTestSceneId;
+    recall_request.groupID           = kTestGroupId;
+    recall_request.sceneID           = kTestSceneId;
     const uint32_t maxTransitionTime = static_cast<uint32_t>(kScenesMaxTransitionTime);
     recall_request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(maxTransitionTime));
 
