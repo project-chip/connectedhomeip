@@ -66,13 +66,14 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_txt_record_present, assert_valid_cm_key,
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
-                                          assert_valid_hostname, assert_valid_icd_key, assert_valid_long_discriminator_subtype,
-                                          assert_valid_ph_key, assert_valid_ph_pi_relationship, assert_valid_pi_key,
-                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
-                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
-                                          assert_valid_vendor_subtype, assert_valid_vp_key)
+                                          assert_valid_icd_key, assert_valid_long_discriminator_subtype, assert_valid_ph_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
+                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
+                                          assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
+                                          assert_valid_vp_key)
 from mdns_discovery.utils.network import is_dut_tcp_supported
-from mdns_discovery.utils.support import SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, DiscoverySupport, verify_aaaa_records
+from mdns_discovery.utils.support import (SUBTYPE_BROWSE_TIMEOUT_SEC, TCP_PICS_STR, DiscoverySupport, get_single_ptr_instance_name,
+                                          get_verify_srv_record, verify_aaaa_records)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -289,23 +290,6 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
 
         return None
 
-    async def _get_verify_discriminator_subtype_ptr_instance_name(self, discriminator_subtype: str, must_be_present: bool = True) -> str | None:
-
-        # TH performs a PTR record query against the Discriminator Subtype
-        ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[discriminator_subtype],
-            log_output=True
-        )
-
-        if must_be_present or ptr_records:
-            # Verify that there is one, and only one, Discriminator Subtype PTR record
-            asserts.assert_equal(len(ptr_records), 1,
-                                 f"There must only be one Long or Short Discriminator Subtype ({discriminator_subtype}) PTR record, found {len(ptr_records)}.")
-
-            return ptr_records[0].instance_name
-
-        return None
-
     async def _verify_discriminator_subtype_advertisements(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
         # Determine discriminator type (Long or Short) to verify
         assert_valid_discriminator_subtype = (
@@ -325,18 +309,11 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
             short_discriminator = (int(discriminator) >> 8) & 0x0F
             short_discriminator_subtype = f"_S{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
-            # Performs PTR record query
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[short_discriminator_subtype],
-                log_output=True
-            )
-
             # Verify that there is one, and only one, Short Discriminator subtype PTR record
-            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'Short Discriminator Subtype' PTR record.")
-            short_discriminator_ptr = ptr_records[0]
+            short_discriminator_ptr_instance_name = await get_single_ptr_instance_name(short_discriminator_subtype)
 
             # Verify that the Short and Long Discriminator Subtype PTR record's instance names are equal
-            asserts.assert_equal(short_discriminator_ptr.instance_name, discriminator_ptr_instance_name,
+            asserts.assert_equal(short_discriminator_ptr_instance_name, discriminator_ptr_instance_name,
                                  "Short and Long Discriminator Subtype PTR record's instance names must be equal.")
 
     async def _verify_commissionable_subtypes(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool, extended_discovery: bool = False) -> None:
@@ -359,18 +336,12 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
         else:
             # When NOT in Extended Discovery Mode, verify that the _CM subtype is present
             # TH performs a PTR record query against the 'In Commissioning Mode Subtype'
-            ptr_records = await MdnsDiscovery().get_ptr_records(
-                service_types=[cm_subtype],
-                log_output=True
-            )
-
-            # Verify that there is one, and only one, 'In Commissioning Mode Subtype' PTR record
-            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'In Commissioning Mode Subtype' subtype PTR record.")
-            cm_ptr = ptr_records[0]
+            # and verifies that there is one, and only one, such PTR record
+            cm_ptr_instance_name = await get_single_ptr_instance_name(cm_subtype)
 
             # Verify that the 'In Commissioning Mode Subtype' PTR record's instance name
             # is equal to the Discriminator Subtype PTR record's instance name
-            asserts.assert_equal(cm_ptr.instance_name, discriminator_ptr_instance_name,
+            asserts.assert_equal(cm_ptr_instance_name, discriminator_ptr_instance_name,
                                  "'In Commissioning Mode Subtype' PTR record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
 
         # *** VENDOR SUBTYPE ***
@@ -459,19 +430,7 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
     async def _get_verify_srv_record(self, long_discriminator_ptr_instance_name: str) -> str:
         # TH performs a 'Commissionable Service' SRV record query
         # against 'long_discriminator_subtype_ptr_instance_name'
-        srv_record = await MdnsDiscovery().get_srv_record(
-            service_name=f"{long_discriminator_ptr_instance_name}.{MdnsServiceType.COMMISSIONABLE.value}",
-            service_type=MdnsServiceType.COMMISSIONABLE.value,
-            log_output=True
-        )
-
-        # Verify SRV record is returned
-        asserts.assert_true(srv_record is not None, "SRV record was not returned")
-
-        # Verify that the SRV record's instance name is equal
-        # to 'long_discriminator_subtype_ptr_instance_name'
-        asserts.assert_equal(srv_record.instance_name, long_discriminator_ptr_instance_name,
-                             "SRV record's instance name must be equal to the 'Long Discriminator Subtype' PTR record's instance name.")
+        srv_record = await get_verify_srv_record(long_discriminator_ptr_instance_name, MdnsServiceType.COMMISSIONABLE.value)
 
         # Verify that the DUT's SRV record's instance name is a 64-bit randomly
         # selected ID expressed as a sixteen-char hex string with capital letters
@@ -480,10 +439,6 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
         # Verify that the DUT's SRV record's service type
         # is '_matterc._udp' and service domain '.local.'
         assert_is_commissionable_type(srv_record.service_type)
-
-        # Verify that the target hostname is derived from the 48bit or 64bit MAC
-        # address expressed as a twelve or sixteen capital letter hex string
-        assert_valid_hostname(srv_record.hostname)
 
         return srv_record.hostname
 
@@ -805,7 +760,7 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
             # *** STEP 12 ***
             # Get the Discriminator Subtype (Long or Short) PTR record's instance name
             self.step(12)
-            discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(discriminator_subtype)
+            discriminator_ptr_instance_name = await get_single_ptr_instance_name(discriminator_subtype)
 
             # *** STEP 13 ***
             # Verify commissionable subtype advertisements
@@ -854,7 +809,7 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
         # *** STEP 20 ***
         # Get the 'Long Discriminator Subtype' PTR record's instance name
         self.step(20)
-        long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
+        long_discriminator_ptr_instance_name = await get_single_ptr_instance_name(long_discriminator_subtype)
 
         # *** STEP 21 ***
         # Verify commissionable subtype advertisements
@@ -885,7 +840,7 @@ class TC_SC_4_1(DiscoverySupport, MatterTestCommissionedDevice):
         # Check if DUT Extended Discovery mode is active
         self.step(26)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
+        long_discriminator_ptr_instance_name = await get_single_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
         # If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present, Extended Discovery mode is active
         extended_discovery_mode = long_discriminator_ptr_instance_name is not None

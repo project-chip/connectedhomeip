@@ -301,7 +301,7 @@ from mdns_discovery.utils.support import DiscoverySupport, get_verify_srv_record
 
 class TC_SC_4_X(DiscoverySupport, MatterBaseTest):
     async def test_TC_SC_4_X(self):
-        srv_hostname = await get_verify_srv_record(instance_name, service_type)
+        srv_hostname = (await get_verify_srv_record(instance_name, service_type)).hostname
 ```
 
 ### ✅ Available support functions

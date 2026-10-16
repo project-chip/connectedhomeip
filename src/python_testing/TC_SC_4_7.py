@@ -182,7 +182,7 @@ class TC_SC_4_7(MatterTestUncommissionedDevice):
         # *** STEP 3 ***
         # TH confirms its commissioner advertisement's SRV record by querying it against the instance name
         self.step(3)
-        srv_hostname = await get_verify_srv_record(service.instance_name, MdnsServiceType.COMMISSIONER.value)
+        srv_hostname = (await get_verify_srv_record(service.instance_name, MdnsServiceType.COMMISSIONER.value)).hostname
 
         # *** STEP 4 ***
         # TH confirms its commissioner advertisement's TXT record by querying it against the instance name

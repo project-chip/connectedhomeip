@@ -26,7 +26,8 @@ import asyncio
 import logging
 import time
 
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.data_classes.mdns_service_info import MdnsServiceInfo
+from mdns_discovery.mdns_discovery import DISCOVERY_TIMEOUT_SEC, MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_is_commissioner_type, assert_valid_commissionable_instance_name,
                                           assert_valid_dn_key, assert_valid_dt_key, assert_valid_hostname,
                                           assert_valid_ipv6_addresses, assert_valid_vp_key)
@@ -45,8 +46,8 @@ COMMISSIONER_BROWSE_DEADLINE_SEC = 30
 TCP_PICS_STR = "MCORE.SC.S.TCP"
 
 
-async def get_verify_srv_record(instance_name: str, service_type: str) -> str:
-    """Query the SRV record for instance_name/service_type, verify it, and return its hostname."""
+async def get_verify_srv_record(instance_name: str, service_type: str) -> MdnsServiceInfo:
+    """Query the SRV record for instance_name/service_type, verify it, and return it."""
     # TH performs an SRV record query against the instance name
     srv_record = await MdnsDiscovery().get_srv_record(
         service_name=f"{instance_name}.{service_type}",
@@ -65,7 +66,7 @@ async def get_verify_srv_record(instance_name: str, service_type: str) -> str:
     # capital letter hex string
     assert_valid_hostname(srv_record.hostname)
 
-    return srv_record.hostname
+    return srv_record
 
 
 async def verify_aaaa_records(hostname: str) -> list[str]:
@@ -81,7 +82,7 @@ async def verify_aaaa_records(hostname: str) -> list[str]:
 
 
 async def get_single_ptr_instance_name(subtype: str, must_be_present: bool = True,
-                                       timeout_sec: float = SUBTYPE_BROWSE_TIMEOUT_SEC) -> str | None:
+                                       timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> str | None:
     """Query PTR records for subtype and return the single advertised instance name.
 
     Asserts exactly one record exists. Returns None when must_be_present is False and none exist.
