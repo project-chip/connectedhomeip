@@ -377,6 +377,9 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
             imports_module(info.imports, module) or
             (filename != "__init__.py" and filename in info.mentioned_files))]
         for other in importers:
+            if other.split("/")[0].removesuffix(".py") in used_by_framework:
+                return Selection(full_reason=f"{TEST_TREE}{origin} is used by {TEST_TREE}{other}, which the test "
+                                 "framework imports, so every test runs it")
             if runnable(other):
                 selection.tests.setdefault(other, f"uses {TEST_TREE}{origin}")
             if files[other].module not in seen:

@@ -163,7 +163,9 @@ class TestSelect(unittest.TestCase):
         "test_testing/TestThing.py": "",
         "post_certification_tests/checks.py": "",
         "netpkg/__init__.py": "",
-        "netpkg/discovery.py": "",
+        "netpkg/discovery.py": "from netutil.resolve import lookup\n",
+        "netutil/__init__.py": "",
+        "netutil/resolve.py": "",
         "TC_Net.py": CI_BLOCK + "from netpkg.discovery import browse\n",
         "matter_testing_infrastructure/matter/testing/commissioning.py": "def probe():\n    from netpkg.discovery import browse\n",
         "README.md": "",
@@ -314,6 +316,8 @@ class TestSelect(unittest.TestCase):
         # Every test goes through the framework, not only the tests that import the module.
         self.assertIn("imported by the test framework", self.select("netpkg/discovery.py").full_reason)
         self.assertIn("imported by the test framework", self.select("netpkg/__init__.py").full_reason)
+        # A module those packages use reaches every test too, through them.
+        self.assertIn("which the test framework imports", self.select("netutil/resolve.py").full_reason)
         self.assert_selected(self.select("TC_Net.py"), "TC_Net.py")
 
     def test_a_test_no_shard_filter_matches_runs_every_shard(self):
@@ -818,15 +822,21 @@ class TestGateGuards(RepositoryGuard):
                 if (self.ROOT / script).is_file():
                     sources[script] = (self.ROOT / script).read_text(errors="replace")
             for source, content in sources.items():
-                for read in sorted(set(re.findall(rf"{self.TREE}/[\w.*/-]+", content))):
-                    if classify([read])[0]:
+                reads = set(re.findall(rf"{self.TREE}/[\w.*/-]+", content))
+                # The job naming the whole tree, as in --search-directory src/python_testing, reads every test.
+                # Only the job's own steps count: the scripts it runs mention the tree in their help texts.
+                if source == path and re.search(rf"{self.TREE}(?:/(?![\w.*-])|(?![\w/]))", content):
+                    reads.add(self.TREE)
+                for read in sorted(reads):
+                    if read == self.TREE or classify([read])[0]:
                         through = f" through {source}" if source != path else ""
                         others = [need for need in self.needs(body) if need != "pr_scope"]
                         own = self.own_condition(str(body.get("if", "")), "!cancelled()", self.GATE)
                         self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
                             f"Job {job} is skipped on {ONLY}, but it reads {read}{through}, which they can change, so a "
                             "break there would go unseen until the full CI run on master after merge.",
-                            f"in {path}, stop gating job {job}, or stop it reading that file. Ungated, the job starts:",
+                            f"in {path}, stop gating job {job}, or stop it reading that "
+                            f"{'folder' if read == self.TREE else 'file'}. Ungated, the job starts:",
                             f"{job}:", *([f"    needs: [{', '.join(others)}]"] if others else []),
                             *([f"    if: {own}"] if own else [])))
 
