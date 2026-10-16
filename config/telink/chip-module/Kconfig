@@ -356,3 +356,8 @@ config EXPOSE_CHIP_ID_VIA_BLE
 config DEFERRED_ATTR_STORAGE
 	bool "Defer the storage time of attributes"
 	default n
+
+config SECURE_PROGRAMMING
+	bool "Enable reading DAC and keys from the DAC partition"
+	depends on CHIP_FACTORY_DATA
+	default n
