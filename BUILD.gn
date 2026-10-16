@@ -299,7 +299,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   group("check") {
     if (chip_link_tests && chip_device_platform != "fake") {
       deps = [
-        "//examples:example_tests_run",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/py_matter_idl:matter-idl.tests",
@@ -310,6 +309,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         # Platform test group locations.
         "//src/platform/silabs/tests:silabs_platform_tests_run",
       ]
+
+      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+        deps += [ "//examples/energy-management/energy-management-triggers/tests:tests_run" ]
+      }
 
       if (current_os == "linux" || current_os == "mac") {
         deps += [

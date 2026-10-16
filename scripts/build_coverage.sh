@@ -163,8 +163,8 @@ if [ "$skip_gn" == false ]; then
     source "$CHIP_ROOT/scripts/activate.sh"
 
     # Set coverage data to zero if not accumulating
-    if [[ -d "$OUTPUT_ROOT/obj" && "$ACCUMULATE" == false ]]; then
-        lcov --zerocounters --directory "$OUTPUT_ROOT/obj" \
+    if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
+        lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
             "${QUIET_FLAG[@]}"
     fi
 
@@ -264,20 +264,15 @@ fi
 
 mkdir -p "$COVERAGE_ROOT"
 
-LCOV_DIRECTORIES=(--directory "$OUTPUT_ROOT/obj/src")
-if [[ -d "$OUTPUT_ROOT/obj/examples" ]]; then
-    LCOV_DIRECTORIES+=(--directory "$OUTPUT_ROOT/obj/examples")
-fi
-
 # Capture compile time coverage data
-lcov --capture --initial "${LCOV_DIRECTORIES[@]}" \
+lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --output-file "$COVERAGE_ROOT/lcov_base.info" \
     "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
     "${QUIET_FLAG[@]}"
 
 # Capture runtime coverage data
-lcov --capture "${LCOV_DIRECTORIES[@]}" \
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --output-file "$COVERAGE_ROOT/lcov_test.info" \
     "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
