@@ -343,13 +343,6 @@ config OPENTHREAD_SED_RAM_CODE
 	help
 	  Move SED standby critical path code to Retention RAM to reduce wakeup latency and power.    
 
-config IEEE802154_TLX_OPTIMIZATION
-    bool "Optimize 802.15.4 RF performance for TLX SoCs"
-    default y if PM && SOC_FAMILY_TELINK_TLX
-    default n
-    help
-      Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
-
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM
     default 4096 if SOC_FAMILY_TELINK_TLX
