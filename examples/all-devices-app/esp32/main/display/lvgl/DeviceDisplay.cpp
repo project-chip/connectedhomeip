@@ -18,13 +18,16 @@
 
 #include "DeviceDisplay.h"
 #include "CommissioningCodesScreen.h"
+#include "CommissioningMonitor.h"
+#include "DisplayBoard.h"
 #include "DisplayNotificationHub.h"
+#include "DisplayWake.h"
 #include "HomeScreen.h"
 #include "NavigationStack.h"
 #include "SystemMenuScreen.h"
+#include "Theme.h"
 
 #include <app/server/Server.h>
-#include <bsp/esp-bsp.h>
 #include <cinttypes>
 #include <esp_log.h>
 #include <lvgl.h>
@@ -33,9 +36,6 @@ namespace {
 
 const char TAG[] = "Display";
 
-// bsp_display_lock() treats 0 as "wait indefinitely".
-constexpr uint32_t kWaitForever = 0;
-
 // 30 seconds of inactivity before blanking the LCD backlight.
 constexpr uint32_t kInactivityTimeoutMs = 30000;
 
@@ -43,21 +43,33 @@ constexpr uint32_t kInactivityTimeoutMs = 30000;
 // after a failed bring-up.
 lv_display_t * gDisplay = nullptr;
 
+constexpr int kBrightnessOn   = 100;
+constexpr uint32_t kFadeOutMs = 700;
+
 bool sBacklightOn       = true;
 lv_obj_t * sWakeOverlay = nullptr;
+
+void SetBrightnessStep(void *, int32_t value)
+{
+    DisplayBoard::SetBrightness(value);
+}
+
+void FadeOut()
+{
+    lv_anim_t anim;
+    lv_anim_init(&anim);
+    lv_anim_set_var(&anim, gDisplay);
+    lv_anim_set_exec_cb(&anim, SetBrightnessStep);
+    lv_anim_set_values(&anim, kBrightnessOn, 0);
+    lv_anim_set_duration(&anim, kFadeOutMs);
+    lv_anim_set_path_cb(&anim, lv_anim_path_ease_in);
+    lv_anim_start(&anim);
+}
 
 void OnWakeOverlayTouch(lv_event_t * event)
 {
     ESP_LOGI(TAG, "Touch detected while sleeping; waking display");
-    bsp_display_backlight_on();
-    sBacklightOn = true;
-
-    if (sWakeOverlay != nullptr)
-    {
-        lv_obj_delete(sWakeOverlay);
-        sWakeOverlay = nullptr;
-    }
-    lv_display_trigger_activity(gDisplay);
+    WakeDisplay();
 }
 
 void CheckInactivityTimer(lv_timer_t * timer)
@@ -73,7 +85,7 @@ void CheckInactivityTimer(lv_timer_t * timer)
         if (inactiveMs >= kInactivityTimeoutMs)
         {
             ESP_LOGI(TAG, "Display inactive for %" PRIu32 " ms; turning off backlight", inactiveMs);
-            bsp_display_backlight_off();
+            FadeOut();
             sBacklightOn = false;
 
             // Place an invisible overlay on the top layer to intercept the wake touch
@@ -81,9 +93,8 @@ void CheckInactivityTimer(lv_timer_t * timer)
             if (sWakeOverlay == nullptr)
             {
                 sWakeOverlay = lv_obj_create(lv_layer_top());
+                lv_obj_remove_style_all(sWakeOverlay);
                 lv_obj_set_size(sWakeOverlay, LV_PCT(100), LV_PCT(100));
-                lv_obj_set_style_bg_opa(sWakeOverlay, LV_OPA_TRANSP, LV_PART_MAIN);
-                lv_obj_set_style_border_width(sWakeOverlay, 0, LV_PART_MAIN);
                 lv_obj_clear_flag(sWakeOverlay, LV_OBJ_FLAG_SCROLLABLE);
                 lv_obj_add_event_cb(sWakeOverlay, OnWakeOverlayTouch, LV_EVENT_PRESSED, nullptr);
             }
@@ -93,26 +104,46 @@ void CheckInactivityTimer(lv_timer_t * timer)
 
 } // namespace
 
+void WakeDisplay()
+{
+    if (gDisplay == nullptr)
+    {
+        return;
+    }
+
+    if (!sBacklightOn)
+    {
+        lv_anim_delete(gDisplay, SetBrightnessStep);
+        DisplayBoard::SetBrightness(kBrightnessOn);
+        sBacklightOn = true;
+    }
+
+    if (sWakeOverlay != nullptr)
+    {
+        lv_obj_delete(sWakeOverlay);
+        sWakeOverlay = nullptr;
+    }
+    lv_display_trigger_activity(gDisplay);
+}
+
 void InitDeviceDisplay()
 {
     // Powers the panel rails, starts the SPI panel and the LVGL port task.
-    gDisplay = bsp_display_start();
+    gDisplay = DisplayBoard::Start();
     if (gDisplay == nullptr)
     {
-        ESP_LOGE(TAG, "bsp_display_start() failed");
+        ESP_LOGE(TAG, "DisplayBoard::Start() failed");
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
         ESP_LOGE(TAG, "Could not take the LVGL lock");
+        gDisplay = nullptr;
         return;
     }
 
-    // Configure dark theme
-    lv_theme_t * theme = lv_theme_default_init(gDisplay, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_CYAN),
-                                               /* dark = */ true, LV_FONT_DEFAULT);
-    lv_display_set_theme(gDisplay, theme);
+    InitTheme(gDisplay);
 
     lv_obj_t * screen = lv_display_get_screen_active(gDisplay);
 
@@ -127,12 +158,12 @@ void InitDeviceDisplay()
     // Register inactivity timer to blank display after 30s
     lv_timer_create(CheckInactivityTimer, 1000, nullptr);
 
-    bsp_display_unlock();
-
     // Only turn the backlight on once there is something to look at, to avoid
     // showing the uninitialized panel contents.
-    ESP_ERROR_CHECK_WITHOUT_ABORT(bsp_display_backlight_on());
+    DisplayBoard::SetBrightness(kBrightnessOn);
     sBacklightOn = true;
+
+    DisplayBoard::Unlock();
 }
 
 void ShowRestartingMessage()
@@ -142,16 +173,13 @@ void ShowRestartingMessage()
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
+        ESP_LOGE(TAG, "Could not acquire display lock for the restart message");
         return;
     }
 
-    if (!sBacklightOn)
-    {
-        bsp_display_backlight_on();
-        sBacklightOn = true;
-    }
+    WakeDisplay();
 
     lv_obj_t * screen = lv_display_get_screen_active(gDisplay);
 
@@ -159,6 +187,7 @@ void ShowRestartingMessage()
     // them first.
     NavigationStack::Detach();
     lv_obj_clean(screen);
+    lv_obj_set_layout(screen, LV_LAYOUT_NONE);
     lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_HIDDEN);
     lv_obj_t * label = lv_label_create(screen);
     lv_label_set_text_static(label, "Restarting...");
@@ -170,7 +199,7 @@ void ShowRestartingMessage()
     lv_display_trigger_activity(gDisplay);
     lv_refr_now(gDisplay);
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }
 
 void InitDisplayDataModelListener()
@@ -183,6 +212,7 @@ void InitDisplayDataModelListener()
     }
 
     chip::app::DisplayNotificationHub::Instance().Init();
+    CommissioningMonitor::Init();
 
     // Called on the CHIP thread once Server::Init() has populated the fabric table. An
     // uncommissioned device jumps straight to the onboarding payload, so the breadcrumbs
@@ -192,8 +222,9 @@ void InitDisplayDataModelListener()
         return;
     }
 
-    if (!bsp_display_lock(kWaitForever))
+    if (!DisplayBoard::Lock())
     {
+        ESP_LOGE(TAG, "Could not acquire display lock for the initial screen");
         return;
     }
 
@@ -201,5 +232,5 @@ void InitDisplayDataModelListener()
     NavigationStack::Push("System", ShowSystemMenu);
     NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
 
-    bsp_display_unlock();
+    DisplayBoard::Unlock();
 }

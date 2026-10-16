@@ -30,6 +30,15 @@
 #include <openthread/error.h>
 #include <openthread/udp.h>
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+#include <inet/IPv6Datagram.h>
+#include <openthread/icmp6.h>
+#include <openthread/message.h>
+
+#include <algorithm>
+#include <cstring>
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 namespace chip {
 namespace Inet {
 
@@ -46,7 +55,112 @@ namespace {
 // buffer.
 constexpr size_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
 constexpr size_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+// RFC 4443 section 3.1; openthread/icmp6.h does not define it.
+constexpr uint8_t kIcmp6CodeDstUnreachPort = 4;
+
+otIcmp6Handler sIcmp6Handler;
+
+// Registered once: this assumes no platform re-initializes OpenThread at runtime; if one does, reports stop.
+otInstance * sIcmp6HandlerInstance = nullptr;
+
+// sPending and sBoundEndPoints are guarded by the OpenThread lock: HandleIcmp6Receive runs with it held, and all
+// other access takes LockOpenThread().
+// One undelivered event: a later one for the same endpoint replaces it, and one for another endpoint is dropped.
+struct PendingUnreachable
+{
+    UDPEndPointImplOT * endPoint;
+    IPPacketInfo info;
+    uint8_t quoted[UDPEndPoint::kMaxQuotedPayloadLen];
+    size_t quotedLen;
+    bool valid;
+};
+PendingUnreachable sPending = {};
+
+UDPEndPointImplOT * sBoundEndPoints = nullptr;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 } // namespace
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+void UDPEndPointImplOT::HandleIcmp6Receive(void * aContext, otMessage * aMsg, const otMessageInfo * aInfo,
+                                           const otIcmp6Header * aIcmpHeader)
+{
+    if (aIcmpHeader->mType != OT_ICMP6_TYPE_DST_UNREACH || aIcmpHeader->mCode != kIcmp6CodeDstUnreachPort)
+    {
+        return;
+    }
+
+    uint8_t inner[IPv6Datagram::kUDPHeadersLen + kMaxQuotedPayloadLen];
+    uint16_t bytes = otMessageRead(aMsg, otMessageGetOffset(aMsg), inner, sizeof(inner));
+
+    IPPacketInfo info;
+    info.Clear();
+    ByteSpan quoted;
+    if (IPv6Datagram::ParseUDPHeaders(ByteSpan(inner, bytes), info, quoted) != CHIP_NO_ERROR)
+    {
+        return;
+    }
+
+    // RFC 4443 section 3.1: port-unreachable comes from the destination host.
+    if (!(IPAddress::FromOtAddr(aInfo->mPeerAddr) == info.DestAddress))
+    {
+        return;
+    }
+
+    UDPEndPointImplOT * ep = nullptr;
+    for (UDPEndPointImplOT * candidate = sBoundEndPoints; candidate != nullptr; candidate = candidate->mNextBoundEndPoint)
+    {
+        if (candidate->GetBoundPort() == info.SrcPort)
+        {
+            ep = candidate;
+            break;
+        }
+    }
+    if (ep == nullptr || ep->mState == State::kClosed || ep->OnPortUnreachable == nullptr)
+    {
+        return;
+    }
+
+    const bool dispatchPending = sPending.valid;
+    if (dispatchPending && sPending.endPoint != ep)
+    {
+        return;
+    }
+    sPending.endPoint  = ep;
+    sPending.info      = info;
+    sPending.quotedLen = std::min(quoted.size(), sizeof(sPending.quoted));
+    memcpy(sPending.quoted, quoted.data(), sPending.quotedLen);
+    sPending.valid = true;
+    if (dispatchPending)
+    {
+        return;
+    }
+
+    ep->Ref();
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep] {
+        ep->LockOpenThread();
+        PendingUnreachable pending = sPending;
+        if (sPending.endPoint == ep)
+        {
+            sPending.valid = false;
+        }
+        ep->UnlockOpenThread();
+
+        if (pending.valid && pending.endPoint == ep && ep->mState != State::kClosed && ep->OnPortUnreachable != nullptr)
+        {
+            ep->OnPortUnreachable(ep, pending.info, ByteSpan(pending.quoted, pending.quotedLen));
+        }
+        ep->Unref();
+    });
+    if (err != CHIP_NO_ERROR)
+    {
+        sPending.valid = false;
+        ep->Unref();
+    }
+}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
 void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo)
 {
@@ -153,6 +267,42 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
         }
     }
 
+    if (err == OT_ERROR_NONE)
+    {
+        mBoundPort = socket.mSockName.mPort;
+    }
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    if (err == OT_ERROR_NONE)
+    {
+        if (sIcmp6HandlerInstance == nullptr)
+        {
+            sIcmp6Handler.mReceiveCallback = HandleIcmp6Receive;
+            sIcmp6Handler.mContext         = nullptr;
+            otError icmpErr                = otIcmp6RegisterHandler(mOTInstance, &sIcmp6Handler);
+            if (icmpErr == OT_ERROR_NONE || icmpErr == OT_ERROR_ALREADY)
+            {
+                sIcmp6HandlerInstance = mOTInstance;
+            }
+            else
+            {
+                ChipLogError(Inet, "otIcmp6RegisterHandler failed; port-unreachable detection unavailable");
+            }
+        }
+        else if (sIcmp6HandlerInstance != mOTInstance)
+        {
+            ChipLogError(Inet, "Port-unreachable detection is limited to the first OpenThread instance");
+        }
+
+        if (!mIsBoundEndPointLinked)
+        {
+            mNextBoundEndPoint     = sBoundEndPoints;
+            sBoundEndPoints        = this;
+            mIsBoundEndPointLinked = true;
+        }
+    }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 exit:
     UnlockOpenThread();
 
@@ -168,7 +318,6 @@ CHIP_ERROR UDPEndPointImplOT::BindImpl(IPAddressType addressType, const IPAddres
     }
 
     ReturnErrorOnFailure(IPv6Bind(mSocket, addr, port, interface));
-    mBoundPort   = port;
     mBoundIntfId = interface;
 
     return CHIP_NO_ERROR;
@@ -297,6 +446,25 @@ void UDPEndPointImplOT::CloseImpl()
             ChipLogError(Inet, "Failed to close socket: %s", chip::ErrorStr(MapOpenThreadError(err)));
         }
     }
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    if (sPending.valid && sPending.endPoint == this)
+    {
+        sPending.valid = false;
+    }
+    if (mIsBoundEndPointLinked)
+    {
+        for (UDPEndPointImplOT ** link = &sBoundEndPoints; *link != nullptr; link = &(*link)->mNextBoundEndPoint)
+        {
+            if (*link == this)
+            {
+                *link = mNextBoundEndPoint;
+                break;
+            }
+        }
+        mNextBoundEndPoint     = nullptr;
+        mIsBoundEndPointLinked = false;
+    }
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
     UnlockOpenThread();
 }
 

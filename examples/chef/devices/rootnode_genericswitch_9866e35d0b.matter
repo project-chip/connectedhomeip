@@ -1887,7 +1887,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1900,7 +1900,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2003,13 +2003,13 @@ endpoint 1 {
     emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
-    ram      attribute numberOfPositions default = 2;
+    callback attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    ram      attribute multiPressMax default = 3;
+    callback attribute multiPressMax default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 30;
+    callback attribute featureMap default = 30;
     callback attribute clusterRevision;
   }
 }
@@ -2045,12 +2045,12 @@ endpoint 2 {
 
   server cluster Switch {
     emits event InitialPress;
-    ram      attribute numberOfPositions default = 2;
+    callback attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    callback attribute featureMap default = 2;
     callback attribute clusterRevision;
   }
 }
@@ -2089,13 +2089,13 @@ endpoint 3 {
     emits event ShortRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
-    ram      attribute numberOfPositions default = 2;
+    callback attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    ram      attribute multiPressMax default = 2;
+    callback attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 22;
+    callback attribute featureMap default = 22;
     callback attribute clusterRevision;
   }
 }

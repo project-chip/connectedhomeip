@@ -64,6 +64,7 @@ class TC_AVANALY_2_13(MatterTestCommissionedDevice, AVANALYTestBase):
     def pics_TC_AVANALY_2_13(self) -> list[str]:
         return [
             "AVANALY.S",
+            "ACS.S",
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis))
