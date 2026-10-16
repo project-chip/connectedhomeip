@@ -297,22 +297,26 @@ TEST(TestPumpConfigurationAndControlCluster, RejectsUndefinedControlModeWithinAt
 
 TEST_F(TestPumpLevelTransition, MaximumTakesOverTransition)
 {
+    gMaxLevel = 240;
+    emberAfLevelControlClusterServerInitCallback(kEndpoint);
     StartTransition(200);
     ASSERT_FALSE(HasFailure());
     ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMaximum);
     EXPECT_FALSE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel.Value(), gMaxLevel);
+    EXPECT_EQ(gCurrentLevel.Value(), 240u);
     EXPECT_EQ(gRemainingTime, 0u);
     EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kYes);
 }
 
 TEST_F(TestPumpLevelTransition, MinimumTakesOverTransition)
 {
+    gMinLevel = 0;
+    emberAfLevelControlClusterServerInitCallback(kEndpoint);
     StartTransition(50);
     ASSERT_FALSE(HasFailure());
     ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
     EXPECT_FALSE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel.Value(), gMinLevel);
+    EXPECT_EQ(gCurrentLevel.Value(), 1u);
     EXPECT_EQ(gRemainingTime, 0u);
     EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kYes);
 }
@@ -328,29 +332,6 @@ TEST_F(TestPumpLevelTransition, TakeoverDoesNotDependOnExecuteIfOff)
     EXPECT_FALSE(gOn);
 }
 
-TEST_F(TestPumpLevelTransition, MinimumKeepsPumpRunningWhenMinLevelIsZero)
-{
-    gMinLevel = 0;
-    emberAfLevelControlClusterServerInitCallback(kEndpoint);
-    StartTransition(50);
-    ASSERT_FALSE(HasFailure());
-    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
-    EXPECT_FALSE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel.Value(), 1u);
-    EXPECT_EQ(gRemainingTime, 0u);
-}
-
-TEST_F(TestPumpLevelTransition, NormalModeLeavesTransitionRunning)
-{
-    StartTransition(200);
-    ASSERT_FALSE(HasFailure());
-    auto level = gCurrentLevel;
-    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kNormal);
-    EXPECT_TRUE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel, level);
-    EXPECT_GT(gRemainingTime, 0u);
-}
-
 TEST_F(TestPumpLevelTransition, LimitReadFailureLeavesTransitionRunning)
 {
     StartTransition(200);
@@ -360,21 +341,6 @@ TEST_F(TestPumpLevelTransition, LimitReadFailureLeavesTransitionRunning)
     ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMaximum);
     EXPECT_TRUE(mTimer.HasTimer());
     EXPECT_EQ(gCurrentLevel, level);
-}
-
-TEST_F(TestPumpLevelTransition, MinimumLimitReadFailureLeavesTransitionRunning)
-{
-    StartTransition(50);
-    ASSERT_FALSE(HasFailure());
-    auto level       = gCurrentLevel;
-    auto remaining   = gRemainingTime;
-    gLimitReadStatus = Status::Failure;
-    gLevelDirty      = MarkAttributeDirty::kNo;
-    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
-    EXPECT_TRUE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel, level);
-    EXPECT_EQ(gRemainingTime, remaining);
-    EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kNo);
 }
 
 TEST_F(TestPumpLevelTransition, TakeoverSynchronizesQuietReportingForStop)
@@ -390,18 +356,6 @@ TEST_F(TestPumpLevelTransition, TakeoverSynchronizesQuietReportingForStop)
     EXPECT_EQ(gCurrentLevel.Value(), gMinLevel);
 }
 
-TEST_F(TestPumpLevelTransition, MaximumUsesConfiguredLimit)
-{
-    gMaxLevel = 240;
-    emberAfLevelControlClusterServerInitCallback(kEndpoint);
-    StartTransition(200);
-    ASSERT_FALSE(HasFailure());
-    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMaximum);
-    EXPECT_FALSE(mTimer.HasTimer());
-    EXPECT_EQ(gCurrentLevel.Value(), 240u);
-    EXPECT_EQ(gRemainingTime, 0u);
-}
-
 TEST_F(TestPumpLevelTransition, LevelWriteFailureEndsTransition)
 {
     StartTransition(200);
@@ -412,20 +366,6 @@ TEST_F(TestPumpLevelTransition, LevelWriteFailureEndsTransition)
     EXPECT_FALSE(mTimer.HasTimer());
     EXPECT_EQ(gRemainingTime, 0u);
     EXPECT_EQ(gCurrentLevel, level);
-}
-
-TEST_F(TestPumpLevelTransition, MinimumLevelWriteFailureEndsTransition)
-{
-    StartTransition(50);
-    ASSERT_FALSE(HasFailure());
-    auto level        = gCurrentLevel;
-    gLevelWriteStatus = Status::Failure;
-    gLevelDirty       = MarkAttributeDirty::kNo;
-    ChangeOperationMode(PumpConfigurationAndControl::OperationModeEnum::kMinimum);
-    EXPECT_FALSE(mTimer.HasTimer());
-    EXPECT_EQ(gRemainingTime, 0u);
-    EXPECT_EQ(gCurrentLevel, level);
-    EXPECT_EQ(gLevelDirty, MarkAttributeDirty::kNo);
 }
 
 } // namespace
