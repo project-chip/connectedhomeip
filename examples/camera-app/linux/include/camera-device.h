@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "ambient-context-sensing-manager.h"
 #include "av-analysis-manager.h"
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
@@ -138,6 +139,7 @@ public:
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
     chip::app::Clusters::AvAnalysisDelegate & GetAVAnalysisDelegate() override;
     chip::app::Clusters::AvAnalysis::AvAnalysisManager & GetAVAnalysisManager() { return mAVAnalysisManager; }
+    chip::app::Clusters::AmbientContextSensing::AmbientContextSensingDelegate & GetAmbientContextSensingDelegate() override;
 
     MediaController & GetMediaController() override;
 
@@ -412,6 +414,7 @@ private:
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
     chip::app::Clusters::AvAnalysis::AvAnalysisManager mAVAnalysisManager;
+    chip::app::Clusters::AmbientContextSensing::AmbientContextSensingManager mAmbientContextSensingManager;
 
     DefaultMediaController mMediaController;
 
@@ -444,7 +447,8 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
     uint8_t mMaxAnalysisStreams            = kMaxAnalysisStreams;
 
-    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
+                                                            StreamUsageEnum::kAnalysis };
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;

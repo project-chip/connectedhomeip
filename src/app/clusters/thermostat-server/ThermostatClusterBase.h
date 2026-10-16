@@ -134,6 +134,7 @@ protected:
                                          chip::app::DataModel::Nullable<chip::ByteSpan> currentPresetHandle);
 
     friend class ThermostatPresets;
+    friend class ThermostatSchedules;
     friend class ThermostatSetpointsBase;
 };
 

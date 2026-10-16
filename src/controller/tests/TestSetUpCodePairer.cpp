@@ -52,7 +52,13 @@ Inet::IPAddress ParseIP(const char * str)
 // the suite's -Wconversion stays clean regardless of the exact underlying type.
 Inet::InterfaceId MakeInterfaceId(unsigned int id)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    static struct netif sNetifs[2] = {};
+    VerifyOrDie(id >= 1 && id <= MATTER_ARRAY_SIZE(sNetifs));
+    return Inet::InterfaceId(&sNetifs[id - 1]);
+#else
     return Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(id));
+#endif
 }
 
 // Build a single-address commissionable-node resolution record for the given address and interface.

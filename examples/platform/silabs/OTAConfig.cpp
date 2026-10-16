@@ -90,19 +90,11 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // In a code-driven build we do not link src/app/clusters/ota-requestor/CodegenIntegration.cpp,
-// which is where these singletons normally live. Provide local instances instead so that the
-// requestor init below can hand them to DefaultOTARequestor::Init. Events are dropped until
-// a code-driven OTARequestorCluster is composed on the root endpoint.
+// which is where these singletons normally live. The application supplies these
+// attributes to the feature-owned cluster and uses that cluster as the event generator.
 namespace chip {
 namespace {
-
-class NoOpOtaRequestorEventGenerator : public DefaultOTARequestorEventGenerator
-{
-public:
-    CHIP_ERROR GenerateVersionAppliedEvent(const VersionAppliedEvent &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GenerateDownloadErrorEvent(const DownloadErrorEvent &) override { return CHIP_NO_ERROR; }
-};
-
+DefaultOTARequestorEventGenerator * gDefaultOTARequestorEventGenerator = nullptr;
 } // namespace
 
 OTARequestorAttributes & GetOTARequestorAttributes()
@@ -111,10 +103,15 @@ OTARequestorAttributes & GetOTARequestorAttributes()
     return gOtaRequestorAttributes;
 }
 
+void SetDefaultOTARequestorEventGenerator(DefaultOTARequestorEventGenerator & eventGenerator)
+{
+    gDefaultOTARequestorEventGenerator = &eventGenerator;
+}
+
 DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator()
 {
-    static NoOpOtaRequestorEventGenerator gOtaRequestorEventGenerator;
-    return gOtaRequestorEventGenerator;
+    VerifyOrDie(gDefaultOTARequestorEventGenerator != nullptr);
+    return *gDefaultOTARequestorEventGenerator;
 }
 
 } // namespace chip
