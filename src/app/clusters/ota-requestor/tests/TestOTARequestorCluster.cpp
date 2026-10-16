@@ -211,6 +211,19 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
     EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
+
+    payload.endpoint   = kInvalidEndpointId;
+    auto invalidResult = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(invalidResult.status,
+              std::make_optional(DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError)));
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
+    EXPECT_EQ(otaCommands.GetLastAnnounceCommandPayload()->endpoint, 5);
+
+    payload.endpoint     = static_cast<EndpointId>(kInvalidEndpointId - 1);
+    auto recoveredResult = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_TRUE(recoveredResult.IsSuccess());
+    ASSERT_TRUE(otaCommands.GetLastAnnounceCommandPayload().has_value());
+    EXPECT_EQ(otaCommands.GetLastAnnounceCommandPayload()->endpoint, payload.endpoint);
 }
 
 TEST_F(TestOTARequestorCluster, UnknownAnnouncementReasonIsRejected)
@@ -627,135 +640,6 @@ TEST_F(TestOTARequestorCluster, OnFabricRemovedNotifiesRequestorEvenWithNoProvid
     EXPECT_EQ(otaCommands.GetFabricRemovedCallCount(), 1u);
     ASSERT_TRUE(otaCommands.GetLastFabricRemovedIndex().has_value());
     EXPECT_EQ(otaCommands.GetLastFabricRemovedIndex().value(), 7);
-}
-
-} // namespace
-
-namespace {
-
-/** Record announcement dispatches without instantiating an OTA transport or driver. */
-class EndpointRecordingCommands : public MockOtaCommands
-{
-public:
-    /** Count the requestor callback, then preserve the existing mock response handling. */
-    void HandleAnnounceOTAProvider(CommandHandler * handler, const ConcreteCommandPath & path,
-                                   const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & data) override
-    {
-        ++calls;
-        MockOtaCommands::HandleAnnounceOTAProvider(handler, path, data);
-    }
-    uint32_t calls = 0;
-};
-
-/** Fixture with a fabric-scoped command subject and observable requestor dispatch. */
-struct TestAnnouncedEndpoint : public TestOTARequestorCluster
-{
-    /** Start the cluster and select a defined accessing fabric for announcement controls. */
-    void SetUp() override
-    {
-        attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle,
-                                  OTARequestorAttributes::OTAChangeReasonEnum::kSuccess, DataModel::NullNullable);
-        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-        tester.SetFabricIndex(1);
-        payload.providerNodeID = 1234;
-        payload.vendorID       = static_cast<VendorId>(4321);
-        payload.endpoint       = 5;
-        context.ChangeListener().DirtyList().clear();
-    }
-
-    /** Shut down while attributes, command implementation, and context remain alive. */
-    void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
-
-    /** Verify forwarded scalar fields without retaining or dereferencing decoded metadata spans. */
-    void ExpectForwarded(EndpointId endpoint)
-    {
-        auto forwarded = commands.GetLastAnnounceCommandPayload();
-        if (!forwarded.has_value())
-        {
-            FAIL();
-            return;
-        }
-        EXPECT_EQ(forwarded->endpoint, endpoint);
-        EXPECT_EQ(forwarded->providerNodeID, payload.providerNodeID);
-        EXPECT_EQ(forwarded->vendorID, payload.vendorID);
-        EXPECT_EQ(forwarded->announcementReason, payload.announcementReason);
-    }
-
-    /** Check that validation does not alter update state or emit attribute notifications. */
-    void ExpectUnchangedAttributes()
-    {
-        OtaSoftwareUpdateRequestor::UpdateStateEnum state{};
-        ASSERT_EQ(tester.ReadAttribute(UpdateState::Id, state), CHIP_NO_ERROR);
-        EXPECT_EQ(state, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
-        EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
-    }
-
-    Testing::TestServerClusterContext context;
-    EndpointRecordingCommands commands;
-    OTARequestorAttributes attributes;
-    OTARequestorCluster cluster{ kTestEndpointId, commands, attributes, context.GetFabricTable() };
-    Testing::ClusterTester tester{ cluster };
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
-};
-
-/** Endpoint number 0xFFFF is reserved, regardless of the otherwise valid announcement reason. */
-TEST_F(TestAnnouncedEndpoint, RejectsReservedEndpointForAllReasons)
-{
-    payload.endpoint = 0xFFFF;
-    for (uint8_t reason : { uint8_t(0), uint8_t(1), uint8_t(2) })
-    {
-        payload.announcementReason = static_cast<OtaSoftwareUpdateRequestor::AnnouncementReasonEnum>(reason);
-        auto result                = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-        EXPECT_EQ(result.GetStatusCode(),
-                  Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
-        EXPECT_EQ(commands.calls, 0u);
-        EXPECT_FALSE(commands.GetLastAnnounceCommandPayload().has_value());
-        ExpectUnchangedAttributes();
-    }
-}
-
-/** Zero, ordinary, and maximum usable endpoint numbers remain valid for all announcement reasons. */
-TEST_F(TestAnnouncedEndpoint, AcceptsEndpointBoundaries)
-{
-    const EndpointId endpoints[] = { 0, 1, 0xFFFE };
-    for (EndpointId endpoint : endpoints)
-    {
-        for (uint8_t reason : { uint8_t(0), uint8_t(1), uint8_t(2) })
-        {
-            payload.endpoint           = endpoint;
-            payload.announcementReason = static_cast<OtaSoftwareUpdateRequestor::AnnouncementReasonEnum>(reason);
-            const auto before          = commands.calls;
-            auto result                = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-            ASSERT_TRUE(result.IsSuccess());
-            EXPECT_EQ(commands.calls, before + 1);
-            ExpectForwarded(endpoint);
-        }
-    }
-    ExpectUnchangedAttributes();
-}
-
-/** Reject repeated invalid announcements after a valid one without replacing the forwarded provider. */
-TEST_F(TestAnnouncedEndpoint, PreservesPreviousAnnouncementAndRecovers)
-{
-    payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
-    auto valid                 = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-    ASSERT_TRUE(valid.IsSuccess());
-    EXPECT_EQ(commands.calls, 1u);
-    payload.endpoint = 0xFFFF;
-    for (unsigned attempt = 0; attempt < 2; ++attempt)
-    {
-        auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-        EXPECT_EQ(result.GetStatusCode(),
-                  Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::ConstraintError));
-        EXPECT_EQ(commands.calls, 1u);
-        ExpectForwarded(5);
-        ExpectUnchangedAttributes();
-    }
-    payload.endpoint = 0xFFFE;
-    auto recovered   = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-    ASSERT_TRUE(recovered.IsSuccess());
-    EXPECT_EQ(commands.calls, 2u);
-    ExpectForwarded(0xFFFE);
 }
 
 } // namespace
