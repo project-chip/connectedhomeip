@@ -276,12 +276,6 @@ public:
 
 } // namespace
 
-/**
- * @brief Append a valid boolean write for scalar request and response controls.
- * @param aWriteClient The client receiving the encoded attribute.
- * @param encoding Select normal encoding or preencoded TLV.
- * Encoding failures are reported as test assertions.
- */
 void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
     AttributePathParams attributePathParams;
@@ -367,12 +361,6 @@ void TestWriteInteraction::AddAttributeStatus(WriteHandler & aWriteHandler)
     EXPECT_EQ(aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success), CHIP_NO_ERROR);
 }
 
-/**
- * @brief Encode the fixed-path request used by receive and timed-write controls.
- * @param aIsTimedWrite The value of the required TimedRequest field.
- * @param aPayload Supplies the buffer and receives the encoded request.
- * Omit both optional booleans so the controls also exercise their default values; encoding errors are test assertions.
- */
 void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
@@ -423,12 +411,9 @@ void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::Pack
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
 }
 
-/**
- * @brief Encode explicit true response-suppression and chunking flags for receive-side rejection controls.
- * @param aPayload Supplies the buffer and receives the encoded single-attribute request.
- * WriteClient does not emit this combination; the raw request exercises receive-side validation and handler cleanup.
- * Encoding failures are reported as test assertions.
- */
+// Builds a single WriteRequest that combines SuppressResponse=true with MoreChunkedMessages=true on one valid
+// AttributeDataIB. A conformant WriteClient never emits this combination; it is constructed directly here to
+// exercise the first-chunk handler lifecycle on the receive path.
 void TestWriteInteraction::GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
@@ -534,11 +519,6 @@ CHIP_ERROR TestWriteInteraction::GenerateOptionalFlagWriteRequest(System::Packet
     return writer.Finalize(&payload);
 }
 
-/**
- * @brief Encode an attribute-status response for the client response and cleanup controls.
- * @param aPayload Supplies the buffer and receives a WriteResponse with InvalidSubscription for endpoint 2, cluster 3, attribute 4.
- * Encoding failures are reported as test assertions.
- */
 void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aPayload)
 {
     System::PacketBufferTLVWriter writer;
@@ -627,10 +607,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
     }
 }
 
-/**
- * @brief Verify matched and mismatched timed-write states with both optional boolean fields omitted.
- * Expect TimedRequestMismatch only for differing message and transaction state, and verify retransmission cleanup.
- */
 TEST_F(TestWriteInteraction, TestWriteHandler)
 {
     using namespace Protocols::InteractionModel;
@@ -820,10 +796,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteSuppressResponseDefaults)
     }
 }
 
-/**
- * @brief Preserve normal and preencoded struct-write payloads, callbacks, and retransmission cleanup.
- * This is the existing WriteClient control alongside the raw optional-field regressions.
- */
 TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
 {
 
