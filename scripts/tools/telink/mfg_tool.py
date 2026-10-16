@@ -32,10 +32,9 @@ import cbor2 as cbor
 import cryptography.hazmat.backends
 import cryptography.x509
 import pyqrcode
-from intelhex import IntelHex
-
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from intelhex import IntelHex
 
 TOOLS = {
     'spake2p': None,

@@ -156,10 +156,7 @@ public:
      * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
      */
-    virtual CHIP_ERROR GetManufacturingDateString(char * buf, size_t bufSize)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR GetManufacturingDateString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * @brief Retrieve the optional vendor-specific suffix of the manufacturing date
