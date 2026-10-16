@@ -534,8 +534,9 @@ private:
     /**
      * Implements the UserType::kExpiringUser access rule (spec 5.2.6.18.8) for a resolved user found by
      * HandleRemoteLockOperation. Returns true if access should be granted. On first use, records the
-     * timestamp and grants access (evicting the oldest tracked entry if the table is full, rather than
-     * leaving this user untracked and so never disabled at all). On a later use, grants access if still
+     * timestamp and grants access, unless the tracking table is already full of other in-flight
+     * countdowns -- evicting one of those to make room would let it lose its own tracking and extend
+     * past its real timeout, so this first use is denied instead. On a later use, grants access if still
      * within ExpiringUserTimeout minutes of that first use; once it has elapsed, or if the attribute can't
      * be read to tell, denies access. On expiry it also persists UserStatus = OccupiedDisabled via
      * modifyUser() so the disabled state itself survives a reboot even though the in-flight countdown does

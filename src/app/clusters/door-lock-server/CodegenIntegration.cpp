@@ -349,7 +349,6 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
 {
     ExpiringUserFirstUseEntry * entry    = nullptr;
     ExpiringUserFirstUseEntry * freeSlot = nullptr;
-    ExpiringUserFirstUseEntry * oldest   = nullptr;
     for (auto & candidate : endpointContext->expiringUserFirstUse)
     {
         if (candidate.valid && candidate.userIndex == userIndex)
@@ -357,42 +356,32 @@ bool DoorLockServer::checkExpiringUserAccess(chip::EndpointId endpointId, EmberA
             entry = &candidate;
             break;
         }
-        if (!candidate.valid)
+        if (!candidate.valid && freeSlot == nullptr)
         {
-            if (freeSlot == nullptr)
-            {
-                freeSlot = &candidate;
-            }
-        }
-        else if (oldest == nullptr || candidate.firstUseTimestamp < oldest->firstUseTimestamp)
-        {
-            oldest = &candidate;
+            freeSlot = &candidate;
         }
     }
 
     if (nullptr == entry)
     {
         // First use: spec 5.2.6.18.8 -- the user has the ability to open the lock for ExpiringUserTimeout
-        // minutes *after the first use*, so this access itself is always granted. If the table is full,
-        // evict the oldest tracked entry (closest to its own expiry anyway) rather than leaving this user
-        // untracked -- an untracked ExpiringUser would never be disabled at all.
-        ExpiringUserFirstUseEntry * slot = (nullptr != freeSlot) ? freeSlot : oldest;
-        if (nullptr == slot)
+        // minutes *after the first use*, so this access itself is always granted, provided we can track
+        // it. If the table is already full of other in-flight countdowns, do NOT evict one to make room:
+        // the evicted entry would lose its tracking and its next use would be treated as a fresh first
+        // use, letting that user's access extend indefinitely past its real timeout. Deny this first use
+        // instead -- it only bites when more than kDoorLockMaxTrackedExpiringUsers ExpiringUser-typed
+        // users have a countdown in flight at once.
+        if (nullptr == freeSlot)
         {
-            // kDoorLockMaxTrackedExpiringUsers is 0, which never happens in practice; deny rather than
-            // grant untracked access if it somehow did.
+            ChipLogError(Zcl,
+                        "[checkExpiringUserAccess] Tracking table full, denying first use for userIndex=%d "
+                        "[endpointId=%d]",
+                        userIndex, endpointId);
             return false;
         }
-        if (slot == oldest)
-        {
-            ChipLogProgress(Zcl,
-                            "[checkExpiringUserAccess] Tracking table full, evicting oldest entry for "
-                            "userIndex=%d to track userIndex=%d [endpointId=%d]",
-                            oldest->userIndex, userIndex, endpointId);
-        }
-        slot->valid             = true;
-        slot->userIndex         = userIndex;
-        slot->firstUseTimestamp = currentTime;
+        freeSlot->valid             = true;
+        freeSlot->userIndex         = userIndex;
+        freeSlot->firstUseTimestamp = currentTime;
         return true;
     }
 
