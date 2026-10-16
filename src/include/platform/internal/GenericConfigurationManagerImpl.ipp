@@ -819,11 +819,6 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             ChipLogProgress(DeviceLayer, "  Manufacturing Date: (not set)");
         }
-
-        /* Add print: Modify Manufacturing Date Format. Delete if it is not needed */
-        char mfgDate[ConfigurationManager::kMaxManufacturingDateLength + 1];
-        err = deviceInstanceInfoProvider->GetManufacturingDateString(mfgDate, sizeof(mfgDate));
-        ChipLogProgress(DeviceLayer, "  Manufacturing Date String: %s", (err == CHIP_NO_ERROR) ? mfgDate : "(not set)");
     }
 
     {
