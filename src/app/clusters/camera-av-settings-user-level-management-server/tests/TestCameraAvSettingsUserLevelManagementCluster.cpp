@@ -594,6 +594,58 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetAcceptsName
     EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZSavePresetFullListHonorsNameLengthBoundary)
+{
+    constexpr CharSpan maxName = "01234567890123456789012345678901"_span;
+    Commands::MPTZSavePreset::Type request;
+    request.name = maxName;
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request).IsSuccess());
+    }
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), testMaxPresets);
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, testMaxPresets);
+
+    const ConcreteAttributePath presetsPath(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id,
+                                            Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan before(beforeBuffer);
+    ASSERT_EQ(persistence.ReadValue(presetsPath, before), CHIP_NO_ERROR);
+
+    mClusterTester.GetDirtyList().clear();
+    const std::string overlengthName(33, 'a');
+    request.name = CharSpan(overlengthName.data(), overlengthName.size());
+    auto result  = mClusterTester.Invoke(Commands::MPTZSavePreset::Id, request);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+    EXPECT_EQ(mMockDelegate.mSavePresetCalls, testMaxPresets);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), testMaxPresets);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+
+    uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan after(afterBuffer);
+    ASSERT_EQ(persistence.ReadValue(presetsPath, after), CHIP_NO_ERROR);
+    EXPECT_TRUE(before.data_equal(after));
+
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester restoredTester(restored);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    auto it = presets.begin();
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, id);
+        EXPECT_TRUE(it.GetValue().name.data_equal(maxName));
+    }
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+}
+
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, MPTZPresetsSkipOverlengthStoredNames)
 {
     const std::string reportName(132, 'a');
