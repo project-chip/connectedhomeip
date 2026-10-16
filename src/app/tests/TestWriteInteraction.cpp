@@ -294,8 +294,8 @@ public:
     }
 
     const Messaging::ExchangeHolder * mExchangeHolder = nullptr;
-    ListWriteEndState mListWriteEndState               = ListWriteEndState::kNotObserved;
-    uint32_t mNotificationCount = 0;
+    ListWriteEndState mListWriteEndState              = ListWriteEndState::kNotObserved;
+    uint32_t mNotificationCount                       = 0;
     std::optional<ConcreteAttributePath> mLastPath;
     DataModel::ListWriteOperation mLastOperation = DataModel::ListWriteOperation::kListWriteBegin;
     FabricIndex mLastFabric                      = kUndefinedFabricIndex;
