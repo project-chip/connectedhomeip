@@ -78,6 +78,8 @@ private:
     jmethodID mOnErrorMethod    = nullptr;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> mPayloadBuffer;
+
+    bool mIsCleanedUp = false;
 };
 
 } // Namespace Controller

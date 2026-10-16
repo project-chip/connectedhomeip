@@ -299,6 +299,7 @@ void AndroidWebRTCTransportProviderClient::HandleCommandError(void * appContext,
     if (self != nullptr)
     {
         self->NotifyError(error != CHIP_NO_ERROR ? error : chip::app::StatusIB(status, clusterStatus).ToChipError());
+        self->Cleanup();
     }
 }
 
@@ -382,6 +383,12 @@ void AndroidWebRTCTransportProviderClient::NotifyError(CHIP_ERROR error)
 
 void AndroidWebRTCTransportProviderClient::Cleanup()
 {
+    if (mIsCleanedUp)
+    {
+        return;
+    }
+    mIsCleanedUp = true;
+
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
             auto * self = reinterpret_cast<AndroidWebRTCTransportProviderClient *>(arg);
