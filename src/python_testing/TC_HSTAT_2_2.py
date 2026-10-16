@@ -64,7 +64,7 @@ class TC_HSTAT_2_2(HSTATBase):
 
     def steps_TC_HSTAT_2_2(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH reads from the DUT the SupportedModesMode attribute.", "Store the value as SupportedModes."),
             TestStep(3, "TH sends command Off to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),

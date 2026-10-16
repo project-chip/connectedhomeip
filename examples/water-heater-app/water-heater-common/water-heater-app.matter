@@ -2894,7 +2894,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2902,7 +2902,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -2944,12 +2944,12 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
-    ram      attribute testEventTriggersEnabled;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command TestEventTrigger;
@@ -2963,7 +2963,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -3066,8 +3066,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster ElectricalEnergyMeasurement {
@@ -3078,7 +3078,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster WaterHeaterManagement {
@@ -3112,8 +3112,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap default = 16;
+    callback attribute clusterRevision;
 
     handle command PauseRequest;
     handle command ResumeRequest;
@@ -3123,8 +3123,8 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster WaterHeaterMode {
@@ -3134,7 +3134,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -3146,19 +3146,19 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0003;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute controlSequenceOfOperation;
-    ram      attribute systemMode;
+    callback attribute localTemperature;
+    callback attribute controlSequenceOfOperation;
+    callback attribute systemMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

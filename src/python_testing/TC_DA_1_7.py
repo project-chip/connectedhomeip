@@ -168,7 +168,7 @@ class TC_DA_1_7(MatterTestCommissionedDevice):
                 ]
 
     def steps_TC_DA_1_7(self):
-        steps = [TestStep(0, "Commission DUT if not already done", is_commissioning=True)]
+        steps = [TestStep(0, "Commission DUT if not already done")]
         steps += self.steps_one_dut(1)
         if self.expected_number_of_DUTs() == 2:
             steps += self.steps_one_dut(2)

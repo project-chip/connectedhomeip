@@ -105,7 +105,7 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
