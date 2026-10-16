@@ -139,18 +139,7 @@ public:
     CHIP_ERROR ScannerStopScan()
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(HandleScannerTimer, this);
-        mDeferringCompletion = true;
-        CHIP_ERROR err       = mScanner.StopScan();
-        mDeferringCompletion = false;
-        if (err != CHIP_NO_ERROR)
-        {
-            OnScanError(err);
-        }
-        else
-        {
-            OnScanComplete();
-        }
-        return err;
+        return mScanner.StopScan();
     }
 
     static void HandleScannerTimer(chip::System::Layer *, void * appState)

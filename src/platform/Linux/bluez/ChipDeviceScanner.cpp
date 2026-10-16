@@ -128,11 +128,14 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
+        mDelegate->OnScanComplete();
+    }
+    else
+    {
+        mDelegate->OnScanError(err);
     }
 
-    mDelegate->OnScanComplete();
-
-    return err == CHIP_NO_ERROR ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return err;
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScanImpl()
