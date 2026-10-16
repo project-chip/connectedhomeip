@@ -722,6 +722,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
     command.requestedStartTime = 800;
     EXPECT_FALSE(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).IsSuccess());
 
+    // Start time equal to earliestStartTime (900) - rejected
+    command.requestedStartTime = 900;
+    EXPECT_FALSE(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).IsSuccess());
+
+    // Start time that would make endTime equal to latestEndTime (2100) - rejected
+    command.requestedStartTime = 1100;
+    EXPECT_FALSE(tester.Invoke(Commands::StartTimeAdjustRequest::Id, command).IsSuccess());
+
     // Start time that would push end beyond latestEndTime (2100) - rejected
     // Forecast duration is 1000, so start at 1200 ends at 2200 > 2100
     command.requestedStartTime = 1200;
