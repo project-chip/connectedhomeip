@@ -150,6 +150,10 @@ public:
     void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
     void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & path, StatusIB status) override
     {
+        if (mOnSuccessCalled == 0)
+        {
+            mFirstStatus = status;
+        }
         mStatus = status;
         mOnSuccessCalled++;
     }
@@ -164,6 +168,7 @@ public:
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
+    StatusIB mFirstStatus;
     StatusIB mStatus;
     StatusIB mLastErrorReason;
     CHIP_ERROR mError = CHIP_NO_ERROR;
@@ -192,6 +197,9 @@ public:
         AppContext::TearDown();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
     }
+
+protected:
+    void ExpectSecondWriteDeniedAfterRevoke(const AttributePathParams & firstPath, const AttributePathParams & secondPath);
 
 private:
     chip::app::DataModel::Provider * mOldProvider = nullptr;
@@ -664,6 +672,52 @@ TEST_F(TestAclAttribute, LegacyEncodingCacheReuseDuringWrite)
     EXPECT_TRUE(aclDelegate.mWriterRevoked);
 
     Access::GetAccessControl().Finish();
+}
+
+// A cached write grant must apply only to its exact path; any other path is re-checked against the current ACL.
+void TestAclAttribute::ExpectSecondWriteDeniedAfterRevoke(const AttributePathParams & firstPath,
+                                                          const AttributePathParams & secondPath)
+{
+    using namespace Protocols::InteractionModel;
+
+    WriterRevokedAfterFirstAttributeDataIBDelegate aclDelegate;
+    Access::GetAccessControl().Finish();
+    EXPECT_SUCCESS(Access::GetAccessControl().Init(&aclDelegate, gDeviceTypeResolver));
+
+    auto * engine = InteractionModelEngine::GetInstance();
+
+    TestWriteClientCallback callback;
+    WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(firstPath, static_cast<uint8_t>(1)));
+    EXPECT_SUCCESS(writeClient.EncodeAttribute(secondPath, static_cast<uint8_t>(2)));
+    EXPECT_SUCCESS(writeClient.SendWriteRequest(GetSessionBobToAlice()));
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnSuccessCalled, 2);
+    EXPECT_EQ(callback.mFirstStatus.mStatus, Status::Success);
+    EXPECT_EQ(callback.mStatus.mStatus, Status::UnsupportedAccess);
+
+    Access::GetAccessControl().Finish();
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentEndpoint)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kTestDeniedEndpointId, kTestClusterId, kTestAttributeId));
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentCluster)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kTestEndpointId, kTestDeniedClusterId2, kTestAttributeId));
+}
+
+TEST_F(TestAclAttribute, WriteCacheDoesNotLeakAcrossDifferentAttribute)
+{
+    ExpectSecondWriteDeniedAfterRevoke(AttributePathParams(kTestEndpointId, kTestClusterId, kTestAttributeId),
+                                       AttributePathParams(kTestEndpointId, kTestClusterId, static_cast<AttributeId>(1)));
 }
 
 } // namespace app
