@@ -51,13 +51,6 @@ namespace app {
 using namespace Protocols::InteractionModel;
 using Status = Protocols::InteractionModel::Status;
 
-/**
- * @brief Prepare the provider, delegate, and list path before receiving a write transaction.
- * @param apProvider The non-null data model provider for this transaction.
- * @param apWriteHandlerDelegate The non-null delegate managing handler lifetime and write conflicts.
- * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE while an exchange is held, or CHIP_ERROR_INVALID_ARGUMENT.
- * The previous transaction must be closed before reuse; Close() clears its captured fabric identity.
- */
 CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDelegate * apWriteHandlerDelegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
@@ -73,10 +66,6 @@ CHIP_ERROR WriteHandler::Init(DataModel::Provider * apProvider, WriteHandlerDele
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Fail any pending list write, release the exchange, and clear the cached transaction fabric.
- * Repeated calls after closure have no effect. The list notification runs before clearing its fabric identity.
- */
 void WriteHandler::Close()
 {
     VerifyOrReturn(mState != State::Uninitialized);
@@ -93,11 +82,6 @@ void WriteHandler::Close()
     MoveToState(State::Uninitialized);
 }
 
-/**
- * @brief Classify a write path from provider metadata for list-write processing and notifications.
- * @param path The endpoint, cluster, and attribute to query.
- * @return The list quality flag, or std::nullopt when the provider or attribute metadata is unavailable.
- */
 std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePath & path)
 {
     if (mDataModelProvider == nullptr)
@@ -119,13 +103,6 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
     return info->HasFlags(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
-/**
- * @brief Process a write message and send its response when the exchange and request require one.
- * @param apExchangeContext The retained exchange used for an individual request or the next chunk.
- * @param aPayload The encoded request, consumed by parsing.
- * @param aIsTimedWrite Whether the request follows an accepted timed interaction.
- * @return The parsing/processing status, or Failure if allocating, encoding, or sending the response fails.
- */
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
                                                System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
@@ -154,14 +131,6 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
     return status;
 }
 
-/**
- * @brief Capture the requesting fabric and process the first message of a write transaction.
- * @param apExchangeContext The request exchange with a live session; retained while more chunks are expected.
- * @param aPayload The encoded write request, consumed by the handler.
- * @param aIsTimedWrite Whether the request follows an accepted timed interaction.
- * @return Success for an accepted or suppressed request, or the write-request error status.
- * Nonchunked and rejected requests close the handler; chunked requests retain the captured fabric until closure.
- */
 Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
                                     bool aIsTimedWrite)
 {
@@ -765,10 +734,6 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Return the transaction fabric without depending on the exchange or session still being present.
- * @return The captured fabric until Close(), or kUndefinedFabricIndex before a request and after closure.
- */
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
     // Close() can deliver a final list-write notification after the exchange or its session is gone.

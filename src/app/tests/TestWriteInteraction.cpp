@@ -59,10 +59,6 @@ namespace app {
 
 using namespace chip::Testing;
 
-/**
- * @brief Provide stable mock metadata for scalar writes and list-write notification regressions.
- * @return The fixture's static endpoint and attribute configuration.
- */
 const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace Clusters::Globals::Attributes;
@@ -131,10 +127,6 @@ const MockNodeConfig & TestMockNodeConfig()
 class TestWriteInteraction : public chip::Testing::AppContext
 {
 public:
-    /**
-     * @brief Start the loopback context and install the group provider, mock model, and list metadata used by the regressions.
-     * Retain the prior model so fixture teardown restores its ownership.
-     */
     void SetUp() override
     {
         AppContext::SetUp();
@@ -153,10 +145,6 @@ public:
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
-    /**
-     * @brief Restore mock metadata and provider ownership, finish group storage, and shut down the loopback context.
-     * This prevents handler reuse and session-release cases from leaving state in the next test.
-     */
     void TearDown() override
     {
         chip::Testing::ResetMockNodeConfig();
@@ -278,15 +266,10 @@ enum class ListWriteEndState
     kExchangeWithSession,
 };
 
+// Records list-write notifications and the exchange state visible during teardown.
 class ListWriteNotificationProvider : public TestImCustomDataModel
 {
 public:
-    /**
-     * @brief Record list operations and the fabric plus exchange/session state observed during completion.
-     * @param path The list attribute receiving the notification.
-     * @param operation The begin, success, or failure event emitted by the handler.
-     * @param accessingFabric The transaction fabric supplied by the handler.
-     */
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation operation,
                                         FabricIndex accessingFabric) override
     {
@@ -320,12 +303,6 @@ public:
 
 } // namespace
 
-/**
- * @brief Append a valid boolean write, including the scalar control used after list-write teardown.
- * @param aWriteClient The client receiving the encoded attribute.
- * @param encoding Select normal encoding or preencoded TLV.
- * Encoding failures are reported as test assertions.
- */
 void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding = EncodingMethod::Standard)
 {
     AttributePathParams attributePathParams;
@@ -639,9 +616,6 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
     }
 }
 
-/**
- * @brief Retain the original fabric in a pending failure notification after explicitly releasing the exchange holder.
- */
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExchangeRelease)
 {
     using namespace Protocols::InteractionModel;
@@ -704,11 +678,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExcha
     }
 }
 
-/**
- * @brief Exercise list-write termination on both fabrics and verify identity, lifecycle, and retransmission cleanup.
- * @param termination The session release, invalid message, malformed chunk, or successful final chunk to exercise.
- * Reuse controls encode both optional flags explicitly, keeping omitted-field defaults in their separate regression.
- */
 void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termination)
 {
     using namespace Protocols::InteractionModel;
@@ -860,33 +829,21 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
     }
 }
 
-/**
- * @brief Preserve the fabric when the exchange remains present but its session is released while awaiting another chunk.
- */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterSessionRelease)
 {
     TestListWriteTermination(ListWriteTermination::kSessionReleased);
 }
 
-/**
- * @brief Fail a pending list write with its original fabric when the exchange receives an unexpected StatusResponse.
- */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterUnexpectedStatusResponse)
 {
     TestListWriteTermination(ListWriteTermination::kUnexpectedStatusResponse);
 }
 
-/**
- * @brief Fail a pending list write with its original fabric when the next WriteRequest cannot be decoded.
- */
 TEST_F(TestWriteInteraction, ListWriteFailureAfterMalformedNextChunk)
 {
     TestListWriteTermination(ListWriteTermination::kMalformedNextChunk);
 }
 
-/**
- * @brief Complete a valid final chunk with a success notification and clear the transaction identity on closure.
- */
 TEST_F(TestWriteInteraction, ListWriteSuccessAfterFinalChunk)
 {
     TestListWriteTermination(ListWriteTermination::kFinalChunk);
