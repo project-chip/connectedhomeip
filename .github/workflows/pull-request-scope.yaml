@@ -21,8 +21,8 @@
 #     needs: pr_scope
 #     if: ${{ !cancelled() && needs.pr_scope.outputs.python_tests_only != 'true' }}
 #
-# so a skipped or failed scope job runs everything, as on push and in the
-# merge queue. Without !cancelled() a skipped scope job would skip them all.
+# so a skipped or failed scope job runs everything, as on a push to master.
+# Without !cancelled() a skipped scope job would skip them all.
 
 name: Pull request scope
 

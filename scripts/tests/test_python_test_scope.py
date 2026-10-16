@@ -825,7 +825,7 @@ class TestGateGuards(RepositoryGuard):
                         own = self.own_condition(str(body.get("if", "")), "!cancelled()", self.GATE)
                         self.fail_with_fix(path, rf"^\s+{re.escape(job)}:\s*$", self.message(
                             f"Job {job} is skipped on {ONLY}, but it reads {read}{through}, which they can change, so a "
-                            "break there would go unseen until the merge queue.",
+                            "break there would go unseen until the full CI run on master after merge.",
                             f"in {path}, stop gating job {job}, or stop it reading that file. Ungated, the job starts:",
                             f"{job}:", *([f"    needs: [{', '.join(others)}]"] if others else []),
                             *([f"    if: {own}"] if own else [])))
