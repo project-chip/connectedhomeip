@@ -40,6 +40,10 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
+// Called synchronously on the Matter queue, with the device's lock held, when
+// the device starts setting up a new subscription (not when an existing
+// ReadClient resubscribes).
+@property (atomic, copy, nullable) dispatch_block_t onSubscriptionSetupStarted;
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;

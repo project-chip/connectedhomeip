@@ -123,6 +123,12 @@
 
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device
 {
+    // MTRDevice asks this exactly once each time it starts setting up a
+    // subscription.
+    if (self.onSubscriptionSetupStarted != nil) {
+        self.onSubscriptionSetupStarted();
+    }
+
     // Allowing time-based reachability changes just makes the tests
     // non-deterministic and can lead to random failures.  Suppress them
     // unconditionally for now.  If we ever add tests that try to exercise that
