@@ -20980,8 +20980,8 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
                     *aError = err;
                     return nil;
                 }
-                newElement_0.imageUri = AsString(entry_0.imageUri);
-                if (newElement_0.imageUri == nil) {
+                newElement_0.imageURI = AsString(entry_0.imageURI);
+                if (newElement_0.imageURI == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;

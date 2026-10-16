@@ -118,6 +118,10 @@ endchoice
 config MBEDTLS_HEAP_SIZE
 	default 8192
 
+# CHIPCryptoPALPSA.cpp uses mbedtls_md_info_from_type() for SPAKE2+.
+config MBEDTLS_MD_C
+	default y if CHIP_CRYPTO_SPAKE2P_MBEDTLS
+
 # Extend the maximum number of PSA key slots to fit Matter requirements
 config MBEDTLS_PSA_KEY_SLOT_COUNT
 	default 64
@@ -132,6 +136,23 @@ config SHELL
 config CHIP_LIB_SHELL
 	default y
 
+config CHIP_WIFI
+	default y if WIFI
+	imply NET_STATISTICS
+	imply NET_IPV6_ND
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_ENABLE_WIFI_STATION
+	default y if CHIP_WIFI
+
+if CHIP_WIFI
+config NET_IF_IPV6_PREFIX_COUNT
+	default NET_IF_UNICAST_IPV6_ADDR_COUNT
+config NET_BUF_DATA_SIZE
+	default 512
+endif
 
 if SHELL
 

@@ -81,7 +81,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
 
     def steps_TC_DA_1_12(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads the Operational Credentials Cluster FeatureMap attribute from the DUT.",
                      "TH verifies that the PQCDA feature bit is set."),
             TestStep(2, "TH reads the PQCDeviceAttestationProfile attribute from the DUT.",

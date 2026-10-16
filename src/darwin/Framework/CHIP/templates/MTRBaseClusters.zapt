@@ -127,10 +127,19 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 #if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
 {{#zcl_enums}}
+{{#if (isInConfigList (concat (asUpperCamelCase ../name preserveAcronyms=true) "::" label) "DarwinPrivateExtensionTypes")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase ../name preserveAcronyms=true)}}
+{{/if}}
 {{> enum_decl cluster=../name name=name enumLabel=label}}
+{{#if (isInConfigList (concat (asUpperCamelCase ../name preserveAcronyms=true) "::" label) "DarwinPrivateExtensionTypes")}}
+#endif
+{{/if}}
 
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
+{{#if (isInConfigList (concat (asUpperCamelCase ../name preserveAcronyms=true) "::" label) "DarwinPrivateExtensionTypes")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase ../name preserveAcronyms=true)}}
+{{/if}}
 {{#*inline "bitmapDef"}}
 typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitmapName}}) {
    {{#zcl_bitmap_items}}
@@ -175,6 +184,9 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 {{/if}}
 {{/inline}}
 {{> oldNameCheck oldBitmapName=(oldName (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true))}}
+{{#if (isInConfigList (concat (asUpperCamelCase ../name preserveAcronyms=true) "::" label) "DarwinPrivateExtensionTypes")}}
+#endif
+{{/if}}
 
 
 {{/zcl_bitmaps}}

@@ -67,7 +67,7 @@ class TC_FAN_2_4(MatterTestCommissionedDevice):
         return "[TC-FAN-2.4] Optional wind attributes with DUT as Server"
 
     def steps_TC_FAN_2_4(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH reads from the DUT the WindSupport attribute.",
                          "Verify that the WindSupport attribute value is a map8 bitmap. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
                 TestStep(3, "[FC] TH reads from the DUT the WindSetting attribute.",
