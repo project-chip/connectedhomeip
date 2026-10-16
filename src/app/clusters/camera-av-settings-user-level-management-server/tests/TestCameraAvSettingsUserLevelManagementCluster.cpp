@@ -689,6 +689,20 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemoveOnlyPresetPersistsE
     EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
     EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
 
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan bytes(buffer);
+    ASSERT_EQ(persistence.ReadValue(path, bytes), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(bytes);
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    Attributes::MPTZPresets::TypeInfo::DecodableType stored;
+    ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
+    size_t storedCount = 0;
+    ASSERT_EQ(stored.ComputeSize(&storedCount), CHIP_NO_ERROR);
+    EXPECT_EQ(storedCount, 0u);
+
     MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
     CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
     restored.SetDelegate(&restoredDelegate);
