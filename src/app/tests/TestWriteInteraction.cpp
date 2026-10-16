@@ -270,6 +270,14 @@ public:
 
 namespace {
 
+enum class ListWriteEndState
+{
+    kNotObserved,
+    kNoExchange,
+    kExchangeWithoutSession,
+    kExchangeWithSession,
+};
+
 class ListWriteNotificationProvider : public TestImCustomDataModel
 {
 public:
@@ -289,15 +297,21 @@ public:
 
         if (operation != DataModel::ListWriteOperation::kListWriteBegin && mExchangeHolder != nullptr)
         {
-            const auto * exchange          = mExchangeHolder->Get();
-            mExchangePresentAtListWriteEnd = exchange != nullptr;
-            mSessionPresentAtListWriteEnd  = exchange != nullptr ? std::make_optional(exchange->HasSessionHandle()) : std::nullopt;
+            const auto * exchange = mExchangeHolder->Get();
+            if (exchange == nullptr)
+            {
+                mListWriteEndState = ListWriteEndState::kNoExchange;
+            }
+            else
+            {
+                mListWriteEndState = exchange->HasSessionHandle() ? ListWriteEndState::kExchangeWithSession
+                                                                  : ListWriteEndState::kExchangeWithoutSession;
+            }
         }
     }
 
     const Messaging::ExchangeHolder * mExchangeHolder = nullptr;
-    std::optional<bool> mExchangePresentAtListWriteEnd;
-    std::optional<bool> mSessionPresentAtListWriteEnd;
+    ListWriteEndState mListWriteEndState               = ListWriteEndState::kNotObserved;
     uint32_t mNotificationCount = 0;
     std::optional<ConcreteAttributePath> mLastPath;
     DataModel::ListWriteOperation mLastOperation = DataModel::ListWriteOperation::kListWriteBegin;
@@ -815,12 +829,16 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
         EXPECT_EQ(provider.mLastOperation,
                   completed ? DataModel::ListWriteOperation::kListWriteSuccess : DataModel::ListWriteOperation::kListWriteFailure);
         EXPECT_EQ(provider.mLastFabric, fabricIndex);
-        EXPECT_EQ(provider.mExchangePresentAtListWriteEnd,
-                  std::make_optional(completed || termination == ListWriteTermination::kSessionReleased));
-        const std::optional<bool> expectedSession = completed       ? std::make_optional(true)
-            : termination == ListWriteTermination::kSessionReleased ? std::make_optional(false)
-                                                                    : std::nullopt;
-        EXPECT_EQ(provider.mSessionPresentAtListWriteEnd, expectedSession);
+        ListWriteEndState expectedState = ListWriteEndState::kNoExchange;
+        if (completed)
+        {
+            expectedState = ListWriteEndState::kExchangeWithSession;
+        }
+        else if (termination == ListWriteTermination::kSessionReleased)
+        {
+            expectedState = ListWriteEndState::kExchangeWithoutSession;
+        }
+        EXPECT_EQ(provider.mListWriteEndState, expectedState);
         EXPECT_FALSE(writeHandler.mProcessingAttributePath.HasValue());
         EXPECT_TRUE(writeHandler.IsFree());
         EXPECT_EQ(writeHandler.GetAccessingFabricIndex(), kUndefinedFabricIndex);
