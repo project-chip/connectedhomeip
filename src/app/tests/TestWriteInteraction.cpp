@@ -744,11 +744,13 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsInFinalChunk)
             ASSERT_FALSE(payload.IsNull());
             ASSERT_SUCCESS(GenerateOptionalFlagWriteRequest(payload, std::nullopt, moreChunks, true));
             GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(exchange);
+            const auto sentBefore = GetLoopback().mSentMessageCount;
             PayloadHeader header;
             header.SetMessageType(MsgType::WriteRequest);
             EXPECT_EQ(exchange->HandleMessage(0, header, {}, std::move(payload)), CHIP_NO_ERROR);
             EXPECT_TRUE(handler.IsFree());
             EXPECT_FALSE(handler.mStateFlags.Has(WriteHandler::StateBits::kHasMoreChunks));
+            EXPECT_EQ(GetLoopback().mSentMessageCount, sentBefore + 1);
             EXPECT_EQ(provider.mNotificationCount, 2u);
             EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteSuccess);
             EXPECT_EQ(provider.mLastFabric, fabric);
