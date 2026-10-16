@@ -27,6 +27,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
 #include <clusters/CameraAvStreamManagement/ClusterId.h>
+#include <clusters/CameraAvStreamManagement/EnumsCheck.h>
 #include <clusters/CameraAvStreamManagement/Ids.h>
 #include <clusters/CameraAvStreamManagement/Metadata.h>
 #include <clusters/shared/EnumsCheck.h>
@@ -1107,6 +1108,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetHardPrivacyModeOn(bool aHardPriva
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNightVision)
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(aNightVision) != TriStateAutoEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mNightVision != aNightVision)
     {
         mNightVision     = aNightVision;
@@ -1122,6 +1125,8 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetNightVision(TriStateAutoEnum aNig
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetNightVisionIllum(TriStateAutoEnum aNightVisionIllum)
 {
+    VerifyOrReturnError(EnsureKnownEnumValue(aNightVisionIllum) != TriStateAutoEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     if (mNightVisionIllum != aNightVisionIllum)
     {
         mNightVisionIllum = aNightVisionIllum;
@@ -1317,7 +1322,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetStatusLightBrightness(Globals::Th
 /**
  * @brief Restores persistent configuration using the context established by Startup().
  *
- * Invalid stored StatusLightBrightness values retain the initialized brightness without rewriting storage.
+ * Invalid stored enum values retain their initialized values without rewriting storage.
  * The delegate receives PersistentAttributesLoadedCallback() after all persistent attributes are loaded.
  */
 void CameraAVStreamManagementCluster::LoadPersistentAttributes()
@@ -1406,7 +1411,8 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
         const uint8_t defaultValue = nightVision;
         if (attrPersistence.LoadNativeEndianValue<uint8_t>(
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVision::Id), nightVision,
-                defaultValue))
+                defaultValue) &&
+            EnsureKnownEnumValue(static_cast<TriStateAutoEnum>(nightVision)) != TriStateAutoEnum::kUnknownEnumValue)
         {
             mNightVision = static_cast<TriStateAutoEnum>(nightVision);
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVision as %d", mPath.mEndpointId,
@@ -1425,7 +1431,8 @@ void CameraAVStreamManagementCluster::LoadPersistentAttributes()
         const uint8_t defaultValue = nightVisionIllum;
         if (attrPersistence.LoadNativeEndianValue<uint8_t>(
                 ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, Attributes::NightVisionIllum::Id),
-                nightVisionIllum, defaultValue))
+                nightVisionIllum, defaultValue) &&
+            EnsureKnownEnumValue(static_cast<TriStateAutoEnum>(nightVisionIllum)) != TriStateAutoEnum::kUnknownEnumValue)
         {
             mNightVisionIllum = static_cast<TriStateAutoEnum>(nightVisionIllum);
             ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Loaded NightVisionIllum as %d", mPath.mEndpointId,
