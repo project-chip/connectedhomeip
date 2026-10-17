@@ -409,9 +409,10 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // The FFI from Python to C when calling a variadic function has issues when the regular, non-variadic, function
-    // arguments are unit16_t. As a result we pass these arguments as size_t and cast them to the expected uint16_t.
+    // arguments are narrow integer types. As a result we pass these arguments as size_t and cast them to their
+    // expected width: uint32_t for the interaction timeout, uint16_t for the others.
     uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
-    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint32_t interactionTimeoutMs = static_cast<uint32_t>(interactionTimeoutMsSizeT);
     uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
@@ -449,7 +450,7 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
-    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint32_t interactionTimeoutMs = static_cast<uint32_t>(interactionTimeoutMsSizeT);
     uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
