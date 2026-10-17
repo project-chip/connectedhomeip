@@ -901,6 +901,7 @@ def main() -> int:
             linux_args.extend([
                 'import("//build_overrides/chip.gni")',
                 'import("${chip_root}/config/standalone/args.gni")',
+                'cpp_standard = "gnu++17"',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_enable_thread = false',
