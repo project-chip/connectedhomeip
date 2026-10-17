@@ -27,6 +27,10 @@
 #include <app/util/config.h>
 #include <clusters/PumpConfigurationAndControl/EnumsCheck.h>
 
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+#include <app/clusters/level-control/level-control.h> // nogncheck
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -164,8 +168,19 @@ static void setEffectiveModes(EndpointId endpoint)
         Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMaximum);
         Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
-        LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
+        Status status = LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
+        if (status == Status::Success)
+        {
+            CHIP_ERROR err = LevelControlServer::SetCurrentLevel(endpoint, maxLevel);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "PCC Server: setting maximum level failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+        else
+        {
+            ChipLogError(Zcl, "PCC Server: reading maximum level failed: 0x%x", to_underlying(status));
+        }
 #endif
         if (isPumpStatusAvailable)
         {
@@ -183,13 +198,24 @@ static void setEffectiveModes(EndpointId endpoint)
         Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMinimum);
         Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
-        if (minLevel == 0)
+        Status status = LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
+        if (status == Status::Success)
         {
-            // Bump the minimum level to 1, since the value of 0 means stop
-            minLevel = 1;
+            if (minLevel == 0)
+            {
+                // Bump the minimum level to 1, since the value of 0 means stop
+                minLevel = 1;
+            }
+            CHIP_ERROR err = LevelControlServer::SetCurrentLevel(endpoint, minLevel);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "PCC Server: setting minimum level failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
-        LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
+        else
+        {
+            ChipLogError(Zcl, "PCC Server: reading minimum level failed: 0x%x", to_underlying(status));
+        }
 #endif
         if (isPumpStatusAvailable)
         {
