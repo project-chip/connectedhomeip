@@ -81,6 +81,7 @@ pw_python_package("matter-idl") {
     "matter/idl/test_matter_idl_parser.py",
     "matter/idl/test_generators.py",
     "matter/idl/test_idl_generator.py",
+    "matter/idl/test_matter_idl_plugin.py",
     "matter/idl/test_supported_types.py",
     "matter/idl/test_zapxml.py",
   ]
