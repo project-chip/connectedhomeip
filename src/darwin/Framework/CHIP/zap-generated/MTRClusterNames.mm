@@ -9615,6 +9615,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentSessions";
             break;
 
+        case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeSupportedSFrameCipherSuitesID:
+            result = @"SupportedSFrameCipherSuites";
+            break;
+
         case MTRAttributeIDTypeClusterWebRTCTransportProviderAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -13586,6 +13590,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
             result = @"EndSession";
+            break;
+
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandUpdateSessionID:
+            result = @"UpdateSession";
             break;
 
         default:

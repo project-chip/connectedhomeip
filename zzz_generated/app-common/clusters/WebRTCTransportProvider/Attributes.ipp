@@ -34,6 +34,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::CurrentSessions::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentSessions);
+    case Attributes::SupportedSFrameCipherSuites::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedSFrameCipherSuites);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
