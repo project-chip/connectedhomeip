@@ -21,6 +21,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <system/SystemClock.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <utility>
 
@@ -35,6 +36,9 @@ namespace {
 // Head-room so the IM exchange outlives our own response timer and can still carry
 // the Status::Timeout back to the commissioner.
 constexpr uint16_t kResponseTimeoutMarginSecs = 5;
+
+// Smallest payload header: exchange flags, opcode, exchange ID and protocol ID.
+constexpr size_t kMinPayloadHeaderLength = 6;
 } // namespace
 
 CommissioningProxySessionManager::SessionSlot * CommissioningProxySessionManager::FindSlot(uint16_t sessionId)
@@ -208,8 +212,40 @@ void CommissioningProxySessionManager::AbortPending(uint16_t sessionId)
     mPendingPool.ReleaseObject(pm);
 }
 
+CHIP_ERROR CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan message)
+{
+    VerifyOrReturnError(!message.empty(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(message.size() <= kMaxProxyMessageLength, CHIP_ERROR_MESSAGE_TOO_LONG);
+
+    PacketHeader packetHeader;
+    uint16_t packetHeaderLength = 0;
+    ReturnErrorOnFailure(packetHeader.Decode(message.data(), message.size(), &packetHeaderLength));
+    ByteSpan payload = message.SubSpan(packetHeaderLength);
+
+    // An encrypted payload header cannot be decoded here, so require room for the
+    // smallest one and the MIC.
+    if (packetHeader.IsEncrypted())
+    {
+        VerifyOrReturnError(payload.size() >= kMinPayloadHeaderLength + packetHeader.MICTagLength(),
+                            CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        return CHIP_NO_ERROR;
+    }
+
+    PayloadHeader payloadHeader;
+    uint16_t payloadHeaderLength = 0;
+    return payloadHeader.Decode(payload.data(), payload.size(), &payloadHeaderLength);
+}
+
 void CommissioningProxySessionManager::DispatchMessageResponse(uint16_t sessionId, const uint8_t * data, size_t length)
 {
+    CHIP_ERROR err = ValidateCommissioneeMessage(ByteSpan(data, length));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "CommissioningProxy: session %u commissionee data not forwarded: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        return;
+    }
+
     SessionSlot * slot = FindSlot(sessionId);
     if (slot == nullptr || slot->pending == nullptr)
     {
